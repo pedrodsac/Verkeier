@@ -8,12 +8,25 @@ struct TransitBottomSheet: View {
 
     var body: some View {
         NavigationStack {
-            BottomSheetContent(
-                viewModel: viewModel,
-                searchQuery: $searchQuery,
-                detent: detent,
-                actions: actions
-            )
+            ZStack(alignment: .top) {
+                BottomSheetContent(
+                    viewModel: viewModel,
+                    searchQuery: $searchQuery,
+                    detent: detent,
+                    actions: actions
+                )
+
+                if viewModel.context == .stopDetail {
+                    StopDetailFloatingActions(
+                        isFavourite: viewModel.stopDetail.isFavourite,
+                        isRefreshDisabled: viewModel.stopDetail.isLoadingDepartures,
+                        toggleFavourite: actions.toggleFavourite,
+                        refreshDepartures: actions.refreshDepartures
+                    )
+                    .padding(.horizontal, 16)
+                    .offset(y: -42)
+                }
+            }
             .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -73,25 +86,10 @@ struct TransitBottomSheet: View {
             }
 
         case .stopDetail:
-            ToolbarItemGroup(placement: .topBarLeading) {
+            ToolbarItem(placement: .topBarLeading) {
                 Button(action: actions.showHome) {
                     Label("Close stop details", systemImage: "chevron.down")
                 }
-
-                Button(action: actions.toggleFavourite) {
-                    Label(
-                        viewModel.stopDetail.isFavourite ? "Remove favourite" : "Save favourite",
-                        systemImage: viewModel.stopDetail.isFavourite ? "star.fill" : "star"
-                    )
-                }
-                .tint(viewModel.stopDetail.isFavourite ? .yellow : nil)
-            }
-
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: actions.refreshDepartures) {
-                    Label("Refresh departures", systemImage: "arrow.clockwise")
-                }
-                .disabled(viewModel.stopDetail.isLoadingDepartures)
             }
 
         case .directions:
@@ -122,5 +120,33 @@ struct TransitBottomSheet: View {
                 }
             }
         }
+    }
+}
+
+private struct StopDetailFloatingActions: View {
+    let isFavourite: Bool
+    let isRefreshDisabled: Bool
+    let toggleFavourite: () -> Void
+    let refreshDepartures: () -> Void
+
+    var body: some View {
+        HStack {
+            Button(action: toggleFavourite) {
+                Label(
+                    isFavourite ? "Remove favourite" : "Save favourite",
+                    systemImage: isFavourite ? "star.fill" : "star"
+                )
+            }
+            .tint(isFavourite ? .yellow : nil)
+
+            Spacer()
+
+            Button(action: refreshDepartures) {
+                Label("Refresh departures", systemImage: "arrow.clockwise")
+            }
+            .disabled(isRefreshDisabled)
+        }
+        .labelStyle(.iconOnly)
+        .buttonStyle(.glass)
     }
 }
