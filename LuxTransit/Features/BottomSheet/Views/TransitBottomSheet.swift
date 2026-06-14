@@ -73,13 +73,11 @@ struct TransitBottomSheet: View {
             }
 
         case .stopDetail:
-            ToolbarItem(placement: .topBarLeading) {
+            ToolbarItemGroup(placement: .topBarLeading) {
                 Button(action: actions.showHome) {
                     Label("Close stop details", systemImage: "chevron.down")
                 }
-            }
 
-            ToolbarItemGroup(placement: .topBarTrailing) {
                 Button(action: actions.toggleFavourite) {
                     Label(
                         viewModel.stopDetail.isFavourite ? "Remove favourite" : "Save favourite",
@@ -87,7 +85,9 @@ struct TransitBottomSheet: View {
                     )
                 }
                 .tint(viewModel.stopDetail.isFavourite ? .yellow : nil)
+            }
 
+            ToolbarItem(placement: .topBarTrailing) {
                 Button(action: actions.refreshDepartures) {
                     Label("Refresh departures", systemImage: "arrow.clockwise")
                 }
