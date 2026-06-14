@@ -15,6 +15,7 @@ struct TransitBottomSheet: View {
                     detent: detent,
                     actions: actions
                 )
+                .padding(.top, viewModel.context == .stopDetail ? 52 : 0)
 
                 if viewModel.context == .stopDetail {
                     StopDetailFloatingActions(
@@ -24,7 +25,7 @@ struct TransitBottomSheet: View {
                         refreshDepartures: actions.refreshDepartures
                     )
                     .padding(.horizontal, 16)
-                    .offset(y: -42)
+                    .padding(.top, 4)
                 }
             }
             .navigationTitle(navigationTitle)
