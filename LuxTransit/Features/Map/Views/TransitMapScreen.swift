@@ -20,6 +20,7 @@ struct TransitMapScreen: View {
     @State private var searchUpdateTask: Task<Void, Never>?
     @State private var nearbyStopsUpdateTask: Task<Void, Never>?
     @State private var shouldCenterOnNextLocation = false
+    @State private var isMainSheetPresented = true
 
     let locationService: LocationService
 
@@ -49,13 +50,29 @@ struct TransitMapScreen: View {
 
                 Spacer()
             }
-
+        }
+        .sheet(isPresented: $isMainSheetPresented) {
             TransitBottomSheet(
-                selectedDetent: $viewModel.sheetDetent,
                 searchQuery: $viewModel.searchQuery,
                 viewModel: sheetPresentationModel,
                 actions: sheetActions
             )
+            .presentationDetents(
+                BottomSheetDetent.presentationDetents,
+                selection: sheetPresentationDetent
+            )
+            .presentationDragIndicator(.visible)
+            .presentationBackground(.regularMaterial)
+            .presentationBackgroundInteraction(
+                .enabled(upThrough: BottomSheetDetent.mediumPresentationDetent)
+            )
+            .presentationCornerRadius(28)
+            .interactiveDismissDisabled()
+        }
+        .onChange(of: isMainSheetPresented) {
+            if !isMainSheetPresented {
+                isMainSheetPresented = true
+            }
         }
         .task {
             locationService.startUpdatingIfAllowed()
@@ -210,6 +227,17 @@ struct TransitMapScreen: View {
                 gtfsUpdateSnapshot: gtfsUpdateController.snapshot,
                 isCheckingGTFSUpdate: gtfsUpdateController.isChecking
             )
+        )
+    }
+
+    private var sheetPresentationDetent: Binding<PresentationDetent> {
+        Binding(
+            get: {
+                viewModel.sheetDetent.presentationDetent
+            },
+            set: { presentationDetent in
+                viewModel.sheetDetent = BottomSheetDetent(presentationDetent: presentationDetent)
+            }
         )
     }
 

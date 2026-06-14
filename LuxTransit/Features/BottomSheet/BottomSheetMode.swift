@@ -27,6 +27,16 @@ enum BottomSheetDetent: CaseIterable {
     case medium
     case expanded
 
+    static let collapsedPresentationDetent = PresentationDetent.height(132)
+    static let mediumPresentationDetent = PresentationDetent.fraction(0.58)
+    static let expandedPresentationDetent = PresentationDetent.large
+
+    static let presentationDetents: Set<PresentationDetent> = [
+        collapsedPresentationDetent,
+        mediumPresentationDetent,
+        expandedPresentationDetent,
+    ]
+
     var accessibilityLabel: String {
         switch self {
         case .collapsed: "Collapsed"
@@ -35,26 +45,24 @@ enum BottomSheetDetent: CaseIterable {
         }
     }
 
-    func detent(after direction: AccessibilityAdjustmentDirection) -> BottomSheetDetent {
-        let detents = Self.allCases
-        guard let currentIndex = detents.firstIndex(of: self) else { return self }
-
-        switch direction {
-        case .increment:
-            return detents[min(currentIndex + 1, detents.endIndex - 1)]
-        case .decrement:
-            return detents[max(currentIndex - 1, detents.startIndex)]
-        @unknown default:
-            return self
+    var presentationDetent: PresentationDetent {
+        switch self {
+        case .collapsed:
+            return Self.collapsedPresentationDetent
+        case .medium:
+            return Self.mediumPresentationDetent
+        case .expanded:
+            return Self.expandedPresentationDetent
         }
     }
 
-    var toggledFromHandleTap: BottomSheetDetent {
-        switch self {
-        case .collapsed, .medium:
-            return .expanded
-        case .expanded:
-            return .medium
+    init(presentationDetent: PresentationDetent) {
+        if presentationDetent == Self.collapsedPresentationDetent {
+            self = .collapsed
+        } else if presentationDetent == Self.expandedPresentationDetent {
+            self = .expanded
+        } else {
+            self = .medium
         }
     }
 }

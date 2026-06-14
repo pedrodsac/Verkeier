@@ -53,9 +53,8 @@ struct BottomSheetContent: View {
                 )
             }
         }
-        .id(viewModel.context)
-        .transition(.opacity)
         .padding(.horizontal, 16)
+        .padding(.top, 8)
         .padding(.bottom, 34)
     }
 }
