@@ -34,7 +34,8 @@ struct TransitBottomSheet: View {
                     refreshDepartures: actions.refreshDepartures
                 )
                 .padding(.horizontal, 16)
-                .offset(y: -42)
+                .padding(.top, 8)
+                .zIndex(1)
             }
         }
     }
