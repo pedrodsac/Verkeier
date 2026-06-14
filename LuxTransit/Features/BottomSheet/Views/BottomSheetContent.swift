@@ -13,16 +13,16 @@ struct BottomSheetContent: View {
             } else {
                 switch viewModel.context {
                 case .home:
-                    VStack(alignment: .leading, spacing: 16) {
-                        BottomSheetSearchButton(query: searchQuery, action: actions.showSearch)
-
-                        CommuteDashboardView(
-                            viewModel: viewModel.commute,
-                            showAlerts: actions.showAlerts,
-                            selectStop: actions.selectStop,
-                            toggleExpansion: actions.toggleFavouriteExpansion
-                        )
-                    }
+                    HomeSheetContent(
+                        query: searchQuery,
+                        detent: detent,
+                        viewModel: viewModel.commute,
+                        showSearch: actions.showSearch,
+                        showSettings: actions.showSettings,
+                        showAlerts: actions.showAlerts,
+                        selectStop: actions.selectStop,
+                        toggleExpansion: actions.toggleFavouriteExpansion
+                    )
                 case .search:
                     SearchView(
                         query: $searchQuery,
@@ -58,6 +58,59 @@ struct BottomSheetContent: View {
         .padding(.horizontal, 16)
         .padding(.top, 0)
         .padding(.bottom, detent == .collapsed ? 0 : 34)
+    }
+}
+
+private struct HomeSheetContent: View {
+    let query: String
+    let detent: BottomSheetDetent
+    let viewModel: CommuteDashboardViewModel
+    let showSearch: () -> Void
+    let showSettings: () -> Void
+    let showAlerts: () -> Void
+    let selectStop: (Stop) -> Void
+    let toggleExpansion: (String) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: detent == .medium ? 22 : 16) {
+            if detent == .medium {
+                mediumHeader
+            } else {
+                BottomSheetSearchButton(query: query, action: showSearch)
+            }
+
+            CommuteDashboardView(
+                viewModel: viewModel,
+                displayStyle: detent == .medium ? .mapsMedium : .regular,
+                showAlerts: showAlerts,
+                selectStop: selectStop,
+                toggleExpansion: toggleExpansion
+            )
+        }
+    }
+
+    private var mediumHeader: some View {
+        HStack(spacing: 12) {
+            BottomSheetSearchButton(query: query, style: .medium, action: showSearch)
+
+            Button(action: showSettings) {
+                Image(systemName: "ellipsis")
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(.primary)
+                    .frame(width: 52, height: 52)
+                    .background(.background.opacity(0.86), in: Circle())
+                    .overlay {
+                        Circle()
+                            .stroke(.separator.opacity(0.22), lineWidth: 0.5)
+                    }
+                    .shadow(color: .black.opacity(0.08), radius: 10, y: 2)
+                    .contentShape(Circle())
+                    .accessibilityHidden(true)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Settings and information")
+        }
+        .padding(.top, 2)
     }
 }
 
@@ -109,11 +162,13 @@ private struct BottomSheetSearchButton: View {
 
     enum SearchButtonStyle {
         case regular
+        case medium
         case collapsed
 
         var height: CGFloat {
             switch self {
             case .regular: 44
+            case .medium: 52
             case .collapsed: 52
             }
         }
@@ -121,6 +176,7 @@ private struct BottomSheetSearchButton: View {
         var horizontalPadding: CGFloat {
             switch self {
             case .regular: 12
+            case .medium: 18
             case .collapsed: 18
             }
         }
@@ -128,6 +184,7 @@ private struct BottomSheetSearchButton: View {
         var cornerRadius: CGFloat {
             switch self {
             case .regular: 12
+            case .medium: 26
             case .collapsed: 26
             }
         }
@@ -135,6 +192,7 @@ private struct BottomSheetSearchButton: View {
         var iconFont: Font {
             switch self {
             case .regular: .body.weight(.semibold)
+            case .medium: .title3.weight(.semibold)
             case .collapsed: .title3.weight(.semibold)
             }
         }
@@ -142,6 +200,7 @@ private struct BottomSheetSearchButton: View {
         var textFont: Font {
             switch self {
             case .regular: .body
+            case .medium: .title3
             case .collapsed: .title3
             }
         }
@@ -149,6 +208,7 @@ private struct BottomSheetSearchButton: View {
         var background: AnyShapeStyle {
             switch self {
             case .regular: AnyShapeStyle(.quaternary.opacity(0.7))
+            case .medium: AnyShapeStyle(.background.opacity(0.86))
             case .collapsed: AnyShapeStyle(.background.opacity(0.86))
             }
         }
@@ -156,6 +216,7 @@ private struct BottomSheetSearchButton: View {
         var strokeOpacity: Double {
             switch self {
             case .regular: 0
+            case .medium: 0.22
             case .collapsed: 0.22
             }
         }
@@ -163,6 +224,7 @@ private struct BottomSheetSearchButton: View {
         var shadowOpacity: Double {
             switch self {
             case .regular: 0
+            case .medium: 0.08
             case .collapsed: 0.08
             }
         }
@@ -170,6 +232,7 @@ private struct BottomSheetSearchButton: View {
         var shadowRadius: CGFloat {
             switch self {
             case .regular: 0
+            case .medium: 10
             case .collapsed: 10
             }
         }
@@ -177,6 +240,7 @@ private struct BottomSheetSearchButton: View {
         var shadowY: CGFloat {
             switch self {
             case .regular: 0
+            case .medium: 2
             case .collapsed: 2
             }
         }

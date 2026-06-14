@@ -28,6 +28,7 @@ struct TransitBottomSheet: View {
 
     private var shouldHideNavigationBar: Bool {
         detent == .collapsed || viewModel.context == .search
+            || (detent == .medium && viewModel.context == .home)
     }
 
     private var navigationTitle: String {
