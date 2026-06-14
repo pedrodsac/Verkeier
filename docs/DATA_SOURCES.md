@@ -49,6 +49,22 @@ MVP approach:
 - sample/mock data is acceptable until real feed processing is added
 - do not build full GTFS journey planning in MVP unless simple and reliable
 
+Source:
+
+- `https://data.public.lu/en/datasets/horaires-et-arrets-des-transport-publics-gtfs/`
+
+The current dataset page exposes dated ZIP resources such as:
+
+- `https://download.data.public.lu/resources/horaires-et-arrets-des-transport-publics-gtfs/20260610-065644/gtfs-20260609-20260823.zip`
+
+Preprocessing:
+
+```sh
+python3 Scripts/preprocess_gtfs.py /path/to/gtfs.zip LuxTransit/Resources/gtfs-compact.json
+```
+
+The app loads cached/generated GTFS data when available. It does not fall back to bundled sample stops; if no GTFS data has been fetched or bundled, GTFS stop results remain empty.
+
 ## AVL Autobus
 
 Purpose:
@@ -63,6 +79,12 @@ Implementation rules:
 - handle empty or malformed data safely
 - show source attribution
 - if mapping alerts to stops/lines is uncertain, show general alerts first
+
+Default MVP feed:
+
+- `https://web.vdl.lu/autobus/data/messages/messages.xml`
+
+The dataset is published by Ville de Luxembourg as "Mobilité - AVL Autobus" on data.public.lu. The XML contains `Message` records with start/end dates, urgency/category, titles/text, and affected line/stop elements.
 
 ## MapKit / Apple Maps
 
