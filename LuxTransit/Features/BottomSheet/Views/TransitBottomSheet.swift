@@ -7,36 +7,35 @@ struct TransitBottomSheet: View {
     let actions: TransitSheetActions
 
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .top) {
+        ZStack(alignment: .top) {
+            NavigationStack {
                 BottomSheetContent(
                     viewModel: viewModel,
                     searchQuery: $searchQuery,
                     detent: detent,
                     actions: actions
                 )
-                .padding(.top, viewModel.context == .stopDetail ? 52 : 0)
-
-                if viewModel.context == .stopDetail {
-                    StopDetailFloatingActions(
-                        isFavourite: viewModel.stopDetail.isFavourite,
-                        isRefreshDisabled: viewModel.stopDetail.isLoadingDepartures,
-                        toggleFavourite: actions.toggleFavourite,
-                        refreshDepartures: actions.refreshDepartures
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.top, 4)
+                .navigationTitle(navigationTitle)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    toolbarContent
                 }
+                .toolbarVisibility(shouldHideNavigationBar ? .hidden : .visible, for: .navigationBar)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel(viewModel.context.accessibilityLabel)
             }
-            .navigationTitle(navigationTitle)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                toolbarContent
+
+            if viewModel.context == .stopDetail {
+                StopDetailFloatingActions(
+                    isFavourite: viewModel.stopDetail.isFavourite,
+                    isRefreshDisabled: viewModel.stopDetail.isLoadingDepartures,
+                    toggleFavourite: actions.toggleFavourite,
+                    refreshDepartures: actions.refreshDepartures
+                )
+                .padding(.horizontal, 16)
+                .offset(y: -42)
             }
-            .toolbarVisibility(shouldHideNavigationBar ? .hidden : .visible, for: .navigationBar)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .accessibilityElement(children: .contain)
-            .accessibilityLabel(viewModel.context.accessibilityLabel)
         }
     }
 
