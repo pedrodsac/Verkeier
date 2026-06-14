@@ -67,7 +67,7 @@ private struct CollapsedSearchContent: View {
 
     var body: some View {
         VStack {
-            BottomSheetSearchButton(query: query, action: action)
+            BottomSheetSearchButton(query: query, style: .collapsed, action: action)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
@@ -75,29 +75,110 @@ private struct CollapsedSearchContent: View {
 
 private struct BottomSheetSearchButton: View {
     let query: String
+    var style: SearchButtonStyle = .regular
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 9) {
                 Image(systemName: "magnifyingglass")
-                    .font(.body.weight(.semibold))
+                    .font(style.iconFont)
                     .foregroundStyle(.secondary)
                     .accessibilityHidden(true)
 
                 Text(query.isEmpty ? "Search Maps" : query)
-                    .font(.body)
+                    .font(style.textFont)
                     .foregroundStyle(query.isEmpty ? .secondary : .primary)
                     .lineLimit(1)
 
                 Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity, minHeight: 44)
-            .padding(.horizontal, 12)
-            .background(.quaternary.opacity(0.7), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .frame(maxWidth: .infinity, minHeight: style.height)
+            .padding(.horizontal, style.horizontalPadding)
+            .background(style.background, in: RoundedRectangle(cornerRadius: style.cornerRadius, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: style.cornerRadius, style: .continuous)
+                    .stroke(.separator.opacity(style.strokeOpacity), lineWidth: 0.5)
+            }
+            .shadow(color: .black.opacity(style.shadowOpacity), radius: style.shadowRadius, y: style.shadowY)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Search stops")
+    }
+
+    enum SearchButtonStyle {
+        case regular
+        case collapsed
+
+        var height: CGFloat {
+            switch self {
+            case .regular: 44
+            case .collapsed: 52
+            }
+        }
+
+        var horizontalPadding: CGFloat {
+            switch self {
+            case .regular: 12
+            case .collapsed: 18
+            }
+        }
+
+        var cornerRadius: CGFloat {
+            switch self {
+            case .regular: 12
+            case .collapsed: 26
+            }
+        }
+
+        var iconFont: Font {
+            switch self {
+            case .regular: .body.weight(.semibold)
+            case .collapsed: .title3.weight(.semibold)
+            }
+        }
+
+        var textFont: Font {
+            switch self {
+            case .regular: .body
+            case .collapsed: .title3
+            }
+        }
+
+        var background: AnyShapeStyle {
+            switch self {
+            case .regular: AnyShapeStyle(.quaternary.opacity(0.7))
+            case .collapsed: AnyShapeStyle(.background.opacity(0.86))
+            }
+        }
+
+        var strokeOpacity: Double {
+            switch self {
+            case .regular: 0
+            case .collapsed: 0.22
+            }
+        }
+
+        var shadowOpacity: Double {
+            switch self {
+            case .regular: 0
+            case .collapsed: 0.08
+            }
+        }
+
+        var shadowRadius: CGFloat {
+            switch self {
+            case .regular: 0
+            case .collapsed: 10
+            }
+        }
+
+        var shadowY: CGFloat {
+            switch self {
+            case .regular: 0
+            case .collapsed: 2
+            }
+        }
     }
 }
