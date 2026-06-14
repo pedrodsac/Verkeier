@@ -41,6 +41,24 @@ struct TransitMapScreen: View {
 
                 Spacer()
             }
+
+            if let selectedStop = viewModel.selectedStop, viewModel.sheetContext == .stopDetail {
+                GeometryReader { geometryProxy in
+                    VStack {
+                        Spacer()
+
+                        StopDetailFloatingActions(
+                            isFavourite: isFavourite(selectedStop),
+                            isRefreshDisabled: viewModel.isLoadingDepartures,
+                            toggleFavourite: toggleSelectedFavourite,
+                            refreshDepartures: refreshDepartures
+                        )
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, floatingActionsBottomPadding(in: geometryProxy.size.height))
+                    }
+                }
+                .zIndex(10)
+            }
         }
         .sheet(isPresented: $isMainSheetPresented) {
             TransitBottomSheet(
@@ -369,6 +387,17 @@ struct TransitMapScreen: View {
         }
     }
 
+    private func floatingActionsBottomPadding(in height: CGFloat) -> CGFloat {
+        switch viewModel.sheetDetent {
+        case .collapsed:
+            return 72
+        case .medium:
+            return max((height * 0.50) - 24, 0)
+        case .expanded:
+            return max(height - 96, 0)
+        }
+    }
+
     private func updateSearch() {
         searchUpdateTask?.cancel()
         viewModel.searchStops(using: gtfsService)
@@ -471,6 +500,34 @@ struct TransitMapScreen: View {
             viewModel.searchStops(using: gtfsService)
             viewModel.showSearch()
         }
+    }
+}
+
+private struct StopDetailFloatingActions: View {
+    let isFavourite: Bool
+    let isRefreshDisabled: Bool
+    let toggleFavourite: () -> Void
+    let refreshDepartures: () -> Void
+
+    var body: some View {
+        HStack {
+            Button(action: toggleFavourite) {
+                Label(
+                    isFavourite ? "Remove favourite" : "Save favourite",
+                    systemImage: isFavourite ? "star.fill" : "star"
+                )
+            }
+            .tint(isFavourite ? .yellow : nil)
+
+            Spacer()
+
+            Button(action: refreshDepartures) {
+                Label("Refresh departures", systemImage: "arrow.clockwise")
+            }
+            .disabled(isRefreshDisabled)
+        }
+        .labelStyle(.iconOnly)
+        .buttonStyle(.glass)
     }
 }
 

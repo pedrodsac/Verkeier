@@ -7,36 +7,22 @@ struct TransitBottomSheet: View {
     let actions: TransitSheetActions
 
     var body: some View {
-        ZStack(alignment: .top) {
-            NavigationStack {
-                BottomSheetContent(
-                    viewModel: viewModel,
-                    searchQuery: $searchQuery,
-                    detent: detent,
-                    actions: actions
-                )
-                .navigationTitle(navigationTitle)
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    toolbarContent
-                }
-                .toolbarVisibility(shouldHideNavigationBar ? .hidden : .visible, for: .navigationBar)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .accessibilityElement(children: .contain)
-                .accessibilityLabel(viewModel.context.accessibilityLabel)
+        NavigationStack {
+            BottomSheetContent(
+                viewModel: viewModel,
+                searchQuery: $searchQuery,
+                detent: detent,
+                actions: actions
+            )
+            .navigationTitle(navigationTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                toolbarContent
             }
-
-            if viewModel.context == .stopDetail {
-                StopDetailFloatingActions(
-                    isFavourite: viewModel.stopDetail.isFavourite,
-                    isRefreshDisabled: viewModel.stopDetail.isLoadingDepartures,
-                    toggleFavourite: actions.toggleFavourite,
-                    refreshDepartures: actions.refreshDepartures
-                )
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .zIndex(1)
-            }
+            .toolbarVisibility(shouldHideNavigationBar ? .hidden : .visible, for: .navigationBar)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel(viewModel.context.accessibilityLabel)
         }
     }
 
@@ -121,33 +107,5 @@ struct TransitBottomSheet: View {
                 }
             }
         }
-    }
-}
-
-private struct StopDetailFloatingActions: View {
-    let isFavourite: Bool
-    let isRefreshDisabled: Bool
-    let toggleFavourite: () -> Void
-    let refreshDepartures: () -> Void
-
-    var body: some View {
-        HStack {
-            Button(action: toggleFavourite) {
-                Label(
-                    isFavourite ? "Remove favourite" : "Save favourite",
-                    systemImage: isFavourite ? "star.fill" : "star"
-                )
-            }
-            .tint(isFavourite ? .yellow : nil)
-
-            Spacer()
-
-            Button(action: refreshDepartures) {
-                Label("Refresh departures", systemImage: "arrow.clockwise")
-            }
-            .disabled(isRefreshDisabled)
-        }
-        .labelStyle(.iconOnly)
-        .buttonStyle(.glass)
     }
 }
