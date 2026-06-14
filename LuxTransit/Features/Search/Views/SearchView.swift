@@ -5,11 +5,12 @@ struct SearchView: View {
     let viewModel: SearchPresentationModel
     let updateSearch: () -> Void
     let selectStop: (Stop) -> Void
+    let cancel: () -> Void
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            searchField
+            searchHeader
 
             if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 NearbySearchSuggestions(
@@ -39,12 +40,23 @@ struct SearchView: View {
         }
     }
 
+    private var searchHeader: some View {
+        HStack(spacing: 12) {
+            searchField
+
+            Button("Cancel", action: cancel)
+                .font(.body)
+                .foregroundStyle(.blue)
+        }
+    }
+
     private var searchField: some View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
+                .font(.body.weight(.semibold))
                 .foregroundStyle(.secondary)
                 .accessibilityHidden(true)
-            TextField("Search stops", text: $query)
+            TextField("Search Maps", text: $query)
                 .textInputAutocapitalization(.words)
                 .autocorrectionDisabled()
                 .focused($isSearchFocused)
@@ -64,13 +76,9 @@ struct SearchView: View {
                 .accessibilityLabel("Clear search")
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(.separator.opacity(0.28), lineWidth: 0.5)
-        }
+        .frame(maxWidth: .infinity, minHeight: 44)
+        .padding(.horizontal, 12)
+        .background(.quaternary.opacity(0.7), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private var resultsList: some View {
@@ -135,6 +143,7 @@ private struct NearbySearchSuggestions: View {
             isLoadingNearbySuggestions: false
         ),
         updateSearch: {},
-        selectStop: { _ in }
+        selectStop: { _ in },
+        cancel: {}
     )
 }

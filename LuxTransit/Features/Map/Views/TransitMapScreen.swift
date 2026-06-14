@@ -28,17 +28,7 @@ struct TransitMapScreen: View {
         ZStack(alignment: .bottom) {
             map
 
-            VStack(spacing: 12) {
-                FloatingMapSearchBar(
-                    query: viewModel.searchQuery,
-                    activeAlertCount: viewModel.activeAlertCount,
-                    showSearch: showSearch,
-                    showAlerts: showAlerts,
-                    showSettings: showSettings
-                )
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
-
+            VStack {
                 HStack {
                     Spacer()
                     LocationPermissionButton(
@@ -46,6 +36,7 @@ struct TransitMapScreen: View {
                         requestLocation: requestLocation
                     )
                     .padding(.trailing, 16)
+                    .padding(.top, 12)
                 }
 
                 Spacer()
@@ -275,6 +266,7 @@ struct TransitMapScreen: View {
         TransitSheetActions(
             selectStop: selectStop,
             showHome: showHome,
+            showSearch: showSearch,
             showAlerts: showAlerts,
             showStopDetail: showStopDetail,
             showDirections: showDirections,
@@ -478,78 +470,6 @@ struct TransitMapScreen: View {
             viewModel.searchStops(using: gtfsService)
             viewModel.showSearch()
         }
-    }
-}
-
-private struct FloatingMapSearchBar: View {
-    let query: String
-    let activeAlertCount: Int
-    let showSearch: () -> Void
-    let showAlerts: () -> Void
-    let showSettings: () -> Void
-
-    var body: some View {
-        HStack(spacing: 10) {
-            Button(action: showSearch) {
-                HStack(spacing: 10) {
-                    Image(systemName: "magnifyingglass")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                        .accessibilityHidden(true)
-                    Text(query.isEmpty ? "Where to?" : query)
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(query.isEmpty ? .secondary : .primary)
-                        .lineLimit(1)
-                    Spacer(minLength: 0)
-                }
-                .frame(maxWidth: .infinity, minHeight: 44)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Search stops")
-
-            if activeAlertCount > 0 {
-                Button(action: showAlerts) {
-                    ZStack(alignment: .topTrailing) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(.orange)
-                            .accessibilityHidden(true)
-                        Text("\(min(activeAlertCount, 9))")
-                            .font(.caption2.weight(.bold))
-                            .foregroundStyle(.white)
-                            .padding(4)
-                            .background(.red, in: Circle())
-                            .offset(x: 6, y: -4)
-                            .accessibilityHidden(true)
-                    }
-                    .frame(width: 44, height: 44)
-                    .contentShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Show alerts")
-            }
-
-            Button(action: showSettings) {
-                Image(systemName: "ellipsis")
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(.primary)
-                    .frame(width: 44, height: 44)
-                    .contentShape(Circle())
-                    .accessibilityHidden(true)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Settings and information")
-        }
-        .padding(.leading, 16)
-        .padding(.trailing, 6)
-        .padding(.vertical, 6)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.white.opacity(0.34), lineWidth: 0.5)
-        }
-        .shadow(color: .black.opacity(0.14), radius: 16, y: 6)
     }
 }
 

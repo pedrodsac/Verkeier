@@ -14,6 +14,7 @@ struct TransitSheetPresentationModel {
 struct TransitSheetActions {
     let selectStop: (Stop) -> Void
     let showHome: () -> Void
+    let showSearch: () -> Void
     let showAlerts: () -> Void
     let showStopDetail: () -> Void
     let showDirections: () -> Void

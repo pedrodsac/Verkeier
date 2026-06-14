@@ -17,6 +17,7 @@ struct TransitBottomSheet: View {
             .toolbar {
                 toolbarContent
             }
+            .toolbarVisibility(viewModel.context == .search ? .hidden : .visible, for: .navigationBar)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .accessibilityElement(children: .contain)
             .accessibilityLabel(viewModel.context.accessibilityLabel)
@@ -61,7 +62,7 @@ struct TransitBottomSheet: View {
 
         case .search:
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Cancel", action: actions.showHome)
+                EmptyView()
             }
 
         case .stopDetail:
