@@ -45,6 +45,7 @@ struct TransitMapScreen: View {
         .sheet(isPresented: $isMainSheetPresented) {
             TransitBottomSheet(
                 searchQuery: $viewModel.searchQuery,
+                detent: viewModel.sheetDetent,
                 viewModel: sheetPresentationModel,
                 actions: sheetActions
             )

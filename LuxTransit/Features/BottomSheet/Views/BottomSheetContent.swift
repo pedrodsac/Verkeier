@@ -3,55 +3,73 @@ import SwiftUI
 struct BottomSheetContent: View {
     let viewModel: TransitSheetPresentationModel
     @Binding var searchQuery: String
+    let detent: BottomSheetDetent
     let actions: TransitSheetActions
 
     var body: some View {
         Group {
-            switch viewModel.context {
-            case .home:
-                VStack(alignment: .leading, spacing: 16) {
-                    BottomSheetSearchButton(query: searchQuery, action: actions.showSearch)
+            if detent == .collapsed {
+                CollapsedSearchContent(query: searchQuery, action: actions.showSearch)
+            } else {
+                switch viewModel.context {
+                case .home:
+                    VStack(alignment: .leading, spacing: 16) {
+                        BottomSheetSearchButton(query: searchQuery, action: actions.showSearch)
 
-                    CommuteDashboardView(
-                        viewModel: viewModel.commute,
-                        showAlerts: actions.showAlerts,
+                        CommuteDashboardView(
+                            viewModel: viewModel.commute,
+                            showAlerts: actions.showAlerts,
+                            selectStop: actions.selectStop,
+                            toggleExpansion: actions.toggleFavouriteExpansion
+                        )
+                    }
+                case .search:
+                    SearchView(
+                        query: $searchQuery,
+                        viewModel: viewModel.search,
+                        updateSearch: actions.updateSearch,
                         selectStop: actions.selectStop,
-                        toggleExpansion: actions.toggleFavouriteExpansion
+                        cancel: actions.showHome
+                    )
+                case .stopDetail:
+                    StopDetailView(
+                        viewModel: viewModel.stopDetail,
+                        openDirections: actions.showDirections,
+                        trackDeparture: actions.trackDeparture
+                    )
+                case .directions:
+                    RouteView(
+                        viewModel: viewModel.route,
+                        calculateRoute: actions.calculateRoute,
+                        openInAppleMaps: actions.openRouteInAppleMaps
+                    )
+                case .alerts:
+                    AlertsView(
+                        viewModel: viewModel.alerts
+                    )
+                case .settings:
+                    SettingsView(
+                        viewModel: viewModel.settings,
+                        checkGTFSUpdate: actions.checkGTFSUpdate
                     )
                 }
-            case .search:
-                SearchView(
-                    query: $searchQuery,
-                    viewModel: viewModel.search,
-                    updateSearch: actions.updateSearch,
-                    selectStop: actions.selectStop,
-                    cancel: actions.showHome
-                )
-            case .stopDetail:
-                StopDetailView(
-                    viewModel: viewModel.stopDetail,
-                    openDirections: actions.showDirections,
-                    trackDeparture: actions.trackDeparture
-                )
-            case .directions:
-                RouteView(
-                    viewModel: viewModel.route,
-                    calculateRoute: actions.calculateRoute,
-                    openInAppleMaps: actions.openRouteInAppleMaps
-                )
-            case .alerts:
-                AlertsView(
-                    viewModel: viewModel.alerts
-                )
-            case .settings:
-                SettingsView(
-                    viewModel: viewModel.settings,
-                    checkGTFSUpdate: actions.checkGTFSUpdate
-                )
             }
         }
         .padding(.horizontal, 16)
-        .padding(.bottom, 34)
+        .padding(.top, 0)
+        .padding(.bottom, detent == .collapsed ? 0 : 34)
+    }
+}
+
+private struct CollapsedSearchContent: View {
+    let query: String
+    let action: () -> Void
+
+    var body: some View {
+        VStack {
+            BottomSheetSearchButton(query: query, action: action)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
 }
 

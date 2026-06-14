@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TransitBottomSheet: View {
     @Binding var searchQuery: String
+    let detent: BottomSheetDetent
     let viewModel: TransitSheetPresentationModel
     let actions: TransitSheetActions
 
@@ -10,6 +11,7 @@ struct TransitBottomSheet: View {
             BottomSheetContent(
                 viewModel: viewModel,
                 searchQuery: $searchQuery,
+                detent: detent,
                 actions: actions
             )
             .navigationTitle(navigationTitle)
@@ -17,11 +19,15 @@ struct TransitBottomSheet: View {
             .toolbar {
                 toolbarContent
             }
-            .toolbarVisibility(viewModel.context == .search ? .hidden : .visible, for: .navigationBar)
+            .toolbarVisibility(shouldHideNavigationBar ? .hidden : .visible, for: .navigationBar)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .accessibilityElement(children: .contain)
             .accessibilityLabel(viewModel.context.accessibilityLabel)
         }
+    }
+
+    private var shouldHideNavigationBar: Bool {
+        detent == .collapsed || viewModel.context == .search
     }
 
     private var navigationTitle: String {
