@@ -3,7 +3,6 @@ import SwiftUI
 struct SettingsView: View {
     let viewModel: SettingsPresentationModel
     let checkGTFSUpdate: () -> Void
-    let close: () -> Void
 
     private var configuration: AppConfiguration {
         viewModel.configuration
@@ -12,23 +11,6 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                HStack(spacing: 12) {
-                    Button(action: close) {
-                        Image(systemName: "chevron.down")
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(.primary)
-                            .frame(width: 44, height: 44)
-                            .background(.thinMaterial, in: Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Close settings")
-
-                    Text("Settings")
-                        .font(.title2.weight(.semibold))
-
-                    Spacer(minLength: 0)
-                }
-
                 SettingsSection(title: "Attribution") {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Transport data:")
@@ -231,7 +213,6 @@ private struct DiagnosticRow: View {
             gtfsUpdateSnapshot: .empty,
             isCheckingGTFSUpdate: false
         ),
-        checkGTFSUpdate: {},
-        close: {}
+        checkGTFSUpdate: {}
     )
 }

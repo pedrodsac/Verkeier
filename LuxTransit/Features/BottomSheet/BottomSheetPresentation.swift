@@ -17,6 +17,7 @@ struct TransitSheetActions {
     let showAlerts: () -> Void
     let showStopDetail: () -> Void
     let showDirections: () -> Void
+    let showSettings: () -> Void
     let toggleFavourite: () -> Void
     let toggleFavouriteExpansion: (String) -> Void
     let refreshDepartures: () -> Void

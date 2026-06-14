@@ -2,11 +2,8 @@ import SwiftUI
 
 struct StopDetailView: View {
     let viewModel: StopDetailPresentationModel
-    let toggleFavourite: () -> Void
-    let refresh: () -> Void
     let openDirections: () -> Void
     let trackDeparture: (Departure) -> Void
-    let close: () -> Void
 
     var body: some View {
         if let stop = viewModel.stop {
@@ -14,12 +11,7 @@ struct StopDetailView: View {
                 StopDetailHeader(
                     stop: stop,
                     routes: viewModel.routes,
-                    isFavourite: viewModel.isFavourite,
-                    toggleFavourite: toggleFavourite,
-                    refresh: refresh,
-                    openDirections: openDirections,
-                    isLoadingDepartures: viewModel.isLoadingDepartures,
-                    close: close
+                    openDirections: openDirections
                 )
 
                 if let liveActivityErrorMessage = viewModel.liveActivityErrorMessage {
@@ -59,52 +51,31 @@ struct StopDetailView: View {
 private struct StopDetailHeader: View {
     let stop: Stop
     let routes: [TransitRoute]
-    let isFavourite: Bool
-    let toggleFavourite: () -> Void
-    let refresh: () -> Void
     let openDirections: () -> Void
-    let isLoadingDepartures: Bool
-    let close: () -> Void
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(alignment: .top, spacing: 12) {
-                    Image(systemName: iconName(for: stop))
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 40, height: 40)
-                        .background(color(for: stop).gradient, in: Circle())
-                        .accessibilityHidden(true)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: iconName(for: stop))
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 40, height: 40)
+                    .background(color(for: stop).gradient, in: Circle())
+                    .accessibilityHidden(true)
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(stop.name)
-                            .font(.title2.weight(.bold))
-                            .foregroundStyle(.primary)
-                            .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        Text(stop.locality ?? stop.dataSource.displayName)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(stop.locality ?? stop.dataSource.displayName)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
                 }
-
-                StopMetadataPanel(routes: routes)
-
-                DirectionsButton(openDirections: openDirections)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
 
-            HeaderActionRail(
-                isFavourite: isFavourite,
-                isLoadingDepartures: isLoadingDepartures,
-                toggleFavourite: toggleFavourite,
-                refresh: refresh,
-                close: close
-            )
+            StopMetadataPanel(routes: routes)
+
+            DirectionsButton(openDirections: openDirections)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func iconName(for stop: Stop) -> String {
@@ -118,90 +89,6 @@ private struct StopDetailHeader: View {
         if stop.modes.contains(.train) { return .red }
         if stop.modes.contains(.tram) { return .orange }
         return .blue
-    }
-}
-
-private struct HeaderActionRail: View {
-    let isFavourite: Bool
-    let isLoadingDepartures: Bool
-    let toggleFavourite: () -> Void
-    let refresh: () -> Void
-    let close: () -> Void
-
-    var body: some View {
-        VStack(spacing: 8) {
-            HeaderIconButton(
-                systemImage: isFavourite ? "star.fill" : "star",
-                accessibilityLabel: isFavourite ? "Remove favourite" : "Save favourite",
-                isHighlighted: isFavourite,
-                action: toggleFavourite
-            )
-
-            HeaderIconButton(
-                systemImage: "arrow.clockwise",
-                accessibilityLabel: "Refresh departures",
-                isDisabled: isLoadingDepartures,
-                action: refresh
-            )
-
-            HeaderIconButton(
-                systemImage: "chevron.down",
-                accessibilityLabel: "Close stop details",
-                action: close
-            )
-        }
-        .frame(width: 38)
-    }
-}
-
-private struct HeaderIconButton: View {
-    let systemImage: String
-    let accessibilityLabel: String
-    var isProminent = false
-    var isHighlighted = false
-    var isDisabled = false
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: systemImage)
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(foregroundStyle)
-                .frame(width: 38, height: 38)
-                .background(backgroundStyle)
-                .overlay {
-                    Circle().stroke(borderStyle, lineWidth: 0.7)
-                }
-                .contentShape(Circle())
-                .accessibilityHidden(true)
-        }
-        .buttonStyle(.plain)
-        .disabled(isDisabled)
-        .opacity(isDisabled ? 0.55 : 1)
-        .accessibilityLabel(accessibilityLabel)
-    }
-
-    private var foregroundStyle: Color {
-        if isProminent { return .white }
-        if isHighlighted { return .yellow }
-        return .primary
-    }
-
-    @ViewBuilder
-    private var backgroundStyle: some View {
-        if isProminent {
-            Circle().fill(.blue)
-        } else if isHighlighted {
-            Circle().fill(.yellow.opacity(0.14))
-        } else {
-            Circle().fill(.thinMaterial)
-        }
-    }
-
-    private var borderStyle: Color {
-        if isProminent { return .blue.opacity(0.16) }
-        if isHighlighted { return .yellow.opacity(0.28) }
-        return .secondary.opacity(0.24)
     }
 }
 

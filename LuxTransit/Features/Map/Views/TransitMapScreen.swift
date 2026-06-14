@@ -278,6 +278,7 @@ struct TransitMapScreen: View {
             showAlerts: showAlerts,
             showStopDetail: showStopDetail,
             showDirections: showDirections,
+            showSettings: showSettings,
             toggleFavourite: toggleSelectedFavourite,
             toggleFavouriteExpansion: toggleFavouriteExpansion,
             refreshDepartures: refreshDepartures,

@@ -5,19 +5,11 @@ struct SearchView: View {
     let viewModel: SearchPresentationModel
     let updateSearch: () -> Void
     let selectStop: (Stop) -> Void
-    let close: () -> Void
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 10) {
-                searchField
-                Button("Cancel", action: close)
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(.blue)
-                    .frame(minHeight: 44)
-                    .accessibilityLabel("Close search")
-            }
+            searchField
 
             if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 NearbySearchSuggestions(
@@ -143,7 +135,6 @@ private struct NearbySearchSuggestions: View {
             isLoadingNearbySuggestions: false
         ),
         updateSearch: {},
-        selectStop: { _ in },
-        close: {}
+        selectStop: { _ in }
     )
 }

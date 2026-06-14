@@ -8,7 +8,9 @@ struct CommuteDashboardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            header
+            Text(viewModel.hasFavourites ? viewModel.statusText : "Stops around you")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
 
             if viewModel.activeAlertCount > 0 {
                 AlertsSummaryRow(alertCount: viewModel.activeAlertCount, action: showAlerts)
@@ -21,16 +23,6 @@ struct CommuteDashboardView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(viewModel.hasFavourites ? "Commute" : "Nearby")
-                .font(.title2.weight(.bold))
-            Text(viewModel.hasFavourites ? viewModel.statusText : "Stops around you")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
     }
 
     private var favouritesContent: some View {

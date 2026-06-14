@@ -4,11 +4,18 @@ struct RouteView: View {
     let viewModel: RoutePresentationModel
     let calculateRoute: () -> Void
     let openInAppleMaps: () -> Void
-    let close: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            header
+            if let selectedStop = viewModel.selectedStop {
+                Text("To \(selectedStop.name)")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Choose a stop from the map, favourites, nearby suggestions, or search.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
 
             if let errorMessage = viewModel.errorMessage {
                 Label(errorMessage, systemImage: "exclamationmark.triangle.fill")
@@ -48,34 +55,6 @@ struct RouteView: View {
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var header: some View {
-        HStack(alignment: .center, spacing: 12) {
-            Button(action: close) {
-                Image(systemName: "chevron.left")
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(.primary)
-                    .frame(width: 44, height: 44)
-                    .background(.thinMaterial, in: Circle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Back to stop")
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Directions")
-                    .font(.title2.weight(.bold))
-                if let selectedStop = viewModel.selectedStop {
-                    Text("To \(selectedStop.name)")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text("Choose a stop from the map, favourites, nearby suggestions, or search.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
     }
 }
 

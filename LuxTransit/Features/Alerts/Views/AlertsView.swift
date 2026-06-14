@@ -2,12 +2,10 @@ import SwiftUI
 
 struct AlertsView: View {
     let viewModel: AlertsPresentationModel
-    let refresh: () -> Void
-    let close: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            header
+            AlertRefreshStatus(lastUpdated: viewModel.lastUpdated, isStale: viewModel.isStale)
 
             if viewModel.isLoading && viewModel.alerts.isEmpty {
                 DepartureLoadingCard(title: "Loading alerts")
@@ -35,39 +33,6 @@ struct AlertsView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var header: some View {
-        HStack(alignment: .center, spacing: 12) {
-            Button(action: close) {
-                Image(systemName: "chevron.down")
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(.primary)
-                    .frame(width: 44, height: 44)
-                    .background(.thinMaterial, in: Circle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Close alerts")
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Service Alerts")
-                    .font(.title2.weight(.bold))
-                AlertRefreshStatus(lastUpdated: viewModel.lastUpdated, isStale: viewModel.isStale)
-            }
-
-            Spacer(minLength: 8)
-
-            Button(action: refresh) {
-                Image(systemName: "arrow.clockwise")
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(.primary)
-                    .frame(width: 44, height: 44)
-                    .background(.thinMaterial, in: Circle())
-            }
-            .buttonStyle(.plain)
-            .disabled(viewModel.isLoading)
-            .accessibilityLabel("Refresh alerts")
-        }
     }
 }
 
