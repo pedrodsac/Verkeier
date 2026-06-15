@@ -188,7 +188,7 @@ final class TransitMapViewModel {
 
         for stop in favourites.prefix(6) {
             do {
-                boards[stop.id] = try await atpClient.departureBoard(stopId: stop.id)
+                boards[stop.id] = try await atpClient.departureBoards(stopIds: stop.platformIds)
             } catch {
                 failedCount += 1
                 boards[stop.id] = []
@@ -225,7 +225,7 @@ final class TransitMapViewModel {
         departuresErrorMessage = nil
 
         do {
-            departures = try await atpClient.departureBoard(stopId: selectedStop.id)
+            departures = try await atpClient.departureBoards(stopIds: selectedStop.platformIds)
             departuresLastUpdated = .now
         } catch {
             departures = []

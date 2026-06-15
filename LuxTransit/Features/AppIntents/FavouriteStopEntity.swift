@@ -8,6 +8,17 @@ struct FavouriteStopEntity: AppEntity, Identifiable {
     let id: String
     let name: String
     let locality: String?
+    let platformIds: [String]
+
+    init(id: String, name: String, locality: String?, platformIds: [String]? = nil) {
+        self.id = id
+        self.name = name
+        self.locality = locality
+        let ids = (platformIds ?? [])
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        self.platformIds = ids.isEmpty ? [id] : ids
+    }
 
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(
@@ -34,14 +45,24 @@ struct FavouriteStopEntityQuery: EntityQuery {
 nonisolated enum FavouriteStopEntityStore {
     nonisolated static func save(stops: [Stop]) {
         let entities = stops.map {
-            SharedFavouriteStop(id: $0.id, name: $0.name, locality: $0.locality)
+            SharedFavouriteStop(
+                id: $0.id,
+                name: $0.name,
+                locality: $0.locality,
+                platformIds: $0.platformIds
+            )
         }
         SharedTransitDataStore.saveFavouriteStops(entities)
     }
 
     nonisolated static func entities() -> [FavouriteStopEntity] {
         SharedTransitDataStore.favouriteStops().map {
-            FavouriteStopEntity(id: $0.id, name: $0.name, locality: $0.locality)
+            FavouriteStopEntity(
+                id: $0.id,
+                name: $0.name,
+                locality: $0.locality,
+                platformIds: $0.platformIds
+            )
         }
     }
 }

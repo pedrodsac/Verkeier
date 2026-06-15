@@ -34,6 +34,43 @@ final class LiveATPClient: ATPClient, @unchecked Sendable {
         return ATPMapper.mapDepartures(response, stopId: stopId)
     }
 
+    func departureBoards(stopIds: [String]) async throws -> [Departure] {
+        let ids = ATPStopIdentifier.normalized(stopIds)
+        guard !ids.isEmpty else { return [] }
+
+        var departures: [Departure] = []
+        var failureCount = 0
+        var firstError: Error?
+
+        await withTaskGroup(of: Result<[Departure], Error>.self) { group in
+            for stopId in ids {
+                group.addTask {
+                    do {
+                        return .success(try await self.departureBoard(stopId: stopId))
+                    } catch {
+                        return .failure(error)
+                    }
+                }
+            }
+
+            for await result in group {
+                switch result {
+                case .success(let board):
+                    departures.append(contentsOf: board)
+                case .failure(let error):
+                    failureCount += 1
+                    firstError = firstError ?? error
+                }
+            }
+        }
+
+        guard failureCount < ids.count else {
+            throw firstError ?? ATPClientError.allPlatformRequestsFailed
+        }
+
+        return ATPMapper.mergedDepartures(departures)
+    }
+
     private func fetch<Response: Decodable>(_ request: URLRequest) async throws -> Response {
         let (data, response) = try await session.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse else {

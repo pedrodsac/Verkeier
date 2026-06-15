@@ -9,6 +9,7 @@ final class PersistedFavouriteStop {
     var latitude: Double
     var longitude: Double
     var modesRawValue: String
+    var platformIdsRawValue: String?
     var createdAt: Date
 
     init(stop: Stop, createdAt: Date = .now) {
@@ -18,6 +19,7 @@ final class PersistedFavouriteStop {
         latitude = stop.location.latitude
         longitude = stop.location.longitude
         modesRawValue = stop.modes.map(\.rawValue).joined(separator: ",")
+        platformIdsRawValue = stop.platformIds.joined(separator: ",")
         self.createdAt = createdAt
     }
 
@@ -30,7 +32,17 @@ final class PersistedFavouriteStop {
             modes: modesRawValue
                 .split(separator: ",")
                 .compactMap { TransportMode(rawValue: String($0)) },
-            dataSource: .local
+            dataSource: .local,
+            platformIds: platformIds
         )
+    }
+
+    private var platformIds: [String] {
+        guard let platformIdsRawValue else { return [stopId] }
+        let ids = platformIdsRawValue
+            .split(separator: ",")
+            .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        return ids.isEmpty ? [stopId] : ids
     }
 }

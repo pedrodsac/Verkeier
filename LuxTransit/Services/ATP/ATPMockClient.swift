@@ -8,4 +8,8 @@ struct EmptyATPClient: ATPClient {
     func departureBoard(stopId: String) async throws -> [Departure] {
         []
     }
+
+    func departureBoards(stopIds: [String]) async throws -> [Departure] {
+        []
+    }
 }

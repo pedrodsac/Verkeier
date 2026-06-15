@@ -70,6 +70,48 @@ struct ATPDeparture: Decodable {
         case cancelled
         case product = "Product"
     }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+        type = try container.decodeIfPresent(String.self, forKey: .type)
+        stop = try container.decodeIfPresent(String.self, forKey: .stop)
+        stopid = try container.decodeIfPresent(String.self, forKey: .stopid)
+        stopExtId = try container.decodeIfPresent(String.self, forKey: .stopExtId)
+        time = try container.decodeIfPresent(String.self, forKey: .time)
+        date = try container.decodeIfPresent(String.self, forKey: .date)
+        rtTime = try container.decodeIfPresent(String.self, forKey: .rtTime)
+        rtDate = try container.decodeIfPresent(String.self, forKey: .rtDate)
+        direction = try container.decodeIfPresent(String.self, forKey: .direction)
+        cancelled = try container.decodeIfPresent(Bool.self, forKey: .cancelled)
+        platform = Self.decodePlatform(from: container)
+        product = Self.decodeProduct(from: container)
+    }
+
+    private static func decodePlatform(from container: KeyedDecodingContainer<CodingKeys>) -> String? {
+        if let platform = try? container.decodeIfPresent(String.self, forKey: .platform) {
+            return platform
+        }
+        if let platform = try? container.decodeIfPresent(ATPPlatform.self, forKey: .platform) {
+            return platform.text
+        }
+        return nil
+    }
+
+    private static func decodeProduct(from container: KeyedDecodingContainer<CodingKeys>) -> ATPProduct? {
+        if let product = try? container.decodeIfPresent(ATPProduct.self, forKey: .product) {
+            return product
+        }
+        if let products = try? container.decodeIfPresent([ATPProduct].self, forKey: .product) {
+            return products.first
+        }
+        return nil
+    }
+}
+
+struct ATPPlatform: Decodable {
+    let text: String?
 }
 
 struct ATPProduct: Decodable {

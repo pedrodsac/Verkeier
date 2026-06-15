@@ -23,7 +23,8 @@ struct AppIntentSharedDataTests {
             locality: "Test City",
             location: LocationPoint(name: "Hill Lift", latitude: 49.6116, longitude: 6.1319),
             modes: [.funicular],
-            dataSource: .gtfs
+            dataSource: .gtfs,
+            platformIds: ["platform-1", "platform-2"]
         )
 
         FavouriteStopEntityStore.save(stops: [stop])
@@ -32,7 +33,45 @@ struct AppIntentSharedDataTests {
         #expect(entity.id == "stop-1")
         #expect(entity.name == "Hill Lift")
         #expect(entity.locality == "Test City")
+        #expect(entity.platformIds == ["platform-1", "platform-2"])
         #expect(SharedTransitDataStore.favouriteStops().first?.name == "Hill Lift")
+        #expect(SharedTransitDataStore.favouriteStops().first?.platformIds == ["platform-1", "platform-2"])
+    }
+
+    @Test func sharedFavouriteStopsDefaultPlatformIdsWhenMissingFromStoredJSON() throws {
+        let data = Data(
+            """
+            [
+              {
+                "id": "stop-1",
+                "name": "Hill Lift",
+                "locality": "Test City"
+              }
+            ]
+            """.utf8
+        )
+
+        let stops = try JSONDecoder().decode([SharedFavouriteStop].self, from: data)
+
+        #expect(stops.first?.platformIds == ["stop-1"])
+    }
+
+    @Test func persistedFavouriteStopsRoundTripPlatformIds() {
+        let stop = Stop(
+            id: "grouped-stop",
+            name: "Badanstalt",
+            locality: "Centre",
+            location: LocationPoint(name: "Badanstalt", latitude: 49.6135, longitude: 6.1292),
+            modes: [.bus],
+            dataSource: .atpOpenAPI,
+            platformIds: ["300362001", "300362002"]
+        )
+
+        let persisted = PersistedFavouriteStop(stop: stop)
+        let restored = persisted.stop
+
+        #expect(restored.id == "grouped-stop")
+        #expect(restored.platformIds == ["300362001", "300362002"])
     }
 
     @Test func deepLinksRoundTripToIntentHandoff() throws {

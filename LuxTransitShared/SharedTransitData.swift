@@ -29,6 +29,43 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
     let id: String
     let name: String
     let locality: String?
+    let platformIds: [String]
+
+    init(id: String, name: String, locality: String?, platformIds: [String]? = nil) {
+        self.id = id
+        self.name = name
+        self.locality = locality
+        self.platformIds = Self.normalizedPlatformIds(platformIds, fallbackId: id)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case locality
+        case platformIds
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let id = try container.decode(String.self, forKey: .id)
+
+        self.id = id
+        name = try container.decode(String.self, forKey: .name)
+        locality = try container.decodeIfPresent(String.self, forKey: .locality)
+        platformIds = Self.normalizedPlatformIds(
+            try container.decodeIfPresent([String].self, forKey: .platformIds),
+            fallbackId: id
+        )
+    }
+
+    private static func normalizedPlatformIds(_ ids: [String]?, fallbackId: String) -> [String] {
+        let normalized = (ids ?? [])
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        var seen: Set<String> = []
+        let unique = normalized.filter { seen.insert($0).inserted }
+        return unique.isEmpty ? [fallbackId] : unique
+    }
 }
 
 nonisolated enum TransitDeepLink: Equatable, Sendable {
