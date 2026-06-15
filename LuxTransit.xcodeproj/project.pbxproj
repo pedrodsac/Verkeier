@@ -43,6 +43,8 @@
 		000000000000000000000120 /* LuxTransit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LuxTransit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		000000000000000000000220 /* LuxTransitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LuxTransitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		000000000000000000000320 /* LuxTransitWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LuxTransitWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		62FE86412FDDDDC400081C59 /* AppConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppConfig.xcconfig; sourceTree = "<group>"; };
+		62FE86412FDDDDC400081C5A /* LocalConfig.xcconfig.example */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = LocalConfig.xcconfig.example; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -113,6 +115,7 @@
 		000000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
+				62FE86412FDDDDC400081C5B /* Config */,
 				62FE86412FDDDDC400081C53 /* LuxTransit */,
 				62FE86412FDDDDC400081C55 /* LuxTransitShared */,
 				62FE86412FDDDDC400081C54 /* LuxTransitTests */,
@@ -129,6 +132,15 @@
 				000000000000000000000320 /* LuxTransitWidgets.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		62FE86412FDDDDC400081C5B /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				62FE86412FDDDDC400081C59 /* AppConfig.xcconfig */,
+				62FE86412FDDDDC400081C5A /* LocalConfig.xcconfig.example */,
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -424,6 +436,7 @@
 		};
 		000000000000000111000000 /* Debug configuration for PBXNativeTarget "LuxTransit" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 62FE86412FDDDDC400081C59 /* AppConfig.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = LuxTransit/LuxTransit.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -460,6 +473,7 @@
 		};
 		000000000000000112000000 /* Release configuration for PBXNativeTarget "LuxTransit" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 62FE86412FDDDDC400081C59 /* AppConfig.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = LuxTransit/LuxTransit.entitlements;
 				CODE_SIGN_STYLE = Automatic;
