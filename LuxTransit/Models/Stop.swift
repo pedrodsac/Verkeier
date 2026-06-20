@@ -9,7 +9,7 @@ struct Stop: Codable, Hashable, Identifiable, Sendable {
     let dataSource: DataSource
     let platformIds: [String]
 
-    init(
+    nonisolated init(
         id: String,
         name: String,
         locality: String? = nil,
@@ -37,7 +37,7 @@ struct Stop: Codable, Hashable, Identifiable, Sendable {
         case platformIds
     }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let id = try container.decode(String.self, forKey: .id)
 
@@ -53,7 +53,7 @@ struct Stop: Codable, Hashable, Identifiable, Sendable {
         )
     }
 
-    private static func normalizedPlatformIds(_ ids: [String]?, fallbackId: String) -> [String] {
+    private nonisolated static func normalizedPlatformIds(_ ids: [String]?, fallbackId: String) -> [String] {
         let normalized = (ids ?? [])
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
@@ -62,7 +62,7 @@ struct Stop: Codable, Hashable, Identifiable, Sendable {
 }
 
 private extension Array where Element == String {
-    init(dictOrderedSet values: [String]) {
+    nonisolated init(dictOrderedSet values: [String]) {
         var seen: Set<String> = []
         self = values.filter { seen.insert($0).inserted }
     }

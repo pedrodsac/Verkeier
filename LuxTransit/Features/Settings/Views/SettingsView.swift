@@ -74,6 +74,13 @@ struct SettingsView: View {
                         label: "Checksum",
                         value: viewModel.gtfsUpdateSnapshot.metadata?.checksum ?? "Unavailable")
                     DiagnosticRow(label: "Status", value: gtfsStatusText)
+                    if let lastFailureMessage = viewModel.gtfsUpdateSnapshot.lastFailureMessage {
+                        SettingsFactRow(
+                            iconName: "exclamationmark.triangle.fill",
+                            title: "Last update failed",
+                            message: lastFailureMessage
+                        )
+                    }
 
                     Button(action: checkGTFSUpdate) {
                         Label(

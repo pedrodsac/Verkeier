@@ -17,6 +17,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "000000000000000100000000"
                BuildableName = "LuxTransit.app"
+               BlueprintName = "LuxTransit"
                ReferencedContainer = "container:LuxTransit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -58,6 +59,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "000000000000000100000000"
             BuildableName = "LuxTransit.app"
+            BlueprintName = "LuxTransit"
             ReferencedContainer = "container:LuxTransit.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -86,6 +88,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "000000000000000100000000"
             BuildableName = "LuxTransit.app"
+            BlueprintName = "LuxTransit"
             ReferencedContainer = "container:LuxTransit.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

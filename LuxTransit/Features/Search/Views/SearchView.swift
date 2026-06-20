@@ -11,6 +11,7 @@ struct SearchView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             searchHeader
+				.padding(.top, 12)
 
             if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 NearbySearchSuggestions(
@@ -56,7 +57,7 @@ struct SearchView: View {
                 .font(.body.weight(.semibold))
                 .foregroundStyle(.secondary)
                 .accessibilityHidden(true)
-            TextField("Search Maps", text: $query)
+            TextField("Search", text: $query)
                 .textInputAutocapitalization(.words)
                 .autocorrectionDisabled()
                 .focused($isSearchFocused)

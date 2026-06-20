@@ -1,6 +1,6 @@
 import Foundation
 
-enum ATPMapper {
+nonisolated enum ATPMapper {
     static func mapNearbyStops(_ response: ATPNearbyStopsResponse) -> [Stop] {
         let platformStops: [ATPPlatformStop] = response.stopLocationOrCoordLocation.compactMap { wrapper in
             guard let dto = wrapper.stopLocation ?? wrapper.coordLocation else { return nil }
@@ -220,7 +220,7 @@ private struct ATPPlatformStop {
 }
 
 private extension String {
-    var normalizedForATPGrouping: String {
+    nonisolated var normalizedForATPGrouping: String {
         folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
             .lowercased()
             .replacingOccurrences(of: #"[^a-z0-9]+"#, with: " ", options: .regularExpression)

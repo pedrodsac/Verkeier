@@ -26,6 +26,29 @@ struct GTFSIndexBuilderTests {
             })
     }
 
+    @Test func buildsTimetableIndexWithTripsCalendarsTransfersAndShapes() throws {
+        let directory = try makeGTFSFolder()
+        let destination = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathComponent("timetable-index.json")
+
+        try GTFSIndexBuilder().buildTimetableIndex(from: directory, to: destination)
+
+        let data = try Data(contentsOf: destination)
+        let payload = try JSONDecoder.gtfsLocal.decode(GTFSTimetableIndexPayload.self, from: data)
+        let trip = try #require(payload.trips.first { $0.id == "T-F1" })
+        let service = try #require(payload.services.first { $0.id == "WEEK" })
+        let shape = try #require(payload.shapes.first { $0.id == "shape-f1" })
+
+        #expect(payload.stops.map(\.id).sorted() == ["S1", "S2"])
+        #expect(payload.routes.map(\.id) == ["F1"])
+        #expect(trip.stopTimes.map(\.departureSeconds) == [28_800, 87_000])
+        #expect(trip.stopTimes.compactMap(\.shapeDistanceTraveled) == [0, 1.4])
+        #expect(service.addedDates.contains("20260614"))
+        #expect(payload.transfers.first?.minimumTransferSeconds == 180)
+        #expect(shape.points.count == 2)
+    }
+
     private func makeGTFSFolder() throws -> URL {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
@@ -42,13 +65,26 @@ struct GTFSIndexBuilderTests {
             F1,Operator,F1,Lower Station - Upper Station,7
             """,
             "trips.txt": """
-            route_id,service_id,trip_id
-            F1,WEEK,T-F1
+            route_id,service_id,trip_id,shape_id
+            F1,WEEK,T-F1,shape-f1
             """,
             "stop_times.txt": """
-            trip_id,arrival_time,departure_time,stop_id,stop_sequence
-            T-F1,08:00:00,08:00:00,S1,1
-            T-F1,08:10:00,08:10:00,S2,2
+            trip_id,arrival_time,departure_time,stop_id,stop_sequence,shape_dist_traveled
+            T-F1,08:00:00,08:00:00,S1,1,0
+            T-F1,24:10:00,24:10:00,S2,2,1.4
+            """,
+            "calendar_dates.txt": """
+            service_id,date,exception_type
+            WEEK,20260614,1
+            """,
+            "transfers.txt": """
+            from_stop_id,to_stop_id,transfer_type,min_transfer_time
+            S1,S2,2,180
+            """,
+            "shapes.txt": """
+            shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence,shape_dist_traveled
+            shape-f1,49.6289,6.21474,1,0
+            shape-f1,49.61779,6.12589,2,1.4
             """,
         ]
 

@@ -1,13 +1,13 @@
 import CoreLocation
 import Foundation
 
-struct LocationPoint: Codable, Hashable, Identifiable, Sendable {
+nonisolated struct LocationPoint: Codable, Hashable, Identifiable, Sendable {
     let id: String
     let name: String?
     let latitude: Double
     let longitude: Double
 
-    init(
+    nonisolated init(
         id: String? = nil,
         name: String? = nil,
         latitude: Double,

@@ -1,13 +1,13 @@
 import Foundation
 
 protocol ATPClient: Sendable {
-    func nearbyStops(latitude: Double, longitude: Double) async throws -> [Stop]
-    func departureBoard(stopId: String) async throws -> [Departure]
-    func departureBoards(stopIds: [String]) async throws -> [Departure]
+    nonisolated func nearbyStops(latitude: Double, longitude: Double) async throws -> [Stop]
+    nonisolated func departureBoard(stopId: String) async throws -> [Departure]
+    nonisolated func departureBoards(stopIds: [String]) async throws -> [Departure]
 }
 
 extension ATPClient {
-    func departureBoards(stopIds: [String]) async throws -> [Departure] {
+    nonisolated func departureBoards(stopIds: [String]) async throws -> [Departure] {
         var departures: [Departure] = []
 
         for stopId in ATPStopIdentifier.normalized(stopIds) {
@@ -26,7 +26,7 @@ enum ATPClientError: Error, Equatable {
 }
 
 enum ATPStopIdentifier {
-    static func normalized(_ ids: [String]) -> [String] {
+    nonisolated static func normalized(_ ids: [String]) -> [String] {
         var seen: Set<String> = []
         return ids
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }

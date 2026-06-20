@@ -1,13 +1,8 @@
 import Foundation
 
-final class LocalGTFSService: GTFSService, @unchecked Sendable {
-    private let lock = NSLock()
-    private let bundle: Bundle
-    private let resourceName: String
-    private let store: GTFSLocalStore
-    private var stops: [Stop]
-    private var routesByStopId: [String: [TransitRoute]]
-    private var updateObserver: NSObjectProtocol?
+final class LocalGTFSService: GTFSService {
+    private let loader: GTFSDataLoader
+    private let updateTask: Task<Void, Never>
 
     init(
         bundle: Bundle = .main,
@@ -16,118 +11,156 @@ final class LocalGTFSService: GTFSService, @unchecked Sendable {
         stops: [Stop]? = nil,
         routesByStopId: [String: [TransitRoute]]? = nil
     ) {
-        self.bundle = bundle
-        self.resourceName = resourceName
-        self.store = store
-
+        let initialSnapshot: GTFSSnapshot?
         if let stops, let routesByStopId {
-            self.stops = stops
-            self.routesByStopId = routesByStopId
-        } else if let store = Self.loadStopsIndex(store: store) {
-            self.stops = store.stops
-            self.routesByStopId = store.routesByStopId
-        } else if let store = Self.loadCompactStore(bundle: bundle, resourceName: resourceName) {
-            self.stops = store.stops
-            self.routesByStopId = store.routesByStopId
+            initialSnapshot = GTFSSnapshot(
+                stops: stops,
+                routesByStopId: routesByStopId,
+                timetable: nil
+            )
         } else {
-            self.stops = []
-            self.routesByStopId = [:]
+            initialSnapshot = nil
         }
 
-        updateObserver = NotificationCenter.default.addObserver(
-            forName: .gtfsDidUpdate,
-            object: nil,
-            queue: nil
-        ) { [weak self] _ in
-            self?.reloadFromDisk()
+        let loader = GTFSDataLoader(
+            bundle: bundle,
+            resourceName: resourceName,
+            store: store,
+            initialSnapshot: initialSnapshot
+        )
+        self.loader = loader
+        updateTask = Task { [loader] in
+            for await _ in NotificationCenter.default.notifications(named: .gtfsDidUpdate) {
+                await loader.reloadFromDisk()
+            }
         }
     }
 
     deinit {
-        if let updateObserver {
-            NotificationCenter.default.removeObserver(updateObserver)
-        }
+        updateTask.cancel()
     }
 
-    func searchStops(query: String) -> [Stop] {
+    nonisolated func searchStops(query: String) async -> [Stop] {
         let normalizedQuery = query.normalizedForSearch
         guard !normalizedQuery.isEmpty else { return [] }
 
-        let currentStops = locked { stops }
-        return
-            currentStops
-            .filter { stop in
-                stop.name.normalizedForSearch.contains(normalizedQuery)
-                    || (stop.locality?.normalizedForSearch.contains(normalizedQuery) ?? false)
-            }
-            .sorted { lhs, rhs in
-                lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
-            }
+        return await loader.searchStops(query: normalizedQuery)
     }
 
-    func stopsForMap(
+    nonisolated func stopsForMap(
         center: LocationPoint,
         latitudeDelta: Double,
         longitudeDelta: Double,
         limit: Int
-    ) -> [Stop] {
+    ) async -> [Stop] {
         let effectiveLimit = max(0, limit)
         guard effectiveLimit > 0 else { return [] }
 
-        let currentStops = locked { stops }
         let latitudeRadius = max(latitudeDelta / 2, 0.01)
         let longitudeRadius = max(longitudeDelta / 2, 0.01)
 
-        return currentStops.compactMap { stop -> (stop: Stop, distance: Double)? in
-            guard abs(stop.location.latitude - center.latitude) <= latitudeRadius,
-                abs(stop.location.longitude - center.longitude) <= longitudeRadius
-            else {
-                return nil
-            }
+        return await loader.stopsForMap(
+            center: center,
+            latitudeRadius: latitudeRadius,
+            longitudeRadius: longitudeRadius,
+            limit: effectiveLimit
+        )
+    }
 
-            return (stop, squaredDistance(from: stop.location, to: center))
-        }
-        .sorted { $0.distance < $1.distance }
-        .prefix(effectiveLimit)
-        .map(\.stop)
+    nonisolated func stop(id: String) async -> Stop? {
+        await loader.stop(id: id)
+    }
+
+    nonisolated func allStops() async -> [Stop] {
+        await loader.allStops()
+    }
+
+    nonisolated func routesForStop(id: String) async -> [TransitRoute] {
+        await loader.routesForStop(id: id)
+    }
+
+    nonisolated func timetableIndex() async -> GTFSTimetableIndexPayload? {
+        await loader.timetableIndex()
+    }
+}
+
+private actor GTFSDataLoader {
+    private let bundle: Bundle
+    private let resourceName: String
+    private let store: GTFSLocalStore
+    private var snapshot: GTFSSnapshot?
+
+    init(
+        bundle: Bundle,
+        resourceName: String,
+        store: GTFSLocalStore,
+        initialSnapshot: GTFSSnapshot?
+    ) {
+        self.bundle = bundle
+        self.resourceName = resourceName
+        self.store = store
+        snapshot = initialSnapshot
+    }
+
+    func searchStops(query: String) -> [Stop] {
+        currentSnapshot().stopIndex.search(query: query)
+    }
+
+    func stopsForMap(
+        center: LocationPoint,
+        latitudeRadius: Double,
+        longitudeRadius: Double,
+        limit: Int
+    ) -> [Stop] {
+        currentSnapshot().stopIndex.stopsForMap(
+            center: center,
+            latitudeRadius: latitudeRadius,
+            longitudeRadius: longitudeRadius,
+            limit: limit
+        )
     }
 
     func stop(id: String) -> Stop? {
-        locked { stops.first { $0.id == id } }
+        currentSnapshot().stopIndex.stop(id: id)
+    }
+
+    func allStops() -> [Stop] {
+        currentSnapshot().stops
     }
 
     func routesForStop(id: String) -> [TransitRoute] {
-        locked { routesByStopId[id, default: []] }
+        currentSnapshot().routesByStopId[id, default: []]
     }
 
-    private func squaredDistance(from location: LocationPoint, to center: LocationPoint) -> Double {
-        let latitude = location.latitude - center.latitude
-        let longitude = location.longitude - center.longitude
-        return latitude * latitude + longitude * longitude
+    func timetableIndex() -> GTFSTimetableIndexPayload? {
+        currentSnapshot().timetable
     }
 
-    private func reloadFromDisk() {
-        guard
-            let store = Self.loadStopsIndex(store: store)
-                ?? Self.loadCompactStore(bundle: bundle, resourceName: resourceName)
-        else {
-            return
+    func reloadFromDisk() {
+        snapshot = loadSnapshotFromDisk()
+    }
+
+    private func currentSnapshot() -> GTFSSnapshot {
+        if let snapshot {
+            return snapshot
         }
 
-        locked {
-            stops = store.stops
-            routesByStopId = store.routesByStopId
-        }
+        let loaded = loadSnapshotFromDisk()
+        snapshot = loaded
+        return loaded
     }
 
-    private func locked<T>(_ work: () -> T) -> T {
-        lock.lock()
-        defer { lock.unlock() }
-        return work()
+    private func loadSnapshotFromDisk() -> GTFSSnapshot {
+        let store = Self.loadStopsIndex(store: store)
+            ?? Self.loadCompactStore(bundle: bundle, resourceName: resourceName)
+        return GTFSSnapshot(
+            stops: store?.stops ?? [],
+            routesByStopId: store?.routesByStopId ?? [:],
+            timetable: Self.loadTimetableIndex(store: self.store)
+        )
     }
 
-    private static func loadCompactStore(bundle: Bundle, resourceName: String) -> GTFSCompactStore?
-    {
+    private static func loadCompactStore(bundle: Bundle, resourceName: String) -> GTFSCompactStore? {
         guard let url = bundle.url(forResource: resourceName, withExtension: "json"),
             let data = try? Data(contentsOf: url),
             let payload = try? JSONDecoder().decode(GTFSCompactPayload.self, from: data)
@@ -156,7 +189,7 @@ final class LocalGTFSService: GTFSService, @unchecked Sendable {
                 name: stop.name,
                 locality: stop.locality,
                 location: LocationPoint(
-                    name: stop.name, latitude: stop.latitude, longitude: stop.longitude),
+                    id: stop.id, name: stop.name, latitude: stop.latitude, longitude: stop.longitude),
                 modes: stop.modes.map { TransportMode(rawValue: $0) ?? .unknown },
                 dataSource: .gtfs
             )
@@ -202,6 +235,7 @@ final class LocalGTFSService: GTFSService, @unchecked Sendable {
                 name: stop.name,
                 locality: stop.locality,
                 location: LocationPoint(
+                    id: stop.id,
                     name: stop.name,
                     latitude: stop.latitude,
                     longitude: stop.longitude
@@ -221,20 +255,162 @@ final class LocalGTFSService: GTFSService, @unchecked Sendable {
 
         return GTFSCompactStore(stops: stops, routesByStopId: routesByStopId)
     }
+
+    private static func loadTimetableIndex(store: GTFSLocalStore) -> GTFSTimetableIndexPayload? {
+        guard FileManager.default.fileExists(atPath: store.timetableIndexURL.path),
+              let data = try? Data(contentsOf: store.timetableIndexURL),
+              let payload = try? JSONDecoder.gtfsLocal.decode(
+                GTFSTimetableIndexPayload.self,
+                from: data
+              ) else {
+            return nil
+        }
+
+        return payload
+    }
 }
 
-private struct GTFSCompactStore {
+private nonisolated struct GTFSSnapshot: Sendable {
+    let stops: [Stop]
+    let routesByStopId: [String: [TransitRoute]]
+    let timetable: GTFSTimetableIndexPayload?
+    let stopIndex: GTFSStopIndex
+
+    init(
+        stops: [Stop],
+        routesByStopId: [String: [TransitRoute]],
+        timetable: GTFSTimetableIndexPayload?
+    ) {
+        self.stops = stops
+        self.routesByStopId = routesByStopId
+        self.timetable = timetable
+        stopIndex = GTFSStopIndex(stops: stops)
+    }
+}
+
+private nonisolated struct GTFSCompactStore: Sendable {
     let stops: [Stop]
     let routesByStopId: [String: [TransitRoute]]
 }
 
-private struct GTFSCompactPayload: Decodable {
+private nonisolated struct GTFSStopIndex {
+    fileprivate static let bucketSize = 0.02
+
+    private let stopsById: [String: Stop]
+    private let searchableStops: [SearchableStop]
+    private let buckets: [SpatialBucket: [Stop]]
+
+    init(stops: [Stop]) {
+        stopsById = Dictionary(uniqueKeysWithValues: stops.map { ($0.id, $0) })
+        searchableStops = stops
+            .map(SearchableStop.init)
+            .sorted { lhs, rhs in
+                lhs.stop.name.localizedStandardCompare(rhs.stop.name) == .orderedAscending
+            }
+        buckets = Dictionary(grouping: stops, by: { SpatialBucket(location: $0.location) })
+    }
+
+    func stop(id: String) -> Stop? {
+        stopsById[id]
+    }
+
+    func search(query: String) -> [Stop] {
+        searchableStops.compactMap { entry in
+            guard entry.name.contains(query) || entry.locality?.contains(query) == true else {
+                return nil
+            }
+            return entry.stop
+        }
+    }
+
+    func stopsForMap(
+        center: LocationPoint,
+        latitudeRadius: Double,
+        longitudeRadius: Double,
+        limit: Int
+    ) -> [Stop] {
+        let minLatitude = center.latitude - latitudeRadius
+        let maxLatitude = center.latitude + latitudeRadius
+        let minLongitude = center.longitude - longitudeRadius
+        let maxLongitude = center.longitude + longitudeRadius
+        let latitudeBuckets = Self.bucketRange(from: minLatitude, to: maxLatitude)
+        let longitudeBuckets = Self.bucketRange(from: minLongitude, to: maxLongitude)
+
+        var candidates: [Stop] = []
+        candidates.reserveCapacity(min(limit * 2, searchableStops.count))
+
+        for latitudeBucket in latitudeBuckets {
+            for longitudeBucket in longitudeBuckets {
+                candidates += buckets[SpatialBucket(latitude: latitudeBucket, longitude: longitudeBucket), default: []]
+            }
+        }
+
+        return candidates.compactMap { stop -> (stop: Stop, distance: Double)? in
+            guard abs(stop.location.latitude - center.latitude) <= latitudeRadius,
+                  abs(stop.location.longitude - center.longitude) <= longitudeRadius else {
+                return nil
+            }
+            return (stop, Self.squaredDistance(from: stop.location, to: center))
+        }
+        .sorted {
+            if $0.distance != $1.distance {
+                return $0.distance < $1.distance
+            }
+            return $0.stop.name.localizedStandardCompare($1.stop.name) == .orderedAscending
+        }
+        .prefix(limit)
+        .map(\.stop)
+    }
+
+    private static func bucketRange(from lower: Double, to upper: Double) -> ClosedRange<Int> {
+        bucketIndex(for: lower)...bucketIndex(for: upper)
+    }
+
+    private static func bucketIndex(for value: Double) -> Int {
+        Int(floor(value / bucketSize))
+    }
+
+    private static func squaredDistance(from location: LocationPoint, to center: LocationPoint) -> Double {
+        let latitude = location.latitude - center.latitude
+        let longitude = location.longitude - center.longitude
+        return latitude * latitude + longitude * longitude
+    }
+}
+
+private nonisolated struct SearchableStop {
+    let stop: Stop
+    let name: String
+    let locality: String?
+
+    init(stop: Stop) {
+        self.stop = stop
+        name = stop.name.normalizedForSearch
+        locality = stop.locality?.normalizedForSearch
+    }
+}
+
+private nonisolated struct SpatialBucket: Hashable {
+    let latitude: Int
+    let longitude: Int
+
+    init(latitude: Int, longitude: Int) {
+        self.latitude = latitude
+        self.longitude = longitude
+    }
+
+    init(location: LocationPoint) {
+        latitude = Int(floor(location.latitude / GTFSStopIndex.bucketSize))
+        longitude = Int(floor(location.longitude / GTFSStopIndex.bucketSize))
+    }
+}
+
+private nonisolated struct GTFSCompactPayload: Decodable {
     let source: String
     let stops: [GTFSCompactStop]
     let routes: [GTFSCompactRoute]
 }
 
-private struct GTFSCompactStop: Decodable {
+private nonisolated struct GTFSCompactStop: Decodable {
     let id: String
     let name: String
     let locality: String?
@@ -244,7 +420,7 @@ private struct GTFSCompactStop: Decodable {
     let routeIds: [String]
 }
 
-private struct GTFSCompactRoute: Decodable {
+private nonisolated struct GTFSCompactRoute: Decodable {
     let id: String
     let shortName: String
     let longName: String
@@ -253,7 +429,7 @@ private struct GTFSCompactRoute: Decodable {
 }
 
 extension String {
-    var normalizedForSearch: String {
+    nonisolated var normalizedForSearch: String {
         folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }

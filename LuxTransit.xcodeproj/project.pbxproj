@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		000000000000000370000000 /* LuxTransitWidgets.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 000000000000000000000320 /* LuxTransitWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		62FE86412FEE000000000001 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000101 /* ZIPFoundation */; };
+		62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000102 /* AsyncAlgorithms */; };
+		62FE86412FEE000000000003 /* HeapModule in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000103 /* HeapModule */; };
+		62FE86412FEE000000000004 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000104 /* ZIPFoundation */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,11 +101,15 @@
 		000000000000000130000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				62FE86412FEE000000000001 /* ZIPFoundation in Frameworks */,
+				62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */,
+				62FE86412FEE000000000003 /* HeapModule in Frameworks */,
 			);
 		};
 		000000000000000230000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				62FE86412FEE000000000004 /* ZIPFoundation in Frameworks */,
 			);
 		};
 		000000000000000330000000 /* Frameworks */ = {
@@ -165,6 +173,11 @@
 				62FE86412FDDDDC400081C55 /* LuxTransitShared */,
 			);
 			name = LuxTransit;
+			packageProductDependencies = (
+				62FE86412FEE000000000101 /* ZIPFoundation */,
+				62FE86412FEE000000000102 /* AsyncAlgorithms */,
+				62FE86412FEE000000000103 /* HeapModule */,
+			);
 			productName = MyApp;
 			productReference = 000000000000000000000120 /* LuxTransit.app */;
 			productType = "com.apple.product-type.application";
@@ -186,6 +199,9 @@
 				62FE86412FDDDDC400081C54 /* LuxTransitTests */,
 			);
 			name = LuxTransitTests;
+			packageProductDependencies = (
+				62FE86412FEE000000000104 /* ZIPFoundation */,
+			);
 			productName = LuxTransitTests;
 			productReference = 000000000000000000000220 /* LuxTransitTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -240,6 +256,11 @@
 			);
 			mainGroup = 000000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				62FE86412FEE000000000201 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+				62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
+				62FE86412FEE000000000203 /* XCRemoteSwiftPackageReference "swift-collections" */,
+			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
 			projectDirPath = "";
@@ -670,6 +691,56 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		62FE86412FEE000000000201 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.20;
+			};
+		};
+		62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-async-algorithms.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.4;
+			};
+		};
+		62FE86412FEE000000000203 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.6.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		62FE86412FEE000000000101 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 62FE86412FEE000000000201 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		62FE86412FEE000000000102 /* AsyncAlgorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
+			productName = AsyncAlgorithms;
+		};
+		62FE86412FEE000000000103 /* HeapModule */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 62FE86412FEE000000000203 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = HeapModule;
+		};
+		62FE86412FEE000000000104 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 62FE86412FEE000000000201 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 000000000000000000000000 /* Project object */;
 }

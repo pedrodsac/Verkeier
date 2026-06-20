@@ -1,7 +1,7 @@
 import MapKit
 
 struct MapKitRouteService: RouteService {
-    func calculateRoute(from: LocationPoint, to: LocationPoint) async throws -> RouteCalculation {
+    nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint) async throws -> RouteCalculation {
         let request = MKDirections.Request()
         request.source = mapItem(for: from)
         request.destination = mapItem(for: to)
@@ -19,25 +19,19 @@ struct MapKitRouteService: RouteService {
             destination: to,
             expectedTravelTime: route.expectedTravelTime,
             distanceMeters: route.distance,
-            legs: [
-                RoutePlan.Leg(
-                    id: "mapkit-primary",
-                    mode: .unknown,
-                    routeName: route.name.isEmpty ? nil : route.name,
-                    origin: from,
-                    destination: to,
-                    departureTime: nil,
-                    arrivalTime: nil,
-                    distanceMeters: route.distance
-                )
-            ],
+            legs: Self.legs(from: route, origin: from, destination: to),
             dataSource: .mapKit
         )
 
-        return RouteCalculation(plan: plan, mapRoute: route)
+        let option = RouteOption(
+            id: "mapkit-\(from.id)-\(to.id)",
+            plan: plan,
+            mapOverlay: Self.overlay(from: route)
+        )
+        return RouteCalculation(options: [option], selectedOptionID: option.id)
     }
 
-    func openInAppleMaps(from: LocationPoint, to: LocationPoint) {
+    @MainActor func openInAppleMaps(from: LocationPoint, to: LocationPoint) {
         let source = mapItem(for: from)
         let destination = mapItem(for: to)
 
@@ -49,7 +43,7 @@ struct MapKitRouteService: RouteService {
         )
     }
 
-    private func mapItem(for point: LocationPoint) -> MKMapItem {
+    private nonisolated func mapItem(for point: LocationPoint) -> MKMapItem {
         let item = MKMapItem(
             location: CLLocation(latitude: point.latitude, longitude: point.longitude),
             address: nil
@@ -57,8 +51,88 @@ struct MapKitRouteService: RouteService {
         item.name = point.name
         return item
     }
+
+    private nonisolated static func legs(
+        from route: MKRoute,
+        origin: LocationPoint,
+        destination: LocationPoint
+    ) -> [RoutePlan.Leg] {
+        let routeName = route.name.isEmpty ? nil : route.name
+        let stepLegs = route.steps.enumerated().compactMap { index, step -> RoutePlan.Leg? in
+            let instruction = step.instructions.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !instruction.isEmpty || step.distance > 0 else { return nil }
+
+            let transportKind = RouteLegTransportKind(step.transportType)
+            return RoutePlan.Leg(
+                id: "mapkit-step-\(index)",
+                mode: transportKind.transportMode,
+                instruction: instruction.isEmpty ? nil : instruction,
+                transportKind: transportKind,
+                routeName: routeName,
+                origin: origin,
+                destination: destination,
+                departureTime: nil,
+                arrivalTime: nil,
+                distanceMeters: step.distance > 0 ? step.distance : nil
+            )
+        }
+
+        if !stepLegs.isEmpty {
+            return stepLegs
+        }
+
+        return [
+            RoutePlan.Leg(
+                id: "mapkit-primary",
+                mode: .unknown,
+                instruction: nil,
+                transportKind: .unknown,
+                routeName: routeName,
+                origin: origin,
+                destination: destination,
+                departureTime: nil,
+                arrivalTime: nil,
+                distanceMeters: route.distance
+            )
+        ]
+    }
+
+    private nonisolated static func overlay(from route: MKRoute) -> RouteMapOverlay {
+        var coordinates = Array(
+            repeating: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+            count: route.polyline.pointCount
+        )
+        route.polyline.getCoordinates(&coordinates, range: NSRange(location: 0, length: route.polyline.pointCount))
+
+        return RouteMapOverlay(segments: [
+            RouteMapSegment(
+                id: "mapkit-route",
+                mode: .unknown,
+                coordinates: coordinates.map {
+                    RouteMapCoordinate(latitude: $0.latitude, longitude: $0.longitude)
+                }
+            )
+        ])
+    }
 }
 
-enum RoutingError: Error {
-    case noRouteFound
+private extension RouteLegTransportKind {
+    nonisolated init(_ transportType: MKDirectionsTransportType) {
+        if transportType.contains(.transit) {
+            self = .transit
+        } else if transportType.contains(.walking) {
+            self = .walking
+        } else if transportType.contains(.automobile) {
+            self = .automobile
+        } else {
+            self = .unknown
+        }
+    }
+
+    nonisolated var transportMode: TransportMode {
+        switch self {
+        case .walking: .walking
+        case .transit, .automobile, .unknown: .unknown
+        }
+    }
 }

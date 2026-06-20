@@ -10,13 +10,30 @@ final class TransitMapViewModel {
     var cameraUpdateToken = 0
     var sheetContext: TransitSheetContext = .home
     var sheetDetent: BottomSheetDetent = .medium
-    var nearbyStops: [Stop] = []
-    var gtfsMapStops: [Stop] = []
+    var nearbyStops: [Stop] = [] {
+        didSet { rebuildGTFSOnlyMapStops() }
+    }
+    var gtfsMapStops: [Stop] = [] {
+        didSet { rebuildGTFSOnlyMapStops() }
+    }
+    private(set) var gtfsOnlyMapStops: [Stop] = []
     var selectedStop: Stop?
-    var selectedStopRoutes: [TransitRoute] = []
+    var selectedStopRoutes: [TransitRoute] = [] {
+        didSet { rebuildDepartureFilters() }
+    }
     var isLoadingNearbyStops = false
     var nearbyStopsErrorMessage: String?
-    var departures: [Departure] = []
+    var departures: [Departure] = [] {
+        didSet { rebuildDepartureFilters() }
+    }
+    var selectedDepartureLine: String? {
+        didSet { rebuildDepartureFilters() }
+    }
+    var selectedDeparturePlatform: String? {
+        didSet { rebuildDepartureFilters() }
+    }
+    private(set) var availableDeparturePlatforms: [String] = []
+    private(set) var filteredDepartures: [Departure] = []
     var isLoadingDepartures = false
     var departuresErrorMessage: String?
     var departuresLastUpdated: Date?
@@ -27,10 +44,12 @@ final class TransitMapViewModel {
     var expandedFavouriteStopIds: Set<String> = []
     var searchQuery = ""
     var searchResults: [Stop] = []
-    var routePlan: RoutePlan?
-    var mapRoute: MKRoute?
-    var isCalculatingRoute = false
+    var routeOptions: [RouteOption] = []
+    var selectedRouteOptionID: String?
+    var visibleRouteOptionCount = 0
+    var routeLoadingPhase: RouteLoadingPhase = .idle
     var routeErrorMessage: String?
+    var routeStatusMessage: String?
     var alerts: [AlertMessage] = []
     var isLoadingAlerts = false
     var alertsErrorMessage: String?
@@ -42,9 +61,41 @@ final class TransitMapViewModel {
     )
     private let minimumMapSpan = 0.001
     private var visibleMapRegion: MKCoordinateRegion?
+    private let now: @Sendable () -> Date
+    private var routeCalculationGeneration = 0
 
-    init() {
+    init(now: @escaping @Sendable () -> Date = { .now }) {
+        self.now = now
         cameraRegion = defaultRegion
+    }
+
+    var routePlan: RoutePlan? {
+        selectedRouteOption?.plan
+    }
+
+    var routeMapOverlay: RouteMapOverlay? {
+        selectedRouteOption?.mapOverlay
+    }
+
+    var isWaitingForRouteLocation: Bool {
+        routeLoadingPhase.isWaitingForLocation
+    }
+
+    var isCalculatingRoute: Bool {
+        routeLoadingPhase.isCalculating
+    }
+
+    var selectedRouteOption: RouteOption? {
+        guard !routeOptions.isEmpty else { return nil }
+        if let selectedRouteOptionID,
+           let match = routeOptions.first(where: { $0.id == selectedRouteOptionID }) {
+            return match
+        }
+        return routeOptions.first
+    }
+
+    var visibleRouteOptions: [RouteOption] {
+        Array(routeOptions.prefix(visibleRouteOptionCount))
     }
 
     func requestLocation(using locationService: LocationService) {
@@ -90,6 +141,12 @@ final class TransitMapViewModel {
         sheetDetent = .medium
     }
 
+    func showRouteTimeline() {
+        guard selectedRouteOption != nil else { return }
+        sheetContext = .routeTimeline
+        sheetDetent = .expanded
+    }
+
     func toggleFavouriteExpansion(stopId: String) {
         if expandedFavouriteStopIds.contains(stopId) {
             expandedFavouriteStopIds.remove(stopId)
@@ -117,18 +174,18 @@ final class TransitMapViewModel {
         isLoadingNearbyStops = false
     }
 
-    func loadGTFSMapStops(using gtfsService: any GTFSService, location _: CLLocation?) {
+    func loadGTFSMapStops(using gtfsService: any GTFSService, location _: CLLocation?) async {
         let region = visibleMapRegion ?? cameraRegion
-        loadGTFSMapStops(using: gtfsService, region: region)
+        await loadGTFSMapStops(using: gtfsService, region: region)
     }
 
-    func updateVisibleMapRegion(_ region: MKCoordinateRegion, using gtfsService: any GTFSService) {
+    func updateVisibleMapRegion(_ region: MKCoordinateRegion, using gtfsService: any GTFSService) async {
         guard let region = sanitized(region) else { return }
         visibleMapRegion = region
-        loadGTFSMapStops(using: gtfsService, region: region)
+        await loadGTFSMapStops(using: gtfsService, region: region)
     }
 
-    private func loadGTFSMapStops(using gtfsService: any GTFSService, region: MKCoordinateRegion) {
+    private func loadGTFSMapStops(using gtfsService: any GTFSService, region: MKCoordinateRegion) async {
         guard let region = sanitized(region) else { return }
         let coordinate = region.center
         let center = LocationPoint(
@@ -136,7 +193,7 @@ final class TransitMapViewModel {
             latitude: coordinate.latitude,
             longitude: coordinate.longitude
         )
-        gtfsMapStops = gtfsService.stopsForMap(
+        gtfsMapStops = await gtfsService.stopsForMap(
             center: center,
             latitudeDelta: max(region.span.latitudeDelta, defaultRegion.span.latitudeDelta),
             longitudeDelta: max(region.span.longitudeDelta, defaultRegion.span.longitudeDelta),
@@ -207,6 +264,8 @@ final class TransitMapViewModel {
         selectedStop = stop
         selectedStopRoutes = []
         departures = []
+        selectedDepartureLine = nil
+        selectedDeparturePlatform = nil
         departuresErrorMessage = nil
         departuresLastUpdated = nil
         routeErrorMessage = nil
@@ -235,46 +294,71 @@ final class TransitMapViewModel {
         isLoadingDepartures = false
     }
 
-    func searchStops(using gtfsService: any GTFSService) {
-        searchResults = Array(gtfsService.searchStops(query: searchQuery).prefix(80))
+    func toggleDepartureLine(_ route: TransitRoute) {
+        if selectedDepartureLine == route.id {
+            selectedDepartureLine = nil
+        } else {
+            selectedDepartureLine = route.id
+        }
+
+        clearSelectedPlatformIfUnavailable()
     }
 
-    func updateSelectedStopRoutes(using gtfsService: any GTFSService) {
+    func selectDeparturePlatform(_ platform: String?) {
+        selectedDeparturePlatform = platform
+    }
+
+    func searchStops(using gtfsService: any GTFSService) async {
+        searchResults = Array(await gtfsService.searchStops(query: searchQuery).prefix(80))
+    }
+
+    func updateSelectedStopRoutes(using gtfsService: any GTFSService) async {
         guard let selectedStop else {
             selectedStopRoutes = []
             return
         }
 
-        let directRoutes = gtfsService.routesForStop(id: selectedStop.id)
+        let directRoutes = await gtfsService.routesForStop(id: selectedStop.id)
         if !directRoutes.isEmpty {
             selectedStopRoutes = directRoutes
             return
         }
 
-        selectedStopRoutes =
-            gtfsService.searchStops(query: selectedStop.name)
+        let matchedStops = await gtfsService.searchStops(query: selectedStop.name)
+        let routeCandidateStops = matchedStops
             .filter { $0.name.normalizedForSearch == selectedStop.name.normalizedForSearch }
             .sorted {
                 squaredDistance(from: $0.location, to: selectedStop.location)
                     < squaredDistance(from: $1.location, to: selectedStop.location)
             }
-            .lazy
-            .map { gtfsService.routesForStop(id: $0.id) }
-            .first { !$0.isEmpty } ?? []
+        for stop in routeCandidateStops {
+            let routes = await gtfsService.routesForStop(id: stop.id)
+            if !routes.isEmpty {
+                selectedStopRoutes = routes
+                return
+            }
+        }
+
+        selectedStopRoutes = []
     }
 
     func calculateRoute(using routeService: any RouteService, from location: CLLocation?) async {
         guard let selectedStop else {
+            routeLoadingPhase = .idle
             routeErrorMessage = "Choose a destination stop first."
             return
         }
         guard let location else {
-            routeErrorMessage = "Current location is required to calculate a route."
+            clearRouteResult()
+            routeLoadingPhase = .waitingForLocation
+            routeErrorMessage = nil
             return
         }
 
-        isCalculatingRoute = true
+        let requestGeneration = startRouteRequest()
+        routeLoadingPhase = .calculating
         routeErrorMessage = nil
+        routeStatusMessage = nil
         sheetContext = .directions
 
         let origin = LocationPoint(
@@ -286,15 +370,45 @@ final class TransitMapViewModel {
         do {
             let calculation = try await routeService.calculateRoute(
                 from: origin, to: selectedStop.location)
-            routePlan = calculation.plan
-            mapRoute = calculation.mapRoute
+            guard requestGeneration == routeCalculationGeneration else { return }
+            routeOptions = calculation.options
+            visibleRouteOptionCount = min(5, routeOptions.count)
+            selectBestRouteOption(preferredID: calculation.selectedOptionID, announceFallback: false)
         } catch {
-            routePlan = nil
-            mapRoute = nil
-            routeErrorMessage = "A route could not be calculated."
+            guard requestGeneration == routeCalculationGeneration else { return }
+            clearRouteResult()
+            routeErrorMessage = routeErrorMessage(for: error)
         }
 
-        isCalculatingRoute = false
+        if requestGeneration == routeCalculationGeneration {
+            routeLoadingPhase = .idle
+        }
+    }
+
+    func failRouteLocationRequest() {
+        clearRouteResult()
+        routeLoadingPhase = .idle
+        routeErrorMessage = "Current location is required to calculate a route."
+        sheetContext = .directions
+    }
+
+    @discardableResult
+    func selectRouteOption(id: String) -> Bool {
+        guard routeOptions.contains(where: { $0.id == id }) else { return false }
+        selectedRouteOptionID = id
+        routeStatusMessage = nil
+        return true
+    }
+
+    func showMoreRouteOptions() {
+        guard !routeOptions.isEmpty else { return }
+
+        if visibleRouteOptionCount < routeOptions.count {
+            visibleRouteOptionCount = min(routeOptions.count, visibleRouteOptionCount + 3)
+            routeStatusMessage = nil
+        } else {
+            routeStatusMessage = "No later public transport options were found."
+        }
     }
 
     func openSelectedRouteInAppleMaps(
@@ -352,10 +466,63 @@ final class TransitMapViewModel {
     }
 
     private func clearRoute() {
-        routePlan = nil
-        mapRoute = nil
+        routeCalculationGeneration += 1
+        clearRouteResult()
         routeErrorMessage = nil
-        isCalculatingRoute = false
+        routeLoadingPhase = .idle
+    }
+
+    private func clearRouteResult() {
+        routeOptions = []
+        selectedRouteOptionID = nil
+        visibleRouteOptionCount = 0
+        routeStatusMessage = nil
+    }
+
+    private func startRouteRequest() -> Int {
+        routeCalculationGeneration += 1
+        return routeCalculationGeneration
+    }
+
+    private func selectBestRouteOption(preferredID: String?, announceFallback: Bool) {
+        guard !routeOptions.isEmpty else {
+            selectedRouteOptionID = nil
+            return
+        }
+
+        let viableStatuses: Set<RouteOptionStatus> = [.viable, .scheduledOnly, .atRisk]
+        let optionsByID = Dictionary(uniqueKeysWithValues: routeOptions.map { ($0.id, $0) })
+
+        if let preferredID,
+           let preferred = optionsByID[preferredID],
+           viableStatuses.contains(preferred.status(at: now())) {
+            selectedRouteOptionID = preferredID
+            return
+        }
+
+        if let replacement = routeOptions.first(where: { viableStatuses.contains($0.status(at: now())) }) {
+            let changed = replacement.id != preferredID
+            selectedRouteOptionID = replacement.id
+            if announceFallback && changed && preferredID != nil {
+                routeStatusMessage = "Showing the next available route."
+            }
+            return
+        }
+
+        selectedRouteOptionID = routeOptions.first?.id
+    }
+
+    private func routeErrorMessage(for error: Error) -> String {
+        guard let routingError = error as? RoutingError else {
+            return "A public transport route could not be calculated."
+        }
+
+        switch routingError {
+        case .timetableUnavailable:
+            return "Public transport schedules are not available yet."
+        case .noPublicTransportRoute, .noRouteFound:
+            return "No public transport route was found."
+        }
     }
 
     private func squaredDistance(from lhs: LocationPoint, to rhs: LocationPoint) -> Double {
@@ -369,5 +536,81 @@ final class TransitMapViewModel {
         cameraRegion = region
         visibleMapRegion = region
         cameraUpdateToken += 1
+    }
+
+    private func rebuildGTFSOnlyMapStops() {
+        gtfsOnlyMapStops = gtfsMapStops.filter { gtfsStop in
+            !nearbyStops.contains { liveStop in
+                stopsRepresentSamePlace(liveStop, gtfsStop)
+            }
+        }
+    }
+
+    private func stopsRepresentSamePlace(_ lhs: Stop, _ rhs: Stop) -> Bool {
+        if lhs.id == rhs.id { return true }
+
+        let namesMatch = lhs.name.normalizedForSearch == rhs.name.normalizedForSearch
+        guard namesMatch else { return false }
+
+        return squaredDistance(from: lhs.location, to: rhs.location) < 0.000002
+    }
+
+    private func rebuildDepartureFilters() {
+        let departuresMatchingLine = departuresMatchingSelectedLine()
+        availableDeparturePlatforms = Array(dictOrderedSet: departuresMatchingLine.compactMap { departure in
+            let platform = departure.platform?.trimmingCharacters(in: .whitespacesAndNewlines)
+            return platform?.isEmpty == false ? platform : nil
+        })
+        .sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+
+        if let selectedDeparturePlatform,
+           !availableDeparturePlatforms.contains(selectedDeparturePlatform) {
+            self.selectedDeparturePlatform = nil
+            return
+        }
+
+        filteredDepartures = departuresMatchingLine.filter { departure in
+            guard let selectedDeparturePlatform else { return true }
+            return departure.platform == selectedDeparturePlatform
+        }
+    }
+
+    private func departuresMatchingSelectedLine() -> [Departure] {
+        guard let selectedDepartureLine else { return departures }
+        guard let route = selectedStopRoutes.first(where: { $0.id == selectedDepartureLine }) else {
+            return departures
+        }
+
+        return departures.filter { departure in
+            departure.matches(route: route)
+        }
+    }
+
+    private func clearSelectedPlatformIfUnavailable() {
+        guard let selectedDeparturePlatform else { return }
+        if !availableDeparturePlatforms.contains(selectedDeparturePlatform) {
+            self.selectedDeparturePlatform = nil
+        }
+    }
+}
+
+private extension Departure {
+    func matches(route: TransitRoute) -> Bool {
+        if routeId?.caseInsensitiveCompare(route.id) == .orderedSame {
+            return true
+        }
+
+        if lineName.caseInsensitiveCompare(route.shortName) == .orderedSame {
+            return true
+        }
+
+        return false
+    }
+}
+
+private extension Array where Element == String {
+    init(dictOrderedSet values: [String]) {
+        var seen: Set<String> = []
+        self = values.filter { seen.insert($0).inserted }
     }
 }

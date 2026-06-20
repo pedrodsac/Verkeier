@@ -21,7 +21,7 @@ struct LuxTransitApp: App {
             atpClient = EmptyATPClient()
         }
         gtfsService = LocalGTFSService()
-        routeService = MapKitRouteService()
+        routeService = PublicTransportRouteService(gtfsService: gtfsService, atpClient: atpClient)
         avlClient = LiveAVLClient(feedURL: configuration.avlMessagesURL)
     }
 

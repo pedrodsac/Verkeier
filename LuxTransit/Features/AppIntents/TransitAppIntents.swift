@@ -89,6 +89,26 @@ struct LuxTransitShortcuts: AppShortcutsProvider {
         )
 
         AppShortcut(
+            intent: OpenFavouriteStopIntent(),
+            phrases: [
+                "Open a favourite stop in \(.applicationName)",
+                "Show my favourite stop in \(.applicationName)"
+            ],
+            shortTitle: "Open Stop",
+            systemImageName: "star.fill"
+        )
+
+        AppShortcut(
+            intent: TrackNextDepartureIntent(),
+            phrases: [
+                "Track the next departure with \(.applicationName)",
+                "Start departure tracking in \(.applicationName)"
+            ],
+            shortTitle: "Track Departure",
+            systemImageName: "livephoto"
+        )
+
+        AppShortcut(
             intent: GetNextDeparturesIntent(),
             phrases: [
                 "Get next departures with \(.applicationName)"

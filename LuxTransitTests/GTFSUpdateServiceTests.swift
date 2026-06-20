@@ -20,15 +20,17 @@ struct GTFSUpdateServiceTests {
             force: true, now: Date(timeIntervalSince1970: 1_000))
 
         #expect(snapshot.status == .updated)
+        #expect(snapshot.lastFailureMessage == nil)
         #expect(snapshot.metadata?.resourceId == "resource-1")
         #expect(FileManager.default.fileExists(atPath: store.currentDirectory.path))
         #expect(FileManager.default.fileExists(atPath: store.stopsIndexURL.path))
+        #expect(FileManager.default.fileExists(atPath: store.timetableIndexURL.path))
 
         let gtfsService = LocalGTFSService(store: store)
-        let lift = try #require(gtfsService.searchStops(query: "lift").first)
+        let lift = try #require(await gtfsService.searchStops(query: "lift").first)
         #expect(lift.name == "Hill Lift")
         #expect(lift.modes == [.funicular])
-        #expect(gtfsService.routesForStop(id: lift.id).contains { $0.shortName == "F1" })
+        #expect(await gtfsService.routesForStop(id: lift.id).contains { $0.shortName == "F1" })
     }
 
     @Test func failedUpdateKeepsExistingGTFS() async throws {
@@ -61,9 +63,10 @@ struct GTFSUpdateServiceTests {
             force: true, now: Date(timeIntervalSince1970: 2_000))
 
         #expect(snapshot.status == .failed)
+        #expect(snapshot.lastFailureMessage == "The GTFS ZIP archive is invalid.")
         #expect((try store.loadMetadata())?.resourceId == "old")
         let gtfsService = LocalGTFSService(store: store)
-        #expect(gtfsService.searchStops(query: "stable").first?.name == "Stable Stop")
+        #expect(await gtfsService.searchStops(query: "stable").first?.name == "Stable Stop")
     }
 
     private func remoteResource(id: String) -> DataPublicResource {

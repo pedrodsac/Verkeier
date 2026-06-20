@@ -5,6 +5,7 @@ enum TransitSheetContext: String, CaseIterable, Identifiable, Hashable {
     case search
     case stopDetail
     case directions
+    case routeTimeline
     case alerts
     case settings
 
@@ -16,6 +17,7 @@ enum TransitSheetContext: String, CaseIterable, Identifiable, Hashable {
         case .search: "Search"
         case .stopDetail: "Selected stop"
         case .directions: "Directions"
+        case .routeTimeline: "Selected route"
         case .alerts: "Alerts"
         case .settings: "Settings"
         }
@@ -27,8 +29,8 @@ enum BottomSheetDetent: CaseIterable {
     case medium
     case expanded
 
-    static let collapsedPresentationDetent = PresentationDetent.height(132)
-    static let mediumPresentationDetent = PresentationDetent.fraction(0.58)
+    static let collapsedPresentationDetent = PresentationDetent.height(70)
+    static let mediumPresentationDetent = PresentationDetent.fraction(0.50)
     static let expandedPresentationDetent = PresentationDetent.large
 
     static let presentationDetents: Set<PresentationDetent> = [

@@ -13,11 +13,13 @@ nonisolated struct GTFSUpdateSnapshot: Equatable, Sendable {
     var metadata: LocalGTFSMetadata?
     var lastMetadataCheckAt: Date?
     var status: GTFSUpdateStatus
+    var lastFailureMessage: String?
 
     static let empty = GTFSUpdateSnapshot(
         metadata: nil,
         lastMetadataCheckAt: nil,
-        status: .idle
+        status: .idle,
+        lastFailureMessage: nil
     )
 }
 

@@ -1,3 +1,4 @@
+import AsyncAlgorithms
 import CoreLocation
 import MapKit
 import SwiftData
@@ -17,10 +18,11 @@ struct TransitMapScreen: View {
         [PersistedFavouriteStop]
     @State private var viewModel = TransitMapViewModel()
     @State private var mapRegionUpdateTask: Task<Void, Never>?
-    @State private var searchUpdateTask: Task<Void, Never>?
+    @State private var searchUpdateContinuation: AsyncStream<String>.Continuation?
     @State private var nearbyStopsUpdateTask: Task<Void, Never>?
     @State private var shouldCenterOnNextLocation = false
     @State private var isMainSheetPresented = true
+    @State private var favouriteStopIds: Set<String> = []
 
     let locationService: LocationService
 
@@ -86,7 +88,7 @@ struct TransitMapScreen: View {
         }
         .task {
             locationService.startUpdatingIfAllowed()
-            viewModel.loadGTFSMapStops(
+            await viewModel.loadGTFSMapStops(
                 using: gtfsService, location: locationService.currentLocation)
             await viewModel.loadNearbyStops(
                 using: atpClient, location: locationService.currentLocation)
@@ -95,25 +97,33 @@ struct TransitMapScreen: View {
             gtfsUpdateController.loadSnapshot()
             gtfsUpdateController.checkAutomatically()
         }
+        .task {
+            await observeSearchUpdates()
+        }
         .onChange(of: locationService.currentLocation) {
             if shouldCenterOnNextLocation, locationService.currentLocation != nil {
                 viewModel.centerOnUserLocation(locationService.currentLocation)
                 shouldCenterOnNextLocation = false
             }
-            viewModel.loadGTFSMapStops(
-                using: gtfsService, location: locationService.currentLocation)
+            Task {
+                await viewModel.loadGTFSMapStops(
+                    using: gtfsService, location: locationService.currentLocation)
+            }
             scheduleNearbyStopsRefresh()
+            calculateWaitingRouteIfNeeded()
         }
         .task(id: departureRefreshKey) {
             guard viewModel.selectedStop != nil, viewModel.sheetContext == .stopDetail else {
                 return
             }
             await viewModel.loadDepartures(using: atpClient)
+            await updateTrackedDepartureIfNeeded()
 
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(45))
                 guard !Task.isCancelled else { return }
                 await viewModel.loadDepartures(using: atpClient)
+                await updateTrackedDepartureIfNeeded()
             }
         }
         .task(id: favouriteRefreshKey) {
@@ -123,9 +133,11 @@ struct TransitMapScreen: View {
             scheduleSearchUpdate()
         }
         .onChange(of: favouriteEntities) {
+            favouriteStopIds = Set(favouriteEntities.map(\.stopId))
             mirrorFavouriteEntitiesForIntents()
         }
         .onAppear {
+            favouriteStopIds = Set(favouriteEntities.map(\.stopId))
             mirrorFavouriteEntitiesForIntents()
             handlePendingIntentHandoff()
         }
@@ -138,10 +150,12 @@ struct TransitMapScreen: View {
             handleDeepLink(url)
         }
         .onReceive(NotificationCenter.default.publisher(for: .gtfsDidUpdate)) { _ in
-            viewModel.loadGTFSMapStops(
-                using: gtfsService, location: locationService.currentLocation)
-            viewModel.updateSelectedStopRoutes(using: gtfsService)
-            updateSearch()
+            Task {
+                await viewModel.loadGTFSMapStops(
+                    using: gtfsService, location: locationService.currentLocation)
+                await viewModel.updateSelectedStopRoutes(using: gtfsService)
+                await viewModel.searchStops(using: gtfsService)
+            }
         }
     }
 
@@ -150,10 +164,10 @@ struct TransitMapScreen: View {
             region: viewModel.cameraRegion,
             cameraUpdateToken: viewModel.cameraUpdateToken,
             liveStops: viewModel.nearbyStops,
-            gtfsStops: gtfsOnlyMapStops,
+            gtfsStops: viewModel.gtfsOnlyMapStops,
             selectedStopId: viewModel.selectedStop?.id,
-            favouriteStopIds: Set(favouriteEntities.map(\.stopId)),
-            routePolyline: viewModel.mapRoute?.polyline,
+            favouriteStopIds: favouriteStopIds,
+            routeOverlay: viewModel.routeMapOverlay,
             selectStop: selectStop,
             regionDidChange: scheduleMapRegionUpdate
         )
@@ -171,14 +185,6 @@ struct TransitMapScreen: View {
 
     private var departureRefreshKey: String {
         "\(viewModel.selectedStop?.id ?? "none")|\(viewModel.sheetContext)"
-    }
-
-    private var gtfsOnlyMapStops: [Stop] {
-        viewModel.gtfsMapStops.filter { gtfsStop in
-            !viewModel.nearbyStops.contains { liveStop in
-                stopsRepresentSamePlace(liveStop, gtfsStop)
-            }
-        }
     }
 
     private var sheetPresentationModel: TransitSheetPresentationModel {
@@ -210,7 +216,10 @@ struct TransitMapScreen: View {
             stopDetail: StopDetailPresentationModel(
                 stop: viewModel.selectedStop,
                 routes: viewModel.selectedStopRoutes,
-                departures: viewModel.departures,
+                departures: viewModel.filteredDepartures,
+                availablePlatforms: viewModel.availableDeparturePlatforms,
+                selectedLine: viewModel.selectedDepartureLine,
+                selectedPlatform: viewModel.selectedDeparturePlatform,
                 isLoadingDepartures: viewModel.isLoadingDepartures,
                 errorMessage: viewModel.departuresErrorMessage,
                 lastUpdated: viewModel.departuresLastUpdated,
@@ -221,9 +230,12 @@ struct TransitMapScreen: View {
             ),
             route: RoutePresentationModel(
                 selectedStop: viewModel.selectedStop,
-                routePlan: viewModel.routePlan,
-                isCalculating: viewModel.isCalculatingRoute,
-                errorMessage: viewModel.routeErrorMessage
+                routeOptions: viewModel.routeOptions,
+                selectedRouteOptionID: viewModel.selectedRouteOptionID,
+                visibleRouteOptionCount: viewModel.visibleRouteOptionCount,
+                loadingPhase: viewModel.routeLoadingPhase,
+                errorMessage: viewModel.routeErrorMessage,
+                statusMessage: viewModel.routeStatusMessage
             ),
             alerts: AlertsPresentationModel(
                 alerts: viewModel.alerts,
@@ -253,28 +265,50 @@ struct TransitMapScreen: View {
 
     private func scheduleMapRegionUpdate(_ region: MKCoordinateRegion) {
         mapRegionUpdateTask?.cancel()
-        mapRegionUpdateTask = Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(120))
+        mapRegionUpdateTask = Task { @concurrent in
+            do {
+                try await Task.sleep(for: .milliseconds(120))
+            } catch {
+                return
+            }
             guard !Task.isCancelled else { return }
-            viewModel.updateVisibleMapRegion(region, using: gtfsService)
+            await viewModel.updateVisibleMapRegion(region, using: gtfsService)
         }
     }
 
     private func scheduleSearchUpdate() {
-        searchUpdateTask?.cancel()
-        searchUpdateTask = Task { @MainActor in
-            if !viewModel.searchQuery.isEmpty {
-                try? await Task.sleep(for: .milliseconds(180))
+        let query = viewModel.searchQuery
+        guard !query.isEmpty else {
+            Task {
+                await viewModel.searchStops(using: gtfsService)
             }
+            return
+        }
+        searchUpdateContinuation?.yield(query)
+    }
+
+    private func observeSearchUpdates() async {
+        let stream = AsyncStream<String>.makeStream(of: String.self)
+        searchUpdateContinuation = stream.continuation
+        defer {
+            searchUpdateContinuation = nil
+        }
+
+        for await query in stream.stream.debounce(for: .milliseconds(180)) {
             guard !Task.isCancelled else { return }
-            viewModel.searchStops(using: gtfsService)
+            guard query == viewModel.searchQuery else { continue }
+            await viewModel.searchStops(using: gtfsService)
         }
     }
 
     private func scheduleNearbyStopsRefresh() {
         nearbyStopsUpdateTask?.cancel()
-        nearbyStopsUpdateTask = Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(350))
+        nearbyStopsUpdateTask = Task { @concurrent in
+            do {
+                try await Task.sleep(for: .milliseconds(350))
+            } catch {
+                return
+            }
             guard !Task.isCancelled else { return }
             await viewModel.loadNearbyStops(
                 using: atpClient, location: locationService.currentLocation)
@@ -289,14 +323,19 @@ struct TransitMapScreen: View {
             showAlerts: showAlerts,
             showStopDetail: showStopDetail,
             showDirections: showDirections,
+            showRouteOptions: showRouteOptions,
             showSettings: showSettings,
             toggleFavourite: toggleSelectedFavourite,
             toggleFavouriteExpansion: toggleFavouriteExpansion,
             refreshDepartures: refreshDepartures,
             refreshAlerts: refreshAlerts,
             calculateRoute: calculateRoute,
+            selectRouteOption: selectRouteOption,
+            showMoreRouteOptions: showMoreRouteOptions,
             openRouteInAppleMaps: openRouteInAppleMaps,
             trackDeparture: trackDeparture,
+            toggleDepartureLine: toggleDepartureLine,
+            selectDeparturePlatform: selectDeparturePlatform,
             updateSearch: updateSearch,
             checkGTFSUpdate: checkGTFSUpdate
         )
@@ -306,8 +345,10 @@ struct TransitMapScreen: View {
         animateSheetChange {
             viewModel.selectStop(stop)
         }
-        viewModel.updateSelectedStopRoutes(using: gtfsService)
-        viewModel.loadGTFSMapStops(using: gtfsService, location: locationService.currentLocation)
+        Task {
+            await viewModel.updateSelectedStopRoutes(using: gtfsService)
+            await viewModel.loadGTFSMapStops(using: gtfsService, location: locationService.currentLocation)
+        }
     }
 
     private func showHome() {
@@ -338,6 +379,21 @@ struct TransitMapScreen: View {
         animateSheetChange {
             viewModel.showDirections()
         }
+        calculateRoute()
+    }
+
+    private func showRouteOptions() {
+        animateSheetChange {
+            viewModel.showDirections()
+        }
+    }
+
+    private func toggleDepartureLine(_ route: TransitRoute) {
+        viewModel.toggleDepartureLine(route)
+    }
+
+    private func selectDeparturePlatform(_ platform: String?) {
+        viewModel.selectDeparturePlatform(platform)
     }
 
     private func showSettings() {
@@ -370,8 +426,10 @@ struct TransitMapScreen: View {
                 locationService.startUpdatingIfAllowed()
             } else {
                 viewModel.centerOnUserLocation(locationService.currentLocation)
-                viewModel.loadGTFSMapStops(
-                    using: gtfsService, location: locationService.currentLocation)
+                Task {
+                    await viewModel.loadGTFSMapStops(
+                        using: gtfsService, location: locationService.currentLocation)
+                }
             }
         case .notDetermined:
             shouldCenterOnNextLocation = true
@@ -384,6 +442,7 @@ struct TransitMapScreen: View {
     private func refreshDepartures() {
         Task {
             await viewModel.loadDepartures(using: atpClient)
+            await updateTrackedDepartureIfNeeded()
         }
     }
 
@@ -399,8 +458,9 @@ struct TransitMapScreen: View {
     }
 
     private func updateSearch() {
-        searchUpdateTask?.cancel()
-        viewModel.searchStops(using: gtfsService)
+        Task {
+            await viewModel.searchStops(using: gtfsService)
+        }
     }
 
     private func checkGTFSUpdate() {
@@ -408,15 +468,47 @@ struct TransitMapScreen: View {
     }
 
     private func calculateRoute() {
+        if locationService.currentLocation == nil {
+            switch locationService.authorizationStatus {
+            case .denied, .restricted:
+                viewModel.failRouteLocationRequest()
+                return
+            default:
+                break
+            }
+
+            requestLocation()
+        }
+
         Task {
             await viewModel.calculateRoute(
                 using: routeService, from: locationService.currentLocation)
         }
     }
 
+    private func calculateWaitingRouteIfNeeded() {
+        guard viewModel.isWaitingForRouteLocation, locationService.currentLocation != nil else {
+            return
+        }
+
+        calculateRoute()
+    }
+
     private func openRouteInAppleMaps() {
         viewModel.openSelectedRouteInAppleMaps(
             using: routeService, from: locationService.currentLocation)
+    }
+
+    private func selectRouteOption(_ id: String) {
+        animateSheetChange {
+            if viewModel.selectRouteOption(id: id) {
+                viewModel.showRouteTimeline()
+            }
+        }
+    }
+
+    private func showMoreRouteOptions() {
+        viewModel.showMoreRouteOptions()
     }
 
     private func refreshAlerts() {
@@ -432,23 +524,31 @@ struct TransitMapScreen: View {
         }
     }
 
+    private func updateTrackedDepartureIfNeeded() async {
+        guard let departure = DepartureTrackingSelection.trackedDeparture(
+            in: viewModel.departures,
+            trackedDepartureId: liveActivityManager.trackedDepartureId
+        ) else {
+            return
+        }
+
+        await liveActivityManager.updateTracking(departure: departure)
+    }
+
+    private func trackNextDeparture(for stop: Stop) {
+        Task {
+            await viewModel.loadDepartures(using: atpClient)
+            guard let departure = DepartureTrackingSelection.nextTrackableDeparture(
+                from: viewModel.departures
+            ) else {
+                return
+            }
+            await liveActivityManager.startTracking(departure: departure, stop: stop)
+        }
+    }
+
     private func isFavourite(_ stop: Stop) -> Bool {
         favouriteEntities.contains { $0.stopId == stop.id }
-    }
-
-    private func squaredDistance(from lhs: LocationPoint, to rhs: LocationPoint) -> Double {
-        let latitude = lhs.latitude - rhs.latitude
-        let longitude = lhs.longitude - rhs.longitude
-        return latitude * latitude + longitude * longitude
-    }
-
-    private func stopsRepresentSamePlace(_ lhs: Stop, _ rhs: Stop) -> Bool {
-        if lhs.id == rhs.id { return true }
-
-        let namesMatch = lhs.name.normalizedForSearch == rhs.name.normalizedForSearch
-        guard namesMatch else { return false }
-
-        return squaredDistance(from: lhs.location, to: rhs.location) < 0.000002
     }
 
     private func toggleSelectedFavourite() {
@@ -487,19 +587,52 @@ struct TransitMapScreen: View {
         switch handoff {
         case .showNearbyStops:
             viewModel.showHome()
-        case .openFavouriteStop(let stopId), .trackNextDeparture(let stopId):
+        case .openFavouriteStop(let stopId):
             if let favourite = favouriteEntities.first(where: { $0.stopId == stopId })?.stop {
                 viewModel.selectStop(favourite)
-                viewModel.updateSelectedStopRoutes(using: gtfsService)
+                Task {
+                    await viewModel.updateSelectedStopRoutes(using: gtfsService)
+                }
                 viewModel.sheetDetent = .expanded
+            } else {
+                viewModel.showSearch()
+            }
+        case .trackNextDeparture(let stopId):
+            if let favourite = favouriteEntities.first(where: { $0.stopId == stopId })?.stop {
+                viewModel.selectStop(favourite)
+                Task {
+                    await viewModel.updateSelectedStopRoutes(using: gtfsService)
+                }
+                viewModel.sheetDetent = .expanded
+                trackNextDeparture(for: favourite)
             } else {
                 viewModel.showSearch()
             }
         case .planRoute(let destinationName):
             viewModel.searchQuery = destinationName
-            viewModel.searchStops(using: gtfsService)
-            viewModel.showSearch()
+            Task {
+                await viewModel.searchStops(using: gtfsService)
+                if let stop = confidentRouteDestinationMatch(for: destinationName) {
+                    selectStop(stop)
+                    showDirections()
+                } else {
+                    viewModel.showSearch()
+                }
+            }
         }
+    }
+
+    private func confidentRouteDestinationMatch(for destinationName: String) -> Stop? {
+        let normalizedDestination = destinationName.normalizedForSearch
+        let exactMatches = viewModel.searchResults.filter {
+            $0.name.normalizedForSearch == normalizedDestination
+        }
+
+        if exactMatches.count == 1 {
+            return exactMatches[0]
+        }
+
+        return viewModel.searchResults.count == 1 ? viewModel.searchResults[0] : nil
     }
 }
 
@@ -538,7 +671,7 @@ private struct TransitMapView: UIViewRepresentable {
     let gtfsStops: [Stop]
     let selectedStopId: String?
     let favouriteStopIds: Set<String>
-    let routePolyline: MKPolyline?
+    let routeOverlay: RouteMapOverlay?
     let selectStop: (Stop) -> Void
     let regionDidChange: (MKCoordinateRegion) -> Void
 
@@ -556,20 +689,25 @@ private struct TransitMapView: UIViewRepresentable {
         context.coordinator.selectedStopId = selectedStopId
         context.coordinator.favouriteStopIds = favouriteStopIds
 
-        let stopAnnotations =
-            liveStops.map {
+        let stopAnnotations = routeOverlay == nil
+            ? liveStops.map {
                 StopMapAnnotation(stop: $0, layer: .liveNearby)
             }
             + gtfsStops.map {
                 StopMapAnnotation(stop: $0, layer: .gtfs)
             }
+            : []
+        let transferAnnotations = routeOverlay?.transferMarkers.map(RouteTransferAnnotation.init) ?? []
 
         view.update(
             snapshot: MapSnapshot(
                 region: region,
                 cameraUpdateToken: cameraUpdateToken,
                 annotations: stopAnnotations,
-                routePolyline: routePolyline
+                transferAnnotations: transferAnnotations,
+                selectedStopId: selectedStopId,
+                favouriteStopIds: favouriteStopIds,
+                routeOverlay: routeOverlay
             )
         )
     }
@@ -578,13 +716,37 @@ private struct TransitMapView: UIViewRepresentable {
         let region: MKCoordinateRegion
         let cameraUpdateToken: Int
         let annotations: [StopMapAnnotation]
-        let routePolyline: MKPolyline?
+        let transferAnnotations: [RouteTransferAnnotation]
+        let selectedStopId: String?
+        let favouriteStopIds: Set<String>
+        let routeOverlay: RouteMapOverlay?
+
+        var key: MapSnapshotKey {
+            MapSnapshotKey(
+                cameraUpdateToken: cameraUpdateToken,
+                annotationKeys: annotations.map(\.key),
+                transferAnnotationKeys: transferAnnotations.map(\.key),
+                selectedStopId: selectedStopId,
+                favouriteStopIds: favouriteStopIds,
+                routeOverlay: routeOverlay
+            )
+        }
+    }
+
+    struct MapSnapshotKey: Equatable {
+        let cameraUpdateToken: Int
+        let annotationKeys: [String]
+        let transferAnnotationKeys: [String]
+        let selectedStopId: String?
+        let favouriteStopIds: Set<String>
+        let routeOverlay: RouteMapOverlay?
     }
 
     final class MapContainerView: UIView {
         private let coordinator: Coordinator
         private var mapView: MKMapView?
         private var snapshot: MapSnapshot?
+        private var appliedSnapshotKey: MapSnapshotKey?
         private var appliedCameraUpdateToken: Int?
 
         init(coordinator: Coordinator) {
@@ -627,6 +789,8 @@ private struct TransitMapView: UIViewRepresentable {
 
         private func applySnapshotIfPossible() {
             guard let mapView, let snapshot, bounds.width > 0, bounds.height > 0 else { return }
+            let snapshotKey = snapshot.key
+            guard appliedSnapshotKey != snapshotKey else { return }
 
             if appliedCameraUpdateToken != snapshot.cameraUpdateToken {
                 coordinator.isApplyingRegion = true
@@ -635,7 +799,9 @@ private struct TransitMapView: UIViewRepresentable {
             }
 
             coordinator.syncAnnotations(snapshot.annotations, in: mapView)
-            coordinator.syncRoute(snapshot.routePolyline, in: mapView)
+            coordinator.syncTransferAnnotations(snapshot.transferAnnotations, in: mapView)
+            coordinator.syncRoute(snapshot.routeOverlay, in: mapView)
+            appliedSnapshotKey = snapshotKey
         }
     }
 
@@ -646,7 +812,10 @@ private struct TransitMapView: UIViewRepresentable {
         var favouriteStopIds: Set<String> = []
         var isApplyingRegion = false
         private var annotationsByKey: [String: StopMapAnnotation] = [:]
-        private var routeOverlay: MKPolyline?
+        private var transferAnnotationsByKey: [String: RouteTransferAnnotation] = [:]
+        private var routeOverlay: RouteMapOverlay?
+        private var routePolylines: [MKPolyline] = []
+        private var routePolylineSegments: [ObjectIdentifier: RouteMapSegment] = [:]
 
         init(
             selectStop: @escaping (Stop) -> Void,
@@ -679,19 +848,50 @@ private struct TransitMapView: UIViewRepresentable {
             }
         }
 
-        func syncRoute(_ polyline: MKPolyline?, in mapView: MKMapView) {
-            if routeOverlay === polyline {
+        func syncTransferAnnotations(
+            _ annotations: [RouteTransferAnnotation],
+            in mapView: MKMapView
+        ) {
+            let nextKeys = Set(annotations.map(\.key))
+            let staleKeys = Set(transferAnnotationsByKey.keys).subtracting(nextKeys)
+            let staleAnnotations = staleKeys.compactMap {
+                transferAnnotationsByKey.removeValue(forKey: $0)
+            }
+            mapView.removeAnnotations(staleAnnotations)
+
+            for annotation in annotations {
+                if transferAnnotationsByKey[annotation.key] != nil {
+                    continue
+                }
+
+                transferAnnotationsByKey[annotation.key] = annotation
+                mapView.addAnnotation(annotation)
+            }
+        }
+
+        func syncRoute(_ overlay: RouteMapOverlay?, in mapView: MKMapView) {
+            if routeOverlay == overlay {
                 return
             }
 
-            if let routeOverlay {
-                mapView.removeOverlay(routeOverlay)
-                self.routeOverlay = nil
+            if !routePolylines.isEmpty {
+                mapView.removeOverlays(routePolylines)
+                routePolylines = []
+                routePolylineSegments = [:]
             }
 
-            if let polyline {
-                mapView.addOverlay(polyline)
-                routeOverlay = polyline
+            routeOverlay = overlay
+
+            if let overlay {
+                let polylines = overlay.segments.compactMap { segment -> MKPolyline? in
+                    var coordinates = segment.coordinates.map(\.coordinate)
+                    guard coordinates.count >= 2 else { return nil }
+                    let polyline = MKPolyline(coordinates: &coordinates, count: coordinates.count)
+                    routePolylineSegments[ObjectIdentifier(polyline)] = segment
+                    return polyline
+                }
+                mapView.addOverlays(polylines)
+                routePolylines = polylines
             }
         }
 
@@ -711,6 +911,21 @@ private struct TransitMapView: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            if let annotation = annotation as? RouteTransferAnnotation {
+                let identifier = "RouteTransferAnnotation"
+                let view =
+                    mapView.dequeueReusableAnnotationView(
+                        withIdentifier: identifier
+                    ) as? MKMarkerAnnotationView
+                    ?? MKMarkerAnnotationView(
+                        annotation: annotation,
+                        reuseIdentifier: identifier
+                    )
+                view.annotation = annotation
+                configureTransfer(view, for: annotation)
+                return view
+            }
+
             guard let annotation = annotation as? StopMapAnnotation else { return nil }
 
             let identifier = "StopMapAnnotation"
@@ -733,11 +948,62 @@ private struct TransitMapView: UIViewRepresentable {
             }
 
             let renderer = MKPolylineRenderer(polyline: polyline)
-            renderer.strokeColor = .systemBlue
-            renderer.lineWidth = 5
+            let segment = routePolylineSegments[ObjectIdentifier(polyline)]
+            let mode = segment?.mode ?? .unknown
+            renderer.strokeColor = routeColor(for: segment)
+            renderer.lineWidth = mode == .walking ? 2 : 3
             renderer.lineCap = .round
             renderer.lineJoin = .round
+            if mode == .walking {
+                renderer.lineDashPattern = [1, 4]
+            }
             return renderer
+        }
+
+        private func routeColor(for segment: RouteMapSegment?) -> UIColor {
+            guard let segment else { return .systemBlue }
+            let palette: [UIColor]
+            switch segment.mode {
+            case .bus:
+                palette = [.systemBlue, .link, .systemCyan, .systemIndigo]
+            case .train:
+                palette = [
+                    .systemRed,
+                    .red,
+                    UIColor(red: 0.72, green: 0.08, blue: 0.12, alpha: 1),
+                    UIColor(red: 0.95, green: 0.22, blue: 0.18, alpha: 1)
+                ]
+            case .tram:
+                palette = [
+                    .systemOrange,
+                    UIColor(red: 0.92, green: 0.42, blue: 0.06, alpha: 1),
+                    UIColor(red: 0.78, green: 0.31, blue: 0.02, alpha: 1),
+                    UIColor(red: 1.0, green: 0.55, blue: 0.12, alpha: 1)
+                ]
+            case .funicular:
+                palette = [.systemTeal]
+            case .walking:
+                palette = [.secondaryLabel]
+            case .unknown:
+                palette = [.systemBlue]
+            }
+
+            let routeKey = segment.routeId ?? segment.routeName ?? segment.id
+            let index = abs(routeKey.hashValue) % palette.count
+            return palette[index]
+        }
+
+        private func configureTransfer(
+            _ view: MKMarkerAnnotationView,
+            for annotation: RouteTransferAnnotation
+        ) {
+            view.markerTintColor = .systemIndigo
+            view.glyphTintColor = .white
+            view.glyphImage = UIImage(systemName: "arrow.triangle.2.circlepath")
+            view.titleVisibility = .visible
+            view.subtitleVisibility = .hidden
+            view.displayPriority = .required
+            view.canShowCallout = false
         }
 
         private func configure(_ view: MKMarkerAnnotationView, for annotation: StopMapAnnotation) {
@@ -795,6 +1061,18 @@ private final class StopMapAnnotation: NSObject, MKAnnotation {
 
     func update(stop: Stop) {
         self.stop = stop
+    }
+}
+
+private final class RouteTransferAnnotation: NSObject, MKAnnotation {
+    private let marker: RouteTransferMarker
+
+    var key: String { marker.id }
+    var coordinate: CLLocationCoordinate2D { marker.coordinate.coordinate }
+    var title: String? { marker.title }
+
+    init(marker: RouteTransferMarker) {
+        self.marker = marker
     }
 }
 

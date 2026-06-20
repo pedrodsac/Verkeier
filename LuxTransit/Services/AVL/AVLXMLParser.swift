@@ -1,6 +1,6 @@
 import Foundation
 
-final class AVLXMLParser: NSObject, XMLParserDelegate {
+nonisolated final class AVLXMLParser: NSObject, XMLParserDelegate {
     private var messages: [AlertMessage] = []
     private var currentValues: [String: String] = [:]
     private var affectedStopIds: [String] = []
@@ -140,7 +140,12 @@ final class AVLXMLParser: NSObject, XMLParserDelegate {
 
     private func parseAVLDate(_ value: String?) -> Date? {
         guard let value, !value.isEmpty else { return nil }
-        return Self.dateFormatter.date(from: value)
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(identifier: "Europe/Luxembourg")
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        return formatter.date(from: value)
     }
 
     private func splitList(_ value: String?) -> [String] {
@@ -155,12 +160,4 @@ final class AVLXMLParser: NSObject, XMLParserDelegate {
         return values.filter { seen.insert($0).inserted }
     }
 
-    private static let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.calendar = Calendar(identifier: .gregorian)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(identifier: "Europe/Luxembourg")
-        formatter.dateFormat = "yyyy-MM-dd HH:mm"
-        return formatter
-    }()
 }

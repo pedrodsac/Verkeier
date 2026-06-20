@@ -11,53 +11,62 @@ struct BottomSheetContent: View {
             if detent == .collapsed {
                 CollapsedSearchContent(query: searchQuery, action: actions.showSearch)
             } else {
-                switch viewModel.context {
-                case .home:
-                    HomeSheetContent(
-                        query: searchQuery,
-                        detent: detent,
-                        viewModel: viewModel.commute,
-                        showSearch: actions.showSearch,
-                        showSettings: actions.showSettings,
-                        showAlerts: actions.showAlerts,
-                        selectStop: actions.selectStop,
-                        toggleExpansion: actions.toggleFavouriteExpansion
-                    )
-                case .search:
-                    SearchView(
-                        query: $searchQuery,
-                        viewModel: viewModel.search,
-                        updateSearch: actions.updateSearch,
-                        selectStop: actions.selectStop,
-                        cancel: actions.showHome
-                    )
-                case .stopDetail:
-                    StopDetailView(
-                        viewModel: viewModel.stopDetail,
-                        openDirections: actions.showDirections,
-                        trackDeparture: actions.trackDeparture
-                    )
-                case .directions:
-                    RouteView(
-                        viewModel: viewModel.route,
-                        calculateRoute: actions.calculateRoute,
-                        openInAppleMaps: actions.openRouteInAppleMaps
-                    )
-                case .alerts:
-                    AlertsView(
-                        viewModel: viewModel.alerts
-                    )
-                case .settings:
-                    SettingsView(
-                        viewModel: viewModel.settings,
-                        checkGTFSUpdate: actions.checkGTFSUpdate
-                    )
+                ScrollView {
+                    switch viewModel.context {
+                    case .home:
+                        HomeSheetContent(
+                            query: searchQuery,
+                            detent: detent,
+                            viewModel: viewModel.commute,
+                            showSearch: actions.showSearch,
+                            showSettings: actions.showSettings,
+                            showAlerts: actions.showAlerts,
+                            selectStop: actions.selectStop,
+                            toggleExpansion: actions.toggleFavouriteExpansion
+                        )
+                    case .search:
+                        SearchView(
+                            query: $searchQuery,
+                            viewModel: viewModel.search,
+                            updateSearch: actions.updateSearch,
+                            selectStop: actions.selectStop,
+                            cancel: actions.showHome
+                        )
+                    case .stopDetail:
+                        StopDetailView(
+                            viewModel: viewModel.stopDetail,
+                            openDirections: actions.showDirections,
+                            trackDeparture: actions.trackDeparture,
+                            toggleDepartureLine: actions.toggleDepartureLine,
+                            selectDeparturePlatform: actions.selectDeparturePlatform
+                        )
+                    case .directions:
+                        RouteView(
+                            viewModel: viewModel.route,
+                            calculateRoute: actions.calculateRoute,
+                            selectRouteOption: actions.selectRouteOption,
+                            showMoreRouteOptions: actions.showMoreRouteOptions,
+                            openInAppleMaps: actions.openRouteInAppleMaps
+                        )
+                    case .routeTimeline:
+                        RouteTimelineView(
+                            viewModel: viewModel.route,
+                            openInAppleMaps: actions.openRouteInAppleMaps
+                        )
+                    case .alerts:
+                        AlertsView(
+                            viewModel: viewModel.alerts
+                        )
+                    case .settings:
+                        SettingsView(
+                            viewModel: viewModel.settings,
+                            checkGTFSUpdate: actions.checkGTFSUpdate
+                        )
+                    }
                 }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 0)
-        .padding(.bottom, detent == .collapsed ? 0 : 34)
+        .safeAreaPadding(.horizontal, 16)
     }
 }
 
@@ -110,7 +119,7 @@ private struct HomeSheetContent: View {
             .buttonStyle(.plain)
             .accessibilityLabel("Settings and information")
         }
-        .padding(.top, 2)
+        .padding(.top, 14)
     }
 }
 

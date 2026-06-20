@@ -16,7 +16,7 @@ struct Departure: Codable, Hashable, Identifiable, Sendable {
     let dataSource: DataSource
     let lastUpdated: Date?
 
-    init(
+    nonisolated init(
         id: String,
         stopId: String,
         routeId: String? = nil,

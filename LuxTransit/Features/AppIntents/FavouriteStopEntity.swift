@@ -1,5 +1,6 @@
 import AppIntents
 import Foundation
+import WidgetKit
 
 struct FavouriteStopEntity: AppEntity, Identifiable {
     static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Favourite Stop")
@@ -10,7 +11,7 @@ struct FavouriteStopEntity: AppEntity, Identifiable {
     let locality: String?
     let platformIds: [String]
 
-    init(id: String, name: String, locality: String?, platformIds: [String]? = nil) {
+    nonisolated init(id: String, name: String, locality: String?, platformIds: [String]? = nil) {
         self.id = id
         self.name = name
         self.locality = locality
@@ -53,6 +54,7 @@ nonisolated enum FavouriteStopEntityStore {
             )
         }
         SharedTransitDataStore.saveFavouriteStops(entities)
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     nonisolated static func entities() -> [FavouriteStopEntity] {

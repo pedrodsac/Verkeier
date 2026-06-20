@@ -24,6 +24,10 @@ nonisolated struct GTFSLocalStore: Sendable {
         indexesDirectory.appendingPathComponent("stops-index.json")
     }
 
+    var timetableIndexURL: URL {
+        indexesDirectory.appendingPathComponent("timetable-index.json")
+    }
+
     private var metadataURL: URL {
         rootDirectory.appendingPathComponent("metadata.json")
     }
@@ -77,6 +81,7 @@ nonisolated struct GTFSLocalStore: Sendable {
     func commit(
         feedDirectory: URL,
         indexURL: URL,
+        timetableIndexURL: URL? = nil,
         metadata: LocalGTFSMetadata
     ) throws {
         try bootstrap()
@@ -86,10 +91,23 @@ nonisolated struct GTFSLocalStore: Sendable {
             isDirectory: true
         )
         let replacementIndex = rootDirectory.appendingPathComponent("stops-index.replacement.json")
+        let replacementTimetableIndex = rootDirectory.appendingPathComponent(
+            "timetable-index.replacement.json"
+        )
         let backupCurrent = rootDirectory.appendingPathComponent("current.backup", isDirectory: true)
         let backupIndex = rootDirectory.appendingPathComponent("stops-index.backup.json")
+        let backupTimetableIndex = rootDirectory.appendingPathComponent(
+            "timetable-index.backup.json"
+        )
 
-        for url in [replacementCurrent, replacementIndex, backupCurrent, backupIndex] {
+        for url in [
+            replacementCurrent,
+            replacementIndex,
+            replacementTimetableIndex,
+            backupCurrent,
+            backupIndex,
+            backupTimetableIndex
+        ] {
             if fileManager.fileExists(atPath: url.path) {
                 try fileManager.removeItem(at: url)
             }
@@ -97,6 +115,9 @@ nonisolated struct GTFSLocalStore: Sendable {
 
         try fileManager.copyItem(at: feedDirectory, to: replacementCurrent)
         try fileManager.copyItem(at: indexURL, to: replacementIndex)
+        if let timetableIndexURL {
+            try fileManager.copyItem(at: timetableIndexURL, to: replacementTimetableIndex)
+        }
 
         if fileManager.fileExists(atPath: currentDirectory.path) {
             try fileManager.moveItem(at: currentDirectory, to: backupCurrent)
@@ -109,9 +130,16 @@ nonisolated struct GTFSLocalStore: Sendable {
                 try fileManager.moveItem(at: stopsIndexURL, to: backupIndex)
             }
             try fileManager.moveItem(at: replacementIndex, to: stopsIndexURL)
+            if fileManager.fileExists(atPath: self.timetableIndexURL.path) {
+                try fileManager.moveItem(at: self.timetableIndexURL, to: backupTimetableIndex)
+            }
+            if fileManager.fileExists(atPath: replacementTimetableIndex.path) {
+                try fileManager.moveItem(at: replacementTimetableIndex, to: self.timetableIndexURL)
+            }
             try saveMetadata(metadata)
             try? fileManager.removeItem(at: backupCurrent)
             try? fileManager.removeItem(at: backupIndex)
+            try? fileManager.removeItem(at: backupTimetableIndex)
         } catch {
             if fileManager.fileExists(atPath: currentDirectory.path) {
                 try? fileManager.removeItem(at: currentDirectory)
@@ -124,6 +152,12 @@ nonisolated struct GTFSLocalStore: Sendable {
             }
             if fileManager.fileExists(atPath: backupIndex.path) {
                 try? fileManager.moveItem(at: backupIndex, to: stopsIndexURL)
+            }
+            if fileManager.fileExists(atPath: self.timetableIndexURL.path) {
+                try? fileManager.removeItem(at: self.timetableIndexURL)
+            }
+            if fileManager.fileExists(atPath: backupTimetableIndex.path) {
+                try? fileManager.moveItem(at: backupTimetableIndex, to: self.timetableIndexURL)
             }
             throw error
         }

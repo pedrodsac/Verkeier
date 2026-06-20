@@ -14,14 +14,6 @@ struct CommuteDashboardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: displayStyle == .mapsMedium ? 18 : 16) {
-            if displayStyle == .mapsMedium {
-                mapsSectionHeader
-            } else {
-                Text(viewModel.hasFavourites ? viewModel.statusText : "Stops around you")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
             if viewModel.activeAlertCount > 0 {
                 AlertsSummaryRow(alertCount: viewModel.activeAlertCount, action: showAlerts)
             }
@@ -33,20 +25,6 @@ struct CommuteDashboardView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var mapsSectionHeader: some View {
-        HStack(spacing: 8) {
-            Text(viewModel.hasFavourites ? "Commute" : "Nearby")
-                .font(.title.bold())
-                .foregroundStyle(.primary)
-
-            Image(systemName: "chevron.right")
-                .font(.title3.weight(.bold))
-                .foregroundStyle(.secondary)
-                .accessibilityHidden(true)
-        }
-        .accessibilityElement(children: .combine)
     }
 
     private var favouritesContent: some View {

@@ -67,4 +67,34 @@ struct AVLXMLParserTests {
         #expect(messages[0].startsAt != nil)
         #expect(messages[0].endsAt != nil)
     }
+
+    @Test func concurrentParsersDoNotShareMutableState() async throws {
+        let xml = """
+            <Messages>
+              <Message>
+                <MessageID>concurrent</MessageID>
+                <DateDebut>2026-01-12 07:00</DateDebut>
+                <Titre>Concurrent alert</Titre>
+                <Texte>Parser state stays isolated.</Texte>
+              </Message>
+            </Messages>
+            """
+        let data = Data(xml.utf8)
+
+        let counts = try await withThrowingTaskGroup(of: Int.self) { group in
+            for _ in 0..<16 {
+                group.addTask {
+                    try AVLXMLParser().parse(data: data).count
+                }
+            }
+
+            var counts: [Int] = []
+            for try await count in group {
+                counts.append(count)
+            }
+            return counts
+        }
+
+        #expect(counts.allSatisfy { $0 == 1 })
+    }
 }

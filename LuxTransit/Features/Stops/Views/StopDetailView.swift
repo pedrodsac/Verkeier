@@ -4,14 +4,24 @@ struct StopDetailView: View {
     let viewModel: StopDetailPresentationModel
     let openDirections: () -> Void
     let trackDeparture: (Departure) -> Void
+    let toggleDepartureLine: (TransitRoute) -> Void
+    let selectDeparturePlatform: (String?) -> Void
 
     var body: some View {
         if let stop = viewModel.stop {
             VStack(alignment: .leading, spacing: 16) {
+                PlatformFilterPicker(
+                    platforms: viewModel.availablePlatforms,
+                    selectedPlatform: viewModel.selectedPlatform,
+                    selectPlatform: selectDeparturePlatform
+                )
+
                 StopDetailHeader(
                     stop: stop,
                     routes: viewModel.routes,
-                    openDirections: openDirections
+                    selectedLine: viewModel.selectedLine,
+                    openDirections: openDirections,
+                    toggleDepartureLine: toggleDepartureLine
                 )
 
                 if let liveActivityErrorMessage = viewModel.liveActivityErrorMessage {
@@ -51,27 +61,17 @@ struct StopDetailView: View {
 private struct StopDetailHeader: View {
     let stop: Stop
     let routes: [TransitRoute]
+    let selectedLine: String?
     let openDirections: () -> Void
+    let toggleDepartureLine: (TransitRoute) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: iconName(for: stop))
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 40, height: 40)
-                    .background(color(for: stop).gradient, in: Circle())
-                    .accessibilityHidden(true)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(stop.locality ?? stop.dataSource.displayName)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-            }
-
-            StopMetadataPanel(routes: routes)
+            StopMetadataPanel(
+                routes: routes,
+                selectedLine: selectedLine,
+                toggleDepartureLine: toggleDepartureLine
+            )
 
             DirectionsButton(openDirections: openDirections)
         }
@@ -89,6 +89,31 @@ private struct StopDetailHeader: View {
         if stop.modes.contains(.train) { return .red }
         if stop.modes.contains(.tram) { return .orange }
         return .blue
+    }
+}
+
+private struct PlatformFilterPicker: View {
+    let platforms: [String]
+    let selectedPlatform: String?
+    let selectPlatform: (String?) -> Void
+
+    var body: some View {
+        if !platforms.isEmpty {
+            Picker(
+                "Platform",
+                selection: Binding(
+                    get: { selectedPlatform ?? "" },
+                    set: { selectPlatform($0.isEmpty ? nil : $0) }
+                )
+            ) {
+                Text("All").tag("")
+                ForEach(platforms, id: \.self) { platform in
+                    Text(platform).tag(platform)
+                }
+            }
+            .pickerStyle(.segmented)
+            .accessibilityLabel("Platform filter")
+        }
     }
 }
 
@@ -113,6 +138,8 @@ private struct DirectionsButton: View {
 
 private struct StopMetadataPanel: View {
     let routes: [TransitRoute]
+    let selectedLine: String?
+    let toggleDepartureLine: (TransitRoute) -> Void
 
     @ViewBuilder
     var body: some View {
@@ -120,7 +147,11 @@ private struct StopMetadataPanel: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(routes.prefix(16)) { route in
-                        RouteChip(route: route)
+                        RouteChip(
+                            route: route,
+                            isSelected: route.id == selectedLine,
+                            toggleDepartureLine: { toggleDepartureLine(route) }
+                        )
                     }
                 }
                 .padding(.vertical, 1)
@@ -132,22 +163,48 @@ private struct StopMetadataPanel: View {
 
 private struct RouteChip: View {
     let route: TransitRoute
+    let isSelected: Bool
+    let toggleDepartureLine: () -> Void
 
     var body: some View {
-        HStack(spacing: 5) {
-            Image(systemName: iconName)
-                .accessibilityHidden(true)
-            Text(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
-                .lineLimit(1)
+        Button(action: toggleDepartureLine) {
+            HStack(spacing: 5) {
+                Image(systemName: iconName)
+                    .accessibilityHidden(true)
+                Text(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
+                    .lineLimit(1)
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.caption2.weight(.bold))
+                        .accessibilityHidden(true)
+                }
+            }
+            .font(.caption.weight(.bold))
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(routeColor.opacity(isSelected ? 0.20 : 0.14), in: Capsule())
+            .overlay {
+                Capsule().stroke(
+                    routeColor.opacity(isSelected ? 0.55 : 0.25),
+                    lineWidth: isSelected ? 1.1 : 0.7
+                )
+            }
+            .contentShape(Capsule())
         }
-        .font(.caption.weight(.bold))
-        .foregroundStyle(.primary)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 7)
-        .background(routeColor.opacity(0.14), in: Capsule())
-        .overlay {
-            Capsule().stroke(routeColor.opacity(0.25), lineWidth: 0.7)
-        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+    }
+
+    init(
+        route: TransitRoute,
+        isSelected: Bool = false,
+        toggleDepartureLine: @escaping () -> Void = {}
+    ) {
+        self.route = route
+        self.isSelected = isSelected
+        self.toggleDepartureLine = toggleDepartureLine
     }
 
     private var iconName: String {
@@ -316,8 +373,9 @@ struct DepartureListRow: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
             }
+			.frame(maxWidth: .infinity)
 
-            Spacer(minLength: 6)
+            Spacer(minLength: 0)
 
             DepartureTimingStatus(
                 countdownText: countdownText,

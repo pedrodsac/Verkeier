@@ -18,14 +18,19 @@ struct TransitSheetActions {
     let showAlerts: () -> Void
     let showStopDetail: () -> Void
     let showDirections: () -> Void
+    let showRouteOptions: () -> Void
     let showSettings: () -> Void
     let toggleFavourite: () -> Void
     let toggleFavouriteExpansion: (String) -> Void
     let refreshDepartures: () -> Void
     let refreshAlerts: () -> Void
     let calculateRoute: () -> Void
+    let selectRouteOption: (String) -> Void
+    let showMoreRouteOptions: () -> Void
     let openRouteInAppleMaps: () -> Void
     let trackDeparture: (Departure) -> Void
+    let toggleDepartureLine: (TransitRoute) -> Void
+    let selectDeparturePlatform: (String?) -> Void
     let updateSearch: () -> Void
     let checkGTFSUpdate: () -> Void
 }
@@ -80,6 +85,9 @@ struct StopDetailPresentationModel {
     let stop: Stop?
     let routes: [TransitRoute]
     let departures: [Departure]
+    let availablePlatforms: [String]
+    let selectedLine: String?
+    let selectedPlatform: String?
     let isLoadingDepartures: Bool
     let errorMessage: String?
     let lastUpdated: Date?
@@ -91,9 +99,37 @@ struct StopDetailPresentationModel {
 
 struct RoutePresentationModel {
     let selectedStop: Stop?
-    let routePlan: RoutePlan?
-    let isCalculating: Bool
+    let routeOptions: [RouteOption]
+    let selectedRouteOptionID: String?
+    let visibleRouteOptionCount: Int
+    let loadingPhase: RouteLoadingPhase
     let errorMessage: String?
+    let statusMessage: String?
+
+    var selectedRouteOption: RouteOption? {
+        guard !routeOptions.isEmpty else { return nil }
+        if let selectedRouteOptionID,
+           let match = routeOptions.first(where: { $0.id == selectedRouteOptionID }) {
+            return match
+        }
+        return routeOptions.first
+    }
+
+    var selectedRoutePlan: RoutePlan? {
+        selectedRouteOption?.plan
+    }
+
+    var isWaitingForLocation: Bool {
+        loadingPhase.isWaitingForLocation
+    }
+
+    var isCalculating: Bool {
+        loadingPhase.isCalculating
+    }
+
+    var visibleRouteOptions: [RouteOption] {
+        Array(routeOptions.prefix(visibleRouteOptionCount))
+    }
 }
 
 struct AlertsPresentationModel {

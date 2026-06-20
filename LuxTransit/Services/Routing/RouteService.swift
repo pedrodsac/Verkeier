@@ -1,6 +1,12 @@
 import Foundation
 
 protocol RouteService: Sendable {
-    func calculateRoute(from: LocationPoint, to: LocationPoint) async throws -> RouteCalculation
-    func openInAppleMaps(from: LocationPoint, to: LocationPoint)
+    nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint) async throws -> RouteCalculation
+    @MainActor func openInAppleMaps(from: LocationPoint, to: LocationPoint)
+}
+
+enum RoutingError: Error, Equatable {
+    case noRouteFound
+    case timetableUnavailable
+    case noPublicTransportRoute
 }

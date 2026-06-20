@@ -10,6 +10,7 @@ actor GTFSUpdateService {
     private let store: GTFSLocalStore
     private let calendar: Calendar
     private var currentStatus: GTFSUpdateStatus = .idle
+    private var lastFailureMessage: String?
 
     init(
         metadataClient: any GTFSMetadataFetching = GTFSMetadataClient(),
@@ -33,13 +34,15 @@ actor GTFSUpdateService {
         GTFSUpdateSnapshot(
             metadata: try? store.loadMetadata(),
             lastMetadataCheckAt: try? store.loadLastMetadataCheckAt(),
-            status: currentStatus
+            status: currentStatus,
+            lastFailureMessage: lastFailureMessage
         )
     }
 
     @discardableResult
     func checkForUpdates(force: Bool = false, now: Date = .now) async -> GTFSUpdateSnapshot {
         currentStatus = .checking
+        lastFailureMessage = nil
 
         do {
             try store.bootstrap()
@@ -73,11 +76,13 @@ actor GTFSUpdateService {
             let archiveURL = tempRoot.appendingPathComponent("gtfs.zip")
             let extractedURL = tempRoot.appendingPathComponent("extracted", isDirectory: true)
             let indexURL = tempRoot.appendingPathComponent("stops-index.json")
+            let timetableIndexURL = tempRoot.appendingPathComponent("timetable-index.json")
 
             try await downloadService.download(from: downloadURL, to: archiveURL)
             try archiveService.unzip(archiveURL, to: extractedURL)
             let feedDirectory = try validator.validatedFeedDirectory(in: extractedURL)
             try indexBuilder.buildStopsIndex(from: feedDirectory, to: indexURL)
+            try indexBuilder.buildTimetableIndex(from: feedDirectory, to: timetableIndexURL)
 
             let metadata = LocalGTFSMetadata(
                 resourceId: remote.id,
@@ -87,7 +92,12 @@ actor GTFSUpdateService {
                 downloadedAt: now,
                 indexedAt: now
             )
-            try store.commit(feedDirectory: feedDirectory, indexURL: indexURL, metadata: metadata)
+            try store.commit(
+                feedDirectory: feedDirectory,
+                indexURL: indexURL,
+                timetableIndexURL: timetableIndexURL,
+                metadata: metadata
+            )
             currentStatus = .updated
 
             await MainActor.run {
@@ -97,6 +107,8 @@ actor GTFSUpdateService {
             return await snapshot()
         } catch {
             currentStatus = .failed
+            lastFailureMessage = (error as? LocalizedError)?.errorDescription
+                ?? "The GTFS update could not be completed."
             store.cleanTempDirectory()
             return await snapshot()
         }

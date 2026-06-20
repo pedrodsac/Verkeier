@@ -56,18 +56,55 @@ struct DepartureStatusTests {
         #expect(departure.status.displayText == "Unknown")
     }
 
+    @Test func nextTrackableDepartureChoosesEarliestUpcomingNonCancelledDeparture() {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let cancelledSoon = makeDeparture(
+            id: "cancelled",
+            scheduledDeparture: now.addingTimeInterval(60),
+            realtimeDeparture: now.addingTimeInterval(60),
+            delayMinutes: 0,
+            isCancelled: true
+        )
+        let later = makeDeparture(
+            id: "later",
+            scheduledDeparture: now.addingTimeInterval(300),
+            realtimeDeparture: now.addingTimeInterval(300),
+            delayMinutes: 0
+        )
+
+        #expect(
+            DepartureTrackingSelection.nextTrackableDeparture(
+                from: [later, cancelledSoon],
+                now: now
+            )?.id == "later"
+        )
+    }
+
+    @Test func trackedDepartureFindsRefreshedDepartureById() {
+        let departure = makeDeparture(id: "tracked")
+
+        #expect(
+            DepartureTrackingSelection.trackedDeparture(
+                in: [makeDeparture(id: "other"), departure],
+                trackedDepartureId: "tracked"
+            ) == departure
+        )
+    }
+
     private func makeDeparture(
-        realtimeDeparture: Date?,
-        delayMinutes: Int?,
+        id: String = "departure-1",
+        scheduledDeparture: Date = Date(timeIntervalSince1970: 1_800),
+        realtimeDeparture: Date? = nil,
+        delayMinutes: Int? = nil,
         isCancelled: Bool = false,
         isStatusUnknown: Bool = false
     ) -> Departure {
         Departure(
-            id: "departure-1",
+            id: id,
             stopId: "stop-1",
             lineName: "F1",
             destination: "Upper Station",
-            scheduledDeparture: Date(timeIntervalSince1970: 1_800),
+            scheduledDeparture: scheduledDeparture,
             realtimeDeparture: realtimeDeparture,
             delayMinutes: delayMinutes,
             isCancelled: isCancelled,

@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct AppConfiguration: Sendable {
+nonisolated struct AppConfiguration: Sendable {
     let atpAccessId: String?
     let apiBaseURL: URL
     let avlMessagesURL: URL

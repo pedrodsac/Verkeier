@@ -1,7 +1,7 @@
 import Foundation
 
 protocol AVLClient: Sendable {
-    func fetchMessages() async throws -> [AlertMessage]
+    nonisolated func fetchMessages() async throws -> [AlertMessage]
 }
 
 enum AVLClientError: Error {

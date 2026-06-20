@@ -3,7 +3,7 @@ import Foundation
 struct MockAVLClient: AVLClient {
     var messages: [AlertMessage] = AVLPreviewFixtures.messages
 
-    func fetchMessages() async throws -> [AlertMessage] {
+    nonisolated func fetchMessages() async throws -> [AlertMessage] {
         messages
     }
 }

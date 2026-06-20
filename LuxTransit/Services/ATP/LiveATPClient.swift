@@ -1,21 +1,21 @@
 import Foundation
 
-final class LiveATPClient: ATPClient, @unchecked Sendable {
+final class LiveATPClient: ATPClient {
     private let configuration: AppConfiguration
     private let session: URLSession
-    private let decoder: JSONDecoder
+    private let makeDecoder: @Sendable () -> JSONDecoder
 
     init(
         configuration: AppConfiguration = .current,
         session: URLSession = .shared,
-        decoder: JSONDecoder = JSONDecoder()
+        makeDecoder: @escaping @Sendable () -> JSONDecoder = { JSONDecoder() }
     ) {
         self.configuration = configuration
         self.session = session
-        self.decoder = decoder
+        self.makeDecoder = makeDecoder
     }
 
-    func nearbyStops(latitude: Double, longitude: Double) async throws -> [Stop] {
+    nonisolated func nearbyStops(latitude: Double, longitude: Double) async throws -> [Stop] {
         let request = try URLRequest(url: ATPRequestBuilder.nearbyStopsURL(
             latitude: latitude,
             longitude: longitude,
@@ -25,7 +25,7 @@ final class LiveATPClient: ATPClient, @unchecked Sendable {
         return ATPMapper.mapNearbyStops(response)
     }
 
-    func departureBoard(stopId: String) async throws -> [Departure] {
+    nonisolated func departureBoard(stopId: String) async throws -> [Departure] {
         let request = try URLRequest(url: ATPRequestBuilder.departureBoardURL(
             stopId: stopId,
             configuration: configuration
@@ -34,7 +34,7 @@ final class LiveATPClient: ATPClient, @unchecked Sendable {
         return ATPMapper.mapDepartures(response, stopId: stopId)
     }
 
-    func departureBoards(stopIds: [String]) async throws -> [Departure] {
+    nonisolated func departureBoards(stopIds: [String]) async throws -> [Departure] {
         let ids = ATPStopIdentifier.normalized(stopIds)
         guard !ids.isEmpty else { return [] }
 
@@ -71,7 +71,7 @@ final class LiveATPClient: ATPClient, @unchecked Sendable {
         return ATPMapper.mergedDepartures(departures)
     }
 
-    private func fetch<Response: Decodable>(_ request: URLRequest) async throws -> Response {
+    private nonisolated func fetch<Response: Decodable>(_ request: URLRequest) async throws -> Response {
         let (data, response) = try await session.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse else {
             throw ATPClientError.invalidResponse
@@ -79,12 +79,12 @@ final class LiveATPClient: ATPClient, @unchecked Sendable {
         guard 200..<300 ~= httpResponse.statusCode else {
             throw ATPClientError.httpStatus(httpResponse.statusCode)
         }
-        return try decoder.decode(Response.self, from: data)
+        return try makeDecoder().decode(Response.self, from: data)
     }
 }
 
 enum ATPRequestBuilder {
-    static func nearbyStopsURL(
+    nonisolated static func nearbyStopsURL(
         latitude: Double,
         longitude: Double,
         configuration: AppConfiguration
@@ -103,7 +103,7 @@ enum ATPRequestBuilder {
         )
     }
 
-    static func departureBoardURL(
+    nonisolated static func departureBoardURL(
         stopId: String,
         configuration: AppConfiguration
     ) throws -> URL {
@@ -118,7 +118,7 @@ enum ATPRequestBuilder {
         )
     }
 
-    private static func url(
+    private nonisolated static func url(
         path: String,
         configuration: AppConfiguration,
         queryItems: [URLQueryItem]
