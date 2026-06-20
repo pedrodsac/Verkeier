@@ -529,3 +529,66 @@ struct CompactUnavailableCard: View {
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
+
+#Preview(traits: .sizeThatFitsLayout) {
+    DepartureLoadingCard(title: "Loading departures")
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    CompactUnavailableCard(
+        title: "No departures",
+        message: "No live departures are available for this stop.",
+        systemImage: "clock.badge.exclamationmark"
+    )
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    DepartureBoardStatus(lastUpdated: .now, isStale: false)
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    DepartureBoardStatus(lastUpdated: .now.addingTimeInterval(-600), isStale: true)
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    DepartureListRow(
+        departure: Departure(
+            id: "dep-1",
+            stopId: "200209001",
+            lineName: "16",
+            destination: "Kirchberg",
+            scheduledDeparture: .now.addingTimeInterval(300),
+            realtimeDeparture: .now.addingTimeInterval(420),
+            delayMinutes: 2,
+            platform: "1",
+            dataSource: .mock
+        )
+    )
+    .padding(.horizontal, 12)
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    RouteChip(
+        route: TransitRoute(
+            id: "route-1",
+            shortName: "16",
+            longName: "Luxembourg – Kirchberg",
+            mode: .bus,
+            dataSource: .mock
+        ),
+        isSelected: false
+    )
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    RouteChip(
+        route: TransitRoute(
+            id: "route-2",
+            shortName: "T1",
+            longName: "Luxembourg Gare – Stadion",
+            mode: .tram,
+            dataSource: .mock
+        ),
+        isSelected: true
+    )
+}

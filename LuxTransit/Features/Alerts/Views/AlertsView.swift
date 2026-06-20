@@ -29,11 +29,47 @@ struct AlertsView: View {
                         }
                     }
                     .padding(.bottom, 72)
-                }
-            }
+					.frame(maxWidth: .infinity, alignment: .leading)
+				}
+			}
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
+}
+
+#Preview {
+    AlertsView(
+        viewModel: AlertsPresentationModel(
+            alerts: [
+                AlertMessage(
+                    id: "alert-1",
+                    title: "Line 16 diverted",
+                    body: "Due to roadworks on Avenue de la Gare, buses are diverting via Rue du Fort Rheinsheim until further notice.",
+                    severity: .warning,
+                    affectedStopIds: ["stop-1", "stop-2"],
+                    affectedRouteIds: ["16"],
+                    startsAt: .now,
+                    endsAt: nil,
+                    dataSource: .mock
+                ),
+                AlertMessage(
+                    id: "alert-2",
+                    title: "T1 service restored",
+                    body: "Tram service between Rout Bréck–Pafendall and Luxexpo has resumed normal operation.",
+                    severity: .info,
+                    affectedStopIds: ["stop-3"],
+                    affectedRouteIds: ["T1"],
+                    startsAt: .now,
+                    endsAt: nil,
+                    dataSource: .mock
+                ),
+            ],
+            isLoading: false,
+            errorMessage: nil,
+            lastUpdated: .now,
+            isStale: false
+        )
+    )
+    .padding(.horizontal, 16)
 }
 
 private struct AlertRefreshStatus: View {

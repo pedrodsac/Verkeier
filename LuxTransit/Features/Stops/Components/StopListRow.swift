@@ -83,3 +83,18 @@ struct StopListRow: View {
         return stop.name
     }
 }
+
+#Preview {
+    StopListRow(
+        stop: Stop(
+            id: "200209001",
+            name: "Hamilius",
+            locality: "Luxembourg",
+            location: LocationPoint(latitude: 49.6107, longitude: 6.1268),
+            modes: [.bus, .tram],
+            dataSource: .mock
+        ),
+        action: {}
+    )
+    .padding(.horizontal, 16)
+}

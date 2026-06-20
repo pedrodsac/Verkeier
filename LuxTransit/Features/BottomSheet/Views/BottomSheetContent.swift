@@ -255,3 +255,18 @@ private struct BottomSheetSearchButton: View {
         }
     }
 }
+
+#Preview(traits: .sizeThatFitsLayout) {
+    BottomSheetSearchButton(query: "Search stops", action: {})
+        .padding(.horizontal, 16)
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    BottomSheetSearchButton(query: "", style: .medium, action: {})
+        .padding(.horizontal, 16)
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    BottomSheetSearchButton(query: "", style: .collapsed, action: {})
+        .padding(.horizontal, 16)
+}

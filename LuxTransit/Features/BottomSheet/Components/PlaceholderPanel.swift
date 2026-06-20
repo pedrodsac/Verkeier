@@ -26,3 +26,11 @@ struct PlaceholderPanel: View {
         .accessibilityElement(children: .combine)
     }
 }
+
+#Preview {
+    PlaceholderPanel(
+        title: "Favourites",
+        systemImage: "star.fill",
+        message: "Your saved stops will appear here."
+    )
+}

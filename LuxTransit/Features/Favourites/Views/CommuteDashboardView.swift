@@ -233,3 +233,45 @@ struct FavouriteStopDepartureCard: View {
         return .blue
     }
 }
+
+#Preview(traits: .sizeThatFitsLayout) {
+    AlertsSummaryRow(alertCount: 3, action: {})
+        .padding(.horizontal, 16)
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    FavouriteStopDepartureCard(
+        stop: Stop(
+            id: "200209001",
+            name: "Hamilius",
+            locality: "Luxembourg",
+            location: LocationPoint(latitude: 49.6107, longitude: 6.1268),
+            modes: [.bus, .tram],
+            dataSource: .mock
+        ),
+        departures: [
+            Departure(
+                id: "dep-1",
+                stopId: "200209001",
+                lineName: "16",
+                destination: "Kirchberg",
+                scheduledDeparture: .now.addingTimeInterval(180),
+                realtimeDeparture: .now.addingTimeInterval(240),
+                delayMinutes: 1,
+                dataSource: .mock
+            ),
+            Departure(
+                id: "dep-2",
+                stopId: "200209001",
+                lineName: "T1",
+                destination: "Rout Bréck–Pafendall",
+                scheduledDeparture: .now.addingTimeInterval(480),
+                dataSource: .mock
+            ),
+        ],
+        isExpanded: true,
+        selectStop: {},
+        toggleExpansion: {}
+    )
+    .padding(.horizontal, 16)
+}
