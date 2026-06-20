@@ -149,7 +149,7 @@ struct TransitMapViewModelTests {
         #expect(routeService.calculateCallCount == 0)
         #expect(viewModel.routePlan == nil)
         #expect(viewModel.isWaitingForRouteLocation == false)
-        #expect(viewModel.routeErrorMessage == "Choose a destination stop first.")
+        #expect(viewModel.routeErrorMessage == "Choose a route destination first.")
     }
 
     @Test func calculatingRouteWithoutLocationWaitsForLocation() async {
@@ -336,6 +336,92 @@ struct TransitMapViewModelTests {
         #expect(viewModel.routePlan == nextOption.plan)
     }
 
+    @Test func selectingStopSetsRouteDestination() {
+        let stop = makeStop(id: "stop-1")
+        let viewModel = TransitMapViewModel()
+
+        viewModel.selectStop(stop)
+
+        #expect(viewModel.routeDestination?.stopId == stop.id)
+        #expect(viewModel.routeDestination?.title == stop.name)
+    }
+
+    @Test func routeFiltersPreferFewestTransfersAndMatchingMode() async {
+        let destination = makeStop(id: "stop-1")
+        let busOption = makeTimedRouteOption(
+            id: "route-bus",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_000),
+            arrival: Date(timeIntervalSince1970: 1_900),
+            routeName: "15",
+            mode: .bus,
+            transferCount: 1
+        )
+        let tramOption = makeTimedRouteOption(
+            id: "route-tram",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_020),
+            arrival: Date(timeIntervalSince1970: 2_000),
+            routeName: "T1",
+            mode: .tram,
+            transferCount: 0
+        )
+        let routeService = MockRouteService(result: .success(RouteCalculation(
+            options: [busOption, tramOption],
+            selectedOptionID: busOption.id
+        )))
+        let viewModel = TransitMapViewModel()
+        viewModel.selectStop(destination)
+        viewModel.updateRouteFilters(RoutePlannerFilters(
+            sort: .fewestTransfers,
+            modePreference: .tram,
+            avoidTightTransfers: false,
+            preferAccessible: false
+        ))
+
+        await viewModel.calculateRoute(
+            using: routeService,
+            from: CLLocation(latitude: 49.61, longitude: 6.13)
+        )
+
+        #expect(viewModel.routeOptions.map(\.id) == ["route-tram"])
+        #expect(viewModel.selectedRouteOptionID == "route-tram")
+    }
+
+    @Test func accessiblePreferenceFallsBackWhenNoRouteMatches() async {
+        let destination = makeStop(id: "stop-1")
+        let busOption = makeTimedRouteOption(
+            id: "route-long-walk",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_000),
+            arrival: Date(timeIntervalSince1970: 1_900),
+            routeName: "15",
+            mode: .bus,
+            transferCount: 2,
+            walkingDistance: 1_200
+        )
+        let routeService = MockRouteService(result: .success(RouteCalculation(
+            options: [busOption],
+            selectedOptionID: busOption.id
+        )))
+        let viewModel = TransitMapViewModel()
+        viewModel.selectStop(destination)
+        viewModel.updateRouteFilters(RoutePlannerFilters(
+            sort: .fastest,
+            modePreference: .any,
+            avoidTightTransfers: false,
+            preferAccessible: true
+        ))
+
+        await viewModel.calculateRoute(
+            using: routeService,
+            from: CLLocation(latitude: 49.61, longitude: 6.13)
+        )
+
+        #expect(viewModel.routeOptions.map(\.id) == ["route-long-walk"])
+        #expect(viewModel.routeStatusMessage == "No routes matched all filters. Showing the closest alternatives.")
+    }
+
     private func configuredViewModel() -> TransitMapViewModel {
         let viewModel = TransitMapViewModel()
         viewModel.selectStop(makeStop(id: "stop-1"))
@@ -442,34 +528,60 @@ struct TransitMapViewModelTests {
         destination: Stop,
         departure: Date,
         arrival: Date,
-        routeName: String
+        routeName: String,
+        mode: TransportMode = .bus,
+        transferCount: Int = 0,
+        walkingDistance: Double = 0
     ) -> RouteOption {
+        var legs: [RoutePlan.Leg] = []
+        if walkingDistance > 0 {
+            legs.append(
+                RoutePlan.Leg(
+                    id: "\(id)-walk",
+                    mode: .walking,
+                    instruction: "Walk to transfer",
+                    transportKind: .walking,
+                    origin: LocationPoint(name: "Origin", latitude: 49.61, longitude: 6.13),
+                    destination: LocationPoint(name: "Transfer", latitude: 49.6105, longitude: 6.1305),
+                    departureTime: departure.addingTimeInterval(-300),
+                    arrivalTime: departure,
+                    distanceMeters: walkingDistance
+                )
+            )
+        }
+
+        for index in 0...transferCount {
+            let legDeparture = departure.addingTimeInterval(Double(index) * 300)
+            let legArrival = index == transferCount ? arrival : legDeparture.addingTimeInterval(240)
+            legs.append(
+                RoutePlan.Leg(
+                    id: "\(id)-transit-\(index)",
+                    mode: mode,
+                    instruction: "Take \(routeName) to Test Stop",
+                    transportKind: .transit,
+                    routeName: routeName,
+                    routeId: routeName,
+                    tripId: "trip-\(routeName)-\(index)",
+                    originStopId: "origin-stop-\(index)",
+                    destinationStopId: destination.id,
+                    origin: LocationPoint(name: "Origin Stop", latitude: 49.6105, longitude: 6.1305),
+                    destination: destination.location,
+                    departureTime: legDeparture,
+                    arrivalTime: legArrival,
+                    scheduledDepartureTime: legDeparture,
+                    scheduledArrivalTime: legArrival,
+                    distanceMeters: 3200 / Double(transferCount + 1)
+                )
+            )
+        }
+
         let plan = RoutePlan(
             id: id,
             origin: LocationPoint(name: "Current Location", latitude: 49.61, longitude: 6.13),
             destination: destination.location,
             expectedTravelTime: arrival.timeIntervalSince(departure),
             distanceMeters: 3200,
-            legs: [
-                RoutePlan.Leg(
-                    id: "\(id)-transit",
-                    mode: .bus,
-                    instruction: "Take \(routeName) to Test Stop",
-                    transportKind: .transit,
-                    routeName: routeName,
-                    routeId: routeName,
-                    tripId: "trip-\(routeName)",
-                    originStopId: "origin-stop",
-                    destinationStopId: destination.id,
-                    origin: LocationPoint(name: "Origin Stop", latitude: 49.6105, longitude: 6.1305),
-                    destination: destination.location,
-                    departureTime: departure,
-                    arrivalTime: arrival,
-                    scheduledDepartureTime: departure,
-                    scheduledArrivalTime: arrival,
-                    distanceMeters: 3200
-                )
-            ],
+            legs: legs,
             dataSource: .mock
         )
         return RouteOption(id: id, plan: plan, mapOverlay: nil)

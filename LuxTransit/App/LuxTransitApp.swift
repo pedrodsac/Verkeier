@@ -4,11 +4,10 @@ import SwiftUI
 @main
 struct LuxTransitApp: App {
     @State private var locationService = LocationService()
+    @AppStorage("debugTransitDataMode") private var debugTransitDataModeRawValue =
+        DebugTransitDataMode.normal.rawValue
     private let configuration: AppConfiguration
-    private let atpClient: any ATPClient
     private let gtfsService: any GTFSService
-    private let routeService: any RouteService
-    private let avlClient: any AVLClient
     private let modelContainer: ModelContainer
     @State private var liveActivityManager = LiveActivityManager()
     @State private var gtfsUpdateController = GTFSUpdateController()
@@ -16,14 +15,7 @@ struct LuxTransitApp: App {
     init() {
         let configuration = AppConfiguration.current
         self.configuration = configuration
-        if configuration.hasATPAccessId {
-            atpClient = LiveATPClient(configuration: configuration)
-        } else {
-            atpClient = EmptyATPClient()
-        }
         gtfsService = LocalGTFSService()
-        routeService = PublicTransportRouteService(gtfsService: gtfsService, atpClient: atpClient)
-        avlClient = LiveAVLClient(feedURL: configuration.avlMessagesURL)
         modelContainer = AppModelContainer.make()
     }
 
@@ -39,5 +31,41 @@ struct LuxTransitApp: App {
                 .environment(\.liveActivityManager, liveActivityManager)
                 .modelContainer(modelContainer)
         }
+    }
+
+    private var debugTransitDataMode: DebugTransitDataMode {
+        DebugTransitDataMode(rawValue: debugTransitDataModeRawValue) ?? .normal
+    }
+
+    private var atpClient: any ATPClient {
+        switch debugTransitDataMode {
+        case .normal:
+            configuration.hasATPAccessId ? LiveATPClient(configuration: configuration) : EmptyATPClient()
+        case .sample:
+            FixtureATPClient(mode: .sample)
+        case .empty:
+            FixtureATPClient(mode: .empty)
+        case .failure:
+            FixtureATPClient(mode: .failure)
+        case .disruption:
+            FixtureATPClient(mode: .disruption)
+        }
+    }
+
+    private var avlClient: any AVLClient {
+        switch debugTransitDataMode {
+        case .normal, .sample:
+            LiveAVLClient(feedURL: configuration.avlMessagesURL)
+        case .empty:
+            EmptyAVLClient()
+        case .failure:
+            FailingAVLClient()
+        case .disruption:
+            SevereMockAVLClient()
+        }
+    }
+
+    private var routeService: any RouteService {
+        PublicTransportRouteService(gtfsService: gtfsService, atpClient: atpClient)
     }
 }

@@ -5,6 +5,8 @@ import SwiftData
 import SwiftUI
 
 struct TransitMapScreen: View {
+    @AppStorage("debugTransitDataMode") private var debugTransitDataModeRawValue =
+        DebugTransitDataMode.normal.rawValue
     @Environment(\.atpClient) private var atpClient
     @Environment(\.gtfsService) private var gtfsService
     @Environment(\.gtfsUpdateController) private var gtfsUpdateController
@@ -87,6 +89,7 @@ struct TransitMapScreen: View {
             }
         }
         .task {
+            viewModel.loadRoutePlanner()
             locationService.startUpdatingIfAllowed()
             await viewModel.loadGTFSMapStops(
                 using: gtfsService, location: locationService.currentLocation)
@@ -234,6 +237,13 @@ struct TransitMapScreen: View {
             ),
             route: RoutePresentationModel(
                 selectedStop: viewModel.selectedStop,
+                origin: viewModel.routeOrigin,
+                destination: viewModel.routeDestination,
+                favouritePlaces: favouriteStops.map { RoutePlace(stop: $0, source: .favourite) },
+                nearbyPlaces: viewModel.nearbyStops.map { RoutePlace(stop: $0, source: .nearby) },
+                recentPlaces: viewModel.recentRoutePlaces,
+                commutePresets: viewModel.commutePresets,
+                filters: viewModel.routeFilters,
                 routeOptions: viewModel.routeOptions,
                 selectedRouteOptionID: viewModel.selectedRouteOptionID,
                 visibleRouteOptionCount: viewModel.visibleRouteOptionCount,
@@ -253,7 +263,8 @@ struct TransitMapScreen: View {
                 gtfsUpdateSnapshot: gtfsUpdateController.snapshot,
                 isCheckingGTFSUpdate: gtfsUpdateController.isChecking,
                 readiness: settingsReadinessSnapshot,
-                supportBundleText: settingsSupportBundleText
+                supportBundleText: settingsSupportBundleText,
+                debugDataMode: debugTransitDataMode
             )
         )
     }
@@ -281,6 +292,10 @@ struct TransitMapScreen: View {
             ?? "1.0"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
         return "\(version) (\(build))"
+    }
+
+    private var debugTransitDataMode: DebugTransitDataMode {
+        DebugTransitDataMode(rawValue: debugTransitDataModeRawValue) ?? .normal
     }
 
     private var sheetPresentationDetent: Binding<PresentationDetent> {
@@ -364,11 +379,18 @@ struct TransitMapScreen: View {
             selectRouteOption: selectRouteOption,
             showMoreRouteOptions: showMoreRouteOptions,
             openRouteInAppleMaps: openRouteInAppleMaps,
+            selectRouteOrigin: selectRouteOrigin,
+            selectRouteDestination: selectRouteDestination,
+            applyCommutePreset: applyCommutePreset,
+            saveCurrentCommutePreset: saveCurrentCommutePreset,
+            swapRouteEndpoints: swapRouteEndpoints,
+            updateRouteFilters: updateRouteFilters,
             trackDeparture: trackDeparture,
             toggleDepartureLine: toggleDepartureLine,
             selectDeparturePlatform: selectDeparturePlatform,
             updateSearch: updateSearch,
-            checkGTFSUpdate: checkGTFSUpdate
+            checkGTFSUpdate: checkGTFSUpdate,
+            setDebugDataMode: setDebugDataMode
         )
     }
 
@@ -420,6 +442,47 @@ struct TransitMapScreen: View {
         }
     }
 
+    private func selectRouteOrigin(_ place: RoutePlace?) {
+        animateSheetChange {
+            viewModel.selectRouteOrigin(place)
+        }
+    }
+
+    private func selectRouteDestination(_ place: RoutePlace) {
+        animateSheetChange {
+            viewModel.selectRouteDestination(place)
+            if let stop = stopForRoutePlace(place) {
+                viewModel.selectedStop = stop
+            }
+            viewModel.showDirections()
+        }
+    }
+
+    private func applyCommutePreset(_ presetID: String) {
+        animateSheetChange {
+            viewModel.applyCommutePreset(presetID)
+            if let destination = viewModel.routeDestination,
+               let stop = stopForRoutePlace(destination) {
+                viewModel.selectedStop = stop
+            }
+            viewModel.showDirections()
+        }
+    }
+
+    private func saveCurrentCommutePreset() {
+        viewModel.saveCurrentCommutePreset()
+    }
+
+    private func swapRouteEndpoints() {
+        animateSheetChange {
+            viewModel.swapRouteEndpoints()
+        }
+    }
+
+    private func updateRouteFilters(_ filters: RoutePlannerFilters) {
+        viewModel.updateRouteFilters(filters)
+    }
+
     private func toggleDepartureLine(_ route: TransitRoute) {
         viewModel.toggleDepartureLine(route)
     }
@@ -438,6 +501,24 @@ struct TransitMapScreen: View {
         animateSheetChange {
             viewModel.toggleFavouriteExpansion(stopId: stopId)
         }
+    }
+
+    private func stopForRoutePlace(_ place: RoutePlace) -> Stop? {
+        if let stopId = place.stopId {
+            if let favourite = favouriteStops.first(where: { $0.id == stopId }) {
+                return favourite
+            }
+            if let nearby = viewModel.nearbyStops.first(where: { $0.id == stopId }) {
+                return nearby
+            }
+            if let result = viewModel.searchResults.first(where: { $0.id == stopId }) {
+                return result
+            }
+            if let selectedStop = viewModel.selectedStop, selectedStop.id == stopId {
+                return selectedStop
+            }
+        }
+        return nil
     }
 
     private func animateSheetChange(_ changes: () -> Void) {
@@ -497,6 +578,18 @@ struct TransitMapScreen: View {
 
     private func checkGTFSUpdate() {
         gtfsUpdateController.checkManually()
+    }
+
+    private func setDebugDataMode(_ mode: DebugTransitDataMode) {
+        debugTransitDataModeRawValue = mode.rawValue
+        Task {
+            await viewModel.loadNearbyStops(using: atpClient, location: locationService.currentLocation)
+            await viewModel.loadAlerts(using: avlClient)
+            await viewModel.loadFavouriteDepartures(using: atpClient, favourites: favouriteStops)
+            if viewModel.selectedStop != nil {
+                await viewModel.loadDepartures(using: atpClient)
+            }
+        }
     }
 
     private func calculateRoute() {

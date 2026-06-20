@@ -3,7 +3,7 @@ import Foundation
 struct TransitIntentHandoffStore {
     nonisolated(unsafe) let defaults: UserDefaults
 
-    static let shared = TransitIntentHandoffStore(
+    nonisolated static let shared = TransitIntentHandoffStore(
         defaults: UserDefaults(suiteName: SharedTransitDataStore.appGroupIdentifier) ?? .standard
     )
 

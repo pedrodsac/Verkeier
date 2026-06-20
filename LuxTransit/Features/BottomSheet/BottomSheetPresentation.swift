@@ -29,11 +29,18 @@ struct TransitSheetActions {
     let selectRouteOption: (String) -> Void
     let showMoreRouteOptions: () -> Void
     let openRouteInAppleMaps: () -> Void
+    let selectRouteOrigin: (RoutePlace?) -> Void
+    let selectRouteDestination: (RoutePlace) -> Void
+    let applyCommutePreset: (String) -> Void
+    let saveCurrentCommutePreset: () -> Void
+    let swapRouteEndpoints: () -> Void
+    let updateRouteFilters: (RoutePlannerFilters) -> Void
     let trackDeparture: (Departure) -> Void
     let toggleDepartureLine: (TransitRoute) -> Void
     let selectDeparturePlatform: (String?) -> Void
     let updateSearch: () -> Void
     let checkGTFSUpdate: () -> Void
+    let setDebugDataMode: (DebugTransitDataMode) -> Void
 }
 
 struct SettingsPresentationModel {
@@ -42,6 +49,7 @@ struct SettingsPresentationModel {
     let isCheckingGTFSUpdate: Bool
     let readiness: DataReadinessSnapshot
     let supportBundleText: String
+    let debugDataMode: DebugTransitDataMode
 }
 
 struct NearbyStopsPresentationModel {
@@ -105,6 +113,13 @@ struct StopDetailPresentationModel {
 
 struct RoutePresentationModel {
     let selectedStop: Stop?
+    let origin: RoutePlace?
+    let destination: RoutePlace?
+    let favouritePlaces: [RoutePlace]
+    let nearbyPlaces: [RoutePlace]
+    let recentPlaces: [RoutePlace]
+    let commutePresets: [RouteCommutePreset]
+    let filters: RoutePlannerFilters
     let routeOptions: [RouteOption]
     let selectedRouteOptionID: String?
     let visibleRouteOptionCount: Int
@@ -131,6 +146,26 @@ struct RoutePresentationModel {
 
     var isCalculating: Bool {
         loadingPhase.isCalculating
+    }
+
+    var originTitle: String {
+        origin?.title ?? "Current Location"
+    }
+
+    var originSubtitle: String? {
+        origin?.subtitle ?? "Live device location"
+    }
+
+    var destinationTitle: String {
+        destination?.title ?? selectedStop?.name ?? "Choose Destination"
+    }
+
+    var destinationSubtitle: String? {
+        destination?.subtitle ?? selectedStop?.locality
+    }
+
+    var hasDestination: Bool {
+        destination != nil || selectedStop != nil
     }
 
     var visibleRouteOptions: [RouteOption] {

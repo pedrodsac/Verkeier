@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     let viewModel: SettingsPresentationModel
     let checkGTFSUpdate: () -> Void
+    let setDebugDataMode: (DebugTransitDataMode) -> Void
 
     private var configuration: AppConfiguration {
         viewModel.configuration
@@ -129,6 +130,15 @@ struct SettingsView: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
+
+                #if DEBUG
+                    SettingsSection(title: "Debug Data Mode") {
+                        DebugDataModePicker(
+                            selection: viewModel.debugDataMode,
+                            setDebugDataMode: setDebugDataMode
+                        )
+                    }
+                #endif
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, 72)
@@ -179,6 +189,32 @@ struct SettingsView: View {
         return date.formatted(date: .abbreviated, time: .shortened)
     }
 }
+
+#if DEBUG
+    private struct DebugDataModePicker: View {
+        let selection: DebugTransitDataMode
+        let setDebugDataMode: (DebugTransitDataMode) -> Void
+
+        var body: some View {
+            Picker(
+                "Debug data mode",
+                selection: Binding(
+                    get: { selection },
+                    set: setDebugDataMode
+                )
+            ) {
+                ForEach(DebugTransitDataMode.allCases) { mode in
+                    Text(mode.title).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Text(selection.detail)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+    }
+#endif
 
 private struct ReadinessSummaryCard: View {
     let title: String
@@ -274,8 +310,10 @@ private struct DiagnosticRow: View {
                 summaryMessage: "This screen shows whether LuxTransit is using live, downloaded, bundled, or fallback data.",
                 items: []
             ),
-            supportBundleText: "Preview"
+            supportBundleText: "Preview",
+            debugDataMode: .normal
         ),
-        checkGTFSUpdate: {}
+        checkGTFSUpdate: {},
+        setDebugDataMode: { _ in }
     )
 }

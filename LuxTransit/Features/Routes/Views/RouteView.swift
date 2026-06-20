@@ -6,10 +6,18 @@ struct RouteView: View {
     let selectRouteOption: (String) -> Void
     let showMoreRouteOptions: () -> Void
     let openInAppleMaps: () -> Void
+    let selectRouteOrigin: (RoutePlace?) -> Void
+    let selectRouteDestination: (RoutePlace) -> Void
+    let applyCommutePreset: (String) -> Void
+    let saveCurrentCommutePreset: () -> Void
+    let swapRouteEndpoints: () -> Void
+    let updateRouteFilters: (RoutePlannerFilters) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             header
+            plannerSection
+            filterSection
 
             if viewModel.isWaitingForLocation {
                 DepartureLoadingCard(title: "Waiting for current location")
@@ -31,7 +39,7 @@ struct RouteView: View {
             } else if !viewModel.isCalculating && !viewModel.isWaitingForLocation && viewModel.routeOptions.isEmpty {
                 CompactUnavailableCard(
                     title: "No route selected",
-                    message: "Choose a stop and directions will show public transport options from your current location.",
+                    message: "Choose an origin and destination to show public transport options.",
                     systemImage: "point.topleft.down.curvedto.point.bottomright.up"
                 )
             }
@@ -59,19 +67,197 @@ struct RouteView: View {
 
     private var header: some View {
         Group {
-            if let selectedStop = viewModel.selectedStop {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Directions")
-                        .font(.headline.weight(.semibold))
-                    Text("To \(selectedStop.name)")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-            } else {
-                Text("Choose a stop from the map, favourites, nearby suggestions, or search.")
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Directions")
+                    .font(.headline.weight(.semibold))
+                Text("Plan a door-to-door trip using nearby stops, favourites, and saved commutes.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
+        }
+    }
+
+    private var plannerSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            RouteEndpointPicker(
+                label: "From",
+                title: viewModel.originTitle,
+                subtitle: viewModel.originSubtitle,
+                systemImage: "location.fill",
+                menuContent: {
+                    Button("Current Location") {
+                        selectRouteOrigin(nil)
+                    }
+
+                    if !viewModel.favouritePlaces.isEmpty {
+                        Section("Favourite Stops") {
+                            ForEach(viewModel.favouritePlaces) { place in
+                                Button(place.title) {
+                                    selectRouteOrigin(place)
+                                }
+                            }
+                        }
+                    }
+
+                    if !viewModel.recentPlaces.isEmpty {
+                        Section("Recent Places") {
+                            ForEach(viewModel.recentPlaces) { place in
+                                Button(place.title) {
+                                    selectRouteOrigin(place)
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+
+            HStack(alignment: .center, spacing: 12) {
+                RouteEndpointPicker(
+                    label: "To",
+                    title: viewModel.destinationTitle,
+                    subtitle: viewModel.destinationSubtitle,
+                    systemImage: "mappin.and.ellipse",
+                    menuContent: {
+                        if let selectedStop = viewModel.selectedStop {
+                            Button(selectedStop.name) {
+                                selectRouteDestination(RoutePlace(stop: selectedStop, source: .selectedStop))
+                            }
+                        }
+
+                        if !viewModel.favouritePlaces.isEmpty {
+                            Section("Favourite Stops") {
+                                ForEach(viewModel.favouritePlaces) { place in
+                                    Button(place.title) {
+                                        selectRouteDestination(place)
+                                    }
+                                }
+                            }
+                        }
+
+                        if !viewModel.nearbyPlaces.isEmpty {
+                            Section("Nearby Stops") {
+                                ForEach(viewModel.nearbyPlaces.prefix(6)) { place in
+                                    Button(place.title) {
+                                        selectRouteDestination(place)
+                                    }
+                                }
+                            }
+                        }
+
+                        if !viewModel.recentPlaces.isEmpty {
+                            Section("Recent Places") {
+                                ForEach(viewModel.recentPlaces) { place in
+                                    Button(place.title) {
+                                        selectRouteDestination(place)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                )
+
+                Button(action: swapRouteEndpoints) {
+                    Image(systemName: "arrow.up.arrow.down.circle.fill")
+                        .font(.title2.weight(.semibold))
+                        .foregroundStyle(.blue)
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Swap origin and destination")
+                .disabled(!viewModel.hasDestination)
+            }
+
+            if !viewModel.commutePresets.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(viewModel.commutePresets) { preset in
+                            Button(preset.title) {
+                                applyCommutePreset(preset.id)
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var filterSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Route Filters")
+                    .font(.headline.weight(.semibold))
+                Spacer()
+                Button("Save Commute", action: saveCurrentCommutePreset)
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .disabled(!viewModel.hasDestination)
+            }
+
+            Picker(
+                "Sort routes",
+                selection: Binding(
+                    get: { viewModel.filters.sort },
+                    set: { newValue in
+                        var updated = viewModel.filters
+                        updated.sort = newValue
+                        updateRouteFilters(updated)
+                    }
+                )
+            ) {
+                ForEach(RoutePlannerSortOption.allCases) { option in
+                    Text(option.title).tag(option)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            HStack(spacing: 10) {
+                Picker(
+                    "Mode preference",
+                    selection: Binding(
+                        get: { viewModel.filters.modePreference },
+                        set: { newValue in
+                            var updated = viewModel.filters
+                            updated.modePreference = newValue
+                            updateRouteFilters(updated)
+                        }
+                    )
+                ) {
+                    ForEach(RoutePlannerModePreference.allCases) { option in
+                        Text(option.title).tag(option)
+                    }
+                }
+                .pickerStyle(.menu)
+
+                Spacer()
+            }
+
+            Toggle(
+                "Avoid tight transfers",
+                isOn: Binding(
+                    get: { viewModel.filters.avoidTightTransfers },
+                    set: { newValue in
+                        var updated = viewModel.filters
+                        updated.avoidTightTransfers = newValue
+                        updateRouteFilters(updated)
+                    }
+                )
+            )
+
+            Toggle(
+                "Prefer accessible and low-walk options",
+                isOn: Binding(
+                    get: { viewModel.filters.preferAccessible },
+                    set: { newValue in
+                        var updated = viewModel.filters
+                        updated.preferAccessible = newValue
+                        updateRouteFilters(updated)
+                    }
+                )
+            )
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
         }
     }
 
@@ -87,7 +273,7 @@ struct RouteView: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .disabled(
-                viewModel.selectedStop == nil
+                !viewModel.hasDestination
                     || viewModel.isCalculating
                     || viewModel.isWaitingForLocation
             )
@@ -98,7 +284,7 @@ struct RouteView: View {
             }
             .buttonStyle(.bordered)
             .controlSize(.large)
-            .disabled(viewModel.selectedStop == nil)
+            .disabled(!viewModel.hasDestination)
         }
     }
 
@@ -106,6 +292,54 @@ struct RouteView: View {
         if viewModel.isWaitingForLocation { return "Waiting" }
         if viewModel.isCalculating { return "Finding" }
         return viewModel.routeOptions.isEmpty ? "Find Routes" : "Refresh"
+    }
+}
+
+private struct RouteEndpointPicker<MenuContent: View>: View {
+    let label: String
+    let title: String
+    let subtitle: String?
+    let systemImage: String
+    @ViewBuilder let menuContent: () -> MenuContent
+
+    var body: some View {
+        Menu {
+            menuContent()
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(label)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                HStack(spacing: 10) {
+                    Image(systemName: systemImage)
+                        .foregroundStyle(.blue)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title)
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                        if let subtitle {
+                            Text(subtitle)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+                    Spacer(minLength: 4)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(.background.opacity(0.72), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(.separator.opacity(0.2), lineWidth: 0.5)
+            }
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -647,7 +881,13 @@ private struct RouteLegRow: View {
             calculateRoute: {},
             selectRouteOption: { _ in },
             showMoreRouteOptions: {},
-            openInAppleMaps: {}
+            openInAppleMaps: {},
+            selectRouteOrigin: { _ in },
+            selectRouteDestination: { _ in },
+            applyCommutePreset: { _ in },
+            saveCurrentCommutePreset: {},
+            swapRouteEndpoints: {},
+            updateRouteFilters: { _ in }
         )
         .padding()
     }
@@ -660,7 +900,13 @@ private struct RouteLegRow: View {
         calculateRoute: {},
         selectRouteOption: { _ in },
         showMoreRouteOptions: {},
-        openInAppleMaps: {}
+        openInAppleMaps: {},
+        selectRouteOrigin: { _ in },
+        selectRouteDestination: { _ in },
+        applyCommutePreset: { _ in },
+        saveCurrentCommutePreset: {},
+        swapRouteEndpoints: {},
+        updateRouteFilters: { _ in }
     )
     .padding()
 }
@@ -680,6 +926,19 @@ private extension RoutePresentationModel {
     static var previewWithRoutes: RoutePresentationModel {
         RoutePresentationModel(
             selectedStop: .previewDestination,
+            origin: nil,
+            destination: RoutePlace(stop: .previewDestination, source: .selectedStop),
+            favouritePlaces: [RoutePlace(stop: .previewDestination, source: .favourite)],
+            nearbyPlaces: [RoutePlace(stop: .previewDestination, source: .nearby)],
+            recentPlaces: [RoutePlace(stop: .previewDestination, source: .recent)],
+            commutePresets: [
+                RouteCommutePreset(
+                    title: "Current Location to Philharmonie",
+                    origin: nil,
+                    destination: RoutePlace(stop: .previewDestination, source: .preset)
+                )
+            ],
+            filters: RoutePlannerFilters(),
             routeOptions: [.previewTramOption, .previewBusOption],
             selectedRouteOptionID: "tram-route",
             visibleRouteOptionCount: 2,
@@ -692,6 +951,13 @@ private extension RoutePresentationModel {
     static var previewWaitingForLocation: RoutePresentationModel {
         RoutePresentationModel(
             selectedStop: .previewDestination,
+            origin: nil,
+            destination: RoutePlace(stop: .previewDestination, source: .selectedStop),
+            favouritePlaces: [],
+            nearbyPlaces: [],
+            recentPlaces: [],
+            commutePresets: [],
+            filters: RoutePlannerFilters(),
             routeOptions: [],
             selectedRouteOptionID: nil,
             visibleRouteOptionCount: 0,

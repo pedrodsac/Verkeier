@@ -41,6 +41,13 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
         }
     }
 
+    var walkingDistanceMeters: Double {
+        plan.legs
+            .filter { $0.transportKind == .walking }
+            .compactMap(\.distanceMeters)
+            .reduce(0, +)
+    }
+
     func status(at now: Date) -> RouteOptionStatus {
         if transitLegs.contains(where: { $0.liveStatus == .cancelled }) {
             return .cancelled

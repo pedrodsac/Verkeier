@@ -46,7 +46,13 @@ struct BottomSheetContent: View {
                             calculateRoute: actions.calculateRoute,
                             selectRouteOption: actions.selectRouteOption,
                             showMoreRouteOptions: actions.showMoreRouteOptions,
-                            openInAppleMaps: actions.openRouteInAppleMaps
+                            openInAppleMaps: actions.openRouteInAppleMaps,
+                            selectRouteOrigin: actions.selectRouteOrigin,
+                            selectRouteDestination: actions.selectRouteDestination,
+                            applyCommutePreset: actions.applyCommutePreset,
+                            saveCurrentCommutePreset: actions.saveCurrentCommutePreset,
+                            swapRouteEndpoints: actions.swapRouteEndpoints,
+                            updateRouteFilters: actions.updateRouteFilters
                         )
                     case .routeTimeline:
                         RouteTimelineView(
@@ -60,7 +66,8 @@ struct BottomSheetContent: View {
                     case .settings:
                         SettingsView(
                             viewModel: viewModel.settings,
-                            checkGTFSUpdate: actions.checkGTFSUpdate
+                            checkGTFSUpdate: actions.checkGTFSUpdate,
+                            setDebugDataMode: actions.setDebugDataMode
                         )
                     }
                 }

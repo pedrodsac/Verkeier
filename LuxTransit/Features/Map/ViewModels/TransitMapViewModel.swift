@@ -45,6 +45,11 @@ final class TransitMapViewModel {
     var expandedFavouriteStopIds: Set<String> = []
     var searchQuery = ""
     var searchResults: [Stop] = []
+    var routeOrigin: RoutePlace?
+    var routeDestination: RoutePlace?
+    var routeFilters = RoutePlannerFilters()
+    var recentRoutePlaces: [RoutePlace] = []
+    var commutePresets: [RouteCommutePreset] = []
     var routeOptions: [RouteOption] = []
     var selectedRouteOptionID: String?
     var visibleRouteOptionCount = 0
@@ -62,9 +67,11 @@ final class TransitMapViewModel {
     )
     private let minimumMapSpan = 0.001
     private let favouriteDepartureConcurrencyLimit = 3
+    private let routeOptionInitialVisibleCount = 5
     private var visibleMapRegion: MKCoordinateRegion?
     private let now: @Sendable () -> Date
     private var routeCalculationGeneration = 0
+    private var unfilteredRouteOptions: [RouteOption] = []
 
     init(now: @escaping @Sendable () -> Date = { .now }) {
         self.now = now
@@ -138,7 +145,7 @@ final class TransitMapViewModel {
     }
 
     func showDirections() {
-        guard selectedStop != nil else { return }
+        guard routeDestination != nil || selectedStop != nil else { return }
         sheetContext = .directions
         sheetDetent = .medium
     }
@@ -261,6 +268,7 @@ final class TransitMapViewModel {
 
     func selectStop(_ stop: Stop) {
         selectedStop = stop
+        routeDestination = RoutePlace(stop: stop, source: .selectedStop)
         selectedStopRoutes = []
         departures = []
         offlineScheduledDepartures = []
@@ -276,6 +284,69 @@ final class TransitMapViewModel {
             center: stop.location.coordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.012, longitudeDelta: 0.012)
         ))
+    }
+
+    func loadRoutePlanner(using store: RoutePlannerStore = .shared) {
+        recentRoutePlaces = store.recentPlaces()
+        commutePresets = store.commutePresets()
+    }
+
+    func selectRouteOrigin(_ place: RoutePlace?) {
+        routeOrigin = place
+        clearRoute()
+    }
+
+    func selectRouteDestination(_ place: RoutePlace, using store: RoutePlannerStore = .shared) {
+        routeDestination = place
+        recentRoutePlaces = store.recordRecentPlace(place)
+        clearRoute()
+    }
+
+    func applyCommutePreset(_ presetID: String, using store: RoutePlannerStore = .shared) {
+        guard let preset = commutePresets.first(where: { $0.id == presetID }) else { return }
+        routeOrigin = preset.origin
+        routeDestination = preset.destination
+        recentRoutePlaces = store.recordRecentPlace(preset.destination)
+        clearRoute()
+    }
+
+    func saveCurrentCommutePreset(using store: RoutePlannerStore = .shared) {
+        guard let destination = effectiveRouteDestination else { return }
+
+        let title: String
+        if let routeOrigin {
+            title = "\(routeOrigin.title) to \(destination.title)"
+        } else {
+            title = "Current Location to \(destination.title)"
+        }
+
+        let preset = RouteCommutePreset(
+            title: title,
+            origin: routeOrigin,
+            destination: destination
+        )
+        var updated = commutePresets.filter {
+            !($0.origin == preset.origin && $0.destination == preset.destination)
+        }
+        updated.insert(preset, at: 0)
+        if updated.count > 6 {
+            updated = Array(updated.prefix(6))
+        }
+        commutePresets = updated
+        store.saveCommutePresets(updated)
+    }
+
+    func swapRouteEndpoints() {
+        guard let destination = effectiveRouteDestination else { return }
+        let previousOrigin = routeOrigin
+        routeOrigin = destination
+        routeDestination = previousOrigin
+        clearRoute()
+    }
+
+    func updateRouteFilters(_ filters: RoutePlannerFilters) {
+        routeFilters = filters
+        applyRouteOptions(preferredID: selectedRouteOptionID, announceFallback: true)
     }
 
     func loadDepartures(using atpClient: any ATPClient) async {
@@ -361,12 +432,31 @@ final class TransitMapViewModel {
     }
 
     func calculateRoute(using routeService: any RouteService, from location: CLLocation?) async {
-        guard let selectedStop else {
+        guard let destination = effectiveRouteDestination else {
             routeLoadingPhase = .idle
-            routeErrorMessage = "Choose a destination stop first."
+            routeErrorMessage = "Choose a route destination first."
             return
         }
-        guard let location else {
+
+        let origin: LocationPoint
+        if let routeOrigin {
+            origin = routeOrigin.location
+        } else {
+            guard let location else {
+                clearRouteResult()
+                routeLoadingPhase = .waitingForLocation
+                routeErrorMessage = nil
+                return
+            }
+
+            origin = LocationPoint(
+                name: "Current Location",
+                latitude: location.coordinate.latitude,
+                longitude: location.coordinate.longitude
+            )
+        }
+
+        if routeOrigin == nil, location == nil {
             clearRouteResult()
             routeLoadingPhase = .waitingForLocation
             routeErrorMessage = nil
@@ -379,19 +469,12 @@ final class TransitMapViewModel {
         routeStatusMessage = nil
         sheetContext = .directions
 
-        let origin = LocationPoint(
-            name: "Current Location",
-            latitude: location.coordinate.latitude,
-            longitude: location.coordinate.longitude
-        )
-
         do {
             let calculation = try await routeService.calculateRoute(
-                from: origin, to: selectedStop.location)
+                from: origin, to: destination.location)
             guard requestGeneration == routeCalculationGeneration else { return }
-            routeOptions = calculation.options
-            visibleRouteOptionCount = min(5, routeOptions.count)
-            selectBestRouteOption(preferredID: calculation.selectedOptionID, announceFallback: false)
+            unfilteredRouteOptions = calculation.options
+            applyRouteOptions(preferredID: calculation.selectedOptionID, announceFallback: false)
         } catch {
             guard requestGeneration == routeCalculationGeneration else { return }
             clearRouteResult()
@@ -430,13 +513,21 @@ final class TransitMapViewModel {
     func openSelectedRouteInAppleMaps(
         using routeService: any RouteService, from location: CLLocation?
     ) {
-        guard let selectedStop, let location else { return }
-        let origin = LocationPoint(
-            name: "Current Location",
-            latitude: location.coordinate.latitude,
-            longitude: location.coordinate.longitude
-        )
-        routeService.openInAppleMaps(from: origin, to: selectedStop.location)
+        guard let destination = effectiveRouteDestination else { return }
+
+        let origin: LocationPoint
+        if let routeOrigin {
+            origin = routeOrigin.location
+        } else {
+            guard let location else { return }
+            origin = LocationPoint(
+                name: "Current Location",
+                latitude: location.coordinate.latitude,
+                longitude: location.coordinate.longitude
+            )
+        }
+
+        routeService.openInAppleMaps(from: origin, to: destination.location)
     }
 
     func loadAlerts(using avlClient: any AVLClient) async {
@@ -489,10 +580,15 @@ final class TransitMapViewModel {
     }
 
     private func clearRouteResult() {
+        unfilteredRouteOptions = []
         routeOptions = []
         selectedRouteOptionID = nil
         visibleRouteOptionCount = 0
         routeStatusMessage = nil
+    }
+
+    private var effectiveRouteDestination: RoutePlace? {
+        routeDestination ?? selectedStop.map { RoutePlace(stop: $0, source: .selectedStop) }
     }
 
     private func startRouteRequest() -> Int {
@@ -526,6 +622,75 @@ final class TransitMapViewModel {
         }
 
         selectedRouteOptionID = routeOptions.first?.id
+    }
+
+    private func applyRouteOptions(preferredID: String?, announceFallback: Bool) {
+        let filtered = filteredRouteOptions(from: unfilteredRouteOptions)
+        let didRelaxFilters = filtered.isEmpty && !unfilteredRouteOptions.isEmpty
+        routeOptions = (didRelaxFilters ? unfilteredRouteOptions : filtered)
+            .sorted(by: compareRouteOptions)
+        visibleRouteOptionCount = min(routeOptionInitialVisibleCount, routeOptions.count)
+        selectBestRouteOption(preferredID: preferredID, announceFallback: announceFallback)
+
+        if didRelaxFilters {
+            routeStatusMessage = "No routes matched all filters. Showing the closest alternatives."
+        } else if routeOptions.isEmpty {
+            routeStatusMessage = nil
+        }
+    }
+
+    private func filteredRouteOptions(from options: [RouteOption]) -> [RouteOption] {
+        options.filter { option in
+            if routeFilters.avoidTightTransfers, option.status(at: now()) == .atRisk {
+                return false
+            }
+
+            if routeFilters.preferAccessible {
+                let walkingDistance = option.walkingDistanceMeters
+                if walkingDistance > 700 || option.transferCount > 1 {
+                    return false
+                }
+            }
+
+            guard let mode = routeFilters.modePreference.transportMode else {
+                return true
+            }
+            return option.transitLegs.contains(where: { $0.mode == mode })
+        }
+    }
+
+    private func compareRouteOptions(_ lhs: RouteOption, _ rhs: RouteOption) -> Bool {
+        let preferredMode = routeFilters.modePreference.transportMode
+        let lhsModeRank = preferredMode.map { mode in
+            lhs.transitLegs.contains(where: { $0.mode == mode }) ? 0 : 1
+        } ?? 0
+        let rhsModeRank = preferredMode.map { mode in
+            rhs.transitLegs.contains(where: { $0.mode == mode }) ? 0 : 1
+        } ?? 0
+        if lhsModeRank != rhsModeRank {
+            return lhsModeRank < rhsModeRank
+        }
+
+        switch routeFilters.sort {
+        case .fastest:
+            let lhsTime = lhs.plan.expectedTravelTime ?? .greatestFiniteMagnitude
+            let rhsTime = rhs.plan.expectedTravelTime ?? .greatestFiniteMagnitude
+            if lhsTime != rhsTime { return lhsTime < rhsTime }
+        case .fewestTransfers:
+            if lhs.transferCount != rhs.transferCount { return lhs.transferCount < rhs.transferCount }
+            let lhsTime = lhs.plan.expectedTravelTime ?? .greatestFiniteMagnitude
+            let rhsTime = rhs.plan.expectedTravelTime ?? .greatestFiniteMagnitude
+            if lhsTime != rhsTime { return lhsTime < rhsTime }
+        case .leastWalking:
+            let lhsWalking = lhs.walkingDistanceMeters
+            let rhsWalking = rhs.walkingDistanceMeters
+            if lhsWalking != rhsWalking { return lhsWalking < rhsWalking }
+            let lhsTime = lhs.plan.expectedTravelTime ?? .greatestFiniteMagnitude
+            let rhsTime = rhs.plan.expectedTravelTime ?? .greatestFiniteMagnitude
+            if lhsTime != rhsTime { return lhsTime < rhsTime }
+        }
+
+        return lhs.id < rhs.id
     }
 
     private func routeErrorMessage(for error: Error) -> String {
