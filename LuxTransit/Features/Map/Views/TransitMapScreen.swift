@@ -154,6 +154,7 @@ struct TransitMapScreen: View {
                 await viewModel.loadGTFSMapStops(
                     using: gtfsService, location: locationService.currentLocation)
                 await viewModel.updateSelectedStopRoutes(using: gtfsService)
+                await viewModel.loadOfflineScheduledDepartures(using: gtfsService)
                 await viewModel.searchStops(using: gtfsService)
             }
         }
@@ -219,6 +220,7 @@ struct TransitMapScreen: View {
                 stop: viewModel.selectedStop,
                 routes: viewModel.selectedStopRoutes,
                 departures: viewModel.filteredDepartures,
+                offlineScheduledDepartures: viewModel.offlineScheduledDepartures,
                 availablePlatforms: viewModel.availableDeparturePlatforms,
                 selectedLine: viewModel.selectedDepartureLine,
                 selectedPlatform: viewModel.selectedDeparturePlatform,
@@ -249,9 +251,36 @@ struct TransitMapScreen: View {
             settings: SettingsPresentationModel(
                 configuration: appConfiguration,
                 gtfsUpdateSnapshot: gtfsUpdateController.snapshot,
-                isCheckingGTFSUpdate: gtfsUpdateController.isChecking
+                isCheckingGTFSUpdate: gtfsUpdateController.isChecking,
+                readiness: settingsReadinessSnapshot,
+                supportBundleText: settingsSupportBundleText
             )
         )
+    }
+
+    private var settingsReadinessSnapshot: DataReadinessSnapshot {
+        SettingsSupport.readinessSnapshot(
+            configuration: appConfiguration,
+            gtfsSnapshot: gtfsUpdateController.snapshot,
+            hasBundledSeed: Bundle.main.url(forResource: "gtfs-compact", withExtension: "json") != nil
+        )
+    }
+
+    private var settingsSupportBundleText: String {
+        SettingsSupport.supportBundleText(
+            appVersion: appVersion,
+            readiness: settingsReadinessSnapshot,
+            gtfsSnapshot: gtfsUpdateController.snapshot,
+            configuration: appConfiguration
+        )
+    }
+
+    private var appVersion: String {
+        let version =
+            Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+            ?? "1.0"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+        return "\(version) (\(build))"
     }
 
     private var sheetPresentationDetent: Binding<PresentationDetent> {
@@ -349,6 +378,7 @@ struct TransitMapScreen: View {
         }
         Task {
             await viewModel.updateSelectedStopRoutes(using: gtfsService)
+            await viewModel.loadOfflineScheduledDepartures(using: gtfsService)
             await viewModel.loadGTFSMapStops(using: gtfsService, location: locationService.currentLocation)
         }
     }
@@ -594,6 +624,7 @@ struct TransitMapScreen: View {
                 viewModel.selectStop(favourite)
                 Task {
                     await viewModel.updateSelectedStopRoutes(using: gtfsService)
+                    await viewModel.loadOfflineScheduledDepartures(using: gtfsService)
                 }
                 viewModel.sheetDetent = .expanded
             } else {
@@ -604,6 +635,7 @@ struct TransitMapScreen: View {
                 viewModel.selectStop(favourite)
                 Task {
                     await viewModel.updateSelectedStopRoutes(using: gtfsService)
+                    await viewModel.loadOfflineScheduledDepartures(using: gtfsService)
                 }
                 viewModel.sheetDetent = .expanded
                 trackNextDeparture(for: favourite)

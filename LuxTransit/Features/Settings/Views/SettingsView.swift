@@ -11,6 +11,21 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
+                SettingsSection(title: "Data Readiness") {
+                    ReadinessSummaryCard(
+                        title: viewModel.readiness.summaryTitle,
+                        message: viewModel.readiness.summaryMessage
+                    )
+
+                    ForEach(viewModel.readiness.items) { item in
+                        SettingsFactRow(
+                            iconName: item.iconName,
+                            title: "\(item.title): \(item.status)",
+                            message: item.detail
+                        )
+                    }
+                }
+
                 SettingsSection(title: "Attribution") {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Transport data:")
@@ -105,6 +120,11 @@ struct SettingsView: View {
 
                 SettingsSection(title: "Support") {
                     DiagnosticRow(label: "Version", value: appVersion)
+                    ShareLink(item: viewModel.supportBundleText) {
+                        Label("Export support bundle", systemImage: "square.and.arrow.up")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    .buttonStyle(.bordered)
                     Text("This app is not an official Luxembourg public transport app.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
@@ -157,6 +177,24 @@ struct SettingsView: View {
     private func formatted(_ date: Date?) -> String {
         guard let date else { return "Unavailable" }
         return date.formatted(date: .abbreviated, time: .shortened)
+    }
+}
+
+private struct ReadinessSummaryCard: View {
+    let title: String
+    let message: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+            Text(message)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(.tint.opacity(0.08), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
@@ -230,7 +268,13 @@ private struct DiagnosticRow: View {
         viewModel: SettingsPresentationModel(
             configuration: .current,
             gtfsUpdateSnapshot: .empty,
-            isCheckingGTFSUpdate: false
+            isCheckingGTFSUpdate: false,
+            readiness: DataReadinessSnapshot(
+                summaryTitle: "Transit data is ready",
+                summaryMessage: "This screen shows whether LuxTransit is using live, downloaded, bundled, or fallback data.",
+                items: []
+            ),
+            supportBundleText: "Preview"
         ),
         checkGTFSUpdate: {}
     )

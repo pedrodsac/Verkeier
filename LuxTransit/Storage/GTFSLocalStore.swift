@@ -63,6 +63,10 @@ nonisolated struct GTFSLocalStore: Sendable {
         FileManager.default.fileExists(atPath: currentDirectory.path)
     }
 
+    func hasDownloadedIndexes() -> Bool {
+        FileManager.default.fileExists(atPath: stopsIndexURL.path)
+    }
+
     func resetTempDirectory() throws -> URL {
         let tempRoot = rootDirectory.appendingPathComponent("temp", isDirectory: true)
         let fileManager = FileManager.default

@@ -40,6 +40,8 @@ struct SettingsPresentationModel {
     let configuration: AppConfiguration
     let gtfsUpdateSnapshot: GTFSUpdateSnapshot
     let isCheckingGTFSUpdate: Bool
+    let readiness: DataReadinessSnapshot
+    let supportBundleText: String
 }
 
 struct NearbyStopsPresentationModel {
@@ -88,6 +90,7 @@ struct StopDetailPresentationModel {
     let stop: Stop?
     let routes: [TransitRoute]
     let departures: [Departure]
+    let offlineScheduledDepartures: [OfflineScheduleDeparture]
     let availablePlatforms: [String]
     let selectedLine: String?
     let selectedPlatform: String?

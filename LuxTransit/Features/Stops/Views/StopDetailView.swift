@@ -45,6 +45,8 @@ struct StopDetailView: View {
                     trackDeparture: trackDeparture
                 )
 
+                OfflineScheduleSection(departures: viewModel.offlineScheduledDepartures)
+
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -54,6 +56,54 @@ struct StopDetailView: View {
                 message: "Choose a marker, favourite, nearby stop, or search result.",
                 systemImage: "bus"
             )
+        }
+    }
+}
+
+private struct OfflineScheduleSection: View {
+    let departures: [OfflineScheduleDeparture]
+
+    var body: some View {
+        if !departures.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Scheduled from GTFS")
+                    .font(.headline.weight(.semibold))
+                Text("Offline timetable preview when live ATP departures are missing or delayed.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
+                ForEach(departures) { departure in
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        RouteChip(
+                            route: TransitRoute(
+                                id: departure.id,
+                                shortName: departure.lineName,
+                                mode: departure.mode,
+                                dataSource: .gtfs
+                            )
+                        )
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(departure.destination)
+                                .font(.subheadline.weight(.semibold))
+                                .lineLimit(1)
+
+                            if let platform = departure.platform, !platform.isEmpty {
+                                Text("Platform \(platform)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+
+                        Spacer()
+
+                        Text(departure.departureDate, style: .time)
+                            .font(.subheadline.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
         }
     }
 }

@@ -31,6 +31,23 @@ nonisolated enum GTFSUpdateStatus: Equatable, Sendable {
     case failed
 }
 
+extension GTFSUpdateStatus {
+    var displayText: String {
+        switch self {
+        case .idle:
+            return "Idle"
+        case .checking:
+            return "Checking"
+        case .upToDate:
+            return "Up to date"
+        case .updated:
+            return "Updated"
+        case .failed:
+            return "Update failed"
+        }
+    }
+}
+
 extension Notification.Name {
     static let gtfsDidUpdate = Notification.Name("gtfsDidUpdate")
 }

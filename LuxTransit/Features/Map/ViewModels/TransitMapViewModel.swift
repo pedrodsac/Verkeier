@@ -26,6 +26,7 @@ final class TransitMapViewModel {
     var departures: [Departure] = [] {
         didSet { rebuildDepartureFilters() }
     }
+    var offlineScheduledDepartures: [OfflineScheduleDeparture] = []
     var selectedDepartureLine: String? {
         didSet { rebuildDepartureFilters() }
     }
@@ -262,6 +263,7 @@ final class TransitMapViewModel {
         selectedStop = stop
         selectedStopRoutes = []
         departures = []
+        offlineScheduledDepartures = []
         selectedDepartureLine = nil
         selectedDeparturePlatform = nil
         departuresErrorMessage = nil
@@ -338,6 +340,24 @@ final class TransitMapViewModel {
         }
 
         selectedStopRoutes = []
+    }
+
+    func loadOfflineScheduledDepartures(
+        using gtfsService: any GTFSService,
+        now: Date = .now
+    ) async {
+        guard let selectedStop,
+              let timetable = await gtfsService.timetableIndex() else {
+            offlineScheduledDepartures = []
+            return
+        }
+
+        let service = OfflineScheduleService()
+        offlineScheduledDepartures = service.upcomingDepartures(
+            for: selectedStop,
+            timetable: timetable,
+            now: now
+        )
     }
 
     func calculateRoute(using routeService: any RouteService, from location: CLLocation?) async {
