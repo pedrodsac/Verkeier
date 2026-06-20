@@ -60,6 +60,7 @@ final class TransitMapViewModel {
         span: MKCoordinateSpan(latitudeDelta: 0.045, longitudeDelta: 0.045)
     )
     private let minimumMapSpan = 0.001
+    private let favouriteDepartureConcurrencyLimit = 3
     private var visibleMapRegion: MKCoordinateRegion?
     private let now: @Sendable () -> Date
     private var routeCalculationGeneration = 0
@@ -229,7 +230,9 @@ final class TransitMapViewModel {
     }
 
     func loadFavouriteDepartures(using atpClient: any ATPClient, favourites: [Stop]) async {
-        guard !favourites.isEmpty else {
+        let limitedFavourites = Array(favourites.prefix(6))
+
+        guard !limitedFavourites.isEmpty else {
             favouriteDeparturesByStopId = [:]
             favouriteDeparturesErrorMessage = nil
             favouriteDeparturesLastUpdated = nil
@@ -240,22 +243,17 @@ final class TransitMapViewModel {
         isLoadingFavouriteDepartures = true
         favouriteDeparturesErrorMessage = nil
 
-        var boards: [String: [Departure]] = [:]
-        var failedCount = 0
-
-        for stop in favourites.prefix(6) {
-            do {
-                boards[stop.id] = try await atpClient.departureBoards(stopIds: stop.platformIds)
-            } catch {
-                failedCount += 1
-                boards[stop.id] = []
-            }
-        }
+        let results = await loadFavouriteDepartureBoards(
+            using: atpClient,
+            favourites: limitedFavourites
+        )
+        let boards = Dictionary(uniqueKeysWithValues: results.map { ($0.stopId, $0.departures) })
+        let failedCount = results.filter(\.didFail).count
 
         favouriteDeparturesByStopId = boards
         favouriteDeparturesLastUpdated = .now
         favouriteDeparturesErrorMessage =
-            failedCount == favourites.prefix(6).count
+            failedCount == limitedFavourites.count
             ? "Favourite departures could not be loaded." : nil
         isLoadingFavouriteDepartures = false
     }
@@ -406,8 +404,6 @@ final class TransitMapViewModel {
         if visibleRouteOptionCount < routeOptions.count {
             visibleRouteOptionCount = min(routeOptions.count, visibleRouteOptionCount + 3)
             routeStatusMessage = nil
-        } else {
-            routeStatusMessage = "No later public transport options were found."
         }
     }
 
@@ -525,6 +521,65 @@ final class TransitMapViewModel {
         }
     }
 
+    private func loadFavouriteDepartureBoards(
+        using atpClient: any ATPClient,
+        favourites: [Stop]
+    ) async -> [FavouriteDepartureBoardResult] {
+        await withTaskGroup(of: FavouriteDepartureBoardResult.self) { group in
+            var results: [FavouriteDepartureBoardResult] = []
+            results.reserveCapacity(favourites.count)
+
+            var iterator = favourites.enumerated().makeIterator()
+            for _ in 0..<min(favouriteDepartureConcurrencyLimit, favourites.count) {
+                guard let next = iterator.next() else { break }
+                group.addTask {
+                    await Self.loadFavouriteDepartureBoard(
+                        using: atpClient,
+                        stop: next.element,
+                        index: next.offset
+                    )
+                }
+            }
+
+            while let result = await group.next() {
+                results.append(result)
+                if let next = iterator.next() {
+                    group.addTask {
+                        await Self.loadFavouriteDepartureBoard(
+                            using: atpClient,
+                            stop: next.element,
+                            index: next.offset
+                        )
+                    }
+                }
+            }
+
+            return results.sorted { $0.index < $1.index }
+        }
+    }
+
+    private static func loadFavouriteDepartureBoard(
+        using atpClient: any ATPClient,
+        stop: Stop,
+        index: Int
+    ) async -> FavouriteDepartureBoardResult {
+        do {
+            return FavouriteDepartureBoardResult(
+                stopId: stop.id,
+                departures: try await atpClient.departureBoards(stopIds: stop.platformIds),
+                didFail: false,
+                index: index
+            )
+        } catch {
+            return FavouriteDepartureBoardResult(
+                stopId: stop.id,
+                departures: [],
+                didFail: true,
+                index: index
+            )
+        }
+    }
+
     private func squaredDistance(from lhs: LocationPoint, to rhs: LocationPoint) -> Double {
         let latitude = lhs.latitude - rhs.latitude
         let longitude = lhs.longitude - rhs.longitude
@@ -591,6 +646,13 @@ final class TransitMapViewModel {
         if !availableDeparturePlatforms.contains(selectedDeparturePlatform) {
             self.selectedDeparturePlatform = nil
         }
+    }
+
+    private struct FavouriteDepartureBoardResult: Sendable {
+        let stopId: String
+        let departures: [Departure]
+        let didFail: Bool
+        let index: Int
     }
 }
 

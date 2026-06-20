@@ -191,7 +191,8 @@ struct TransitMapScreen: View {
         let nearby = NearbyStopsPresentationModel(
             stops: viewModel.nearbyStops,
             isLoading: viewModel.isLoadingNearbyStops,
-            errorMessage: viewModel.nearbyStopsErrorMessage
+            errorMessage: viewModel.nearbyStopsErrorMessage,
+            referenceLocation: locationService.currentLocation
         )
 
         return TransitSheetPresentationModel(
@@ -211,7 +212,8 @@ struct TransitMapScreen: View {
             search: SearchPresentationModel(
                 results: viewModel.searchResults,
                 nearbySuggestions: viewModel.nearbyStops,
-                isLoadingNearbySuggestions: viewModel.isLoadingNearbyStops
+                isLoadingNearbySuggestions: viewModel.isLoadingNearbyStops,
+                referenceLocation: locationService.currentLocation
             ),
             stopDetail: StopDetailPresentationModel(
                 stop: viewModel.selectedStop,
@@ -1016,7 +1018,8 @@ private struct TransitMapView: UIViewRepresentable {
                 isFavourite: isFavourite
             )
             view.glyphTintColor = .white
-            view.glyphImage = UIImage(systemName: glyphName(for: annotation.stop))
+            view.glyphText = isFavourite ? "★" : nil
+            view.glyphImage = isFavourite ? nil : UIImage(systemName: glyphName(for: annotation.stop))
             view.titleVisibility = .hidden
             view.subtitleVisibility = .hidden
             view.displayPriority = isSelected ? .required : .defaultHigh
@@ -1028,8 +1031,14 @@ private struct TransitMapView: UIViewRepresentable {
             isSelected: Bool,
             isFavourite: Bool
         ) -> UIColor {
+            if isFavourite {
+                if stop.modes.contains(.train) { return UIColor(red: 0.75, green: 0.10, blue: 0.16, alpha: 1) }
+                if stop.modes.contains(.tram) { return UIColor(red: 0.86, green: 0.44, blue: 0.04, alpha: 1) }
+                return UIColor(red: 0.07, green: 0.44, blue: 0.89, alpha: 1)
+            }
             if stop.modes.contains(.train) { return .systemRed }
             if stop.modes.contains(.tram) { return .systemOrange }
+            if isSelected { return .systemIndigo }
             return .systemBlue
         }
 
@@ -1071,7 +1080,7 @@ private final class RouteTransferAnnotation: NSObject, MKAnnotation {
     var coordinate: CLLocationCoordinate2D { marker.coordinate.coordinate }
     var title: String? { marker.title }
 
-    init(marker: RouteTransferMarker) {
+    nonisolated init(marker: RouteTransferMarker) {
         self.marker = marker
     }
 }

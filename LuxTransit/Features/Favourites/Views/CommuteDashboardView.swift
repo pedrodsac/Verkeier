@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct CommuteDashboardView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     enum DisplayStyle {
         case regular
         case mapsMedium
@@ -70,7 +72,11 @@ struct CommuteDashboardView: View {
                 ScrollView {
                     LazyVStack(spacing: 10) {
                         ForEach(viewModel.nearby.stops.prefix(5)) { stop in
-                            StopListRow(stop: stop, markerColor: .blue) {
+                            StopListRow(
+                                stop: stop,
+                                markerColor: .blue,
+                                referenceLocation: viewModel.nearby.referenceLocation
+                            ) {
                                 selectStop(stop)
                             }
                         }
@@ -124,6 +130,7 @@ struct AlertsSummaryRow: View {
 }
 
 struct FavouriteStopDepartureCard: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let stop: Stop
     let departures: [Departure]
     let isExpanded: Bool
@@ -204,7 +211,7 @@ struct FavouriteStopDepartureCard: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(.separator.opacity(0.22), lineWidth: 0.5)
         }
-        .animation(.snappy(duration: 0.22), value: isExpanded)
+        .animation(reduceMotion ? nil : .snappy(duration: 0.22), value: isExpanded)
     }
 
     private var primarySummary: String {

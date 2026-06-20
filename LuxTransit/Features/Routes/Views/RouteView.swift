@@ -43,6 +43,7 @@ struct RouteView: View {
             if !viewModel.routeOptions.isEmpty {
                 RouteOptionsSection(
                     options: viewModel.visibleRouteOptions,
+                    canShowMore: viewModel.canShowMoreRouteOptions,
                     selectedRouteOptionID: viewModel.selectedRouteOptionID,
                     selectRouteOption: selectRouteOption,
                     showMoreRouteOptions: showMoreRouteOptions
@@ -110,6 +111,7 @@ struct RouteView: View {
 
 private struct RouteOptionsSection: View {
     let options: [RouteOption]
+    let canShowMore: Bool
     let selectedRouteOptionID: String?
     let selectRouteOption: (String) -> Void
     let showMoreRouteOptions: () -> Void
@@ -127,13 +129,15 @@ private struct RouteOptionsSection: View {
                 )
             }
 
-            Button(action: showMoreRouteOptions) {
-                Label("Show 3 more", systemImage: "plus.circle")
-                    .font(.callout.weight(.semibold))
-                    .frame(maxWidth: .infinity)
+            if canShowMore {
+                Button(action: showMoreRouteOptions) {
+                    Label("Show 3 more", systemImage: "plus.circle")
+                        .font(.callout.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
             }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
         }
     }
 }

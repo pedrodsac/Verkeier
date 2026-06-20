@@ -52,13 +52,17 @@ struct SettingsView: View {
                 }
 
                 SettingsSection(title: "API Diagnostics") {
+                    DiagnosticRow(label: "ATP mode", value: atpMode)
                     DiagnosticRow(
-                        label: "ATP OpenAPI",
-                        value: configuration.hasATPAccessId ? "Configured" : "Mocked")
-                    DiagnosticRow(label: "GTFS", value: gtfsSummary)
+                        label: "ATP endpoint",
+                        value: configuration.apiBaseURL.host() ?? "Configured"
+                    )
+                    DiagnosticRow(label: "GTFS cache", value: gtfsSummary)
                     DiagnosticRow(
-                        label: "AVL", value: configuration.avlMessagesURL.host() ?? "Configured")
-                    DiagnosticRow(label: "Routing", value: "MapKit with Apple Maps handoff")
+                        label: "AVL feed",
+                        value: configuration.avlMessagesURL.host() ?? "Configured"
+                    )
+                    DiagnosticRow(label: "Routing", value: "MapKit and Apple Maps handoff")
                 }
 
                 SettingsSection(title: "Data Sources") {
@@ -70,6 +74,10 @@ struct SettingsView: View {
                     DiagnosticRow(
                         label: "Last checked",
                         value: formatted(viewModel.gtfsUpdateSnapshot.lastMetadataCheckAt))
+                    DiagnosticRow(
+                        label: "Last modified",
+                        value: formatted(viewModel.gtfsUpdateSnapshot.metadata?.lastModified)
+                    )
                     DiagnosticRow(
                         label: "Checksum",
                         value: viewModel.gtfsUpdateSnapshot.metadata?.checksum ?? "Unavailable")
@@ -116,7 +124,11 @@ struct SettingsView: View {
     }
 
     private var gtfsSummary: String {
-        viewModel.gtfsUpdateSnapshot.metadata == nil ? "No GTFS data" : "Cached GTFS"
+        viewModel.gtfsUpdateSnapshot.metadata == nil ? "Unavailable" : "Cached locally"
+    }
+
+    private var atpMode: String {
+        configuration.hasATPAccessId ? "Live API configured" : "Mock fallback"
     }
 
     private var currentGTFSResource: String {

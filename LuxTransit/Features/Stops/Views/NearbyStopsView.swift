@@ -1,9 +1,7 @@
 import SwiftUI
 
 struct NearbyStopsView: View {
-    let stops: [Stop]
-    let isLoading: Bool
-    let errorMessage: String?
+    let viewModel: NearbyStopsPresentationModel
     let selectStop: (Stop) -> Void
 
     var body: some View {
@@ -12,16 +10,16 @@ struct NearbyStopsView: View {
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(.secondary)
 
-            if isLoading {
+            if viewModel.isLoading {
                 ProgressView("Loading stops")
                     .frame(maxWidth: .infinity, alignment: .leading)
-            } else if let errorMessage {
+            } else if let errorMessage = viewModel.errorMessage {
                 ContentUnavailableView(
                     "Stops unavailable",
                     systemImage: "wifi.exclamationmark",
                     description: Text(errorMessage)
                 )
-            } else if stops.isEmpty {
+            } else if viewModel.stops.isEmpty {
                 ContentUnavailableView(
                     "No nearby stops",
                     systemImage: "mappin.slash",
@@ -30,8 +28,12 @@ struct NearbyStopsView: View {
             } else {
                 ScrollView {
                     LazyVStack(spacing: 8) {
-                        ForEach(stops) { stop in
-                            StopListRow(stop: stop, markerColor: .blue) {
+                        ForEach(viewModel.stops) { stop in
+                            StopListRow(
+                                stop: stop,
+                                markerColor: .blue,
+                                referenceLocation: viewModel.referenceLocation
+                            ) {
                                 selectStop(stop)
                             }
                         }
@@ -46,9 +48,12 @@ struct NearbyStopsView: View {
 
 #Preview {
     NearbyStopsView(
-        stops: [],
-        isLoading: false,
-        errorMessage: nil,
+        viewModel: NearbyStopsPresentationModel(
+            stops: [],
+            isLoading: false,
+            errorMessage: nil,
+            referenceLocation: nil
+        ),
         selectStop: { _ in }
     )
 }

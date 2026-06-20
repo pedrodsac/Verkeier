@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 
 struct TransitSheetPresentationModel {
@@ -45,6 +46,7 @@ struct NearbyStopsPresentationModel {
     let stops: [Stop]
     let isLoading: Bool
     let errorMessage: String?
+    let referenceLocation: CLLocation?
 }
 
 struct CommuteDashboardViewModel {
@@ -79,6 +81,7 @@ struct SearchPresentationModel {
     let results: [Stop]
     let nearbySuggestions: [Stop]
     let isLoadingNearbySuggestions: Bool
+    let referenceLocation: CLLocation?
 }
 
 struct StopDetailPresentationModel {
@@ -129,6 +132,10 @@ struct RoutePresentationModel {
 
     var visibleRouteOptions: [RouteOption] {
         Array(routeOptions.prefix(visibleRouteOptionCount))
+    }
+
+    var canShowMoreRouteOptions: Bool {
+        visibleRouteOptionCount < routeOptions.count
     }
 }
 

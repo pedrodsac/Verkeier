@@ -103,7 +103,7 @@ private struct HomeSheetContent: View {
             BottomSheetSearchButton(query: query, style: .medium, action: showSearch)
 
             Button(action: showSettings) {
-                Image(systemName: "ellipsis")
+                Image(systemName: "gearshape.fill")
                     .font(.title3.weight(.bold))
                     .foregroundStyle(.primary)
                     .frame(width: 52, height: 52)
@@ -148,7 +148,7 @@ private struct BottomSheetSearchButton: View {
                     .foregroundStyle(.secondary)
                     .accessibilityHidden(true)
 
-                Text(query.isEmpty ? "Search Maps" : query)
+                Text(query.isEmpty ? "Search stops" : query)
                     .font(style.textFont)
                     .foregroundStyle(query.isEmpty ? .secondary : .primary)
                     .lineLimit(1)

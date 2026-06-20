@@ -279,7 +279,7 @@ struct TransitMapViewModelTests {
         #expect(viewModel.routeMapOverlay == secondOption.mapOverlay)
     }
 
-    @Test func showMoreRouteOptionsRevealsThreeMoreAndThenShowsStatusMessage() {
+    @Test func showMoreRouteOptionsRevealsThreeMoreAndThenStopsAtAllAvailableOptions() {
         let destination = makeStop(id: "stop-1")
         let viewModel = TransitMapViewModel()
         viewModel.selectStop(destination)
@@ -300,7 +300,7 @@ struct TransitMapViewModelTests {
         viewModel.showMoreRouteOptions()
 
         #expect(viewModel.visibleRouteOptionCount == 8)
-        #expect(viewModel.routeStatusMessage == "No later public transport options were found.")
+        #expect(viewModel.routeStatusMessage == nil)
     }
 
     @Test func missedPreferredRouteFallsBackToNextViableOption() async {

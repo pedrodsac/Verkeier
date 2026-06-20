@@ -65,7 +65,7 @@ struct TransitBottomSheet: View {
 
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: actions.showSettings) {
-                    Label("Settings", systemImage: "ellipsis.circle")
+                    Label("Settings and diagnostics", systemImage: "gearshape")
                 }
             }
 

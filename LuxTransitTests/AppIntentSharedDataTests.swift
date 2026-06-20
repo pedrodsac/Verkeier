@@ -5,12 +5,16 @@ import Testing
 
 struct AppIntentSharedDataTests {
     @Test func handoffRoundTripsAndConsumesOnce() {
-        _ = TransitIntentHandoff.consumePending()
+        let store = makeHandoffStore()
+        _ = TransitIntentHandoff.consumePending(from: store)
 
-        TransitIntentHandoff.save(.planRoute(destinationName: "Hill Lift"))
+        TransitIntentHandoff.save(.planRoute(destinationName: "Hill Lift"), store: store)
 
-        #expect(TransitIntentHandoff.consumePending() == .planRoute(destinationName: "Hill Lift"))
-        #expect(TransitIntentHandoff.consumePending() == nil)
+        #expect(
+            TransitIntentHandoff.consumePending(from: store)
+                == .planRoute(destinationName: "Hill Lift")
+        )
+        #expect(TransitIntentHandoff.consumePending(from: store) == nil)
     }
 
     @Test func favouriteStopEntitiesMirrorSharedFavouriteStops() throws {
@@ -138,5 +142,12 @@ struct AppIntentSharedDataTests {
         SharedTransitDataStore.userDefaults.removeObject(
             forKey: SharedTransitDataStore.favouriteStopsKey)
         UserDefaults.standard.removeObject(forKey: SharedTransitDataStore.favouriteStopsKey)
+    }
+
+    private func makeHandoffStore() -> TransitIntentHandoffStore {
+        let suiteName = "AppIntentSharedDataTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName) ?? .standard
+        defaults.removePersistentDomain(forName: suiteName)
+        return TransitIntentHandoffStore(defaults: defaults)
     }
 }

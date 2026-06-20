@@ -1,6 +1,8 @@
+import CoreLocation
 import SwiftUI
 
 struct SearchView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Binding var query: String
     let viewModel: SearchPresentationModel
     let updateSearch: () -> Void
@@ -11,12 +13,13 @@ struct SearchView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             searchHeader
-				.padding(.top, 12)
+                .padding(.top, 12)
 
             if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 NearbySearchSuggestions(
                     stops: viewModel.nearbySuggestions,
                     isLoading: viewModel.isLoadingNearbySuggestions,
+                    referenceLocation: viewModel.referenceLocation,
                     selectStop: selectStop
                 )
                 .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -33,8 +36,8 @@ struct SearchView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .animation(.snappy(duration: 0.24), value: query.isEmpty)
-        .animation(.snappy(duration: 0.24), value: viewModel.results.count)
+        .animation(reduceMotion ? nil : .snappy(duration: 0.24), value: query.isEmpty)
+        .animation(reduceMotion ? nil : .snappy(duration: 0.24), value: viewModel.results.count)
         .onAppear {
             isSearchFocused = true
             updateSearch()
@@ -103,6 +106,7 @@ struct SearchView: View {
 private struct NearbySearchSuggestions: View {
     let stops: [Stop]
     let isLoading: Bool
+    let referenceLocation: CLLocation?
     let selectStop: (Stop) -> Void
 
     var body: some View {
@@ -123,7 +127,11 @@ private struct NearbySearchSuggestions: View {
                 ScrollView {
                     LazyVStack(spacing: 10) {
                         ForEach(stops.prefix(5)) { stop in
-                            StopListRow(stop: stop, markerColor: .teal) {
+                            StopListRow(
+                                stop: stop,
+                                markerColor: .teal,
+                                referenceLocation: referenceLocation
+                            ) {
                                 selectStop(stop)
                             }
                         }
@@ -141,7 +149,8 @@ private struct NearbySearchSuggestions: View {
         viewModel: SearchPresentationModel(
             results: [],
             nearbySuggestions: [],
-            isLoadingNearbySuggestions: false
+            isLoadingNearbySuggestions: false,
+            referenceLocation: nil
         ),
         updateSearch: {},
         selectStop: { _ in },

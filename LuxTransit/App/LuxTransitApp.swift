@@ -9,6 +9,7 @@ struct LuxTransitApp: App {
     private let gtfsService: any GTFSService
     private let routeService: any RouteService
     private let avlClient: any AVLClient
+    private let modelContainer: ModelContainer
     @State private var liveActivityManager = LiveActivityManager()
     @State private var gtfsUpdateController = GTFSUpdateController()
 
@@ -23,6 +24,7 @@ struct LuxTransitApp: App {
         gtfsService = LocalGTFSService()
         routeService = PublicTransportRouteService(gtfsService: gtfsService, atpClient: atpClient)
         avlClient = LiveAVLClient(feedURL: configuration.avlMessagesURL)
+        modelContainer = AppModelContainer.make()
     }
 
     var body: some Scene {
@@ -35,7 +37,7 @@ struct LuxTransitApp: App {
                 .environment(\.routeService, routeService)
                 .environment(\.avlClient, avlClient)
                 .environment(\.liveActivityManager, liveActivityManager)
-                .modelContainer(for: PersistedFavouriteStop.self)
+                .modelContainer(modelContainer)
         }
     }
 }

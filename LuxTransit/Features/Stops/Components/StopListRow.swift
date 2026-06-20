@@ -1,9 +1,11 @@
+import CoreLocation
 import SwiftUI
 
 struct StopListRow: View {
     let stop: Stop
     var markerColor: Color = .blue
     var accessorySystemName: String? = "chevron.right"
+    var referenceLocation: CLLocation? = nil
     let action: () -> Void
 
     var body: some View {
@@ -36,6 +38,13 @@ struct StopListRow: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
+
+                    if let distanceMetadata {
+                        Text(distanceMetadata)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
                 }
 
                 Spacer(minLength: 8)
@@ -77,10 +86,40 @@ struct StopListRow: View {
     }
 
     private var accessibilityLabel: String {
+        var parts: [String] = [stop.name]
         if let locality = stop.locality {
-            return "\(stop.name), \(locality)"
+            parts.append(locality)
         }
-        return stop.name
+        if let distanceMetadata {
+            parts.append(distanceMetadata)
+        }
+        return parts.joined(separator: ", ")
+    }
+
+    private var distanceMetadata: String? {
+        guard let referenceLocation else { return nil }
+
+        let distance = CLLocation(
+            latitude: stop.location.latitude,
+            longitude: stop.location.longitude
+        ).distance(from: referenceLocation)
+        guard distance.isFinite else { return nil }
+
+        let distanceText = formattedDistance(distance)
+        let walkingText = formattedWalkingMinutes(for: distance)
+        return "\(distanceText) · \(walkingText) walk"
+    }
+
+    private func formattedDistance(_ distance: CLLocationDistance) -> String {
+        if distance < 1_000 {
+            return "\(Int(distance.rounded())) m"
+        }
+        return String(format: "%.1f km", distance / 1_000)
+    }
+
+    private func formattedWalkingMinutes(for distance: CLLocationDistance) -> String {
+        let minutes = max(1, Int((distance / 1.33 / 60).rounded()))
+        return "\(minutes) min"
     }
 }
 
