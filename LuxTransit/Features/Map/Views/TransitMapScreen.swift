@@ -159,6 +159,9 @@ struct TransitMapScreen: View {
                 await viewModel.updateSelectedStopRoutes(using: gtfsService)
                 await viewModel.loadOfflineScheduledDepartures(using: gtfsService)
                 await viewModel.searchStops(using: gtfsService)
+                if viewModel.selectedLineDetailRoute != nil {
+                    await viewModel.loadLineDetail(using: gtfsService)
+                }
             }
         }
     }
@@ -171,7 +174,8 @@ struct TransitMapScreen: View {
             gtfsStops: viewModel.gtfsOnlyMapStops,
             selectedStopId: viewModel.selectedStop?.id,
             favouriteStopIds: favouriteStopIds,
-            routeOverlay: viewModel.routeMapOverlay,
+            alertStopIds: Set(viewModel.alerts.flatMap(\.affectedStopIds)),
+            routeOverlay: viewModel.activeMapOverlay,
             selectStop: selectStop,
             regionDidChange: scheduleMapRegionUpdate
         )
@@ -224,6 +228,7 @@ struct TransitMapScreen: View {
                 routes: viewModel.selectedStopRoutes,
                 departures: viewModel.filteredDepartures,
                 offlineScheduledDepartures: viewModel.offlineScheduledDepartures,
+                alerts: viewModel.stopDetailAlerts,
                 availablePlatforms: viewModel.availableDeparturePlatforms,
                 selectedLine: viewModel.selectedDepartureLine,
                 selectedPlatform: viewModel.selectedDeparturePlatform,
@@ -245,11 +250,18 @@ struct TransitMapScreen: View {
                 commutePresets: viewModel.commutePresets,
                 filters: viewModel.routeFilters,
                 routeOptions: viewModel.routeOptions,
+                alerts: viewModel.routeAlerts,
                 selectedRouteOptionID: viewModel.selectedRouteOptionID,
                 visibleRouteOptionCount: viewModel.visibleRouteOptionCount,
                 loadingPhase: viewModel.routeLoadingPhase,
                 errorMessage: viewModel.routeErrorMessage,
                 statusMessage: viewModel.routeStatusMessage
+            ),
+            lineDetail: LineDetailPresentationModel(
+                route: viewModel.selectedLineDetailRoute,
+                detail: viewModel.selectedLineDetail,
+                alerts: viewModel.lineDetailAlerts,
+                errorMessage: viewModel.selectedLineDetailErrorMessage
             ),
             alerts: AlertsPresentationModel(
                 alerts: viewModel.alerts,
@@ -370,6 +382,8 @@ struct TransitMapScreen: View {
             showStopDetail: showStopDetail,
             showDirections: showDirections,
             showRouteOptions: showRouteOptions,
+            showLineDetail: showLineDetail,
+            selectLineDetailDirection: selectLineDetailDirection,
             showSettings: showSettings,
             toggleFavourite: toggleSelectedFavourite,
             toggleFavouriteExpansion: toggleFavouriteExpansion,
@@ -439,6 +453,22 @@ struct TransitMapScreen: View {
     private func showRouteOptions() {
         animateSheetChange {
             viewModel.showDirections()
+        }
+    }
+
+    private func showLineDetail(_ route: TransitRoute) {
+        animateSheetChange {
+            viewModel.showLineDetail(route)
+        }
+        Task {
+            await viewModel.loadLineDetail(using: gtfsService)
+        }
+    }
+
+    private func selectLineDetailDirection(_ directionID: String) {
+        viewModel.selectLineDetailDirection(directionID)
+        Task {
+            await viewModel.loadLineDetail(using: gtfsService)
         }
     }
 
@@ -798,6 +828,7 @@ private struct TransitMapView: UIViewRepresentable {
     let gtfsStops: [Stop]
     let selectedStopId: String?
     let favouriteStopIds: Set<String>
+    let alertStopIds: Set<String>
     let routeOverlay: RouteMapOverlay?
     let selectStop: (Stop) -> Void
     let regionDidChange: (MKCoordinateRegion) -> Void
@@ -815,6 +846,7 @@ private struct TransitMapView: UIViewRepresentable {
         context.coordinator.regionDidChange = regionDidChange
         context.coordinator.selectedStopId = selectedStopId
         context.coordinator.favouriteStopIds = favouriteStopIds
+        context.coordinator.alertStopIds = alertStopIds
 
         let stopAnnotations = routeOverlay == nil
             ? liveStops.map {
@@ -834,6 +866,7 @@ private struct TransitMapView: UIViewRepresentable {
                 transferAnnotations: transferAnnotations,
                 selectedStopId: selectedStopId,
                 favouriteStopIds: favouriteStopIds,
+                alertStopIds: alertStopIds,
                 routeOverlay: routeOverlay
             )
         )
@@ -846,6 +879,7 @@ private struct TransitMapView: UIViewRepresentable {
         let transferAnnotations: [RouteTransferAnnotation]
         let selectedStopId: String?
         let favouriteStopIds: Set<String>
+        let alertStopIds: Set<String>
         let routeOverlay: RouteMapOverlay?
 
         var key: MapSnapshotKey {
@@ -855,6 +889,7 @@ private struct TransitMapView: UIViewRepresentable {
                 transferAnnotationKeys: transferAnnotations.map(\.key),
                 selectedStopId: selectedStopId,
                 favouriteStopIds: favouriteStopIds,
+                alertStopIds: alertStopIds,
                 routeOverlay: routeOverlay
             )
         }
@@ -866,6 +901,7 @@ private struct TransitMapView: UIViewRepresentable {
         let transferAnnotationKeys: [String]
         let selectedStopId: String?
         let favouriteStopIds: Set<String>
+        let alertStopIds: Set<String>
         let routeOverlay: RouteMapOverlay?
     }
 
@@ -937,6 +973,7 @@ private struct TransitMapView: UIViewRepresentable {
         var regionDidChange: (MKCoordinateRegion) -> Void
         var selectedStopId: String?
         var favouriteStopIds: Set<String> = []
+        var alertStopIds: Set<String> = []
         var isApplyingRegion = false
         private var annotationsByKey: [String: StopMapAnnotation] = [:]
         private var transferAnnotationsByKey: [String: RouteTransferAnnotation] = [:]
@@ -1136,15 +1173,22 @@ private struct TransitMapView: UIViewRepresentable {
         private func configure(_ view: MKMarkerAnnotationView, for annotation: StopMapAnnotation) {
             let isSelected = selectedStopId == annotation.stop.id
             let isFavourite = favouriteStopIds.contains(annotation.stop.id)
+            let hasAlert = alertStopIds.contains(annotation.stop.id)
 
             view.markerTintColor = markerColor(
                 for: annotation.stop,
                 isSelected: isSelected,
-                isFavourite: isFavourite
+                isFavourite: isFavourite,
+                hasAlert: hasAlert
             )
             view.glyphTintColor = .white
-            view.glyphText = isFavourite ? "★" : nil
-            view.glyphImage = isFavourite ? nil : UIImage(systemName: glyphName(for: annotation.stop))
+            if hasAlert {
+                view.glyphText = "!"
+                view.glyphImage = nil
+            } else {
+                view.glyphText = isFavourite ? "★" : nil
+                view.glyphImage = isFavourite ? nil : UIImage(systemName: glyphName(for: annotation.stop))
+            }
             view.titleVisibility = .hidden
             view.subtitleVisibility = .hidden
             view.displayPriority = isSelected ? .required : .defaultHigh
@@ -1154,8 +1198,13 @@ private struct TransitMapView: UIViewRepresentable {
         private func markerColor(
             for stop: Stop,
             isSelected: Bool,
-            isFavourite: Bool
+            isFavourite: Bool,
+            hasAlert: Bool
         ) -> UIColor {
+            if hasAlert {
+                if isSelected { return .systemRed }
+                return UIColor(red: 0.82, green: 0.24, blue: 0.16, alpha: 1)
+            }
             if isFavourite {
                 if stop.modes.contains(.train) { return UIColor(red: 0.75, green: 0.10, blue: 0.16, alpha: 1) }
                 if stop.modes.contains(.tram) { return UIColor(red: 0.86, green: 0.44, blue: 0.04, alpha: 1) }

@@ -38,6 +38,7 @@ struct BottomSheetContent: View {
                             openDirections: actions.showDirections,
                             trackDeparture: actions.trackDeparture,
                             toggleDepartureLine: actions.toggleDepartureLine,
+                            showLineDetail: actions.showLineDetail,
                             selectDeparturePlatform: actions.selectDeparturePlatform
                         )
                     case .directions:
@@ -58,6 +59,12 @@ struct BottomSheetContent: View {
                         RouteTimelineView(
                             viewModel: viewModel.route,
                             openInAppleMaps: actions.openRouteInAppleMaps
+                        )
+                    case .lineDetail:
+                        LineDetailView(
+                            viewModel: viewModel.lineDetail,
+                            selectStop: actions.selectStop,
+                            selectDirection: actions.selectLineDetailDirection
                         )
                     case .alerts:
                         AlertsView(

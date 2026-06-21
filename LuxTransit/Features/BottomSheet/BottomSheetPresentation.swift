@@ -8,6 +8,7 @@ struct TransitSheetPresentationModel {
     let search: SearchPresentationModel
     let stopDetail: StopDetailPresentationModel
     let route: RoutePresentationModel
+    let lineDetail: LineDetailPresentationModel
     let alerts: AlertsPresentationModel
     let settings: SettingsPresentationModel
 }
@@ -20,6 +21,8 @@ struct TransitSheetActions {
     let showStopDetail: () -> Void
     let showDirections: () -> Void
     let showRouteOptions: () -> Void
+    let showLineDetail: (TransitRoute) -> Void
+    let selectLineDetailDirection: (String) -> Void
     let showSettings: () -> Void
     let toggleFavourite: () -> Void
     let toggleFavouriteExpansion: (String) -> Void
@@ -99,6 +102,7 @@ struct StopDetailPresentationModel {
     let routes: [TransitRoute]
     let departures: [Departure]
     let offlineScheduledDepartures: [OfflineScheduleDeparture]
+    let alerts: [AlertMessage]
     let availablePlatforms: [String]
     let selectedLine: String?
     let selectedPlatform: String?
@@ -121,6 +125,7 @@ struct RoutePresentationModel {
     let commutePresets: [RouteCommutePreset]
     let filters: RoutePlannerFilters
     let routeOptions: [RouteOption]
+    let alerts: [AlertMessage]
     let selectedRouteOptionID: String?
     let visibleRouteOptionCount: Int
     let loadingPhase: RouteLoadingPhase
@@ -175,6 +180,13 @@ struct RoutePresentationModel {
     var canShowMoreRouteOptions: Bool {
         visibleRouteOptionCount < routeOptions.count
     }
+}
+
+struct LineDetailPresentationModel {
+    let route: TransitRoute?
+    let detail: LineDetail?
+    let alerts: [AlertMessage]
+    let errorMessage: String?
 }
 
 struct AlertsPresentationModel {

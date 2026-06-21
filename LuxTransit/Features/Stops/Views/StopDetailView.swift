@@ -5,6 +5,7 @@ struct StopDetailView: View {
     let openDirections: () -> Void
     let trackDeparture: (Departure) -> Void
     let toggleDepartureLine: (TransitRoute) -> Void
+    let showLineDetail: (TransitRoute) -> Void
     let selectDeparturePlatform: (String?) -> Void
 
     var body: some View {
@@ -21,7 +22,8 @@ struct StopDetailView: View {
                     routes: viewModel.routes,
                     selectedLine: viewModel.selectedLine,
                     openDirections: openDirections,
-                    toggleDepartureLine: toggleDepartureLine
+                    toggleDepartureLine: toggleDepartureLine,
+                    showLineDetail: showLineDetail
                 )
 
                 if let liveActivityErrorMessage = viewModel.liveActivityErrorMessage {
@@ -44,6 +46,8 @@ struct StopDetailView: View {
                     trackedDepartureId: viewModel.trackedDepartureId,
                     trackDeparture: trackDeparture
                 )
+
+                StopDisruptionSection(alerts: viewModel.alerts)
 
                 OfflineScheduleSection(departures: viewModel.offlineScheduledDepartures)
 
@@ -114,13 +118,15 @@ private struct StopDetailHeader: View {
     let selectedLine: String?
     let openDirections: () -> Void
     let toggleDepartureLine: (TransitRoute) -> Void
+    let showLineDetail: (TransitRoute) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             StopMetadataPanel(
                 routes: routes,
                 selectedLine: selectedLine,
-                toggleDepartureLine: toggleDepartureLine
+                toggleDepartureLine: toggleDepartureLine,
+                showLineDetail: showLineDetail
             )
 
             DirectionsButton(openDirections: openDirections)
@@ -190,6 +196,7 @@ private struct StopMetadataPanel: View {
     let routes: [TransitRoute]
     let selectedLine: String?
     let toggleDepartureLine: (TransitRoute) -> Void
+    let showLineDetail: (TransitRoute) -> Void
 
     @ViewBuilder
     var body: some View {
@@ -197,10 +204,11 @@ private struct StopMetadataPanel: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(routes.prefix(16)) { route in
-                        RouteChip(
+                        RouteLineCard(
                             route: route,
                             isSelected: route.id == selectedLine,
-                            toggleDepartureLine: { toggleDepartureLine(route) }
+                            toggleDepartureLine: { toggleDepartureLine(route) },
+                            showLineDetail: { showLineDetail(route) }
                         )
                     }
                 }
@@ -211,50 +219,65 @@ private struct StopMetadataPanel: View {
 
 }
 
-private struct RouteChip: View {
+private struct RouteLineCard: View {
     let route: TransitRoute
     let isSelected: Bool
     let toggleDepartureLine: () -> Void
+    let showLineDetail: () -> Void
 
     var body: some View {
-        Button(action: toggleDepartureLine) {
-            HStack(spacing: 5) {
-                Image(systemName: iconName)
-                    .accessibilityHidden(true)
-                Text(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
-                    .lineLimit(1)
-                if isSelected {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.caption2.weight(.bold))
+        HStack(spacing: 6) {
+            Button(action: toggleDepartureLine) {
+                HStack(spacing: 5) {
+                    Image(systemName: iconName)
                         .accessibilityHidden(true)
+                    Text(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
+                        .lineLimit(1)
+                    if isSelected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.caption.weight(.bold))
+                            .accessibilityHidden(true)
+                    }
                 }
+                .font(.callout.weight(.bold))
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(routeColor.opacity(isSelected ? 0.20 : 0.14), in: Capsule())
+                .overlay {
+                    Capsule().stroke(
+                        routeColor.opacity(isSelected ? 0.55 : 0.25),
+                        lineWidth: isSelected ? 1.1 : 0.7
+                    )
+                }
+                .contentShape(Capsule())
             }
-            .font(.caption.weight(.bold))
-            .foregroundStyle(.primary)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background(routeColor.opacity(isSelected ? 0.20 : 0.14), in: Capsule())
-            .overlay {
-                Capsule().stroke(
-                    routeColor.opacity(isSelected ? 0.55 : 0.25),
-                    lineWidth: isSelected ? 1.1 : 0.7
-                )
+            .buttonStyle(.plain)
+            .accessibilityLabel(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
+            .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+
+            Button(action: showLineDetail) {
+                Image(systemName: "info.circle")
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(routeColor)
+                    .frame(width: 28, height: 28)
+                    .background(.background.opacity(0.6), in: Circle())
             }
-            .contentShape(Capsule())
+            .buttonStyle(.plain)
+            .accessibilityLabel("Show line details for \(route.shortName.isEmpty ? route.mode.displayName : route.shortName)")
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
-        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 
     init(
         route: TransitRoute,
         isSelected: Bool = false,
-        toggleDepartureLine: @escaping () -> Void = {}
+        toggleDepartureLine: @escaping () -> Void = {},
+        showLineDetail: @escaping () -> Void = {}
     ) {
         self.route = route
         self.isSelected = isSelected
         self.toggleDepartureLine = toggleDepartureLine
+        self.showLineDetail = showLineDetail
     }
 
     private var iconName: String {
@@ -276,6 +299,91 @@ private struct RouteChip: View {
         case .funicular: .purple
         case .walking, .unknown: .secondary
         }
+    }
+}
+
+private struct RouteChip: View {
+    let route: TransitRoute
+    var isSelected: Bool = false
+
+    var body: some View {
+        HStack(spacing: 5) {
+            Image(systemName: iconName)
+                .accessibilityHidden(true)
+            Text(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
+                .lineLimit(1)
+        }
+        .font(.callout.weight(.bold))
+        .foregroundStyle(.primary)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
+        .background(routeColor.opacity(isSelected ? 0.20 : 0.14), in: Capsule())
+        .overlay {
+            Capsule().stroke(
+                routeColor.opacity(isSelected ? 0.55 : 0.25),
+                lineWidth: isSelected ? 1.1 : 0.7
+            )
+        }
+    }
+
+    private var iconName: String {
+        switch route.mode {
+        case .train: "train.side.front.car"
+        case .tram: "tram.fill"
+        case .bus: "bus.fill"
+        case .funicular: "cablecar.fill"
+        case .walking: "figure.walk"
+        case .unknown: "circle"
+        }
+    }
+
+    private var routeColor: Color {
+        switch route.mode {
+        case .train: .red
+        case .tram: .orange
+        case .bus: .blue
+        case .funicular: .purple
+        case .walking, .unknown: .secondary
+        }
+    }
+}
+
+private struct StopDisruptionSection: View {
+    let alerts: [AlertMessage]
+
+    var body: some View {
+        if !alerts.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Disruption Impact")
+                    .font(.headline.weight(.semibold))
+                Text("These AVL alerts affect this stop or its served lines.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
+                ForEach(alerts.prefix(3)) { alert in
+                    CompactAlertRow(alert: alert)
+                }
+            }
+        }
+    }
+}
+
+private struct CompactAlertRow: View {
+    let alert: AlertMessage
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(alert.title)
+                .font(.subheadline.weight(.semibold))
+                .lineLimit(2)
+            Text(alert.body)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .lineLimit(3)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(.orange.opacity(0.10), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 }
 

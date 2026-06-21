@@ -6,6 +6,7 @@ enum TransitSheetContext: String, CaseIterable, Identifiable, Hashable {
     case stopDetail
     case directions
     case routeTimeline
+    case lineDetail
     case alerts
     case settings
 
@@ -18,6 +19,7 @@ enum TransitSheetContext: String, CaseIterable, Identifiable, Hashable {
         case .stopDetail: "Selected stop"
         case .directions: "Directions"
         case .routeTimeline: "Selected route"
+        case .lineDetail: "Line details"
         case .alerts: "Alerts"
         case .settings: "Settings"
         }

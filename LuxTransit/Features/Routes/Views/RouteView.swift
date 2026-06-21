@@ -48,6 +48,10 @@ struct RouteView: View {
                 RouteStatusMessage(text: statusMessage)
             }
 
+            if !viewModel.alerts.isEmpty {
+                RouteAlertsSection(alerts: viewModel.alerts)
+            }
+
             if !viewModel.routeOptions.isEmpty {
                 RouteOptionsSection(
                     options: viewModel.visibleRouteOptions,
@@ -386,6 +390,9 @@ struct RouteTimelineView: View {
 
             if let selectedOption = viewModel.selectedRouteOption {
                 RouteLegList(legs: selectedOption.plan.legs)
+                if !viewModel.alerts.isEmpty {
+                    RouteAlertsSection(alerts: viewModel.alerts)
+                }
             } else {
                 CompactUnavailableCard(
                     title: "No selected route",
@@ -416,6 +423,30 @@ struct RouteTimelineView: View {
                 Text("To \(selectedStop.name)")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
+private struct RouteAlertsSection: View {
+    let alerts: [AlertMessage]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Journey Alerts")
+                .font(.headline.weight(.semibold))
+            ForEach(alerts.prefix(3)) { alert in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(alert.title)
+                        .font(.subheadline.weight(.semibold))
+                    Text(alert.body)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(3)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(.orange.opacity(0.10), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
         }
     }
@@ -940,6 +971,19 @@ private extension RoutePresentationModel {
             ],
             filters: RoutePlannerFilters(),
             routeOptions: [.previewTramOption, .previewBusOption],
+            alerts: [
+                AlertMessage(
+                    id: "route-alert",
+                    title: "Line T1 disruption",
+                    body: "Expect longer boarding times between Hamilius and Philharmonie.",
+                    severity: .warning,
+                    affectedStopIds: ["destination"],
+                    affectedRouteIds: ["T1"],
+                    startsAt: .now,
+                    endsAt: nil,
+                    dataSource: .mock
+                )
+            ],
             selectedRouteOptionID: "tram-route",
             visibleRouteOptionCount: 2,
             loadingPhase: .idle,
@@ -959,6 +1003,7 @@ private extension RoutePresentationModel {
             commutePresets: [],
             filters: RoutePlannerFilters(),
             routeOptions: [],
+            alerts: [],
             selectedRouteOptionID: nil,
             visibleRouteOptionCount: 0,
             loadingPhase: .waitingForLocation,

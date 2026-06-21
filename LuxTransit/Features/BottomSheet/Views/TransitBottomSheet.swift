@@ -43,6 +43,8 @@ struct TransitBottomSheet: View {
             "Directions"
         case .routeTimeline:
             "Selected route"
+        case .lineDetail:
+            viewModel.lineDetail.route?.shortName ?? "Line details"
         case .alerts:
             "Service Alerts"
         case .settings:
@@ -92,6 +94,13 @@ struct TransitBottomSheet: View {
             ToolbarItem(placement: .topBarLeading) {
                 Button(action: actions.showRouteOptions) {
                     Label("Back to route options", systemImage: "chevron.left")
+                }
+            }
+
+        case .lineDetail:
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: actions.showStopDetail) {
+                    Label("Back to stop", systemImage: "chevron.left")
                 }
             }
 

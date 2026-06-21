@@ -422,6 +422,50 @@ struct TransitMapViewModelTests {
         #expect(viewModel.routeStatusMessage == "No routes matched all filters. Showing the closest alternatives.")
     }
 
+    @Test func stopDetailAlertsMatchSelectedStopAndServedRoutes() {
+        let viewModel = TransitMapViewModel()
+        let stop = makeStop(id: "stop-1")
+        viewModel.selectStop(stop)
+        viewModel.selectedStopRoutes = [route15]
+        viewModel.alerts = [
+            AlertMessage(
+                id: "stop-alert",
+                title: "Hamilius disruption",
+                body: "Affected stop",
+                severity: .warning,
+                affectedStopIds: ["stop-1"],
+                affectedRouteIds: [],
+                startsAt: nil,
+                endsAt: nil,
+                dataSource: .mock
+            ),
+            AlertMessage(
+                id: "route-alert",
+                title: "Line 15 disruption",
+                body: "Affected line",
+                severity: .warning,
+                affectedStopIds: [],
+                affectedRouteIds: [route15.id],
+                startsAt: nil,
+                endsAt: nil,
+                dataSource: .mock
+            ),
+            AlertMessage(
+                id: "other-alert",
+                title: "Other",
+                body: "Unrelated",
+                severity: .info,
+                affectedStopIds: ["stop-9"],
+                affectedRouteIds: ["other"],
+                startsAt: nil,
+                endsAt: nil,
+                dataSource: .mock
+            )
+        ]
+
+        #expect(viewModel.stopDetailAlerts.map(\.id) == ["stop-alert", "route-alert"])
+    }
+
     private func configuredViewModel() -> TransitMapViewModel {
         let viewModel = TransitMapViewModel()
         viewModel.selectStop(makeStop(id: "stop-1"))

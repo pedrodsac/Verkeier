@@ -57,6 +57,10 @@ final class TransitMapViewModel {
     var routeErrorMessage: String?
     var routeStatusMessage: String?
     var alerts: [AlertMessage] = []
+    var selectedLineDetailRoute: TransitRoute?
+    var selectedLineDetailDirectionID: String?
+    var selectedLineDetail: LineDetail?
+    var selectedLineDetailErrorMessage: String?
     var isLoadingAlerts = false
     var alertsErrorMessage: String?
     var alertsLastUpdated: Date?
@@ -84,6 +88,13 @@ final class TransitMapViewModel {
 
     var routeMapOverlay: RouteMapOverlay? {
         selectedRouteOption?.mapOverlay
+    }
+
+    var activeMapOverlay: RouteMapOverlay? {
+        if sheetContext == .lineDetail {
+            return selectedLineDetail?.mapOverlay
+        }
+        return routeMapOverlay
     }
 
     var isWaitingForRouteLocation: Bool {
@@ -115,12 +126,14 @@ final class TransitMapViewModel {
         sheetContext = .home
         sheetDetent = .medium
         clearRoute()
+        clearLineDetail()
     }
 
     func showSearch() {
         sheetContext = .search
         sheetDetent = .expanded
         clearRoute()
+        clearLineDetail()
     }
 
     func showAlerts() {
@@ -142,6 +155,7 @@ final class TransitMapViewModel {
         sheetContext = .settings
         sheetDetent = .expanded
         clearRoute()
+        clearLineDetail()
     }
 
     func showDirections() {
@@ -154,6 +168,17 @@ final class TransitMapViewModel {
         guard selectedRouteOption != nil else { return }
         sheetContext = .routeTimeline
         sheetDetent = .expanded
+    }
+
+    func showLineDetail(_ route: TransitRoute) {
+        selectedLineDetailRoute = route
+        selectedLineDetailDirectionID = nil
+        sheetContext = .lineDetail
+        sheetDetent = .expanded
+    }
+
+    func selectLineDetailDirection(_ directionID: String) {
+        selectedLineDetailDirectionID = directionID
     }
 
     func toggleFavouriteExpansion(stopId: String) {
@@ -269,6 +294,7 @@ final class TransitMapViewModel {
     func selectStop(_ stop: Stop) {
         selectedStop = stop
         routeDestination = RoutePlace(stop: stop, source: .selectedStop)
+        clearLineDetail()
         selectedStopRoutes = []
         departures = []
         offlineScheduledDepartures = []
@@ -545,6 +571,27 @@ final class TransitMapViewModel {
         isLoadingAlerts = false
     }
 
+    func loadLineDetail(using gtfsService: any GTFSService, now: Date = .now) async {
+        guard let route = selectedLineDetailRoute,
+              let timetable = await gtfsService.timetableIndex() else {
+            selectedLineDetail = nil
+            selectedLineDetailErrorMessage = "Line details are not available yet."
+            return
+        }
+
+        let service = LineDetailService()
+        selectedLineDetail = service.detail(
+            for: route,
+            selectedStopId: selectedStop?.id,
+            timetable: timetable,
+            now: now
+            ,
+            selectedDirectionID: selectedLineDetailDirectionID
+        )
+        selectedLineDetailErrorMessage =
+            selectedLineDetail == nil ? "No GTFS timetable details are available for this line." : nil
+    }
+
     var areDeparturesStale: Bool {
         guard let departuresLastUpdated else { return false }
         return Date().timeIntervalSince(departuresLastUpdated) > 90
@@ -564,6 +611,36 @@ final class TransitMapViewModel {
         alerts.count
     }
 
+    var stopDetailAlerts: [AlertMessage] {
+        guard let selectedStop else { return [] }
+        let routeIDs = Set(selectedStopRoutes.map(\.id))
+        return alerts.filter { alert in
+            alert.affectedStopIds.contains(selectedStop.id)
+                || !routeIDs.isDisjoint(with: alert.affectedRouteIds)
+        }
+    }
+
+    var routeAlerts: [AlertMessage] {
+        guard let selectedRouteOption else { return [] }
+        let routeIDs = Set(selectedRouteOption.plan.legs.compactMap(\.routeId))
+        let stopIDs = Set(selectedRouteOption.plan.legs.flatMap { leg in
+            [leg.originStopId, leg.destinationStopId].compactMap { $0 }
+        })
+        return alerts.filter { alert in
+            !routeIDs.isDisjoint(with: alert.affectedRouteIds)
+                || !stopIDs.isDisjoint(with: alert.affectedStopIds)
+        }
+    }
+
+    var lineDetailAlerts: [AlertMessage] {
+        guard let route = selectedLineDetailRoute else { return [] }
+        let stopIDs = Set(selectedLineDetail?.stopSequence.map(\.id) ?? [])
+        return alerts.filter { alert in
+            alert.affectedRouteIds.contains(route.id)
+                || !stopIDs.isDisjoint(with: alert.affectedStopIds)
+        }
+    }
+
     func centerOnUserLocation(_ location: CLLocation?) {
         guard let coordinate = location?.coordinate else { return }
         moveCamera(to: MKCoordinateRegion(
@@ -577,6 +654,13 @@ final class TransitMapViewModel {
         clearRouteResult()
         routeErrorMessage = nil
         routeLoadingPhase = .idle
+    }
+
+    private func clearLineDetail() {
+        selectedLineDetailRoute = nil
+        selectedLineDetailDirectionID = nil
+        selectedLineDetail = nil
+        selectedLineDetailErrorMessage = nil
     }
 
     private func clearRouteResult() {
