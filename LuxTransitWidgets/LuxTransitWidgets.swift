@@ -1,4 +1,5 @@
 import ActivityKit
+import AppIntents
 import SwiftUI
 import WidgetKit
 
@@ -11,30 +12,81 @@ struct LuxTransitWidgets: WidgetBundle {
     }
 }
 
-private struct FavouriteStopEntry: TimelineEntry {
-    let date: Date
-    let favouriteStops: [SharedFavouriteStop]
-}
+struct WidgetFavouriteStopEntity: AppEntity, Identifiable {
+    static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Favourite Stop")
+    static let defaultQuery = WidgetFavouriteStopEntityQuery()
 
-private struct FavouriteStopTimelineProvider: TimelineProvider {
-    func placeholder(in context: Context) -> FavouriteStopEntry {
-        FavouriteStopEntry(
-            date: .now,
-            favouriteStops: []
+    let id: String
+    let name: String
+    let locality: String?
+
+    var displayRepresentation: DisplayRepresentation {
+        DisplayRepresentation(
+            title: "\(name)",
+            subtitle: locality.map { "\($0)" }
         )
     }
+}
 
-    func getSnapshot(in context: Context, completion: @escaping (FavouriteStopEntry) -> Void) {
-        completion(
-            FavouriteStopEntry(date: .now, favouriteStops: SharedTransitDataStore.favouriteStops()))
+struct WidgetFavouriteStopEntityQuery: EntityQuery {
+    func entities(for identifiers: [WidgetFavouriteStopEntity.ID]) async throws
+        -> [WidgetFavouriteStopEntity]
+    {
+        sharedStops().filter { identifiers.contains($0.id) }
     }
 
-    func getTimeline(
-        in context: Context, completion: @escaping (Timeline<FavouriteStopEntry>) -> Void
-    ) {
-        let entry = FavouriteStopEntry(
-            date: .now, favouriteStops: SharedTransitDataStore.favouriteStops())
-        completion(Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(30 * 60))))
+    func suggestedEntities() async throws -> [WidgetFavouriteStopEntity] {
+        sharedStops()
+    }
+
+    func defaultResult() async -> WidgetFavouriteStopEntity? {
+        sharedStops().first
+    }
+
+    private func sharedStops() -> [WidgetFavouriteStopEntity] {
+        SharedTransitDataStore.favouriteStops().map {
+            WidgetFavouriteStopEntity(id: $0.id, name: $0.name, locality: $0.locality)
+        }
+    }
+}
+
+struct SelectFavouriteStopIntent: WidgetConfigurationIntent {
+    static let title: LocalizedStringResource = "Choose Favourite Stop"
+    static let description = IntentDescription("Pick which saved favourite stop this widget opens.")
+
+    @Parameter(title: "Stop")
+    var stop: WidgetFavouriteStopEntity?
+}
+
+private struct FavouriteStopEntry: TimelineEntry {
+    let date: Date
+    let selectedStop: SharedFavouriteStop?
+}
+
+private struct FavouriteStopTimelineProvider: AppIntentTimelineProvider {
+    func placeholder(in context: Context) -> FavouriteStopEntry {
+        FavouriteStopEntry(date: .now, selectedStop: SharedTransitDataStore.favouriteStops().first)
+    }
+
+    func snapshot(for configuration: SelectFavouriteStopIntent, in context: Context) async
+        -> FavouriteStopEntry
+    {
+        FavouriteStopEntry(date: .now, selectedStop: selectedStop(from: configuration))
+    }
+
+    func timeline(for configuration: SelectFavouriteStopIntent, in context: Context) async
+        -> Timeline<FavouriteStopEntry>
+    {
+        let entry = FavouriteStopEntry(date: .now, selectedStop: selectedStop(from: configuration))
+        return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(30 * 60)))
+    }
+
+    private func selectedStop(from configuration: SelectFavouriteStopIntent) -> SharedFavouriteStop? {
+        let stops = SharedTransitDataStore.favouriteStops()
+        if let stopID = configuration.stop?.id {
+            return stops.first(where: { $0.id == stopID }) ?? stops.first
+        }
+        return stops.first
     }
 }
 
@@ -42,15 +94,19 @@ private struct FavouriteStopWidget: Widget {
     let kind = "FavouriteStopWidget"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: FavouriteStopTimelineProvider()) { entry in
+        AppIntentConfiguration(
+            kind: kind,
+            intent: SelectFavouriteStopIntent.self,
+            provider: FavouriteStopTimelineProvider()
+        ) { entry in
             FavouriteStopWidgetView(entry: entry)
                 .containerBackground(.background, for: .widget)
                 .widgetURL(
-                    entry.favouriteStops.first.map { TransitDeepLink.openStop(id: $0.id).url }
+                    entry.selectedStop.map { TransitDeepLink.openStop(id: $0.id).url }
                         ?? TransitDeepLink.showNearbyStops.url)
         }
         .configurationDisplayName("Favourite Stop")
-        .description("Shows a saved stop. Open the app for live departures.")
+        .description("Choose which favourite stop opens from this widget.")
         .supportedFamilies([.systemSmall])
     }
 }
@@ -59,7 +115,7 @@ private struct FavouriteStopWidgetView: View {
     let entry: FavouriteStopEntry
 
     var body: some View {
-        if let stop = entry.favouriteStops.first {
+        if let stop = entry.selectedStop {
             VStack(alignment: .leading, spacing: 8) {
                 Image(systemName: "star.fill")
                     .foregroundStyle(.yellow)
@@ -95,18 +151,20 @@ private struct DeparturesSummaryWidget: Widget {
     let kind = "DeparturesSummaryWidget"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: FavouriteStopTimelineProvider()) { entry in
+        AppIntentConfiguration(
+            kind: kind,
+            intent: SelectFavouriteStopIntent.self,
+            provider: FavouriteStopTimelineProvider()
+        ) { entry in
             DeparturesSummaryWidgetView(entry: entry)
                 .containerBackground(.background, for: .widget)
                 .widgetURL(
-                    entry.favouriteStops.first.map {
+                    entry.selectedStop.map {
                         TransitDeepLink.showDepartures(stopId: $0.id).url
                     } ?? TransitDeepLink.showNearbyStops.url)
         }
         .configurationDisplayName("Departures")
-        .description(
-            "A favourite-stop launcher. Widgets refresh periodically and are not continuously live."
-        )
+        .description("Choose a favourite stop. This widget refreshes periodically and is not continuously live.")
         .supportedFamilies([.systemMedium])
     }
 }
@@ -120,25 +178,25 @@ private struct DeparturesSummaryWidgetView: View {
                 Label("Departures", systemImage: "clock.fill")
                     .font(.headline)
                 Spacer()
-                Text("Not live")
+                Text("Periodic")
                     .font(.caption2.weight(.semibold))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(.secondary.opacity(0.14), in: Capsule())
             }
 
-            if let stop = entry.favouriteStops.first {
+            if let stop = entry.selectedStop {
                 Text(stop.name)
                     .font(.title3.weight(.semibold))
                     .lineLimit(1)
-                Text("Open LuxTransit for real-time ATP departures, delays, and cancellations.")
+                Text("Open LuxTransit for live ATP departures, delay updates, and cancellation details.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             } else {
                 Text("Choose a favourite stop")
                     .font(.title3.weight(.semibold))
-                Text("Save a stop in the app to make this widget useful.")
+                Text("Save a stop in the app, then configure this widget.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

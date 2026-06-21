@@ -10,6 +10,7 @@ struct LuxTransitApp: App {
     private let gtfsService: any GTFSService
     private let modelContainer: ModelContainer
     @State private var liveActivityManager = LiveActivityManager()
+    @State private var departureReminderService = DepartureReminderService()
     @State private var gtfsUpdateController = GTFSUpdateController()
 
     init() {
@@ -29,6 +30,7 @@ struct LuxTransitApp: App {
                 .environment(\.routeService, routeService)
                 .environment(\.avlClient, avlClient)
                 .environment(\.liveActivityManager, liveActivityManager)
+                .environment(\.departureReminderService, departureReminderService)
                 .modelContainer(modelContainer)
         }
     }

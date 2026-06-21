@@ -196,7 +196,7 @@ struct FavouriteStopDepartureCard: View {
                             .padding(.bottom, 12)
                     } else {
                         ForEach(departures.prefix(3)) { departure in
-                            DepartureListRow(departure: departure, showsTrackButton: false)
+                            DepartureListRow(departure: departure, showsControls: false)
                         }
                         .padding(.horizontal, 10)
                         .padding(.bottom, 10)

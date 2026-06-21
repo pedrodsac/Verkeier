@@ -36,7 +36,10 @@ struct BottomSheetContent: View {
                         StopDetailView(
                             viewModel: viewModel.stopDetail,
                             openDirections: actions.showDirections,
-                            trackDeparture: actions.trackDeparture,
+                            startTrackingDeparture: actions.startTrackingDeparture,
+                            stopTrackingDeparture: actions.stopTrackingDeparture,
+                            scheduleDepartureReminder: actions.scheduleDepartureReminder,
+                            cancelDepartureReminder: actions.cancelDepartureReminder,
                             toggleDepartureLine: actions.toggleDepartureLine,
                             showLineDetail: actions.showLineDetail,
                             selectDeparturePlatform: actions.selectDeparturePlatform

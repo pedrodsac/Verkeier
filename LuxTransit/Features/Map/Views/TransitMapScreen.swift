@@ -14,6 +14,7 @@ struct TransitMapScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.avlClient) private var avlClient
     @Environment(\.liveActivityManager) private var liveActivityManager
+    @Environment(\.departureReminderService) private var departureReminderService
     @Environment(\.appConfiguration) private var appConfiguration
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \PersistedFavouriteStop.createdAt) private var favouriteEntities:
@@ -238,7 +239,10 @@ struct TransitMapScreen: View {
                 isStale: viewModel.areDeparturesStale,
                 isFavourite: viewModel.selectedStop.map(isFavourite) ?? false,
                 trackedDepartureId: liveActivityManager.trackedDepartureId,
-                liveActivityErrorMessage: liveActivityManager.lastErrorMessage
+                liveActivityErrorMessage: liveActivityManager.lastErrorMessage,
+                liveActivityStaleMessage: liveActivityManager.staleExplanation,
+                activeReminder: departureReminderForSelectedStop,
+                departureReminderErrorMessage: departureReminderService.lastErrorMessage
             ),
             route: RoutePresentationModel(
                 selectedStop: viewModel.selectedStop,
@@ -308,6 +312,14 @@ struct TransitMapScreen: View {
 
     private var debugTransitDataMode: DebugTransitDataMode {
         DebugTransitDataMode(rawValue: debugTransitDataModeRawValue) ?? .normal
+    }
+
+    private var departureReminderForSelectedStop: SharedTrackedDepartureReminder? {
+        guard let selectedStopID = viewModel.selectedStop?.id else { return nil }
+        guard let reminder = departureReminderService.activeReminder, reminder.stopId == selectedStopID else {
+            return nil
+        }
+        return reminder
     }
 
     private var sheetPresentationDetent: Binding<PresentationDetent> {
@@ -399,7 +411,10 @@ struct TransitMapScreen: View {
             saveCurrentCommutePreset: saveCurrentCommutePreset,
             swapRouteEndpoints: swapRouteEndpoints,
             updateRouteFilters: updateRouteFilters,
-            trackDeparture: trackDeparture,
+            startTrackingDeparture: startTrackingDeparture,
+            stopTrackingDeparture: stopTrackingDeparture,
+            scheduleDepartureReminder: scheduleDepartureReminder,
+            cancelDepartureReminder: cancelDepartureReminder,
             toggleDepartureLine: toggleDepartureLine,
             selectDeparturePlatform: selectDeparturePlatform,
             updateSearch: updateSearch,
@@ -672,22 +687,49 @@ struct TransitMapScreen: View {
         }
     }
 
-    private func trackDeparture(_ departure: Departure) {
+    private func startTrackingDeparture(_ departure: Departure) {
         guard let selectedStop = viewModel.selectedStop else { return }
         Task {
             await liveActivityManager.startTracking(departure: departure, stop: selectedStop)
         }
     }
 
+    private func stopTrackingDeparture() {
+        Task {
+            await liveActivityManager.endTracking()
+        }
+    }
+
+    private func scheduleDepartureReminder(_ departure: Departure, _ leadTimeMinutes: Int) {
+        guard let selectedStop = viewModel.selectedStop else { return }
+        Task {
+            await departureReminderService.scheduleReminder(
+                for: departure,
+                stop: selectedStop,
+                leadTimeMinutes: leadTimeMinutes
+            )
+        }
+    }
+
+    private func cancelDepartureReminder() {
+        departureReminderService.cancelReminder()
+    }
+
     private func updateTrackedDepartureIfNeeded() async {
-        guard let departure = DepartureTrackingSelection.trackedDeparture(
+        if let trackedDeparture = DepartureTrackingSelection.trackedDeparture(
             in: viewModel.departures,
             trackedDepartureId: liveActivityManager.trackedDepartureId
-        ) else {
-            return
+        ) {
+            await liveActivityManager.updateTracking(departure: trackedDeparture)
         }
 
-        await liveActivityManager.updateTracking(departure: departure)
+        if let reminderDepartureID = departureReminderService.activeReminder?.departureId,
+           let reminderDeparture = viewModel.departures.first(where: { $0.id == reminderDepartureID }) {
+            await departureReminderService.syncTrackedDeparture(
+                reminderDeparture,
+                stopName: viewModel.selectedStop?.name
+            )
+        }
     }
 
     private func trackNextDeparture(for stop: Stop) {

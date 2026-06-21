@@ -3,7 +3,10 @@ import SwiftUI
 struct StopDetailView: View {
     let viewModel: StopDetailPresentationModel
     let openDirections: () -> Void
-    let trackDeparture: (Departure) -> Void
+    let startTrackingDeparture: (Departure) -> Void
+    let stopTrackingDeparture: () -> Void
+    let scheduleDepartureReminder: (Departure, Int) -> Void
+    let cancelDepartureReminder: () -> Void
     let toggleDepartureLine: (TransitRoute) -> Void
     let showLineDetail: (TransitRoute) -> Void
     let selectDeparturePlatform: (String?) -> Void
@@ -37,6 +40,17 @@ struct StopDetailView: View {
                             in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
 
+                if let departureReminderErrorMessage = viewModel.departureReminderErrorMessage {
+                    Label(departureReminderErrorMessage, systemImage: "bell.badge.fill")
+                        .font(.footnote)
+                        .foregroundStyle(.orange)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(
+                            .orange.opacity(0.12),
+                            in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+
                 DepartureBoardView(
                     departures: viewModel.departures,
                     isLoading: viewModel.isLoadingDepartures,
@@ -44,7 +58,12 @@ struct StopDetailView: View {
                     lastUpdated: viewModel.lastUpdated,
                     isStale: viewModel.isStale,
                     trackedDepartureId: viewModel.trackedDepartureId,
-                    trackDeparture: trackDeparture
+                    liveActivityStaleMessage: viewModel.liveActivityStaleMessage,
+                    activeReminder: viewModel.activeReminder,
+                    startTrackingDeparture: startTrackingDeparture,
+                    stopTrackingDeparture: stopTrackingDeparture,
+                    scheduleDepartureReminder: scheduleDepartureReminder,
+                    cancelDepartureReminder: cancelDepartureReminder
                 )
 
                 StopDisruptionSection(alerts: viewModel.alerts)
@@ -394,7 +413,12 @@ struct DepartureBoardView: View {
     let lastUpdated: Date?
     let isStale: Bool
     let trackedDepartureId: String?
-    let trackDeparture: (Departure) -> Void
+    let liveActivityStaleMessage: String
+    let activeReminder: SharedTrackedDepartureReminder?
+    let startTrackingDeparture: (Departure) -> Void
+    let stopTrackingDeparture: () -> Void
+    let scheduleDepartureReminder: (Departure, Int) -> Void
+    let cancelDepartureReminder: () -> Void
 
     var body: some View {
         if isLoading && departures.isEmpty {
@@ -414,6 +438,13 @@ struct DepartureBoardView: View {
         } else {
             VStack(alignment: .leading, spacing: 8) {
                 DepartureBoardStatus(lastUpdated: lastUpdated, isStale: isStale)
+                DepartureTrackingStatusCard(
+                    trackedDeparture: departures.first(where: { $0.id == trackedDepartureId }),
+                    activeReminder: activeReminder,
+                    staleMessage: liveActivityStaleMessage,
+                    stopTrackingDeparture: stopTrackingDeparture,
+                    cancelDepartureReminder: cancelDepartureReminder
+                )
 
                 ScrollView {
                     LazyVStack(spacing: 8) {
@@ -421,7 +452,13 @@ struct DepartureBoardView: View {
                             DepartureListRow(
                                 departure: departure,
                                 isTracked: departure.id == trackedDepartureId,
-                                trackDeparture: { trackDeparture(departure) }
+                                activeReminder: activeReminder,
+                                startTrackingDeparture: { startTrackingDeparture(departure) },
+                                stopTrackingDeparture: stopTrackingDeparture,
+                                scheduleReminder: { minutes in
+                                    scheduleDepartureReminder(departure, minutes)
+                                },
+                                cancelReminder: cancelDepartureReminder
                             )
                         }
                     }
@@ -429,6 +466,49 @@ struct DepartureBoardView: View {
                 }
             }
         }
+    }
+}
+
+private struct DepartureTrackingStatusCard: View {
+    let trackedDeparture: Departure?
+    let activeReminder: SharedTrackedDepartureReminder?
+    let staleMessage: String
+    let stopTrackingDeparture: () -> Void
+    let cancelDepartureReminder: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if let trackedDeparture {
+                HStack(alignment: .top, spacing: 10) {
+                    Label("Live Activity tracking \(trackedDeparture.lineName) to \(trackedDeparture.destination)", systemImage: "livephoto")
+                        .font(.footnote.weight(.semibold))
+                    Spacer(minLength: 0)
+                    Button("Stop", action: stopTrackingDeparture)
+                        .font(.caption.weight(.semibold))
+                        .buttonStyle(.bordered)
+                }
+            }
+
+            if let activeReminder {
+                HStack(alignment: .top, spacing: 10) {
+                    Label(
+                        "Reminder set for \(activeReminder.leadTimeMinutes) min before \(activeReminder.lineName) to \(activeReminder.destination)",
+                        systemImage: "bell.badge.fill"
+                    )
+                    .font(.footnote.weight(.semibold))
+                    Spacer(minLength: 0)
+                    Button("Cancel", action: cancelDepartureReminder)
+                        .font(.caption.weight(.semibold))
+                        .buttonStyle(.bordered)
+                }
+            }
+
+            Text(staleMessage)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(12)
+        .background(.secondary.opacity(0.10), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
 
@@ -495,8 +575,12 @@ private struct DepartureTimingStatus: View {
 struct DepartureListRow: View {
     let departure: Departure
     var isTracked: Bool = false
-    var showsTrackButton: Bool = true
-    var trackDeparture: () -> Void = {}
+    var showsControls: Bool = true
+    var activeReminder: SharedTrackedDepartureReminder?
+    var startTrackingDeparture: () -> Void = {}
+    var stopTrackingDeparture: () -> Void = {}
+    var scheduleReminder: (Int) -> Void = { _ in }
+    var cancelReminder: () -> Void = {}
 
     var body: some View {
         HStack(spacing: 12) {
@@ -542,22 +626,25 @@ struct DepartureListRow: View {
                 statusColor: statusColor
             )
 
-            if showsTrackButton {
-                Button(action: trackDeparture) {
-                    Image(systemName: isTracked ? "timer.circle.fill" : "timer")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(isTracked ? .blue : .secondary)
-                        .frame(width: 34, height: 34)
-                        .background(.thinMaterial, in: Circle())
-                        .overlay {
-                            Circle().stroke(.separator.opacity(0.20), lineWidth: 0.7)
-                        }
-                        .contentTransition(.symbolEffect(.replace))
-                        .accessibilityHidden(true)
+            if showsControls {
+                VStack(spacing: 8) {
+                    Button(action: isTracked ? stopTrackingDeparture : startTrackingDeparture) {
+                        Image(systemName: isTracked ? "timer.circle.fill" : "timer")
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(isTracked ? .blue : .secondary)
+                            .frame(width: 34, height: 34)
+                            .background(.thinMaterial, in: Circle())
+                            .overlay {
+                                Circle().stroke(.separator.opacity(0.20), lineWidth: 0.7)
+                            }
+                            .contentTransition(.symbolEffect(.replace))
+                            .accessibilityHidden(true)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(isTracked ? "Stop tracking departure" : "Track departure")
+
+                    reminderMenu
                 }
-                .buttonStyle(.plain)
-                .disabled(isTracked)
-                .accessibilityLabel(isTracked ? "Tracking departure" : "Track departure")
             }
         }
         .padding(.vertical, 10)
@@ -570,6 +657,34 @@ struct DepartureListRow: View {
                 .stroke(.separator.opacity(0.16), lineWidth: 0.7)
         }
         .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder
+    private var reminderMenu: some View {
+        Menu {
+            Button("Remind 5 min before") {
+                scheduleReminder(5)
+            }
+
+            Button("Remind 10 min before") {
+                scheduleReminder(10)
+            }
+
+            if isReminderActive {
+                Button("Cancel reminder", role: .destructive, action: cancelReminder)
+            }
+        } label: {
+            Image(systemName: isReminderActive ? "bell.badge.fill" : "bell")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(isReminderActive ? .orange : .secondary)
+                .frame(width: 34, height: 34)
+                .background(.thinMaterial, in: Circle())
+                .overlay {
+                    Circle().stroke(.separator.opacity(0.20), lineWidth: 0.7)
+                }
+                .accessibilityHidden(true)
+        }
+        .accessibilityLabel(isReminderActive ? "Change departure reminder" : "Add departure reminder")
     }
 
     private var departureDate: Date? {
@@ -620,6 +735,10 @@ struct DepartureListRow: View {
         case .train: .red
         case .bus: .blue
         }
+    }
+
+    private var isReminderActive: Bool {
+        activeReminder?.departureId == departure.id
     }
 
     private var transportIcon: String {

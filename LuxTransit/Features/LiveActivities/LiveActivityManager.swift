@@ -5,12 +5,17 @@ import Observation
 @Observable
 @MainActor
 final class LiveActivityManager {
+    private let staleInterval: TimeInterval = 90
     private var trackedActivity: Activity<DepartureActivityAttributes>?
     var trackedDepartureId: String?
     var lastErrorMessage: String?
 
     var isTrackingDeparture: Bool {
         trackedActivity != nil
+    }
+
+    var staleExplanation: String {
+        "Live Activity updates can go stale after 90 seconds without a fresh ATP refresh."
     }
 
     func startTracking(departure: Departure, stop: Stop) async {
@@ -74,6 +79,6 @@ final class LiveActivityManager {
 
     private func departureStaleDate(from departure: Departure) -> Date {
         let baseDate = departure.lastUpdated ?? .now
-        return baseDate.addingTimeInterval(90)
+        return baseDate.addingTimeInterval(staleInterval)
     }
 }

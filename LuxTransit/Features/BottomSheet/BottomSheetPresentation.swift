@@ -38,7 +38,10 @@ struct TransitSheetActions {
     let saveCurrentCommutePreset: () -> Void
     let swapRouteEndpoints: () -> Void
     let updateRouteFilters: (RoutePlannerFilters) -> Void
-    let trackDeparture: (Departure) -> Void
+    let startTrackingDeparture: (Departure) -> Void
+    let stopTrackingDeparture: () -> Void
+    let scheduleDepartureReminder: (Departure, Int) -> Void
+    let cancelDepartureReminder: () -> Void
     let toggleDepartureLine: (TransitRoute) -> Void
     let selectDeparturePlatform: (String?) -> Void
     let updateSearch: () -> Void
@@ -113,6 +116,9 @@ struct StopDetailPresentationModel {
     let isFavourite: Bool
     let trackedDepartureId: String?
     let liveActivityErrorMessage: String?
+    let liveActivityStaleMessage: String
+    let activeReminder: SharedTrackedDepartureReminder?
+    let departureReminderErrorMessage: String?
 }
 
 struct RoutePresentationModel {

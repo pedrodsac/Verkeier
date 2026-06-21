@@ -18,8 +18,8 @@ struct AppIntentSharedDataTests {
     }
 
     @Test func favouriteStopEntitiesMirrorSharedFavouriteStops() throws {
-        clearFavouriteStorage()
-        defer { clearFavouriteStorage() }
+        clearSharedStorage()
+        defer { clearSharedStorage() }
 
         let stop = Stop(
             id: "stop-1",
@@ -138,10 +138,43 @@ struct AppIntentSharedDataTests {
         )
     }
 
-    private func clearFavouriteStorage() {
+    @Test func trackedDepartureReminderRoundTripsSharedStorage() throws {
+        clearSharedStorage()
+        defer { clearSharedStorage() }
+
+        let reminder = SharedTrackedDepartureReminder(
+            departureId: "dep-1",
+            stopId: "stop-1",
+            stopName: "Hamilius",
+            lineName: "16",
+            destination: "Kirchberg",
+            scheduledDeparture: Date(timeIntervalSince1970: 1_200),
+            realtimeDeparture: Date(timeIntervalSince1970: 1_260),
+            delayMinutes: 1,
+            isCancelled: false,
+            leadTimeMinutes: 5,
+            notifiedDelayMinutes: 1,
+            didNotifyCancellation: false,
+            lastUpdated: Date(timeIntervalSince1970: 1_000)
+        )
+
+        SharedTransitDataStore.saveTrackedReminder(reminder)
+
+        let restored = try #require(SharedTransitDataStore.trackedReminder())
+        #expect(restored.departureId == "dep-1")
+        #expect(restored.stopName == "Hamilius")
+        #expect(restored.leadTimeMinutes == 5)
+        #expect(restored.notifiedDelayMinutes == 1)
+        #expect(restored.didNotifyCancellation == false)
+    }
+
+    private func clearSharedStorage() {
         SharedTransitDataStore.userDefaults.removeObject(
             forKey: SharedTransitDataStore.favouriteStopsKey)
         UserDefaults.standard.removeObject(forKey: SharedTransitDataStore.favouriteStopsKey)
+        SharedTransitDataStore.userDefaults.removeObject(
+            forKey: SharedTransitDataStore.trackedDepartureReminderKey)
+        UserDefaults.standard.removeObject(forKey: SharedTransitDataStore.trackedDepartureReminderKey)
     }
 
     private func makeHandoffStore() -> TransitIntentHandoffStore {

@@ -11,4 +11,5 @@ extension EnvironmentValues {
     @Entry var avlClient: any AVLClient = LiveAVLClient(
         feedURL: AppConfiguration.current.avlMessagesURL)
     @Entry var liveActivityManager: LiveActivityManager = LiveActivityManager()
+    @Entry var departureReminderService: DepartureReminderService = DepartureReminderService()
 }

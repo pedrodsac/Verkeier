@@ -3,6 +3,7 @@ import Foundation
 nonisolated enum SharedTransitDataStore {
     static let appGroupIdentifier = "group.dev.pedrocordeiro.LuxTransit"
     static let favouriteStopsKey = "FavouriteStopEntities"
+    static let trackedDepartureReminderKey = "TrackedDepartureReminder"
 
     nonisolated static var userDefaults: UserDefaults {
         UserDefaults(suiteName: appGroupIdentifier) ?? .standard
@@ -22,6 +23,28 @@ nonisolated enum SharedTransitDataStore {
         }
 
         return stops
+    }
+
+    nonisolated static func saveTrackedReminder(_ reminder: SharedTrackedDepartureReminder?) {
+        guard let reminder else {
+            userDefaults.removeObject(forKey: trackedDepartureReminderKey)
+            UserDefaults.standard.removeObject(forKey: trackedDepartureReminderKey)
+            return
+        }
+
+        guard let data = try? JSONEncoder().encode(reminder) else { return }
+        userDefaults.set(data, forKey: trackedDepartureReminderKey)
+        UserDefaults.standard.set(data, forKey: trackedDepartureReminderKey)
+    }
+
+    nonisolated static func trackedReminder() -> SharedTrackedDepartureReminder? {
+        guard let data = userDefaults.data(forKey: trackedDepartureReminderKey)
+                ?? UserDefaults.standard.data(forKey: trackedDepartureReminderKey),
+              let reminder = try? JSONDecoder().decode(SharedTrackedDepartureReminder.self, from: data) else {
+            return nil
+        }
+
+        return reminder
     }
 }
 
@@ -65,6 +88,102 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
         var seen: Set<String> = []
         let unique = normalized.filter { seen.insert($0).inserted }
         return unique.isEmpty ? [fallbackId] : unique
+    }
+}
+
+struct SharedTrackedDepartureReminder: Codable, Hashable, Sendable {
+    let departureId: String
+    let stopId: String
+    let stopName: String
+    let lineName: String
+    let destination: String
+    let scheduledDeparture: Date?
+    let realtimeDeparture: Date?
+    let delayMinutes: Int?
+    let isCancelled: Bool
+    let leadTimeMinutes: Int
+    let notifiedDelayMinutes: Int?
+    let didNotifyCancellation: Bool
+    let lastUpdated: Date
+
+    private enum CodingKeys: String, CodingKey {
+        case departureId
+        case stopId
+        case stopName
+        case lineName
+        case destination
+        case scheduledDeparture
+        case realtimeDeparture
+        case delayMinutes
+        case isCancelled
+        case leadTimeMinutes
+        case notifiedDelayMinutes
+        case didNotifyCancellation
+        case lastUpdated
+    }
+
+    nonisolated init(
+        departureId: String,
+        stopId: String,
+        stopName: String,
+        lineName: String,
+        destination: String,
+        scheduledDeparture: Date?,
+        realtimeDeparture: Date?,
+        delayMinutes: Int?,
+        isCancelled: Bool,
+        leadTimeMinutes: Int,
+        notifiedDelayMinutes: Int? = nil,
+        didNotifyCancellation: Bool = false,
+        lastUpdated: Date
+    ) {
+        self.departureId = departureId
+        self.stopId = stopId
+        self.stopName = stopName
+        self.lineName = lineName
+        self.destination = destination
+        self.scheduledDeparture = scheduledDeparture
+        self.realtimeDeparture = realtimeDeparture
+        self.delayMinutes = delayMinutes
+        self.isCancelled = isCancelled
+        self.leadTimeMinutes = leadTimeMinutes
+        self.notifiedDelayMinutes = notifiedDelayMinutes
+        self.didNotifyCancellation = didNotifyCancellation
+        self.lastUpdated = lastUpdated
+    }
+
+    nonisolated init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        departureId = try container.decode(String.self, forKey: .departureId)
+        stopId = try container.decode(String.self, forKey: .stopId)
+        stopName = try container.decode(String.self, forKey: .stopName)
+        lineName = try container.decode(String.self, forKey: .lineName)
+        destination = try container.decode(String.self, forKey: .destination)
+        scheduledDeparture = try container.decodeIfPresent(Date.self, forKey: .scheduledDeparture)
+        realtimeDeparture = try container.decodeIfPresent(Date.self, forKey: .realtimeDeparture)
+        delayMinutes = try container.decodeIfPresent(Int.self, forKey: .delayMinutes)
+        isCancelled = try container.decode(Bool.self, forKey: .isCancelled)
+        leadTimeMinutes = try container.decode(Int.self, forKey: .leadTimeMinutes)
+        notifiedDelayMinutes = try container.decodeIfPresent(Int.self, forKey: .notifiedDelayMinutes)
+        didNotifyCancellation = try container.decode(Bool.self, forKey: .didNotifyCancellation)
+        lastUpdated = try container.decode(Date.self, forKey: .lastUpdated)
+    }
+
+    nonisolated func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(departureId, forKey: .departureId)
+        try container.encode(stopId, forKey: .stopId)
+        try container.encode(stopName, forKey: .stopName)
+        try container.encode(lineName, forKey: .lineName)
+        try container.encode(destination, forKey: .destination)
+        try container.encodeIfPresent(scheduledDeparture, forKey: .scheduledDeparture)
+        try container.encodeIfPresent(realtimeDeparture, forKey: .realtimeDeparture)
+        try container.encodeIfPresent(delayMinutes, forKey: .delayMinutes)
+        try container.encode(isCancelled, forKey: .isCancelled)
+        try container.encode(leadTimeMinutes, forKey: .leadTimeMinutes)
+        try container.encodeIfPresent(notifiedDelayMinutes, forKey: .notifiedDelayMinutes)
+        try container.encode(didNotifyCancellation, forKey: .didNotifyCancellation)
+        try container.encode(lastUpdated, forKey: .lastUpdated)
     }
 }
 
