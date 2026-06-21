@@ -589,8 +589,95 @@ private actor PublicTransportRoutingEngine {
             ),
             transport: transport
         )
-        roadRouteCoordinateCache[key] = coordinates
+        let acceptedCoordinates = coordinates.flatMap {
+            acceptableRoadCoordinates($0, from: origin, to: destination, transport: transport)
+        }
+        roadRouteCoordinateCache[key] = acceptedCoordinates
+        return acceptedCoordinates
+    }
+
+    private func acceptableRoadCoordinates(
+        _ coordinates: [RouteMapCoordinate],
+        from origin: RouteMapCoordinate,
+        to destination: RouteMapCoordinate,
+        transport: RoadRouteTransport
+    ) -> [RouteMapCoordinate]? {
+        guard coordinates.count >= 2 else { return nil }
+
+        let directDistance = distanceMeters(
+            from: LocationPoint(latitude: origin.latitude, longitude: origin.longitude),
+            to: LocationPoint(latitude: destination.latitude, longitude: destination.longitude)
+        )
+        guard directDistance > 0 else { return coordinates }
+
+        let routedDistance = polylineDistanceMeters(coordinates)
+        let maximumDistanceRatio = transport == .automobile ? 2.2 : 2.8
+        let maximumExtraDistance = transport == .automobile ? 600.0 : 900.0
+        let allowedDistance = max(
+            directDistance * maximumDistanceRatio,
+            directDistance + maximumExtraDistance
+        )
+        guard routedDistance <= allowedDistance else { return nil }
+
+        let maximumDetourDistance = max(directDistance * 1.25, 350.0)
+        guard coordinates.allSatisfy({
+            distanceFromRouteCorridorMeters(point: $0, origin: origin, destination: destination)
+                <= maximumDetourDistance
+        }) else {
+            return nil
+        }
+
         return coordinates
+    }
+
+    private func polylineDistanceMeters(_ coordinates: [RouteMapCoordinate]) -> Double {
+        zip(coordinates, coordinates.dropFirst()).reduce(0) { total, pair in
+            total + distanceMeters(
+                from: LocationPoint(latitude: pair.0.latitude, longitude: pair.0.longitude),
+                to: LocationPoint(latitude: pair.1.latitude, longitude: pair.1.longitude)
+            )
+        }
+    }
+
+    private func distanceFromRouteCorridorMeters(
+        point: RouteMapCoordinate,
+        origin: RouteMapCoordinate,
+        destination: RouteMapCoordinate
+    ) -> Double {
+        let originLocation = CLLocation(latitude: origin.latitude, longitude: origin.longitude)
+        let destinationLocation = CLLocation(latitude: destination.latitude, longitude: destination.longitude)
+        let pointLocation = CLLocation(latitude: point.latitude, longitude: point.longitude)
+        let routeDistance = originLocation.distance(from: destinationLocation)
+        guard routeDistance > 0 else {
+            return pointLocation.distance(from: originLocation)
+        }
+
+        let t = max(0, min(1, projectedFraction(
+            point: point,
+            origin: origin,
+            destination: destination
+        )))
+        let interpolated = CLLocation(
+            latitude: origin.latitude + (destination.latitude - origin.latitude) * t,
+            longitude: origin.longitude + (destination.longitude - origin.longitude) * t
+        )
+        return pointLocation.distance(from: interpolated)
+    }
+
+    private func projectedFraction(
+        point: RouteMapCoordinate,
+        origin: RouteMapCoordinate,
+        destination: RouteMapCoordinate
+    ) -> Double {
+        let originLatitude = origin.latitude * .pi / 180
+        let longitudeScale = cos(originLatitude)
+        let routeX = (destination.longitude - origin.longitude) * longitudeScale
+        let routeY = destination.latitude - origin.latitude
+        let pointX = (point.longitude - origin.longitude) * longitudeScale
+        let pointY = point.latitude - origin.latitude
+        let denominator = routeX * routeX + routeY * routeY
+        guard denominator > 0 else { return 0 }
+        return (pointX * routeX + pointY * routeY) / denominator
     }
 
     private func matchedDeparture(for leg: RoutePlan.Leg, in departures: [Departure]) -> Departure? {

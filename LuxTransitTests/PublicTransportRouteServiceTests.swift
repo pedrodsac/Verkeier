@@ -334,6 +334,33 @@ struct PublicTransportRouteServiceTests {
         #expect(busSegment.coordinates == shapeCoordinates)
     }
 
+    @Test func busRouteOverlayRejectsExcessiveMapKitDetour() async throws {
+        let now = luxembourgDate(hour: 8, minute: 0)
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: makeTimetable()),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(routes: [
+                "49.6,6.1|49.61,6.11": [
+                    RouteMapCoordinate(latitude: 49.6, longitude: 6.1),
+                    RouteMapCoordinate(latitude: 50.0, longitude: 6.6),
+                    RouteMapCoordinate(latitude: 49.61, longitude: 6.11)
+                ]
+            ]),
+            now: { now }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(name: "Current Location", latitude: 49.6001, longitude: 6.1001),
+            to: LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11)
+        )
+
+        let busSegment = try #require(calculation.mapOverlay?.segments.first { $0.mode == .bus })
+        #expect(busSegment.coordinates == [
+            RouteMapCoordinate(latitude: 49.6, longitude: 6.1),
+            RouteMapCoordinate(latitude: 49.61, longitude: 6.11)
+        ])
+    }
+
     private func makeTimetable(
         routes: [GTFSTimetableRouteEntry]? = nil,
         trips: [GTFSTimetableTripEntry]? = nil,
