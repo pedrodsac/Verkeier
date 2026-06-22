@@ -1,30 +1,64 @@
 import Foundation
 
+/// A computed door-to-door journey from one place to another.
+///
+/// A plan is an ordered list of ``RoutePlan/Leg`` values that alternate between
+/// walking and transit. It is produced by a ``RouteService`` and usually wrapped
+/// in a ``RouteOption`` (which adds map overlay and live-status derivations).
 nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
+    /// A single contiguous segment of a ``RoutePlan`` in one mode.
+    ///
+    /// Carries both scheduled and realtime times where known; the scheduled
+    /// fields fall back to ``departureTime`` / ``arrivalTime`` when not given
+    /// explicitly.
     nonisolated struct Leg: Codable, Hashable, Identifiable, Sendable {
+        /// Stable identifier for the leg.
         let id: String
+        /// Transport mode for this leg.
         let mode: TransportMode
+        /// Optional turn-by-turn or ride instruction.
         let instruction: String?
+        /// Coarse classification used for styling and routing hints.
         let transportKind: RouteLegTransportKind
+        /// Public line label for transit legs.
         let routeName: String?
+        /// Route identifier for transit legs.
         let routeId: String?
+        /// Trip identifier for transit legs.
         let tripId: String?
+        /// Origin stop identifier for transit legs.
         let originStopId: String?
+        /// Destination stop identifier for transit legs.
         let destinationStopId: String?
+        /// Where the leg starts.
         let origin: LocationPoint
+        /// Where the leg ends.
         let destination: LocationPoint
+        /// Effective departure time (realtime if available, else scheduled).
         let departureTime: Date?
+        /// Effective arrival time (realtime if available, else scheduled).
         let arrivalTime: Date?
+        /// Timetabled departure time.
         let scheduledDepartureTime: Date?
+        /// Timetabled arrival time.
         let scheduledArrivalTime: Date?
+        /// Realtime predicted departure, when a live feed provided one.
         let realtimeDepartureTime: Date?
+        /// Realtime predicted arrival, when a live feed provided one.
         let realtimeArrivalTime: Date?
+        /// Leg length in metres, for walking and driving legs.
         let distanceMeters: Double?
+        /// Polyline coordinates used to draw the leg on the map.
         let mapCoordinates: [RouteMapCoordinate]
+        /// Hint for how the leg's geometry should be road-snapped.
         let roadRoutingHint: RouteLegRoadRoutingHint
+        /// Boarding platform for transit legs, when published.
         let platform: String?
+        /// Delay in minutes for transit legs, when known.
         let delayMinutes: Int?
+        /// Live-status classification for transit legs.
         let liveStatus: RouteLegLiveStatus
+        /// Non-`nil` when the transfer onto this leg is tight or at risk.
         let transferWarning: String?
 
         init(
@@ -80,21 +114,33 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
         }
     }
 
+    /// Stable identifier for the plan.
     let id: String
+    /// Journey origin.
     let origin: LocationPoint
+    /// Journey destination.
     let destination: LocationPoint
+    /// Total expected travel time, if known.
     let expectedTravelTime: TimeInterval?
+    /// Total distance in metres, if known.
     let distanceMeters: Double?
+    /// Ordered legs that make up the journey.
     let legs: [Leg]
+    /// Which feed/engine produced the plan.
     let dataSource: DataSource
 }
 
+/// Coarse classification of a ``RoutePlan/Leg``.
 enum RouteLegTransportKind: String, Codable, Hashable, Sendable {
+    /// A ride on a transit line.
     case transit
+    /// An on-foot segment.
     case walking
+    /// A driving segment (Apple Maps fallback).
     case automobile
     case unknown
 
+    /// Human-readable name for the kind.
     var displayName: String {
         switch self {
         case .transit: "Transit"
@@ -105,19 +151,28 @@ enum RouteLegTransportKind: String, Codable, Hashable, Sendable {
     }
 }
 
+/// Hint for whether a leg's geometry should be snapped to a road/path network
+/// when drawn, and by which profile.
 enum RouteLegRoadRoutingHint: String, Codable, Hashable, Sendable {
+    /// Use the straight geometry as given.
     case none
     case automobile
     case walking
 }
 
+/// Live-status classification for a transit ``RoutePlan/Leg``.
 enum RouteLegLiveStatus: String, Codable, Hashable, Sendable {
+    /// No realtime data; timetable only.
     case scheduled
+    /// Realtime data present and on schedule.
     case live
+    /// Realtime data present and running late.
     case delayed
+    /// The trip has been cancelled.
     case cancelled
     case unknown
 
+    /// Short label suitable for display.
     var displayText: String {
         switch self {
         case .scheduled: "Scheduled"

@@ -1,6 +1,13 @@
 import Foundation
 import Observation
 
+/// Orchestrates checking for, downloading, validating, and installing GTFS feed
+/// updates.
+///
+/// The actor coordinates a pipeline of injected collaborators — metadata fetch,
+/// download, archive extraction, validation, and index building — and persists
+/// progress through a `GTFSLocalStore`. It exposes the current
+/// `GTFSUpdateStatus` via ``snapshot()`` so the UI can show update state.
 actor GTFSUpdateService {
     private let metadataClient: any GTFSMetadataFetching
     private let downloadService: any GTFSDownloading

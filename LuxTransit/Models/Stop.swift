@@ -1,14 +1,38 @@
 import Foundation
 
+/// A public-transport stop or station.
+///
+/// `Stop` is the canonical place model used across search, the map, departure
+/// boards, and route planning. Instances originate from the on-device GTFS
+/// index (``DataSource/gtfs``) or the ATP nearby-stops feed
+/// (``DataSource/atpOpenAPI``) and are mapped into this value type before they
+/// reach any view.
 struct Stop: Codable, Hashable, Identifiable, Sendable {
+    /// Stable identifier for the stop, used for `Identifiable` and as the
+    /// lookup key in GTFS and ATP requests.
     let id: String
+    /// Human-readable stop name, e.g. `"Luxembourg, Gare Centrale"`.
     let name: String
+    /// Optional town or district the stop belongs to.
     let locality: String?
+    /// Geographic position of the stop.
     let location: LocationPoint
+    /// Transport modes that serve this stop (bus, tram, train, …).
     let modes: [TransportMode]
+    /// Which feed this stop was derived from.
     let dataSource: DataSource
+    /// Per-platform identifiers grouped under this stop.
+    ///
+    /// A logical stop may aggregate several physical platforms, each of which
+    /// has its own ATP departure board. Defaults to `[id]` when no distinct
+    /// platforms are known.
     let platformIds: [String]
 
+    /// Creates a stop.
+    ///
+    /// - Parameter platformIds: Distinct platform identifiers. Blank entries are
+    ///   trimmed and duplicates removed; if the result is empty the stop's own
+    ///   `id` is used as the single platform.
     nonisolated init(
         id: String,
         name: String,
@@ -37,6 +61,9 @@ struct Stop: Codable, Hashable, Identifiable, Sendable {
         case platformIds
     }
 
+    /// Decodes a stop, applying the same platform normalization as the
+    /// memberwise initializer so persisted and freshly built stops behave
+    /// identically.
     nonisolated init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let id = try container.decode(String.self, forKey: .id)

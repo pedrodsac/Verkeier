@@ -1,14 +1,26 @@
 import Foundation
 
+/// A timetabled departure computed from the offline GTFS index.
 struct OfflineScheduleDeparture: Identifiable, Equatable, Sendable {
+    /// Stable identifier for the departure.
     let id: String
+    /// Public line label.
     let lineName: String
+    /// Trip headsign / destination.
     let destination: String
+    /// Scheduled departure date and time.
     let departureDate: Date
+    /// Boarding platform, when published.
     let platform: String?
+    /// Transport mode of the trip.
     let mode: TransportMode
 }
 
+/// Computes upcoming departures for a stop purely from the offline GTFS
+/// timetable, with no network access.
+///
+/// Used as a fallback when live ATP data is unavailable. All time arithmetic is
+/// done in the `Europe/Luxembourg` time zone by default.
 struct OfflineScheduleService: Sendable {
     private let calendar: Calendar
 
@@ -20,6 +32,16 @@ struct OfflineScheduleService: Sendable {
         self.calendar = calendar
     }
 
+    /// Computes the next departures from a stop using the offline timetable.
+    ///
+    /// Only services active on `now`'s date are considered.
+    /// - Parameters:
+    ///   - stop: The stop to compute departures for.
+    ///   - timetable: The offline timetable index (see
+    ///     ``GTFSService/timetableIndex()``).
+    ///   - now: Reference time; departures before it are excluded.
+    ///   - limit: Maximum number of departures to return.
+    /// - Returns: Upcoming departures sorted by time, or `[]` when none apply.
     func upcomingDepartures(
         for stop: Stop,
         timetable: GTFSTimetableIndexPayload,

@@ -1,5 +1,10 @@
 import Foundation
 
+/// Builds a ``LineDetail`` for a route from the offline GTFS timetable.
+///
+/// Groups a route's trips into directions, derives the stop sequence and the
+/// next departures for the selected direction, and assembles a map overlay. All
+/// time arithmetic uses the `Europe/Luxembourg` time zone by default.
 struct LineDetailService {
     private let calendar: Calendar
 
@@ -11,6 +16,14 @@ struct LineDetailService {
         self.calendar = calendar
     }
 
+    /// Builds line detail for a route, or `nil` when the timetable has no trips
+    /// for it.
+    /// - Parameters:
+    ///   - route: The route to describe.
+    ///   - selectedStopId: A stop to anchor/highlight in the sequence, if any.
+    ///   - timetable: The offline timetable index.
+    ///   - now: Reference time used to pick active services and next departures.
+    ///   - selectedDirectionID: The direction to show; defaults to the first.
     func detail(
         for route: TransitRoute,
         selectedStopId: String?,

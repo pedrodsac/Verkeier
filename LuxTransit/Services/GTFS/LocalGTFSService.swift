@@ -1,5 +1,12 @@
 import Foundation
 
+/// The production ``GTFSService``, serving stops, routes, and the timetable
+/// index from on-device data.
+///
+/// Data is loaded lazily into an internal actor-isolated snapshot, preferring a
+/// downloaded GTFS update on disk and falling back to the bundled compact feed.
+/// The service observes the `gtfsDidUpdate` notification and reloads its
+/// snapshot when a fresh feed is installed.
 final class LocalGTFSService: GTFSService {
     private let loader: GTFSDataLoader
     private let updateTask: Task<Void, Never>

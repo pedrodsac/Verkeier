@@ -1,10 +1,17 @@
 import CoreLocation
 import Observation
 
+/// Observable wrapper around `CLLocationManager` for when-in-use location.
+///
+/// Main-actor isolated and `@Observable` so SwiftUI views can read
+/// ``authorizationStatus`` and ``currentLocation`` directly. Delegate callbacks
+/// arrive off the main actor and are hopped back on before mutating state.
 @Observable
 @MainActor
 final class LocationService: NSObject {
+    /// Current Core Location authorization status.
     var authorizationStatus: CLAuthorizationStatus
+    /// Most recent location fix, or `nil` until one is delivered.
     var currentLocation: CLLocation?
 
     @ObservationIgnored private let manager: CLLocationManager
@@ -18,6 +25,8 @@ final class LocationService: NSObject {
         manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
     }
 
+    /// Requests when-in-use authorization, or starts updates immediately if
+    /// access has already been decided.
     func requestWhenInUseAuthorization() {
         guard authorizationStatus == .notDetermined else {
             startUpdatingIfAllowed()
@@ -26,6 +35,7 @@ final class LocationService: NSObject {
         manager.requestWhenInUseAuthorization()
     }
 
+    /// Begins location updates when authorization permits; otherwise a no-op.
     func startUpdatingIfAllowed() {
         guard authorizationStatus == .authorizedAlways || authorizationStatus == .authorizedWhenInUse else {
             return

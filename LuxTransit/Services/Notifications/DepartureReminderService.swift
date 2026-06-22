@@ -2,6 +2,11 @@ import Foundation
 import Observation
 import UserNotifications
 
+/// The slice of `UNUserNotificationCenter` that
+/// ``DepartureReminderService`` depends on.
+///
+/// Abstracted so tests can substitute a fake notification centre without
+/// touching the system one.
 protocol DepartureReminderNotificationCenter: Sendable {
     func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool
     func add(_ request: UNNotificationRequest) async throws
@@ -11,6 +16,12 @@ protocol DepartureReminderNotificationCenter: Sendable {
 extension UNUserNotificationCenter: DepartureReminderNotificationCenter {
 }
 
+/// Schedules and tracks a local notification reminding the rider to leave for a
+/// departure.
+///
+/// Observable and main-actor isolated for direct use from SwiftUI. It tracks a
+/// single ``activeReminder`` (mirrored to the shared app group so widgets and
+/// App Intents can read it) and surfaces failures via ``lastErrorMessage``.
 @Observable
 @MainActor
 final class DepartureReminderService {

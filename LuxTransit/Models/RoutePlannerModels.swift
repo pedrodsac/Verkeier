@@ -1,5 +1,6 @@
 import Foundation
 
+/// How the route planner orders the alternatives it returns.
 nonisolated enum RoutePlannerSortOption: String, Codable, CaseIterable, Identifiable, Sendable {
     case fastest
     case fewestTransfers
@@ -7,6 +8,7 @@ nonisolated enum RoutePlannerSortOption: String, Codable, CaseIterable, Identifi
 
     var id: String { rawValue }
 
+    /// Localized title for the picker.
     var title: String {
         switch self {
         case .fastest: "Fastest"
@@ -16,7 +18,9 @@ nonisolated enum RoutePlannerSortOption: String, Codable, CaseIterable, Identifi
     }
 }
 
+/// A rider's preferred transport mode for route planning.
 nonisolated enum RoutePlannerModePreference: String, Codable, CaseIterable, Identifiable, Sendable {
+    /// No mode preference.
     case any
     case bus
     case tram
@@ -24,6 +28,7 @@ nonisolated enum RoutePlannerModePreference: String, Codable, CaseIterable, Iden
 
     var id: String { rawValue }
 
+    /// Localized title for the picker.
     var title: String {
         switch self {
         case .any: "Any"
@@ -33,6 +38,7 @@ nonisolated enum RoutePlannerModePreference: String, Codable, CaseIterable, Iden
         }
     }
 
+    /// The matching ``TransportMode``, or `nil` for ``any``.
     var transportMode: TransportMode? {
         switch self {
         case .any:
@@ -47,13 +53,20 @@ nonisolated enum RoutePlannerModePreference: String, Codable, CaseIterable, Iden
     }
 }
 
+/// The set of user-configurable constraints applied to route planning.
 nonisolated struct RoutePlannerFilters: Codable, Hashable, Sendable {
+    /// Ordering preference for the returned options.
     var sort: RoutePlannerSortOption = .fastest
+    /// Preferred transport mode.
     var modePreference: RoutePlannerModePreference = .any
+    /// When `true`, avoid options with tight transfers.
     var avoidTightTransfers = false
+    /// When `true`, prefer step-free / accessible options.
     var preferAccessible = false
 }
 
+/// Where a ``RoutePlace`` originated, used for grouping and analytics-free
+/// presentation in the planner.
 nonisolated enum RoutePlaceSource: String, Codable, Hashable, Sendable {
     case currentLocation
     case selectedStop
@@ -64,13 +77,24 @@ nonisolated enum RoutePlaceSource: String, Codable, Hashable, Sendable {
     case search
 }
 
+/// An origin or destination the rider can pick in the route planner.
+///
+/// Unlike ``Stop``, a place can also be a free coordinate (e.g. the current
+/// device location), so ``stopId`` is optional.
 nonisolated struct RoutePlace: Codable, Hashable, Identifiable, Sendable {
+    /// Stable identifier; defaults to ``stopId`` then the location id.
     let id: String
+    /// Primary label.
     let title: String
+    /// Optional secondary label, e.g. locality.
     let subtitle: String?
+    /// Geographic position.
     let location: LocationPoint
+    /// Underlying stop identifier, when the place is a stop.
     let stopId: String?
+    /// Modes available at the place, when known.
     let modes: [TransportMode]
+    /// Where the place came from.
     let source: RoutePlaceSource
 
     init(
@@ -91,6 +115,7 @@ nonisolated struct RoutePlace: Codable, Hashable, Identifiable, Sendable {
         self.source = source
     }
 
+    /// Creates a place from an existing ``Stop``.
     init(stop: Stop, source: RoutePlaceSource) {
         self.init(
             id: stop.id,
@@ -103,6 +128,7 @@ nonisolated struct RoutePlace: Codable, Hashable, Identifiable, Sendable {
         )
     }
 
+    /// Builds the synthetic "Current Location" place for a device coordinate.
     static func currentLocation(_ location: LocationPoint) -> RoutePlace {
         RoutePlace(
             id: "current-location",
@@ -114,11 +140,20 @@ nonisolated struct RoutePlace: Codable, Hashable, Identifiable, Sendable {
     }
 }
 
+/// A saved commute the rider can re-plan with one tap.
+///
+/// When ``origin`` is `nil` the planner uses the rider's current location as the
+/// starting point.
 nonisolated struct RouteCommutePreset: Codable, Hashable, Identifiable, Sendable {
+    /// Stable identifier; defaults to a fresh UUID.
     let id: String
+    /// Rider-facing name, e.g. `"Home → Work"`.
     let title: String
+    /// Fixed origin, or `nil` to start from the current location.
     let origin: RoutePlace?
+    /// Destination of the commute.
     let destination: RoutePlace
+    /// When the preset was created, used for ordering.
     let createdAt: Date
 
     init(
