@@ -83,11 +83,29 @@ struct TransitBottomSheet: View {
                 }
             }
 
+            ToolbarItem(placement: .topBarTrailing) {
+                let isFavourite = viewModel.stopDetail.isFavourite
+                Button(action: actions.toggleFavourite) {
+                    Label(
+                        isFavourite ? "Remove favourite" : "Save favourite",
+                        systemImage: isFavourite ? "star.fill" : "star"
+                    )
+                }
+                .tint(isFavourite ? .yellow : nil)
+            }
+
         case .directions:
             ToolbarItem(placement: .topBarLeading) {
                 Button(action: actions.showStopDetail) {
                     Label("Back to stop", systemImage: "chevron.left")
                 }
+            }
+
+            ToolbarItem(placement: .topBarTrailing) {
+                RoutePlanningTimeButton(
+                    current: viewModel.route.planningTime,
+                    onChange: actions.setRoutePlanningTime
+                )
             }
 
         case .routeTimeline:
@@ -124,6 +142,89 @@ struct TransitBottomSheet: View {
                     Label("Close settings", systemImage: "chevron.down")
                 }
             }
+        }
+    }
+}
+
+// MARK: - Route planning time
+
+/// Toolbar calendar menu for choosing when to travel. A menu offers
+/// "Leave now / Leave at… / Arrive by…"; the latter two open a sheet to pick the
+/// time.
+private struct RoutePlanningTimeButton: View {
+    let current: RoutePlanningTime
+    let onChange: (RoutePlanningTime) -> Void
+
+    @State private var editing: Mode?
+    @State private var date: Date = .now
+
+    private enum Mode: Identifiable {
+        case leave, arrive
+        var id: Int {
+            self == .leave ? 0 : 1
+        }
+
+        var title: String {
+            self == .leave ? "Leave at" : "Arrive by"
+        }
+
+        func planningTime(_ date: Date) -> RoutePlanningTime {
+            self == .leave ? .departAt(date) : .arriveBy(date)
+        }
+    }
+
+    var body: some View {
+        Menu {
+            Button {
+                onChange(.leaveNow)
+            } label: {
+                Label("Leave now", systemImage: current.isNow ? "checkmark" : "clock")
+            }
+            Button {
+                date = current.date ?? .now
+                editing = .leave
+            } label: {
+                Label("Leave at…", systemImage: "calendar")
+            }
+            Button {
+                date = current.date ?? .now
+                editing = .arrive
+            } label: {
+                Label("Arrive by…", systemImage: "flag.checkered")
+            }
+        } label: {
+            Label(
+                "Choose travel time",
+                systemImage: current.isNow ? "calendar" : "calendar.badge.clock"
+            )
+        }
+        .tint(current.isNow ? nil : .blue)
+        .sheet(item: $editing) { mode in
+            NavigationStack {
+                DatePicker(
+                    "Time",
+                    selection: $date,
+                    displayedComponents: [.date, .hourAndMinute]
+                )
+                .datePickerStyle(.graphical)
+                .padding()
+                .frame(maxHeight: .infinity, alignment: .top)
+                .navigationTitle(mode.title)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") { editing = nil }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") {
+                            onChange(mode.planningTime(date))
+                            editing = nil
+                        }
+                        .fontWeight(.semibold)
+                    }
+                }
+            }
+            .presentationDetents([.medium, .large])
         }
     }
 }

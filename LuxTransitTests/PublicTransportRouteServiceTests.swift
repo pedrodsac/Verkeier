@@ -1,6 +1,5 @@
 import Foundation
 import Testing
-
 @testable import LuxTransit
 
 struct PublicTransportRouteServiceTests {
@@ -577,6 +576,28 @@ struct PublicTransportRouteServiceTests {
         )
     }
 
+    @Test func planForDepartAtAndArriveBy() async throws {
+        let now = luxembourgDate(hour: 8, minute: 0)
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: makeTimetable()),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { now }
+        )
+        let from = LocationPoint(name: "Current Location", latitude: 49.6001, longitude: 6.1001)
+        let to = LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11)
+
+        let departAt = try await routeService.calculateRoute(
+            from: from, to: to, time: .departAt(luxembourgDate(hour: 8, minute: 0))
+        )
+        #expect(!departAt.options.isEmpty)
+
+        let arriveBy = try await routeService.calculateRoute(
+            from: from, to: to, time: .arriveBy(luxembourgDate(hour: 8, minute: 30))
+        )
+        #expect(!arriveBy.options.isEmpty)
+    }
+
     private func luxembourgDate(hour: Int, minute: Int) -> Date {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "Europe/Luxembourg")!
@@ -594,15 +615,15 @@ struct PublicTransportRouteServiceTests {
 private struct MockGTFSService: GTFSService {
     let timetable: GTFSTimetableIndexPayload?
 
-    nonisolated func searchStops(query: String) async -> [Stop] {
+    nonisolated func searchStops(query _: String) async -> [Stop] {
         []
     }
 
     nonisolated func stopsForMap(
-        center: LocationPoint,
-        latitudeDelta: Double,
-        longitudeDelta: Double,
-        limit: Int
+        center _: LocationPoint,
+        latitudeDelta _: Double,
+        longitudeDelta _: Double,
+        limit _: Int
     ) async -> [Stop] {
         []
     }
@@ -623,7 +644,7 @@ private struct MockGTFSService: GTFSService {
         []
     }
 
-    nonisolated func routesForStop(id: String) async -> [TransitRoute] {
+    nonisolated func routesForStop(id _: String) async -> [TransitRoute] {
         []
     }
 
@@ -635,7 +656,7 @@ private struct MockGTFSService: GTFSService {
 private struct MockATPClient: ATPClient {
     var departuresByStopId: [String: [Departure]] = [:]
 
-    func nearbyStops(latitude: Double, longitude: Double) async throws -> [Stop] {
+    func nearbyStops(latitude _: Double, longitude _: Double) async throws -> [Stop] {
         []
     }
 

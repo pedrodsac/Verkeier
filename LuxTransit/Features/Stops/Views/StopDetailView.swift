@@ -37,7 +37,8 @@ struct StopDetailView: View {
                         .padding(.vertical, 8)
                         .background(
                             .orange.opacity(0.12),
-                            in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        )
                 }
 
                 if let departureReminderErrorMessage = viewModel.departureReminderErrorMessage {
@@ -48,7 +49,8 @@ struct StopDetailView: View {
                         .padding(.vertical, 8)
                         .background(
                             .orange.opacity(0.12),
-                            in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        )
                 }
 
                 DepartureBoardView(
@@ -58,7 +60,6 @@ struct StopDetailView: View {
                     lastUpdated: viewModel.lastUpdated,
                     isStale: viewModel.isStale,
                     trackedDepartureId: viewModel.trackedDepartureId,
-                    liveActivityStaleMessage: viewModel.liveActivityStaleMessage,
                     activeReminder: viewModel.activeReminder,
                     startTrackingDeparture: startTrackingDeparture,
                     stopTrackingDeparture: stopTrackingDeparture,
@@ -217,7 +218,6 @@ private struct StopMetadataPanel: View {
     let toggleDepartureLine: (TransitRoute) -> Void
     let showLineDetail: (TransitRoute) -> Void
 
-    @ViewBuilder
     var body: some View {
         if !routes.isEmpty {
             ScrollView(.horizontal, showsIndicators: false) {
@@ -235,7 +235,6 @@ private struct StopMetadataPanel: View {
             }
         }
     }
-
 }
 
 private struct RouteLineCard: View {
@@ -283,7 +282,9 @@ private struct RouteLineCard: View {
                     .background(.background.opacity(0.6), in: Circle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Show line details for \(route.shortName.isEmpty ? route.mode.displayName : route.shortName)")
+            .accessibilityLabel(
+                "Show line details for \(route.shortName.isEmpty ? route.mode.displayName : route.shortName)"
+            )
         }
     }
 
@@ -413,7 +414,6 @@ struct DepartureBoardView: View {
     let lastUpdated: Date?
     let isStale: Bool
     let trackedDepartureId: String?
-    let liveActivityStaleMessage: String
     let activeReminder: SharedTrackedDepartureReminder?
     let startTrackingDeparture: (Departure) -> Void
     let stopTrackingDeparture: () -> Void
@@ -421,7 +421,7 @@ struct DepartureBoardView: View {
     let cancelDepartureReminder: () -> Void
 
     var body: some View {
-        if isLoading && departures.isEmpty {
+        if isLoading, departures.isEmpty {
             DepartureLoadingCard(title: "Loading departures")
         } else if let errorMessage {
             CompactUnavailableCard(
@@ -441,7 +441,6 @@ struct DepartureBoardView: View {
                 DepartureTrackingStatusCard(
                     trackedDeparture: departures.first(where: { $0.id == trackedDepartureId }),
                     activeReminder: activeReminder,
-                    staleMessage: liveActivityStaleMessage,
                     stopTrackingDeparture: stopTrackingDeparture,
                     cancelDepartureReminder: cancelDepartureReminder
                 )
@@ -472,16 +471,24 @@ struct DepartureBoardView: View {
 private struct DepartureTrackingStatusCard: View {
     let trackedDeparture: Departure?
     let activeReminder: SharedTrackedDepartureReminder?
-    let staleMessage: String
     let stopTrackingDeparture: () -> Void
     let cancelDepartureReminder: () -> Void
 
     var body: some View {
+        if trackedDeparture != nil || activeReminder != nil {
+            card
+        }
+    }
+
+    private var card: some View {
         VStack(alignment: .leading, spacing: 10) {
             if let trackedDeparture {
                 HStack(alignment: .top, spacing: 10) {
-                    Label("Live Activity tracking \(trackedDeparture.lineName) to \(trackedDeparture.destination)", systemImage: "livephoto")
-                        .font(.footnote.weight(.semibold))
+                    Label(
+                        "Live Activity tracking \(trackedDeparture.lineName) to \(trackedDeparture.destination)",
+                        systemImage: "livephoto"
+                    )
+                    .font(.footnote.weight(.semibold))
                     Spacer(minLength: 0)
                     Button("Stop", action: stopTrackingDeparture)
                         .font(.caption.weight(.semibold))
@@ -502,10 +509,6 @@ private struct DepartureTrackingStatusCard: View {
                         .buttonStyle(.bordered)
                 }
             }
-
-            Text(staleMessage)
-                .font(.caption)
-                .foregroundStyle(.secondary)
         }
         .padding(12)
         .background(.secondary.opacity(0.10), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -594,30 +597,31 @@ struct DepartureListRow: View {
             .padding(.horizontal, 7)
             .background(
                 lineColor.gradient,
-                in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+            )
 
             VStack(alignment: .leading, spacing: 4) {
-				VStack {
-					Text(departure.destination)
-						.font(.body.weight(.semibold))
-						.lineLimit(1)
-				}
+                VStack {
+                    Text(departure.destination)
+                        .font(.body.weight(.semibold))
+                        .lineLimit(1)
+                }
 
                 HStack(spacing: 6) {
                     Text(departureTimeText)
-					Divider()
-						.frame(height: 10)
+                    Divider()
+                        .frame(height: 10)
                     if let platform = departure.platform {
                         Text("Platform \(platform)")
                     }
-					
-					Spacer()
+
+                    Spacer()
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
             }
-			.frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity)
 
             DepartureTimingStatus(
                 countdownText: countdownText,
@@ -659,7 +663,6 @@ struct DepartureListRow: View {
         .accessibilityElement(children: .combine)
     }
 
-    @ViewBuilder
     private var reminderMenu: some View {
         Menu {
             let defaultMinutes = preferences.defaultReminderLeadTimeMinutes
@@ -707,7 +710,7 @@ struct DepartureListRow: View {
     private var statusBadge: String? {
         switch departure.status {
         case .cancelled: "Cancelled"
-        case .delayed(let minutes): "+\(minutes)"
+        case let .delayed(minutes): "+\(minutes)"
         case .onTime: "On time"
         case .scheduled, .unknown: nil
         }

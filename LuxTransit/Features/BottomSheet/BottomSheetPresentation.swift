@@ -26,7 +26,7 @@ struct TransitSheetActions {
     let showSettings: () -> Void
     let toggleFavourite: () -> Void
     let toggleFavouriteExpansion: (String) -> Void
-    let refreshDepartures: () -> Void
+    let refreshDepartures: () async -> Void
     let refreshAlerts: () -> Void
     let calculateRoute: () -> Void
     let selectRouteOption: (String) -> Void
@@ -38,6 +38,7 @@ struct TransitSheetActions {
     let saveCurrentCommutePreset: () -> Void
     let swapRouteEndpoints: () -> Void
     let updateRouteFilters: (RoutePlannerFilters) -> Void
+    let setRoutePlanningTime: (RoutePlanningTime) -> Void
     let startTrackingDeparture: (Departure) -> Void
     let stopTrackingDeparture: () -> Void
     let scheduleDepartureReminder: (Departure, Int) -> Void
@@ -130,6 +131,7 @@ struct RoutePresentationModel {
     let recentPlaces: [RoutePlace]
     let commutePresets: [RouteCommutePreset]
     let filters: RoutePlannerFilters
+    let planningTime: RoutePlanningTime
     let routeOptions: [RouteOption]
     let alerts: [AlertMessage]
     let selectedRouteOptionID: String?

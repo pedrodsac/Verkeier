@@ -1,12 +1,19 @@
 import MapKit
 
 struct MapKitRouteService: RouteService {
-    nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint) async throws -> RouteCalculation {
+    nonisolated func calculateRoute(
+        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime
+    ) async throws -> RouteCalculation {
         let request = MKDirections.Request()
         request.source = mapItem(for: from)
         request.destination = mapItem(for: to)
         request.transportType = [.transit, .walking]
         request.requestsAlternateRoutes = false
+        switch time {
+        case .leaveNow: break
+        case let .departAt(date): request.departureDate = date
+        case let .arriveBy(date): request.arrivalDate = date
+        }
 
         let response = try await MKDirections(request: request).calculate()
         guard let route = response.routes.first else {

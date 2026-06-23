@@ -46,24 +46,6 @@ struct TransitMapScreen: View {
 
                 Spacer()
             }
-
-            if let selectedStop = viewModel.selectedStop, viewModel.sheetContext == .stopDetail {
-                GeometryReader { geometryProxy in
-                    VStack {
-                        Spacer()
-
-                        StopDetailFloatingActions(
-                            isFavourite: isFavourite(selectedStop),
-                            isRefreshDisabled: viewModel.isLoadingDepartures,
-                            toggleFavourite: toggleSelectedFavourite,
-                            refreshDepartures: refreshDepartures
-                        )
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, floatingActionsBottomPadding(in: geometryProxy.size.height))
-                    }
-                }
-                .zIndex(10)
-            }
         }
         .sheet(isPresented: $isMainSheetPresented) {
             TransitBottomSheet(
@@ -93,9 +75,11 @@ struct TransitMapScreen: View {
             viewModel.loadRoutePlanner()
             locationService.startUpdatingIfAllowed()
             await viewModel.loadGTFSMapStops(
-                using: gtfsService, location: locationService.currentLocation)
+                using: gtfsService, location: locationService.currentLocation
+            )
             await viewModel.loadNearbyStops(
-                using: atpClient, location: locationService.currentLocation)
+                using: atpClient, location: locationService.currentLocation
+            )
             await viewModel.loadAlerts(using: avlClient)
             await viewModel.loadFavouriteDepartures(using: atpClient, favourites: favouriteStops)
             gtfsUpdateController.loadSnapshot()
@@ -111,7 +95,8 @@ struct TransitMapScreen: View {
             }
             Task {
                 await viewModel.loadGTFSMapStops(
-                    using: gtfsService, location: locationService.currentLocation)
+                    using: gtfsService, location: locationService.currentLocation
+                )
             }
             scheduleNearbyStopsRefresh()
             calculateWaitingRouteIfNeeded()
@@ -156,7 +141,8 @@ struct TransitMapScreen: View {
         .onReceive(NotificationCenter.default.publisher(for: .gtfsDidUpdate)) { _ in
             Task {
                 await viewModel.loadGTFSMapStops(
-                    using: gtfsService, location: locationService.currentLocation)
+                    using: gtfsService, location: locationService.currentLocation
+                )
                 await viewModel.updateSelectedStopRoutes(using: gtfsService)
                 await viewModel.loadOfflineScheduledDepartures(using: gtfsService)
                 await viewModel.searchStops(using: gtfsService)
@@ -253,6 +239,7 @@ struct TransitMapScreen: View {
                 recentPlaces: viewModel.recentRoutePlaces,
                 commutePresets: viewModel.commutePresets,
                 filters: viewModel.routeFilters,
+                planningTime: viewModel.routePlanningTime,
                 routeOptions: viewModel.routeOptions,
                 alerts: viewModel.routeAlerts,
                 selectedRouteOptionID: viewModel.selectedRouteOptionID,
@@ -305,7 +292,7 @@ struct TransitMapScreen: View {
     private var appVersion: String {
         let version =
             Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-            ?? "1.0"
+                ?? "1.0"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
         return "\(version) (\(build))"
     }
@@ -381,7 +368,8 @@ struct TransitMapScreen: View {
             }
             guard !Task.isCancelled else { return }
             await viewModel.loadNearbyStops(
-                using: atpClient, location: locationService.currentLocation)
+                using: atpClient, location: locationService.currentLocation
+            )
         }
     }
 
@@ -411,6 +399,7 @@ struct TransitMapScreen: View {
             saveCurrentCommutePreset: saveCurrentCommutePreset,
             swapRouteEndpoints: swapRouteEndpoints,
             updateRouteFilters: updateRouteFilters,
+            setRoutePlanningTime: setRoutePlanningTime,
             startTrackingDeparture: startTrackingDeparture,
             stopTrackingDeparture: stopTrackingDeparture,
             scheduleDepartureReminder: scheduleDepartureReminder,
@@ -528,6 +517,13 @@ struct TransitMapScreen: View {
         viewModel.updateRouteFilters(filters)
     }
 
+    private func setRoutePlanningTime(_ time: RoutePlanningTime) {
+        guard viewModel.routePlanningTime != time else { return }
+        viewModel.routePlanningTime = time
+        // Re-query the service: a new time means different departures.
+        calculateRoute()
+    }
+
     private func toggleDepartureLine(_ route: TransitRoute) {
         viewModel.toggleDepartureLine(route)
     }
@@ -586,7 +582,8 @@ struct TransitMapScreen: View {
                 viewModel.centerOnUserLocation(locationService.currentLocation)
                 Task {
                     await viewModel.loadGTFSMapStops(
-                        using: gtfsService, location: locationService.currentLocation)
+                        using: gtfsService, location: locationService.currentLocation
+                    )
                 }
             }
         case .notDetermined:
@@ -597,22 +594,9 @@ struct TransitMapScreen: View {
         }
     }
 
-    private func refreshDepartures() {
-        Task {
-            await viewModel.loadDepartures(using: atpClient)
-            await updateTrackedDepartureIfNeeded()
-        }
-    }
-
-    private func floatingActionsBottomPadding(in height: CGFloat) -> CGFloat {
-        switch viewModel.sheetDetent {
-        case .collapsed:
-            return 72
-        case .medium:
-            return max((height * 0.50) - 24, 0)
-        case .expanded:
-            return max(height - 96, 0)
-        }
+    private func refreshDepartures() async {
+        await viewModel.loadDepartures(using: atpClient)
+        await updateTrackedDepartureIfNeeded()
     }
 
     private func updateSearch() {
@@ -652,7 +636,8 @@ struct TransitMapScreen: View {
 
         Task {
             await viewModel.calculateRoute(
-                using: routeService, from: locationService.currentLocation)
+                using: routeService, from: locationService.currentLocation
+            )
         }
     }
 
@@ -666,7 +651,8 @@ struct TransitMapScreen: View {
 
     private func openRouteInAppleMaps() {
         viewModel.openSelectedRouteInAppleMaps(
-            using: routeService, from: locationService.currentLocation)
+            using: routeService, from: locationService.currentLocation
+        )
     }
 
     private func selectRouteOption(_ id: String) {
@@ -772,7 +758,7 @@ struct TransitMapScreen: View {
 
     private func handleDeepLink(_ url: URL) {
         guard let deepLink = TransitDeepLink(url: url),
-            let handoff = TransitIntentHandoff(deepLink)
+              let handoff = TransitIntentHandoff(deepLink)
         else {
             return
         }
@@ -784,7 +770,7 @@ struct TransitMapScreen: View {
         switch handoff {
         case .showNearbyStops:
             viewModel.showHome()
-        case .openFavouriteStop(let stopId):
+        case let .openFavouriteStop(stopId):
             if let favourite = favouriteEntities.first(where: { $0.stopId == stopId })?.stop {
                 viewModel.selectStop(favourite)
                 Task {
@@ -795,7 +781,7 @@ struct TransitMapScreen: View {
             } else {
                 viewModel.showSearch()
             }
-        case .trackNextDeparture(let stopId):
+        case let .trackNextDeparture(stopId):
             if let favourite = favouriteEntities.first(where: { $0.stopId == stopId })?.stop {
                 viewModel.selectStop(favourite)
                 Task {
@@ -807,7 +793,7 @@ struct TransitMapScreen: View {
             } else {
                 viewModel.showSearch()
             }
-        case .planRoute(let destinationName):
+        case let .planRoute(destinationName):
             viewModel.searchQuery = destinationName
             Task {
                 await viewModel.searchStops(using: gtfsService)
@@ -832,34 +818,6 @@ struct TransitMapScreen: View {
         }
 
         return viewModel.searchResults.count == 1 ? viewModel.searchResults[0] : nil
-    }
-}
-
-private struct StopDetailFloatingActions: View {
-    let isFavourite: Bool
-    let isRefreshDisabled: Bool
-    let toggleFavourite: () -> Void
-    let refreshDepartures: () -> Void
-
-    var body: some View {
-        HStack {
-            Button(action: toggleFavourite) {
-                Label(
-                    isFavourite ? "Remove favourite" : "Save favourite",
-                    systemImage: isFavourite ? "star.fill" : "star"
-                )
-            }
-            .tint(isFavourite ? .yellow : nil)
-
-            Spacer()
-
-            Button(action: refreshDepartures) {
-                Label("Refresh departures", systemImage: "arrow.clockwise")
-            }
-            .disabled(isRefreshDisabled)
-        }
-        .labelStyle(.iconOnly)
-        .buttonStyle(.glass)
     }
 }
 
@@ -961,7 +919,7 @@ private struct TransitMapView: UIViewRepresentable {
         }
 
         @available(*, unavailable)
-        required init?(coder: NSCoder) {
+        required init?(coder _: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
 
@@ -979,7 +937,8 @@ private struct TransitMapView: UIViewRepresentable {
                 let mapView = MKMapView(frame: bounds)
                 let configuration = MKStandardMapConfiguration(elevationStyle: .flat)
                 configuration.pointOfInterestFilter = MKPointOfInterestFilter(
-                    excluding: [.publicTransport])
+                    excluding: [.publicTransport]
+                )
                 mapView.preferredConfiguration = configuration
                 mapView.delegate = coordinator
                 mapView.showsUserLocation = true
@@ -1101,7 +1060,7 @@ private struct TransitMapView: UIViewRepresentable {
             }
         }
 
-        func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+        func mapView(_ mapView: MKMapView, regionDidChangeAnimated _: Bool) {
             if isApplyingRegion {
                 isApplyingRegion = false
                 return
@@ -1148,7 +1107,7 @@ private struct TransitMapView: UIViewRepresentable {
             return view
         }
 
-        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        func mapView(_: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
             guard let polyline = overlay as? MKPolyline else {
                 return MKOverlayRenderer(overlay: overlay)
             }
@@ -1168,30 +1127,29 @@ private struct TransitMapView: UIViewRepresentable {
 
         private func routeColor(for segment: RouteMapSegment?) -> UIColor {
             guard let segment else { return .systemBlue }
-            let palette: [UIColor]
-            switch segment.mode {
+            let palette: [UIColor] = switch segment.mode {
             case .bus:
-                palette = [.systemBlue, .link, .systemCyan, .systemIndigo]
+                [.systemBlue, .link, .systemCyan, .systemIndigo]
             case .train:
-                palette = [
+                [
                     .systemRed,
                     .red,
                     UIColor(red: 0.72, green: 0.08, blue: 0.12, alpha: 1),
                     UIColor(red: 0.95, green: 0.22, blue: 0.18, alpha: 1)
                 ]
             case .tram:
-                palette = [
+                [
                     .systemOrange,
                     UIColor(red: 0.92, green: 0.42, blue: 0.06, alpha: 1),
                     UIColor(red: 0.78, green: 0.31, blue: 0.02, alpha: 1),
                     UIColor(red: 1.0, green: 0.55, blue: 0.12, alpha: 1)
                 ]
             case .funicular:
-                palette = [.systemTeal]
+                [.systemTeal]
             case .walking:
-                palette = [.secondaryLabel]
+                [.secondaryLabel]
             case .unknown:
-                palette = [.systemBlue]
+                [.systemBlue]
             }
 
             let routeKey = segment.routeId ?? segment.routeName ?? segment.id
@@ -1201,7 +1159,7 @@ private struct TransitMapView: UIViewRepresentable {
 
         private func configureTransfer(
             _ view: MKMarkerAnnotationView,
-            for annotation: RouteTransferAnnotation
+            for _: RouteTransferAnnotation
         ) {
             view.markerTintColor = .systemIndigo
             view.glyphTintColor = .white
@@ -1275,9 +1233,17 @@ private final class StopMapAnnotation: NSObject, MKAnnotation {
     private(set) var stop: Stop
     let layer: Layer
 
-    var key: String { "\(layer)-\(stop.id)" }
-    var coordinate: CLLocationCoordinate2D { stop.location.coordinate }
-    var title: String? { stop.name }
+    var key: String {
+        "\(layer)-\(stop.id)"
+    }
+
+    var coordinate: CLLocationCoordinate2D {
+        stop.location.coordinate
+    }
+
+    var title: String? {
+        stop.name
+    }
 
     init(stop: Stop, layer: Layer) {
         self.stop = stop
@@ -1292,9 +1258,17 @@ private final class StopMapAnnotation: NSObject, MKAnnotation {
 private final class RouteTransferAnnotation: NSObject, MKAnnotation {
     private let marker: RouteTransferMarker
 
-    var key: String { marker.id }
-    var coordinate: CLLocationCoordinate2D { marker.coordinate.coordinate }
-    var title: String? { marker.title }
+    var key: String {
+        marker.id
+    }
+
+    var coordinate: CLLocationCoordinate2D {
+        marker.coordinate.coordinate
+    }
+
+    var title: String? {
+        marker.title
+    }
 
     nonisolated init(marker: RouteTransferMarker) {
         self.marker = marker
@@ -1322,7 +1296,7 @@ private struct StopMapMarker: View {
                     .frame(width: markerSize, height: markerSize)
                     .background(markerColor.gradient, in: Circle())
                     .overlay {
-                        if layer == .gtfs && !isSelected {
+                        if layer == .gtfs, !isSelected {
                             Circle().stroke(.white.opacity(0.85), lineWidth: 2)
                         }
                         if isFavourite {

@@ -1,12 +1,14 @@
 import Foundation
 
 /// How the route planner orders the alternatives it returns.
-nonisolated enum RoutePlannerSortOption: String, Codable, CaseIterable, Identifiable, Sendable {
+nonisolated enum RoutePlannerSortOption: String, Codable, CaseIterable, Identifiable {
     case fastest
     case fewestTransfers
     case leastWalking
 
-    var id: String { rawValue }
+    var id: String {
+        rawValue
+    }
 
     /// Localized title for the picker.
     var title: String {
@@ -19,14 +21,16 @@ nonisolated enum RoutePlannerSortOption: String, Codable, CaseIterable, Identifi
 }
 
 /// A rider's preferred transport mode for route planning.
-nonisolated enum RoutePlannerModePreference: String, Codable, CaseIterable, Identifiable, Sendable {
+nonisolated enum RoutePlannerModePreference: String, Codable, CaseIterable, Identifiable {
     /// No mode preference.
     case any
     case bus
     case tram
     case train
 
-    var id: String { rawValue }
+    var id: String {
+        rawValue
+    }
 
     /// Localized title for the picker.
     var title: String {
@@ -54,7 +58,7 @@ nonisolated enum RoutePlannerModePreference: String, Codable, CaseIterable, Iden
 }
 
 /// The set of user-configurable constraints applied to route planning.
-nonisolated struct RoutePlannerFilters: Codable, Hashable, Sendable {
+nonisolated struct RoutePlannerFilters: Codable, Hashable {
     /// Ordering preference for the returned options.
     var sort: RoutePlannerSortOption = .fastest
     /// Preferred transport mode.
@@ -65,9 +69,30 @@ nonisolated struct RoutePlannerFilters: Codable, Hashable, Sendable {
     var preferAccessible = false
 }
 
+/// When the rider wants to travel: right now, departing at a chosen time, or
+/// arriving by a chosen time. Drives the route search anchor.
+nonisolated enum RoutePlanningTime: Hashable {
+    case leaveNow
+    case departAt(Date)
+    case arriveBy(Date)
+
+    /// The chosen instant, or `nil` for ``leaveNow``.
+    var date: Date? {
+        switch self {
+        case .leaveNow: nil
+        case let .departAt(date), let .arriveBy(date): date
+        }
+    }
+
+    var isNow: Bool {
+        if case .leaveNow = self { return true }
+        return false
+    }
+}
+
 /// Where a ``RoutePlace`` originated, used for grouping and analytics-free
 /// presentation in the planner.
-nonisolated enum RoutePlaceSource: String, Codable, Hashable, Sendable {
+nonisolated enum RoutePlaceSource: String, Codable, Hashable {
     case currentLocation
     case selectedStop
     case favourite
@@ -81,7 +106,7 @@ nonisolated enum RoutePlaceSource: String, Codable, Hashable, Sendable {
 ///
 /// Unlike ``Stop``, a place can also be a free coordinate (e.g. the current
 /// device location), so ``stopId`` is optional.
-nonisolated struct RoutePlace: Codable, Hashable, Identifiable, Sendable {
+nonisolated struct RoutePlace: Codable, Hashable, Identifiable {
     /// Stable identifier; defaults to ``stopId`` then the location id.
     let id: String
     /// Primary label.
@@ -144,7 +169,7 @@ nonisolated struct RoutePlace: Codable, Hashable, Identifiable, Sendable {
 ///
 /// When ``origin`` is `nil` the planner uses the rider's current location as the
 /// starting point.
-nonisolated struct RouteCommutePreset: Codable, Hashable, Identifiable, Sendable {
+nonisolated struct RouteCommutePreset: Codable, Hashable, Identifiable {
     /// Stable identifier; defaults to a fresh UUID.
     let id: String
     /// Rider-facing name, e.g. `"Home → Work"`.

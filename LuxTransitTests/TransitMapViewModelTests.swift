@@ -1,7 +1,6 @@
 import CoreLocation
 import Foundation
 import Testing
-
 @testable import LuxTransit
 
 @MainActor
@@ -283,7 +282,7 @@ struct TransitMapViewModelTests {
         let destination = makeStop(id: "stop-1")
         let viewModel = TransitMapViewModel()
         viewModel.selectStop(destination)
-        viewModel.routeOptions = (0..<8).map { index in
+        viewModel.routeOptions = (0 ..< 8).map { index in
             makeRouteOption(
                 id: "route-\(index)",
                 plan: makeRoutePlan(destination: destination, routeName: "\(index)")
@@ -304,7 +303,7 @@ struct TransitMapViewModelTests {
     }
 
     @Test func missedPreferredRouteFallsBackToNextViableOption() async {
-        let baseNow = Date(timeIntervalSince1970: 10_000)
+        let baseNow = Date(timeIntervalSince1970: 10000)
         let destination = makeStop(id: "stop-1")
         let missedOption = makeTimedRouteOption(
             id: "route-missed",
@@ -317,7 +316,7 @@ struct TransitMapViewModelTests {
             id: "route-next",
             destination: destination,
             departure: baseNow.addingTimeInterval(300),
-            arrival: baseNow.addingTimeInterval(1_200),
+            arrival: baseNow.addingTimeInterval(1200),
             routeName: "16"
         )
         let routeService = MockRouteService(result: .success(RouteCalculation(
@@ -351,8 +350,8 @@ struct TransitMapViewModelTests {
         let busOption = makeTimedRouteOption(
             id: "route-bus",
             destination: destination,
-            departure: Date(timeIntervalSince1970: 1_000),
-            arrival: Date(timeIntervalSince1970: 1_900),
+            departure: Date(timeIntervalSince1970: 1000),
+            arrival: Date(timeIntervalSince1970: 1900),
             routeName: "15",
             mode: .bus,
             transferCount: 1
@@ -360,8 +359,8 @@ struct TransitMapViewModelTests {
         let tramOption = makeTimedRouteOption(
             id: "route-tram",
             destination: destination,
-            departure: Date(timeIntervalSince1970: 1_020),
-            arrival: Date(timeIntervalSince1970: 2_000),
+            departure: Date(timeIntervalSince1970: 1020),
+            arrival: Date(timeIntervalSince1970: 2000),
             routeName: "T1",
             mode: .tram,
             transferCount: 0
@@ -393,12 +392,12 @@ struct TransitMapViewModelTests {
         let busOption = makeTimedRouteOption(
             id: "route-long-walk",
             destination: destination,
-            departure: Date(timeIntervalSince1970: 1_000),
-            arrival: Date(timeIntervalSince1970: 1_900),
+            departure: Date(timeIntervalSince1970: 1000),
+            arrival: Date(timeIntervalSince1970: 1900),
             routeName: "15",
             mode: .bus,
             transferCount: 2,
-            walkingDistance: 1_200
+            walkingDistance: 1200
         )
         let routeService = MockRouteService(result: .success(RouteCalculation(
             options: [busOption],
@@ -537,9 +536,9 @@ struct TransitMapViewModelTests {
                     destinationStopId: destination.id,
                     origin: LocationPoint(name: "Origin Stop", latitude: 49.6105, longitude: 6.1305),
                     destination: destination.location,
-                    departureTime: Date(timeIntervalSince1970: 1_000),
-                    arrivalTime: Date(timeIntervalSince1970: 1_600),
-                    distanceMeters: 2_880
+                    departureTime: Date(timeIntervalSince1970: 1000),
+                    arrivalTime: Date(timeIntervalSince1970: 1600),
+                    distanceMeters: 2880
                 )
             ],
             dataSource: .mock
@@ -594,7 +593,7 @@ struct TransitMapViewModelTests {
             )
         }
 
-        for index in 0...transferCount {
+        for index in 0 ... transferCount {
             let legDeparture = departure.addingTimeInterval(Double(index) * 300)
             let legArrival = index == transferCount ? arrival : legDeparture.addingTimeInterval(240)
             legs.append(
@@ -643,7 +642,7 @@ struct TransitMapViewModelTests {
             routeId: routeId,
             lineName: lineName,
             destination: "Central",
-            scheduledDeparture: Date(timeIntervalSince1970: 1_000),
+            scheduledDeparture: Date(timeIntervalSince1970: 1000),
             platform: platform,
             dataSource: .mock
         )
@@ -662,10 +661,12 @@ private final class MockRouteService: RouteService, @unchecked Sendable {
         self.result = result
     }
 
-    func calculateRoute(from: LocationPoint, to: LocationPoint) async throws -> RouteCalculation {
+    func calculateRoute(
+        from _: LocationPoint, to _: LocationPoint, time _: RoutePlanningTime
+    ) async throws -> RouteCalculation {
         calculateCallCount += 1
         return try result.get()
     }
 
-    func openInAppleMaps(from: LocationPoint, to: LocationPoint) {}
+    func openInAppleMaps(from _: LocationPoint, to _: LocationPoint) {}
 }

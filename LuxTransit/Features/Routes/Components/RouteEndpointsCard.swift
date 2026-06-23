@@ -181,49 +181,50 @@ struct RouteEndpointsCard: View {
 }
 
 #if DEBUG
-#Preview(traits: .sizeThatFitsLayout) {
-    RouteEndpointsCard(
-        viewModel: .previewForCard,
-        selectRouteOrigin: { _ in },
-        selectRouteDestination: { _ in },
-        swapRouteEndpoints: {}
-    )
-    .padding()
-    .background(Color(uiColor: .systemGroupedBackground))
-}
-
-private extension RoutePresentationModel {
-    static var previewForCard: RoutePresentationModel {
-        RoutePresentationModel(
-            selectedStop: Stop(
-                id: "stop-luxexpo",
-                name: "Luxexpo",
-                locality: "Kirchberg",
-                location: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
-                modes: [.tram, .bus],
-                dataSource: .mock
-            ),
-            origin: nil,
-            destination: RoutePlace(
-                title: "Luxexpo",
-                subtitle: "Kirchberg",
-                location: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
-                stopId: "stop-luxexpo",
-                source: .selectedStop
-            ),
-            favouritePlaces: [],
-            nearbyPlaces: [],
-            recentPlaces: [],
-            commutePresets: [],
-            filters: RoutePlannerFilters(),
-            routeOptions: [],
-            alerts: [],
-            selectedRouteOptionID: nil,
-            visibleRouteOptionCount: 0,
-            loadingPhase: .idle,
-            errorMessage: nil,
-            statusMessage: nil
+    #Preview(traits: .sizeThatFitsLayout) {
+        RouteEndpointsCard(
+            viewModel: .previewForCard,
+            selectRouteOrigin: { _ in },
+            selectRouteDestination: { _ in },
+            swapRouteEndpoints: {}
         )
+        .padding()
+        .background(Color(uiColor: .systemGroupedBackground))
     }
-}
+
+    private extension RoutePresentationModel {
+        static var previewForCard: RoutePresentationModel {
+            RoutePresentationModel(
+                selectedStop: Stop(
+                    id: "stop-luxexpo",
+                    name: "Luxexpo",
+                    locality: "Kirchberg",
+                    location: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
+                    modes: [.tram, .bus],
+                    dataSource: .mock
+                ),
+                origin: nil,
+                destination: RoutePlace(
+                    title: "Luxexpo",
+                    subtitle: "Kirchberg",
+                    location: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
+                    stopId: "stop-luxexpo",
+                    source: .selectedStop
+                ),
+                favouritePlaces: [],
+                nearbyPlaces: [],
+                recentPlaces: [],
+                commutePresets: [],
+                filters: RoutePlannerFilters(),
+                planningTime: .leaveNow,
+                routeOptions: [],
+                alerts: [],
+                selectedRouteOptionID: nil,
+                visibleRouteOptionCount: 0,
+                loadingPhase: .idle,
+                errorMessage: nil,
+                statusMessage: nil
+            )
+        }
+    }
 #endif

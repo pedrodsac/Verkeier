@@ -13,26 +13,32 @@ final class TransitMapViewModel {
     var nearbyStops: [Stop] = [] {
         didSet { rebuildGTFSOnlyMapStops() }
     }
+
     var gtfsMapStops: [Stop] = [] {
         didSet { rebuildGTFSOnlyMapStops() }
     }
+
     private(set) var gtfsOnlyMapStops: [Stop] = []
     var selectedStop: Stop?
     var selectedStopRoutes: [TransitRoute] = [] {
         didSet { rebuildDepartureFilters() }
     }
+
     var isLoadingNearbyStops = false
     var nearbyStopsErrorMessage: String?
     var departures: [Departure] = [] {
         didSet { rebuildDepartureFilters() }
     }
+
     var offlineScheduledDepartures: [OfflineScheduleDeparture] = []
     var selectedDepartureLine: String? {
         didSet { rebuildDepartureFilters() }
     }
+
     var selectedDeparturePlatform: String? {
         didSet { rebuildDepartureFilters() }
     }
+
     private(set) var availableDeparturePlatforms: [String] = []
     private(set) var filteredDepartures: [Departure] = []
     var isLoadingDepartures = false
@@ -48,6 +54,7 @@ final class TransitMapViewModel {
     var routeOrigin: RoutePlace?
     var routeDestination: RoutePlace?
     var routeFilters = AppPreferences.shared.defaultRouteFilters
+    var routePlanningTime: RoutePlanningTime = .leaveNow
     var recentRoutePlaces: [RoutePlace] = []
     var commutePresets: [RouteCommutePreset] = []
     var routeOptions: [RouteOption] = []
@@ -242,13 +249,13 @@ final class TransitMapViewModel {
         let longitudeDelta = region.span.longitudeDelta
 
         guard latitude.isFinite,
-            longitude.isFinite,
-            latitudeDelta.isFinite,
-            longitudeDelta.isFinite,
-            (-90...90).contains(latitude),
-            (-180...180).contains(longitude),
-            latitudeDelta > 0,
-            longitudeDelta > 0
+              longitude.isFinite,
+              latitudeDelta.isFinite,
+              longitudeDelta.isFinite,
+              (-90 ... 90).contains(latitude),
+              (-180 ... 180).contains(longitude),
+              latitudeDelta > 0,
+              longitudeDelta > 0
         else {
             return nil
         }
@@ -287,7 +294,7 @@ final class TransitMapViewModel {
         favouriteDeparturesLastUpdated = .now
         favouriteDeparturesErrorMessage =
             failedCount == limitedFavourites.count
-            ? "Favourite departures could not be loaded." : nil
+                ? "Favourite departures could not be loaded." : nil
         isLoadingFavouriteDepartures = false
     }
 
@@ -306,8 +313,8 @@ final class TransitMapViewModel {
         clearRoute()
         sheetContext = .stopDetail
         sheetDetent = .medium
-        moveCamera(to: MKCoordinateRegion(
-            center: stop.location.coordinate,
+        moveCamera(to: anchoredRegion(
+            for: stop.location.coordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.012, longitudeDelta: 0.012)
         ))
     }
@@ -339,11 +346,10 @@ final class TransitMapViewModel {
     func saveCurrentCommutePreset(using store: RoutePlannerStore = .shared) {
         guard let destination = effectiveRouteDestination else { return }
 
-        let title: String
-        if let routeOrigin {
-            title = "\(routeOrigin.title) to \(destination.title)"
+        let title = if let routeOrigin {
+            "\(routeOrigin.title) to \(destination.title)"
         } else {
-            title = "Current Location to \(destination.title)"
+            "Current Location to \(destination.title)"
         }
 
         let preset = RouteCommutePreset(
@@ -406,7 +412,7 @@ final class TransitMapViewModel {
     }
 
     func searchStops(using gtfsService: any GTFSService) async {
-        searchResults = Array(await gtfsService.searchStops(query: searchQuery).prefix(80))
+        searchResults = await Array(gtfsService.searchStops(query: searchQuery).prefix(80))
     }
 
     func updateSelectedStopRoutes(using gtfsService: any GTFSService) async {
@@ -497,7 +503,8 @@ final class TransitMapViewModel {
 
         do {
             let calculation = try await routeService.calculateRoute(
-                from: origin, to: destination.location)
+                from: origin, to: destination.location, time: routePlanningTime
+            )
             guard requestGeneration == routeCalculationGeneration else { return }
             unfilteredRouteOptions = calculation.options
             applyRouteOptions(preferredID: calculation.selectedOptionID, announceFallback: false)
@@ -584,8 +591,8 @@ final class TransitMapViewModel {
             for: route,
             selectedStopId: selectedStop?.id,
             timetable: timetable,
-            now: now
-            ,
+            now: now,
+
             selectedDirectionID: selectedLineDetailDirectionID
         )
         selectedLineDetailErrorMessage =
@@ -624,7 +631,7 @@ final class TransitMapViewModel {
         guard let selectedRouteOption else { return [] }
         let routeIDs = Set(selectedRouteOption.plan.legs.compactMap(\.routeId))
         let stopIDs = Set(selectedRouteOption.plan.legs.flatMap { leg in
-            [leg.originStopId, leg.destinationStopId].compactMap { $0 }
+            [leg.originStopId, leg.destinationStopId].compactMap(\.self)
         })
         return alerts.filter { alert in
             !routeIDs.isDisjoint(with: alert.affectedRouteIds)
@@ -643,8 +650,8 @@ final class TransitMapViewModel {
 
     func centerOnUserLocation(_ location: CLLocation?) {
         guard let coordinate = location?.coordinate else { return }
-        moveCamera(to: MKCoordinateRegion(
-            center: coordinate,
+        moveCamera(to: anchoredRegion(
+            for: coordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.018, longitudeDelta: 0.018)
         ))
     }
@@ -699,7 +706,7 @@ final class TransitMapViewModel {
         if let replacement = routeOptions.first(where: { viableStatuses.contains($0.status(at: now())) }) {
             let changed = replacement.id != preferredID
             selectedRouteOptionID = replacement.id
-            if announceFallback && changed && preferredID != nil {
+            if announceFallback, changed, preferredID != nil {
                 routeStatusMessage = "Showing the next available route."
             }
             return
@@ -799,7 +806,7 @@ final class TransitMapViewModel {
             results.reserveCapacity(favourites.count)
 
             var iterator = favourites.enumerated().makeIterator()
-            for _ in 0..<min(favouriteDepartureConcurrencyLimit, favourites.count) {
+            for _ in 0 ..< min(favouriteDepartureConcurrencyLimit, favourites.count) {
                 guard let next = iterator.next() else { break }
                 group.addTask {
                     await Self.loadFavouriteDepartureBoard(
@@ -833,9 +840,9 @@ final class TransitMapViewModel {
         index: Int
     ) async -> FavouriteDepartureBoardResult {
         do {
-            return FavouriteDepartureBoardResult(
+            return try await FavouriteDepartureBoardResult(
                 stopId: stop.id,
-                departures: try await atpClient.departureBoards(stopIds: stop.platformIds),
+                departures: atpClient.departureBoards(stopIds: stop.platformIds),
                 didFail: false,
                 index: index
             )
@@ -853,6 +860,22 @@ final class TransitMapViewModel {
         let latitude = lhs.latitude - rhs.latitude
         let longitude = lhs.longitude - rhs.longitude
         return latitude * latitude + longitude * longitude
+    }
+
+    /// Builds a region that places `coordinate` roughly 25% from the top of the
+    /// screen rather than dead center, so the pin sits in the visible area above
+    /// the bottom sheet instead of behind it.
+    private func anchoredRegion(
+        for coordinate: CLLocationCoordinate2D,
+        span: MKCoordinateSpan
+    ) -> MKCoordinateRegion {
+        // Map center is at 50% of the height; shifting it south by 25% of the
+        // latitude span moves the target coordinate up to ~25% from the top.
+        let center = CLLocationCoordinate2D(
+            latitude: coordinate.latitude - span.latitudeDelta * 0.25,
+            longitude: coordinate.longitude
+        )
+        return MKCoordinateRegion(center: center, span: span)
     }
 
     private func moveCamera(to region: MKCoordinateRegion) {
@@ -917,7 +940,7 @@ final class TransitMapViewModel {
         }
     }
 
-    private struct FavouriteDepartureBoardResult: Sendable {
+    private struct FavouriteDepartureBoardResult {
         let stopId: String
         let departures: [Departure]
         let didFail: Bool
@@ -939,7 +962,7 @@ private extension Departure {
     }
 }
 
-private extension Array where Element == String {
+private extension [String] {
     init(dictOrderedSet values: [String]) {
         var seen: Set<String> = []
         self = values.filter { seen.insert($0).inserted }

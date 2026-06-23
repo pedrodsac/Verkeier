@@ -82,7 +82,7 @@ struct RouteView: View {
                     .tint(.blue)
                 }
             }
-            .padding(.horizontal, 1)   // avoid clipping focus rings
+            .padding(.horizontal, 1) // avoid clipping focus rings
         }
     }
 
@@ -125,7 +125,7 @@ struct RouteView: View {
         }
 
         // Initial load: show skeleton cards instead of a lone spinner
-        if viewModel.isCalculating && viewModel.routeOptions.isEmpty {
+        if viewModel.isCalculating, viewModel.routeOptions.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
                 Text("Route options")
                     .font(.headline.weight(.semibold))
@@ -136,7 +136,7 @@ struct RouteView: View {
         }
 
         // Inline refresh banner when results are already visible
-        if viewModel.isCalculating && !viewModel.routeOptions.isEmpty {
+        if viewModel.isCalculating, !viewModel.routeOptions.isEmpty {
             RouteInfoBanner(
                 title: "Refreshing routes",
                 systemImage: "arrow.trianglehead.clockwise"
@@ -153,11 +153,10 @@ struct RouteView: View {
         }
 
         // Empty — no route selected yet; offer quick destination picks
-        if !viewModel.isCalculating
-            && !viewModel.isWaitingForLocation
-            && viewModel.routeOptions.isEmpty
-            && viewModel.errorMessage == nil
-        {
+        if !viewModel.isCalculating,
+           !viewModel.isWaitingForLocation,
+           viewModel.routeOptions.isEmpty,
+           viewModel.errorMessage == nil {
             emptyState
         }
 
@@ -200,7 +199,10 @@ struct RouteView: View {
                             Button {
                                 selectRouteDestination(place)
                             } label: {
-                                Label(place.title, systemImage: place.source == .favourite ? "bookmark.fill" : "location.fill")
+                                Label(
+                                    place.title,
+                                    systemImage: place.source == .favourite ? "bookmark.fill" : "location.fill"
+                                )
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
@@ -293,7 +295,7 @@ struct RouteTimelineView: View {
 private struct FlexibleWrappingRow: Layout {
     var spacing: CGFloat = 8
 
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache _: inout ()) -> CGSize {
         let containerWidth = proposal.width ?? 0
         var currentX: CGFloat = 0
         var currentY: CGFloat = 0
@@ -302,7 +304,7 @@ private struct FlexibleWrappingRow: Layout {
 
         for subview in subviews {
             let size = subview.sizeThatFits(.unspecified)
-            if currentX + size.width > containerWidth && currentX > 0 {
+            if currentX + size.width > containerWidth, currentX > 0 {
                 currentX = 0
                 currentY += lineHeight + spacing
                 totalHeight = currentY
@@ -315,14 +317,14 @@ private struct FlexibleWrappingRow: Layout {
         return CGSize(width: containerWidth, height: totalHeight)
     }
 
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+    func placeSubviews(in bounds: CGRect, proposal _: ProposedViewSize, subviews: Subviews, cache _: inout ()) {
         var currentX = bounds.minX
         var currentY = bounds.minY
         var lineHeight: CGFloat = 0
 
         for subview in subviews {
             let size = subview.sizeThatFits(.unspecified)
-            if currentX + size.width > bounds.maxX && currentX > bounds.minX {
+            if currentX + size.width > bounds.maxX, currentX > bounds.minX {
                 currentX = bounds.minX
                 currentY += lineHeight + spacing
                 lineHeight = 0
@@ -340,333 +342,368 @@ private struct FlexibleWrappingRow: Layout {
 // MARK: - Previews
 
 #if DEBUG
-#Preview("Route Options") {
-    ScrollView {
-        RouteView(
-            viewModel: .previewWithRoutes,
-            calculateRoute: {},
-            selectRouteOption: { _ in },
-            showMoreRouteOptions: {},
-            openInAppleMaps: {},
-            selectRouteOrigin: { _ in },
-            selectRouteDestination: { _ in },
-            applyCommutePreset: { _ in },
-            saveCurrentCommutePreset: {},
-            swapRouteEndpoints: {},
-            updateRouteFilters: { _ in }
-        )
-        .padding()
+    #Preview("Route Options") {
+        ScrollView {
+            RouteView(
+                viewModel: .previewWithRoutes,
+                calculateRoute: {},
+                selectRouteOption: { _ in },
+                showMoreRouteOptions: {},
+                openInAppleMaps: {},
+                selectRouteOrigin: { _ in },
+                selectRouteDestination: { _ in },
+                applyCommutePreset: { _ in },
+                saveCurrentCommutePreset: {},
+                swapRouteEndpoints: {},
+                updateRouteFilters: { _ in }
+            )
+            .padding()
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
     }
-    .background(Color(uiColor: .systemGroupedBackground))
-}
 
-#Preview("Calculating (skeleton)") {
-    ScrollView {
-        RouteView(
-            viewModel: .previewCalculating,
-            calculateRoute: {},
-            selectRouteOption: { _ in },
-            showMoreRouteOptions: {},
-            openInAppleMaps: {},
-            selectRouteOrigin: { _ in },
-            selectRouteDestination: { _ in },
-            applyCommutePreset: { _ in },
-            saveCurrentCommutePreset: {},
-            swapRouteEndpoints: {},
-            updateRouteFilters: { _ in }
-        )
-        .padding()
+    #Preview("Calculating (skeleton)") {
+        ScrollView {
+            RouteView(
+                viewModel: .previewCalculating,
+                calculateRoute: {},
+                selectRouteOption: { _ in },
+                showMoreRouteOptions: {},
+                openInAppleMaps: {},
+                selectRouteOrigin: { _ in },
+                selectRouteDestination: { _ in },
+                applyCommutePreset: { _ in },
+                saveCurrentCommutePreset: {},
+                swapRouteEndpoints: {},
+                updateRouteFilters: { _ in }
+            )
+            .padding()
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
     }
-    .background(Color(uiColor: .systemGroupedBackground))
-}
 
-#Preview("Waiting For Location") {
-    ScrollView {
-        RouteView(
-            viewModel: .previewWaitingForLocation,
-            calculateRoute: {},
-            selectRouteOption: { _ in },
-            showMoreRouteOptions: {},
-            openInAppleMaps: {},
-            selectRouteOrigin: { _ in },
-            selectRouteDestination: { _ in },
-            applyCommutePreset: { _ in },
-            saveCurrentCommutePreset: {},
-            swapRouteEndpoints: {},
-            updateRouteFilters: { _ in }
-        )
-        .padding()
+    #Preview("Waiting For Location") {
+        ScrollView {
+            RouteView(
+                viewModel: .previewWaitingForLocation,
+                calculateRoute: {},
+                selectRouteOption: { _ in },
+                showMoreRouteOptions: {},
+                openInAppleMaps: {},
+                selectRouteOrigin: { _ in },
+                selectRouteDestination: { _ in },
+                applyCommutePreset: { _ in },
+                saveCurrentCommutePreset: {},
+                swapRouteEndpoints: {},
+                updateRouteFilters: { _ in }
+            )
+            .padding()
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
     }
-    .background(Color(uiColor: .systemGroupedBackground))
-}
 
-#Preview("Empty state") {
-    ScrollView {
-        RouteView(
-            viewModel: .previewEmpty,
-            calculateRoute: {},
-            selectRouteOption: { _ in },
-            showMoreRouteOptions: {},
-            openInAppleMaps: {},
-            selectRouteOrigin: { _ in },
-            selectRouteDestination: { _ in },
-            applyCommutePreset: { _ in },
-            saveCurrentCommutePreset: {},
-            swapRouteEndpoints: {},
-            updateRouteFilters: { _ in }
-        )
-        .padding()
+    #Preview("Empty state") {
+        ScrollView {
+            RouteView(
+                viewModel: .previewEmpty,
+                calculateRoute: {},
+                selectRouteOption: { _ in },
+                showMoreRouteOptions: {},
+                openInAppleMaps: {},
+                selectRouteOrigin: { _ in },
+                selectRouteDestination: { _ in },
+                applyCommutePreset: { _ in },
+                saveCurrentCommutePreset: {},
+                swapRouteEndpoints: {},
+                updateRouteFilters: { _ in }
+            )
+            .padding()
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
     }
-    .background(Color(uiColor: .systemGroupedBackground))
-}
 
-#Preview("Error state") {
-    ScrollView {
-        RouteView(
-            viewModel: .previewError,
-            calculateRoute: {},
-            selectRouteOption: { _ in },
-            showMoreRouteOptions: {},
-            openInAppleMaps: {},
-            selectRouteOrigin: { _ in },
-            selectRouteDestination: { _ in },
-            applyCommutePreset: { _ in },
-            saveCurrentCommutePreset: {},
-            swapRouteEndpoints: {},
-            updateRouteFilters: { _ in }
-        )
-        .padding()
+    #Preview("Error state") {
+        ScrollView {
+            RouteView(
+                viewModel: .previewError,
+                calculateRoute: {},
+                selectRouteOption: { _ in },
+                showMoreRouteOptions: {},
+                openInAppleMaps: {},
+                selectRouteOrigin: { _ in },
+                selectRouteDestination: { _ in },
+                applyCommutePreset: { _ in },
+                saveCurrentCommutePreset: {},
+                swapRouteEndpoints: {},
+                updateRouteFilters: { _ in }
+            )
+            .padding()
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
     }
-    .background(Color(uiColor: .systemGroupedBackground))
-}
 
-#Preview("Route Timeline") {
-    ScrollView {
-        RouteTimelineView(
-            viewModel: .previewWithRoutes,
-            openInAppleMaps: {}
-        )
-        .padding()
+    #Preview("Route Timeline") {
+        ScrollView {
+            RouteTimelineView(
+                viewModel: .previewWithRoutes,
+                openInAppleMaps: {}
+            )
+            .padding()
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
     }
-    .background(Color(uiColor: .systemGroupedBackground))
-}
 
-// MARK: Preview data
+    // MARK: Preview data
 
-private extension RoutePresentationModel {
-    static var previewWithRoutes: RoutePresentationModel {
-        RoutePresentationModel(
-            selectedStop: .previewDestinationStop,
-            origin: nil,
-            destination: RoutePlace(stop: .previewDestinationStop, source: .selectedStop),
-            favouritePlaces: [RoutePlace(stop: .previewDestinationStop, source: .favourite)],
-            nearbyPlaces: [RoutePlace(stop: .previewDestinationStop, source: .nearby)],
-            recentPlaces: [],
-            commutePresets: [
-                RouteCommutePreset(
-                    title: "Kirchberg",
-                    origin: nil,
-                    destination: RoutePlace(stop: .previewDestinationStop, source: .preset)
-                )
-            ],
-            filters: RoutePlannerFilters(),
-            routeOptions: [.previewTramRoute, .previewBusRoute],
-            alerts: [
-                AlertMessage(
-                    id: "alert-1",
-                    title: "T1 line disruption",
-                    body: "Expect longer boarding times between Hamilius and Philharmonie.",
-                    severity: .warning,
-                    affectedStopIds: [],
-                    affectedRouteIds: ["T1"],
-                    startsAt: .now,
-                    endsAt: nil,
+    private extension RoutePresentationModel {
+        static var previewWithRoutes: RoutePresentationModel {
+            RoutePresentationModel(
+                selectedStop: .previewDestinationStop,
+                origin: nil,
+                destination: RoutePlace(stop: .previewDestinationStop, source: .selectedStop),
+                favouritePlaces: [RoutePlace(stop: .previewDestinationStop, source: .favourite)],
+                nearbyPlaces: [RoutePlace(stop: .previewDestinationStop, source: .nearby)],
+                recentPlaces: [],
+                commutePresets: [
+                    RouteCommutePreset(
+                        title: "Kirchberg",
+                        origin: nil,
+                        destination: RoutePlace(stop: .previewDestinationStop, source: .preset)
+                    )
+                ],
+                filters: RoutePlannerFilters(),
+                planningTime: .leaveNow,
+                routeOptions: [.previewTramRoute, .previewBusRoute],
+                alerts: [
+                    AlertMessage(
+                        id: "alert-1",
+                        title: "T1 line disruption",
+                        body: "Expect longer boarding times between Hamilius and Philharmonie.",
+                        severity: .warning,
+                        affectedStopIds: [],
+                        affectedRouteIds: ["T1"],
+                        startsAt: .now,
+                        endsAt: nil,
+                        dataSource: .mock
+                    )
+                ],
+                selectedRouteOptionID: "tram-route",
+                visibleRouteOptionCount: 2,
+                loadingPhase: .idle,
+                errorMessage: nil,
+                statusMessage: "Fastest option from your current location."
+            )
+        }
+
+        static var previewCalculating: RoutePresentationModel {
+            RoutePresentationModel(
+                selectedStop: .previewDestinationStop,
+                origin: nil,
+                destination: RoutePlace(stop: .previewDestinationStop, source: .selectedStop),
+                favouritePlaces: [],
+                nearbyPlaces: [],
+                recentPlaces: [],
+                commutePresets: [],
+                filters: RoutePlannerFilters(),
+                planningTime: .leaveNow,
+                routeOptions: [],
+                alerts: [],
+                selectedRouteOptionID: nil,
+                visibleRouteOptionCount: 0,
+                loadingPhase: .calculating,
+                errorMessage: nil,
+                statusMessage: nil
+            )
+        }
+
+        static var previewWaitingForLocation: RoutePresentationModel {
+            RoutePresentationModel(
+                selectedStop: .previewDestinationStop,
+                origin: nil,
+                destination: RoutePlace(stop: .previewDestinationStop, source: .selectedStop),
+                favouritePlaces: [],
+                nearbyPlaces: [],
+                recentPlaces: [],
+                commutePresets: [],
+                filters: RoutePlannerFilters(),
+                planningTime: .leaveNow,
+                routeOptions: [],
+                alerts: [],
+                selectedRouteOptionID: nil,
+                visibleRouteOptionCount: 0,
+                loadingPhase: .waitingForLocation,
+                errorMessage: nil,
+                statusMessage: nil
+            )
+        }
+
+        static var previewEmpty: RoutePresentationModel {
+            RoutePresentationModel(
+                selectedStop: nil,
+                origin: nil,
+                destination: nil,
+                favouritePlaces: [RoutePlace(stop: .previewDestinationStop, source: .favourite)],
+                nearbyPlaces: [
+                    RoutePlace(stop: .previewDestinationStop, source: .nearby),
+                    RoutePlace(
+                        title: "Clausen",
+                        subtitle: "Clausen",
+                        location: LocationPoint(id: "clausen", name: "Clausen", latitude: 49.6116, longitude: 6.132),
+                        source: .nearby
+                    )
+                ],
+                recentPlaces: [],
+                commutePresets: [],
+                filters: RoutePlannerFilters(),
+                planningTime: .leaveNow,
+                routeOptions: [],
+                alerts: [],
+                selectedRouteOptionID: nil,
+                visibleRouteOptionCount: 0,
+                loadingPhase: .idle,
+                errorMessage: nil,
+                statusMessage: nil
+            )
+        }
+
+        static var previewError: RoutePresentationModel {
+            RoutePresentationModel(
+                selectedStop: .previewDestinationStop,
+                origin: nil,
+                destination: RoutePlace(stop: .previewDestinationStop, source: .selectedStop),
+                favouritePlaces: [],
+                nearbyPlaces: [],
+                recentPlaces: [],
+                commutePresets: [],
+                filters: RoutePlannerFilters(),
+                planningTime: .leaveNow,
+                routeOptions: [],
+                alerts: [],
+                selectedRouteOptionID: nil,
+                visibleRouteOptionCount: 0,
+                loadingPhase: .idle,
+                errorMessage: "No public transport routes found between these locations. Try adjusting your destination.",
+                statusMessage: nil
+            )
+        }
+    }
+
+    private extension Stop {
+        static var previewDestinationStop: Stop {
+            Stop(
+                id: "stop-luxexpo",
+                name: "Luxexpo",
+                locality: "Kirchberg",
+                location: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
+                modes: [.tram, .bus],
+                dataSource: .mock
+            )
+        }
+    }
+
+    private extension RouteOption {
+        static var previewTramRoute: RouteOption {
+            RouteOption(
+                id: "tram-route",
+                plan: RoutePlan(
+                    id: "tram-plan",
+                    origin: LocationPoint(id: "origin", name: "Current Location", latitude: 49.6116, longitude: 6.1319),
+                    destination: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
+                    expectedTravelTime: 18 * 60,
+                    distanceMeters: 4300,
+                    legs: [
+                        RoutePlan.Leg(
+                            id: "walk-to-tram",
+                            mode: .walking,
+                            instruction: "Walk to Hamilius",
+                            transportKind: .walking,
+                            origin: LocationPoint(
+                                id: "origin",
+                                name: "Current Location",
+                                latitude: 49.6116,
+                                longitude: 6.1319
+                            ),
+                            destination: LocationPoint(
+                                id: "hamilius",
+                                name: "Hamilius",
+                                latitude: 49.6111,
+                                longitude: 6.1275
+                            ),
+                            departureTime: Date(),
+                            arrivalTime: Date().addingTimeInterval(4 * 60),
+                            distanceMeters: 350
+                        ),
+                        RoutePlan.Leg(
+                            id: "tram-leg",
+                            mode: .tram,
+                            instruction: "Take tram T1 toward Luxexpo",
+                            transportKind: .transit,
+                            routeName: "T1",
+                            origin: LocationPoint(
+                                id: "hamilius",
+                                name: "Hamilius",
+                                latitude: 49.6111,
+                                longitude: 6.1275
+                            ),
+                            destination: LocationPoint(
+                                id: "luxexpo",
+                                name: "Luxexpo",
+                                latitude: 49.6329,
+                                longitude: 6.1746
+                            ),
+                            departureTime: Date().addingTimeInterval(6 * 60),
+                            arrivalTime: Date().addingTimeInterval(18 * 60),
+                            realtimeDepartureTime: Date().addingTimeInterval(7 * 60),
+                            realtimeArrivalTime: Date().addingTimeInterval(19 * 60),
+                            distanceMeters: 3950,
+                            platform: "2",
+                            delayMinutes: 1,
+                            liveStatus: .live
+                        )
+                    ],
                     dataSource: .mock
-                )
-            ],
-            selectedRouteOptionID: "tram-route",
-            visibleRouteOptionCount: 2,
-            loadingPhase: .idle,
-            errorMessage: nil,
-            statusMessage: "Fastest option from your current location."
-        )
-    }
+                ),
+                mapOverlay: nil
+            )
+        }
 
-    static var previewCalculating: RoutePresentationModel {
-        RoutePresentationModel(
-            selectedStop: .previewDestinationStop,
-            origin: nil,
-            destination: RoutePlace(stop: .previewDestinationStop, source: .selectedStop),
-            favouritePlaces: [],
-            nearbyPlaces: [],
-            recentPlaces: [],
-            commutePresets: [],
-            filters: RoutePlannerFilters(),
-            routeOptions: [],
-            alerts: [],
-            selectedRouteOptionID: nil,
-            visibleRouteOptionCount: 0,
-            loadingPhase: .calculating,
-            errorMessage: nil,
-            statusMessage: nil
-        )
+        static var previewBusRoute: RouteOption {
+            RouteOption(
+                id: "bus-route",
+                plan: RoutePlan(
+                    id: "bus-plan",
+                    origin: LocationPoint(id: "origin", name: "Current Location", latitude: 49.6116, longitude: 6.1319),
+                    destination: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
+                    expectedTravelTime: 24 * 60,
+                    distanceMeters: 4800,
+                    legs: [
+                        RoutePlan.Leg(
+                            id: "bus-leg",
+                            mode: .bus,
+                            instruction: "Take bus 16 toward Kirchberg",
+                            transportKind: .transit,
+                            routeName: "16",
+                            origin: LocationPoint(
+                                id: "origin",
+                                name: "Current Location",
+                                latitude: 49.6116,
+                                longitude: 6.1319
+                            ),
+                            destination: LocationPoint(
+                                id: "luxexpo",
+                                name: "Luxexpo",
+                                latitude: 49.6329,
+                                longitude: 6.1746
+                            ),
+                            departureTime: Date().addingTimeInterval(9 * 60),
+                            arrivalTime: Date().addingTimeInterval(24 * 60),
+                            distanceMeters: 4800
+                        )
+                    ],
+                    dataSource: .mock
+                ),
+                mapOverlay: nil
+            )
+        }
     }
-
-    static var previewWaitingForLocation: RoutePresentationModel {
-        RoutePresentationModel(
-            selectedStop: .previewDestinationStop,
-            origin: nil,
-            destination: RoutePlace(stop: .previewDestinationStop, source: .selectedStop),
-            favouritePlaces: [],
-            nearbyPlaces: [],
-            recentPlaces: [],
-            commutePresets: [],
-            filters: RoutePlannerFilters(),
-            routeOptions: [],
-            alerts: [],
-            selectedRouteOptionID: nil,
-            visibleRouteOptionCount: 0,
-            loadingPhase: .waitingForLocation,
-            errorMessage: nil,
-            statusMessage: nil
-        )
-    }
-
-    static var previewEmpty: RoutePresentationModel {
-        RoutePresentationModel(
-            selectedStop: nil,
-            origin: nil,
-            destination: nil,
-            favouritePlaces: [RoutePlace(stop: .previewDestinationStop, source: .favourite)],
-            nearbyPlaces: [
-                RoutePlace(stop: .previewDestinationStop, source: .nearby),
-                RoutePlace(
-                    title: "Clausen",
-                    subtitle: "Clausen",
-                    location: LocationPoint(id: "clausen", name: "Clausen", latitude: 49.6116, longitude: 6.132),
-                    source: .nearby
-                )
-            ],
-            recentPlaces: [],
-            commutePresets: [],
-            filters: RoutePlannerFilters(),
-            routeOptions: [],
-            alerts: [],
-            selectedRouteOptionID: nil,
-            visibleRouteOptionCount: 0,
-            loadingPhase: .idle,
-            errorMessage: nil,
-            statusMessage: nil
-        )
-    }
-
-    static var previewError: RoutePresentationModel {
-        RoutePresentationModel(
-            selectedStop: .previewDestinationStop,
-            origin: nil,
-            destination: RoutePlace(stop: .previewDestinationStop, source: .selectedStop),
-            favouritePlaces: [],
-            nearbyPlaces: [],
-            recentPlaces: [],
-            commutePresets: [],
-            filters: RoutePlannerFilters(),
-            routeOptions: [],
-            alerts: [],
-            selectedRouteOptionID: nil,
-            visibleRouteOptionCount: 0,
-            loadingPhase: .idle,
-            errorMessage: "No public transport routes found between these locations. Try adjusting your destination.",
-            statusMessage: nil
-        )
-    }
-}
-
-private extension Stop {
-    static var previewDestinationStop: Stop {
-        Stop(
-            id: "stop-luxexpo",
-            name: "Luxexpo",
-            locality: "Kirchberg",
-            location: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
-            modes: [.tram, .bus],
-            dataSource: .mock
-        )
-    }
-}
-
-private extension RouteOption {
-    static var previewTramRoute: RouteOption {
-        RouteOption(
-            id: "tram-route",
-            plan: RoutePlan(
-                id: "tram-plan",
-                origin: LocationPoint(id: "origin", name: "Current Location", latitude: 49.6116, longitude: 6.1319),
-                destination: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
-                expectedTravelTime: 18 * 60,
-                distanceMeters: 4300,
-                legs: [
-                    RoutePlan.Leg(
-                        id: "walk-to-tram",
-                        mode: .walking,
-                        instruction: "Walk to Hamilius",
-                        transportKind: .walking,
-                        origin: LocationPoint(id: "origin", name: "Current Location", latitude: 49.6116, longitude: 6.1319),
-                        destination: LocationPoint(id: "hamilius", name: "Hamilius", latitude: 49.6111, longitude: 6.1275),
-                        departureTime: Date(),
-                        arrivalTime: Date().addingTimeInterval(4 * 60),
-                        distanceMeters: 350
-                    ),
-                    RoutePlan.Leg(
-                        id: "tram-leg",
-                        mode: .tram,
-                        instruction: "Take tram T1 toward Luxexpo",
-                        transportKind: .transit,
-                        routeName: "T1",
-                        origin: LocationPoint(id: "hamilius", name: "Hamilius", latitude: 49.6111, longitude: 6.1275),
-                        destination: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
-                        departureTime: Date().addingTimeInterval(6 * 60),
-                        arrivalTime: Date().addingTimeInterval(18 * 60),
-                        realtimeDepartureTime: Date().addingTimeInterval(7 * 60),
-                        realtimeArrivalTime: Date().addingTimeInterval(19 * 60),
-                        distanceMeters: 3950,
-                        platform: "2",
-                        delayMinutes: 1,
-                        liveStatus: .live
-                    )
-                ],
-                dataSource: .mock
-            ),
-            mapOverlay: nil
-        )
-    }
-
-    static var previewBusRoute: RouteOption {
-        RouteOption(
-            id: "bus-route",
-            plan: RoutePlan(
-                id: "bus-plan",
-                origin: LocationPoint(id: "origin", name: "Current Location", latitude: 49.6116, longitude: 6.1319),
-                destination: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
-                expectedTravelTime: 24 * 60,
-                distanceMeters: 4800,
-                legs: [
-                    RoutePlan.Leg(
-                        id: "bus-leg",
-                        mode: .bus,
-                        instruction: "Take bus 16 toward Kirchberg",
-                        transportKind: .transit,
-                        routeName: "16",
-                        origin: LocationPoint(id: "origin", name: "Current Location", latitude: 49.6116, longitude: 6.1319),
-                        destination: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
-                        departureTime: Date().addingTimeInterval(9 * 60),
-                        arrivalTime: Date().addingTimeInterval(24 * 60),
-                        distanceMeters: 4800
-                    )
-                ],
-                dataSource: .mock
-            ),
-            mapOverlay: nil
-        )
-    }
-}
 #endif

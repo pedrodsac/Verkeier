@@ -26,8 +26,10 @@ struct PublicTransportRouteService: RouteService {
         )
     }
 
-    nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint) async throws -> RouteCalculation {
-        try await engine.calculateRoute(from: from, to: to)
+    nonisolated func calculateRoute(
+        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime
+    ) async throws -> RouteCalculation {
+        try await engine.calculateRoute(from: from, to: to, time: time)
     }
 
     @MainActor func openInAppleMaps(from: LocationPoint, to: LocationPoint) {
@@ -50,7 +52,6 @@ struct PublicTransportRouteService: RouteService {
         item.name = point.name
         return item
     }
-
 }
 
 protocol RoadRouteProviding: Sendable {
@@ -61,7 +62,7 @@ protocol RoadRouteProviding: Sendable {
     ) async -> [RouteMapCoordinate]?
 }
 
-enum RoadRouteTransport: String, Sendable {
+enum RoadRouteTransport: String {
     case automobile
     case walking
 }
@@ -138,6 +139,9 @@ private actor PublicTransportRoutingEngine {
     private let destinationRadiusMeters = 900.0
     private let transferBufferSeconds = 120
     private let searchHorizonSeconds = 4 * 60 * 60
+    // ponytail: arrive-by reuses the forward search from this far before the target
+    // and filters to journeys arriving in time; widen if long journeys get dropped.
+    private let arriveByLookbackSeconds: TimeInterval = 3 * 60 * 60
     private let maximumTransitLegs = 3
     private let walkingSpeedMetersPerSecond = 1.33
     private let evaluatedCandidateLimit = 18
@@ -162,19 +166,40 @@ private actor PublicTransportRoutingEngine {
         self.calendar = calendar
     }
 
-    func calculateRoute(from: LocationPoint, to: LocationPoint) async throws -> RouteCalculation {
+    func calculateRoute(
+        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime = .leaveNow
+    ) async throws -> RouteCalculation {
         guard let timetable = await gtfsService.timetableIndex(), !timetable.trips.isEmpty else {
             throw RoutingError.timetableUnavailable
         }
 
-        let requestNow = now()
+        // The forward search is anchored at `requestNow`. "Leave at" anchors there
+        // directly; "arrive by" anchors a few hours earlier and filters results to
+        // those reaching the destination in time.
+        let requestNow: Date
+        let arriveByLimit: Date?
+        switch time {
+        case .leaveNow:
+            requestNow = now()
+            arriveByLimit = nil
+        case let .departAt(date):
+            requestNow = date
+            arriveByLimit = nil
+        case let .arriveBy(date):
+            requestNow = date.addingTimeInterval(-arriveByLookbackSeconds)
+            arriveByLimit = date
+        }
+
         let staticContext = cachedStaticContext(for: timetable, now: requestNow)
         let context = RouteSearchContext(staticContext: staticContext, now: requestNow)
         guard !context.activeTrips.isEmpty else {
             throw RoutingError.noPublicTransportRoute
         }
 
-        let scheduledCandidates = scheduledJourneys(from: from, to: to, context: context)
+        var scheduledCandidates = scheduledJourneys(from: from, to: to, context: context)
+        if let arriveByLimit {
+            scheduledCandidates = scheduledCandidates.filter { $0.arrivalTime <= arriveByLimit }
+        }
         guard !scheduledCandidates.isEmpty else {
             throw RoutingError.noPublicTransportRoute
         }
@@ -289,7 +314,7 @@ private actor PublicTransportRoutingEngine {
         var bestArrivalByStopAndLegCount: [String: Int] = [:]
         var expansionCount = 0
 
-        while let state = queue.popMin(), expansionCount < 5_000 {
+        while let state = queue.popMin(), expansionCount < 5000 {
             if Task.isCancelled { return [] }
             expansionCount += 1
 
@@ -430,7 +455,7 @@ private actor PublicTransportRoutingEngine {
 
     private func enrich(
         _ candidates: [ScheduledJourney],
-        context: RouteSearchContext
+        context _: RouteSearchContext
     ) async -> [RouteCandidate] {
         let stopIds = Set(candidates.flatMap { journey in
             journey.legs.compactMap { leg in
@@ -478,7 +503,7 @@ private actor PublicTransportRoutingEngine {
             for stopId in stopIds {
                 group.addTask {
                     let platformIds = await self.gtfsService.stop(id: stopId)?.platformIds ?? [stopId]
-                    let departures = (try? await self.atpClient.departureBoards(stopIds: platformIds)) ?? []
+                    let departures = await (try? self.atpClient.departureBoards(stopIds: platformIds)) ?? []
                     return (stopId, departures)
                 }
             }
@@ -567,7 +592,7 @@ private actor PublicTransportRoutingEngine {
                 to: pair.1,
                 transport: transport
             ),
-                  segmentCoordinates.count >= 2 else {
+                segmentCoordinates.count >= 2 else {
                 return nil
             }
 
@@ -736,15 +761,14 @@ private actor PublicTransportRoutingEngine {
         let realtimeArrival = delay.map { minutes in
             (leg.scheduledArrivalTime ?? leg.arrivalTime)?.addingTimeInterval(Double(minutes * 60))
         } ?? nil
-        let liveStatus: RouteLegLiveStatus
-        if departure.isCancelled {
-            liveStatus = .cancelled
+        let liveStatus: RouteLegLiveStatus = if departure.isCancelled {
+            .cancelled
         } else if let delay, delay > 0 {
-            liveStatus = .delayed
+            .delayed
         } else if realtimeDeparture != nil {
-            liveStatus = .live
+            .live
         } else {
-            liveStatus = .unknown
+            .unknown
         }
 
         return copy(
@@ -791,7 +815,7 @@ private actor PublicTransportRoutingEngine {
                   arrival.addingTimeInterval(Double(transferBufferSeconds)) > nextDeparture else {
                 continue
             }
-            penalty += 50_000
+            penalty += 50000
         }
         return penalty
     }
@@ -868,7 +892,7 @@ private actor PublicTransportRoutingEngine {
             let idMatches = stop.id == point.id
             let nameMatches = normalizedName?.isEmpty == false
                 && stop.name.normalizedForSearch == normalizedName
-                && distance <= 2_500
+                && distance <= 2500
             let distanceMatches = distance <= radiusMeters
 
             guard idMatches || nameMatches || distanceMatches else { return nil }
@@ -904,12 +928,12 @@ private actor PublicTransportRoutingEngine {
         let roadRoutingHint: RouteLegRoadRoutingHint
         if route.transportMode == .bus,
            let shapeCoordinates = shapeCoordinates(
-            trip: trip,
-            boardTime: boardTime,
-            alightTime: alightTime,
-            boardStop: boardStop,
-            alightStop: alightStop,
-            context: context
+               trip: trip,
+               boardTime: boardTime,
+               alightTime: alightTime,
+               boardStop: boardStop,
+               alightStop: alightStop,
+               context: context
            ) {
             coordinates = shapeCoordinates
             roadRoutingHint = .none
@@ -1113,7 +1137,7 @@ private actor PublicTransportRoutingEngine {
         let shapeCoordinates = shape.points
             .filter { point in
                 guard let distance = point.distanceTraveled else { return false }
-                return (lower...upper).contains(distance)
+                return (lower ... upper).contains(distance)
             }
             .sorted { $0.sequence < $1.sequence }
             .map { RouteMapCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
@@ -1132,7 +1156,7 @@ private actor PublicTransportRoutingEngine {
         context: RouteSearchContext
     ) -> [RouteMapCoordinate] {
         trip.stopTimes
-            .filter { (fromSequence...toSequence).contains($0.sequence) }
+            .filter { (fromSequence ... toSequence).contains($0.sequence) }
             .compactMap { context.stopsById[$0.stopId]?.location }
             .map { RouteMapCoordinate($0) }
     }
@@ -1147,13 +1171,33 @@ private nonisolated struct RouteSearchContext {
     let now: Date
     let currentSeconds: Int
 
-    var serviceStart: Date { staticContext.serviceStart }
-    var stopsById: [String: GTFSTimetableStopEntry] { staticContext.stopsById }
-    var routesById: [String: GTFSTimetableRouteEntry] { staticContext.routesById }
-    var shapesById: [String: GTFSTimetableShapeEntry] { staticContext.shapesById }
-    var activeTrips: [GTFSTimetableTripEntry] { staticContext.activeTrips }
-    var tripReferencesByStopId: [String: [TripStopReference]] { staticContext.tripReferencesByStopId }
-    var transfersByFromStopId: [String: [GTFSTimetableTransferEntry]] { staticContext.transfersByFromStopId }
+    var serviceStart: Date {
+        staticContext.serviceStart
+    }
+
+    var stopsById: [String: GTFSTimetableStopEntry] {
+        staticContext.stopsById
+    }
+
+    var routesById: [String: GTFSTimetableRouteEntry] {
+        staticContext.routesById
+    }
+
+    var shapesById: [String: GTFSTimetableShapeEntry] {
+        staticContext.shapesById
+    }
+
+    var activeTrips: [GTFSTimetableTripEntry] {
+        staticContext.activeTrips
+    }
+
+    var tripReferencesByStopId: [String: [TripStopReference]] {
+        staticContext.tripReferencesByStopId
+    }
+
+    var transfersByFromStopId: [String: [GTFSTimetableTransferEntry]] {
+        staticContext.transfersByFromStopId
+    }
 
     init(staticContext: CachedRouteSearchContext, now: Date) {
         self.staticContext = staticContext

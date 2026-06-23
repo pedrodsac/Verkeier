@@ -11,6 +11,7 @@ struct RouteOptionCard: View {
     let selectRouteOption: () -> Void
 
     @Environment(AppPreferences.self) private var preferences
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Button(action: selectRouteOption) {
@@ -48,6 +49,7 @@ struct RouteOptionCard: View {
             .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
         .buttonStyle(.plain)
+        .animation(reduceMotion ? nil : .snappy(duration: 0.22), value: isSelected)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
         .accessibilityHint("Opens route step-by-step timeline")
         .accessibilityLabel(accessibilityLabel)
@@ -76,11 +78,10 @@ struct RouteOptionCard: View {
     }
 
     private var secondarySummary: String {
-        let transfers: String
-        switch option.transferCount {
-        case 0: transfers = "Direct"
-        case 1: transfers = "1 transfer"
-        default: transfers = "\(option.transferCount) transfers"
+        let transfers = switch option.transferCount {
+        case 0: "Direct"
+        case 1: "1 transfer"
+        default: "\(option.transferCount) transfers"
         }
 
         let distance = preferences.formattedDistance(option.plan.distanceMeters ?? 0)
@@ -108,93 +109,93 @@ struct RouteOptionCard: View {
 }
 
 #if DEBUG
-#Preview(traits: .sizeThatFitsLayout) {
-    VStack(spacing: 10) {
-        RouteOptionCard(
-            option: .previewTramOption,
-            isSelected: true,
-            selectRouteOption: {}
-        )
-        RouteOptionCard(
-            option: .previewBusOption,
-            isSelected: false,
-            selectRouteOption: {}
-        )
-    }
-    .padding()
-    .background(Color(uiColor: .systemGroupedBackground))
-    .environment(AppPreferences())
-}
-
-private extension RouteOption {
-    static var previewTramOption: RouteOption {
-        RouteOption(
-            id: "tram-route",
-            plan: RoutePlan(
-                id: "tram-plan",
-                origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
-                destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
-                expectedTravelTime: 18 * 60,
-                distanceMeters: 4300,
-                legs: [
-                    RoutePlan.Leg(
-                        id: "walk1",
-                        mode: .walking,
-                        transportKind: .walking,
-                        origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
-                        destination: LocationPoint(id: "h", name: "Hamilius", latitude: 49.6111, longitude: 6.1275),
-                        departureTime: Date(),
-                        arrivalTime: Date().addingTimeInterval(4 * 60),
-                        distanceMeters: 350
-                    ),
-                    RoutePlan.Leg(
-                        id: "tram1",
-                        mode: .tram,
-                        transportKind: .transit,
-                        routeName: "T1",
-                        origin: LocationPoint(id: "h", name: "Hamilius", latitude: 49.6111, longitude: 6.1275),
-                        destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
-                        departureTime: Date().addingTimeInterval(6 * 60),
-                        arrivalTime: Date().addingTimeInterval(18 * 60),
-                        realtimeDepartureTime: Date().addingTimeInterval(7 * 60),
-                        realtimeArrivalTime: Date().addingTimeInterval(19 * 60),
-                        distanceMeters: 3950,
-                        delayMinutes: 1,
-                        liveStatus: .live
-                    )
-                ],
-                dataSource: .mock
-            ),
-            mapOverlay: nil
-        )
+    #Preview(traits: .sizeThatFitsLayout) {
+        VStack(spacing: 10) {
+            RouteOptionCard(
+                option: .previewTramOption,
+                isSelected: true,
+                selectRouteOption: {}
+            )
+            RouteOptionCard(
+                option: .previewBusOption,
+                isSelected: false,
+                selectRouteOption: {}
+            )
+        }
+        .padding()
+        .background(Color(uiColor: .systemGroupedBackground))
+        .environment(AppPreferences())
     }
 
-    static var previewBusOption: RouteOption {
-        RouteOption(
-            id: "bus-route",
-            plan: RoutePlan(
-                id: "bus-plan",
-                origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
-                destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
-                expectedTravelTime: 24 * 60,
-                distanceMeters: 4800,
-                legs: [
-                    RoutePlan.Leg(
-                        id: "bus1",
-                        mode: .bus,
-                        transportKind: .transit,
-                        routeName: "16",
-                        origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
-                        destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
-                        departureTime: Date().addingTimeInterval(9 * 60),
-                        arrivalTime: Date().addingTimeInterval(24 * 60),
-                        distanceMeters: 4800
-                    )
-                ],
-                dataSource: .mock
-            ),
-            mapOverlay: nil
-        )
+    private extension RouteOption {
+        static var previewTramOption: RouteOption {
+            RouteOption(
+                id: "tram-route",
+                plan: RoutePlan(
+                    id: "tram-plan",
+                    origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
+                    destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
+                    expectedTravelTime: 18 * 60,
+                    distanceMeters: 4300,
+                    legs: [
+                        RoutePlan.Leg(
+                            id: "walk1",
+                            mode: .walking,
+                            transportKind: .walking,
+                            origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
+                            destination: LocationPoint(id: "h", name: "Hamilius", latitude: 49.6111, longitude: 6.1275),
+                            departureTime: Date(),
+                            arrivalTime: Date().addingTimeInterval(4 * 60),
+                            distanceMeters: 350
+                        ),
+                        RoutePlan.Leg(
+                            id: "tram1",
+                            mode: .tram,
+                            transportKind: .transit,
+                            routeName: "T1",
+                            origin: LocationPoint(id: "h", name: "Hamilius", latitude: 49.6111, longitude: 6.1275),
+                            destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
+                            departureTime: Date().addingTimeInterval(6 * 60),
+                            arrivalTime: Date().addingTimeInterval(18 * 60),
+                            realtimeDepartureTime: Date().addingTimeInterval(7 * 60),
+                            realtimeArrivalTime: Date().addingTimeInterval(19 * 60),
+                            distanceMeters: 3950,
+                            delayMinutes: 1,
+                            liveStatus: .live
+                        )
+                    ],
+                    dataSource: .mock
+                ),
+                mapOverlay: nil
+            )
+        }
+
+        static var previewBusOption: RouteOption {
+            RouteOption(
+                id: "bus-route",
+                plan: RoutePlan(
+                    id: "bus-plan",
+                    origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
+                    destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
+                    expectedTravelTime: 24 * 60,
+                    distanceMeters: 4800,
+                    legs: [
+                        RoutePlan.Leg(
+                            id: "bus1",
+                            mode: .bus,
+                            transportKind: .transit,
+                            routeName: "16",
+                            origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
+                            destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
+                            departureTime: Date().addingTimeInterval(9 * 60),
+                            arrivalTime: Date().addingTimeInterval(24 * 60),
+                            distanceMeters: 4800
+                        )
+                    ],
+                    dataSource: .mock
+                ),
+                mapOverlay: nil
+            )
+        }
     }
-}
 #endif

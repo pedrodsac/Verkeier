@@ -84,6 +84,18 @@ struct BottomSheetContent: View {
                 }
             }
             .safeAreaPadding(.horizontal, 16)
+            .refreshableWhen(viewModel.context == .stopDetail, action: actions.refreshDepartures)
+        }
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func refreshableWhen(_ enabled: Bool, action: @escaping () async -> Void) -> some View {
+        if enabled {
+            refreshable { await action() }
+        } else {
+            self
         }
     }
 }

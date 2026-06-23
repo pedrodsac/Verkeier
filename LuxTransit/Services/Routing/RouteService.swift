@@ -10,12 +10,22 @@ protocol RouteService: Sendable {
     /// - Parameters:
     ///   - from: Journey origin.
     ///   - to: Journey destination.
+    ///   - time: When the rider wants to travel (now / depart at / arrive by).
     /// - Returns: A ``RouteCalculation`` holding one or more options.
     /// - Throws: ``RoutingError`` when no usable route can be produced.
-    nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint) async throws -> RouteCalculation
+    nonisolated func calculateRoute(
+        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime
+    ) async throws -> RouteCalculation
 
     /// Opens the journey in Apple Maps for turn-by-turn navigation.
     @MainActor func openInAppleMaps(from: LocationPoint, to: LocationPoint)
+}
+
+extension RouteService {
+    /// Convenience that plans for immediate departure.
+    nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint) async throws -> RouteCalculation {
+        try await calculateRoute(from: from, to: to, time: .leaveNow)
+    }
 }
 
 /// Errors thrown by a ``RouteService``.
