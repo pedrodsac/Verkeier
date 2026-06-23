@@ -10,6 +10,8 @@ struct RouteOptionCard: View {
     let isSelected: Bool
     let selectRouteOption: () -> Void
 
+    @Environment(AppPreferences.self) private var preferences
+
     var body: some View {
         Button(action: selectRouteOption) {
             VStack(alignment: .leading, spacing: 8) {
@@ -81,17 +83,10 @@ struct RouteOptionCard: View {
         default: transfers = "\(option.transferCount) transfers"
         }
 
-        let distance = distanceText(option.plan.distanceMeters ?? 0)
+        let distance = preferences.formattedDistance(option.plan.distanceMeters ?? 0)
         let dataNote = option.usesLiveData ? "Live" : "Scheduled"
 
         return "\(transfers)  ·  \(distance)  ·  \(dataNote)"
-    }
-
-    private func distanceText(_ meters: Double) -> String {
-        if meters >= 1000 {
-            return String(format: "%.1f km", meters / 1000)
-        }
-        return "\(Int(meters)) m"
     }
 
     private var cardBackground: AnyShapeStyle {
@@ -128,6 +123,7 @@ struct RouteOptionCard: View {
     }
     .padding()
     .background(Color(uiColor: .systemGroupedBackground))
+    .environment(AppPreferences())
 }
 
 private extension RouteOption {

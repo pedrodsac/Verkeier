@@ -92,9 +92,6 @@ struct RouteLegList: View {
     var body: some View {
         if !displayLegs.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Step by step")
-                    .font(.headline.weight(.semibold))
-
                 ZStack(alignment: .topLeading) {
                     timelineRail(for: displayLegs)
 
@@ -209,12 +206,9 @@ struct RouteLegRow: View {
     @ViewBuilder
     private var instructionRow: some View {
         if let routeName = leg.routeName, leg.transportKind == .transit {
-            // Transit leg: instruction + inline line badge
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(leg.instruction ?? leg.mode.displayName)
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(.primary)
-
+            // Transit leg: line chip first, then the destination — the raw
+            // instruction already repeats the line number, so don't show both.
+            HStack(alignment: .center, spacing: 6) {
                 Text(routeName)
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.white)
@@ -224,6 +218,10 @@ struct RouteLegRow: View {
                         markerColor.gradient,
                         in: RoundedRectangle(cornerRadius: 5, style: .continuous)
                     )
+
+                Text(transitHeadline)
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(.primary)
             }
         } else {
             Text(leg.instruction ?? leg.transportKind.displayName)
@@ -267,6 +265,15 @@ struct RouteLegRow: View {
 
     private var markerColor: Color {
         leg.transportKind == .walking ? .green : leg.mode.tint
+    }
+
+    /// Text shown after the line chip on a transit row. Prefers the destination
+    /// stop ("to Kirchberg"); falls back to the mode name when it's unknown.
+    private var transitHeadline: String {
+        if let name = leg.destination.name, !name.isEmpty {
+            return "to \(name)"
+        }
+        return leg.mode.displayName
     }
 
     private var timeText: String? {
@@ -318,3 +325,146 @@ struct TimelineMarkerCenterPreferenceKey: PreferenceKey {
         value.merge(nextValue()) { _, next in next }
     }
 }
+
+// MARK: - Previews
+
+#if DEBUG
+
+private let previewOrigin = LocationPoint(id: "origin", name: "Current Location", latitude: 49.6116, longitude: 6.1319)
+private let previewHamilius = LocationPoint(id: "hamilius", name: "Hamilius", latitude: 49.6111, longitude: 6.1275)
+private let previewKirchberg = LocationPoint(id: "kirchberg", name: "Kirchberg P+R", latitude: 49.6260, longitude: 6.1600)
+private let previewLuxexpo = LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746)
+
+private let previewWalkLeg = RoutePlan.Leg(
+    id: "walk1",
+    mode: .walking,
+    instruction: "Walk to Hamilius",
+    transportKind: .walking,
+    origin: previewOrigin,
+    destination: previewHamilius,
+    departureTime: Date(),
+    arrivalTime: Date().addingTimeInterval(4 * 60),
+    distanceMeters: 320
+)
+
+private let previewTramLeg = RoutePlan.Leg(
+    id: "tram1",
+    mode: .tram,
+    instruction: "Take tram T1 toward Luxexpo",
+    transportKind: .transit,
+    routeName: "T1",
+    origin: previewHamilius,
+    destination: previewKirchberg,
+    departureTime: Date().addingTimeInterval(6 * 60),
+    arrivalTime: Date().addingTimeInterval(14 * 60),
+    realtimeDepartureTime: Date().addingTimeInterval(7 * 60),
+    realtimeArrivalTime: Date().addingTimeInterval(15 * 60),
+    platform: "2",
+    delayMinutes: 1,
+    liveStatus: .live
+)
+
+private let previewBusLeg = RoutePlan.Leg(
+    id: "bus1",
+    mode: .bus,
+    instruction: "Take bus 16 toward Luxexpo",
+    transportKind: .transit,
+    routeName: "16",
+    origin: previewKirchberg,
+    destination: previewLuxexpo,
+    departureTime: Date().addingTimeInterval(16 * 60),
+    arrivalTime: Date().addingTimeInterval(22 * 60),
+    liveStatus: .scheduled,
+    transferWarning: "Only 1 min to transfer"
+)
+
+private let previewFinalWalkLeg = RoutePlan.Leg(
+    id: "walk2",
+    mode: .walking,
+    instruction: "Walk to Luxexpo entrance",
+    transportKind: .walking,
+    origin: previewLuxexpo,
+    destination: LocationPoint(id: "dest", name: "Luxexpo", latitude: 49.6335, longitude: 6.1755),
+    departureTime: Date().addingTimeInterval(22 * 60),
+    arrivalTime: Date().addingTimeInterval(24 * 60),
+    distanceMeters: 110
+)
+
+private let previewTramPlan = RoutePlan(
+    id: "tram-plan",
+    origin: previewOrigin,
+    destination: previewLuxexpo,
+    expectedTravelTime: 24 * 60,
+    distanceMeters: 4500,
+    legs: [previewWalkLeg, previewTramLeg, previewBusLeg, previewFinalWalkLeg],
+    dataSource: .mock
+)
+
+private let previewTramOption = RouteOption(
+    id: "tram-route",
+    plan: previewTramPlan,
+    mapOverlay: nil
+)
+
+private let previewDelayedOption = RouteOption(
+    id: "delayed-route",
+    plan: RoutePlan(
+        id: "delayed-plan",
+        origin: previewOrigin,
+        destination: previewLuxexpo,
+        expectedTravelTime: 30 * 60,
+        distanceMeters: 4800,
+        legs: [
+            previewWalkLeg,
+            RoutePlan.Leg(
+                id: "delayed-tram",
+                mode: .tram,
+                instruction: "Take tram T1 toward Luxexpo",
+                transportKind: .transit,
+                routeName: "T1",
+                origin: previewHamilius,
+                destination: previewLuxexpo,
+                departureTime: Date().addingTimeInterval(6 * 60),
+                arrivalTime: Date().addingTimeInterval(28 * 60),
+                realtimeDepartureTime: Date().addingTimeInterval(12 * 60),
+                realtimeArrivalTime: Date().addingTimeInterval(30 * 60),
+                delayMinutes: 6,
+                liveStatus: .delayed
+            )
+        ],
+        dataSource: .mock
+    ),
+    mapOverlay: nil
+)
+
+#Preview("Summary Card – Live", traits: .sizeThatFitsLayout) {
+    RouteTimelineSummaryCard(option: previewTramOption)
+        .padding()
+}
+
+#Preview("Summary Card – Delayed", traits: .sizeThatFitsLayout) {
+    RouteTimelineSummaryCard(option: previewDelayedOption)
+        .padding()
+}
+
+#Preview("Leg List – Walk + Tram + Bus + Walk", traits: .sizeThatFitsLayout) {
+    RouteLegList(legs: [previewWalkLeg, previewTramLeg, previewBusLeg, previewFinalWalkLeg])
+        .padding()
+}
+
+#Preview("Leg Row – Walking", traits: .sizeThatFitsLayout) {
+    RouteLegRow(leg: previewWalkLeg)
+        .padding()
+}
+
+#Preview("Leg Row – Transit (Live + Platform)", traits: .sizeThatFitsLayout) {
+    RouteLegRow(leg: previewTramLeg)
+        .padding()
+}
+
+#Preview("Leg Row – Transit (Transfer Warning)", traits: .sizeThatFitsLayout) {
+    RouteLegRow(leg: previewBusLeg)
+        .padding()
+}
+
+#endif

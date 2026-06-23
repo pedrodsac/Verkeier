@@ -21,7 +21,7 @@ struct RouteRibbon: View {
             EmptyView()
         } else {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 5) {
+				HStack(spacing: 7.5) {
                     ForEach(Array(displayLegs.enumerated()), id: \.element.id) { index, leg in
                         if index > 0 {
                             Image(systemName: "chevron.right")

@@ -142,6 +142,9 @@ private actor PublicTransportRoutingEngine {
     private let walkingSpeedMetersPerSecond = 1.33
     private let evaluatedCandidateLimit = 18
     private let returnedOptionLimit = 18
+    // Time-equivalent cost of one transfer when ranking journeys. 5 minutes is a
+    // common transit-routing value; raise it to bias harder towards fewer transfers.
+    private let transferPenaltySeconds = 300
     private var cachedContext: CachedRouteSearchContext?
     private var roadRouteCoordinateCache: [RoadRouteCacheKey: [RouteMapCoordinate]?] = [:]
 
@@ -178,13 +181,27 @@ private actor PublicTransportRoutingEngine {
 
         try Task.checkCancellation()
 
-        let enrichedCandidates = await enrich(
-            Array(scheduledCandidates.prefix(evaluatedCandidateLimit)),
-            context: context
+        // Keep low-transfer journeys alive through truncation: drop only journeys that
+        // are strictly worse on every axis, then pick the cheapest by comfort cost
+        // (arrival + transfer penalty) rather than the earliest-arriving alone.
+        let selectedScheduled = paretoFiltered(
+            scheduledCandidates,
+            departure: \.firstTransitDeparture,
+            arrival: \.arrivalTime,
+            transfers: \.transitLegCount
         )
-        let sortedCandidates = enrichedCandidates
-            .sorted(by: candidateSort)
-            .prefix(returnedOptionLimit)
+        .sorted { scheduledComfortCostSeconds($0) < scheduledComfortCostSeconds($1) }
+        .prefix(evaluatedCandidateLimit)
+
+        let enrichedCandidates = await enrich(Array(selectedScheduled), context: context)
+        let sortedCandidates = paretoFiltered(
+            enrichedCandidates,
+            departure: \.firstTransitDeparture,
+            arrival: \.arrivalTime,
+            transfers: \.transitLegCount
+        )
+        .sorted { comfortCostSeconds($0) < comfortCostSeconds($1) }
+        .prefix(returnedOptionLimit)
         var options: [RouteOption] = []
         options.reserveCapacity(sortedCandidates.count)
         for (index, candidate) in sortedCandidates.enumerated() {
@@ -779,11 +796,48 @@ private actor PublicTransportRoutingEngine {
         return penalty
     }
 
-    private func candidateSort(_ lhs: RouteCandidate, _ rhs: RouteCandidate) -> Bool {
-        let lhsArrival = lhs.legs.compactMap(\.arrivalTime).last ?? .distantFuture
-        let rhsArrival = rhs.legs.compactMap(\.arrivalTime).last ?? .distantFuture
-        return lhsArrival.addingTimeInterval(TimeInterval(lhs.penalty))
-            < rhsArrival.addingTimeInterval(TimeInterval(rhs.penalty))
+    /// Ranking cost for an enriched candidate: arrival time plus a per-transfer
+    /// penalty plus the live-data reliability penalty (cancelled/broken/no-realtime).
+    /// Lower is better. This is what makes a slightly-later direct route outrank a
+    /// faster multi-transfer one.
+    private func comfortCostSeconds(_ candidate: RouteCandidate) -> Double {
+        candidate.arrivalTime.timeIntervalSinceReferenceDate
+            + Double(candidate.transitLegCount * transferPenaltySeconds)
+            + Double(candidate.penalty)
+    }
+
+    /// Pre-enrichment cost over scheduled data only (no live penalties known yet).
+    private func scheduledComfortCostSeconds(_ journey: ScheduledJourney) -> Double {
+        journey.arrivalTime.timeIntervalSinceReferenceDate
+            + Double(journey.transitLegCount * transferPenaltySeconds)
+    }
+
+    /// Removes journeys dominated on all three axes — a dominated journey boards its
+    /// first transit leg no earlier, arrives no later, and uses no fewer transfers than
+    /// another, with at least one of those strictly worse. Keeping the departure axis
+    /// preserves distinct upcoming departures (which would collapse under an
+    /// arrival/transfers-only frontier).
+    private func paretoFiltered<T>(
+        _ items: [T],
+        departure: (T) -> Date,
+        arrival: (T) -> Date,
+        transfers: (T) -> Int
+    ) -> [T] {
+        let keyed = items.map { (departure: departure($0), arrival: arrival($0), transfers: transfers($0), value: $0) }
+        return keyed.enumerated()
+            .filter { index, candidate in
+                !keyed.enumerated().contains { otherIndex, other in
+                    guard otherIndex != index else { return false }
+                    let noWorse = other.departure >= candidate.departure
+                        && other.arrival <= candidate.arrival
+                        && other.transfers <= candidate.transfers
+                    let strictlyBetter = other.departure > candidate.departure
+                        || other.arrival < candidate.arrival
+                        || other.transfers < candidate.transfers
+                    return noWorse && strictlyBetter
+                }
+            }
+            .map(\.element.value)
     }
 
     private func nearestStops(
@@ -1249,6 +1303,15 @@ private nonisolated struct ScheduledJourney {
         legs.compactMap(\.arrivalTime).last ?? .distantFuture
     }
 
+    var firstTransitDeparture: Date {
+        legs.first { $0.transportKind == .transit }
+            .flatMap { $0.scheduledDepartureTime ?? $0.departureTime } ?? .distantPast
+    }
+
+    var transitLegCount: Int {
+        legs.reduce(0) { $0 + ($1.transportKind == .transit ? 1 : 0) }
+    }
+
     var signature: String {
         legs.map { leg in
             [
@@ -1266,6 +1329,19 @@ private nonisolated struct ScheduledJourney {
 private nonisolated struct RouteCandidate {
     let legs: [RoutePlan.Leg]
     let penalty: Int
+
+    var arrivalTime: Date {
+        legs.compactMap(\.arrivalTime).last ?? .distantFuture
+    }
+
+    var firstTransitDeparture: Date {
+        legs.first { $0.transportKind == .transit }
+            .flatMap { $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime } ?? .distantPast
+    }
+
+    var transitLegCount: Int {
+        legs.reduce(0) { $0 + ($1.transportKind == .transit ? 1 : 0) }
+    }
 }
 
 private nonisolated struct RoadRouteCacheKey: Hashable {

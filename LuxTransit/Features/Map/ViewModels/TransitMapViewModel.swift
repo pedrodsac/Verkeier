@@ -47,7 +47,7 @@ final class TransitMapViewModel {
     var searchResults: [Stop] = []
     var routeOrigin: RoutePlace?
     var routeDestination: RoutePlace?
-    var routeFilters = RoutePlannerFilters()
+    var routeFilters = AppPreferences.shared.defaultRouteFilters
     var recentRoutePlaces: [RoutePlace] = []
     var commutePresets: [RouteCommutePreset] = []
     var routeOptions: [RouteOption] = []

@@ -143,6 +143,94 @@ struct PublicTransportRouteServiceTests {
         })
     }
 
+    @Test func directRouteOutranksFasterButMoreTransferredItinerary() async throws {
+        // Direct trip arrives 8:25; a 1-transfer itinerary arrives 8:23 (2 min sooner).
+        // Old arrival-only ranking put the transfer first; comfort cost now favours
+        // the direct journey.
+        let now = luxembourgDate(hour: 8, minute: 0)
+        let timetable = makeTimetable(
+            routes: [
+                makeRoute(id: "R15", shortName: "15"),
+                makeRoute(id: "R16", shortName: "16"),
+                makeRoute(id: "R17", shortName: "17")
+            ],
+            trips: [
+                timedTrip(id: "Tdirect", routeId: "R15", stops: [
+                    ("S1", t(8, 1), t(8, 1)),
+                    ("S2", t(8, 25), t(8, 25))
+                ]),
+                timedTrip(id: "Tleg1", routeId: "R16", stops: [
+                    ("S1", t(8, 2), t(8, 2)),
+                    ("S3", t(8, 11), t(8, 11))
+                ]),
+                timedTrip(id: "Tleg2", routeId: "R17", stops: [
+                    ("S3", t(8, 14), t(8, 14)),
+                    ("S2", t(8, 23), t(8, 23))
+                ])
+            ]
+        )
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { now }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(name: "Current Location", latitude: 49.6001, longitude: 6.1001),
+            to: LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11)
+        )
+
+        let first = try #require(calculation.options.first)
+        #expect(first.transferCount == 0)
+        #expect(first.plan.legs.first { $0.transportKind == .transit }?.routeId == "R15")
+        // The faster transfer itinerary is still offered, just ranked lower.
+        #expect(calculation.options.contains { $0.transferCount == 1 })
+    }
+
+    @Test func dropsJourneyDominatedOnEveryAxis() async throws {
+        // Bad itinerary leaves earlier (8:01) but arrives later (8:30) with an extra
+        // transfer — strictly worse than the direct 8:05→8:21 trip, so it is pruned.
+        let now = luxembourgDate(hour: 8, minute: 0)
+        let timetable = makeTimetable(
+            routes: [
+                makeRoute(id: "R15", shortName: "15"),
+                makeRoute(id: "R16", shortName: "16"),
+                makeRoute(id: "R17", shortName: "17")
+            ],
+            trips: [
+                timedTrip(id: "Tgood", routeId: "R15", stops: [
+                    ("S1", t(8, 5), t(8, 5)),
+                    ("S2", t(8, 21), t(8, 21))
+                ]),
+                timedTrip(id: "Tbad1", routeId: "R16", stops: [
+                    ("S1", t(8, 1), t(8, 1)),
+                    ("S3", t(8, 10), t(8, 10))
+                ]),
+                timedTrip(id: "Tbad2", routeId: "R17", stops: [
+                    ("S3", t(8, 12), t(8, 12)),
+                    ("S2", t(8, 30), t(8, 30))
+                ])
+            ]
+        )
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { now }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(name: "Current Location", latitude: 49.6001, longitude: 6.1001),
+            to: LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11)
+        )
+
+        #expect(calculation.options.allSatisfy { $0.transferCount == 0 })
+        #expect(calculation.options.allSatisfy { option in
+            option.plan.legs.allSatisfy { $0.routeId != "R17" }
+        })
+    }
+
     @Test func cachedRoutingContextKeepsRequestTimeFresh() async throws {
         var currentNow = luxembourgDate(hour: 8, minute: 0)
         let timetable = makeTimetable(trips: [
@@ -450,6 +538,40 @@ struct PublicTransportRouteServiceTests {
                     pickupType: nil,
                     dropOffType: nil,
                     shapeDistanceTraveled: shapeDistances?[offset] ?? nil
+                )
+            }
+        )
+    }
+
+    /// Seconds from service start (midnight) for a given wall-clock time.
+    private func t(_ hour: Int, _ minute: Int) -> Int {
+        hour * 3600 + minute * 60
+    }
+
+    /// Builds a trip with explicit per-stop arrival/departure seconds, for tests that
+    /// need finer timing than `makeTrip`'s fixed 20-minute spacing.
+    private func timedTrip(
+        id: String,
+        routeId: String,
+        stops: [(stopId: String, arrival: Int, departure: Int)]
+    ) -> GTFSTimetableTripEntry {
+        GTFSTimetableTripEntry(
+            id: id,
+            routeId: routeId,
+            serviceId: "WEEK",
+            headsign: "Central",
+            directionId: nil,
+            shapeId: nil,
+            stopTimes: stops.enumerated().map { offset, stop in
+                GTFSTimetableStopTimeEntry(
+                    stopId: stop.stopId,
+                    arrivalSeconds: stop.arrival,
+                    departureSeconds: stop.departure,
+                    sequence: offset + 1,
+                    headsign: nil,
+                    pickupType: nil,
+                    dropOffType: nil,
+                    shapeDistanceTraveled: nil
                 )
             }
         )

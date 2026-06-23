@@ -6,6 +6,7 @@ struct LuxTransitApp: App {
     @State private var locationService = LocationService()
     @AppStorage("debugTransitDataMode") private var debugTransitDataModeRawValue =
         DebugTransitDataMode.normal.rawValue
+    @State private var preferences = AppPreferences.shared
     private let configuration: AppConfiguration
     private let gtfsService: any GTFSService
     private let modelContainer: ModelContainer
@@ -31,7 +32,9 @@ struct LuxTransitApp: App {
                 .environment(\.avlClient, avlClient)
                 .environment(\.liveActivityManager, liveActivityManager)
                 .environment(\.departureReminderService, departureReminderService)
+                .environment(preferences)
                 .modelContainer(modelContainer)
+                .preferredColorScheme(preferences.appearance.colorScheme)
         }
     }
 

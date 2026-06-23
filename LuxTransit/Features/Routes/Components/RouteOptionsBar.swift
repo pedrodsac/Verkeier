@@ -14,8 +14,7 @@ struct RouteOptionsBar: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            sortPicker
-            Spacer(minLength: 0)
+			sortPicker
             optionsMenu
         }
     }
@@ -35,7 +34,7 @@ struct RouteOptionsBar: View {
             Text("Walking").tag(RoutePlannerSortOption.leastWalking)
         }
         .pickerStyle(.segmented)
-        .fixedSize()
+		.frame(maxWidth: .infinity)
     }
 
     // MARK: - Options menu

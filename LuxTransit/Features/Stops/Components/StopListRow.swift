@@ -8,6 +8,8 @@ struct StopListRow: View {
     var referenceLocation: CLLocation? = nil
     let action: () -> Void
 
+    @Environment(AppPreferences.self) private var preferences
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
@@ -15,7 +17,7 @@ struct StopListRow: View {
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)
                     .frame(width: 38, height: 38)
-                    .background(transitColor.gradient, in: Circle())
+					.background(transitColor.gradient, in: RoundedRectangle(cornerRadius: 8))
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -30,21 +32,24 @@ struct StopListRow: View {
                         } else {
                             Text(stop.dataSource.displayName)
                         }
+						
+						Divider()
+							.frame(height: 10)
 
                         if !stop.modes.isEmpty {
                             Text(modeSummary)
                         }
+						
+						if let distanceMetadata {
+							Divider()
+								.frame(height: 10)
+							
+							Text(distanceMetadata)
+						}
                     }
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
-
-                    if let distanceMetadata {
-                        Text(distanceMetadata)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
                 }
 
                 Spacer(minLength: 8)
@@ -105,21 +110,7 @@ struct StopListRow: View {
         ).distance(from: referenceLocation)
         guard distance.isFinite else { return nil }
 
-        let distanceText = formattedDistance(distance)
-        let walkingText = formattedWalkingMinutes(for: distance)
-        return "\(distanceText) · \(walkingText) walk"
-    }
-
-    private func formattedDistance(_ distance: CLLocationDistance) -> String {
-        if distance < 1_000 {
-            return "\(Int(distance.rounded())) m"
-        }
-        return String(format: "%.1f km", distance / 1_000)
-    }
-
-    private func formattedWalkingMinutes(for distance: CLLocationDistance) -> String {
-        let minutes = max(1, Int((distance / 1.33 / 60).rounded()))
-        return "\(minutes) min"
+        return preferences.formattedDistance(distance)
     }
 }
 
@@ -136,4 +127,5 @@ struct StopListRow: View {
         action: {}
     )
     .padding(.horizontal, 16)
+    .environment(AppPreferences())
 }

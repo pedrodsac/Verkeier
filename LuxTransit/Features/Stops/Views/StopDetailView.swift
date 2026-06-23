@@ -437,7 +437,7 @@ struct DepartureBoardView: View {
             )
         } else {
             VStack(alignment: .leading, spacing: 8) {
-                DepartureBoardStatus(lastUpdated: lastUpdated, isStale: isStale)
+//                DepartureBoardStatus(lastUpdated: lastUpdated, isStale: isStale)
                 DepartureTrackingStatusCard(
                     trackedDeparture: departures.first(where: { $0.id == trackedDepartureId }),
                     activeReminder: activeReminder,
@@ -554,12 +554,6 @@ private struct DepartureTimingStatus: View {
 
             if let statusBadge {
                 HStack(spacing: 4) {
-                    if statusBadge == "On time" {
-                        Circle()
-                            .fill(statusColor)
-                            .frame(width: 5, height: 5)
-                            .accessibilityHidden(true)
-                    }
                     Text(statusBadge)
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(statusColor)
@@ -568,7 +562,7 @@ private struct DepartureTimingStatus: View {
                 .transition(.scale(scale: 0.92).combined(with: .opacity))
             }
         }
-        .frame(minWidth: 50, alignment: .trailing)
+        .frame(alignment: .trailing)
     }
 }
 
@@ -581,6 +575,8 @@ struct DepartureListRow: View {
     var stopTrackingDeparture: () -> Void = {}
     var scheduleReminder: (Int) -> Void = { _ in }
     var cancelReminder: () -> Void = {}
+
+    @Environment(AppPreferences.self) private var preferences
 
     var body: some View {
         HStack(spacing: 12) {
@@ -601,23 +597,27 @@ struct DepartureListRow: View {
                 in: RoundedRectangle(cornerRadius: 10, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(departure.destination)
-                    .font(.body.weight(.semibold))
-                    .lineLimit(1)
+				VStack {
+					Text(departure.destination)
+						.font(.body.weight(.semibold))
+						.lineLimit(1)
+				}
 
                 HStack(spacing: 6) {
                     Text(departureTimeText)
+					Divider()
+						.frame(height: 10)
                     if let platform = departure.platform {
                         Text("Platform \(platform)")
                     }
+					
+					Spacer()
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
             }
 			.frame(maxWidth: .infinity)
-
-            Spacer(minLength: 0)
 
             DepartureTimingStatus(
                 countdownText: countdownText,
@@ -643,7 +643,7 @@ struct DepartureListRow: View {
                     .buttonStyle(.plain)
                     .accessibilityLabel(isTracked ? "Stop tracking departure" : "Track departure")
 
-                    reminderMenu
+//                    reminderMenu
                 }
             }
         }
@@ -662,14 +662,15 @@ struct DepartureListRow: View {
     @ViewBuilder
     private var reminderMenu: some View {
         Menu {
-            Button("Remind 5 min before") {
-                scheduleReminder(5)
+            let defaultMinutes = preferences.defaultReminderLeadTimeMinutes
+            Button("Remind \(defaultMinutes) min before (default)") {
+                scheduleReminder(defaultMinutes)
             }
-
-            Button("Remind 10 min before") {
-                scheduleReminder(10)
+            ForEach(AppPreferences.reminderLeadTimeOptions.filter { $0 != defaultMinutes }, id: \.self) { minutes in
+                Button("Remind \(minutes) min before") {
+                    scheduleReminder(minutes)
+                }
             }
-
             if isReminderActive {
                 Button("Cancel reminder", role: .destructive, action: cancelReminder)
             }
@@ -706,7 +707,7 @@ struct DepartureListRow: View {
     private var statusBadge: String? {
         switch departure.status {
         case .cancelled: "Cancelled"
-        case .delayed(let minutes): "+\(minutes)m"
+        case .delayed(let minutes): "+\(minutes)"
         case .onTime: "On time"
         case .scheduled, .unknown: nil
         }
@@ -833,10 +834,10 @@ struct CompactUnavailableCard: View {
             id: "dep-1",
             stopId: "200209001",
             lineName: "16",
-            destination: "Kirchberg",
-            scheduledDeparture: .now.addingTimeInterval(300),
-            realtimeDeparture: .now.addingTimeInterval(420),
-            delayMinutes: 2,
+            destination: "Bertrange, Belle Étoile",
+            scheduledDeparture: .now,
+            realtimeDeparture: .now,
+            delayMinutes: 0,
             platform: "1",
             dataSource: .mock
         )

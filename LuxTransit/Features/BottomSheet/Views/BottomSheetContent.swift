@@ -7,83 +7,84 @@ struct BottomSheetContent: View {
     let actions: TransitSheetActions
 
     var body: some View {
-        Group {
-            if detent == .collapsed {
-                CollapsedSearchContent(query: searchQuery, action: actions.showSearch)
-            } else {
-                ScrollView {
-                    switch viewModel.context {
-                    case .home:
-                        HomeSheetContent(
-                            query: searchQuery,
-                            detent: detent,
-                            viewModel: viewModel.commute,
-                            showSearch: actions.showSearch,
-                            showSettings: actions.showSettings,
-                            showAlerts: actions.showAlerts,
-                            selectStop: actions.selectStop,
-                            toggleExpansion: actions.toggleFavouriteExpansion
-                        )
-                    case .search:
-                        SearchView(
-                            query: $searchQuery,
-                            viewModel: viewModel.search,
-                            updateSearch: actions.updateSearch,
-                            selectStop: actions.selectStop,
-                            cancel: actions.showHome
-                        )
-                    case .stopDetail:
-                        StopDetailView(
-                            viewModel: viewModel.stopDetail,
-                            openDirections: actions.showDirections,
-                            startTrackingDeparture: actions.startTrackingDeparture,
-                            stopTrackingDeparture: actions.stopTrackingDeparture,
-                            scheduleDepartureReminder: actions.scheduleDepartureReminder,
-                            cancelDepartureReminder: actions.cancelDepartureReminder,
-                            toggleDepartureLine: actions.toggleDepartureLine,
-                            showLineDetail: actions.showLineDetail,
-                            selectDeparturePlatform: actions.selectDeparturePlatform
-                        )
-                    case .directions:
-                        RouteView(
-                            viewModel: viewModel.route,
-                            calculateRoute: actions.calculateRoute,
-                            selectRouteOption: actions.selectRouteOption,
-                            showMoreRouteOptions: actions.showMoreRouteOptions,
-                            openInAppleMaps: actions.openRouteInAppleMaps,
-                            selectRouteOrigin: actions.selectRouteOrigin,
-                            selectRouteDestination: actions.selectRouteDestination,
-                            applyCommutePreset: actions.applyCommutePreset,
-                            saveCurrentCommutePreset: actions.saveCurrentCommutePreset,
-                            swapRouteEndpoints: actions.swapRouteEndpoints,
-                            updateRouteFilters: actions.updateRouteFilters
-                        )
-                    case .routeTimeline:
-                        RouteTimelineView(
-                            viewModel: viewModel.route,
-                            openInAppleMaps: actions.openRouteInAppleMaps
-                        )
-                    case .lineDetail:
-                        LineDetailView(
-                            viewModel: viewModel.lineDetail,
-                            selectStop: actions.selectStop,
-                            selectDirection: actions.selectLineDetailDirection
-                        )
-                    case .alerts:
-                        AlertsView(
-                            viewModel: viewModel.alerts
-                        )
-                    case .settings:
-                        SettingsView(
-                            viewModel: viewModel.settings,
-                            checkGTFSUpdate: actions.checkGTFSUpdate,
-                            setDebugDataMode: actions.setDebugDataMode
-                        )
-                    }
+        if detent == .collapsed {
+            CollapsedSearchContent(query: searchQuery, action: actions.showSearch)
+                .safeAreaPadding(.horizontal, 16)
+        } else if viewModel.context == .settings {
+            SettingsView(
+                viewModel: viewModel.settings,
+                checkGTFSUpdate: actions.checkGTFSUpdate,
+                setDebugDataMode: actions.setDebugDataMode
+            )
+        } else {
+            ScrollView {
+                switch viewModel.context {
+                case .home:
+                    HomeSheetContent(
+                        query: searchQuery,
+                        detent: detent,
+                        viewModel: viewModel.commute,
+                        showSearch: actions.showSearch,
+                        showSettings: actions.showSettings,
+                        showAlerts: actions.showAlerts,
+                        selectStop: actions.selectStop,
+                        toggleExpansion: actions.toggleFavouriteExpansion
+                    )
+                case .search:
+                    SearchView(
+                        query: $searchQuery,
+                        viewModel: viewModel.search,
+                        updateSearch: actions.updateSearch,
+                        selectStop: actions.selectStop,
+                        cancel: actions.showHome
+                    )
+                case .stopDetail:
+                    StopDetailView(
+                        viewModel: viewModel.stopDetail,
+                        openDirections: actions.showDirections,
+                        startTrackingDeparture: actions.startTrackingDeparture,
+                        stopTrackingDeparture: actions.stopTrackingDeparture,
+                        scheduleDepartureReminder: actions.scheduleDepartureReminder,
+                        cancelDepartureReminder: actions.cancelDepartureReminder,
+                        toggleDepartureLine: actions.toggleDepartureLine,
+                        showLineDetail: actions.showLineDetail,
+                        selectDeparturePlatform: actions.selectDeparturePlatform
+                    )
+                case .directions:
+                    RouteView(
+                        viewModel: viewModel.route,
+                        calculateRoute: actions.calculateRoute,
+                        selectRouteOption: actions.selectRouteOption,
+                        showMoreRouteOptions: actions.showMoreRouteOptions,
+                        openInAppleMaps: actions.openRouteInAppleMaps,
+                        selectRouteOrigin: actions.selectRouteOrigin,
+                        selectRouteDestination: actions.selectRouteDestination,
+                        applyCommutePreset: actions.applyCommutePreset,
+                        saveCurrentCommutePreset: actions.saveCurrentCommutePreset,
+                        swapRouteEndpoints: actions.swapRouteEndpoints,
+                        updateRouteFilters: actions.updateRouteFilters
+                    )
+                case .routeTimeline:
+                    RouteTimelineView(
+                        viewModel: viewModel.route,
+                        openInAppleMaps: actions.openRouteInAppleMaps
+                    )
+                case .lineDetail:
+                    LineDetailView(
+                        viewModel: viewModel.lineDetail,
+                        selectStop: actions.selectStop,
+                        selectDirection: actions.selectLineDetailDirection
+                    )
+                case .alerts:
+                    AlertsView(
+                        viewModel: viewModel.alerts
+                    )
+                case .settings:
+                    EmptyView()
                 }
             }
+            .safeAreaPadding(.horizontal, 16)
         }
-        .safeAreaPadding(.horizontal, 16)
     }
 }
 

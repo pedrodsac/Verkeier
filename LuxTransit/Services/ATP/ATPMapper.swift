@@ -112,28 +112,20 @@ nonisolated enum ATPMapper {
 
     private static func date(dateString: String?, timeString: String?) -> Date? {
         guard let dateString, let timeString else { return nil }
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(identifier: "Europe/Luxembourg")
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-
-        if let date = formatter.date(from: "\(dateString) \(timeString)") {
-            return date
-        }
-
-        formatter.dateFormat = "yyyyMMdd HH:mm:ss"
-        if let date = formatter.date(from: "\(dateString) \(timeString)") {
-            return date
-        }
-
-        formatter.dateFormat = "yyyyMMdd HHmmss"
-        if let date = formatter.date(from: "\(dateString) \(timeString)") {
-            return date
-        }
-
-        formatter.dateFormat = "yyyyMMdd HH:mm"
-        return formatter.date(from: "\(dateString) \(timeString)")
+        let combined = "\(dateString) \(timeString)"
+        return dateFormatters.lazy.compactMap { $0.date(from: combined) }.first
     }
+
+    private static let dateFormatters: [DateFormatter] = {
+        let formats = ["yyyy-MM-dd HH:mm:ss", "yyyyMMdd HH:mm:ss", "yyyyMMdd HHmmss", "yyyyMMdd HH:mm"]
+        return formats.map { format in
+            let f = DateFormatter()
+            f.locale = Locale(identifier: "en_US_POSIX")
+            f.timeZone = TimeZone(identifier: "Europe/Luxembourg")
+            f.dateFormat = format
+            return f
+        }
+    }()
 
     private static func groupedStop(_ platformStops: [ATPPlatformStop]) -> Stop {
         let sortedPlatformIds = platformStops.map(\.id).sorted()
