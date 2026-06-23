@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcodebuild -project LuxTransit.xcodeproj -scheme LuxTransit -destination *)",
+      "Bash(xcodebuild -project LuxTransit.xcodeproj -list)",
+      "Bash(python3 Scripts/preprocess_gtfs.py *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/swiftformat.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

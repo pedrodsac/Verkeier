@@ -1,0 +1,21 @@
+# SwiftFormat config for LuxTransit
+--swiftversion 6.0
+
+# Indentation & layout
+--indent 4
+--maxwidth 120
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+
+# Keep changes conservative / low-noise
+--self remove
+--importgrouping testable-bottom
+--commas inline
+--trimwhitespace always
+
+# Don't fight Xcode or reorganize declarations
+--disable sortedImports,blankLinesAtStartOfScope,wrapMultilineStatementBraces
+
+# Exclude generated / vendored paths
+--exclude DerivedData,.build,Resources

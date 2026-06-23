@@ -3,3 +3,6 @@ DerivedData/
 Config/LocalConfig.xcconfig
 *.xcuserstate
 .superpowers/
+
+# Claude Code: keep personal settings local, share team config (settings.json, commands/)
+.claude/settings.local.json
