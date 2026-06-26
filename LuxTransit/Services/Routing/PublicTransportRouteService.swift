@@ -486,7 +486,7 @@ private actor PublicTransportRoutingEngine {
             }
         }
 
-        return deduplicated(
+        return deduplicatedByTripSequence(
             candidates
                 .filter { $0.legs.contains { $0.transportKind == .transit } }
                 .map { ScheduledJourney(legs: justInTimeLeadingWalk($0.legs)) }
@@ -586,18 +586,43 @@ private actor PublicTransportRoutingEngine {
         }
     }
 
-    private func deduplicated(_ candidates: [ScheduledJourney]) -> [ScheduledJourney] {
-        var seen: Set<String> = []
-        var unique: [ScheduledJourney] = []
+    /// Collapses journeys that ride the **same ordered sequence of vehicle trips** into
+    /// one. Two itineraries on the identical buses that just change at a different shared
+    /// stop (or board the same trip from a different nearby access stop) are one journey
+    /// to the rider, not five — so they keyed on stop IDs before and showed up repeatedly.
+    /// Keeps the most comfortable representative per trip sequence.
+    private func deduplicatedByTripSequence(_ candidates: [ScheduledJourney]) -> [ScheduledJourney] {
+        var bestBySignature: [String: ScheduledJourney] = [:]
+        var order: [String] = []
 
         for candidate in candidates {
-            let signature = candidate.signature
-            if seen.insert(signature).inserted {
-                unique.append(candidate)
+            let signature = candidate.tripSignature
+            guard let existing = bestBySignature[signature] else {
+                bestBySignature[signature] = candidate
+                order.append(signature)
+                continue
+            }
+            if isMoreComfortable(candidate, than: existing) {
+                bestBySignature[signature] = candidate
             }
         }
 
-        return unique
+        return order.compactMap { bestBySignature[$0] }
+    }
+
+    /// Orders two journeys riding the same vehicles by rider comfort: earliest arrival,
+    /// then latest departure (least waiting before the first bus), then least walking,
+    /// then fewest legs (a same-stop change beats a walk transfer), then the latest
+    /// first-vehicle alight — i.e. stay aboard the first bus to the last shared stop
+    /// rather than hopping off at the earliest one.
+    private func isMoreComfortable(_ lhs: ScheduledJourney, than rhs: ScheduledJourney) -> Bool {
+        if lhs.arrivalTime != rhs.arrivalTime { return lhs.arrivalTime < rhs.arrivalTime }
+        if lhs.departureTime != rhs.departureTime { return lhs.departureTime > rhs.departureTime }
+        if lhs.totalWalkingMeters != rhs.totalWalkingMeters {
+            return lhs.totalWalkingMeters < rhs.totalWalkingMeters
+        }
+        if lhs.legs.count != rhs.legs.count { return lhs.legs.count < rhs.legs.count }
+        return lhs.firstTransitAlightTime > rhs.firstTransitAlightTime
     }
 
     private func routeOption(
@@ -1588,13 +1613,41 @@ private nonisolated struct ScheduledJourney {
         legs.compactMap(\.arrivalTime).last ?? .distantFuture
     }
 
+    var departureTime: Date {
+        legs.compactMap(\.departureTime).first ?? .distantPast
+    }
+
     var firstTransitDeparture: Date {
         legs.first { $0.transportKind == .transit }
             .flatMap { $0.scheduledDepartureTime ?? $0.departureTime } ?? .distantPast
     }
 
+    /// Scheduled arrival of the first transit leg — later means the rider stays aboard
+    /// the first vehicle longer before changing.
+    var firstTransitAlightTime: Date {
+        legs.first { $0.transportKind == .transit }
+            .flatMap { $0.scheduledArrivalTime ?? $0.arrivalTime } ?? .distantPast
+    }
+
+    var totalWalkingMeters: Double {
+        legs.lazy
+            .filter { $0.transportKind == .walking }
+            .compactMap(\.distanceMeters)
+            .reduce(0, +)
+    }
+
     var transitLegCount: Int {
         legs.reduce(0) { $0 + ($1.transportKind == .transit ? 1 : 0) }
+    }
+
+    /// Identity for "the same journey": the ordered vehicle trips ridden. Itineraries
+    /// differing only in where they board/change between the same trips share this.
+    var tripSignature: String {
+        let trips = legs.compactMap { leg -> String? in
+            guard leg.transportKind == .transit else { return nil }
+            return leg.tripId ?? leg.routeId ?? leg.id
+        }
+        return trips.isEmpty ? signature : trips.joined(separator: ">")
     }
 
     var signature: String {

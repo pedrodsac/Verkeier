@@ -890,6 +890,72 @@ struct PublicTransportRouteServiceTests {
         #expect(first.options.first?.id == second.options.first?.id)
     }
 
+    @Test func collapsesOverlappingTransferStopsIntoOneOption() async throws {
+        // Lines A and B share stops S2 and S3, so a rider can change at either while
+        // riding the exact same two vehicles. Before, the engine surfaced one option per
+        // overlapping transfer stop; now they collapse to a single journey that stays
+        // aboard the first bus to the last shared stop (S3).
+        let now = luxembourgDate(hour: 8, minute: 0)
+        let timetable = GTFSTimetableIndexPayload(
+            source: "test",
+            stops: [
+                GTFSTimetableStopEntry(
+                    id: "S1", name: "Origin", latitude: 49.600, longitude: 6.100,
+                    parentStation: nil, platformCode: nil
+                ),
+                GTFSTimetableStopEntry(
+                    id: "S2", name: "Mid A", latitude: 49.610, longitude: 6.110,
+                    parentStation: nil, platformCode: nil
+                ),
+                GTFSTimetableStopEntry(
+                    id: "S3", name: "Mid B", latitude: 49.620, longitude: 6.120,
+                    parentStation: nil, platformCode: nil
+                ),
+                GTFSTimetableStopEntry(
+                    id: "S4", name: "Dest", latitude: 49.630, longitude: 6.130,
+                    parentStation: nil, platformCode: nil
+                )
+            ],
+            routes: [makeRoute(id: "R-A", shortName: "A"), makeRoute(id: "R-B", shortName: "B")],
+            services: [GTFSTimetableServiceEntry(
+                id: "WEEK", weekdays: [], startDate: nil, endDate: nil,
+                addedDates: ["20260614"], removedDates: []
+            )],
+            trips: [
+                timedTrip(id: "T-A", routeId: "R-A", stops: [
+                    ("S1", t(8, 5), t(8, 5)),
+                    ("S2", t(8, 10), t(8, 10)),
+                    ("S3", t(8, 15), t(8, 15))
+                ]),
+                timedTrip(id: "T-B", routeId: "R-B", stops: [
+                    ("S2", t(8, 14), t(8, 14)),
+                    ("S3", t(8, 20), t(8, 20)),
+                    ("S4", t(8, 30), t(8, 30))
+                ])
+            ],
+            transfers: [],
+            shapes: []
+        )
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { now }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(name: "Current Location", latitude: 49.6001, longitude: 6.1001),
+            to: LocationPoint(id: "S4", name: "Dest", latitude: 49.630, longitude: 6.130)
+        )
+
+        #expect(calculation.options.count == 1)
+        let option = try #require(calculation.options.first)
+        #expect(option.transitLegs.map(\.routeId) == ["R-A", "R-B"])
+        // Stayed aboard line A to the last shared stop (S3) rather than changing at S2.
+        #expect(option.transitLegs.first?.destinationStopId == "S3")
+        #expect(option.transitLegs.last?.originStopId == "S3")
+    }
+
     private func luxembourgDate(hour: Int, minute: Int) -> Date {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "Europe/Luxembourg")!
