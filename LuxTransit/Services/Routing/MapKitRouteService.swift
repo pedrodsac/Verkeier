@@ -2,8 +2,10 @@ import MapKit
 
 struct MapKitRouteService: RouteService {
     nonisolated func calculateRoute(
-        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime
+        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime, filters _: RoutePlannerFilters
     ) async throws -> RouteCalculation {
+        // MapKit transit routing has no per-mode/sort hook, so filters are advisory only
+        // here; the public-transport engine is where they take effect.
         let request = MKDirections.Request()
         request.source = mapItem(for: from)
         request.destination = mapItem(for: to)

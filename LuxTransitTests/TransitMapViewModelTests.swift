@@ -662,7 +662,7 @@ private final class MockRouteService: RouteService, @unchecked Sendable {
     }
 
     func calculateRoute(
-        from _: LocationPoint, to _: LocationPoint, time _: RoutePlanningTime
+        from _: LocationPoint, to _: LocationPoint, time _: RoutePlanningTime, filters _: RoutePlannerFilters
     ) async throws -> RouteCalculation {
         calculateCallCount += 1
         return try result.get()

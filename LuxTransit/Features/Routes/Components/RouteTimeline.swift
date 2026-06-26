@@ -109,12 +109,17 @@ struct RouteLegList: View {
 private struct TimelinePlaceRow: View {
     let node: PlaceNode
 
+    // Vertical centre of the first text line, so the dot/time anchor to the
+    // top line when a stop name wraps. Scales with Dynamic Type.
+    // ponytail: tuned to subheadline line height; nudge if the dot drifts off the time.
+    @ScaledMetric(relativeTo: .subheadline) private var firstLineCentre: CGFloat = 11
+
     var body: some View {
-        HStack(alignment: .center, spacing: RouteTimelineLayout.columnSpacing) {
-            TimelineRail(above: node.railAbove, below: node.railBelow, dot: true)
+        HStack(alignment: .top, spacing: RouteTimelineLayout.columnSpacing) {
+            TimelineRail(above: node.railAbove, below: node.railBelow, dot: true, junctionFromTop: firstLineCentre)
                 .frame(width: RouteTimelineLayout.railColumnWidth)
 
-            VStack(alignment: .leading, spacing: 1) {
+            HStack(alignment: .firstTextBaseline, spacing: 5) {
                 Text(node.time?.formatted(date: .omitted, time: .shortened) ?? "")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.primary)
@@ -132,6 +137,7 @@ private struct TimelinePlaceRow: View {
                 Text(node.name)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.primary)
+                    .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 4)
                 if let platform = node.platform, !platform.isEmpty {
@@ -146,7 +152,9 @@ private struct TimelinePlaceRow: View {
     }
 
     private var delayText: String {
-        "+\(node.delayMinutes ?? 0)"
+        if node.liveStatus == .cancelled { return "Cancelled" }
+        let mins = node.delayMinutes ?? 0
+        return mins > 0 ? "+\(mins)" : "\(mins)"
     }
 
     private var delayColor: Color {
@@ -168,9 +176,6 @@ private struct TimelineSegmentRow: View {
         HStack(alignment: .center, spacing: RouteTimelineLayout.columnSpacing) {
             TimelineRail(above: node.rail, below: node.rail, dot: false)
                 .frame(width: RouteTimelineLayout.railColumnWidth)
-
-            Color.clear
-                .frame(width: RouteTimelineLayout.timeColumnWidth, height: 0)
 
             VStack(alignment: .leading, spacing: 4) {
                 content
@@ -204,11 +209,14 @@ private struct TimelineSegmentRow: View {
                             .foregroundStyle(.primary)
                     }
                 }
-            }
-            if let mins = node.durationMinutes {
-                Text("\(mins) min")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                if let mins = node.durationMinutes {
+                    Text("\(mins) min")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
             }
         case .walk, .transfer:
             Label {
@@ -254,23 +262,26 @@ private struct TimelineRail: View {
     let above: RailStyle?
     let below: RailStyle?
     let dot: Bool
+    /// Where the dot and the above/below rail meet, measured from the top.
+    /// `nil` centres it — used by segment rows, where the rail just passes through.
+    var junctionFromTop: CGFloat?
 
     var body: some View {
         GeometryReader { proxy in
             let midX = proxy.size.width / 2
-            let midY = proxy.size.height / 2
+            let junctionY = junctionFromTop ?? proxy.size.height / 2
             ZStack {
                 if let above {
-                    railLine(above, from: CGPoint(x: midX, y: 0), to: CGPoint(x: midX, y: midY))
+                    railLine(above, from: CGPoint(x: midX, y: 0), to: CGPoint(x: midX, y: junctionY))
                 }
                 if let below {
-                    railLine(below, from: CGPoint(x: midX, y: midY), to: CGPoint(x: midX, y: proxy.size.height))
+                    railLine(below, from: CGPoint(x: midX, y: junctionY), to: CGPoint(x: midX, y: proxy.size.height))
                 }
                 if dot {
                     Circle()
                         .fill(dotColor)
                         .frame(width: RouteTimelineLayout.dotSize, height: RouteTimelineLayout.dotSize)
-                        .position(x: midX, y: midY)
+                        .position(x: midX, y: junctionY)
                 }
             }
         }
@@ -335,7 +346,7 @@ private struct TimelineLineBadge: View {
 // MARK: - Layout constants
 
 private enum RouteTimelineLayout {
-    static let timeColumnWidth: CGFloat = 52
+    static let timeColumnWidth: CGFloat = 65
     static let railColumnWidth: CGFloat = 24
     static let columnSpacing: CGFloat = 10
     static let railWidth: CGFloat = 2.5
@@ -398,10 +409,12 @@ private enum RouteTimelineLayout {
         instruction: "Take bus 16 toward Luxexpo",
         transportKind: .transit,
         routeName: "16",
+        headsign: "Luxexpo, Gare routière",
         origin: previewKirchberg,
         destination: previewLuxexpo,
         departureTime: Date().addingTimeInterval(16 * 60),
         arrivalTime: Date().addingTimeInterval(22 * 60),
+        platform: "3",
         liveStatus: .scheduled,
         transferWarning: "Only 1 min to transfer"
     )
@@ -476,13 +489,56 @@ private enum RouteTimelineLayout {
     }
 
     #Preview("Timeline – Walk + Tram + Bus + Walk", traits: .sizeThatFitsLayout) {
-        RouteLegList(legs: [previewWalkLeg, previewTramLeg, previewBusLeg, previewFinalWalkLeg])
-            .padding()
+        ScrollView {
+            RouteLegList(legs: [previewWalkLeg, previewTramLeg, previewBusLeg, previewFinalWalkLeg])
+                .padding()
+        }
     }
 
     #Preview("Timeline – Delayed", traits: .sizeThatFitsLayout) {
         RouteLegList(legs: previewDelayedOption.plan.legs)
             .padding()
+    }
+
+    #Preview("Timeline – Long names", traits: .sizeThatFitsLayout) {
+        let longHamilius = LocationPoint(
+            id: "ham-long",
+            name: "Luxembourg, Hamilius — Centre Quai 3 Direction Kirchberg",
+            latitude: 49.6111,
+            longitude: 6.1275
+        )
+        let walk = RoutePlan.Leg(
+            id: "lw",
+            mode: .walking,
+            instruction: "Walk",
+            transportKind: .walking,
+            origin: LocationPoint(
+                id: "o-long",
+                name: "Senningerberg, Breedewues Gare Routière Sud",
+                latitude: 49.6116,
+                longitude: 6.1319
+            ),
+            destination: longHamilius,
+            departureTime: Date(),
+            arrivalTime: Date().addingTimeInterval(4 * 60),
+            distanceMeters: 320
+        )
+        let tram = RoutePlan.Leg(
+            id: "lt",
+            mode: .tram,
+            instruction: "Tram",
+            transportKind: .transit,
+            routeName: "T1",
+            origin: longHamilius,
+            destination: previewKirchberg,
+            departureTime: Date().addingTimeInterval(6 * 60),
+            arrivalTime: Date().addingTimeInterval(14 * 60),
+            platform: "2",
+            liveStatus: .scheduled
+        )
+        return ScrollView {
+            RouteLegList(legs: [walk, tram, previewFinalWalkLeg]).padding()
+        }
     }
 
 #endif

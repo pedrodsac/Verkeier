@@ -11,10 +11,12 @@ protocol RouteService: Sendable {
     ///   - from: Journey origin.
     ///   - to: Journey destination.
     ///   - time: When the rider wants to travel (now / depart at / arrive by).
+    ///   - filters: Rider constraints (sort / mode / accessibility) applied while
+    ///     planning so preferred-mode journeys survive truncation.
     /// - Returns: A ``RouteCalculation`` holding one or more options.
     /// - Throws: ``RoutingError`` when no usable route can be produced.
     nonisolated func calculateRoute(
-        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime
+        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime, filters: RoutePlannerFilters
     ) async throws -> RouteCalculation
 
     /// Opens the journey in Apple Maps for turn-by-turn navigation.
@@ -22,9 +24,16 @@ protocol RouteService: Sendable {
 }
 
 extension RouteService {
-    /// Convenience that plans for immediate departure.
+    /// Convenience that plans for immediate departure with default filters.
     nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint) async throws -> RouteCalculation {
-        try await calculateRoute(from: from, to: to, time: .leaveNow)
+        try await calculateRoute(from: from, to: to, time: .leaveNow, filters: RoutePlannerFilters())
+    }
+
+    /// Convenience that plans for the given time with default filters.
+    nonisolated func calculateRoute(
+        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime
+    ) async throws -> RouteCalculation {
+        try await calculateRoute(from: from, to: to, time: time, filters: RoutePlannerFilters())
     }
 }
 

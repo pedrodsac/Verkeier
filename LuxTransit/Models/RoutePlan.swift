@@ -5,13 +5,13 @@ import Foundation
 /// A plan is an ordered list of ``RoutePlan/Leg`` values that alternate between
 /// walking and transit. It is produced by a ``RouteService`` and usually wrapped
 /// in a ``RouteOption`` (which adds map overlay and live-status derivations).
-nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
+nonisolated struct RoutePlan: Codable, Hashable, Identifiable {
     /// A single contiguous segment of a ``RoutePlan`` in one mode.
     ///
     /// Carries both scheduled and realtime times where known; the scheduled
     /// fields fall back to ``departureTime`` / ``arrivalTime`` when not given
     /// explicitly.
-    nonisolated struct Leg: Codable, Hashable, Identifiable, Sendable {
+    nonisolated struct Leg: Codable, Hashable, Identifiable {
         /// Stable identifier for the leg.
         let id: String
         /// Transport mode for this leg.
@@ -22,6 +22,8 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
         let transportKind: RouteLegTransportKind
         /// Public line label for transit legs.
         let routeName: String?
+        /// Line terminus / direction (GTFS trip headsign) for transit legs.
+        let headsign: String?
         /// Route identifier for transit legs.
         let routeId: String?
         /// Trip identifier for transit legs.
@@ -67,6 +69,7 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
             instruction: String? = nil,
             transportKind: RouteLegTransportKind,
             routeName: String? = nil,
+            headsign: String? = nil,
             routeId: String? = nil,
             tripId: String? = nil,
             originStopId: String? = nil,
@@ -92,6 +95,7 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
             self.instruction = instruction
             self.transportKind = transportKind
             self.routeName = routeName
+            self.headsign = headsign
             self.routeId = routeId
             self.tripId = tripId
             self.originStopId = originStopId
@@ -131,7 +135,7 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
 }
 
 /// Coarse classification of a ``RoutePlan/Leg``.
-enum RouteLegTransportKind: String, Codable, Hashable, Sendable {
+enum RouteLegTransportKind: String, Codable, Hashable {
     /// A ride on a transit line.
     case transit
     /// An on-foot segment.
@@ -153,7 +157,7 @@ enum RouteLegTransportKind: String, Codable, Hashable, Sendable {
 
 /// Hint for whether a leg's geometry should be snapped to a road/path network
 /// when drawn, and by which profile.
-enum RouteLegRoadRoutingHint: String, Codable, Hashable, Sendable {
+enum RouteLegRoadRoutingHint: String, Codable, Hashable {
     /// Use the straight geometry as given.
     case none
     case automobile
@@ -161,7 +165,7 @@ enum RouteLegRoadRoutingHint: String, Codable, Hashable, Sendable {
 }
 
 /// Live-status classification for a transit ``RoutePlan/Leg``.
-enum RouteLegLiveStatus: String, Codable, Hashable, Sendable {
+enum RouteLegLiveStatus: String, Codable, Hashable {
     /// No realtime data; timetable only.
     case scheduled
     /// Realtime data present and on schedule.

@@ -503,7 +503,7 @@ final class TransitMapViewModel {
 
         do {
             let calculation = try await routeService.calculateRoute(
-                from: origin, to: destination.location, time: routePlanningTime
+                from: origin, to: destination.location, time: routePlanningTime, filters: routeFilters
             )
             guard requestGeneration == routeCalculationGeneration else { return }
             unfilteredRouteOptions = calculation.options

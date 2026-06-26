@@ -61,7 +61,7 @@ struct SegmentNode: Identifiable, Equatable {
     let mode: TransportMode
     /// Line label for transit legs (e.g. "T1", "29").
     let badgeText: String?
-    /// Destination/headsign name for transit legs.
+    /// Line terminus / direction name for transit legs.
     let headsign: String?
     let durationMinutes: Int?
     let distanceMeters: Double?
@@ -113,13 +113,19 @@ enum RouteTimelineBuilder {
         // Boarding time when leaving here, otherwise the arrival from below.
         let time = outgoing.map { departureTime(of: $0) } ?? incoming.map { arrivalTime(of: $0) } ?? nil
 
+        // Badge only when there's something to say: a non-zero delay or a cancellation.
+        // An on-time live leg shows no "+0" — on time needs no callout.
+        let status = outgoingTransit?.liveStatus ?? .scheduled
+        let delay = outgoingTransit?.delayMinutes ?? 0
+        let showsDelayBadge = status == .cancelled || (status != .scheduled && delay != 0)
+
         return PlaceNode(
             id: id,
             name: point.name ?? "Stop",
             time: time,
             delayMinutes: outgoingTransit?.delayMinutes,
-            liveStatus: outgoingTransit?.liveStatus ?? .scheduled,
-            showsDelayBadge: (outgoingTransit?.liveStatus ?? .scheduled) != .scheduled,
+            liveStatus: status,
+            showsDelayBadge: showsDelayBadge,
             platform: outgoingTransit?.platform,
             railAbove: incoming.map(railStyle(for:)),
             railBelow: outgoing.map(railStyle(for:))
@@ -149,7 +155,7 @@ enum RouteTimelineBuilder {
             kind: kind,
             mode: leg.mode,
             badgeText: kind == .transit ? leg.routeName : nil,
-            headsign: kind == .transit ? leg.destination.name : nil,
+            headsign: kind == .transit ? (leg.headsign ?? leg.destination.name) : nil,
             durationMinutes: durationMinutes(of: leg),
             distanceMeters: kind == .transit ? nil : leg.distanceMeters,
             transferWarning: leg.transferWarning,

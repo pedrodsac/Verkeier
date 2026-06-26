@@ -27,9 +27,9 @@ struct PublicTransportRouteService: RouteService {
     }
 
     nonisolated func calculateRoute(
-        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime
+        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime, filters: RoutePlannerFilters
     ) async throws -> RouteCalculation {
-        try await engine.calculateRoute(from: from, to: to, time: time)
+        try await engine.calculateRoute(from: from, to: to, time: time, filters: filters)
     }
 
     @MainActor func openInAppleMaps(from: LocationPoint, to: LocationPoint) {
@@ -146,6 +146,11 @@ private actor PublicTransportRoutingEngine {
     private let walkingSpeedMetersPerSecond = 1.33
     private let evaluatedCandidateLimit = 18
     private let returnedOptionLimit = 18
+    /// Below this, an access/egress walk is too short to be worth showing as its own leg.
+    private let minimumWalkLegMeters = 25.0
+    /// Penalties at or above this mark a journey as effectively infeasible (cancelled /
+    /// broken connection) so arrive-by ranking sinks them below the soft no-realtime nudge.
+    private let severePenaltyThreshold = 1000
     // Time-equivalent cost of one transfer when ranking journeys. 5 minutes is a
     // common transit-routing value; raise it to bias harder towards fewer transfers.
     private let transferPenaltySeconds = 300
@@ -167,7 +172,10 @@ private actor PublicTransportRoutingEngine {
     }
 
     func calculateRoute(
-        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime = .leaveNow
+        from: LocationPoint,
+        to: LocationPoint,
+        time: RoutePlanningTime = .leaveNow,
+        filters: RoutePlannerFilters = RoutePlannerFilters()
     ) async throws -> RouteCalculation {
         guard let timetable = await gtfsService.timetableIndex(), !timetable.trips.isEmpty else {
             throw RoutingError.timetableUnavailable
@@ -200,22 +208,43 @@ private actor PublicTransportRoutingEngine {
         if let arriveByLimit {
             scheduledCandidates = scheduledCandidates.filter { $0.arrivalTime <= arriveByLimit }
         }
+
+        // Honour a mode preference before truncation, so a valid (e.g.) tram itinerary
+        // can't be discarded by cheaper buses. Relax if nothing matches rather than
+        // returning no route — the view model surfaces the "closest alternatives" note.
+        if let preferredMode = filters.modePreference.transportMode {
+            let preferred = scheduledCandidates.filter { journey in
+                journey.legs.contains { $0.transportKind == .transit && $0.mode == preferredMode }
+            }
+            if !preferred.isEmpty {
+                scheduledCandidates = preferred
+            }
+        }
+
         guard !scheduledCandidates.isEmpty else {
             throw RoutingError.noPublicTransportRoute
         }
 
         try Task.checkCancellation()
 
+        // Arrive-by wants the latest journey you can still board in time; everything
+        // else wants the lowest comfort cost (earliest arrival + transfer penalty).
+        let preferLatestDeparture = arriveByLimit != nil
+
         // Keep low-transfer journeys alive through truncation: drop only journeys that
-        // are strictly worse on every axis, then pick the cheapest by comfort cost
-        // (arrival + transfer penalty) rather than the earliest-arriving alone.
+        // are strictly worse on every axis, then rank by the active objective rather
+        // than the earliest-arriving alone.
         let selectedScheduled = paretoFiltered(
             scheduledCandidates,
             departure: \.firstTransitDeparture,
             arrival: \.arrivalTime,
             transfers: \.transitLegCount
         )
-        .sorted { scheduledComfortCostSeconds($0) < scheduledComfortCostSeconds($1) }
+        .sorted { lhs, rhs in
+            preferLatestDeparture
+                ? departsLater(lhs, rhs)
+                : scheduledComfortCostSeconds(lhs) < scheduledComfortCostSeconds(rhs)
+        }
         .prefix(evaluatedCandidateLimit)
 
         let enrichedCandidates = await enrich(Array(selectedScheduled), context: context)
@@ -225,14 +254,17 @@ private actor PublicTransportRoutingEngine {
             arrival: \.arrivalTime,
             transfers: \.transitLegCount
         )
-        .sorted { comfortCostSeconds($0) < comfortCostSeconds($1) }
+        .sorted { lhs, rhs in
+            preferLatestDeparture
+                ? departsLater(lhs, rhs)
+                : comfortCostSeconds(lhs) < comfortCostSeconds(rhs)
+        }
         .prefix(returnedOptionLimit)
         var options: [RouteOption] = []
         options.reserveCapacity(sortedCandidates.count)
-        for (index, candidate) in sortedCandidates.enumerated() {
+        for candidate in sortedCandidates {
             if let option = await routeOption(
                 from: candidate,
-                index: index,
                 origin: from,
                 destination: to,
                 context: context
@@ -304,7 +336,7 @@ private actor PublicTransportRoutingEngine {
             queue.push(JourneyState(
                 stopId: originCandidate.stop.id,
                 readySeconds: context.currentSeconds + walkSeconds,
-                legs: originCandidate.distanceMeters > 25 ? [accessLeg] : [],
+                legs: originCandidate.distanceMeters > minimumWalkLegMeters ? [accessLeg] : [],
                 transitLegCount: 0,
                 visitedStopIds: [originCandidate.stop.id]
             ))
@@ -331,7 +363,7 @@ private actor PublicTransportRoutingEngine {
                     distanceMeters: destinationCandidate.distanceMeters,
                     instruction: "Walk to \(destination.name ?? destinationCandidate.stop.name)"
                 )
-                let completeLegs = destinationCandidate.distanceMeters > 25
+                let completeLegs = destinationCandidate.distanceMeters > minimumWalkLegMeters
                     ? state.legs + [egressLeg]
                     : state.legs
                 candidates.append(ScheduledJourney(legs: completeLegs))
@@ -356,9 +388,14 @@ private actor PublicTransportRoutingEngine {
                 guard boardTime.departureSeconds >= boardingReadySeconds else {
                     continue
                 }
-                guard boardTime.departureSeconds <= context.currentSeconds + searchHorizonSeconds,
-                      boardTime.pickupType != "1" else {
+                // References are sorted by departure time, so the horizon check is
+                // monotonic (break). No-pickup is per-trip, so it must skip this trip
+                // only (continue) — breaking here would drop every later departure.
+                guard boardTime.departureSeconds <= context.currentSeconds + searchHorizonSeconds else {
                     break
+                }
+                guard boardTime.pickupType != "1" else {
+                    continue
                 }
 
                 for downstreamIndex in trip.stopTimes.indices.dropFirst(reference.stopTimeIndex + 1) {
@@ -374,6 +411,9 @@ private actor PublicTransportRoutingEngine {
 
                     let isDestinationStop = destinationStopsById[alightTime.stopId] != nil
                     if !isDestinationStop {
+                        // ponytail: time-only label pruning at (stop, legCount). Can drop a
+                        // slightly-later arrival that would enable a strictly better
+                        // continuation; add a small slack term here if optimality matters.
                         let key = "\(alightTime.stopId)|\(state.transitLegCount + 1)"
                         if let bestArrival = bestArrivalByStopAndLegCount[key],
                            bestArrival <= alightTime.arrivalSeconds {
@@ -449,8 +489,38 @@ private actor PublicTransportRoutingEngine {
         return deduplicated(
             candidates
                 .filter { $0.legs.contains { $0.transportKind == .transit } }
+                .map { ScheduledJourney(legs: justInTimeLeadingWalk($0.legs)) }
                 .sorted { $0.arrivalTime < $1.arrivalTime }
         )
+    }
+
+    /// Collapses dead time before boarding by snapping any leading walking legs to
+    /// abut the first transit departure (`arrival = board`, `departure = board − walk`).
+    /// Without this an arrive-by plan's access walk starts at the search anchor (hours
+    /// early); with it the plan reflects the real "leave by" time.
+    private func justInTimeLeadingWalk(_ legs: [RoutePlan.Leg]) -> [RoutePlan.Leg] {
+        guard let firstTransitIndex = legs.firstIndex(where: { $0.transportKind == .transit }),
+              firstTransitIndex > 0,
+              let board = legs[firstTransitIndex].scheduledDepartureTime
+              ?? legs[firstTransitIndex].departureTime else {
+            return legs
+        }
+
+        var result = legs
+        var anchor = board
+        for index in stride(from: firstTransitIndex - 1, through: 0, by: -1) {
+            let leg = result[index]
+            guard leg.transportKind == .walking,
+                  let departure = leg.departureTime,
+                  let arrival = leg.arrivalTime else {
+                break
+            }
+            let duration = arrival.timeIntervalSince(departure)
+            let shiftedDeparture = anchor.addingTimeInterval(-duration)
+            result[index] = copy(leg, departureTime: shiftedDeparture, arrivalTime: anchor)
+            anchor = shiftedDeparture
+        }
+        return result
     }
 
     private func enrich(
@@ -532,10 +602,9 @@ private actor PublicTransportRoutingEngine {
 
     private func routeOption(
         from candidate: RouteCandidate,
-        index: Int,
         origin: LocationPoint,
         destination: LocationPoint,
-        context: RouteSearchContext
+        context _: RouteSearchContext
     ) async -> RouteOption? {
         let legs = legsWithTransferWarnings(candidate.legs)
         guard legs.contains(where: { $0.transportKind == .transit }) else {
@@ -543,12 +612,12 @@ private actor PublicTransportRoutingEngine {
         }
         let overlayLegs = await legsWithRoadRoutedSegments(legs)
 
-        let optionID = "gtfs-option-\(origin.id)-\(destination.id)-\(Int(context.now.timeIntervalSince1970))-\(index)"
+        let optionID = "gtfs-option-\(origin.id)-\(destination.id)-\(optionSignature(for: legs))"
         let plan = RoutePlan(
             id: optionID,
             origin: origin,
             destination: destination,
-            expectedTravelTime: legs.compactMap(\.arrivalTime).last?.timeIntervalSince(context.now),
+            expectedTravelTime: travelTime(for: legs),
             distanceMeters: legs.compactMap(\.distanceMeters).reduce(0, +),
             legs: legs,
             dataSource: .gtfs
@@ -836,6 +905,64 @@ private actor PublicTransportRoutingEngine {
             + Double(journey.transitLegCount * transferPenaltySeconds)
     }
 
+    /// Arrive-by ranking: prefer the journey you can board **latest** (less waiting),
+    /// among feasible ones, then fewer transfers, then earlier arrival. Cancelled /
+    /// broken candidates (severe penalty) sink to the bottom.
+    private func departsLater(_ lhs: ScheduledJourney, _ rhs: ScheduledJourney) -> Bool {
+        if lhs.firstTransitDeparture != rhs.firstTransitDeparture {
+            return lhs.firstTransitDeparture > rhs.firstTransitDeparture
+        }
+        if lhs.transitLegCount != rhs.transitLegCount {
+            return lhs.transitLegCount < rhs.transitLegCount
+        }
+        return lhs.arrivalTime < rhs.arrivalTime
+    }
+
+    private func departsLater(_ lhs: RouteCandidate, _ rhs: RouteCandidate) -> Bool {
+        let lhsSevere = lhs.penalty >= severePenaltyThreshold
+        let rhsSevere = rhs.penalty >= severePenaltyThreshold
+        if lhsSevere != rhsSevere {
+            return !lhsSevere
+        }
+        if lhs.firstTransitDeparture != rhs.firstTransitDeparture {
+            return lhs.firstTransitDeparture > rhs.firstTransitDeparture
+        }
+        if lhs.transitLegCount != rhs.transitLegCount {
+            return lhs.transitLegCount < rhs.transitLegCount
+        }
+        return lhs.arrivalTime < rhs.arrivalTime
+    }
+
+    /// Door-to-door duration: last arrival minus the first leg's actual departure.
+    /// Uses the journey's own start (not the search anchor), so arrive-by plans don't
+    /// report the hours of phantom wait baked into the anchored `now`.
+    private func travelTime(for legs: [RoutePlan.Leg]) -> TimeInterval? {
+        guard let start = legs.compactMap(\.departureTime).first,
+              let end = legs.compactMap(\.arrivalTime).last else {
+            return nil
+        }
+        return end.timeIntervalSince(start)
+    }
+
+    /// Stable per-itinerary identity from the transit trips and walk endpoints (never
+    /// wall-clock), so a `.leaveNow` recalculation keeps the rider's selected option.
+    private func optionSignature(for legs: [RoutePlan.Leg]) -> String {
+        legs.map { leg in
+            switch leg.transportKind {
+            case .transit:
+                [
+                    "t",
+                    leg.tripId ?? leg.routeId ?? leg.id,
+                    leg.originStopId ?? "",
+                    leg.destinationStopId ?? "",
+                    String(Int(leg.scheduledDepartureTime?.timeIntervalSince1970 ?? 0))
+                ].joined(separator: ":")
+            default:
+                ["w", leg.origin.id, leg.destination.id].joined(separator: ":")
+            }
+        }.joined(separator: "-")
+    }
+
     /// Removes journeys dominated on all three axes — a dominated journey boards its
     /// first transit leg no earlier, arrives no later, and uses no fewer transfers than
     /// another, with at least one of those strictly worse. Keeping the departure axis
@@ -963,6 +1090,7 @@ private actor PublicTransportRoutingEngine {
             instruction: "Take \(routeName ?? route.id) to \(destinationName)",
             transportKind: .transit,
             routeName: routeName,
+            headsign: trip.headsign ?? alightTime.headsign,
             routeId: route.id,
             tripId: trip.id,
             originStopId: boardStop.id,
@@ -1068,6 +1196,7 @@ private actor PublicTransportRoutingEngine {
             instruction: leg.instruction,
             transportKind: leg.transportKind,
             routeName: leg.routeName,
+            headsign: leg.headsign,
             routeId: leg.routeId,
             tripId: leg.tripId,
             originStopId: leg.originStopId,
@@ -1233,11 +1362,26 @@ private nonisolated struct CachedRouteSearchContext {
             on: now,
             calendar: calendar
         )
-        let activeTripsValue = timetable.trips.filter { activeServiceIds.contains($0.serviceId) }
+        var combinedTrips = timetable.trips.filter { activeServiceIds.contains($0.serviceId) }
+
+        // GTFS service days run past 24:00, so a just-after-midnight search must also see
+        // yesterday's late trips. Pull the previous day's services and shift their
+        // midnight-crossing trips back a day onto today's clock.
+        let previousDay = calendar.date(byAdding: .day, value: -1, to: now) ?? now
+        let previousServiceIds = Self.activeServiceIds(
+            in: timetable.services,
+            on: previousDay,
+            calendar: calendar
+        )
+        let yesterdayLateTrips = timetable.trips
+            .filter { previousServiceIds.contains($0.serviceId) }
+            .filter { ($0.stopTimes.map(\.departureSeconds).max() ?? 0) >= Self.secondsPerDay }
+            .map { Self.shiftedBackADay($0) }
+        combinedTrips.append(contentsOf: yesterdayLateTrips)
 
         var references: [String: [TripStopReference]] = [:]
-        for tripIndex in activeTripsValue.indices {
-            let trip = activeTripsValue[tripIndex]
+        for tripIndex in combinedTrips.indices {
+            let trip = combinedTrips[tripIndex]
             for stopTimeIndex in trip.stopTimes.indices.dropLast() {
                 let stopTime = trip.stopTimes[stopTimeIndex]
                 references[stopTime.stopId, default: []].append(
@@ -1247,14 +1391,95 @@ private nonisolated struct CachedRouteSearchContext {
         }
         let sortedReferences = references.mapValues {
             $0.sorted {
-                activeTripsValue[$0.tripIndex].stopTimes[$0.stopTimeIndex].departureSeconds
-                    < activeTripsValue[$1.tripIndex].stopTimes[$1.stopTimeIndex].departureSeconds
+                combinedTrips[$0.tripIndex].stopTimes[$0.stopTimeIndex].departureSeconds
+                    < combinedTrips[$1.tripIndex].stopTimes[$1.stopTimeIndex].departureSeconds
             }
         }
 
-        activeTrips = activeTripsValue
+        activeTrips = combinedTrips
         tripReferencesByStopId = sortedReferences
-        transfersByFromStopId = Dictionary(grouping: timetable.transfers, by: \.fromStopId)
+        transfersByFromStopId = Self.transfers(
+            stops: timetable.stops,
+            declaredTransfers: timetable.transfers
+        )
+    }
+
+    private static let secondsPerDay = 86400
+
+    /// Re-stamps a trip's stop times a day earlier so a previous-service-day trip that
+    /// crosses midnight (e.g. `24:30`) lines up with today's `serviceStart` clock.
+    private static func shiftedBackADay(_ trip: GTFSTimetableTripEntry) -> GTFSTimetableTripEntry {
+        GTFSTimetableTripEntry(
+            id: "\(trip.id)#prev",
+            routeId: trip.routeId,
+            serviceId: trip.serviceId,
+            headsign: trip.headsign,
+            directionId: trip.directionId,
+            shapeId: trip.shapeId,
+            stopTimes: trip.stopTimes.map { stopTime in
+                GTFSTimetableStopTimeEntry(
+                    stopId: stopTime.stopId,
+                    arrivalSeconds: stopTime.arrivalSeconds - secondsPerDay,
+                    departureSeconds: stopTime.departureSeconds - secondsPerDay,
+                    sequence: stopTime.sequence,
+                    headsign: stopTime.headsign,
+                    pickupType: stopTime.pickupType,
+                    dropOffType: stopTime.dropOffType,
+                    shapeDistanceTraveled: stopTime.shapeDistanceTraveled
+                )
+            }
+        )
+    }
+
+    /// Declared `transfers.txt` edges augmented with synthesised foot-transfers between
+    /// stops within walking range — so riders can change lines at stations split across
+    /// platform stop IDs (or between adjacent stops) even when the feed omits them.
+    private static func transfers(
+        stops: [GTFSTimetableStopEntry],
+        declaredTransfers: [GTFSTimetableTransferEntry]
+    ) -> [String: [GTFSTimetableTransferEntry]] {
+        var grouped = Dictionary(grouping: declaredTransfers, by: \.fromStopId)
+        var seenPairs = Set(declaredTransfers.map { "\($0.fromStopId)|\($0.toStopId)" })
+
+        // ponytail: grid bucketing keeps this near-linear; swap for a KD-tree only if the
+        // full feed makes context rebuilds slow.
+        let radiusMeters = 200.0
+        let cellDegrees = 0.0025 // ~250 m, a touch wider than the radius
+        var grid: [GridCell: [GTFSTimetableStopEntry]] = [:]
+        for stop in stops {
+            grid[GridCell(stop: stop, cellDegrees: cellDegrees), default: []].append(stop)
+        }
+
+        for stop in stops {
+            let base = GridCell(stop: stop, cellDegrees: cellDegrees)
+            for deltaLatitude in -1 ... 1 {
+                for deltaLongitude in -1 ... 1 {
+                    let neighbours = grid[
+                        GridCell(
+                            latitude: base.latitude + deltaLatitude,
+                            longitude: base.longitude + deltaLongitude
+                        ),
+                        default: []
+                    ]
+                    for other in neighbours where other.id != stop.id {
+                        let pair = "\(stop.id)|\(other.id)"
+                        guard !seenPairs.contains(pair),
+                              distanceMeters(from: stop.location, to: other.location) <= radiusMeters else {
+                            continue
+                        }
+                        seenPairs.insert(pair)
+                        grouped[stop.id, default: []].append(
+                            GTFSTimetableTransferEntry(
+                                fromStopId: stop.id,
+                                toStopId: other.id,
+                                minimumTransferSeconds: nil
+                            )
+                        )
+                    }
+                }
+            }
+        }
+        return grouped
     }
 
     private static func activeServiceIds(
@@ -1321,6 +1546,22 @@ private nonisolated struct RouteSearchCacheKey: Equatable {
 private nonisolated struct TripStopReference {
     let tripIndex: Int
     let stopTimeIndex: Int
+}
+
+/// A fixed-size lat/lon bucket used to find nearby stops without an O(n²) scan.
+private nonisolated struct GridCell: Hashable {
+    let latitude: Int
+    let longitude: Int
+
+    init(latitude: Int, longitude: Int) {
+        self.latitude = latitude
+        self.longitude = longitude
+    }
+
+    init(stop: GTFSTimetableStopEntry, cellDegrees: Double) {
+        latitude = Int((stop.latitude / cellDegrees).rounded(.down))
+        longitude = Int((stop.longitude / cellDegrees).rounded(.down))
+    }
 }
 
 private nonisolated struct StopCandidate {
