@@ -92,3 +92,29 @@ struct UnavailableBikeShareService: BikeShareService {
         []
     }
 }
+
+// MARK: - Station facilities (amenities, elevator status, imagery)
+
+/// Static and live facility info for a station: amenities, lift outages, imagery.
+struct StationFacilities: Hashable {
+    var hasTicketMachine: Bool?
+    var hasWaitingRoom: Bool?
+    var hasShelter: Bool?
+    /// Names/labels of currently out-of-service elevators or escalators.
+    var outOfServiceLifts: [String]
+    /// Station photo / imagery, when an asset source provides one.
+    var imageURL: URL?
+}
+
+/// Facilities for a stop. No amenity dataset, CFL lift-status infeed, or imagery
+/// source is bundled yet, so the live implementation returns `nil`.
+// ponytail: stubbed — wire when station amenity / CFL lift / imagery feeds are confirmed.
+protocol StationFacilitiesService: Sendable {
+    func facilities(forStopId stopId: String) async -> StationFacilities?
+}
+
+struct UnavailableStationFacilitiesService: StationFacilitiesService {
+    func facilities(forStopId _: String) async -> StationFacilities? {
+        nil
+    }
+}

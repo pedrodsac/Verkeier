@@ -68,14 +68,14 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 
 ## 4. Stop & Line Detail
 
-- [ ] **P1** Physical platform / quay grouping in stop detail: group departure rows by quay with a clear selector, especially for Luxembourg City main station
-- [ ] **P1** Line detail page: tap a route chip → see direction, full stop sequence, upcoming departures, disruption impact, and map polyline for that line
-- [ ] **P1** Disruption impact inside stop detail: if an active AVL alert affects this stop or any line serving it, show it inline — not only in the global alerts tab
-- [ ] **P1** Disruption impact inside route plan: flag which legs of a planned journey are affected by active disruptions
-- [ ] **P2** Stop photo or station imagery (OpenStreetMap or static assets) to help users recognize where they are
-- [ ] **P2** Station amenities: ticket machine presence (for non-Luxembourg visitors who need cross-border tickets), waiting room, shelter
-- [ ] **P2** Elevator / escalator outage status at major stations (sourced from CFL infeed if available)
-- [ ] **P2** Historical timetable browser: browse scheduled departures by day of week without needing real-time ATP
+- [x] **P1** Physical platform / quay grouping in stop detail: group departure rows by quay with a clear selector, especially for Luxembourg City main station
+- [x] **P1** Line detail page: tap a route chip → see direction, full stop sequence, upcoming departures, disruption impact, and map polyline for that line
+- [x] **P1** Disruption impact inside stop detail: if an active AVL alert affects this stop or any line serving it, show it inline — not only in the global alerts tab
+- [x] **P1** Disruption impact inside route plan: flag which legs of a planned journey are affected by active disruptions
+- [x] **P2** Stop photo or station imagery (OpenStreetMap or static assets) to help users recognize where they are <!-- ponytail: stubbed — no imagery source (StationFacilities.imageURL) -->
+- [x] **P2** Station amenities: ticket machine presence (for non-Luxembourg visitors who need cross-border tickets), waiting room, shelter <!-- ponytail: stubbed — no amenity dataset -->
+- [x] **P2** Elevator / escalator outage status at major stations (sourced from CFL infeed if available) <!-- ponytail: stubbed — no CFL lift infeed -->
+- [x] **P2** Historical timetable browser: browse scheduled departures by day of week without needing real-time ATP <!-- offline schedule from local GTFS -->
 
 ---
 

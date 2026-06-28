@@ -20,4 +20,5 @@ extension EnvironmentValues {
     @Entry var parkAndRideService: any ParkAndRideService = UnavailableParkAndRideService()
     @Entry var vehiclePositionService: any VehiclePositionService = UnavailableVehiclePositionService()
     @Entry var bikeShareService: any BikeShareService = UnavailableBikeShareService()
+    @Entry var stationFacilitiesService: any StationFacilitiesService = UnavailableStationFacilitiesService()
 }
