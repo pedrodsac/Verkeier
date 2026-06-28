@@ -465,6 +465,33 @@ struct TransitMapViewModelTests {
         #expect(viewModel.stopDetailAlerts.map(\.id) == ["stop-alert", "route-alert"])
     }
 
+    @Test func routeLegAlertsMapDisruptionsToAffectedTransitLegs() {
+        let destination = makeStop(id: "stop-1")
+        let option = makeRouteOption(id: "route-1", plan: makeRoutePlan(destination: destination, routeName: "15"))
+        let viewModel = TransitMapViewModel()
+        viewModel.routeOptions = [option]
+        viewModel.selectedRouteOptionID = option.id
+        viewModel.alerts = [
+            AlertMessage(
+                id: "route-alert", title: "Line 15", body: "", severity: .warning,
+                affectedStopIds: [], affectedRouteIds: ["15"], startsAt: nil, endsAt: nil, dataSource: .mock
+            ),
+            AlertMessage(
+                id: "stop-alert", title: "Origin stop", body: "", severity: .warning,
+                affectedStopIds: ["origin-stop"], affectedRouteIds: [], startsAt: nil, endsAt: nil, dataSource: .mock
+            ),
+            AlertMessage(
+                id: "unrelated", title: "Other", body: "", severity: .info,
+                affectedStopIds: ["zzz"], affectedRouteIds: ["999"], startsAt: nil, endsAt: nil, dataSource: .mock
+            )
+        ]
+
+        let legAlerts = viewModel.routeLegAlerts
+        // Walking access leg (index 0) has no alerts; the transit leg (index 1) matches both.
+        #expect(legAlerts["0"] == nil)
+        #expect(legAlerts["1"]?.map(\.id).sorted() == ["route-alert", "stop-alert"])
+    }
+
     private func configuredViewModel() -> TransitMapViewModel {
         let viewModel = TransitMapViewModel()
         viewModel.selectStop(makeStop(id: "stop-1"))

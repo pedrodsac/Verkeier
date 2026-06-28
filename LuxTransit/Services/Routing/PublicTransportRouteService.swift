@@ -109,7 +109,7 @@ struct MapKitRoadRouteProvider: RoadRouteProviding {
 }
 
 private extension RoadRouteTransport {
-    init?(_ hint: RouteLegRoadRoutingHint) {
+    nonisolated init?(_ hint: RouteLegRoadRoutingHint) {
         switch hint {
         case .none:
             return nil
@@ -120,7 +120,7 @@ private extension RoadRouteTransport {
         }
     }
 
-    var mapKitTransportType: MKDirectionsTransportType {
+    nonisolated var mapKitTransportType: MKDirectionsTransportType {
         switch self {
         case .automobile: .automobile
         case .walking: .walking

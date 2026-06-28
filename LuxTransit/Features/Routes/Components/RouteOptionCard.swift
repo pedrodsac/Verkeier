@@ -49,7 +49,7 @@ struct RouteOptionCard: View {
             .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
         .buttonStyle(.plain)
-        .animation(reduceMotion ? nil : .snappy(duration: 0.22), value: isSelected)
+        .animation(Animation.respectingReduceMotion(.snappy(duration: 0.22), reduceMotion), value: isSelected)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
         .accessibilityHint("Opens route step-by-step timeline")
         .accessibilityLabel(accessibilityLabel)

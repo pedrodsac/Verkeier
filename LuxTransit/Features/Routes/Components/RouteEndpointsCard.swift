@@ -179,12 +179,6 @@ struct RouteEndpointsCard: View {
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
-            if let subtitle {
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
         }
         .padding(.vertical, 13)
         .padding(.horizontal, 4)

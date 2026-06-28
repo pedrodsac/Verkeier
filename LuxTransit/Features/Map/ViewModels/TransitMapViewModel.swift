@@ -19,6 +19,10 @@ final class TransitMapViewModel {
     }
 
     private(set) var gtfsOnlyMapStops: [Stop] = []
+    /// When set, only stops served by this mode are shown on the map. `nil` = all.
+    var mapModeFilter: TransportMode?
+    /// Routes serving each nearby stop, keyed by stop id, for the nearby list.
+    var nearbyStopRoutes: [String: [TransitRoute]] = [:]
     var selectedStop: Stop?
     var selectedStopRoutes: [TransitRoute] = [] {
         didSet { rebuildDepartureFilters() }
@@ -56,6 +60,7 @@ final class TransitMapViewModel {
     var routeFilters = AppPreferences.shared.defaultRouteFilters
     var routePlanningTime: RoutePlanningTime = .leaveNow
     var recentRoutePlaces: [RoutePlace] = []
+    var recentStops: [Stop] = []
     var commutePresets: [RouteCommutePreset] = []
     var routeOptions: [RouteOption] = []
     var selectedRouteOptionID: String?
@@ -78,6 +83,7 @@ final class TransitMapViewModel {
     )
     private let minimumMapSpan = 0.001
     private let favouriteDepartureConcurrencyLimit = 3
+    private let nearbyRouteConcurrencyLimit = 10
     private let routeOptionInitialVisibleCount = 5
     private var visibleMapRegion: MKCoordinateRegion?
     private let now: @Sendable () -> Date
@@ -127,6 +133,10 @@ final class TransitMapViewModel {
 
     func requestLocation(using locationService: LocationService) {
         locationService.requestWhenInUseAuthorization()
+    }
+
+    func setMapModeFilter(_ mode: TransportMode?) {
+        mapModeFilter = mode
     }
 
     func showHome() {
@@ -215,6 +225,33 @@ final class TransitMapViewModel {
         isLoadingNearbyStops = false
     }
 
+    /// Loads the lines serving each nearby stop, with bounded concurrency, so
+    /// the nearby list can show "12 · 14 · 25" rather than just a mode label.
+    func loadNearbyStopRoutes(using gtfsService: any GTFSService) async {
+        let stops = nearbyStops
+        guard !stops.isEmpty else {
+            nearbyStopRoutes = [:]
+            return
+        }
+
+        var result: [String: [TransitRoute]] = [:]
+        await withTaskGroup(of: (String, [TransitRoute]).self) { group in
+            var iterator = stops.makeIterator()
+            for _ in 0 ..< min(nearbyRouteConcurrencyLimit, stops.count) {
+                guard let stop = iterator.next() else { break }
+                group.addTask { await (stop.id, gtfsService.routesForStop(id: stop.id)) }
+            }
+
+            while let (id, routes) = await group.next() {
+                if !routes.isEmpty { result[id] = routes }
+                if let stop = iterator.next() {
+                    group.addTask { await (stop.id, gtfsService.routesForStop(id: stop.id)) }
+                }
+            }
+        }
+        nearbyStopRoutes = result
+    }
+
     func loadGTFSMapStops(using gtfsService: any GTFSService, location _: CLLocation?) async {
         let region = visibleMapRegion ?? cameraRegion
         await loadGTFSMapStops(using: gtfsService, region: region)
@@ -298,8 +335,9 @@ final class TransitMapViewModel {
         isLoadingFavouriteDepartures = false
     }
 
-    func selectStop(_ stop: Stop) {
+    func selectStop(_ stop: Stop, using store: RoutePlannerStore = .shared) {
         selectedStop = stop
+        recentStops = store.recordRecentStop(stop)
         routeDestination = RoutePlace(stop: stop, source: .selectedStop)
         clearLineDetail()
         selectedStopRoutes = []
@@ -322,6 +360,33 @@ final class TransitMapViewModel {
     func loadRoutePlanner(using store: RoutePlannerStore = .shared) {
         recentRoutePlaces = store.recentPlaces()
         commutePresets = store.commutePresets()
+        recentStops = store.recentStops()
+    }
+
+    /// A commute preset to highlight on the home sheet based on the time of day:
+    /// in the morning window (06:00–10:30) the first "Home → Work" preset, in the
+    /// evening window (16:00–20:00) the last "Work → Home" preset. `nil` outside
+    /// those windows or when no matching preset exists.
+    var suggestedCommutePreset: RouteCommutePreset? {
+        let components = Calendar.current.dateComponents([.hour, .minute], from: now())
+        guard let hour = components.hour, let minute = components.minute else { return nil }
+        let minutesOfDay = hour * 60 + minute
+
+        if (360 ... 630).contains(minutesOfDay) {
+            return commutePresets.first { titleHasOrder($0.title, "Home", "Work") }
+        }
+        if (960 ... 1200).contains(minutesOfDay) {
+            return commutePresets.last { titleHasOrder($0.title, "Work", "Home") }
+        }
+        return nil
+    }
+
+    /// True when `title` contains both keywords and `first` appears before `second`.
+    private func titleHasOrder(_ title: String, _ first: String, _ second: String) -> Bool {
+        let lower = title.lowercased()
+        guard let firstRange = lower.range(of: first.lowercased()),
+              let secondRange = lower.range(of: second.lowercased()) else { return false }
+        return firstRange.lowerBound < secondRange.lowerBound
     }
 
     func selectRouteOrigin(_ place: RoutePlace?, using store: RoutePlannerStore = .shared) {
@@ -415,7 +480,55 @@ final class TransitMapViewModel {
     }
 
     func searchStops(using gtfsService: any GTFSService) async {
-        searchResults = await Array(gtfsService.searchStops(query: searchQuery).prefix(80))
+        let query = searchQuery
+        async let gtfsLookup = gtfsService.searchStops(query: query)
+        async let mapKitLookup = Self.mapKitStops(matching: query)
+
+        let gtfsResults = await Array(gtfsLookup.prefix(80))
+        // Drop MapKit hits that land on top of a GTFS stop we already returned.
+        let mapKitResults = await mapKitLookup.filter { place in
+            !gtfsResults.contains { Self.areWithin(100, place, $0) }
+        }
+
+        // A newer keystroke may have superseded this query while MapKit ran.
+        guard query == searchQuery else { return }
+        searchResults = gtfsResults + mapKitResults
+    }
+
+    /// Runs an address/POI search bounded to Luxembourg and maps the hits to
+    /// ``Stop`` values tagged ``DataSource/mapKit``.
+    private static func mapKitStops(matching query: String) async -> [Stop] {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count >= 2 else { return [] }
+
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = trimmed
+        request.region = MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: 49.8153, longitude: 6.1296),
+            span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
+        )
+
+        guard let response = try? await MKLocalSearch(request: request).start() else { return [] }
+        return response.mapItems.compactMap(mapKitStop)
+    }
+
+    private static func mapKitStop(from item: MKMapItem) -> Stop? {
+        let coordinate = item.location.coordinate
+        guard CLLocationCoordinate2DIsValid(coordinate),
+              coordinate.latitude != 0 || coordinate.longitude != 0 else { return nil }
+
+        return Stop(
+            id: "mapkit:\(coordinate.latitude),\(coordinate.longitude)",
+            name: item.name ?? "Place",
+            location: LocationPoint(latitude: coordinate.latitude, longitude: coordinate.longitude),
+            modes: [],
+            dataSource: .mapKit
+        )
+    }
+
+    private static func areWithin(_ meters: CLLocationDistance, _ lhs: Stop, _ rhs: Stop) -> Bool {
+        CLLocation(latitude: lhs.location.latitude, longitude: lhs.location.longitude)
+            .distance(from: CLLocation(latitude: rhs.location.latitude, longitude: rhs.location.longitude)) < meters
     }
 
     func updateSelectedStopRoutes(using gtfsService: any GTFSService) async {
@@ -581,6 +694,29 @@ final class TransitMapViewModel {
         isLoadingAlerts = false
     }
 
+    /// After an AVL refresh, notify the rider about any new disruption that
+    /// affects a line serving one of their favourite stops. Resolves the favourite
+    /// stops' route ids with bounded fan-out, then defers to
+    /// ``DisruptionAlertService`` to dedupe and deliver.
+    func checkDisruptionAlerts(
+        using gtfsService: any GTFSService,
+        disruptionAlertService: DisruptionAlertService,
+        favouriteStops: [Stop]
+    ) async {
+        guard !favouriteStops.isEmpty, !alerts.isEmpty else { return }
+
+        let favouriteRouteIds = await Set(
+            withTaskGroup(of: [TransitRoute].self) { group in
+                for stop in favouriteStops {
+                    group.addTask { await gtfsService.routesForStop(id: stop.id) }
+                }
+                return await group.reduce(into: []) { $0 += $1 }
+            }.map(\.id)
+        )
+
+        await disruptionAlertService.checkAlerts(alerts, favouriteRouteIds: favouriteRouteIds)
+    }
+
     func loadLineDetail(using gtfsService: any GTFSService, now: Date = .now) async {
         guard let route = selectedLineDetailRoute,
               let timetable = await gtfsService.timetableIndex() else {
@@ -640,6 +776,24 @@ final class TransitMapViewModel {
             !routeIDs.isDisjoint(with: alert.affectedRouteIds)
                 || !stopIDs.isDisjoint(with: alert.affectedStopIds)
         }
+    }
+
+    /// Active alerts that affect each transit leg of the selected route plan,
+    /// keyed by leg index (as a string). Walking legs are skipped.
+    var routeLegAlerts: [String: [AlertMessage]] {
+        guard let plan = selectedRouteOption?.plan else { return [:] }
+        var result: [String: [AlertMessage]] = [:]
+        for (index, leg) in plan.legs.enumerated() where leg.transportKind == .transit {
+            let legStopIDs = Set([leg.originStopId, leg.destinationStopId].compactMap(\.self))
+            let matching = alerts.filter { alert in
+                if let routeID = leg.routeId, alert.affectedRouteIds.contains(routeID) {
+                    return true
+                }
+                return !legStopIDs.isDisjoint(with: alert.affectedStopIds)
+            }
+            if !matching.isEmpty { result[String(index)] = matching }
+        }
+        return result
     }
 
     var lineDetailAlerts: [AlertMessage] {

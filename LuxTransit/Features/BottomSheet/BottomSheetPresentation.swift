@@ -48,6 +48,7 @@ struct TransitSheetActions {
     let updateSearch: () -> Void
     let checkGTFSUpdate: () -> Void
     let setDebugDataMode: (DebugTransitDataMode) -> Void
+    let setMapModeFilter: (TransportMode?) -> Void
 }
 
 struct SettingsPresentationModel {
@@ -64,6 +65,8 @@ struct NearbyStopsPresentationModel {
     let isLoading: Bool
     let errorMessage: String?
     let referenceLocation: CLLocation?
+    /// Lines serving each stop, keyed by stop id, shown on the nearby rows.
+    var routesByStopId: [String: [TransitRoute]] = [:]
 }
 
 struct CommuteDashboardViewModel {
@@ -76,6 +79,10 @@ struct CommuteDashboardViewModel {
     let expandedStopIds: Set<String>
     let nearby: NearbyStopsPresentationModel
     let activeAlertCount: Int
+    /// Time-of-day commute preset to surface at the top of the dashboard, if any.
+    var suggestedCommutePreset: RouteCommutePreset?
+    /// Recently opened stops, most-recent first.
+    var recentStops: [Stop] = []
 
     var hasFavourites: Bool {
         !favourites.isEmpty
@@ -134,6 +141,8 @@ struct RoutePresentationModel {
     let planningTime: RoutePlanningTime
     let routeOptions: [RouteOption]
     let alerts: [AlertMessage]
+    /// Active disruptions affecting each transit leg, keyed by leg index string.
+    var legAlerts: [String: [AlertMessage]] = [:]
     let selectedRouteOptionID: String?
     let visibleRouteOptionCount: Int
     let loadingPhase: RouteLoadingPhase

@@ -165,7 +165,7 @@ enum RouteTimelineBuilder {
 
     // MARK: - Helpers
 
-    private static func railStyle(for leg: RoutePlan.Leg) -> RailStyle {
+    private nonisolated static func railStyle(for leg: RoutePlan.Leg) -> RailStyle {
         leg.transportKind == .transit ? .transit(leg.mode) : .walk
     }
 

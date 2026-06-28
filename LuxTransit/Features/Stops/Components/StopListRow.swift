@@ -5,7 +5,8 @@ struct StopListRow: View {
     let stop: Stop
     var markerColor: Color = .blue
     var accessorySystemName: String? = "chevron.right"
-    var referenceLocation: CLLocation? = nil
+    var referenceLocation: CLLocation?
+    var routes: [TransitRoute] = []
     let action: () -> Void
 
     @Environment(AppPreferences.self) private var preferences
@@ -17,7 +18,7 @@ struct StopListRow: View {
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)
                     .frame(width: 38, height: 38)
-					.background(transitColor.gradient, in: RoundedRectangle(cornerRadius: 8))
+                    .background(transitColor.gradient, in: RoundedRectangle(cornerRadius: 8))
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -32,20 +33,22 @@ struct StopListRow: View {
                         } else {
                             Text(stop.dataSource.displayName)
                         }
-						
-						Divider()
-							.frame(height: 10)
 
-                        if !stop.modes.isEmpty {
+                        Divider()
+                            .frame(height: 10)
+
+                        if let lineSummary {
+                            Text(lineSummary)
+                        } else if !stop.modes.isEmpty {
                             Text(modeSummary)
                         }
-						
-						if let distanceMetadata {
-							Divider()
-								.frame(height: 10)
-							
-							Text(distanceMetadata)
-						}
+
+                        if let distanceMetadata {
+                            Divider()
+                                .frame(height: 10)
+
+                            Text(distanceMetadata)
+                        }
                     }
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -90,6 +93,14 @@ struct StopListRow: View {
         stop.modes.map(\.displayName).joined(separator: ", ")
     }
 
+    /// Up to four route short names, e.g. "12 · 14 · 25", truncated with "…".
+    private var lineSummary: String? {
+        let names = routes.map(\.shortName).filter { !$0.isEmpty }
+        guard !names.isEmpty else { return nil }
+        let shown = names.prefix(4).joined(separator: " · ")
+        return names.count > 4 ? "\(shown) …" : shown
+    }
+
     private var accessibilityLabel: String {
         var parts: [String] = [stop.name]
         if let locality = stop.locality {
@@ -110,7 +121,14 @@ struct StopListRow: View {
         ).distance(from: referenceLocation)
         guard distance.isFinite else { return nil }
 
-        return preferences.formattedDistance(distance)
+        return "\(preferences.formattedDistance(distance)) · \(walkingETA(for: distance))"
+    }
+
+    /// Walking time at ~5 km/h (83.3 m/min), rounded up. "<1 min" under 50 m.
+    private func walkingETA(for meters: CLLocationDistance) -> String {
+        if meters < 50 { return "<1 min" }
+        let minutes = Int((meters / 83.3).rounded(.up))
+        return "~\(minutes) min"
     }
 }
 

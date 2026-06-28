@@ -1,7 +1,7 @@
 import Foundation
 
 /// A transit line / route, such as a single bus or tram line.
-struct TransitRoute: Codable, Hashable, Identifiable, Sendable {
+struct TransitRoute: Codable, Hashable, Identifiable {
     /// Stable route identifier (GTFS `route_id` where applicable).
     let id: String
     /// Short public label, e.g. `"16"` or `"T1"`.
@@ -15,7 +15,7 @@ struct TransitRoute: Codable, Hashable, Identifiable, Sendable {
     /// Which feed this route was derived from.
     let dataSource: DataSource
 
-    init(
+    nonisolated init(
         id: String,
         shortName: String,
         longName: String? = nil,
@@ -29,5 +29,16 @@ struct TransitRoute: Codable, Hashable, Identifiable, Sendable {
         self.mode = mode
         self.operatorName = operatorName
         self.dataSource = dataSource
+    }
+}
+
+extension TransitRoute {
+    nonisolated func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(shortName)
+        hasher.combine(longName)
+        hasher.combine(mode)
+        hasher.combine(operatorName)
+        hasher.combine(dataSource)
     }
 }

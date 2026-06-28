@@ -8,6 +8,7 @@ struct RoutePlannerStore {
     )
 
     private let recentPlacesKey = "RoutePlannerRecentPlaces"
+    private let recentStopsKey = "RoutePlannerRecentStops"
     private let commutePresetsKey = "RoutePlannerCommutePresets"
 
     init(defaults: UserDefaults) {
@@ -44,7 +45,29 @@ struct RoutePlannerStore {
         return updated
     }
 
-    private func save<T: Encodable>(_ value: T, forKey key: String) {
+    func recentStops() -> [Stop] {
+        load([Stop].self, forKey: recentStopsKey) ?? []
+    }
+
+    func saveRecentStops(_ stops: [Stop]) {
+        save(stops, forKey: recentStopsKey)
+    }
+
+    func recordRecentStop(_ stop: Stop, limit: Int = 8) -> [Stop] {
+        guard stop.dataSource != .mock else {
+            return recentStops()
+        }
+
+        var updated = recentStops().filter { $0.id != stop.id }
+        updated.insert(stop, at: 0)
+        if updated.count > limit {
+            updated = Array(updated.prefix(limit))
+        }
+        saveRecentStops(updated)
+        return updated
+    }
+
+    private func save(_ value: some Encodable, forKey key: String) {
         guard let data = try? JSONEncoder().encode(value) else { return }
         defaults.set(data, forKey: key)
     }

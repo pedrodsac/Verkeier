@@ -12,6 +12,7 @@ struct LuxTransitApp: App {
     private let modelContainer: ModelContainer
     @State private var liveActivityManager = LiveActivityManager()
     @State private var departureReminderService = DepartureReminderService()
+    @State private var disruptionAlertService = DisruptionAlertService()
     @State private var gtfsUpdateController = GTFSUpdateController()
 
     init() {
@@ -32,6 +33,7 @@ struct LuxTransitApp: App {
                 .environment(\.avlClient, avlClient)
                 .environment(\.liveActivityManager, liveActivityManager)
                 .environment(\.departureReminderService, departureReminderService)
+                .environment(\.disruptionAlertService, disruptionAlertService)
                 .environment(preferences)
                 .modelContainer(modelContainer)
                 .preferredColorScheme(preferences.appearance.colorScheme)

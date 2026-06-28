@@ -259,7 +259,7 @@ struct RouteTimelineView: View {
                 RouteTimelineSummaryCard(option: selectedOption)
 
                 // Vertical leg-by-leg timeline
-                RouteLegList(legs: selectedOption.plan.legs)
+                RouteLegList(legs: selectedOption.plan.legs, legAlerts: viewModel.legAlerts)
 
                 // Journey alerts
                 if !viewModel.alerts.isEmpty {

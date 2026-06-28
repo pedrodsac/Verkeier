@@ -36,8 +36,11 @@ struct SearchView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .animation(reduceMotion ? nil : .snappy(duration: 0.24), value: query.isEmpty)
-        .animation(reduceMotion ? nil : .snappy(duration: 0.24), value: viewModel.results.count)
+        .animation(Animation.respectingReduceMotion(.snappy(duration: 0.24), reduceMotion), value: query.isEmpty)
+        .animation(
+            Animation.respectingReduceMotion(.snappy(duration: 0.24), reduceMotion),
+            value: viewModel.results.count
+        )
         .onAppear {
             isSearchFocused = true
             updateSearch()
@@ -114,7 +117,7 @@ private struct NearbySearchSuggestions: View {
             Text("Nearby Suggestions")
                 .font(.headline.weight(.semibold))
 
-            if isLoading && stops.isEmpty {
+            if isLoading, stops.isEmpty {
                 ProgressView("Finding nearby stops")
                     .frame(maxWidth: .infinity, alignment: .leading)
             } else if stops.isEmpty {

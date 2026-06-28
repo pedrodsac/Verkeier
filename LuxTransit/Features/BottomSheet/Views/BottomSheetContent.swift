@@ -28,7 +28,8 @@ struct BottomSheetContent: View {
                         showSettings: actions.showSettings,
                         showAlerts: actions.showAlerts,
                         selectStop: actions.selectStop,
-                        toggleExpansion: actions.toggleFavouriteExpansion
+                        toggleExpansion: actions.toggleFavouriteExpansion,
+                        applyCommutePreset: actions.applyCommutePreset
                     )
                 case .search:
                     SearchView(
@@ -109,6 +110,7 @@ private struct HomeSheetContent: View {
     let showAlerts: () -> Void
     let selectStop: (Stop) -> Void
     let toggleExpansion: (String) -> Void
+    let applyCommutePreset: (String) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: detent == .medium ? 22 : 16) {
@@ -123,7 +125,8 @@ private struct HomeSheetContent: View {
                 displayStyle: detent == .medium ? .mapsMedium : .regular,
                 showAlerts: showAlerts,
                 selectStop: selectStop,
-                toggleExpansion: toggleExpansion
+                toggleExpansion: toggleExpansion,
+                applyCommutePreset: applyCommutePreset
             )
         }
     }

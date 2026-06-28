@@ -11,6 +11,8 @@ final class PersistedFavouriteStop {
     var modesRawValue: String
     var platformIdsRawValue: String?
     var createdAt: Date
+    /// Optional rider-set grouping label, e.g. "Home", "Work". `nil` = unlabelled.
+    var label: String?
 
     init(stop: Stop, createdAt: Date = .now) {
         stopId = stop.id

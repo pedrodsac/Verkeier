@@ -32,7 +32,8 @@ struct NearbyStopsView: View {
                             StopListRow(
                                 stop: stop,
                                 markerColor: .blue,
-                                referenceLocation: viewModel.referenceLocation
+                                referenceLocation: viewModel.referenceLocation,
+                                routes: viewModel.routesByStopId[stop.id] ?? []
                             ) {
                                 selectStop(stop)
                             }

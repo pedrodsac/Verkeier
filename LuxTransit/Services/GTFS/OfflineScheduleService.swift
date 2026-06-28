@@ -1,7 +1,7 @@
 import Foundation
 
 /// A timetabled departure computed from the offline GTFS index.
-struct OfflineScheduleDeparture: Identifiable, Equatable, Sendable {
+struct OfflineScheduleDeparture: Identifiable, Equatable {
     /// Stable identifier for the departure.
     let id: String
     /// Public line label.
@@ -21,7 +21,7 @@ struct OfflineScheduleDeparture: Identifiable, Equatable, Sendable {
 ///
 /// Used as a fallback when live ATP data is unavailable. All time arithmetic is
 /// done in the `Europe/Luxembourg` time zone by default.
-struct OfflineScheduleService: Sendable {
+struct OfflineScheduleService {
     private let calendar: Calendar
 
     init(calendar: Calendar = {
@@ -50,7 +50,6 @@ struct OfflineScheduleService: Sendable {
     ) -> [OfflineScheduleDeparture] {
         guard limit > 0 else { return [] }
 
-        let servicesById = Dictionary(uniqueKeysWithValues: timetable.services.map { ($0.id, $0) })
         let routesById = Dictionary(uniqueKeysWithValues: timetable.routes.map { ($0.id, $0) })
         let stopsById = Dictionary(uniqueKeysWithValues: timetable.stops.map { ($0.id, $0) })
         let activeServiceIds = Set(
@@ -65,8 +64,8 @@ struct OfflineScheduleService: Sendable {
         let currentSeconds = calendar.dateComponents([.hour, .minute, .second], from: now)
         let secondsSinceMidnight =
             (currentSeconds.hour ?? 0) * 3600
-            + (currentSeconds.minute ?? 0) * 60
-            + (currentSeconds.second ?? 0)
+                + (currentSeconds.minute ?? 0) * 60
+                + (currentSeconds.second ?? 0)
 
         let departures = timetable.trips
             .lazy
@@ -146,9 +145,11 @@ struct OfflineScheduleService: Sendable {
             return false
         }
 
-        let weekday = calendar.component(.weekday, from: date)
-        let weekdayIndex = weekday == 1 ? 7 : weekday - 1
-        return service.weekdays.contains(weekdayIndex)
+        // `weekdays` is stored in Foundation order (Sun=1 ... Sat=7) by
+        // GTFSIndexBuilder, matching `Calendar.component(.weekday:)`. Compare directly —
+        // the routing engine uses the same raw value. (An earlier ISO conversion here
+        // silently shifted every service by one day against real feed data.)
+        return service.weekdays.contains(calendar.component(.weekday, from: date))
     }
 
     private func serviceDateString(for date: Date) -> String {

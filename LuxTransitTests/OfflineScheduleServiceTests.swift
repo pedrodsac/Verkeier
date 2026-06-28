@@ -1,6 +1,5 @@
 import Foundation
 import Testing
-
 @testable import LuxTransit
 
 struct OfflineScheduleServiceTests {
@@ -86,8 +85,10 @@ struct OfflineScheduleServiceTests {
             ],
             services: [
                 GTFSTimetableServiceEntry(
+                    // Foundation weekday order (Sun=1 ... Sat=7), as GTFSIndexBuilder
+                    // produces. 2026-06-22 is a Monday → 2.
                     id: "weekday",
-                    weekdays: [1],
+                    weekdays: [2],
                     startDate: "20260601",
                     endDate: "20260630",
                     addedDates: [],

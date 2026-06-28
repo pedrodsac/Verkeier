@@ -1,7 +1,7 @@
 import Foundation
 
 struct FixtureATPClient: ATPClient {
-    enum Mode: Sendable {
+    enum Mode {
         case sample
         case empty
         case failure
@@ -16,7 +16,7 @@ struct FixtureATPClient: ATPClient {
         self.now = now
     }
 
-    nonisolated func nearbyStops(latitude: Double, longitude: Double) async throws -> [Stop] {
+    nonisolated func nearbyStops(latitude _: Double, longitude _: Double) async throws -> [Stop] {
         switch mode {
         case .sample, .disruption:
             return Self.sampleStops
@@ -40,7 +40,7 @@ struct FixtureATPClient: ATPClient {
         }
     }
 
-    private static var sampleStops: [Stop] {
+    private nonisolated static var sampleStops: [Stop] {
         [
             Stop(
                 id: "sample-hamilius",
@@ -72,7 +72,7 @@ struct FixtureATPClient: ATPClient {
         ]
     }
 
-    private static func sampleDepartures(now: Date) -> [String: [Departure]] {
+    private nonisolated static func sampleDepartures(now: Date) -> [String: [Departure]] {
         [
             "sample-hamilius": [
                 sampleDeparture(
@@ -123,7 +123,7 @@ struct FixtureATPClient: ATPClient {
         }
     }
 
-    private static func disruptionDepartures(now: Date) -> [String: [Departure]] {
+    private nonisolated static func disruptionDepartures(now: Date) -> [String: [Departure]] {
         [
             "sample-hamilius": [
                 sampleDeparture(
@@ -154,7 +154,7 @@ struct FixtureATPClient: ATPClient {
         }
     }
 
-    private static func sampleDeparture(
+    private nonisolated static func sampleDeparture(
         id: String,
         stopId: String,
         routeId: String,
@@ -189,7 +189,7 @@ struct FixtureATPClient: ATPClient {
         let platform: String
         let isCancelled: Bool
 
-        func resolved(at now: Date) -> Departure {
+        nonisolated func resolved(at now: Date) -> Departure {
             let scheduled = now.addingTimeInterval(TimeInterval(minutesFromNow * 60))
             let realtime = scheduled.addingTimeInterval(TimeInterval((delayMinutes ?? 0) * 60))
             return Departure(

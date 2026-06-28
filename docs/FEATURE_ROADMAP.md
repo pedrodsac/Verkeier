@@ -48,7 +48,7 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 
 ## 3. Map & Stops
 
-- [ ] **P0** Favourite stop markers are visually distinct on the active map implementation (current bug: `markerColor` ignores `isFavourite`)
+- [x] **P0** Favourite stop markers are visually distinct on the active map implementation (current bug: `markerColor` ignores `isFavourite`)
 - [ ] **P0** Stop search accepts addresses and place names, not only GTFS stop names
 - [ ] **P1** Map clustering for dense stop areas; cluster tap expands or shows a list
 - [ ] **P1** Mode filter controls on the map: toggle bus / tram / train / night-bus layers independently
@@ -125,7 +125,7 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 - [ ] **P1** Larger departure board mode: single-column full-screen view with 200% text, high contrast, and audio-ready labels
 - [ ] **P1** All interactive elements have VoiceOver labels and accessibility hints
 - [ ] **P1** Dynamic Type support at all sizes including Accessibility sizes (xxLarge and above)
-- [ ] **P1** Respect Reduce Motion in all sheet transitions, card expansions, and search animations (current gap: `.snappy(...)` used directly)
+- [x] **P1** Respect Reduce Motion in all sheet transitions, card expansions, and search animations (current gap: `.snappy(...)` used directly)
 - [ ] **P2** High-contrast mode: departure status colours (red/green/amber) work at WCAG AA contrast against map and sheet backgrounds
 - [ ] **P2** VoiceOver announcement when departure board refreshes with new data
 - [ ] **P2** Haptic feedback on departure board refresh and route plan found
@@ -182,12 +182,12 @@ Luxembourg has five commonly spoken languages. Monolingual apps lose the frontal
 - [ ] **P1** Split `TransitMapScreen.swift` (1185 lines) into map container, annotation layer, and sheet coordinator
 - [ ] **P1** Split `RouteView.swift` (803 lines) into endpoint card, options list, and timeline detail
 - [ ] **P1** Split `TransitMapViewModel.swift` (616 lines): separate stop loading, departure loading, and route state into focused observable objects
-- [ ] **P1** Isolate `TransitIntentHandoff` from `UserDefaults.standard`: use an injectable storage abstraction so tests use a dedicated suite (current bug: simulator contamination caused test flakiness)
-- [ ] **P1** Create the app-group `Application Support` directory before SwiftData store initialization (current bug: CoreData logs a recovery error at launch)
-- [ ] **P1** Parallelise favourite departure refreshes with bounded concurrency using `withThrowingTaskGroup` (currently sequential, which makes the commute dashboard slow to load)
-- [ ] **P1** Reduce Motion-aware animation helper: replace all direct `.snappy(...)` calls with a function that checks `UIAccessibility.isReduceMotionEnabled`
-- [ ] **P1** Favourite marker distinction fix in `markerColor(...)` — it currently ignores the `isFavourite` parameter
-- [ ] **P1** Route pagination fix: hide "Show 3 more" when no additional options exist
+- [x] **P1** Isolate `TransitIntentHandoff` from `UserDefaults.standard`: use an injectable storage abstraction so tests use a dedicated suite (current bug: simulator contamination caused test flakiness)
+- [x] **P1** Create the app-group `Application Support` directory before SwiftData store initialization (current bug: CoreData logs a recovery error at launch)
+- [x] **P1** Parallelise favourite departure refreshes with bounded concurrency using `withThrowingTaskGroup` (currently sequential, which makes the commute dashboard slow to load)
+- [x] **P1** Reduce Motion-aware animation helper: replace all direct `.snappy(...)` calls with a function that checks `UIAccessibility.isReduceMotionEnabled`
+- [x] **P1** Favourite marker distinction fix in `markerColor(...)` — it currently ignores the `isFavourite` parameter
+- [x] **P1** Route pagination fix: hide "Show 3 more" when no additional options exist
 - [ ] **P2** Route options tab pagination: lazy-load additional options rather than truncating at a fixed count
 - [ ] **P2** Map annotation throttle: debounce spatial GTFS queries on camera movement to avoid re-querying on every 120 ms delta
 - [ ] **P2** Narrow `TransitMapViewModel` responsibility: move alert state, route state, and departure state into dedicated view-model objects; the main VM becomes a coordinator

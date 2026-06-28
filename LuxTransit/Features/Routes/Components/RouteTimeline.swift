@@ -82,9 +82,16 @@ struct RouteTimelineSummaryCard: View {
 /// continuous rail. Flattened from the legs by ``RouteTimelineBuilder``.
 struct RouteLegList: View {
     let legs: [RoutePlan.Leg]
+    /// Active disruptions per transit leg, keyed by leg index string (matching
+    /// ``RouteTimelineBuilder`` segment ids "segment-<index>").
+    var legAlerts: [String: [AlertMessage]] = [:]
 
     private var items: [RouteTimelineItem] {
         RouteTimelineBuilder.items(from: legs)
+    }
+
+    private var alertsBySegmentID: [String: [AlertMessage]] {
+        Dictionary(uniqueKeysWithValues: legAlerts.map { ("segment-\($0.key)", $0.value) })
     }
 
     var body: some View {
@@ -95,7 +102,7 @@ struct RouteLegList: View {
                     case let .place(node):
                         TimelinePlaceRow(node: node)
                     case let .segment(node):
-                        TimelineSegmentRow(node: node)
+                        TimelineSegmentRow(node: node, alerts: alertsBySegmentID[node.id] ?? [])
                     }
                 }
             }
@@ -171,6 +178,7 @@ private struct TimelinePlaceRow: View {
 
 private struct TimelineSegmentRow: View {
     let node: SegmentNode
+    var alerts: [AlertMessage] = []
 
     var body: some View {
         HStack(alignment: .center, spacing: RouteTimelineLayout.columnSpacing) {
@@ -183,6 +191,12 @@ private struct TimelineSegmentRow: View {
                     Label(warning, systemImage: "exclamationmark.triangle.fill")
                         .font(.footnote.weight(.medium))
                         .foregroundStyle(.orange)
+                }
+                if !alerts.isEmpty {
+                    Label("Disruption", systemImage: "exclamationmark.triangle.fill")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.orange)
+                        .accessibilityLabel("Disruption affects this leg")
                 }
             }
             .padding(.vertical, 10)

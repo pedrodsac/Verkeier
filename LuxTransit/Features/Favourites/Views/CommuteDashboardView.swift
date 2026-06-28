@@ -13,11 +13,16 @@ struct CommuteDashboardView: View {
     let showAlerts: () -> Void
     let selectStop: (Stop) -> Void
     let toggleExpansion: (String) -> Void
+    var applyCommutePreset: (String) -> Void = { _ in }
 
     var body: some View {
         VStack(alignment: .leading, spacing: displayStyle == .mapsMedium ? 18 : 16) {
             if viewModel.activeAlertCount > 0 {
                 AlertsSummaryRow(alertCount: viewModel.activeAlertCount, action: showAlerts)
+            }
+
+            if let preset = viewModel.suggestedCommutePreset {
+                CommuteSuggestionRow(preset: preset) { applyCommutePreset(preset.id) }
             }
 
             if viewModel.hasFavourites {
@@ -31,12 +36,13 @@ struct CommuteDashboardView: View {
 
     private var favouritesContent: some View {
         Group {
-            if viewModel.isLoadingDepartures && viewModel.departuresByStopId.isEmpty {
+            if viewModel.isLoadingDepartures, viewModel.departuresByStopId.isEmpty {
                 DepartureLoadingCard(title: "Loading favourite departures")
             } else if let errorMessage = viewModel.errorMessage {
                 CompactUnavailableCard(
                     title: "Favourite departures unavailable", message: errorMessage,
-                    systemImage: "wifi.exclamationmark")
+                    systemImage: "wifi.exclamationmark"
+                )
             }
 
             ScrollView {
@@ -50,6 +56,16 @@ struct CommuteDashboardView: View {
                             toggleExpansion: { toggleExpansion(stop.id) }
                         )
                     }
+
+                    if !viewModel.recentStops.isEmpty {
+                        DisclosureGroup("Recent") {
+                            recentStopRows
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        .tint(.secondary)
+                        .padding(.top, 6)
+                        .padding(.horizontal, 4)
+                    }
                 }
                 .padding(.bottom, 72)
             }
@@ -57,19 +73,21 @@ struct CommuteDashboardView: View {
     }
 
     private var emptyFavouritesContent: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            if viewModel.nearby.isLoading && viewModel.nearby.stops.isEmpty {
-                DepartureLoadingCard(title: "Finding nearby stops")
-            } else if let errorMessage = viewModel.nearby.errorMessage {
-                CompactUnavailableCard(
-                    title: "Nearby stops unavailable", message: errorMessage,
-                    systemImage: "location.slash")
-            } else if viewModel.nearby.stops.isEmpty {
-                CompactUnavailableCard(
-                    title: "No nearby stops", message: "Use search to find and save a stop.",
-                    systemImage: "mappin.slash")
-            } else {
-                ScrollView {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                if viewModel.nearby.isLoading, viewModel.nearby.stops.isEmpty {
+                    DepartureLoadingCard(title: "Finding nearby stops")
+                } else if let errorMessage = viewModel.nearby.errorMessage {
+                    CompactUnavailableCard(
+                        title: "Nearby stops unavailable", message: errorMessage,
+                        systemImage: "location.slash"
+                    )
+                } else if viewModel.nearby.stops.isEmpty {
+                    CompactUnavailableCard(
+                        title: "No nearby stops", message: "Use search to find and save a stop.",
+                        systemImage: "mappin.slash"
+                    )
+                } else {
                     LazyVStack(spacing: 10) {
                         ForEach(viewModel.nearby.stops.prefix(5)) { stop in
                             StopListRow(
@@ -88,10 +106,73 @@ struct CommuteDashboardView: View {
                             .padding(.top, 2)
                             .padding(.horizontal, 4)
                     }
-                    .padding(.bottom, 72)
+                }
+
+                if !viewModel.recentStops.isEmpty {
+                    Text("Recent")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 6)
+                        .padding(.horizontal, 4)
+                    recentStopRows
+                }
+            }
+            .padding(.bottom, 72)
+        }
+    }
+
+    private var recentStopRows: some View {
+        LazyVStack(spacing: 8) {
+            ForEach(viewModel.recentStops.prefix(8)) { stop in
+                StopListRow(
+                    stop: stop,
+                    markerColor: .blue,
+                    referenceLocation: viewModel.nearby.referenceLocation
+                ) {
+                    selectStop(stop)
                 }
             }
         }
+    }
+}
+
+private struct CommuteSuggestionRow: View {
+    let preset: RouteCommutePreset
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                Image(systemName: "arrow.right.circle.fill")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.tint)
+                    .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(preset.title)
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                    Text("Leave now")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
+            }
+            .padding(.horizontal, 12)
+            .frame(minHeight: 52)
+            .background(
+                .tint.opacity(0.1), in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Commute suggestion, \(preset.title), leave now")
     }
 }
 
@@ -118,7 +199,8 @@ struct AlertsSummaryRow: View {
             .padding(.horizontal, 12)
             .frame(minHeight: 44)
             .background(
-                .orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+            )
         }
         .buttonStyle(.plain)
         .accessibilityLabel(alertText)
@@ -211,7 +293,7 @@ struct FavouriteStopDepartureCard: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(.separator.opacity(0.22), lineWidth: 0.5)
         }
-        .animation(reduceMotion ? nil : .snappy(duration: 0.22), value: isExpanded)
+        .animation(Animation.respectingReduceMotion(.snappy(duration: 0.22), reduceMotion), value: isExpanded)
     }
 
     private var primarySummary: String {
@@ -274,7 +356,7 @@ struct FavouriteStopDepartureCard: View {
                 destination: "Rout Bréck–Pafendall",
                 scheduledDeparture: .now.addingTimeInterval(480),
                 dataSource: .mock
-            ),
+            )
         ],
         isExpanded: true,
         selectStop: {},

@@ -1,5 +1,6 @@
 import AsyncAlgorithms
 import CoreLocation
+import CoreSpotlight
 import MapKit
 import SwiftData
 import SwiftUI
@@ -15,6 +16,7 @@ struct TransitMapScreen: View {
     @Environment(\.avlClient) private var avlClient
     @Environment(\.liveActivityManager) private var liveActivityManager
     @Environment(\.departureReminderService) private var departureReminderService
+    @Environment(\.disruptionAlertService) private var disruptionAlertService
     @Environment(\.appConfiguration) private var appConfiguration
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \PersistedFavouriteStop.createdAt) private var favouriteEntities:
@@ -80,7 +82,8 @@ struct TransitMapScreen: View {
             await viewModel.loadNearbyStops(
                 using: atpClient, location: locationService.currentLocation
             )
-            await viewModel.loadAlerts(using: avlClient)
+            await viewModel.loadNearbyStopRoutes(using: gtfsService)
+            await loadAlertsAndCheckDisruptions()
             await viewModel.loadFavouriteDepartures(using: atpClient, favourites: favouriteStops)
             gtfsUpdateController.loadSnapshot()
             gtfsUpdateController.checkAutomatically()
@@ -138,6 +141,9 @@ struct TransitMapScreen: View {
         .onOpenURL { url in
             handleDeepLink(url)
         }
+        .onContinueUserActivity(CSSearchableItemActionType) { activity in
+            handleSpotlightActivity(activity)
+        }
         .onReceive(NotificationCenter.default.publisher(for: .gtfsDidUpdate)) { _ in
             Task {
                 await viewModel.loadGTFSMapStops(
@@ -157,8 +163,8 @@ struct TransitMapScreen: View {
         TransitMapView(
             region: viewModel.cameraRegion,
             cameraUpdateToken: viewModel.cameraUpdateToken,
-            liveStops: viewModel.nearbyStops,
-            gtfsStops: viewModel.gtfsOnlyMapStops,
+            liveStops: stopsForMode(viewModel.nearbyStops),
+            gtfsStops: stopsForMode(viewModel.gtfsOnlyMapStops),
             selectedStopId: viewModel.selectedStop?.id,
             favouriteStopIds: favouriteStopIds,
             alertStopIds: Set(viewModel.alerts.flatMap(\.affectedStopIds)),
@@ -167,7 +173,17 @@ struct TransitMapScreen: View {
             regionDidChange: scheduleMapRegionUpdate
         )
         .ignoresSafeArea()
+        .overlay(alignment: .bottom) {
+            MapModeFilterBar(selected: viewModel.mapModeFilter, select: setMapModeFilter)
+                // Sit just above the collapsed sheet edge (collapsed detent = 70pt).
+                .padding(.bottom, 82)
+        }
         .accessibilityLabel("Luxembourg transit map")
+    }
+
+    private func stopsForMode(_ stops: [Stop]) -> [Stop] {
+        guard let mode = viewModel.mapModeFilter else { return stops }
+        return stops.filter { $0.modes.contains(mode) }
     }
 
     private var favouriteStops: [Stop] {
@@ -187,7 +203,8 @@ struct TransitMapScreen: View {
             stops: viewModel.nearbyStops,
             isLoading: viewModel.isLoadingNearbyStops,
             errorMessage: viewModel.nearbyStopsErrorMessage,
-            referenceLocation: locationService.currentLocation
+            referenceLocation: locationService.currentLocation,
+            routesByStopId: viewModel.nearbyStopRoutes
         )
 
         return TransitSheetPresentationModel(
@@ -202,7 +219,9 @@ struct TransitMapScreen: View {
                 isStale: viewModel.areFavouriteDeparturesStale,
                 expandedStopIds: viewModel.expandedFavouriteStopIds,
                 nearby: nearby,
-                activeAlertCount: viewModel.activeAlertCount
+                activeAlertCount: viewModel.activeAlertCount,
+                suggestedCommutePreset: viewModel.suggestedCommutePreset,
+                recentStops: viewModel.recentStops
             ),
             search: SearchPresentationModel(
                 results: viewModel.searchResults,
@@ -242,6 +261,7 @@ struct TransitMapScreen: View {
                 planningTime: viewModel.routePlanningTime,
                 routeOptions: viewModel.routeOptions,
                 alerts: viewModel.routeAlerts,
+                legAlerts: viewModel.routeLegAlerts,
                 selectedRouteOptionID: viewModel.selectedRouteOptionID,
                 visibleRouteOptionCount: viewModel.visibleRouteOptionCount,
                 loadingPhase: viewModel.routeLoadingPhase,
@@ -370,6 +390,7 @@ struct TransitMapScreen: View {
             await viewModel.loadNearbyStops(
                 using: atpClient, location: locationService.currentLocation
             )
+            await viewModel.loadNearbyStopRoutes(using: gtfsService)
         }
     }
 
@@ -408,8 +429,15 @@ struct TransitMapScreen: View {
             selectDeparturePlatform: selectDeparturePlatform,
             updateSearch: updateSearch,
             checkGTFSUpdate: checkGTFSUpdate,
-            setDebugDataMode: setDebugDataMode
+            setDebugDataMode: setDebugDataMode,
+            setMapModeFilter: setMapModeFilter
         )
+    }
+
+    private func setMapModeFilter(_ mode: TransportMode?) {
+        animateSheetChange {
+            viewModel.setMapModeFilter(mode)
+        }
     }
 
     private func selectStop(_ stop: Stop) {
@@ -563,12 +591,10 @@ struct TransitMapScreen: View {
     }
 
     private func animateSheetChange(_ changes: () -> Void) {
-        if reduceMotion {
-            changes()
+        if let animation = Animation.respectingReduceMotion(.snappy(duration: 0.28), reduceMotion) {
+            withAnimation(animation) { changes() }
         } else {
-            withAnimation(.snappy(duration: 0.28)) {
-                changes()
-            }
+            changes()
         }
     }
 
@@ -613,7 +639,8 @@ struct TransitMapScreen: View {
         debugTransitDataModeRawValue = mode.rawValue
         Task {
             await viewModel.loadNearbyStops(using: atpClient, location: locationService.currentLocation)
-            await viewModel.loadAlerts(using: avlClient)
+            await viewModel.loadNearbyStopRoutes(using: gtfsService)
+            await loadAlertsAndCheckDisruptions()
             await viewModel.loadFavouriteDepartures(using: atpClient, favourites: favouriteStops)
             if viewModel.selectedStop != nil {
                 await viewModel.loadDepartures(using: atpClient)
@@ -669,8 +696,17 @@ struct TransitMapScreen: View {
 
     private func refreshAlerts() {
         Task {
-            await viewModel.loadAlerts(using: avlClient)
+            await loadAlertsAndCheckDisruptions()
         }
+    }
+
+    private func loadAlertsAndCheckDisruptions() async {
+        await viewModel.loadAlerts(using: avlClient)
+        await viewModel.checkDisruptionAlerts(
+            using: gtfsService,
+            disruptionAlertService: disruptionAlertService,
+            favouriteStops: favouriteStops
+        )
     }
 
     private func startTrackingDeparture(_ departure: Departure) {
@@ -748,12 +784,35 @@ struct TransitMapScreen: View {
     }
 
     private func mirrorFavouriteEntitiesForIntents() {
-        FavouriteStopEntityStore.save(stops: favouriteStops)
+        let stops = favouriteStops
+        FavouriteStopEntityStore.save(stops: stops)
+        if stops.isEmpty {
+            FavouriteStopSpotlightIndexer.removeAll()
+        } else {
+            FavouriteStopSpotlightIndexer.index(stops)
+        }
     }
 
     private func handlePendingIntentHandoff() {
         guard let handoff = TransitIntentHandoff.consumePending() else { return }
         handle(handoff)
+    }
+
+    private func handleSpotlightActivity(_ activity: NSUserActivity) {
+        guard let identifier = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String,
+              identifier.hasPrefix("stop.")
+        else {
+            return
+        }
+
+        let stopId = String(identifier.dropFirst("stop.".count))
+        guard let stop = favouriteEntities.first(where: { $0.stopId == stopId })?.stop else {
+            viewModel.showSearch()
+            return
+        }
+
+        selectStop(stop)
+        viewModel.sheetDetent = .expanded
     }
 
     private func handleDeepLink(_ url: URL) {
@@ -1206,9 +1265,10 @@ private struct TransitMapView: UIViewRepresentable {
                 return UIColor(red: 0.82, green: 0.24, blue: 0.16, alpha: 1)
             }
             if isFavourite {
-                if stop.modes.contains(.train) { return UIColor(red: 0.75, green: 0.10, blue: 0.16, alpha: 1) }
-                if stop.modes.contains(.tram) { return UIColor(red: 0.86, green: 0.44, blue: 0.04, alpha: 1) }
-                return UIColor(red: 0.07, green: 0.44, blue: 0.89, alpha: 1)
+                // Amber/gold, clearly distinct from regular blue stops, regardless
+                // of mode. Selected still wins so the active marker reads as active.
+                if isSelected { return .systemIndigo }
+                return UIColor(red: 0.95, green: 0.75, blue: 0.10, alpha: 1)
             }
             if stop.modes.contains(.train) { return .systemRed }
             if stop.modes.contains(.tram) { return .systemOrange }
@@ -1315,6 +1375,7 @@ private struct StopMapMarker: View {
     }
 
     private var markerColor: Color {
+        if isFavourite { return .yellow }
         if stop.modes.contains(.train) { return .red }
         if stop.modes.contains(.tram) { return .orange }
         return .blue
