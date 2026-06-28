@@ -6,7 +6,7 @@ import Foundation
 /// The route planner returns several options; the computed properties here
 /// (transfer count, walking distance, live-data usage, and ``status(at:)``)
 /// drive both sorting and the badges shown for each alternative.
-nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
+nonisolated struct RouteOption: Codable, Hashable, Identifiable {
     /// Stable identifier for the option.
     let id: String
     /// The underlying journey plan.
@@ -65,6 +65,16 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
             .reduce(0, +)
     }
 
+    /// True when any leg endpoint lies outside Luxembourg's bounding box — the
+    /// journey likely crosses into France, Germany, or Belgium, where ATP
+    /// real-time coverage of CFL/SNCF/DB connections may be incomplete.
+    var crossesBorder: Bool {
+        func insideLuxembourg(_ point: LocationPoint) -> Bool {
+            (49.44 ... 50.19).contains(point.latitude) && (5.73 ... 6.54).contains(point.longitude)
+        }
+        return plan.legs.contains { !insideLuxembourg($0.origin) || !insideLuxembourg($0.destination) }
+    }
+
     /// Resolves the option's status relative to a reference time.
     ///
     /// Resolution order: cancelled → missed (first departure already gone, with
@@ -96,7 +106,7 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
 
 /// Overall viability of a ``RouteOption`` at a given time, used for badges and
 /// filtering.
-nonisolated enum RouteOptionStatus: String, Codable, Hashable, Sendable {
+nonisolated enum RouteOptionStatus: String, Codable, Hashable {
     /// Backed by live data and currently catchable.
     case viable
     /// Timetable-only; no realtime confirmation.

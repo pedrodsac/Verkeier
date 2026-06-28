@@ -55,7 +55,22 @@ struct RouteView: View {
             // ── State-driven body ─────────────────────────────────────────
             stateBody
 
-            // ── Apple Maps handoff ────────────────────────────────────────
+            // ── Share + Apple Maps handoff ────────────────────────────────
+            if let option = viewModel.selectedRouteOption {
+                ShareLink(
+                    item: option.shareText(
+                        originTitle: viewModel.originTitle,
+                        destinationTitle: viewModel.destinationTitle
+                    )
+                ) {
+                    Label("Share route", systemImage: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+                .tint(.primary)
+            }
+
             if viewModel.hasDestination {
                 Button(action: openInAppleMaps) {
                     Label("Open in Apple Maps", systemImage: "map")
@@ -194,6 +209,14 @@ struct RouteView: View {
         // Journey alerts
         if !viewModel.alerts.isEmpty {
             RouteAlertsSection(alerts: viewModel.alerts)
+        }
+
+        // Cross-border hint
+        if viewModel.selectedRouteOption?.crossesBorder == true {
+            RouteInfoBanner(
+                title: "Crosses a border — CFL / SNCF / DB live data may be incomplete",
+                systemImage: "flag.checkered"
+            )
         }
 
         // Results

@@ -15,4 +15,7 @@ extension EnvironmentValues {
     @Entry var liveActivityManager: LiveActivityManager = .init()
     @Entry var departureReminderService: DepartureReminderService = .init()
     @Entry var disruptionAlertService: DisruptionAlertService = .init()
+    // ponytail: stubbed — wire when the respective feed/dataset is confirmed.
+    @Entry var routeReliabilityService: any RouteReliabilityService = UnavailableRouteReliabilityService()
+    @Entry var parkAndRideService: any ParkAndRideService = UnavailableParkAndRideService()
 }

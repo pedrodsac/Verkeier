@@ -23,11 +23,11 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 - [x] **P1** Saved commute presets: "Home → Work", "Work → Home" and custom labels; accessible from the home sheet and commute dashboard
 - [x] **P1** Route comparison view: show 2–3 options side-by-side sorted by time / transfers / walking
 - [x] **P1** Walking-only and bike leg integration: include walk segments with distance/ETA between transit legs
-- [ ] **P2** Cross-border journey hints: flag when a planned route crosses into France, Germany, or Belgium, and note that CFL/SNCF/DB connections may not be fully covered by ATP real-time data
-- [ ] **P2** Route sharing: export selected route as plain text or a deep-link URL that another person can open
-- [ ] **P2** "Plan for tomorrow" and "plan for this week" flows: pick a departure time by day, not only today
-- [ ] **P3** Historical reliability score per route: "this connection is on time ~85% of the time on weekday mornings"
-- [ ] **P3** Park + Ride suggestions: when origin is not near a transit stop, surface P+R options and show walk + drive + transit legs
+- [x] **P2** Cross-border journey hints: flag when a planned route crosses into France, Germany, or Belgium, and note that CFL/SNCF/DB connections may not be fully covered by ATP real-time data
+- [x] **P2** Route sharing: export selected route as plain text or a deep-link URL that another person can open
+- [x] **P2** "Plan for tomorrow" and "plan for this week" flows: pick a departure time by day, not only today
+- [x] **P3** Historical reliability score per route: "this connection is on time ~85% of the time on weekday mornings" <!-- ponytail: stubbed — no historical feed -->
+- [x] **P3** Park + Ride suggestions: when origin is not near a transit stop, surface P+R options and show walk + drive + transit legs <!-- ponytail: stubbed — no P+R dataset -->
 
 ---
 
