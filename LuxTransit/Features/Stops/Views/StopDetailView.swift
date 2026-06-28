@@ -455,9 +455,27 @@ struct DepartureBoardView: View {
                     NextDepartureHeroCard(departure: next)
                 }
 
+                let now = Date()
+                let departed = departures
+                    .filter { ($0.realtimeDeparture ?? $0.scheduledDeparture).map { $0 < now } ?? false }
+                    .suffix(3)
+                let upcoming = departures
+                    .filter { ($0.realtimeDeparture ?? $0.scheduledDeparture).map { $0 >= now } ?? true }
+
                 ScrollView {
                     LazyVStack(spacing: 8) {
-                        ForEach(departures) { departure in
+                        if !departed.isEmpty {
+                            DisclosureGroup("Recently departed") {
+                                ForEach(Array(departed)) { departure in
+                                    DepartureListRow(departure: departure, showsControls: false)
+                                        .opacity(0.55)
+                                }
+                            }
+                            .font(.subheadline.weight(.semibold))
+                            .tint(.secondary)
+                        }
+
+                        ForEach(upcoming) { departure in
                             DepartureListRow(
                                 departure: departure,
                                 isTracked: departure.id == trackedDepartureId,
@@ -639,6 +657,25 @@ struct DepartureListRow: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
+
+                if departure.hasPlatformChange, let previous = departure.previousPlatform {
+                    Label("Platform changed from \(previous)", systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.orange)
+                        .lineLimit(1)
+                }
+                if let continuesAs = departure.continuesAs {
+                    Label("Continues as \(continuesAs) — no change needed", systemImage: "arrow.triangle.merge")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+                if let occupancy = departure.occupancy {
+                    Label(occupancy.displayText, systemImage: occupancy.symbolName)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
             }
             .frame(maxWidth: .infinity)
 

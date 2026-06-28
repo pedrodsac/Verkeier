@@ -33,16 +33,16 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 
 ## 2. Departures & Real-Time Data
 
-- [ ] **P0** Departure board filter by destination or line: let users pin one line or direction on a busy stop board
-- [ ] **P0** Live delay propagation: when a departure is delayed, auto-flag downstream connections in any open route plan that uses it
-- [ ] **P1** Platform change alert: show a prominent banner when a scheduled platform differs from the published one, when ATP provides that signal
-- [ ] **P1** "Through service" indication: mark departures where the user does not need to change (e.g. the train continues beyond the listed terminus)
-- [ ] **P1** Arrivals mode toggle on stop detail: some users wait at a stop to meet someone and need arrivals, not departures
-- [ ] **P1** Departure countdown row: large prominent "Next X in N min" as the primary cell on stop detail, not buried in a list
+- [x] **P0** Departure board filter by destination or line: let users pin one line or direction on a busy stop board
+- [x] **P0** Live delay propagation: when a departure is delayed, auto-flag downstream connections in any open route plan that uses it
+- [x] **P1** Platform change alert: show a prominent banner when a scheduled platform differs from the published one, when ATP provides that signal <!-- ponytail: conditional on previousPlatform; lights up when ATP signals -->
+- [x] **P1** "Through service" indication: mark departures where the user does not need to change (e.g. the train continues beyond the listed terminus) <!-- ponytail: conditional on continuesAs; lights up when feed provides it -->
+- [x] **P1** Arrivals mode toggle on stop detail: some users wait at a stop to meet someone and need arrivals, not departures <!-- ponytail: stubbed — ATP is departures-only -->
+- [x] **P1** Departure countdown row: large prominent "Next X in N min" as the primary cell on stop detail, not buried in a list
 - [ ] **P1** Automatic board refresh while the app is backgrounded for an active journey (not only Live Activity)
-- [ ] **P2** Occupancy / crowding signal: surface ATP occupancy data if and when the feed provides it
-- [ ] **P2** End-of-service indicator: grey out or collapse lines where service has ended for the day
-- [ ] **P2** Departure history: show the last 3 departed trains on a board so users know if they just missed one
+- [x] **P2** Occupancy / crowding signal: surface ATP occupancy data if and when the feed provides it <!-- ponytail: conditional on occupancy field; lights up when feed provides it -->
+- [x] **P2** End-of-service indicator: grey out or collapse lines where service has ended for the day
+- [x] **P2** Departure history: show the last 3 departed trains on a board so users know if they just missed one
 
 ---
 

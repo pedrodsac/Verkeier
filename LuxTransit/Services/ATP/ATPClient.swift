@@ -27,6 +27,12 @@ protocol ATPClient: Sendable {
     /// - Parameter stopIds: The stop/platform identifiers to query.
     /// - Throws: ``ATPClientError`` on auth, transport, or decoding failure.
     nonisolated func departureBoards(stopIds: [String]) async throws -> [Departure]
+
+    /// Fetches the arrival board for a stop (vehicles arriving, for riders
+    /// waiting to meet someone). ATP exposes departures only today, so the
+    /// default implementation returns an empty board.
+    // ponytail: stubbed — wire when an ATP arrivals feed is confirmed.
+    nonisolated func arrivalBoard(stopId: String) async throws -> [Departure]
 }
 
 extension ATPClient {
@@ -34,10 +40,15 @@ extension ATPClient {
         var departures: [Departure] = []
 
         for stopId in ATPStopIdentifier.normalized(stopIds) {
-            departures.append(contentsOf: try await departureBoard(stopId: stopId))
+            try await departures.append(contentsOf: departureBoard(stopId: stopId))
         }
 
         return ATPMapper.mergedDepartures(departures)
+    }
+
+    // ponytail: stubbed — wire when an ATP arrivals feed is confirmed.
+    nonisolated func arrivalBoard(stopId _: String) async throws -> [Departure] {
+        []
     }
 }
 

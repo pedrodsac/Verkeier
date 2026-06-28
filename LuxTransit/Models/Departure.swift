@@ -5,7 +5,7 @@ import Foundation
 /// A departure carries both the scheduled time and, when available, the
 /// realtime estimate so the UI can show live delays. Derive the user-facing
 /// state with ``status`` rather than inspecting the raw fields.
-struct Departure: Codable, Hashable, Identifiable, Sendable {
+struct Departure: Codable, Hashable, Identifiable {
     /// Stable identifier for the departure entry.
     let id: String
     /// Identifier of the stop this departure leaves from.
@@ -36,6 +36,17 @@ struct Departure: Codable, Hashable, Identifiable, Sendable {
     let dataSource: DataSource
     /// When the realtime data was last refreshed.
     let lastUpdated: Date?
+    /// The previously published platform when ATP signals a platform change;
+    /// `nil` when the platform is unchanged or no change signal is available.
+    // ponytail: stubbed — populate from ATP when the platform-change signal is confirmed.
+    let previousPlatform: String?
+    /// Set when the vehicle continues past the listed terminus (through service),
+    /// naming where it carries on to; `nil` when not a through service.
+    // ponytail: stubbed — populate from GTFS block / ATP when continuation data is confirmed.
+    let continuesAs: String?
+    /// Crowding level when the feed provides it; `nil` when unknown.
+    // ponytail: stubbed — populate from ATP when the occupancy feed is confirmed.
+    let occupancy: OccupancyLevel?
 
     nonisolated init(
         id: String,
@@ -51,7 +62,10 @@ struct Departure: Codable, Hashable, Identifiable, Sendable {
         isCancelled: Bool = false,
         isStatusUnknown: Bool = false,
         dataSource: DataSource,
-        lastUpdated: Date? = nil
+        lastUpdated: Date? = nil,
+        previousPlatform: String? = nil,
+        continuesAs: String? = nil,
+        occupancy: OccupancyLevel? = nil
     ) {
         self.id = id
         self.stopId = stopId
@@ -67,6 +81,15 @@ struct Departure: Codable, Hashable, Identifiable, Sendable {
         self.isStatusUnknown = isStatusUnknown
         self.dataSource = dataSource
         self.lastUpdated = lastUpdated
+        self.previousPlatform = previousPlatform
+        self.continuesAs = continuesAs
+        self.occupancy = occupancy
+    }
+
+    /// Whether ATP has signalled a platform change for this departure.
+    var hasPlatformChange: Bool {
+        guard let previousPlatform, let platform else { return false }
+        return previousPlatform != platform
     }
 
     /// The rider-facing status, resolved from cancellation, realtime presence,
@@ -99,8 +122,37 @@ struct Departure: Codable, Hashable, Identifiable, Sendable {
     }
 }
 
+/// Crowding level for a departure, surfaced when the feed provides occupancy.
+enum OccupancyLevel: String, Codable, Hashable, CaseIterable {
+    case empty
+    case manySeats
+    case fewSeats
+    case standingRoom
+    case full
+
+    /// Short rider-facing label.
+    var displayText: String {
+        switch self {
+        case .empty: "Empty"
+        case .manySeats: "Many seats"
+        case .fewSeats: "Few seats"
+        case .standingRoom: "Standing only"
+        case .full: "Full"
+        }
+    }
+
+    /// SF Symbol communicating crowding at a glance.
+    var symbolName: String {
+        switch self {
+        case .empty, .manySeats: "person.fill"
+        case .fewSeats: "person.2.fill"
+        case .standingRoom, .full: "person.3.fill"
+        }
+    }
+}
+
 /// The displayable state of a ``Departure``.
-enum DepartureStatus: Codable, Equatable, Hashable, Sendable {
+enum DepartureStatus: Codable, Equatable, Hashable {
     /// No realtime data; only the timetable is known.
     case scheduled
     /// Running on time per realtime data.
@@ -117,7 +169,7 @@ enum DepartureStatus: Codable, Equatable, Hashable, Sendable {
         switch self {
         case .scheduled: "Scheduled"
         case .onTime: "On time"
-        case .delayed(let minutes): "+\(minutes) min"
+        case let .delayed(minutes): "+\(minutes) min"
         case .cancelled: "Cancelled"
         case .unknown: "Unknown"
         }
