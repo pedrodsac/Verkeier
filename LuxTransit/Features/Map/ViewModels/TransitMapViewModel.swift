@@ -324,8 +324,11 @@ final class TransitMapViewModel {
         commutePresets = store.commutePresets()
     }
 
-    func selectRouteOrigin(_ place: RoutePlace?) {
+    func selectRouteOrigin(_ place: RoutePlace?, using store: RoutePlannerStore = .shared) {
         routeOrigin = place
+        if let place {
+            recentRoutePlaces = store.recordRecentPlace(place)
+        }
         clearRoute()
     }
 

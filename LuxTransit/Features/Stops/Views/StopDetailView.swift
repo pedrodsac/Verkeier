@@ -436,14 +436,24 @@ struct DepartureBoardView: View {
                 systemImage: "clock.badge.exclamationmark"
             )
         } else {
+            let trackedDeparture = departures.first(where: { $0.id == trackedDepartureId })
+            let showsTrackingCard = trackedDeparture != nil || activeReminder != nil
+            let lastOfDayIDs = lastServiceDepartureIDs(in: departures)
+
             VStack(alignment: .leading, spacing: 8) {
 //                DepartureBoardStatus(lastUpdated: lastUpdated, isStale: isStale)
                 DepartureTrackingStatusCard(
-                    trackedDeparture: departures.first(where: { $0.id == trackedDepartureId }),
+                    trackedDeparture: trackedDeparture,
                     activeReminder: activeReminder,
                     stopTrackingDeparture: stopTrackingDeparture,
                     cancelDepartureReminder: cancelDepartureReminder
                 )
+
+                // Hero card for the next ride — hidden while a tracking card is shown.
+                if !showsTrackingCard,
+                   let next = departures.first(where: { !$0.isCancelled }) {
+                    NextDepartureHeroCard(departure: next)
+                }
 
                 ScrollView {
                     LazyVStack(spacing: 8) {
@@ -451,6 +461,7 @@ struct DepartureBoardView: View {
                             DepartureListRow(
                                 departure: departure,
                                 isTracked: departure.id == trackedDepartureId,
+                                isLastOfDay: lastOfDayIDs.contains(departure.id),
                                 activeReminder: activeReminder,
                                 startTrackingDeparture: { startTrackingDeparture(departure) },
                                 stopTrackingDeparture: stopTrackingDeparture,
@@ -572,6 +583,7 @@ private struct DepartureTimingStatus: View {
 struct DepartureListRow: View {
     let departure: Departure
     var isTracked: Bool = false
+    var isLastOfDay: Bool = false
     var showsControls: Bool = true
     var activeReminder: SharedTrackedDepartureReminder?
     var startTrackingDeparture: () -> Void = {}
@@ -604,6 +616,13 @@ struct DepartureListRow: View {
                 VStack {
                     Text(departure.destination)
                         .font(.body.weight(.semibold))
+                        .lineLimit(1)
+                }
+
+                if isLastOfDay {
+                    Text("Last service today")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
                         .lineLimit(1)
                 }
 
@@ -734,11 +753,7 @@ struct DepartureListRow: View {
     }
 
     private var lineColor: Color {
-        switch transportKind {
-        case .tram: .orange
-        case .train: .red
-        case .bus: .blue
-        }
+        transportKind.color
     }
 
     private var isReminderActive: Bool {
@@ -746,25 +761,46 @@ struct DepartureListRow: View {
     }
 
     private var transportIcon: String {
-        switch transportKind {
+        transportKind.icon
+    }
+
+    private var transportKind: DepartureTransportKind {
+        DepartureTransportKind(lineName: departure.lineName)
+    }
+}
+
+enum DepartureTransportKind {
+    case bus
+    case tram
+    case train
+
+    /// Infers the kind from a public line label, e.g. `"T1"` → tram.
+    init(lineName: String) {
+        let line = lineName.uppercased()
+        if line.hasPrefix("T") {
+            self = .tram
+        } else if line.hasPrefix("R") || line.hasPrefix("RE") || line.hasPrefix("IC") {
+            self = .train
+        } else {
+            self = .bus
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .tram: .orange
+        case .train: .red
+        case .bus: .blue
+        }
+    }
+
+    var icon: String {
+        switch self {
         case .tram: "tram.fill"
         case .train: "train.side.front.car"
         case .bus: "bus.fill"
         }
     }
-
-    private var transportKind: DepartureTransportKind {
-        let line = departure.lineName.uppercased()
-        if line.hasPrefix("T") { return .tram }
-        if line.hasPrefix("R") || line.hasPrefix("RE") || line.hasPrefix("IC") { return .train }
-        return .bus
-    }
-}
-
-private enum DepartureTransportKind {
-    case bus
-    case tram
-    case train
 }
 
 struct DepartureLoadingCard: View {

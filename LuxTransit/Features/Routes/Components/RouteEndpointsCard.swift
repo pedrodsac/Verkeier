@@ -13,6 +13,10 @@ struct RouteEndpointsCard: View {
     let selectRouteDestination: (RoutePlace) -> Void
     let swapRouteEndpoints: () -> Void
 
+    @Environment(\.gtfsService) private var gtfsService
+    @State private var showOriginSearch = false
+    @State private var showDestinationSearch = false
+
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
             connectorRail
@@ -33,6 +37,18 @@ struct RouteEndpointsCard: View {
         .overlay {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(.separator.opacity(0.22), lineWidth: 0.5)
+        }
+        .sheet(isPresented: $showOriginSearch) {
+            RouteStopSearchSheet(title: "Search Origin", gtfsService: gtfsService) { stop in
+                selectRouteOrigin(RoutePlace(stop: stop, source: .search))
+                showOriginSearch = false
+            }
+        }
+        .sheet(isPresented: $showDestinationSearch) {
+            RouteStopSearchSheet(title: "Search Destination", gtfsService: gtfsService) { stop in
+                selectRouteDestination(RoutePlace(stop: stop, source: .search))
+                showDestinationSearch = false
+            }
         }
     }
 
@@ -73,6 +89,12 @@ struct RouteEndpointsCard: View {
                 selectRouteOrigin(nil)
             }
 
+            Button {
+                showOriginSearch = true
+            } label: {
+                Label("Search stops…", systemImage: "magnifyingglass")
+            }
+
             if !viewModel.favouritePlaces.isEmpty {
                 Section("Favourite Stops") {
                     ForEach(viewModel.favouritePlaces) { place in
@@ -106,6 +128,12 @@ struct RouteEndpointsCard: View {
                         RoutePlace(stop: selectedStop, source: .selectedStop)
                     )
                 }
+            }
+
+            Button {
+                showDestinationSearch = true
+            } label: {
+                Label("Search stops…", systemImage: "magnifyingglass")
             }
 
             if !viewModel.favouritePlaces.isEmpty {
@@ -177,6 +205,116 @@ struct RouteEndpointsCard: View {
         .disabled(!viewModel.hasDestination)
         .accessibilityLabel("Swap origin and destination")
         .padding(.trailing, 4)
+    }
+}
+
+// MARK: - Stop search sheet
+
+/// A self-contained stop-search sheet for picking a trip origin or destination.
+///
+/// Mirrors the search field + results list of ``SearchView`` but queries the
+/// local GTFS service directly and reports the chosen ``Stop`` via ``onSelect``.
+private struct RouteStopSearchSheet: View {
+    let title: String
+    let gtfsService: any GTFSService
+    let onSelect: (Stop) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var query = ""
+    @State private var results: [Stop] = []
+    @FocusState private var isSearchFocused: Bool
+
+    private var trimmedQuery: String {
+        query.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 12) {
+                searchField
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+
+                if trimmedQuery.isEmpty {
+                    ContentUnavailableView(
+                        "Search stops",
+                        systemImage: "magnifyingglass",
+                        description: Text("Start typing to find a stop from local data.")
+                    )
+                } else if results.isEmpty {
+                    ContentUnavailableView(
+                        "No matches",
+                        systemImage: "tram",
+                        description: Text("Try another stop name.")
+                    )
+                } else {
+                    List(results) { stop in
+                        Button {
+                            onSelect(stop)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(stop.name)
+                                    .font(.body.weight(.semibold))
+                                    .foregroundStyle(.primary)
+                                if let locality = stop.locality {
+                                    Text(locality)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+        }
+        .task(id: query) {
+            let current = trimmedQuery
+            guard !current.isEmpty else {
+                results = []
+                return
+            }
+            // Debounce: a new keystroke cancels this task before the sleep ends.
+            try? await Task.sleep(for: .milliseconds(250))
+            guard !Task.isCancelled else { return }
+            results = await gtfsService.searchStops(query: current)
+        }
+        .onAppear { isSearchFocused = true }
+    }
+
+    private var searchField: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
+            TextField("Search", text: $query)
+                .textInputAutocapitalization(.words)
+                .autocorrectionDisabled()
+                .focused($isSearchFocused)
+                .accessibilityLabel("Stop search")
+            if !query.isEmpty {
+                Button {
+                    query = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.tertiary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Clear search")
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 44)
+        .padding(.horizontal, 12)
+        .background(.quaternary.opacity(0.7), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
