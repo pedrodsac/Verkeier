@@ -1003,6 +1003,11 @@ private struct TransitMapView: UIViewRepresentable {
                 mapView.delegate = coordinator
                 mapView.showsUserLocation = true
                 mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                let longPress = UILongPressGestureRecognizer(
+                    target: coordinator,
+                    action: #selector(Coordinator.handleWalkRingLongPress(_:))
+                )
+                mapView.addGestureRecognizer(longPress)
                 addSubview(mapView)
                 self.mapView = mapView
             }
@@ -1041,6 +1046,9 @@ private struct TransitMapView: UIViewRepresentable {
         private var routeOverlay: RouteMapOverlay?
         private var routePolylines: [MKPolyline] = []
         private var routePolylineSegments: [ObjectIdentifier: RouteMapSegment] = [:]
+        private var walkRing: MKCircle?
+        // ponytail: fixed 10-min ring at ~80 m/min; add a walk-time picker to vary it.
+        private let walkRingRadiusMeters: CLLocationDistance = 800
 
         init(
             selectStop: @escaping (Stop) -> Void,
@@ -1048,6 +1056,19 @@ private struct TransitMapView: UIViewRepresentable {
         ) {
             self.selectStop = selectStop
             self.regionDidChange = regionDidChange
+        }
+
+        /// Long-press drops (or moves) a walking-radius ring so riders can see
+        /// which stops are reachable on foot from an arbitrary point.
+        @objc func handleWalkRingLongPress(_ gesture: UILongPressGestureRecognizer) {
+            guard gesture.state == .began, let mapView = gesture.view as? MKMapView else { return }
+            let coordinate = mapView.convert(gesture.location(in: mapView), toCoordinateFrom: mapView)
+            if let walkRing {
+                mapView.removeOverlay(walkRing)
+            }
+            let circle = MKCircle(center: coordinate, radius: walkRingRadiusMeters)
+            mapView.addOverlay(circle, level: .aboveRoads)
+            walkRing = circle
         }
 
         func syncAnnotations(_ annotations: [StopMapAnnotation], in mapView: MKMapView) {
@@ -1168,6 +1189,14 @@ private struct TransitMapView: UIViewRepresentable {
         }
 
         func mapView(_: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            if let circle = overlay as? MKCircle {
+                let renderer = MKCircleRenderer(circle: circle)
+                renderer.fillColor = UIColor.systemBlue.withAlphaComponent(0.12)
+                renderer.strokeColor = UIColor.systemBlue.withAlphaComponent(0.6)
+                renderer.lineWidth = 1.5
+                return renderer
+            }
+
             guard let polyline = overlay as? MKPolyline else {
                 return MKOverlayRenderer(overlay: overlay)
             }
@@ -1253,6 +1282,11 @@ private struct TransitMapView: UIViewRepresentable {
             view.subtitleVisibility = .hidden
             view.displayPriority = isSelected ? .required : .defaultHigh
             view.canShowCallout = false
+            // Native clustering for dense regular stops; selected / favourite /
+            // alert markers stay unclustered so they're always visible.
+            view.clusteringIdentifier = (isSelected || isFavourite || hasAlert)
+                ? nil
+                : "stop-\(annotation.layer)"
         }
 
         private func markerColor(

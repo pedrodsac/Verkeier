@@ -18,4 +18,6 @@ extension EnvironmentValues {
     // ponytail: stubbed — wire when the respective feed/dataset is confirmed.
     @Entry var routeReliabilityService: any RouteReliabilityService = UnavailableRouteReliabilityService()
     @Entry var parkAndRideService: any ParkAndRideService = UnavailableParkAndRideService()
+    @Entry var vehiclePositionService: any VehiclePositionService = UnavailableVehiclePositionService()
+    @Entry var bikeShareService: any BikeShareService = UnavailableBikeShareService()
 }

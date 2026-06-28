@@ -18,15 +18,14 @@ final class LocalGTFSService: GTFSService {
         stops: [Stop]? = nil,
         routesByStopId: [String: [TransitRoute]]? = nil
     ) {
-        let initialSnapshot: GTFSSnapshot?
-        if let stops, let routesByStopId {
-            initialSnapshot = GTFSSnapshot(
+        let initialSnapshot: GTFSSnapshot? = if let stops, let routesByStopId {
+            GTFSSnapshot(
                 stops: stops,
                 routesByStopId: routesByStopId,
                 timetable: nil
             )
         } else {
-            initialSnapshot = nil
+            nil
         }
 
         let loader = GTFSDataLoader(
@@ -169,8 +168,8 @@ private actor GTFSDataLoader {
 
     private static func loadCompactStore(bundle: Bundle, resourceName: String) -> GTFSCompactStore? {
         guard let url = bundle.url(forResource: resourceName, withExtension: "json"),
-            let data = try? Data(contentsOf: url),
-            let payload = try? JSONDecoder().decode(GTFSCompactPayload.self, from: data)
+              let data = try? Data(contentsOf: url),
+              let payload = try? JSONDecoder().decode(GTFSCompactPayload.self, from: data)
         else {
             return nil
         }
@@ -188,7 +187,8 @@ private actor GTFSDataLoader {
                         dataSource: .gtfs
                     )
                 )
-            })
+            }
+        )
 
         let stops = payload.stops.map { stop in
             Stop(
@@ -196,7 +196,8 @@ private actor GTFSDataLoader {
                 name: stop.name,
                 locality: stop.locality,
                 location: LocationPoint(
-                    id: stop.id, name: stop.name, latitude: stop.latitude, longitude: stop.longitude),
+                    id: stop.id, name: stop.name, latitude: stop.latitude, longitude: stop.longitude
+                ),
                 modes: stop.modes.map { TransportMode(rawValue: $0) ?? .unknown },
                 dataSource: .gtfs
             )
@@ -208,15 +209,16 @@ private actor GTFSDataLoader {
                     stop.id,
                     stop.routeIds.compactMap { routesById[$0] }
                 )
-            })
+            }
+        )
 
         return GTFSCompactStore(stops: stops, routesByStopId: routesByStopId)
     }
 
     private static func loadStopsIndex(store: GTFSLocalStore) -> GTFSCompactStore? {
         guard FileManager.default.fileExists(atPath: store.stopsIndexURL.path),
-            let data = try? Data(contentsOf: store.stopsIndexURL),
-            let payload = try? JSONDecoder.gtfsLocal.decode(GTFSStopsIndexPayload.self, from: data)
+              let data = try? Data(contentsOf: store.stopsIndexURL),
+              let payload = try? JSONDecoder.gtfsLocal.decode(GTFSStopsIndexPayload.self, from: data)
         else {
             return nil
         }
@@ -234,7 +236,8 @@ private actor GTFSDataLoader {
                         dataSource: .gtfs
                     )
                 )
-            })
+            }
+        )
 
         let stops = payload.stops.map { stop in
             Stop(
@@ -248,7 +251,8 @@ private actor GTFSDataLoader {
                     longitude: stop.longitude
                 ),
                 modes: stop.modes.map { TransportMode(rawValue: $0) ?? .unknown },
-                dataSource: .gtfs
+                dataSource: .gtfs,
+                wheelchairBoarding: WheelchairAccess(gtfsValue: stop.wheelchairBoarding)
             )
         }
 
@@ -258,7 +262,8 @@ private actor GTFSDataLoader {
                     stop.id,
                     stop.routeIds.compactMap { routesById[$0] }
                 )
-            })
+            }
+        )
 
         return GTFSCompactStore(stops: stops, routesByStopId: routesByStopId)
     }
@@ -267,8 +272,8 @@ private actor GTFSDataLoader {
         guard FileManager.default.fileExists(atPath: store.timetableIndexURL.path),
               let data = try? Data(contentsOf: store.timetableIndexURL),
               let payload = try? JSONDecoder.gtfsLocal.decode(
-                GTFSTimetableIndexPayload.self,
-                from: data
+                  GTFSTimetableIndexPayload.self,
+                  from: data
               ) else {
             return nil
         }
@@ -277,7 +282,7 @@ private actor GTFSDataLoader {
     }
 }
 
-private nonisolated struct GTFSSnapshot: Sendable {
+private nonisolated struct GTFSSnapshot {
     let stops: [Stop]
     let routesByStopId: [String: [TransitRoute]]
     let timetable: GTFSTimetableIndexPayload?
@@ -295,7 +300,7 @@ private nonisolated struct GTFSSnapshot: Sendable {
     }
 }
 
-private nonisolated struct GTFSCompactStore: Sendable {
+private nonisolated struct GTFSCompactStore {
     let stops: [Stop]
     let routesByStopId: [String: [TransitRoute]]
 }
@@ -370,7 +375,7 @@ private nonisolated struct GTFSStopIndex {
     }
 
     private static func bucketRange(from lower: Double, to upper: Double) -> ClosedRange<Int> {
-        bucketIndex(for: lower)...bucketIndex(for: upper)
+        bucketIndex(for: lower) ... bucketIndex(for: upper)
     }
 
     private static func bucketIndex(for value: Double) -> Int {

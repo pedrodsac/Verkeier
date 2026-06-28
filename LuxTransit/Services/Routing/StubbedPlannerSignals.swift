@@ -44,3 +44,51 @@ struct UnavailableParkAndRideService: ParkAndRideService {
         []
     }
 }
+
+// MARK: - Live vehicle positions
+
+/// A live vehicle position for drawing a moving train/tram/bus dot on the map.
+struct VehiclePosition: Identifiable, Hashable {
+    let id: String
+    let routeId: String?
+    let mode: TransportMode
+    let location: LocationPoint
+    let bearingDegrees: Double?
+}
+
+/// Live vehicle positions near a coordinate. ATP does not expose a
+/// vehicle-position stream today, so the live implementation returns nothing.
+// ponytail: stubbed — wire when an ATP vehicle-position stream is confirmed.
+protocol VehiclePositionService: Sendable {
+    func vehiclePositions(near location: LocationPoint) async -> [VehiclePosition]
+}
+
+struct UnavailableVehiclePositionService: VehiclePositionService {
+    func vehiclePositions(near _: LocationPoint) async -> [VehiclePosition] {
+        []
+    }
+}
+
+// MARK: - Bike sharing
+
+/// A bike-share station (e.g. Vël'OK in Luxembourg City).
+struct BikeShareStation: Identifiable, Hashable {
+    let id: String
+    let name: String
+    let location: LocationPoint
+    let bikesAvailable: Int?
+    let docksAvailable: Int?
+}
+
+/// Bike-share stations near a coordinate. No bike-share feed is bundled yet, so
+/// the live implementation returns nothing and the overlay stays hidden.
+// ponytail: stubbed — wire when a Vël'OK bike-share feed is confirmed.
+protocol BikeShareService: Sendable {
+    func bikeShareStations(near location: LocationPoint) async -> [BikeShareStation]
+}
+
+struct UnavailableBikeShareService: BikeShareService {
+    func bikeShareStations(near _: LocationPoint) async -> [BikeShareStation] {
+        []
+    }
+}

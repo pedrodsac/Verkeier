@@ -37,6 +37,12 @@ struct StopListRow: View {
                         Divider()
                             .frame(height: 10)
 
+                        if servesNightBus {
+                            Image(systemName: "moon.stars.fill")
+                                .foregroundStyle(.indigo)
+                                .accessibilityLabel("Night bus")
+                        }
+
                         if let lineSummary {
                             Text(lineSummary)
                         } else if !stop.modes.isEmpty {
@@ -91,6 +97,11 @@ struct StopListRow: View {
 
     private var modeSummary: String {
         stop.modes.map(\.displayName).joined(separator: ", ")
+    }
+
+    /// True when any line serving this stop is a night service.
+    private var servesNightBus: Bool {
+        routes.contains { $0.isNightService }
     }
 
     /// Up to four route short names, e.g. "12 · 14 · 25", truncated with "…".

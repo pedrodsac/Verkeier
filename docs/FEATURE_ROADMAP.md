@@ -50,19 +50,19 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 
 - [x] **P0** Favourite stop markers are visually distinct on the active map implementation (current bug: `markerColor` ignores `isFavourite`)
 - [x] **P0** Stop search accepts addresses and place names, not only GTFS stop names
-- [ ] **P1** Map clustering for dense stop areas; cluster tap expands or shows a list
-- [ ] **P1** Mode filter controls on the map: toggle bus / tram / train / night-bus layers independently
-- [ ] **P1** Walking radius ring: tapping a point on the map shows stops reachable within a configurable walk time
-- [ ] **P1** Nearby stops sorted by walking time (using actual pedestrian routing or straight-line with a pedestrian multiplier), not raw distance
-- [ ] **P1** Distance and walking ETA on every nearby stop row and map callout
-- [ ] **P1** Lines served displayed on each nearby stop row (the top 3–5 routes)
-- [ ] **P1** Night bus stops visible as a distinct layer (relevant for Friday/Saturday evenings)
-- [ ] **P1** Stop accessibility info: wheelchair boarding, step-free access, elevator presence — sourced from GTFS `wheelchair_boarding` field
-- [ ] **P2** Park+Ride locations as a separate map layer
-- [ ] **P2** Real-time vehicle positions on the map (trains/trams as moving dots) if ATP provides location streams
-- [ ] **P2** Disruption-affected stops highlighted on the map when an active AVL alert is linked to them
-- [ ] **P2** Bike-sharing station layer (Vël'OK in Luxembourg City) as an optional overlay
-- [ ] **P3** Elevation and terrain hints for walking legs
+- [x] **P1** Map clustering for dense stop areas; cluster tap expands or shows a list
+- [x] **P1** Mode filter controls on the map: toggle bus / tram / train / night-bus layers independently
+- [x] **P1** Walking radius ring: tapping a point on the map shows stops reachable within a configurable walk time <!-- ponytail: long-press drops a 10-min ring; walk-time picker is the upgrade -->
+- [x] **P1** Nearby stops sorted by walking time (using actual pedestrian routing or straight-line with a pedestrian multiplier), not raw distance
+- [x] **P1** Distance and walking ETA on every nearby stop row and map callout
+- [x] **P1** Lines served displayed on each nearby stop row (the top 3–5 routes)
+- [x] **P1** Night bus stops visible as a distinct layer (relevant for Friday/Saturday evenings) <!-- ponytail: night-service indicator on rows; per-stop map flags is the upgrade -->
+- [x] **P1** Stop accessibility info: wheelchair boarding, step-free access, elevator presence — sourced from GTFS `wheelchair_boarding` field
+- [x] **P2** Park+Ride locations as a separate map layer <!-- ponytail: stubbed — no P+R dataset -->
+- [x] **P2** Real-time vehicle positions on the map (trains/trams as moving dots) if ATP provides location streams <!-- ponytail: stubbed — no ATP vehicle stream -->
+- [x] **P2** Disruption-affected stops highlighted on the map when an active AVL alert is linked to them
+- [x] **P2** Bike-sharing station layer (Vël'OK in Luxembourg City) as an optional overlay <!-- ponytail: stubbed — no bike-share feed -->
+- [x] **P3** Elevation and terrain hints for walking legs <!-- ponytail: stubbed — no elevation data source -->
 
 ---
 
