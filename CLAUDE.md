@@ -83,4 +83,4 @@ ATP (mobiliteit.lu) access is gated behind `ATP_ACCESS_ID`; the app tolerates a 
 ## Working notes
 
 - Make occasional small, focused commits after a coherent buildable change or passing-test milestone; don't mix unrelated work. Use concise imperative messages (`Add GTFS update validation`).
-- `docs/` holds the phased plan (`PRD.md`, `ARCHITECTURE.md`, `MVP_CHECKLIST.md`, `CODEBASE_RULES.md`, feature/audit specs). Consult them before large changes — they define intended scope and contracts.
+- `docs/` holds the phased plan (`PRD.md`, `ARCHITECTURE.md`, `MVP_CHECKLIST.md`, `CODEBASE_RULES.md`, feature/audit specs). Start with `docs/README.md` for navigation and `docs/SERVICES.md` for protocol signatures. Consult both before large changes — they define intended scope and contracts.

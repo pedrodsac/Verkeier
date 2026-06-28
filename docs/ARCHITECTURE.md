@@ -88,29 +88,33 @@ LuxTransit/
 ### ATPClient
 
 ```swift
-func nearbyStops(latitude: Double, longitude: Double) async throws -> [Stop]
-func departureBoard(stopId: String) async throws -> [Departure]
+nonisolated func nearbyStops(latitude: Double, longitude: Double) async throws -> [Stop]
+nonisolated func departureBoard(stopId: String) async throws -> [Departure]
+nonisolated func departureBoards(stopIds: [String]) async throws -> [Departure]
 ```
 
 ### GTFSService
 
 ```swift
-func searchStops(query: String) -> [Stop]
-func stop(id: String) -> Stop?
-func routesForStop(id: String) -> [TransitRoute]
+nonisolated func searchStops(query: String) async -> [Stop]
+nonisolated func stopsForMap(center: LocationPoint, latitudeDelta: Double, longitudeDelta: Double, limit: Int) async -> [Stop]
+nonisolated func stop(id: String) async -> Stop?
+nonisolated func allStops() async -> [Stop]
+nonisolated func routesForStop(id: String) async -> [TransitRoute]
+nonisolated func timetableIndex() async -> GTFSTimetableIndexPayload?
 ```
 
 ### AVLClient
 
 ```swift
-func fetchMessages() async throws -> [AlertMessage]
+nonisolated func fetchMessages() async throws -> [AlertMessage]
 ```
 
-### MapKitRouteService
+### RouteService
 
 ```swift
-func calculateRoute(from: LocationPoint, to: LocationPoint) async throws -> RoutePlan
-func openInAppleMaps(from: LocationPoint, to: LocationPoint)
+nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint, time: RoutePlanningTime, filters: RoutePlannerFilters) async throws -> RouteCalculation
+@MainActor func openInAppleMaps(from: LocationPoint, to: LocationPoint)
 ```
 
 ### LiveActivityManager
@@ -120,3 +124,36 @@ func startTracking(departure: Departure, stop: Stop) async throws
 func updateTracking(departure: Departure) async
 func endTracking()
 ```
+
+## Dependency Injection
+
+Services are injected via SwiftUI `EnvironmentValues` using `@Entry`
+(Swift 5.10+). All entries are declared in `LuxTransit/App/AppDependencies.swift`.
+
+```swift
+// Read in any view:
+@Environment(\.atpClient) private var atpClient
+
+// Override in a preview:
+#Preview {
+    MyView().environment(\.atpClient, ATPMockClient())
+}
+```
+
+The app entry point (`LuxTransitApp`) wires live implementations at launch.
+Default values in `AppDependencies.swift` are the safe no-op stubs
+(`EmptyATPClient`, `LocalGTFSService`). See `docs/SERVICES.md` for all
+protocol signatures and mock implementations.
+
+## Domain Model Inventory
+
+15 model files in `LuxTransit/Models/`. Key ones:
+
+- **Stop** — canonical place: id, name, locality, location, modes, platformIds
+- **Departure** — one departure row; scheduled/realtime times, delayMinutes, isCancelled
+- **TransitRoute** — a transit line: shortName, mode, operatorName
+- **RoutePlan** / **RouteOption** — journey result with legs, overlays, and live-status
+- **LocationPoint** — Codable lat/lon coordinate; convert with `.coordinate`
+- **DataSource** — provenance enum on all models: `.atpOpenAPI .gtfs .avl .mock …`
+
+Full signatures and all 15 models: `docs/SERVICES.md`.
