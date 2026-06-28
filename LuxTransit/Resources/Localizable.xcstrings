@@ -1,0 +1,198 @@
+{
+  "sourceLanguage" : "en",
+  "version" : "1.0",
+  "strings" : {
+    "Cancel" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abbrechen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Annuler" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Ofbriechen" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Cancelar" } }
+      }
+    },
+    "Cancelled" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ausgefallen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Annulé" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Annuléiert" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Cancelado" } }
+      }
+    },
+    "Clear search" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Suche löschen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Effacer la recherche" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Sich läschen" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Limpar pesquisa" } }
+      }
+    },
+    "Departures" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abfahrten" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Départs" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Departuren" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Partidas" } }
+      }
+    },
+    "Directions" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Route" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Itinéraire" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Wee" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Itinerário" } }
+      }
+    },
+    "Find Routes" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Routen suchen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Rechercher des itinéraires" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Weeër sichen" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Procurar rotas" } }
+      }
+    },
+    "Get directions" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Route anzeigen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Obtenir l’itinéraire" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Wee weisen" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Obter itinerário" } }
+      }
+    },
+    "Last service today" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Letzte Fahrt heute" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Dernier service aujourd’hui" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Lescht Faart haut" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Último serviço hoje" } }
+      }
+    },
+    "Loading departures" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abfahrten werden geladen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Chargement des départs" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Departure lueden" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "A carregar partidas" } }
+      }
+    },
+    "Nearby Suggestions" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Vorschläge in der Nähe" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Suggestions à proximité" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Virschléi an der Géigend" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Sugestões próximas" } }
+      }
+    },
+    "No departures" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Keine Abfahrten" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucun départ" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Keng Departuren" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Sem partidas" } }
+      }
+    },
+    "On time" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Pünktlich" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "À l’heure" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Op der Zäit" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Pontual" } }
+      }
+    },
+    "Open in Apple Maps" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "In Karten öffnen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir dans Plans" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "An Apple Maps opmaachen" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Abrir no Mapas" } }
+      }
+    },
+    "Quick destinations" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Schnellziele" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Destinations rapides" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Séier Destinatiounen" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Destinos rápidos" } }
+      }
+    },
+    "Recently departed" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Kürzlich abgefahren" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Partis récemment" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Viru kuerzem fortgefuer" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Partiu recentemente" } }
+      }
+    },
+    "Refresh Routes" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Routen aktualisieren" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Actualiser les itinéraires" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Weeër aktualiséieren" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Atualizar rotas" } }
+      }
+    },
+    "Route options" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Routenoptionen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Options d’itinéraire" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Weeoptiounen" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Opções de rota" } }
+      }
+    },
+    "Save" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sichern" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Enregistrer" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Späicheren" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Guardar" } }
+      }
+    },
+    "Scheduled" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Geplant" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Planifié" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Geplangt" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Programado" } }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Einstellungen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Astellungen" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Definições" } }
+      }
+    },
+    "Share route" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Route teilen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Partager l’itinéraire" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Wee deelen" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Partilhar rota" } }
+      }
+    },
+    "Show more routes" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Weitere Routen anzeigen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher plus d’itinéraires" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Méi Weeër weisen" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Mostrar mais rotas" } }
+      }
+    },
+    "Stop search" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Haltestellensuche" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Recherche d’arrêt" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Statiounssich" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Pesquisa de paragem" } }
+      }
+    },
+    "Wheelchair accessible" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Rollstuhlgerecht" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Accessible en fauteuil roulant" } },
+        "lb" : { "stringUnit" : { "state" : "translated", "value" : "Rollstullzougänglech" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Acessível a cadeira de rodas" } }
+      }
+    }
+  }
+}

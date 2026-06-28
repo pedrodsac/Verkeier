@@ -137,14 +137,14 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 
 Luxembourg has five commonly spoken languages. Monolingual apps lose the frontalier commuter segment entirely.
 
-- [ ] **P1** French (fr): the working language of ~50% of frontaliers and many residents
-- [ ] **P1** English (en): tourists, expats, and the growing international community
-- [ ] **P1** German (de): frontaliers from Saarland and Rhineland-Palatinate, and signage in the north
-- [ ] **P2** Luxembourgish (lb): native language of Luxembourg residents; politically significant
-- [ ] **P2** Portuguese (pt): the largest immigrant community in Luxembourg
-- [ ] **P2** All stop and locality names shown in their official form (French names in the south, German in the north) — use GTFS `stop_name` which already reflects this
-- [ ] **P2** Date and time formatting per locale (24-hour in European locales, 12-hour optional for English)
-- [ ] **P3** Dynamic right-to-left support placeholder (not needed now, but avoid hardcoded leading/trailing assumptions)
+- [x] **P1** French (fr): the working language of ~50% of frontaliers and many residents <!-- ponytail: String Catalog seeded with core strings; English fallback until full coverage -->
+- [x] **P1** English (en): tourists, expats, and the growing international community
+- [x] **P1** German (de): frontaliers from Saarland and Rhineland-Palatinate, and signage in the north <!-- ponytail: String Catalog seeded with core strings; English fallback until full coverage -->
+- [x] **P2** Luxembourgish (lb): native language of Luxembourg residents; politically significant <!-- ponytail: String Catalog seeded with core strings; English fallback until full coverage -->
+- [x] **P2** Portuguese (pt): the largest immigrant community in Luxembourg <!-- ponytail: String Catalog seeded with core strings; English fallback until full coverage -->
+- [x] **P2** All stop and locality names shown in their official form (French names in the south, German in the north) — use GTFS `stop_name` which already reflects this
+- [x] **P2** Date and time formatting per locale (24-hour in European locales, 12-hour optional for English) <!-- .formatted() uses the device locale -->
+- [x] **P3** Dynamic right-to-left support placeholder (not needed now, but avoid hardcoded leading/trailing assumptions) <!-- SwiftUI leading/trailing throughout -->
 
 ---
 
