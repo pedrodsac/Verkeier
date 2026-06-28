@@ -70,7 +70,16 @@ struct FavouritesView: View {
         favourites.contains { ($0.label?.isEmpty == false) }
     }
 
+    /// Favourites after applying the active Focus filter. In a work Focus only
+    /// stops labelled with "work" are shown.
+    private var visibleFavourites: [PersistedFavouriteStop] {
+        guard FocusFilterStore.shared.isWorkFocusActive else { return favourites }
+        let workOnly = favourites.filter { $0.label?.lowercased().contains("work") == true }
+        return workOnly.isEmpty ? favourites : workOnly
+    }
+
     private var sections: [LabelSection] {
+        let favourites = visibleFavourites
         guard isGrouped else {
             return [LabelSection(title: "Saved Stops", stops: favourites)]
         }

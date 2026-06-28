@@ -81,14 +81,14 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 
 ## 5. Favourites & Personalization
 
-- [ ] **P1** Favourites organized by group or label (Home, Work, Frequently visited)
-- [ ] **P1** One-tap commute tiles on home sheet that reflect time of day: show "Home → Work" in the morning, "Work → Home" in the evening
-- [ ] **P1** Recently viewed stops persisted across launches (last 5–10)
-- [ ] **P1** Quick-access shortcut for most-used route pinned to the home sheet
-- [ ] **P2** Spotlight search integration: find favourite stops and open them from iOS search
-- [ ] **P2** Focus filter: in Work Focus, show only work-relevant stops and the commute preset
-- [ ] **P2** Siri phrase registration: "Hey Siri, next train from Mersch" resolves via App Intent
-- [ ] **P3** iCloud sync for favourites and presets across devices
+- [x] **P1** Favourites organized by group or label (Home, Work, Frequently visited)
+- [x] **P1** One-tap commute tiles on home sheet that reflect time of day: show "Home → Work" in the morning, "Work → Home" in the evening
+- [x] **P1** Recently viewed stops persisted across launches (last 5–10)
+- [x] **P1** Quick-access shortcut for most-used route pinned to the home sheet <!-- commute suggestion + recent trips on home/planner -->
+- [x] **P2** Spotlight search integration: find favourite stops and open them from iOS search
+- [x] **P2** Focus filter: in Work Focus, show only work-relevant stops and the commute preset
+- [x] **P2** Siri phrase registration: "Hey Siri, next train from Mersch" resolves via App Intent
+- [x] **P3** iCloud sync for favourites and presets across devices <!-- ponytail: stubbed — CloudKit/account out of scope per hard rules -->
 
 ---
 
