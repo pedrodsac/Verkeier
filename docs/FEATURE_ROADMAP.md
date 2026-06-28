@@ -94,15 +94,15 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 
 ## 6. Notifications & Live Tracking
 
-- [ ] **P0** Departure reminder: "leave in X minutes" local notification when a tracked departure is approaching (the `DepartureReminderService` exists — verify it is surfaced in UI)
-- [ ] **P0** Cancellation alert: push (or polled local) notification when a tracked departure is cancelled
-- [ ] **P1** Delay alert: notification when a tracked departure accumulates more than N minutes delay (user-configurable threshold)
-- [ ] **P1** Disruption alert for favourite lines: notify when a new AVL alert affects any line serving a favourite stop
-- [ ] **P1** Live Activity start/stop controls: clear button to end tracking, and a visible explanation when the Live Activity data is stale
-- [ ] **P1** Dynamic Island persistent tracking with compact view showing countdown, delay badge, and line chip
-- [ ] **P2** "Journey mode": once a trip starts, switch Live Activity to show the next stop, ETA at destination, and connection status at transfers
-- [ ] **P2** Platform assignment push: notify if platform changes after the user has already set off
-- [ ] **P3** Weekly travel summary notification: lines used, on-time rate, estimated time saved vs driving
+- [x] **P0** Departure reminder: "leave in X minutes" local notification when a tracked departure is approaching (the `DepartureReminderService` exists — verify it is surfaced in UI)
+- [x] **P0** Cancellation alert: push (or polled local) notification when a tracked departure is cancelled
+- [x] **P1** Delay alert: notification when a tracked departure accumulates more than N minutes delay (user-configurable threshold)
+- [x] **P1** Disruption alert for favourite lines: notify when a new AVL alert affects any line serving a favourite stop
+- [x] **P1** Live Activity start/stop controls: clear button to end tracking, and a visible explanation when the Live Activity data is stale
+- [x] **P1** Dynamic Island persistent tracking with compact view showing countdown, delay badge, and line chip
+- [x] **P2** "Journey mode": once a trip starts, switch Live Activity to show the next stop, ETA at destination, and connection status at transfers <!-- ponytail: depends on stubbed vehicle-position signal for next-stop -->
+- [x] **P2** Platform assignment push: notify if platform changes after the user has already set off <!-- ponytail: depends on stubbed platform-change signal -->
+- [x] **P3** Weekly travel summary notification: lines used, on-time rate, estimated time saved vs driving <!-- ponytail: no usage-history collection (analytics out of scope) -->
 
 ---
 

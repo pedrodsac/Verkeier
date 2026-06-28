@@ -718,7 +718,7 @@ struct DepartureListRow: View {
                     .buttonStyle(.plain)
                     .accessibilityLabel(isTracked ? "Stop tracking departure" : "Track departure")
 
-//                    reminderMenu
+                    reminderMenu
                 }
             }
         }
