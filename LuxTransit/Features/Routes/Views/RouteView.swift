@@ -17,7 +17,7 @@ struct RouteView: View {
     let selectRouteOrigin: (RoutePlace?) -> Void
     let selectRouteDestination: (RoutePlace) -> Void
     let applyCommutePreset: (String) -> Void
-    let saveCurrentCommutePreset: () -> Void
+    let saveCurrentCommutePreset: (String) -> Void
     let swapRouteEndpoints: () -> Void
     let updateRouteFilters: (RoutePlannerFilters) -> Void
 
@@ -34,6 +34,11 @@ struct RouteView: View {
             // ── Commute presets ───────────────────────────────────────────
             if !viewModel.commutePresets.isEmpty {
                 commutePresetsRow
+            }
+
+            // ── Recent trips ──────────────────────────────────────────────
+            if !viewModel.recentTrips.isEmpty {
+                recentTripsRow
             }
 
             // ── Sort + options bar ────────────────────────────────────────
@@ -83,6 +88,27 @@ struct RouteView: View {
                 }
             }
             .padding(.horizontal, 1) // avoid clipping focus rings
+        }
+    }
+
+    // MARK: - Recent trips
+
+    private var recentTripsRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(viewModel.recentTrips) { trip in
+                    Button {
+                        applyCommutePreset(trip.id)
+                    } label: {
+                        Label(trip.title, systemImage: "clock.arrow.circlepath")
+                            .lineLimit(1)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .tint(.secondary)
+                }
+            }
+            .padding(.horizontal, 1)
         }
     }
 
@@ -353,7 +379,7 @@ private struct FlexibleWrappingRow: Layout {
                 selectRouteOrigin: { _ in },
                 selectRouteDestination: { _ in },
                 applyCommutePreset: { _ in },
-                saveCurrentCommutePreset: {},
+                saveCurrentCommutePreset: { _ in },
                 swapRouteEndpoints: {},
                 updateRouteFilters: { _ in }
             )
@@ -373,7 +399,7 @@ private struct FlexibleWrappingRow: Layout {
                 selectRouteOrigin: { _ in },
                 selectRouteDestination: { _ in },
                 applyCommutePreset: { _ in },
-                saveCurrentCommutePreset: {},
+                saveCurrentCommutePreset: { _ in },
                 swapRouteEndpoints: {},
                 updateRouteFilters: { _ in }
             )
@@ -393,7 +419,7 @@ private struct FlexibleWrappingRow: Layout {
                 selectRouteOrigin: { _ in },
                 selectRouteDestination: { _ in },
                 applyCommutePreset: { _ in },
-                saveCurrentCommutePreset: {},
+                saveCurrentCommutePreset: { _ in },
                 swapRouteEndpoints: {},
                 updateRouteFilters: { _ in }
             )
@@ -413,7 +439,7 @@ private struct FlexibleWrappingRow: Layout {
                 selectRouteOrigin: { _ in },
                 selectRouteDestination: { _ in },
                 applyCommutePreset: { _ in },
-                saveCurrentCommutePreset: {},
+                saveCurrentCommutePreset: { _ in },
                 swapRouteEndpoints: {},
                 updateRouteFilters: { _ in }
             )
@@ -433,7 +459,7 @@ private struct FlexibleWrappingRow: Layout {
                 selectRouteOrigin: { _ in },
                 selectRouteDestination: { _ in },
                 applyCommutePreset: { _ in },
-                saveCurrentCommutePreset: {},
+                saveCurrentCommutePreset: { _ in },
                 swapRouteEndpoints: {},
                 updateRouteFilters: { _ in }
             )

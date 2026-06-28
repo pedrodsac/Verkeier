@@ -9,6 +9,7 @@ struct RoutePlannerStore {
 
     private let recentPlacesKey = "RoutePlannerRecentPlaces"
     private let recentStopsKey = "RoutePlannerRecentStops"
+    private let recentTripsKey = "RoutePlannerRecentTrips"
     private let commutePresetsKey = "RoutePlannerCommutePresets"
 
     init(defaults: UserDefaults) {
@@ -42,6 +43,28 @@ struct RoutePlannerStore {
             updated = Array(updated.prefix(limit))
         }
         saveRecentPlaces(updated)
+        return updated
+    }
+
+    /// The most recently planned origin→destination pairs, newest first.
+    func recentTrips() -> [RouteCommutePreset] {
+        load([RouteCommutePreset].self, forKey: recentTripsKey) ?? []
+    }
+
+    /// Records a planned trip, de-duplicating by origin+destination and capping
+    /// the list. Returns the updated list. Skips current-location-only origins so
+    /// re-use stays meaningful.
+    func recordRecentTrip(origin: RoutePlace?, destination: RoutePlace, limit: Int = 10) -> [RouteCommutePreset] {
+        let title = origin.map { "\($0.title) → \(destination.title)" } ?? destination.title
+        let trip = RouteCommutePreset(title: title, origin: origin, destination: destination)
+        var updated = recentTrips().filter {
+            !($0.origin == trip.origin && $0.destination == trip.destination)
+        }
+        updated.insert(trip, at: 0)
+        if updated.count > limit {
+            updated = Array(updated.prefix(limit))
+        }
+        save(updated, forKey: recentTripsKey)
         return updated
     }
 

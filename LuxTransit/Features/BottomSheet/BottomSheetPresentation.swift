@@ -35,7 +35,7 @@ struct TransitSheetActions {
     let selectRouteOrigin: (RoutePlace?) -> Void
     let selectRouteDestination: (RoutePlace) -> Void
     let applyCommutePreset: (String) -> Void
-    let saveCurrentCommutePreset: () -> Void
+    let saveCurrentCommutePreset: (String) -> Void
     let swapRouteEndpoints: () -> Void
     let updateRouteFilters: (RoutePlannerFilters) -> Void
     let setRoutePlanningTime: (RoutePlanningTime) -> Void
@@ -137,6 +137,7 @@ struct RoutePresentationModel {
     let nearbyPlaces: [RoutePlace]
     let recentPlaces: [RoutePlace]
     let commutePresets: [RouteCommutePreset]
+    var recentTrips: [RouteCommutePreset] = []
     let filters: RoutePlannerFilters
     let planningTime: RoutePlanningTime
     let routeOptions: [RouteOption]

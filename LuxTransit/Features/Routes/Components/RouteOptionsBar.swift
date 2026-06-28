@@ -10,12 +10,29 @@ struct RouteOptionsBar: View {
     let filters: RoutePlannerFilters
     let hasDestination: Bool
     let updateRouteFilters: (RoutePlannerFilters) -> Void
-    let saveCurrentCommutePreset: () -> Void
+    /// Saves the current origin→destination as a commute preset. The string is an
+    /// optional custom label; pass empty to auto-name it "Origin to Destination".
+    let saveCurrentCommutePreset: (String) -> Void
+
+    @State private var showingSaveAlert = false
+    @State private var presetLabel = ""
 
     var body: some View {
         HStack(spacing: 10) {
-			sortPicker
+            sortPicker
             optionsMenu
+        }
+        .alert("Save commute", isPresented: $showingSaveAlert) {
+            TextField("Label (e.g. Home → Work)", text: $presetLabel)
+            Button("Save") {
+                saveCurrentCommutePreset(presetLabel)
+                presetLabel = ""
+            }
+            Button("Cancel", role: .cancel) { presetLabel = "" }
+        } message: {
+            Text(
+                "Name this trip so you can re-plan it in one tap. Use “Home → Work” for time-of-day commute suggestions."
+            )
         }
     }
 
@@ -34,7 +51,7 @@ struct RouteOptionsBar: View {
             Text("Walking").tag(RoutePlannerSortOption.leastWalking)
         }
         .pickerStyle(.segmented)
-		.frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Options menu
@@ -80,7 +97,7 @@ struct RouteOptionsBar: View {
 
             if hasDestination {
                 Divider()
-                Button("Save Commute", action: saveCurrentCommutePreset)
+                Button("Save Commute…") { showingSaveAlert = true }
             }
         } label: {
             Image(systemName: "slider.horizontal.3")
@@ -110,13 +127,13 @@ struct RouteOptionsBar: View {
 }
 
 #if DEBUG
-#Preview(traits: .sizeThatFitsLayout) {
-    RouteOptionsBar(
-        filters: RoutePlannerFilters(),
-        hasDestination: true,
-        updateRouteFilters: { _ in },
-        saveCurrentCommutePreset: {}
-    )
-    .padding()
-}
+    #Preview(traits: .sizeThatFitsLayout) {
+        RouteOptionsBar(
+            filters: RoutePlannerFilters(),
+            hasDestination: true,
+            updateRouteFilters: { _ in },
+            saveCurrentCommutePreset: { _ in }
+        )
+        .padding()
+    }
 #endif

@@ -18,11 +18,11 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 - [x] **P0** "Depart at" and "Arrive by" time pickers with a clear now/later toggle
 - [x] **P0** Route filter controls: fastest · fewest transfers · least walking · accessible · prefer train/tram/bus · avoid tight transfers
 - [x] **P0** Transfer reliability indicator: flag connections with <5 min window as "tight", suggest alternatives when live delay makes a transfer unlikely
-- [ ] **P1** "Last service" warning: show when the selected departure is the last one of the day on that line, and the last connection from a transfer stop
-- [ ] **P1** Recent trips and destinations: remember last 10 A→B pairs for one-tap re-use
-- [ ] **P1** Saved commute presets: "Home → Work", "Work → Home" and custom labels; accessible from the home sheet and commute dashboard
-- [ ] **P1** Route comparison view: show 2–3 options side-by-side sorted by time / transfers / walking
-- [ ] **P1** Walking-only and bike leg integration: include walk segments with distance/ETA between transit legs
+- [x] **P1** "Last service" warning: show when the selected departure is the last one of the day on that line, and the last connection from a transfer stop
+- [x] **P1** Recent trips and destinations: remember last 10 A→B pairs for one-tap re-use
+- [x] **P1** Saved commute presets: "Home → Work", "Work → Home" and custom labels; accessible from the home sheet and commute dashboard
+- [x] **P1** Route comparison view: show 2–3 options side-by-side sorted by time / transfers / walking
+- [x] **P1** Walking-only and bike leg integration: include walk segments with distance/ETA between transit legs
 - [ ] **P2** Cross-border journey hints: flag when a planned route crosses into France, Germany, or Belgium, and note that CFL/SNCF/DB connections may not be fully covered by ATP real-time data
 - [ ] **P2** Route sharing: export selected route as plain text or a deep-link URL that another person can open
 - [ ] **P2** "Plan for tomorrow" and "plan for this week" flows: pick a departure time by day, not only today

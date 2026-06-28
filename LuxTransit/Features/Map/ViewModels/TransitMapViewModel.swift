@@ -61,6 +61,7 @@ final class TransitMapViewModel {
     var routePlanningTime: RoutePlanningTime = .leaveNow
     var recentRoutePlaces: [RoutePlace] = []
     var recentStops: [Stop] = []
+    var recentTrips: [RouteCommutePreset] = []
     var commutePresets: [RouteCommutePreset] = []
     var routeOptions: [RouteOption] = []
     var selectedRouteOptionID: String?
@@ -361,6 +362,7 @@ final class TransitMapViewModel {
         recentRoutePlaces = store.recentPlaces()
         commutePresets = store.commutePresets()
         recentStops = store.recentStops()
+        recentTrips = store.recentTrips()
     }
 
     /// A commute preset to highlight on the home sheet based on the time of day:
@@ -404,17 +406,22 @@ final class TransitMapViewModel {
     }
 
     func applyCommutePreset(_ presetID: String, using store: RoutePlannerStore = .shared) {
-        guard let preset = commutePresets.first(where: { $0.id == presetID }) else { return }
+        let preset = commutePresets.first(where: { $0.id == presetID })
+            ?? recentTrips.first(where: { $0.id == presetID })
+        guard let preset else { return }
         routeOrigin = preset.origin
         routeDestination = preset.destination
         recentRoutePlaces = store.recordRecentPlace(preset.destination)
         clearRoute()
     }
 
-    func saveCurrentCommutePreset(using store: RoutePlannerStore = .shared) {
+    func saveCurrentCommutePreset(title customTitle: String = "", using store: RoutePlannerStore = .shared) {
         guard let destination = effectiveRouteDestination else { return }
 
-        let title = if let routeOrigin {
+        let trimmed = customTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        let title: String = if !trimmed.isEmpty {
+            trimmed
+        } else if let routeOrigin {
             "\(routeOrigin.title) to \(destination.title)"
         } else {
             "Current Location to \(destination.title)"
@@ -624,6 +631,11 @@ final class TransitMapViewModel {
             guard requestGeneration == routeCalculationGeneration else { return }
             unfilteredRouteOptions = calculation.options
             applyRouteOptions(preferredID: calculation.selectedOptionID, announceFallback: false)
+            if !calculation.options.isEmpty {
+                recentTrips = RoutePlannerStore.shared.recordRecentTrip(
+                    origin: routeOrigin, destination: destination
+                )
+            }
         } catch {
             guard requestGeneration == routeCalculationGeneration else { return }
             clearRouteResult()

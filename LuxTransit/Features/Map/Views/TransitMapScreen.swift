@@ -257,6 +257,7 @@ struct TransitMapScreen: View {
                 nearbyPlaces: viewModel.nearbyStops.map { RoutePlace(stop: $0, source: .nearby) },
                 recentPlaces: viewModel.recentRoutePlaces,
                 commutePresets: viewModel.commutePresets,
+                recentTrips: viewModel.recentTrips,
                 filters: viewModel.routeFilters,
                 planningTime: viewModel.routePlanningTime,
                 routeOptions: viewModel.routeOptions,
@@ -531,8 +532,8 @@ struct TransitMapScreen: View {
         }
     }
 
-    private func saveCurrentCommutePreset() {
-        viewModel.saveCurrentCommutePreset()
+    private func saveCurrentCommutePreset(_ title: String) {
+        viewModel.saveCurrentCommutePreset(title: title)
     }
 
     private func swapRouteEndpoints() {
