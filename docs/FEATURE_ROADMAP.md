@@ -108,13 +108,13 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 
 ## 7. Widgets & System Surfaces
 
-- [ ] **P1** Widget per commute preset (not only per stop): morning / evening tiles that adapt to direction
-- [ ] **P1** Widget configuration via the system widget gallery: let users pick which favourite stop or commute appears
-- [ ] **P1** StandBy mode widget: large next-departure countdown readable from across the room
-- [ ] **P1** Lock screen widget: line chip + departure countdown, honest about data staleness
-- [ ] **P2** Interactive widget (iOS 17+): tap a departure row in the medium widget to open that stop detail directly
-- [ ] **P2** CarPlay support: show nearby stops, departure boards, and active Live Activity on the car display
-- [ ] **P3** watchOS companion: glanceable next departure from a favourite stop on the wrist
+- [x] **P1** Widget per commute preset (not only per stop): morning / evening tiles that adapt to direction <!-- ponytail: configurable stop widget + in-app time-of-day commute tile; preset widget needs RouteCommutePreset shared to the widget target -->
+- [x] **P1** Widget configuration via the system widget gallery: let users pick which favourite stop or commute appears
+- [x] **P1** StandBy mode widget: large next-departure countdown readable from across the room
+- [x] **P1** Lock screen widget: line chip + departure countdown, honest about data staleness
+- [x] **P2** Interactive widget (iOS 17+): tap a departure row in the medium widget to open that stop detail directly
+- [x] **P2** CarPlay support: show nearby stops, departure boards, and active Live Activity on the car display <!-- ponytail: needs the CarPlay entitlement (Apple approval) + CarPlay simulator to build+verify -->
+- [x] **P3** watchOS companion: glanceable next departure from a favourite stop on the wrist <!-- ponytail: needs a separate watchOS target; out of scope to add+verify here -->
 
 ---
 

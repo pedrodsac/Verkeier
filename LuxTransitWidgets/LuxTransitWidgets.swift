@@ -30,8 +30,7 @@ struct WidgetFavouriteStopEntity: AppEntity, Identifiable {
 
 struct WidgetFavouriteStopEntityQuery: EntityQuery {
     func entities(for identifiers: [WidgetFavouriteStopEntity.ID]) async throws
-        -> [WidgetFavouriteStopEntity]
-    {
+        -> [WidgetFavouriteStopEntity] {
         sharedStops().filter { identifiers.contains($0.id) }
     }
 
@@ -64,19 +63,17 @@ private struct FavouriteStopEntry: TimelineEntry {
 }
 
 private struct FavouriteStopTimelineProvider: AppIntentTimelineProvider {
-    func placeholder(in context: Context) -> FavouriteStopEntry {
+    func placeholder(in _: Context) -> FavouriteStopEntry {
         FavouriteStopEntry(date: .now, selectedStop: SharedTransitDataStore.favouriteStops().first)
     }
 
-    func snapshot(for configuration: SelectFavouriteStopIntent, in context: Context) async
-        -> FavouriteStopEntry
-    {
+    func snapshot(for configuration: SelectFavouriteStopIntent, in _: Context) async
+        -> FavouriteStopEntry {
         FavouriteStopEntry(date: .now, selectedStop: selectedStop(from: configuration))
     }
 
-    func timeline(for configuration: SelectFavouriteStopIntent, in context: Context) async
-        -> Timeline<FavouriteStopEntry>
-    {
+    func timeline(for configuration: SelectFavouriteStopIntent, in _: Context) async
+        -> Timeline<FavouriteStopEntry> {
         let entry = FavouriteStopEntry(date: .now, selectedStop: selectedStop(from: configuration))
         return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(30 * 60)))
     }
@@ -103,18 +100,49 @@ private struct FavouriteStopWidget: Widget {
                 .containerBackground(.background, for: .widget)
                 .widgetURL(
                     entry.selectedStop.map { TransitDeepLink.openStop(id: $0.id).url }
-                        ?? TransitDeepLink.showNearbyStops.url)
+                        ?? TransitDeepLink.showNearbyStops.url
+                )
         }
         .configurationDisplayName("Favourite Stop")
         .description("Choose which favourite stop opens from this widget.")
-        .supportedFamilies([.systemSmall])
+        .supportedFamilies([
+            .systemSmall,
+            .accessoryRectangular,
+            .accessoryInline,
+            .accessoryCircular
+        ])
     }
 }
 
 private struct FavouriteStopWidgetView: View {
+    @Environment(\.widgetFamily) private var family
     let entry: FavouriteStopEntry
 
     var body: some View {
+        switch family {
+        case .accessoryInline:
+            Label(entry.selectedStop?.name ?? "No favourite", systemImage: "star.fill")
+        case .accessoryCircular:
+            Image(systemName: "star.fill")
+                .font(.title2)
+                .widgetAccentable()
+        case .accessoryRectangular:
+            VStack(alignment: .leading, spacing: 2) {
+                Label(entry.selectedStop?.name ?? "No favourite", systemImage: "star.fill")
+                    .font(.headline)
+                    .lineLimit(1)
+                Text(entry.selectedStop?.locality ?? "Open for live departures")
+                    .font(.caption)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        default:
+            systemSmallView
+        }
+    }
+
+    @ViewBuilder
+    private var systemSmallView: some View {
         if let stop = entry.selectedStop {
             VStack(alignment: .leading, spacing: 8) {
                 Image(systemName: "star.fill")
@@ -161,7 +189,8 @@ private struct DeparturesSummaryWidget: Widget {
                 .widgetURL(
                     entry.selectedStop.map {
                         TransitDeepLink.showDepartures(stopId: $0.id).url
-                    } ?? TransitDeepLink.showNearbyStops.url)
+                    } ?? TransitDeepLink.showNearbyStops.url
+                )
         }
         .configurationDisplayName("Departures")
         .description("Choose a favourite stop. This widget refreshes periodically and is not continuously live.")
@@ -239,7 +268,7 @@ private struct DepartureCountdownActivityWidget: Widget {
                     .font(.caption.weight(.bold))
             } compactTrailing: {
                 if let departureDate = context.state.displayDepartureDate {
-                    Text(timerInterval: .now...departureDate, countsDown: true)
+                    Text(timerInterval: .now ... departureDate, countsDown: true)
                         .monospacedDigit()
                 } else {
                     Image(systemName: "clock")
@@ -275,7 +304,7 @@ private struct DepartureLockScreenView: View {
 
             VStack(alignment: .trailing, spacing: 3) {
                 if let departureDate = context.state.displayDepartureDate {
-                    Text(timerInterval: .now...departureDate, countsDown: true)
+                    Text(timerInterval: .now ... departureDate, countsDown: true)
                         .font(.headline.monospacedDigit())
                 } else {
                     Text("Time unknown")
