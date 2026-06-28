@@ -84,6 +84,8 @@ struct RouteView: View {
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        // Haptic when a route plan is found.
+        .sensoryFeedback(.success, trigger: viewModel.routeOptions.count)
     }
 
     // MARK: - Commute presets

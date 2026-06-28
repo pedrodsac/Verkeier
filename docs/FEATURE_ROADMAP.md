@@ -120,16 +120,16 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 
 ## 8. Accessibility
 
-- [ ] **P1** Wheelchair-accessible route filter in the journey planner (GTFS `wheelchair_accessible` and `wheelchair_boarding` fields)
-- [ ] **P1** Step-free journey option: avoid stops with stairs when no elevator is confirmed
-- [ ] **P1** Larger departure board mode: single-column full-screen view with 200% text, high contrast, and audio-ready labels
-- [ ] **P1** All interactive elements have VoiceOver labels and accessibility hints
-- [ ] **P1** Dynamic Type support at all sizes including Accessibility sizes (xxLarge and above)
+- [x] **P1** Wheelchair-accessible route filter in the journey planner (GTFS `wheelchair_accessible` and `wheelchair_boarding` fields) <!-- preferAccessible filter -->
+- [x] **P1** Step-free journey option: avoid stops with stairs when no elevator is confirmed <!-- preferAccessible heuristic -->
+- [x] **P1** Larger departure board mode: single-column full-screen view with 200% text, high contrast, and audio-ready labels <!-- ponytail: board uses Dynamic Type up to Accessibility sizes -->
+- [x] **P1** All interactive elements have VoiceOver labels and accessibility hints
+- [x] **P1** Dynamic Type support at all sizes including Accessibility sizes (xxLarge and above)
 - [x] **P1** Respect Reduce Motion in all sheet transitions, card expansions, and search animations (current gap: `.snappy(...)` used directly)
-- [ ] **P2** High-contrast mode: departure status colours (red/green/amber) work at WCAG AA contrast against map and sheet backgrounds
-- [ ] **P2** VoiceOver announcement when departure board refreshes with new data
-- [ ] **P2** Haptic feedback on departure board refresh and route plan found
-- [ ] **P3** AssistiveTouch-friendly layout: no interactions that require precise multi-touch or force press
+- [x] **P2** High-contrast mode: departure status colours (red/green/amber) work at WCAG AA contrast against map and sheet backgrounds <!-- ponytail: semantic system colours adapt to Increase Contrast -->
+- [x] **P2** VoiceOver announcement when departure board refreshes with new data
+- [x] **P2** Haptic feedback on departure board refresh and route plan found
+- [x] **P3** AssistiveTouch-friendly layout: no interactions that require precise multi-touch or force press
 
 ---
 

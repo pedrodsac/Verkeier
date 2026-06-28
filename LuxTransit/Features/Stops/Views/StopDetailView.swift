@@ -66,6 +66,13 @@ struct StopDetailView: View {
                     scheduleDepartureReminder: scheduleDepartureReminder,
                     cancelDepartureReminder: cancelDepartureReminder
                 )
+                // Haptic + VoiceOver feedback when the board refreshes with new data.
+                .sensoryFeedback(.impact(weight: .light), trigger: viewModel.lastUpdated)
+                .onChange(of: viewModel.lastUpdated) { _, newValue in
+                    if newValue != nil {
+                        AccessibilityNotification.Announcement("Departures updated").post()
+                    }
+                }
 
                 StopDisruptionSection(alerts: viewModel.alerts)
 
