@@ -14,6 +14,7 @@ struct RouteEndpointsCard: View {
     let swapRouteEndpoints: () -> Void
 
     @Environment(\.gtfsService) private var gtfsService
+    @Environment(\.placeSearchService) private var placeSearchService
     @State private var showOriginSearch = false
     @State private var showDestinationSearch = false
 
@@ -39,14 +40,22 @@ struct RouteEndpointsCard: View {
                 .stroke(.separator.opacity(0.22), lineWidth: 0.5)
         }
         .sheet(isPresented: $showOriginSearch) {
-            RouteStopSearchSheet(title: "Search Origin", gtfsService: gtfsService) { stop in
-                selectRouteOrigin(RoutePlace(stop: stop, source: .search))
+            RouteStopSearchSheet(
+                title: "Search Origin",
+                gtfsService: gtfsService,
+                placeSearchService: placeSearchService
+            ) { place in
+                selectRouteOrigin(place)
                 showOriginSearch = false
             }
         }
         .sheet(isPresented: $showDestinationSearch) {
-            RouteStopSearchSheet(title: "Search Destination", gtfsService: gtfsService) { stop in
-                selectRouteDestination(RoutePlace(stop: stop, source: .search))
+            RouteStopSearchSheet(
+                title: "Search Destination",
+                gtfsService: gtfsService,
+                placeSearchService: placeSearchService
+            ) { place in
+                selectRouteDestination(place)
                 showDestinationSearch = false
             }
         }
@@ -169,7 +178,7 @@ struct RouteEndpointsCard: View {
         .buttonStyle(.plain)
     }
 
-    private func endpointLabel(tag: String, title: String, subtitle: String?) -> some View {
+    private func endpointLabel(tag: String, title: String, subtitle _: String?) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(tag)
                 .font(.caption2.weight(.bold))
@@ -206,16 +215,18 @@ struct RouteEndpointsCard: View {
 
 /// A self-contained stop-search sheet for picking a trip origin or destination.
 ///
-/// Mirrors the search field + results list of ``SearchView`` but queries the
-/// local GTFS service directly and reports the chosen ``Stop`` via ``onSelect``.
+/// Mirrors the search field + results list of ``SearchView`` but queries both
+/// the local GTFS service (stops) and the place-search service (addresses /
+/// POIs), reporting the chosen ``RoutePlace`` via ``onSelect``.
 private struct RouteStopSearchSheet: View {
     let title: String
     let gtfsService: any GTFSService
-    let onSelect: (Stop) -> Void
+    let placeSearchService: any PlaceSearchService
+    let onSelect: (RoutePlace) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var query = ""
-    @State private var results: [Stop] = []
+    @State private var results: [RoutePlace] = []
     @FocusState private var isSearchFocused: Bool
 
     private var trimmedQuery: String {
@@ -231,30 +242,35 @@ private struct RouteStopSearchSheet: View {
 
                 if trimmedQuery.isEmpty {
                     ContentUnavailableView(
-                        "Search stops",
+                        "Search stops & places",
                         systemImage: "magnifyingglass",
-                        description: Text("Start typing to find a stop from local data.")
+                        description: Text("Start typing to find a stop, address, or place.")
                     )
                 } else if results.isEmpty {
                     ContentUnavailableView(
                         "No matches",
-                        systemImage: "tram",
-                        description: Text("Try another stop name.")
+                        systemImage: "mappin.slash",
+                        description: Text("Try another stop, address, or place name.")
                     )
                 } else {
-                    List(results) { stop in
+                    List(results) { place in
                         Button {
-                            onSelect(stop)
+                            onSelect(place)
                         } label: {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(stop.name)
-                                    .font(.body.weight(.semibold))
-                                    .foregroundStyle(.primary)
-                                if let locality = stop.locality {
-                                    Text(locality)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                            Label {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(place.title)
+                                        .font(.body.weight(.semibold))
+                                        .foregroundStyle(.primary)
+                                    if let subtitle = place.subtitle {
+                                        Text(subtitle)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
+                            } icon: {
+                                Image(systemName: place.stopId != nil ? "tram.fill" : "mappin.circle.fill")
+                                    .foregroundStyle(place.stopId != nil ? Color.blue : Color.red)
                             }
                         }
                     }
@@ -280,7 +296,11 @@ private struct RouteStopSearchSheet: View {
             // Debounce: a new keystroke cancels this task before the sleep ends.
             try? await Task.sleep(for: .milliseconds(250))
             guard !Task.isCancelled else { return }
-            results = await gtfsService.searchStops(query: current)
+            async let stops = gtfsService.searchStops(query: current)
+            async let places = placeSearchService.searchPlaces(query: current, near: nil)
+            let stopPlaces = await stops.map { RoutePlace(stop: $0, source: .search) }
+            guard !Task.isCancelled else { return }
+            results = await stopPlaces + places
         }
         .onAppear { isSearchFocused = true }
     }

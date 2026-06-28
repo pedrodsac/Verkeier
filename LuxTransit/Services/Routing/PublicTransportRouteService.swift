@@ -138,6 +138,9 @@ private actor PublicTransportRoutingEngine {
     private let accessRadiusMeters = 900.0
     private let destinationRadiusMeters = 900.0
     private let transferBufferSeconds = 120
+    // Connections with less than this slack are flagged "tight" for the rider,
+    // even though they're still feasible (>= transferBufferSeconds).
+    private let tightTransferThresholdSeconds = 300
     private let searchHorizonSeconds = 4 * 60 * 60
     // ponytail: arrive-by reuses the forward search from this far before the target
     // and filters to journeys arriving in time; widen if long journeys get dropped.
@@ -886,12 +889,20 @@ private actor PublicTransportRoutingEngine {
             guard current.transportKind == .transit,
                   next.transportKind == .transit,
                   let arrival = current.realtimeArrivalTime ?? current.scheduledArrivalTime ?? current.arrivalTime,
-                  let nextDeparture = next.realtimeDepartureTime ?? next.scheduledDepartureTime ?? next.departureTime,
-                  arrival.addingTimeInterval(Double(transferBufferSeconds)) > nextDeparture else {
+                  let nextDeparture = next.realtimeDepartureTime ?? next.scheduledDepartureTime ?? next.departureTime
+            else {
                 continue
             }
 
-            result[index] = copy(current, transferWarning: "Connection may be missed")
+            let slack = nextDeparture.timeIntervalSince(arrival)
+            guard slack < Double(tightTransferThresholdSeconds) else { continue }
+
+            let warning = if slack < Double(transferBufferSeconds) {
+                "Connection may be missed"
+            } else {
+                "Tight connection — \(max(1, Int(slack / 60))) min to change"
+            }
+            result[index] = copy(current, transferWarning: warning)
         }
 
         return result

@@ -13,11 +13,11 @@ Priority: **P0** = must-have / blocking real use · **P1** = high-value, common 
 
 The biggest gap. The app can show departures from a single stop, but cannot answer "how do I get from A to B?"
 
-- [ ] **P0** Door-to-door journey planner: origin and destination both editable (not just current location → selected stop)
-- [ ] **P0** Address and POI search as trip origin or destination (not only GTFS stops)
-- [ ] **P0** "Depart at" and "Arrive by" time pickers with a clear now/later toggle
-- [ ] **P0** Route filter controls: fastest · fewest transfers · least walking · accessible · prefer train/tram/bus · avoid tight transfers
-- [ ] **P0** Transfer reliability indicator: flag connections with <5 min window as "tight", suggest alternatives when live delay makes a transfer unlikely
+- [x] **P0** Door-to-door journey planner: origin and destination both editable (not just current location → selected stop)
+- [x] **P0** Address and POI search as trip origin or destination (not only GTFS stops)
+- [x] **P0** "Depart at" and "Arrive by" time pickers with a clear now/later toggle
+- [x] **P0** Route filter controls: fastest · fewest transfers · least walking · accessible · prefer train/tram/bus · avoid tight transfers
+- [x] **P0** Transfer reliability indicator: flag connections with <5 min window as "tight", suggest alternatives when live delay makes a transfer unlikely
 - [ ] **P1** "Last service" warning: show when the selected departure is the last one of the day on that line, and the last connection from a transfer stop
 - [ ] **P1** Recent trips and destinations: remember last 10 A→B pairs for one-tap re-use
 - [ ] **P1** Saved commute presets: "Home → Work", "Work → Home" and custom labels; accessible from the home sheet and commute dashboard
@@ -49,7 +49,7 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 ## 3. Map & Stops
 
 - [x] **P0** Favourite stop markers are visually distinct on the active map implementation (current bug: `markerColor` ignores `isFavourite`)
-- [ ] **P0** Stop search accepts addresses and place names, not only GTFS stop names
+- [x] **P0** Stop search accepts addresses and place names, not only GTFS stop names
 - [ ] **P1** Map clustering for dense stop areas; cluster tap expands or shows a list
 - [ ] **P1** Mode filter controls on the map: toggle bus / tram / train / night-bus layers independently
 - [ ] **P1** Walking radius ring: tapping a point on the map shows stops reachable within a configurable walk time

@@ -3,6 +3,7 @@ import SwiftUI
 extension EnvironmentValues {
     @Entry var atpClient: any ATPClient = EmptyATPClient()
     @Entry var gtfsService: any GTFSService = LocalGTFSService()
+    @Entry var placeSearchService: any PlaceSearchService = LivePlaceSearchService()
     @Entry var gtfsUpdateController: GTFSUpdateController = .init()
     @Entry var routeService: any RouteService = PublicTransportRouteService(
         gtfsService: LocalGTFSService(),
