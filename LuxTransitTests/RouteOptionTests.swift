@@ -54,4 +54,55 @@ struct RouteOptionTests {
         #expect(text.contains("Bus 16"))
         #expect(text.contains("LuxTransit"))
     }
+
+    // MARK: - Transfer reliability / status
+
+    private func transitLeg(
+        from: LocationPoint,
+        to: LocationPoint,
+        departure: Date,
+        liveStatus: RouteLegLiveStatus = .scheduled,
+        transferWarning: String? = nil
+    ) -> RoutePlan.Leg {
+        RoutePlan.Leg(
+            id: "leg-\(departure.timeIntervalSince1970)",
+            mode: .bus,
+            transportKind: .transit,
+            routeName: "16",
+            origin: from,
+            destination: to,
+            departureTime: departure,
+            arrivalTime: departure.addingTimeInterval(300),
+            distanceMeters: 1000,
+            liveStatus: liveStatus,
+            transferWarning: transferWarning
+        )
+    }
+
+    @Test func tightTransferMakesOptionAtRisk() {
+        let now = Date(timeIntervalSince1970: 10000)
+        let future = now.addingTimeInterval(600)
+        let legs = [
+            transitLeg(from: hamilius, to: luxexpo, departure: future, liveStatus: .live),
+            transitLeg(
+                from: luxexpo, to: hamilius, departure: future.addingTimeInterval(400),
+                transferWarning: "Tight connection — 1 min to change"
+            )
+        ]
+        #expect(option(legs: legs).status(at: now) == .atRisk)
+    }
+
+    @Test func cancelledLegMakesOptionCancelled() {
+        let now = Date(timeIntervalSince1970: 10000)
+        let leg = transitLeg(
+            from: hamilius, to: luxexpo, departure: now.addingTimeInterval(600), liveStatus: .cancelled
+        )
+        #expect(option(legs: [leg]).status(at: now) == .cancelled)
+    }
+
+    @Test func pastFirstDepartureIsMissed() {
+        let now = Date(timeIntervalSince1970: 10000)
+        let leg = transitLeg(from: hamilius, to: luxexpo, departure: now.addingTimeInterval(-600))
+        #expect(option(legs: [leg]).status(at: now) == .missed)
+    }
 }

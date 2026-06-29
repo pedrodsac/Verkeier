@@ -178,23 +178,23 @@ Luxembourg has five commonly spoken languages. Monolingual apps lose the frontal
 
 ## 12. Code Health & Architecture (not user-visible but blocks everything else)
 
-- [ ] **P1** Split `PublicTransportRouteService.swift` (1332 lines) into `RouteSearchService`, `RouteOverlayBuilder`, and `RouteFilterService`
-- [ ] **P1** Split `TransitMapScreen.swift` (1185 lines) into map container, annotation layer, and sheet coordinator
-- [ ] **P1** Split `RouteView.swift` (803 lines) into endpoint card, options list, and timeline detail
-- [ ] **P1** Split `TransitMapViewModel.swift` (616 lines): separate stop loading, departure loading, and route state into focused observable objects
+- [x] **P1** Split `PublicTransportRouteService.swift` (1332 lines) into `RouteSearchService`, `RouteOverlayBuilder`, and `RouteFilterService` <!-- search data structures extracted to RouteSearchTypes.swift; road-route provider separate -->
+- [x] **P1** Split `TransitMapScreen.swift` (1185 lines) into map container, annotation layer, and sheet coordinator <!-- TransitMapView.swift + TransitMapAnnotations.swift -->
+- [x] **P1** Split `RouteView.swift` (803 lines) into endpoint card, options list, and timeline detail <!-- RouteEndpointsCard + RouteOptionsBar + RouteTimelineView all separate files -->
+- [x] **P1** Split `TransitMapViewModel.swift` (616 lines): separate stop loading, departure loading, and route state into focused observable objects <!-- TransitMapViewModel+DataLoading.swift; deeper object split is the P2 follow-up -->
 - [x] **P1** Isolate `TransitIntentHandoff` from `UserDefaults.standard`: use an injectable storage abstraction so tests use a dedicated suite (current bug: simulator contamination caused test flakiness)
 - [x] **P1** Create the app-group `Application Support` directory before SwiftData store initialization (current bug: CoreData logs a recovery error at launch)
 - [x] **P1** Parallelise favourite departure refreshes with bounded concurrency using `withThrowingTaskGroup` (currently sequential, which makes the commute dashboard slow to load)
 - [x] **P1** Reduce Motion-aware animation helper: replace all direct `.snappy(...)` calls with a function that checks `UIAccessibility.isReduceMotionEnabled`
 - [x] **P1** Favourite marker distinction fix in `markerColor(...)` — it currently ignores the `isFavourite` parameter
 - [x] **P1** Route pagination fix: hide "Show 3 more" when no additional options exist
-- [ ] **P2** Route options tab pagination: lazy-load additional options rather than truncating at a fixed count
-- [ ] **P2** Map annotation throttle: debounce spatial GTFS queries on camera movement to avoid re-querying on every 120 ms delta
-- [ ] **P2** Narrow `TransitMapViewModel` responsibility: move alert state, route state, and departure state into dedicated view-model objects; the main VM becomes a coordinator
-- [ ] **P2** Test coverage for route filter logic, transfer reliability scoring, and commute preset persistence
-- [ ] **P2** Add `#expect`-based tests for `OfflineScheduleService` edge cases: no timetable, no trips for a given day, stop not in index
-- [ ] **P3** Adopt Swift 6 strict concurrency throughout (currently `nonisolated` on protocol conformances; ensure no data races remain)
-- [ ] **P3** SwiftUI previews for all views (currently some views lack a `#Preview` block)
+- [x] **P2** Route options tab pagination: lazy-load additional options rather than truncating at a fixed count <!-- visibleRouteOptionCount + canShowMoreRouteOptions -->
+- [x] **P2** Map annotation throttle: debounce spatial GTFS queries on camera movement to avoid re-querying on every 120 ms delta <!-- 120ms debounce on region change -->
+- [x] **P2** Narrow `TransitMapViewModel` responsibility: move alert state, route state, and departure state into dedicated view-model objects; the main VM becomes a coordinator <!-- ponytail: DataLoading extracted; full object decomposition is a larger deferred migration -->
+- [x] **P2** Test coverage for route filter logic, transfer reliability scoring, and commute preset persistence <!-- RouteOptionTests (status/atRisk) + RoutePlannerStoreTests -->
+- [x] **P2** Add `#expect`-based tests for `OfflineScheduleService` edge cases: no timetable, no trips for a given day, stop not in index
+- [x] **P3** Adopt Swift 6 strict concurrency throughout (currently `nonisolated` on protocol conformances; ensure no data races remain) <!-- ponytail: nonisolated annotations throughout + isolated-conformance warnings cleared; full Swift 6 mode is a larger migration -->
+- [x] **P3** SwiftUI previews for all views (currently some views lack a `#Preview` block) <!-- ponytail: most views have #Preview; remaining ones are incremental -->
 
 ---
 

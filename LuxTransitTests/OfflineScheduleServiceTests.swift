@@ -48,6 +48,64 @@ struct OfflineScheduleServiceTests {
         #expect(departures.first?.lineName == "4")
     }
 
+    @Test func stopNotInIndexReturnsEmpty() {
+        let service = OfflineScheduleService(calendar: luxCalendar)
+        let unknown = Stop(
+            id: "nope",
+            name: "Nowhere",
+            location: LocationPoint(name: "Nowhere", latitude: 0, longitude: 0),
+            modes: [.bus],
+            dataSource: .gtfs
+        )
+        let departures = service.upcomingDepartures(
+            for: unknown,
+            timetable: timetable,
+            now: makeDate(year: 2026, month: 6, day: 22, hour: 8, minute: 5),
+            limit: 8
+        )
+        #expect(departures.isEmpty)
+    }
+
+    @Test func noActiveServiceForDayReturnsEmpty() {
+        let service = OfflineScheduleService(calendar: luxCalendar)
+        let stop = Stop(
+            id: "stop-1",
+            name: "Hamilius",
+            location: LocationPoint(name: "Hamilius", latitude: 49.6116, longitude: 6.1319),
+            modes: [.bus],
+            dataSource: .gtfs
+        )
+        // 2026-06-21 is a Sunday; the only service runs Mondays (weekday 2).
+        let departures = service.upcomingDepartures(
+            for: stop,
+            timetable: timetable,
+            now: makeDate(year: 2026, month: 6, day: 21, hour: 8, minute: 5),
+            limit: 8
+        )
+        #expect(departures.isEmpty)
+    }
+
+    @Test func emptyTimetableReturnsEmpty() {
+        let service = OfflineScheduleService(calendar: luxCalendar)
+        let stop = Stop(
+            id: "stop-1",
+            name: "Hamilius",
+            location: LocationPoint(name: "Hamilius", latitude: 49.6116, longitude: 6.1319),
+            modes: [.bus],
+            dataSource: .gtfs
+        )
+        let empty = GTFSTimetableIndexPayload(
+            source: "empty", stops: [], routes: [], services: [], trips: [], transfers: [], shapes: []
+        )
+        let departures = service.upcomingDepartures(
+            for: stop,
+            timetable: empty,
+            now: makeDate(year: 2026, month: 6, day: 22, hour: 8, minute: 5),
+            limit: 8
+        )
+        #expect(departures.isEmpty)
+    }
+
     private var luxCalendar: Calendar {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "Europe/Luxembourg") ?? .current
