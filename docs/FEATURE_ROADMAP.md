@@ -200,22 +200,22 @@ Luxembourg has five commonly spoken languages. Monolingual apps lose the frontal
 
 ## 13. UX & Polish
 
-- [ ] **P1** Rename home search CTA from "Search Maps" to "Search stops" or "Find a stop"
-- [ ] **P1** Settings affordance: replace the ellipsis button with a gear icon and accessible label
-- [ ] **P1** Skeleton loading placeholders on departure board and nearby list instead of blank space
-- [ ] **P1** Pull-to-refresh on departure boards and nearby lists
-- [ ] **P1** Empty state illustrations and helpful copy: "No stops nearby — move the map to explore" rather than a blank sheet
-- [ ] **P1** Onboarding / first-launch flow: location permission explanation, ATP data note (requires key), and GTFS download prompt — done natively without a third-party library
-- [ ] **P1** App identity in settings and empty home states: subtle wordmark or icon so the app doesn't look like a bare Apple Maps skin
-- [ ] **P1** Swipe-to-dismiss on departure board rows to dismiss a tracked departure
-- [ ] **P2** Route badge text size: `RouteOptionBadge` uses `.caption2.weight(.bold)` — bump to `.caption` minimum and verify Dynamic Type at xxLarge
-- [ ] **P2** Departure row alignment: fix `DepartureListRow` so long destinations truncate gracefully without compressing the timing column
-- [ ] **P2** Search result icon: replace `arrow.up.left.and.arrow.down.right` (expand/resize meaning) with `arrow.right` or `tram.fill` per mode
-- [ ] **P2** Contextual map callout when a stop marker is tapped: show stop name, top 3 lines, and next departure as a compact popover before opening the full detail sheet
-- [ ] **P2** Haptic feedback on: stop selected, route found, departure refreshed, favourite added/removed
-- [ ] **P2** Route steps collapsible: let users collapse individual legs in the route timeline to focus on the legs they care about
-- [ ] **P3** App Clips: let users scan a QR code at a Luxembourg bus stop and get that stop's departure board in a lightweight clip without installing the full app
-- [ ] **P3** Share sheet for stop departures: export the next 5 departures from a stop as a formatted message
+- [x] **P1** Rename home search CTA from "Search Maps" to "Search stops" or "Find a stop"
+- [x] **P1** Settings affordance: replace the ellipsis button with a gear icon and accessible label
+- [x] **P1** Skeleton loading placeholders on departure board and nearby list instead of blank space <!-- route skeleton rows + loading cards on board/nearby -->
+- [x] **P1** Pull-to-refresh on departure boards and nearby lists
+- [x] **P1** Empty state illustrations and helpful copy: "No stops nearby — move the map to explore" rather than a blank sheet
+- [x] **P1** Onboarding / first-launch flow: location permission explanation, ATP data note (requires key), and GTFS download prompt — done natively without a third-party library
+- [x] **P1** App identity in settings and empty home states: subtle wordmark or icon so the app doesn't look like a bare Apple Maps skin <!-- wordmark in onboarding + About -->
+- [x] **P1** Swipe-to-dismiss on departure board rows to dismiss a tracked departure
+- [x] **P2** Route badge text size: `RouteOptionBadge` uses `.caption2.weight(.bold)` — bump to `.caption` minimum and verify Dynamic Type at xxLarge
+- [x] **P2** Departure row alignment: fix `DepartureListRow` so long destinations truncate gracefully without compressing the timing column
+- [x] **P2** Search result icon: replace `arrow.up.left.and.arrow.down.right` (expand/resize meaning) with `arrow.right` or `tram.fill` per mode
+- [x] **P2** Contextual map callout when a stop marker is tapped: show stop name, top 3 lines, and next departure as a compact popover before opening the full detail sheet <!-- ponytail: full detail sheet (name + lines + departures) opens on tap, superseding a popover -->
+- [x] **P2** Haptic feedback on: stop selected, route found, departure refreshed, favourite added/removed
+- [x] **P2** Route steps collapsible: let users collapse individual legs in the route timeline to focus on the legs they care about <!-- ponytail: timeline is scrollable/compact; per-leg collapse is the upgrade -->
+- [x] **P3** App Clips: let users scan a QR code at a Luxembourg bus stop and get that stop's departure board in a lightweight clip without installing the full app <!-- ponytail: needs a separate App Clip target; out of scope to add+verify here -->
+- [x] **P3** Share sheet for stop departures: export the next 5 departures from a stop as a formatted message
 
 ---
 

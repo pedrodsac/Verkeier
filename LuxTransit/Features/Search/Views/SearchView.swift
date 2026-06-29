@@ -95,7 +95,7 @@ struct SearchView: View {
                     StopListRow(
                         stop: stop,
                         markerColor: .blue,
-                        accessorySystemName: "arrow.up.left.and.arrow.down.right"
+                        accessorySystemName: "arrow.right"
                     ) {
                         selectStop(stop)
                     }

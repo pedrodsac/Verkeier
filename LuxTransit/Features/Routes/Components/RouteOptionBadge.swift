@@ -7,7 +7,7 @@ struct RouteOptionBadge: View {
 
     var body: some View {
         Text(status.displayText)
-            .font(.caption2.weight(.bold))
+            .font(.caption.weight(.bold))
             .foregroundStyle(foregroundColor)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
@@ -34,14 +34,14 @@ struct RouteOptionBadge: View {
 }
 
 #if DEBUG
-#Preview(traits: .sizeThatFitsLayout) {
-    HStack {
-        RouteOptionBadge(status: .viable)
-        RouteOptionBadge(status: .scheduledOnly)
-        RouteOptionBadge(status: .atRisk)
-        RouteOptionBadge(status: .missed)
-        RouteOptionBadge(status: .cancelled)
+    #Preview(traits: .sizeThatFitsLayout) {
+        HStack {
+            RouteOptionBadge(status: .viable)
+            RouteOptionBadge(status: .scheduledOnly)
+            RouteOptionBadge(status: .atRisk)
+            RouteOptionBadge(status: .missed)
+            RouteOptionBadge(status: .cancelled)
+        }
+        .padding()
     }
-    .padding()
-}
 #endif

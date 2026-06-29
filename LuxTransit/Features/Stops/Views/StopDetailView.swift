@@ -29,6 +29,15 @@ struct StopDetailView: View {
                     showLineDetail: showLineDetail
                 )
 
+                if !viewModel.departures.isEmpty {
+                    ShareLink(
+                        item: stopDeparturesShareText(stop: stop, departures: viewModel.departures)
+                    ) {
+                        Label("Share next departures", systemImage: "square.and.arrow.up")
+                            .font(.callout.weight(.medium))
+                    }
+                }
+
                 if let liveActivityErrorMessage = viewModel.liveActivityErrorMessage {
                     Label(liveActivityErrorMessage, systemImage: "exclamationmark.triangle.fill")
                         .font(.footnote)
@@ -88,6 +97,25 @@ struct StopDetailView: View {
                 systemImage: "bus"
             )
         }
+    }
+
+    /// Formats the next five departures as a shareable plain-text message.
+    private func stopDeparturesShareText(stop: Stop, departures: [Departure]) -> String {
+        var lines = ["Next departures — \(stop.name)"]
+        for departure in departures.prefix(5) {
+            let time = (departure.realtimeDeparture ?? departure.scheduledDeparture)?
+                .formatted(date: .omitted, time: .shortened) ?? "--:--"
+            let status = if departure.isCancelled {
+                " (cancelled)"
+            } else if let delay = departure.delayMinutes, delay > 0 {
+                " (+\(delay) min)"
+            } else {
+                ""
+            }
+            lines.append("\(time)  \(departure.lineName) → \(departure.destination)\(status)")
+        }
+        lines.append("via LuxTransit")
+        return lines.joined(separator: "\n")
     }
 }
 
@@ -738,6 +766,18 @@ struct DepartureListRow: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(.separator.opacity(0.16), lineWidth: 0.7)
         }
+        // Swipe a tracked row left to stop tracking it.
+        .gesture(
+            isTracked
+                ? DragGesture(minimumDistance: 30)
+                .onEnded { value in
+                    if value.translation.width < -50,
+                       abs(value.translation.height) < 40 {
+                        stopTrackingDeparture()
+                    }
+                }
+                : nil
+        )
         .accessibilityElement(children: .combine)
     }
 

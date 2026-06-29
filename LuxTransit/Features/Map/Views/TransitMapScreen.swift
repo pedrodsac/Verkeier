@@ -101,6 +101,8 @@ struct TransitMapScreen: View {
         .task {
             await observeSearchUpdates()
         }
+        .sensoryFeedback(.selection, trigger: viewModel.selectedStop?.id)
+        .sensoryFeedback(.impact(weight: .light), trigger: favouriteStopIds.count)
         .onChange(of: locationService.currentLocation) {
             if shouldCenterOnNextLocation, locationService.currentLocation != nil {
                 viewModel.centerOnUserLocation(locationService.currentLocation)
