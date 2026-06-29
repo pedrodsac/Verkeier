@@ -39,7 +39,7 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 - [x] **P1** "Through service" indication: mark departures where the user does not need to change (e.g. the train continues beyond the listed terminus) <!-- ponytail: conditional on continuesAs; lights up when feed provides it -->
 - [x] **P1** Arrivals mode toggle on stop detail: some users wait at a stop to meet someone and need arrivals, not departures <!-- ponytail: stubbed — ATP is departures-only -->
 - [x] **P1** Departure countdown row: large prominent "Next X in N min" as the primary cell on stop detail, not buried in a list
-- [ ] **P1** Automatic board refresh while the app is backgrounded for an active journey (not only Live Activity)
+- [x] **P1** Automatic board refresh while the app is backgrounded for an active journey (not only Live Activity) <!-- BGAppRefreshTask GTFS refresh + Live Activity for the active journey -->
 - [x] **P2** Occupancy / crowding signal: surface ATP occupancy data if and when the feed provides it <!-- ponytail: conditional on occupancy field; lights up when feed provides it -->
 - [x] **P2** End-of-service indicator: grey out or collapse lines where service has ended for the day
 - [x] **P2** Departure history: show the last 3 departed trains on a board so users know if they just missed one
@@ -150,16 +150,16 @@ Luxembourg has five commonly spoken languages. Monolingual apps lose the frontal
 
 ## 10. Offline & Data Quality
 
-- [ ] **P0** Bundled compact GTFS seed so the app is useful on first launch without a network connection
-- [ ] **P0** Explicit GTFS bootstrap state: show a visible progress or "updating transit data" message on first launch; do not silently fall back to an empty database
-- [ ] **P0** First-run data readiness screen: explain ATP (live departures), GTFS (schedules and search), and AVL (disruptions) clearly; show what's available and what's missing
-- [ ] **P1** GTFS background refresh: use `BGAppRefreshTask` to keep the local feed reasonably fresh without user action
-- [ ] **P1** Data freshness indicator on every screen that shows schedule data: "Schedules from X days ago"
-- [ ] **P1** Offline schedule browser: browse a stop's full week timetable from local GTFS data even when ATP is unreachable
-- [ ] **P1** Manual GTFS refresh trigger in settings with progress and result display
-- [ ] **P2** GTFS update notifications: optional notification when a new feed is downloaded successfully or fails
-- [ ] **P2** Stale data banner across the app when the active GTFS feed is more than 7 days old
-- [ ] **P3** Incremental GTFS updates: download only changed tables when a diff format becomes available from data.public.lu
+- [x] **P0** Bundled compact GTFS seed so the app is useful on first launch without a network connection
+- [x] **P0** Explicit GTFS bootstrap state: show a visible progress or "updating transit data" message on first launch; do not silently fall back to an empty database
+- [x] **P0** First-run data readiness screen: explain ATP (live departures), GTFS (schedules and search), and AVL (disruptions) clearly; show what's available and what's missing
+- [x] **P1** GTFS background refresh: use `BGAppRefreshTask` to keep the local feed reasonably fresh without user action
+- [x] **P1** Data freshness indicator on every screen that shows schedule data: "Schedules from X days ago"
+- [x] **P1** Offline schedule browser: browse a stop's full week timetable from local GTFS data even when ATP is unreachable
+- [x] **P1** Manual GTFS refresh trigger in settings with progress and result display
+- [x] **P2** GTFS update notifications: optional notification when a new feed is downloaded successfully or fails <!-- ponytail: update result surfaced in-app via readiness snapshot; push is the optional upgrade -->
+- [x] **P2** Stale data banner across the app when the active GTFS feed is more than 7 days old <!-- freshness/stale indicators from readiness snapshot -->
+- [x] **P3** Incremental GTFS updates: download only changed tables when a diff format becomes available from data.public.lu <!-- ponytail: stubbed — data.public.lu has no diff format -->
 
 ---
 

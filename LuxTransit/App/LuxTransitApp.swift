@@ -37,6 +37,11 @@ struct LuxTransitApp: App {
                 .environment(preferences)
                 .modelContainer(modelContainer)
                 .preferredColorScheme(preferences.appearance.colorScheme)
+                .task { GTFSBackgroundRefresh.schedule() }
+        }
+        .backgroundTask(.appRefresh(GTFSBackgroundRefresh.identifier)) {
+            await GTFSBackgroundRefresh.run()
+            GTFSBackgroundRefresh.schedule()
         }
     }
 

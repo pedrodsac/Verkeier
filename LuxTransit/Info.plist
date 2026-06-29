@@ -39,6 +39,15 @@
 	<string>LuxTransit uses your location to show nearby public transport stops on the map.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>dev.pedrocordeiro.LuxTransit.gtfsRefresh</string>
+	</array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchScreen</key>

@@ -28,6 +28,7 @@ struct TransitMapScreen: View {
     @State private var shouldCenterOnNextLocation = false
     @State private var isMainSheetPresented = true
     @State private var favouriteStopIds: Set<String> = []
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 
     let locationService: LocationService
 
@@ -67,6 +68,15 @@ struct TransitMapScreen: View {
             )
             .presentationCornerRadius(28)
             .interactiveDismissDisabled()
+        }
+        .fullScreenCover(isPresented: .init(
+            get: { !hasCompletedOnboarding },
+            set: { if !$0 { hasCompletedOnboarding = true } }
+        )) {
+            FirstRunOnboardingView(readiness: settingsReadinessSnapshot) {
+                hasCompletedOnboarding = true
+                gtfsUpdateController.checkAutomatically()
+            }
         }
         .onChange(of: isMainSheetPresented) {
             if !isMainSheetPresented {
