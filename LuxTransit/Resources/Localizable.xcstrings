@@ -209,6 +209,15 @@
     "Delayed +%lld" : {
 
     },
+    "Delete all favourites, recent stops, trips, and commute presets?" : {
+
+    },
+    "Delete all local data" : {
+
+    },
+    "Delete everything" : {
+
+    },
     "Departures" : {
       "localizations" : {
         "de" : {
@@ -370,6 +379,9 @@
     "Get Next Departures" : {
 
     },
+    "Get started" : {
+
+    },
     "GTFS Data" : {
 
     },
@@ -458,7 +470,16 @@
     "Loading stops" : {
 
     },
+    "Location" : {
+
+    },
+    "Luxembourg public transport — departures, journeys, and disruptions." : {
+
+    },
     "Luxembourg transit map" : {
+
+    },
+    "LuxTransit" : {
 
     },
     "Maps:" : {
@@ -551,6 +572,9 @@
     "Not wheelchair accessible" : {
 
     },
+    "Notifications" : {
+
+    },
     "Offline timetable preview when live ATP departures are missing or delayed." : {
 
     },
@@ -614,6 +638,9 @@
         }
       }
     },
+    "Open iOS Settings" : {
+
+    },
     "Open LuxTransit route planning for a destination." : {
 
     },
@@ -642,6 +669,9 @@
 
     },
     "Opens route step-by-step timeline" : {
+
+    },
+    "Permissions" : {
 
     },
     "Plan Route" : {
@@ -898,6 +928,9 @@
     "Search" : {
 
     },
+    "Search settings" : {
+
+    },
     "Search stops" : {
 
     },
@@ -939,6 +972,9 @@
 
     },
     "Settings and information" : {
+
+    },
+    "Share next departures" : {
 
     },
     "Share route" : {
