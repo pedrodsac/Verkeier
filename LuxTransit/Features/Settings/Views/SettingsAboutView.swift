@@ -1,6 +1,10 @@
+import SwiftData
 import SwiftUI
 
 struct SettingsAboutView: View {
+    @Environment(\.modelContext) private var modelContext
+    @State private var showDeleteConfirm = false
+
     var body: some View {
         List {
             Section("Attribution") {
@@ -27,20 +31,32 @@ struct SettingsAboutView: View {
                     iconName: "location.fill",
                     title: "Location",
                     message:
-                        "Location is used on device for nearby stops and route planning. You can use the app with mocked or searched stops if location is unavailable."
+                    "Location is used on device for nearby stops and route planning. You can use the app with mocked or searched stops if location is unavailable."
                 )
                 AboutFactRow(
                     iconName: "star.fill",
                     title: "Favourites",
                     message:
-                        "Favourite stops are stored locally with SwiftData and mirrored to Shortcuts for App Intent suggestions."
+                    "Favourite stops are stored locally with SwiftData and mirrored to Shortcuts for App Intent suggestions."
                 )
                 AboutFactRow(
                     iconName: "person.crop.circle.badge.xmark",
                     title: "No account",
                     message:
-                        "LuxTransit does not add accounts, ads, subscriptions, or a backend service."
+                    "LuxTransit does not add accounts, ads, subscriptions, or a backend service."
                 )
+
+                Button("Delete all local data", role: .destructive) {
+                    showDeleteConfirm = true
+                }
+                .confirmationDialog(
+                    "Delete all favourites, recent stops, trips, and commute presets?",
+                    isPresented: $showDeleteConfirm,
+                    titleVisibility: .visible
+                ) {
+                    Button("Delete everything", role: .destructive) { deleteAllLocalData() }
+                    Button("Cancel", role: .cancel) {}
+                }
             }
 
             Section {
@@ -52,6 +68,14 @@ struct SettingsAboutView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("About & Legal")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func deleteAllLocalData() {
+        try? modelContext.delete(model: PersistedFavouriteStop.self)
+        try? modelContext.save()
+        RoutePlannerStore.shared.clearAll()
+        SharedTransitDataStore.saveTrackedReminder(nil)
+        FocusFilterStore.shared.isWorkFocusActive = false
     }
 }
 

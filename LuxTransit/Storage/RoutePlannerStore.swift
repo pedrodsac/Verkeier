@@ -16,6 +16,13 @@ struct RoutePlannerStore {
         self.defaults = defaults
     }
 
+    /// Removes all planner data (recent places/stops/trips and commute presets).
+    func clearAll() {
+        for item in [recentPlacesKey, recentStopsKey, recentTripsKey, commutePresetsKey] {
+            defaults.removeObject(forKey: item)
+        }
+    }
+
     func recentPlaces() -> [RoutePlace] {
         load([RoutePlace].self, forKey: recentPlacesKey) ?? []
     }

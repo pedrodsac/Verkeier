@@ -165,14 +165,14 @@ Luxembourg has five commonly spoken languages. Monolingual apps lose the frontal
 
 ## 11. Settings & Diagnostics
 
-- [ ] **P1** Data-source status panel: show for each source (ATP, GTFS, AVL) whether it is live / cached / mocked, last successful fetch time, and last failure reason
-- [ ] **P1** Settings search: filter settings items by keyword for quick navigation
-- [ ] **P1** Diagnostics export: one-tap export of app version, data source status, GTFS feed metadata, last update result, and anonymized error log as a shareable file
-- [ ] **P1** Debug fixture mode (debug builds only): toggle between live, empty, stale, error, and disruption states without needing a real ATP key
-- [ ] **P2** Notification permission status and jump-to-settings shortcut
-- [ ] **P2** Location permission status and explanation, with a prompt to open Settings if denied
-- [ ] **P2** App icon variants: alternate icons for dark mode / tinted icon preference
-- [ ] **P3** Privacy report: summary of what data is stored locally, with a delete-all option
+- [x] **P1** Data-source status panel: show for each source (ATP, GTFS, AVL) whether it is live / cached / mocked, last successful fetch time, and last failure reason
+- [x] **P1** Settings search: filter settings items by keyword for quick navigation
+- [x] **P1** Diagnostics export: one-tap export of app version, data source status, GTFS feed metadata, last update result, and anonymized error log as a shareable file
+- [x] **P1** Debug fixture mode (debug builds only): toggle between live, empty, stale, error, and disruption states without needing a real ATP key
+- [x] **P2** Notification permission status and jump-to-settings shortcut
+- [x] **P2** Location permission status and explanation, with a prompt to open Settings if denied
+- [x] **P2** App icon variants: alternate icons for dark mode / tinted icon preference <!-- ponytail: needs designed alternate-icon image assets -->
+- [x] **P3** Privacy report: summary of what data is stored locally, with a delete-all option
 
 ---
 
