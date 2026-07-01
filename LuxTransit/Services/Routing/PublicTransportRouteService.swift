@@ -6,10 +6,14 @@ import MapKit
 struct PublicTransportRouteService: RouteService {
     private let engine: PublicTransportRoutingEngine
 
+    /// - Parameter offlineMode: When true, planning ignores live ATP data (no
+    ///   delays/cancellations) and enforces a 15-minute minimum transfer buffer as
+    ///   a safety margin. See the routing engine for where the buffer is applied.
     init(
         gtfsService: any GTFSService,
         atpClient: any ATPClient,
         roadRouteProvider: any RoadRouteProviding = MapKitRoadRouteProvider(),
+        offlineMode: Bool = false,
         now: @escaping @Sendable () -> Date = { .now },
         calendar: Calendar = {
             var calendar = Calendar(identifier: .gregorian)
@@ -21,6 +25,7 @@ struct PublicTransportRouteService: RouteService {
             gtfsService: gtfsService,
             atpClient: atpClient,
             roadRouteProvider: roadRouteProvider,
+            offlineMode: offlineMode,
             now: now,
             calendar: calendar
         )
@@ -135,9 +140,12 @@ private actor PublicTransportRoutingEngine {
     private let now: @Sendable () -> Date
     private let calendar: Calendar
 
+    private let offlineMode: Bool
     private let accessRadiusMeters = 900.0
     private let destinationRadiusMeters = 900.0
-    private let transferBufferSeconds = 120
+    /// Minimum slack allowed between a transit arrival and the next boarding. Offline
+    /// mode raises this to 15 min to absorb delays it can't see (no live data).
+    private let transferBufferSeconds: Int
     // Connections with less than this slack are flagged "tight" for the rider,
     // even though they're still feasible (>= transferBufferSeconds).
     private let tightTransferThresholdSeconds = 300
@@ -164,14 +172,17 @@ private actor PublicTransportRoutingEngine {
         gtfsService: any GTFSService,
         atpClient: any ATPClient,
         roadRouteProvider: any RoadRouteProviding,
+        offlineMode: Bool,
         now: @escaping @Sendable () -> Date,
         calendar: Calendar
     ) {
         self.gtfsService = gtfsService
         self.atpClient = atpClient
         self.roadRouteProvider = roadRouteProvider
+        self.offlineMode = offlineMode
         self.now = now
         self.calendar = calendar
+        transferBufferSeconds = offlineMode ? 15 * 60 : 120
     }
 
     func calculateRoute(
@@ -530,6 +541,14 @@ private actor PublicTransportRoutingEngine {
         _ candidates: [ScheduledJourney],
         context _: RouteSearchContext
     ) async -> [RouteCandidate] {
+        // Offline mode plans purely on the static schedule — no ATP fetch, and no
+        // no-realtime penalty (which would otherwise flag every leg as unverified).
+        guard !offlineMode else {
+            return candidates.map {
+                RouteCandidate(legs: $0.legs, penalty: brokenConnectionPenalty(for: $0.legs))
+            }
+        }
+
         let stopIds = Set(candidates.flatMap { journey in
             journey.legs.compactMap { leg in
                 leg.transportKind == .transit ? leg.originStopId : nil

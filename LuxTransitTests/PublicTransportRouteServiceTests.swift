@@ -44,6 +44,95 @@ struct PublicTransportRouteServiceTests {
         #expect(calculation.mapOverlay?.segments.contains { $0.mode == .bus } == true)
     }
 
+    @Test func offlineModeIgnoresLiveDelaysAndUsesScheduledTimes() async throws {
+        // Offline mode must plan on the static schedule only: even with a delayed live
+        // departure available, the leg stays scheduled (no delay/live status).
+        let now = luxembourgDate(hour: 8, minute: 0)
+        let atpClient = MockATPClient(departuresByStopId: [
+            "S1": [
+                Departure(
+                    id: "live-15",
+                    stopId: "S1",
+                    routeId: "R15",
+                    lineName: "15",
+                    destination: "Central",
+                    scheduledDeparture: luxembourgDate(hour: 8, minute: 5),
+                    realtimeDeparture: luxembourgDate(hour: 8, minute: 8),
+                    delayMinutes: 3,
+                    platform: "2",
+                    dataSource: .atpOpenAPI
+                )
+            ]
+        ])
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: makeTimetable()),
+            atpClient: atpClient,
+            roadRouteProvider: MockRoadRouteProvider(),
+            offlineMode: true,
+            now: { now }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(name: "Current Location", latitude: 49.6001, longitude: 6.1001),
+            to: LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11)
+        )
+
+        let transitLeg = try #require(calculation.plan.legs.first { $0.transportKind == .transit })
+        #expect(transitLeg.liveStatus == .scheduled)
+        #expect(transitLeg.delayMinutes == nil)
+        #expect(transitLeg.departureTime == luxembourgDate(hour: 8, minute: 5))
+    }
+
+    @Test func offlineModeEnforcesFifteenMinuteTransferBuffer() async throws {
+        // A 3-minute connection is feasible live but must be rejected offline; the engine
+        // has to skip it and choose the later trip that clears the 15-minute buffer.
+        let now = luxembourgDate(hour: 8, minute: 0)
+        let timetable = makeTimetable(
+            routes: [
+                makeRoute(id: "R-1", shortName: "1"),
+                makeRoute(id: "R-tight", shortName: "T"),
+                makeRoute(id: "R-safe", shortName: "S")
+            ],
+            trips: [
+                timedTrip(id: "T-1", routeId: "R-1", stops: [
+                    ("S1", t(8, 5), t(8, 5)),
+                    ("S2", t(8, 15), t(8, 15))
+                ]),
+                timedTrip(id: "T-tight", routeId: "R-tight", stops: [
+                    ("S2", t(8, 18), t(8, 18)),
+                    ("S3", t(8, 28), t(8, 28))
+                ]),
+                timedTrip(id: "T-safe", routeId: "R-safe", stops: [
+                    ("S2", t(8, 32), t(8, 32)),
+                    ("S3", t(8, 42), t(8, 42))
+                ])
+            ]
+        )
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            offlineMode: true,
+            now: { now }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(name: "Current Location", latitude: 49.6001, longitude: 6.1001),
+            to: LocationPoint(id: "S3", name: "Airport", latitude: 49.62, longitude: 6.12)
+        )
+
+        let option = try #require(calculation.options.first)
+        let transitLegs = option.transitLegs
+        #expect(transitLegs.map(\.routeId) == ["R-1", "R-safe"])
+        let arrival = try #require(transitLegs.first?.arrivalTime)
+        let nextDeparture = try #require(transitLegs.last?.departureTime)
+        #expect(nextDeparture.timeIntervalSince(arrival) >= 15 * 60)
+        // The tight 3-minute connection must not appear in any returned option.
+        #expect(calculation.options.allSatisfy { option in
+            option.plan.legs.allSatisfy { $0.routeId != "R-tight" }
+        })
+    }
+
     @Test func rejectsWalkingOnlyRoutes() async throws {
         let now = luxembourgDate(hour: 8, minute: 0)
         let timetable = makeTimetable()

@@ -5,7 +5,9 @@ import SwiftUI
 enum AppearancePreference: String, Codable, CaseIterable, Identifiable {
     case system, light, dark
 
-    var id: String { rawValue }
+    var id: String {
+        rawValue
+    }
 
     var title: String {
         switch self {
@@ -27,7 +29,9 @@ enum AppearancePreference: String, Codable, CaseIterable, Identifiable {
 enum DistanceUnitPreference: String, Codable, CaseIterable, Identifiable {
     case metric, imperial
 
-    var id: String { rawValue }
+    var id: String {
+        rawValue
+    }
 
     var title: String {
         switch self {
@@ -46,21 +50,33 @@ final class AppPreferences {
     var appearance: AppearancePreference {
         didSet { saveString(appearance.rawValue, forKey: Keys.appearance) }
     }
+
     var distanceUnit: DistanceUnitPreference {
         didSet { saveString(distanceUnit.rawValue, forKey: Keys.distanceUnit) }
     }
+
     var defaultRouteSort: RoutePlannerSortOption {
         didSet { saveString(defaultRouteSort.rawValue, forKey: Keys.defaultRouteSort) }
     }
+
     var defaultModePreference: RoutePlannerModePreference {
         didSet { saveString(defaultModePreference.rawValue, forKey: Keys.defaultModePreference) }
     }
+
     var avoidTightTransfers: Bool {
         didSet { defaults.set(avoidTightTransfers, forKey: Keys.avoidTightTransfers) }
     }
+
     var preferAccessible: Bool {
         didSet { defaults.set(preferAccessible, forKey: Keys.preferAccessible) }
     }
+
+    /// Plan on static GTFS only: no live departures/delays/cancellations, and a
+    /// 15-minute minimum transfer buffer.
+    var offlineMode: Bool {
+        didSet { defaults.set(offlineMode, forKey: Keys.offlineMode) }
+    }
+
     var defaultReminderLeadTimeMinutes: Int {
         didSet { defaults.set(defaultReminderLeadTimeMinutes, forKey: Keys.defaultReminderLeadTime) }
     }
@@ -71,10 +87,13 @@ final class AppPreferences {
         self.defaults = defaults
         appearance = AppearancePreference(rawValue: defaults.string(forKey: Keys.appearance) ?? "") ?? .system
         distanceUnit = DistanceUnitPreference(rawValue: defaults.string(forKey: Keys.distanceUnit) ?? "") ?? .metric
-        defaultRouteSort = RoutePlannerSortOption(rawValue: defaults.string(forKey: Keys.defaultRouteSort) ?? "") ?? .fastest
-        defaultModePreference = RoutePlannerModePreference(rawValue: defaults.string(forKey: Keys.defaultModePreference) ?? "") ?? .any
+        defaultRouteSort = RoutePlannerSortOption(rawValue: defaults.string(forKey: Keys.defaultRouteSort) ?? "") ??
+            .fastest
+        defaultModePreference = RoutePlannerModePreference(rawValue: defaults
+            .string(forKey: Keys.defaultModePreference) ?? "") ?? .any
         avoidTightTransfers = defaults.bool(forKey: Keys.avoidTightTransfers)
         preferAccessible = defaults.bool(forKey: Keys.preferAccessible)
+        offlineMode = defaults.bool(forKey: Keys.offlineMode)
         let saved = defaults.integer(forKey: Keys.defaultReminderLeadTime)
         defaultReminderLeadTimeMinutes = saved > 0 ? saved : 5
     }
@@ -91,8 +110,8 @@ final class AppPreferences {
     func formattedDistance(_ meters: CLLocationDistance) -> String {
         switch distanceUnit {
         case .metric:
-            if meters < 1_000 { return "\(Int(meters.rounded())) m" }
-            return String(format: "%.1f km", meters / 1_000)
+            if meters < 1000 { return "\(Int(meters.rounded())) m" }
+            return String(format: "%.1f km", meters / 1000)
         case .imperial:
             let feet = meters * 3.28084
             if feet < 528 { return "\(Int(feet.rounded())) ft" }
@@ -116,6 +135,7 @@ final class AppPreferences {
         static let defaultModePreference = "AppPreferences.defaultModePreference"
         static let avoidTightTransfers = "AppPreferences.avoidTightTransfers"
         static let preferAccessible = "AppPreferences.preferAccessible"
+        static let offlineMode = "AppPreferences.offlineMode"
         static let defaultReminderLeadTime = "AppPreferences.defaultReminderLeadTime"
     }
 }

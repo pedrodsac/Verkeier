@@ -50,7 +50,11 @@ struct LuxTransitApp: App {
     }
 
     private var atpClient: any ATPClient {
-        switch debugTransitDataMode {
+        // Offline mode: no live transit data anywhere (departures, delays, cancellations).
+        if preferences.offlineMode {
+            return EmptyATPClient()
+        }
+        return switch debugTransitDataMode {
         case .normal:
             configuration.hasATPAccessId ? LiveATPClient(configuration: configuration) : EmptyATPClient()
         case .sample:
@@ -78,6 +82,10 @@ struct LuxTransitApp: App {
     }
 
     private var routeService: any RouteService {
-        PublicTransportRouteService(gtfsService: gtfsService, atpClient: atpClient)
+        PublicTransportRouteService(
+            gtfsService: gtfsService,
+            atpClient: atpClient,
+            offlineMode: preferences.offlineMode
+        )
     }
 }

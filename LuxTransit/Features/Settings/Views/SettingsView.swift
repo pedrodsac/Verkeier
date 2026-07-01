@@ -62,6 +62,18 @@ struct SettingsView: View {
                     }
                 }
 
+                if matches("offline mode data live realtime schedule gtfs transfers") {
+                    Section {
+                        Toggle("Offline mode", isOn: $prefs.offlineMode)
+                    } header: {
+                        Text("Data")
+                    } footer: {
+                        Text("Plan journeys from the static schedule only, without live "
+                            + "departures, delays, or cancellations. Adds a 15-minute "
+                            + "minimum between transfers as a safety buffer.")
+                    }
+                }
+
                 if matches("reminders lead time departure notification") {
                     Section("Reminders") {
                         Picker(
