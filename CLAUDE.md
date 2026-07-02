@@ -84,3 +84,16 @@ ATP (mobiliteit.lu) access is gated behind `ATP_ACCESS_ID`; the app tolerates a 
 
 - Make occasional small, focused commits after a coherent buildable change or passing-test milestone; don't mix unrelated work. Use concise imperative messages (`Add GTFS update validation`).
 - `docs/` holds the phased plan (`PRD.md`, `ARCHITECTURE.md`, `MVP_CHECKLIST.md`, `CODEBASE_RULES.md`, feature/audit specs). Start with `docs/README.md` for navigation and `docs/SERVICES.md` for protocol signatures. Consult both before large changes — they define intended scope and contracts.
+
+## Skills & tooling
+
+Installed skills cover the SwiftUI/iOS surface this project lives in — use the matching one when doing that kind of work:
+
+- **SwiftUI:** `swiftui-pro` / `swiftui-expert-skill` (review, modern APIs, data flow), `swiftui-animation` (transitions, springs, SF Symbol effects), `swiftui-performance-audit` (janky scroll, excess view updates), `make-interfaces-feel-better` (UI polish, micro-interactions).
+- **Platform:** `ios-accessibility` (VoiceOver, Dynamic Type — see the Dynamic Type/VoiceOver convention above), `ios-localization` (String Catalogs), `ios-networking` (URLSession for the ATP/AVL/GTFS clients), `swiftdata-pro` (favourites storage).
+- **Testing:** `swift-testing-pro`, `swift-protocol-di-testing` — match the Swift Testing + protocol-DI conventions this codebase already uses.
+- **Build/run:** `xcodebuildmcp-cli`, `ios-simulator-skill` for building, running, and UI automation on the simulator.
+
+## Codebase graph
+
+`graphify-out/` holds a knowledge graph of the codebase — `GRAPH_REPORT.md` (god nodes, communities, surprising connections, file-size/god-object hints) and `graph.html` (interactive map). Skim the report to orient on unfamiliar areas or spot over-connected god objects before a large change. Refresh after structural changes with `/graphify . --update` (code-only diffs cost no LLM tokens); ask a question against it with `/graphify query "..."`.
