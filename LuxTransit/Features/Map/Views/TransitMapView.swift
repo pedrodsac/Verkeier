@@ -2,7 +2,9 @@ import CoreLocation
 import MapKit
 import SwiftUI
 
-struct TransitMapView: UIViewRepresentable {
+/// The data the map renders from, bundled so the call site passes one value
+/// instead of eight positional arguments.
+struct MapViewState {
     let region: MKCoordinateRegion
     let cameraUpdateToken: Int
     let liveStops: [Stop]
@@ -11,6 +13,10 @@ struct TransitMapView: UIViewRepresentable {
     let favouriteStopIds: Set<String>
     let alertStopIds: Set<String>
     let routeOverlay: RouteMapOverlay?
+}
+
+struct TransitMapView: UIViewRepresentable {
+    let state: MapViewState
     let selectStop: (Stop) -> Void
     let regionDidChange: (MKCoordinateRegion) -> Void
 
@@ -25,30 +31,30 @@ struct TransitMapView: UIViewRepresentable {
     func updateUIView(_ view: MapContainerView, context: Context) {
         context.coordinator.selectStop = selectStop
         context.coordinator.regionDidChange = regionDidChange
-        context.coordinator.selectedStopId = selectedStopId
-        context.coordinator.favouriteStopIds = favouriteStopIds
-        context.coordinator.alertStopIds = alertStopIds
+        context.coordinator.selectedStopId = state.selectedStopId
+        context.coordinator.favouriteStopIds = state.favouriteStopIds
+        context.coordinator.alertStopIds = state.alertStopIds
 
-        let stopAnnotations = routeOverlay == nil
-            ? liveStops.map {
+        let stopAnnotations = state.routeOverlay == nil
+            ? state.liveStops.map {
                 StopMapAnnotation(stop: $0, layer: .liveNearby)
             }
-            + gtfsStops.map {
+            + state.gtfsStops.map {
                 StopMapAnnotation(stop: $0, layer: .gtfs)
             }
             : []
-        let transferAnnotations = routeOverlay?.transferMarkers.map(RouteTransferAnnotation.init) ?? []
+        let transferAnnotations = state.routeOverlay?.transferMarkers.map(RouteTransferAnnotation.init) ?? []
 
         view.update(
             snapshot: MapSnapshot(
-                region: region,
-                cameraUpdateToken: cameraUpdateToken,
+                region: state.region,
+                cameraUpdateToken: state.cameraUpdateToken,
                 annotations: stopAnnotations,
                 transferAnnotations: transferAnnotations,
-                selectedStopId: selectedStopId,
-                favouriteStopIds: favouriteStopIds,
-                alertStopIds: alertStopIds,
-                routeOverlay: routeOverlay
+                selectedStopId: state.selectedStopId,
+                favouriteStopIds: state.favouriteStopIds,
+                alertStopIds: state.alertStopIds,
+                routeOverlay: state.routeOverlay
             )
         )
     }

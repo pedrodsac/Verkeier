@@ -173,14 +173,16 @@ struct TransitMapScreen: View {
 
     var map: some View {
         TransitMapView(
-            region: viewModel.cameraRegion,
-            cameraUpdateToken: viewModel.cameraUpdateToken,
-            liveStops: stopsForMode(viewModel.nearbyStops),
-            gtfsStops: stopsForMode(viewModel.gtfsOnlyMapStops),
-            selectedStopId: viewModel.selectedStop?.id,
-            favouriteStopIds: favouriteStopIds,
-            alertStopIds: Set(viewModel.alerts.flatMap(\.affectedStopIds)),
-            routeOverlay: viewModel.activeMapOverlay,
+            state: MapViewState(
+                region: viewModel.cameraRegion,
+                cameraUpdateToken: viewModel.cameraUpdateToken,
+                liveStops: stopsForMode(viewModel.nearbyStops),
+                gtfsStops: stopsForMode(viewModel.gtfsOnlyMapStops),
+                selectedStopId: viewModel.selectedStop?.id,
+                favouriteStopIds: favouriteStopIds,
+                alertStopIds: Set(viewModel.alerts.flatMap(\.affectedStopIds)),
+                routeOverlay: viewModel.activeMapOverlay
+            ),
             selectStop: selectStop,
             regionDidChange: scheduleMapRegionUpdate
         )
