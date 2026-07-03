@@ -24,46 +24,23 @@ struct BottomSheetContent: View {
                         query: searchQuery,
                         detent: detent,
                         viewModel: viewModel.commute,
-                        showSearch: actions.showSearch,
-                        showSettings: actions.showSettings,
-                        showAlerts: actions.showAlerts,
-                        selectStop: actions.selectStop,
-                        toggleExpansion: actions.toggleFavouriteExpansion,
-                        applyCommutePreset: actions.applyCommutePreset
+                        actions: HomeActions(from: actions)
                     )
                 case .search:
                     SearchView(
                         query: $searchQuery,
                         viewModel: viewModel.search,
-                        updateSearch: actions.updateSearch,
-                        selectStop: actions.selectStop,
-                        cancel: actions.showHome
+                        actions: SearchActions(from: actions)
                     )
                 case .stopDetail:
                     StopDetailView(
                         viewModel: viewModel.stopDetail,
-                        openDirections: actions.showDirections,
-                        startTrackingDeparture: actions.startTrackingDeparture,
-                        stopTrackingDeparture: actions.stopTrackingDeparture,
-                        scheduleDepartureReminder: actions.scheduleDepartureReminder,
-                        cancelDepartureReminder: actions.cancelDepartureReminder,
-                        toggleDepartureLine: actions.toggleDepartureLine,
-                        showLineDetail: actions.showLineDetail,
-                        selectDeparturePlatform: actions.selectDeparturePlatform
+                        actions: StopDetailActions(from: actions)
                     )
                 case .directions:
                     RouteView(
                         viewModel: viewModel.route,
-                        calculateRoute: actions.calculateRoute,
-                        selectRouteOption: actions.selectRouteOption,
-                        showMoreRouteOptions: actions.showMoreRouteOptions,
-                        openInAppleMaps: actions.openRouteInAppleMaps,
-                        selectRouteOrigin: actions.selectRouteOrigin,
-                        selectRouteDestination: actions.selectRouteDestination,
-                        applyCommutePreset: actions.applyCommutePreset,
-                        saveCurrentCommutePreset: actions.saveCurrentCommutePreset,
-                        swapRouteEndpoints: actions.swapRouteEndpoints,
-                        updateRouteFilters: actions.updateRouteFilters
+                        actions: RouteActions(from: actions)
                     )
                 case .routeTimeline:
                     RouteTimelineView(
@@ -73,8 +50,7 @@ struct BottomSheetContent: View {
                 case .lineDetail:
                     LineDetailView(
                         viewModel: viewModel.lineDetail,
-                        selectStop: actions.selectStop,
-                        selectDirection: actions.selectLineDetailDirection
+                        actions: LineDetailActions(from: actions)
                     )
                 case .alerts:
                     AlertsView(
@@ -105,37 +81,29 @@ private struct HomeSheetContent: View {
     let query: String
     let detent: BottomSheetDetent
     let viewModel: CommuteDashboardViewModel
-    let showSearch: () -> Void
-    let showSettings: () -> Void
-    let showAlerts: () -> Void
-    let selectStop: (Stop) -> Void
-    let toggleExpansion: (String) -> Void
-    let applyCommutePreset: (String) -> Void
+    let actions: HomeActions
 
     var body: some View {
         VStack(alignment: .leading, spacing: detent == .medium ? 22 : 16) {
             if detent == .medium {
                 mediumHeader
             } else {
-                BottomSheetSearchButton(query: query, action: showSearch)
+                BottomSheetSearchButton(query: query, action: actions.showSearch)
             }
 
             CommuteDashboardView(
                 viewModel: viewModel,
                 displayStyle: detent == .medium ? .mapsMedium : .regular,
-                showAlerts: showAlerts,
-                selectStop: selectStop,
-                toggleExpansion: toggleExpansion,
-                applyCommutePreset: applyCommutePreset
+                actions: actions.commute
             )
         }
     }
 
     private var mediumHeader: some View {
         HStack(spacing: 12) {
-            BottomSheetSearchButton(query: query, style: .medium, action: showSearch)
+            BottomSheetSearchButton(query: query, style: .medium, action: actions.showSearch)
 
-            Button(action: showSettings) {
+            Button(action: actions.showSettings) {
                 Image(systemName: "gearshape.fill")
                     .font(.title3.weight(.bold))
                     .foregroundStyle(.primary)

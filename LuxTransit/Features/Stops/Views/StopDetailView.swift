@@ -2,14 +2,7 @@ import SwiftUI
 
 struct StopDetailView: View {
     let viewModel: StopDetailPresentationModel
-    let openDirections: () -> Void
-    let startTrackingDeparture: (Departure) -> Void
-    let stopTrackingDeparture: () -> Void
-    let scheduleDepartureReminder: (Departure, Int) -> Void
-    let cancelDepartureReminder: () -> Void
-    let toggleDepartureLine: (TransitRoute) -> Void
-    let showLineDetail: (TransitRoute) -> Void
-    let selectDeparturePlatform: (String?) -> Void
+    let actions: StopDetailActions
 
     var body: some View {
         if let stop = viewModel.stop {
@@ -17,16 +10,16 @@ struct StopDetailView: View {
                 PlatformFilterPicker(
                     platforms: viewModel.availablePlatforms,
                     selectedPlatform: viewModel.selectedPlatform,
-                    selectPlatform: selectDeparturePlatform
+                    selectPlatform: actions.selectDeparturePlatform
                 )
 
                 StopDetailHeader(
                     stop: stop,
                     routes: viewModel.routes,
                     selectedLine: viewModel.selectedLine,
-                    openDirections: openDirections,
-                    toggleDepartureLine: toggleDepartureLine,
-                    showLineDetail: showLineDetail
+                    openDirections: actions.openDirections,
+                    toggleDepartureLine: actions.toggleDepartureLine,
+                    showLineDetail: actions.showLineDetail
                 )
 
                 if !viewModel.departures.isEmpty {
@@ -70,10 +63,10 @@ struct StopDetailView: View {
                     isStale: viewModel.isStale,
                     trackedDepartureId: viewModel.trackedDepartureId,
                     activeReminder: viewModel.activeReminder,
-                    startTrackingDeparture: startTrackingDeparture,
-                    stopTrackingDeparture: stopTrackingDeparture,
-                    scheduleDepartureReminder: scheduleDepartureReminder,
-                    cancelDepartureReminder: cancelDepartureReminder
+                    startTrackingDeparture: actions.startTrackingDeparture,
+                    stopTrackingDeparture: actions.stopTrackingDeparture,
+                    scheduleDepartureReminder: actions.scheduleDepartureReminder,
+                    cancelDepartureReminder: actions.cancelDepartureReminder
                 )
                 // Haptic + VoiceOver feedback when the board refreshes with new data.
                 .sensoryFeedback(.impact(weight: .light), trigger: viewModel.lastUpdated)

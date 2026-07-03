@@ -10,25 +10,16 @@ import SwiftUI
 /// stateless, driven by ``RoutePresentationModel`` and closure callbacks.
 struct RouteView: View {
     let viewModel: RoutePresentationModel
-    let calculateRoute: () -> Void
-    let selectRouteOption: (String) -> Void
-    let showMoreRouteOptions: () -> Void
-    let openInAppleMaps: () -> Void
-    let selectRouteOrigin: (RoutePlace?) -> Void
-    let selectRouteDestination: (RoutePlace) -> Void
-    let applyCommutePreset: (String) -> Void
-    let saveCurrentCommutePreset: (String) -> Void
-    let swapRouteEndpoints: () -> Void
-    let updateRouteFilters: (RoutePlannerFilters) -> Void
+    let actions: RouteActions
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             // ── From / To unified card ────────────────────────────────────
             RouteEndpointsCard(
                 viewModel: viewModel,
-                selectRouteOrigin: selectRouteOrigin,
-                selectRouteDestination: selectRouteDestination,
-                swapRouteEndpoints: swapRouteEndpoints
+                selectRouteOrigin: actions.selectRouteOrigin,
+                selectRouteDestination: actions.selectRouteDestination,
+                swapRouteEndpoints: actions.swapRouteEndpoints
             )
 
             // ── Commute presets ───────────────────────────────────────────
@@ -45,8 +36,8 @@ struct RouteView: View {
             RouteOptionsBar(
                 filters: viewModel.filters,
                 hasDestination: viewModel.hasDestination,
-                updateRouteFilters: updateRouteFilters,
-                saveCurrentCommutePreset: saveCurrentCommutePreset
+                updateRouteFilters: actions.updateRouteFilters,
+                saveCurrentCommutePreset: actions.saveCurrentCommutePreset
             )
 
             // ── Primary action ────────────────────────────────────────────
@@ -72,7 +63,7 @@ struct RouteView: View {
             }
 
             if viewModel.hasDestination {
-                Button(action: openInAppleMaps) {
+                Button(action: actions.openInAppleMaps) {
                     Label("Open in Apple Maps", systemImage: "map")
                         .frame(maxWidth: .infinity)
                 }
@@ -95,7 +86,7 @@ struct RouteView: View {
             HStack(spacing: 8) {
                 ForEach(viewModel.commutePresets) { preset in
                     Button {
-                        applyCommutePreset(preset.id)
+                        actions.applyCommutePreset(preset.id)
                     } label: {
                         Label(preset.title, systemImage: "bookmark.fill")
                     }
@@ -115,7 +106,7 @@ struct RouteView: View {
             HStack(spacing: 8) {
                 ForEach(viewModel.recentTrips) { trip in
                     Button {
-                        applyCommutePreset(trip.id)
+                        actions.applyCommutePreset(trip.id)
                     } label: {
                         Label(trip.title, systemImage: "clock.arrow.circlepath")
                             .lineLimit(1)
@@ -132,7 +123,7 @@ struct RouteView: View {
     // MARK: - Find Routes button
 
     private var findRoutesButton: some View {
-        Button(action: calculateRoute) {
+        Button(action: actions.calculateRoute) {
             HStack {
                 if viewModel.isCalculating {
                     ProgressView()
@@ -248,7 +239,7 @@ struct RouteView: View {
                     FlexibleWrappingRow(spacing: 8) {
                         ForEach(Array(quickPicks)) { place in
                             Button {
-                                selectRouteDestination(place)
+                                actions.selectRouteDestination(place)
                             } label: {
                                 Label(
                                     place.title,
@@ -275,12 +266,12 @@ struct RouteView: View {
                 RouteOptionCard(
                     option: option,
                     isSelected: option.id == viewModel.selectedRouteOptionID,
-                    selectRouteOption: { selectRouteOption(option.id) }
+                    selectRouteOption: { actions.selectRouteOption(option.id) }
                 )
             }
 
             if viewModel.canShowMoreRouteOptions {
-                Button(action: showMoreRouteOptions) {
+                Button(action: actions.showMoreRouteOptions) {
                     Label("Show more routes", systemImage: "plus.circle")
                         .font(.callout.weight(.semibold))
                         .frame(maxWidth: .infinity)
@@ -349,16 +340,7 @@ private struct FlexibleWrappingRow: Layout {
         ScrollView {
             RouteView(
                 viewModel: .previewWithRoutes,
-                calculateRoute: {},
-                selectRouteOption: { _ in },
-                showMoreRouteOptions: {},
-                openInAppleMaps: {},
-                selectRouteOrigin: { _ in },
-                selectRouteDestination: { _ in },
-                applyCommutePreset: { _ in },
-                saveCurrentCommutePreset: { _ in },
-                swapRouteEndpoints: {},
-                updateRouteFilters: { _ in }
+                actions: RouteActions()
             )
             .padding()
         }
@@ -369,16 +351,7 @@ private struct FlexibleWrappingRow: Layout {
         ScrollView {
             RouteView(
                 viewModel: .previewCalculating,
-                calculateRoute: {},
-                selectRouteOption: { _ in },
-                showMoreRouteOptions: {},
-                openInAppleMaps: {},
-                selectRouteOrigin: { _ in },
-                selectRouteDestination: { _ in },
-                applyCommutePreset: { _ in },
-                saveCurrentCommutePreset: { _ in },
-                swapRouteEndpoints: {},
-                updateRouteFilters: { _ in }
+                actions: RouteActions()
             )
             .padding()
         }
@@ -389,16 +362,7 @@ private struct FlexibleWrappingRow: Layout {
         ScrollView {
             RouteView(
                 viewModel: .previewWaitingForLocation,
-                calculateRoute: {},
-                selectRouteOption: { _ in },
-                showMoreRouteOptions: {},
-                openInAppleMaps: {},
-                selectRouteOrigin: { _ in },
-                selectRouteDestination: { _ in },
-                applyCommutePreset: { _ in },
-                saveCurrentCommutePreset: { _ in },
-                swapRouteEndpoints: {},
-                updateRouteFilters: { _ in }
+                actions: RouteActions()
             )
             .padding()
         }
@@ -409,16 +373,7 @@ private struct FlexibleWrappingRow: Layout {
         ScrollView {
             RouteView(
                 viewModel: .previewEmpty,
-                calculateRoute: {},
-                selectRouteOption: { _ in },
-                showMoreRouteOptions: {},
-                openInAppleMaps: {},
-                selectRouteOrigin: { _ in },
-                selectRouteDestination: { _ in },
-                applyCommutePreset: { _ in },
-                saveCurrentCommutePreset: { _ in },
-                swapRouteEndpoints: {},
-                updateRouteFilters: { _ in }
+                actions: RouteActions()
             )
             .padding()
         }
@@ -429,16 +384,7 @@ private struct FlexibleWrappingRow: Layout {
         ScrollView {
             RouteView(
                 viewModel: .previewError,
-                calculateRoute: {},
-                selectRouteOption: { _ in },
-                showMoreRouteOptions: {},
-                openInAppleMaps: {},
-                selectRouteOrigin: { _ in },
-                selectRouteDestination: { _ in },
-                applyCommutePreset: { _ in },
-                saveCurrentCommutePreset: { _ in },
-                swapRouteEndpoints: {},
-                updateRouteFilters: { _ in }
+                actions: RouteActions()
             )
             .padding()
         }

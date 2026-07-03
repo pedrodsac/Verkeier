@@ -2,8 +2,7 @@ import SwiftUI
 
 struct LineDetailView: View {
     let viewModel: LineDetailPresentationModel
-    let selectStop: (Stop) -> Void
-    let selectDirection: (String) -> Void
+    let actions: LineDetailActions
 
     var body: some View {
         if let detail = viewModel.detail {
@@ -25,7 +24,7 @@ struct LineDetailView: View {
                         "Direction",
                         selection: Binding(
                             get: { detail.selectedDirectionID },
-                            set: selectDirection
+                            set: actions.selectDirection
                         )
                     ) {
                         ForEach(detail.directions) { direction in
@@ -44,7 +43,7 @@ struct LineDetailView: View {
 
                     ForEach(Array(detail.stopSequence.enumerated()), id: \.element.id) { index, stop in
                         Button {
-                            selectStop(
+                            actions.selectStop(
                                 Stop(
                                     id: stop.id,
                                     name: stop.name,

@@ -10,19 +10,16 @@ struct CommuteDashboardView: View {
 
     let viewModel: CommuteDashboardViewModel
     var displayStyle: DisplayStyle = .regular
-    let showAlerts: () -> Void
-    let selectStop: (Stop) -> Void
-    let toggleExpansion: (String) -> Void
-    var applyCommutePreset: (String) -> Void = { _ in }
+    let actions: CommuteActions
 
     var body: some View {
         VStack(alignment: .leading, spacing: displayStyle == .mapsMedium ? 18 : 16) {
             if viewModel.activeAlertCount > 0 {
-                AlertsSummaryRow(alertCount: viewModel.activeAlertCount, action: showAlerts)
+                AlertsSummaryRow(alertCount: viewModel.activeAlertCount, action: actions.showAlerts)
             }
 
             if let preset = viewModel.suggestedCommutePreset {
-                CommuteSuggestionRow(preset: preset) { applyCommutePreset(preset.id) }
+                CommuteSuggestionRow(preset: preset) { actions.applyCommutePreset(preset.id) }
             }
 
             if viewModel.hasFavourites {
@@ -52,8 +49,8 @@ struct CommuteDashboardView: View {
                             stop: stop,
                             departures: viewModel.departuresByStopId[stop.id] ?? [],
                             isExpanded: viewModel.expandedStopIds.contains(stop.id),
-                            selectStop: { selectStop(stop) },
-                            toggleExpansion: { toggleExpansion(stop.id) }
+                            selectStop: { actions.selectStop(stop) },
+                            toggleExpansion: { actions.toggleExpansion(stop.id) }
                         )
                     }
 
@@ -95,7 +92,7 @@ struct CommuteDashboardView: View {
                                 markerColor: .blue,
                                 referenceLocation: viewModel.nearby.referenceLocation
                             ) {
-                                selectStop(stop)
+                                actions.selectStop(stop)
                             }
                         }
 
@@ -129,7 +126,7 @@ struct CommuteDashboardView: View {
                     markerColor: .blue,
                     referenceLocation: viewModel.nearby.referenceLocation
                 ) {
-                    selectStop(stop)
+                    actions.selectStop(stop)
                 }
             }
         }

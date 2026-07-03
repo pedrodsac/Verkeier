@@ -5,9 +5,7 @@ struct SearchView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Binding var query: String
     let viewModel: SearchPresentationModel
-    let updateSearch: () -> Void
-    let selectStop: (Stop) -> Void
-    let cancel: () -> Void
+    let actions: SearchActions
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
@@ -20,7 +18,7 @@ struct SearchView: View {
                     stops: viewModel.nearbySuggestions,
                     isLoading: viewModel.isLoadingNearbySuggestions,
                     referenceLocation: viewModel.referenceLocation,
-                    selectStop: selectStop
+                    selectStop: actions.selectStop
                 )
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             } else if viewModel.results.isEmpty {
@@ -43,7 +41,7 @@ struct SearchView: View {
         )
         .onAppear {
             isSearchFocused = true
-            updateSearch()
+            actions.updateSearch()
         }
     }
 
@@ -51,7 +49,7 @@ struct SearchView: View {
         HStack(spacing: 12) {
             searchField
 
-            Button("Cancel", action: cancel)
+            Button("Cancel", action: actions.cancel)
                 .font(.body)
                 .foregroundStyle(.blue)
         }
@@ -67,13 +65,13 @@ struct SearchView: View {
                 .textInputAutocapitalization(.words)
                 .autocorrectionDisabled()
                 .focused($isSearchFocused)
-                .onSubmit(updateSearch)
+                .onSubmit(actions.updateSearch)
                 .accessibilityLabel("Stop search")
 
             if !query.isEmpty {
                 Button {
                     query = ""
-                    updateSearch()
+                    actions.updateSearch()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(.tertiary)
@@ -99,7 +97,7 @@ struct SearchView: View {
                         markerColor: .blue,
                         accessorySystemName: "arrow.right"
                     ) {
-                        selectStop(stop)
+                        actions.selectStop(stop)
                     }
                 }
             }
@@ -157,8 +155,6 @@ private struct NearbySearchSuggestions: View {
             isLoadingNearbySuggestions: false,
             referenceLocation: nil
         ),
-        updateSearch: {},
-        selectStop: { _ in },
-        cancel: {}
+        actions: SearchActions()
     )
 }
