@@ -30,22 +30,28 @@ struct RouteTimelineBuilderTests {
         to: String,
         line: String = "T1",
         mode: TransportMode = .tram,
+        headsign: String? = nil,
         platform: String? = nil,
         delay: Int? = nil,
-        status: RouteLegLiveStatus = .scheduled
+        status: RouteLegLiveStatus = .scheduled,
+        transferWarning: String? = nil,
+        departure: Double = 100,
+        arrival: Double = 900
     ) -> RoutePlan.Leg {
         RoutePlan.Leg(
             id: id,
             mode: mode,
             transportKind: .transit,
             routeName: line,
+            headsign: headsign,
             origin: point(from),
             destination: point(to),
-            departureTime: Date(timeIntervalSince1970: 100),
-            arrivalTime: Date(timeIntervalSince1970: 900),
+            departureTime: Date(timeIntervalSince1970: departure),
+            arrivalTime: Date(timeIntervalSince1970: arrival),
             platform: platform,
             delayMinutes: delay,
-            liveStatus: status
+            liveStatus: status,
+            transferWarning: transferWarning
         )
     }
 
@@ -138,10 +144,108 @@ struct RouteTimelineBuilderTests {
         #expect(places[1].platform == "2")
         #expect(places[1].delayMinutes == 3)
         #expect(places[1].showsDelayBadge)
-        #expect(places[1].time == Date(timeIntervalSince1970: 100)) // boarding (departure) time
+        #expect(places[1].departureTime == Date(timeIntervalSince1970: 100)) // boarding (departure) time
 
         // The final place has no outgoing leg: arrival time, no badge.
         #expect(places.last?.showsDelayBadge == false)
-        #expect(places.last?.time == Date(timeIntervalSince1970: 900))
+        #expect(places.last?.arrivalTime == Date(timeIntervalSince1970: 900))
+    }
+
+    // MARK: - Roles
+
+    private func places(_ legs: [RoutePlan.Leg]) -> [PlaceNode] {
+        RouteTimelineBuilder.items(from: legs).compactMap { if case let .place(p) = $0 { p } else { nil } }
+    }
+
+    private func segments(_ legs: [RoutePlan.Leg]) -> [SegmentNode] {
+        RouteTimelineBuilder.items(from: legs).compactMap { if case let .segment(s) = $0 { s } else { nil } }
+    }
+
+    @Test func rolesFollowJourneyPositionAndMode() {
+        // walk → ride → walk: origin, board, alight, destination.
+        let roles = places([
+            walk("w1", from: "origin", to: "stop"),
+            transit("t1", from: "stop", to: "dest"),
+            walk("w2", from: "dest", to: "door")
+        ]).map(\.role)
+        #expect(roles == [.origin, .board, .alight, .destination])
+    }
+
+    @Test func directRideToRideIsATransfer() {
+        // ride → ride at the same stop: origin, transfer, destination.
+        let roles = places([
+            transit("t1", from: "a", to: "b"),
+            transit("t2", from: "b", to: "c", line: "16", mode: .bus)
+        ]).map(\.role)
+        #expect(roles == [.origin, .transfer, .destination])
+    }
+
+    @Test func walkConnectedTransferSplitsIntoAlightAndBoard() {
+        let roles = places([
+            transit("t1", from: "a", to: "b"),
+            walk("w", from: "b", to: "b2", minutes: 3),
+            transit("t2", from: "b2", to: "c", line: "16", mode: .bus)
+        ]).map(\.role)
+        #expect(roles == [.origin, .alight, .board, .destination])
+    }
+
+    // MARK: - Transfer arrival / departure / wait
+
+    @Test func transferPlaceCarriesArrivalDepartureAndWait() {
+        let legs = [
+            transit("t1", from: "a", to: "b", departure: 0, arrival: 900), // arrives 15:15 → t+900
+            transit("t2", from: "b", to: "c", line: "16", mode: .bus, departure: 1200, arrival: 2000)
+        ]
+        let transferPlace = places(legs)[1]
+        #expect(transferPlace.role == .transfer)
+        #expect(transferPlace.arrivalTime == Date(timeIntervalSince1970: 900))
+        #expect(transferPlace.departureTime == Date(timeIntervalSince1970: 1200))
+        #expect(transferPlace.waitMinutes == 5) // (1200 - 900) / 60
+    }
+
+    @Test func noWaitWhenArrivalAndDepartureCoincide() {
+        let legs = [
+            transit("t1", from: "a", to: "b", departure: 0, arrival: 900),
+            transit("t2", from: "b", to: "c", line: "16", mode: .bus, departure: 900, arrival: 1500)
+        ]
+        #expect(places(legs)[1].waitMinutes == nil)
+    }
+
+    // MARK: - Tight-transfer warning relocation
+
+    @Test func tightTransferWarningLandsOnTheBoardingPlace() {
+        let legs = [
+            transit("t1", from: "a", to: "b", departure: 0, arrival: 900),
+            transit(
+                "t2", from: "b", to: "c", line: "16", mode: .bus,
+                transferWarning: "Only 1 min to change", departure: 1000, arrival: 1600
+            )
+        ]
+        let allPlaces = places(legs)
+        #expect(allPlaces[0].transferWarning == nil) // origin never warns
+        #expect(allPlaces[1].transferWarning == "Only 1 min to change") // the transfer where t2 is boarded
+        #expect(allPlaces[2].transferWarning == nil) // destination
+    }
+
+    // MARK: - Headsign (no destination fallback)
+
+    @Test func headsignIsPassedThroughButNeverFallsBackToStopName() {
+        let withHeadsign = segments([transit("t1", from: "a", to: "b", headsign: "Luxexpo")])[0]
+        #expect(withHeadsign.headsign == "Luxexpo")
+
+        // No headsign in the feed ⇒ nil, not the alighting stop's name.
+        let withoutHeadsign = segments([transit("t2", from: "a", to: "b")])[0]
+        #expect(withoutHeadsign.headsign == nil)
+    }
+
+    // MARK: - Id stability (per-leg alert wiring depends on these)
+
+    @Test func itemIdsAreStablePlaceAndSegmentIndices() {
+        let legs = [
+            walk("w1", from: "origin", to: "stop"),
+            transit("t1", from: "stop", to: "dest")
+        ]
+        let ids = RouteTimelineBuilder.items(from: legs).map(\.id)
+        #expect(ids == ["place-0", "segment-0", "place-1", "segment-1", "place-2"])
     }
 }

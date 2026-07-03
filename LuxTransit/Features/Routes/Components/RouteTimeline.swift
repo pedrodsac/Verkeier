@@ -1,85 +1,11 @@
 import SwiftUI
 
-// MARK: - RouteTimelineSummaryCard
-
-/// A summary card at the top of the route timeline showing the chosen option's
-/// ribbon, total duration, and arrival time.
-struct RouteTimelineSummaryCard: View {
-    let option: RouteOption
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // Header row: time range + duration
-            HStack(alignment: .firstTextBaseline, spacing: 0) {
-                Text(timeRangeText)
-                    .font(.callout.weight(.bold))
-                    .foregroundStyle(.primary)
-
-                Text("  ·  \(durationText)")
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(.secondary)
-
-                Spacer(minLength: 8)
-
-                RouteOptionBadge(status: option.status(at: .now))
-            }
-
-            // Mode/line ribbon
-            RouteRibbon(legs: option.plan.legs)
-
-            // Footer: transfer count + distance
-            Text(footerText)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .padding(14)
-        .background(
-            .background.opacity(0.86),
-            in: RoundedRectangle(cornerRadius: 18, style: .continuous)
-        )
-        .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.blue.opacity(0.35), lineWidth: 1)
-        }
-    }
-
-    private var timeRangeText: String {
-        let dep = option.firstTransitDepartureTime
-        let arr = option.arrivalTime
-        switch (dep, arr) {
-        case let (.some(d), .some(a)):
-            return "\(d.formatted(date: .omitted, time: .shortened)) – \(a.formatted(date: .omitted, time: .shortened))"
-        case let (.some(d), .none):
-            return d.formatted(date: .omitted, time: .shortened)
-        default:
-            return "Scheduled route"
-        }
-    }
-
-    private var durationText: String {
-        let minutes = max(1, Int(((option.plan.expectedTravelTime ?? 0) / 60).rounded()))
-        return "\(minutes) min"
-    }
-
-    private var footerText: String {
-        let transfers = switch option.transferCount {
-        case 0: "Direct"
-        case 1: "1 transfer"
-        default: "\(option.transferCount) transfers"
-        }
-        let meters = option.plan.distanceMeters ?? 0
-        let dist = meters >= 1000
-            ? String(format: "%.1f km", meters / 1000)
-            : "\(Int(meters)) m"
-        return "\(transfers)  ·  \(dist)"
-    }
-}
-
 // MARK: - RouteLegList
 
 /// The place-centric vertical timeline for a selected route: an alternating list
-/// of station rows (dots) and segment rows (walk / transfer / ride), joined by a
-/// continuous rail. Flattened from the legs by ``RouteTimelineBuilder``.
+/// of place rows (markers) and segment rows (walk / transfer / ride), joined by a
+/// continuous rail and grouped on one card. Flattened from the legs by
+/// ``RouteTimelineBuilder``; the row and rail views live in their own files.
 struct RouteLegList: View {
     let legs: [RoutePlan.Leg]
     /// Active disruptions per transit leg, keyed by leg index string (matching
@@ -107,266 +33,10 @@ struct RouteLegList: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(14)
+            .cardSurface(radius: Radius.card)
         }
     }
-}
-
-// MARK: - Place row
-
-private struct TimelinePlaceRow: View {
-    let node: PlaceNode
-
-    // Vertical centre of the first text line, so the dot/time anchor to the
-    // top line when a stop name wraps. Scales with Dynamic Type.
-    // ponytail: tuned to subheadline line height; nudge if the dot drifts off the time.
-    @ScaledMetric(relativeTo: .subheadline) private var firstLineCentre: CGFloat = 11
-
-    var body: some View {
-        HStack(alignment: .top, spacing: RouteTimelineLayout.columnSpacing) {
-            TimelineRail(above: node.railAbove, below: node.railBelow, dot: true, junctionFromTop: firstLineCentre)
-                .frame(width: RouteTimelineLayout.railColumnWidth)
-
-            HStack(alignment: .firstTextBaseline, spacing: 5) {
-                Text(node.time?.formatted(date: .omitted, time: .shortened) ?? "")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
-                    .monospacedDigit()
-                if node.showsDelayBadge {
-                    Text(delayText)
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(delayColor)
-                        .monospacedDigit()
-                }
-            }
-            .frame(width: RouteTimelineLayout.timeColumnWidth, alignment: .leading)
-
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(node.name)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-                Spacer(minLength: 4)
-                if let platform = node.platform, !platform.isEmpty {
-                    Text("Plat. \(platform)")
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-        .frame(minHeight: RouteTimelineLayout.placeRowHeight)
-        .accessibilityElement(children: .combine)
-    }
-
-    private var delayText: String {
-        if node.liveStatus == .cancelled { return "Cancelled" }
-        let mins = node.delayMinutes ?? 0
-        return mins > 0 ? "+\(mins)" : "\(mins)"
-    }
-
-    private var delayColor: Color {
-        switch node.liveStatus {
-        case .live: .green
-        case .delayed: .orange
-        case .cancelled: .red
-        case .scheduled, .unknown: .secondary
-        }
-    }
-}
-
-// MARK: - Segment row
-
-private struct TimelineSegmentRow: View {
-    let node: SegmentNode
-    var alerts: [AlertMessage] = []
-
-    var body: some View {
-        HStack(alignment: .center, spacing: RouteTimelineLayout.columnSpacing) {
-            TimelineRail(above: node.rail, below: node.rail, dot: false)
-                .frame(width: RouteTimelineLayout.railColumnWidth)
-
-            VStack(alignment: .leading, spacing: 4) {
-                content
-                if let warning = node.transferWarning {
-                    Label(warning, systemImage: "exclamationmark.triangle.fill")
-                        .font(.footnote.weight(.medium))
-                        .foregroundStyle(.orange)
-                }
-                if !alerts.isEmpty {
-                    Label("Disruption", systemImage: "exclamationmark.triangle.fill")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(.orange)
-                        .accessibilityLabel("Disruption affects this leg")
-                }
-            }
-            .padding(.vertical, 10)
-
-            Spacer(minLength: 0)
-        }
-        .frame(minHeight: RouteTimelineLayout.segmentRowHeight)
-        .accessibilityElement(children: .combine)
-    }
-
-    @ViewBuilder
-    private var content: some View {
-        switch node.kind {
-        case .transit:
-            HStack(spacing: 8) {
-                TimelineLineBadge(text: node.badgeText ?? node.mode.displayName, mode: node.mode)
-                if let headsign = node.headsign, !headsign.isEmpty {
-                    HStack(spacing: 4) {
-                        Image(systemName: "arrow.right")
-                            .font(.caption2.weight(.bold))
-                            .foregroundStyle(.secondary)
-                        Text(headsign)
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(.primary)
-                    }
-                }
-
-                Spacer()
-
-                if let mins = node.durationMinutes {
-                    Text("\(mins) min")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        case .walk, .transfer:
-            Label {
-                Text(walkText)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            } icon: {
-                Image(systemName: "figure.walk")
-                    .font(.subheadline)
-                    .foregroundStyle(.green)
-            }
-        }
-    }
-
-    private var walkText: String {
-        let mins = node.durationMinutes
-        if node.kind == .transfer {
-            return mins.map { "Transfer: \($0) min" } ?? "Transfer"
-        }
-        let dist = node.distanceMeters.map(distanceText)
-        switch (dist, mins) {
-        case let (.some(d), .some(m)): return "Walk: \(d) (\(m) min)"
-        case let (.some(d), .none): return "Walk: \(d)"
-        case let (.none, .some(m)): return "Walk: \(m) min"
-        case (.none, .none): return "Walk"
-        }
-    }
-
-    private func distanceText(_ meters: Double) -> String {
-        meters >= 1000
-            ? String(format: "%.1f km", meters / 1000)
-            : "\(Int(meters)) m"
-    }
-}
-
-// MARK: - Rail
-
-/// Draws one row's slice of the connecting rail: an upper half (`above`) and a
-/// lower half (`below`), each solid or dotted per ``RailStyle``, with an
-/// optional station dot centred on top. With `VStack(spacing: 0)` the per-row
-/// slices join into one continuous rail.
-private struct TimelineRail: View {
-    let above: RailStyle?
-    let below: RailStyle?
-    let dot: Bool
-    /// Where the dot and the above/below rail meet, measured from the top.
-    /// `nil` centres it — used by segment rows, where the rail just passes through.
-    var junctionFromTop: CGFloat?
-
-    var body: some View {
-        GeometryReader { proxy in
-            let midX = proxy.size.width / 2
-            let junctionY = junctionFromTop ?? proxy.size.height / 2
-            ZStack {
-                if let above {
-                    railLine(above, from: CGPoint(x: midX, y: 0), to: CGPoint(x: midX, y: junctionY))
-                }
-                if let below {
-                    railLine(below, from: CGPoint(x: midX, y: junctionY), to: CGPoint(x: midX, y: proxy.size.height))
-                }
-                if dot {
-                    Circle()
-                        .fill(dotColor)
-                        .frame(width: RouteTimelineLayout.dotSize, height: RouteTimelineLayout.dotSize)
-                        .position(x: midX, y: junctionY)
-                }
-            }
-        }
-        .accessibilityHidden(true)
-    }
-
-    private func railLine(_ style: RailStyle, from: CGPoint, to: CGPoint) -> some View {
-        Path { path in
-            path.move(to: from)
-            path.addLine(to: to)
-        }
-        .stroke(
-            color(for: style),
-            style: StrokeStyle(
-                lineWidth: RouteTimelineLayout.railWidth,
-                lineCap: .round,
-                dash: isDashed(style) ? [1, RouteTimelineLayout.railWidth * 2.5] : []
-            )
-        )
-    }
-
-    private func color(for style: RailStyle) -> Color {
-        switch style {
-        case let .transit(mode): mode.tint
-        case .walk: .green
-        }
-    }
-
-    private func isDashed(_ style: RailStyle) -> Bool {
-        if case .walk = style { return true }
-        return false
-    }
-
-    private var dotColor: Color {
-        if let above { return color(for: above) }
-        if let below { return color(for: below) }
-        return .secondary
-    }
-}
-
-// MARK: - Line badge
-
-/// A solid line badge — white label on the mode's gradient.
-// ponytail: small dup of RouteRibbon.TransitBadge; extract to shared only if a third user appears.
-private struct TimelineLineBadge: View {
-    let text: String
-    let mode: TransportMode
-
-    var body: some View {
-        Text(text)
-            .font(.callout.weight(.bold))
-            .foregroundStyle(.white)
-            .padding(.horizontal, 9)
-            .padding(.vertical, 4)
-            .background(
-                mode.tint.gradient,
-                in: RoundedRectangle(cornerRadius: 8, style: .continuous)
-            )
-    }
-}
-
-// MARK: - Layout constants
-
-private enum RouteTimelineLayout {
-    static let timeColumnWidth: CGFloat = 65
-    static let railColumnWidth: CGFloat = 24
-    static let columnSpacing: CGFloat = 10
-    static let railWidth: CGFloat = 2.5
-    static let dotSize: CGFloat = 11
-    static let placeRowHeight: CGFloat = 30
-    static let segmentRowHeight: CGFloat = 44
 }
 
 // MARK: - Previews
@@ -406,6 +76,7 @@ private enum RouteTimelineLayout {
         instruction: "Take tram T1 toward Luxexpo",
         transportKind: .transit,
         routeName: "T1",
+        headsign: "Luxexpo, Pôle d'Échange",
         origin: previewHamilius,
         destination: previewKirchberg,
         departureTime: Date().addingTimeInterval(6 * 60),
@@ -477,6 +148,7 @@ private enum RouteTimelineLayout {
                     instruction: "Take tram T1 toward Luxexpo",
                     transportKind: .transit,
                     routeName: "T1",
+                    headsign: "Luxexpo, Pôle d'Échange",
                     origin: previewHamilius,
                     destination: previewLuxexpo,
                     departureTime: Date().addingTimeInterval(6 * 60),
@@ -495,11 +167,13 @@ private enum RouteTimelineLayout {
     #Preview("Summary Card – Live", traits: .sizeThatFitsLayout) {
         RouteTimelineSummaryCard(option: previewTramOption)
             .padding()
+            .background(Color(uiColor: .systemGroupedBackground))
     }
 
     #Preview("Summary Card – Delayed", traits: .sizeThatFitsLayout) {
         RouteTimelineSummaryCard(option: previewDelayedOption)
             .padding()
+            .background(Color(uiColor: .systemGroupedBackground))
     }
 
     #Preview("Timeline – Walk + Tram + Bus + Walk", traits: .sizeThatFitsLayout) {
@@ -507,11 +181,13 @@ private enum RouteTimelineLayout {
             RouteLegList(legs: [previewWalkLeg, previewTramLeg, previewBusLeg, previewFinalWalkLeg])
                 .padding()
         }
+        .background(Color(uiColor: .systemGroupedBackground))
     }
 
     #Preview("Timeline – Delayed", traits: .sizeThatFitsLayout) {
         RouteLegList(legs: previewDelayedOption.plan.legs)
             .padding()
+            .background(Color(uiColor: .systemGroupedBackground))
     }
 
     #Preview("Timeline – Long names", traits: .sizeThatFitsLayout) {
@@ -553,6 +229,7 @@ private enum RouteTimelineLayout {
         return ScrollView {
             RouteLegList(legs: [walk, tram, previewFinalWalkLeg]).padding()
         }
+        .background(Color(uiColor: .systemGroupedBackground))
     }
 
 #endif

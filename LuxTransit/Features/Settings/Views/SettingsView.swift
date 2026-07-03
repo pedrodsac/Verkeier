@@ -112,6 +112,8 @@ struct SettingsView: View {
                 }
             }
             .listStyle(.insetGrouped)
+            // Give every settings glyph subtle layered depth without per-row changes.
+            .symbolRenderingMode(.hierarchical)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
             .searchable(

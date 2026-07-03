@@ -145,6 +145,7 @@ private struct CommuteSuggestionRow: View {
             HStack(spacing: 10) {
                 Image(systemName: "arrow.right.circle.fill")
                     .font(.title3.weight(.semibold))
+                    .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(.tint)
                     .accessibilityHidden(true)
 
@@ -168,10 +169,10 @@ private struct CommuteSuggestionRow: View {
             .padding(.horizontal, 12)
             .frame(minHeight: 52)
             .background(
-                .tint.opacity(0.1), in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .tint.opacity(0.1), in: RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
         .accessibilityLabel("Commute suggestion, \(preset.title), leave now")
     }
 }
@@ -185,6 +186,7 @@ struct AlertsSummaryRow: View {
             HStack(spacing: 10) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.subheadline.weight(.semibold))
+                    .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(.orange)
                     .accessibilityHidden(true)
                 Text(alertText)
@@ -199,10 +201,10 @@ struct AlertsSummaryRow: View {
             .padding(.horizontal, 12)
             .frame(minHeight: 44)
             .background(
-                .orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .orange.opacity(0.12), in: RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
         .accessibilityLabel(alertText)
     }
 
@@ -223,7 +225,7 @@ struct FavouriteStopDepartureCard: View {
         VStack(spacing: 0) {
             Button(action: selectStop) {
                 HStack(alignment: .top, spacing: 12) {
-                    Image(systemName: iconName)
+                    Image(systemName: stop.modes.primaryMode.symbolName)
                         .font(.headline.weight(.semibold))
                         .foregroundStyle(.white)
                         .frame(width: 38, height: 38)
@@ -256,8 +258,10 @@ struct FavouriteStopDepartureCard: View {
                                 ? "chevron.up.circle.fill" : "chevron.down.circle.fill"
                         )
                         .font(.title3.weight(.semibold))
+                        .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(.secondary)
                         .frame(width: 34, height: 34)
+                        .contentTransition(.symbolEffect(.replace))
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(isExpanded ? "Collapse departures" : "Expand departures")
@@ -287,10 +291,10 @@ struct FavouriteStopDepartureCard: View {
             }
         }
         .background(
-            .background.opacity(0.76), in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+            .background.opacity(0.76), in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
         )
         .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+            RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
                 .stroke(.separator.opacity(0.22), lineWidth: 0.5)
         }
         .animation(Animation.respectingReduceMotion(.snappy(duration: 0.22), reduceMotion), value: isExpanded)
@@ -307,13 +311,6 @@ struct FavouriteStopDepartureCard: View {
         guard departures.count > 1 else { return nil }
         let departure = departures[1]
         return "\(departure.lineName) \(departure.destination) · \(departure.status.displayText)"
-    }
-
-    private var iconName: String {
-        if stop.modes.contains(.train) { return "train.side.front.car" }
-        if stop.modes.contains(.tram) { return "tram.fill" }
-        if stop.modes.contains(.funicular) { return "cablecar.fill" }
-        return "bus.fill"
     }
 
     private var transitColor: Color {

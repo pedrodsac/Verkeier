@@ -10,9 +10,6 @@
     "%lld" : {
 
     },
-    "%lld min" : {
-
-    },
     "%lld min before" : {
 
     },
@@ -53,6 +50,9 @@
 
     },
     "Apple Maps / MapKit" : {
+
+    },
+    "Arrive" : {
 
     },
     "Arrive by…" : {
@@ -198,6 +198,9 @@
 
     },
     "Current Location" : {
+
+    },
+    "Data" : {
 
     },
     "Data Status" : {
@@ -575,6 +578,9 @@
     "Notifications" : {
 
     },
+    "Offline mode" : {
+
+    },
     "Offline timetable preview when live ATP departures are missing or delayed." : {
 
     },
@@ -675,9 +681,6 @@
 
     },
     "Plan Route" : {
-
-    },
-    "Plat. %@" : {
 
     },
     "Platform" : {
@@ -821,6 +824,9 @@
 
     },
     "Remove Label" : {
+
+    },
+    "Ride %lld min" : {
 
     },
     "Route options" : {
@@ -1125,6 +1131,9 @@
 
     },
     "Time" : {
+
+    },
+    "toward %@" : {
 
     },
     "Track departure" : {

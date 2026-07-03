@@ -27,6 +27,17 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable {
         }.min()
     }
 
+    /// Door-to-door departure of the whole journey — the effective departure of
+    /// the first leg, *including* any initial access walk. Mirrors ``arrivalTime``
+    /// so the detail timeline's first row and the summary header open on the same
+    /// minute. (``firstTransitDepartureTime`` remains the "when does my bus leave"
+    /// figure used for status and the options list.)
+    var departureTime: Date? {
+        plan.legs.first.flatMap {
+            $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime
+        }
+    }
+
     /// Arrival time at the destination, preferring realtime over scheduled.
     var arrivalTime: Date? {
         plan.legs.compactMap {

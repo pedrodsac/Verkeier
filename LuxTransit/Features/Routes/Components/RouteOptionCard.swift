@@ -20,10 +20,12 @@ struct RouteOptionCard: View {
                 HStack(alignment: .firstTextBaseline, spacing: 0) {
                     Text(timeRangeText)
                         .font(.callout.weight(.bold))
+                        .monospacedDigit()
                         .foregroundStyle(.primary)
 
                     Text("  ·  \(durationText)")
                         .font(.callout.weight(.semibold))
+                        .monospacedDigit()
                         .foregroundStyle(.secondary)
 
                     Spacer(minLength: 8)
@@ -41,14 +43,14 @@ struct RouteOptionCard: View {
                     .lineLimit(1)
             }
             .padding(14)
-            .background(cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .background(cardBackground, in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
                     .stroke(cardStroke, lineWidth: isSelected ? 1.5 : 0.5)
             }
-            .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
         .animation(Animation.respectingReduceMotion(.snappy(duration: 0.22), reduceMotion), value: isSelected)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
         .accessibilityHint("Opens route step-by-step timeline")

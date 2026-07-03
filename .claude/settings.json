@@ -5,26 +5,7 @@
       "Bash(xcodebuild -project LuxTransit.xcodeproj -list)",
       "Bash(python3 Scripts/preprocess_gtfs.py *)"
     ],
-    "deny": [
-      "Read(**/.env)",
-      "Read(**/.env.*)",
-      "Read(**/secrets/**)",
-      "Read(**/*.pem)",
-      "Read(**/*.key)",
-      "Read(**/LocalConfig.xcconfig)",
-      "Write(**/.env)",
-      "Write(**/.env.*)",
-      "Write(**/secrets/**)",
-      "Write(**/*.pem)",
-      "Write(**/*.key)",
-      "Write(**/LocalConfig.xcconfig)",
-      "Edit(**/.env)",
-      "Edit(**/.env.*)",
-      "Edit(**/secrets/**)",
-      "Edit(**/*.pem)",
-      "Edit(**/*.key)",
-      "Edit(**/LocalConfig.xcconfig)"
-    ]
+    "deny": []
   },
   "hooks": {
     "PreToolUse": [

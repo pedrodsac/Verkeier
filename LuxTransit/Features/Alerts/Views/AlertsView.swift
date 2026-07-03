@@ -7,7 +7,7 @@ struct AlertsView: View {
         VStack(alignment: .leading, spacing: 16) {
             AlertRefreshStatus(lastUpdated: viewModel.lastUpdated, isStale: viewModel.isStale)
 
-            if viewModel.isLoading && viewModel.alerts.isEmpty {
+            if viewModel.isLoading, viewModel.alerts.isEmpty {
                 DepartureLoadingCard(title: "Loading alerts")
             } else if let errorMessage = viewModel.errorMessage {
                 CompactUnavailableCard(
@@ -29,9 +29,9 @@ struct AlertsView: View {
                         }
                     }
                     .padding(.bottom, 72)
-					.frame(maxWidth: .infinity, alignment: .leading)
-				}
-			}
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
         }
     }
 }
@@ -61,7 +61,7 @@ struct AlertsView: View {
                     startsAt: .now,
                     endsAt: nil,
                     dataSource: .mock
-                ),
+                )
             ],
             isLoading: false,
             errorMessage: nil,
@@ -76,11 +76,16 @@ private struct AlertRefreshStatus: View {
     let lastUpdated: Date?
     let isStale: Bool
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: isStale ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
                 .font(.caption.weight(.semibold))
+                .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(isStale ? .orange : .green)
+                .contentTransition(.symbolEffect(.replace))
+                .animation(Animation.respectingReduceMotion(.snappy, reduceMotion), value: isStale)
                 .accessibilityHidden(true)
             Text(statusText)
                 .font(.footnote)
@@ -105,6 +110,7 @@ private struct AlertCard: View {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: iconName)
                     .font(.headline.weight(.semibold))
+                    .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(iconColor)
                     .frame(width: 36, height: 36)
                     .background(iconColor.opacity(0.14), in: Circle())
@@ -140,10 +146,10 @@ private struct AlertCard: View {
         }
         .padding(14)
         .background(
-            .background.opacity(0.78), in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+            .background.opacity(0.78), in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
         )
         .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+            RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
                 .stroke(iconColor.opacity(0.20), lineWidth: 1)
         }
         .accessibilityElement(children: .combine)

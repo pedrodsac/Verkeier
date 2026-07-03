@@ -105,4 +105,57 @@ struct RouteOptionTests {
         let leg = transitLeg(from: hamilius, to: luxexpo, departure: now.addingTimeInterval(-600))
         #expect(option(legs: [leg]).status(at: now) == .missed)
     }
+
+    // MARK: - Door-to-door departure
+
+    @Test func departureTimeIncludesLeadingAccessWalk() {
+        // A journey that starts on foot: door-to-door departure is the walk's,
+        // which is earlier than the first bus — the two must differ.
+        let walk = RoutePlan.Leg(
+            id: "walk",
+            mode: .walking,
+            transportKind: .walking,
+            origin: hamilius,
+            destination: luxexpo,
+            departureTime: Date(timeIntervalSince1970: 1000),
+            arrivalTime: Date(timeIntervalSince1970: 1300)
+        )
+        let ride = transitLeg(from: luxexpo, to: hamilius, departure: Date(timeIntervalSince1970: 1400))
+        let o = option(legs: [walk, ride])
+        #expect(o.departureTime == Date(timeIntervalSince1970: 1000)) // includes the walk
+        #expect(o.firstTransitDepartureTime == Date(timeIntervalSince1970: 1400)) // still the bus
+    }
+
+    @Test func departureTimeIsFirstTransitWhenNoAccessWalk() {
+        let ride = transitLeg(from: hamilius, to: luxexpo, departure: Date(timeIntervalSince1970: 2000))
+        #expect(option(legs: [ride]).departureTime == Date(timeIntervalSince1970: 2000))
+    }
+
+    @Test func departureTimePrefersRealtime() {
+        let ride = RoutePlan.Leg(
+            id: "ride",
+            mode: .bus,
+            transportKind: .transit,
+            routeName: "16",
+            origin: hamilius,
+            destination: luxexpo,
+            departureTime: Date(timeIntervalSince1970: 2000),
+            arrivalTime: Date(timeIntervalSince1970: 2600),
+            realtimeDepartureTime: Date(timeIntervalSince1970: 2120)
+        )
+        #expect(option(legs: [ride]).departureTime == Date(timeIntervalSince1970: 2120))
+    }
+
+    @Test func departureTimeIsNilWithoutLegs() {
+        let plan = RoutePlan(
+            id: "empty",
+            origin: hamilius,
+            destination: luxexpo,
+            expectedTravelTime: nil,
+            distanceMeters: nil,
+            legs: [],
+            dataSource: .mock
+        )
+        #expect(RouteOption(id: "o", plan: plan, mapOverlay: nil).departureTime == nil)
+    }
 }

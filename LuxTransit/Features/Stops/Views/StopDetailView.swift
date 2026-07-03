@@ -598,11 +598,16 @@ struct DepartureBoardStatus: View {
     let lastUpdated: Date?
     let isStale: Bool
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: isStale ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
                 .font(.caption2.weight(.semibold))
+                .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(isStale ? .orange : .green)
+                .contentTransition(.symbolEffect(.replace))
+                .animation(Animation.respectingReduceMotion(.snappy, reduceMotion), value: isStale)
                 .accessibilityHidden(true)
             Text(statusText)
                 .font(.caption)
@@ -626,13 +631,17 @@ private struct DepartureTimingStatus: View {
     let statusBadge: String?
     let statusColor: Color
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         VStack(alignment: .trailing, spacing: 3) {
             Text(countdownText)
                 .font(.headline.weight(.bold))
+                .monospacedDigit()
                 .foregroundStyle(countdownColor)
                 .lineLimit(1)
                 .contentTransition(.numericText())
+                .animation(Animation.respectingReduceMotion(.snappy, reduceMotion), value: countdownText)
 
             if let statusBadge {
                 HStack(spacing: 4) {
@@ -660,6 +669,7 @@ struct DepartureListRow: View {
     var cancelReminder: () -> Void = {}
 
     @Environment(AppPreferences.self) private var preferences
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: 12) {
@@ -705,6 +715,7 @@ struct DepartureListRow: View {
                     Spacer()
                 }
                 .font(.caption)
+                .monospacedDigit()
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
 
@@ -741,6 +752,7 @@ struct DepartureListRow: View {
                     Button(action: isTracked ? stopTrackingDeparture : startTrackingDeparture) {
                         Image(systemName: isTracked ? "timer.circle.fill" : "timer")
                             .font(.headline.weight(.semibold))
+                            .symbolRenderingMode(.hierarchical)
                             .foregroundStyle(isTracked ? .blue : .secondary)
                             .frame(width: 34, height: 34)
                             .background(.thinMaterial, in: Circle())
@@ -748,6 +760,8 @@ struct DepartureListRow: View {
                                 Circle().stroke(.separator.opacity(0.20), lineWidth: 0.7)
                             }
                             .contentTransition(.symbolEffect(.replace))
+                            .symbolEffect(.bounce, value: isTracked)
+                            .symbolEffectsRemoved(reduceMotion)
                             .accessibilityHidden(true)
                     }
                     .buttonStyle(.plain)
@@ -760,10 +774,10 @@ struct DepartureListRow: View {
         .padding(.vertical, 10)
         .padding(.horizontal, 12)
         .background(
-            .background.opacity(0.82), in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+            .background.opacity(0.82), in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
         )
         .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+            RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
                 .stroke(.separator.opacity(0.16), lineWidth: 0.7)
         }
         // Swipe a tracked row left to stop tracking it.
@@ -798,12 +812,16 @@ struct DepartureListRow: View {
         } label: {
             Image(systemName: isReminderActive ? "bell.badge.fill" : "bell")
                 .font(.subheadline.weight(.semibold))
+                .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(isReminderActive ? .orange : .secondary)
                 .frame(width: 34, height: 34)
                 .background(.thinMaterial, in: Circle())
                 .overlay {
                     Circle().stroke(.separator.opacity(0.20), lineWidth: 0.7)
                 }
+                .contentTransition(.symbolEffect(.replace))
+                .symbolEffect(.bounce, value: isReminderActive)
+                .symbolEffectsRemoved(reduceMotion)
                 .accessibilityHidden(true)
         }
         .accessibilityLabel(isReminderActive ? "Change departure reminder" : "Add departure reminder")

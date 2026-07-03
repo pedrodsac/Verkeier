@@ -8,10 +8,13 @@ import SwiftUI
 struct NextDepartureHeroCard: View {
     let departure: Departure
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         let kind = DepartureTransportKind(lineName: departure.lineName)
 
         TimelineView(.periodic(from: .now, by: 30)) { context in
+            let countdown = countdownText(now: context.date)
             HStack(spacing: 14) {
                 lineChip(kind: kind)
 
@@ -33,11 +36,13 @@ struct NextDepartureHeroCard: View {
                 Spacer(minLength: 8)
 
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text(countdownText(now: context.date))
+                    Text(countdown)
                         .font(.title2.weight(.bold))
+                        .monospacedDigit()
                         .foregroundStyle(delayMinutes == nil ? Color.primary : Color.orange)
                         .lineLimit(1)
                         .contentTransition(.numericText())
+                        .animation(Animation.respectingReduceMotion(.snappy, reduceMotion), value: countdown)
                     if let delay = delayMinutes {
                         Text("Delayed +\(delay)")
                             .font(.caption2.weight(.semibold))
@@ -47,12 +52,13 @@ struct NextDepartureHeroCard: View {
             }
             .padding(14)
             .background(
-                .background.opacity(0.9), in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .background.opacity(0.9), in: RoundedRectangle(cornerRadius: Radius.hero, style: .continuous)
             )
             .overlay {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                RoundedRectangle(cornerRadius: Radius.hero, style: .continuous)
                     .stroke(kind.color.opacity(0.35), lineWidth: 1)
             }
+            .shadow(color: .black.opacity(0.12), radius: 8, y: 3)
             .accessibilityElement(children: .combine)
         }
     }

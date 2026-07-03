@@ -4,8 +4,13 @@ import Foundation
 //
 // A journey of `N` legs is flattened into an alternating list of `N + 1`
 // *places* (the stations/addresses where legs meet) and `N` *segments* (the
-// walk/transfer/ride that connects them). Each item carries the rail styles it
-// needs so the SwiftUI views stay dumb. See ``RouteTimelineBuilder``.
+// walk/transfer/ride that connects them). Each item carries the rail styles and
+// derived facts it needs so the SwiftUI views stay dumb. See ``RouteTimelineBuilder``.
+//
+// Id contract: places are `"place-<index>"` and segments `"segment-<index>"`
+// (index = leg index). `RouteLegList` keys per-leg alerts off the segment ids,
+// so these strings are a stable API — changing them silently breaks alert
+// wiring. `RouteTimelineBuilderTests` pins them.
 
 /// Visual treatment for a stretch of the connecting rail.
 enum RailStyle: Equatable {
@@ -15,7 +20,7 @@ enum RailStyle: Equatable {
     case walk
 }
 
-/// One row in the timeline: a place (dot) or a segment (line + description).
+/// One row in the timeline: a place (marker) or a segment (line + description).
 enum RouteTimelineItem: Identifiable, Equatable {
     case place(PlaceNode)
     case segment(SegmentNode)
@@ -30,10 +35,30 @@ enum RouteTimelineItem: Identifiable, Equatable {
 
 /// A station / address where the journey starts, ends, or changes legs.
 struct PlaceNode: Identifiable, Equatable {
+    /// The place's part in the journey, driving its marker and typography.
+    enum Role: Equatable {
+        /// Journey start.
+        case origin
+        /// Board a transit leg after walking (or straight from the origin).
+        case board
+        /// Change directly between two rides at the same stop (arrive + depart).
+        case transfer
+        /// Get off a ride onto a final walk.
+        case alight
+        /// Journey end.
+        case destination
+    }
+
     let id: String
     let name: String
-    /// Boarding time for a place with an outgoing leg; arrival for the final place.
-    let time: Date?
+    let role: Role
+    /// Effective arrival from the incoming leg (`nil` at the origin).
+    let arrivalTime: Date?
+    /// Effective departure of the outgoing leg (`nil` at the destination).
+    let departureTime: Date?
+    /// Minutes spent here between arriving and departing, when `>= 1` — the
+    /// "N min to change" figure at a transfer.
+    let waitMinutes: Int?
     /// Realtime delay in minutes of the outgoing transit leg, when live.
     let delayMinutes: Int?
     /// Live status of the outgoing transit leg, used to colour the delay badge.
@@ -42,6 +67,10 @@ struct PlaceNode: Identifiable, Equatable {
     let showsDelayBadge: Bool
     /// Boarding platform of the outgoing transit leg, when published.
     let platform: String?
+    /// Tight-transfer warning for the leg boarded here, when at risk. The
+    /// warning belongs to the leg being *boarded* (see ``RoutePlan/Leg/transferWarning``),
+    /// so it lands on the place where you board it, not the ride segment.
+    let transferWarning: String?
     /// Rail style entering from above (`nil` for the first place).
     let railAbove: RailStyle?
     /// Rail style leaving below (`nil` for the final place).
@@ -61,11 +90,12 @@ struct SegmentNode: Identifiable, Equatable {
     let mode: TransportMode
     /// Line label for transit legs (e.g. "T1", "29").
     let badgeText: String?
-    /// Line terminus / direction name for transit legs.
+    /// Line terminus / direction for transit legs — the "toward …" name. `nil`
+    /// when the feed gives no headsign (never the alighting stop; that would
+    /// misread as "where you get off").
     let headsign: String?
     let durationMinutes: Int?
     let distanceMeters: Double?
-    let transferWarning: String?
     let rail: RailStyle
 }
 
@@ -110,11 +140,18 @@ enum RouteTimelineBuilder {
         outgoing: RoutePlan.Leg?
     ) -> PlaceNode {
         let outgoingTransit = outgoing?.transportKind == .transit ? outgoing : nil
-        // Boarding time when leaving here, otherwise the arrival from below.
-        let time = outgoing.map { departureTime(of: $0) } ?? incoming.map { arrivalTime(of: $0) } ?? nil
 
-        // Badge only when there's something to say: a non-zero delay or a cancellation.
-        // An on-time live leg shows no "+0" — on time needs no callout.
+        let arrival = incoming.flatMap { arrivalTime(of: $0) }
+        let departure = outgoing.flatMap { departureTime(of: $0) }
+
+        let wait: Int? = {
+            guard let arrival, let departure else { return nil }
+            let minutes = Int((departure.timeIntervalSince(arrival) / 60).rounded())
+            return minutes >= 1 ? minutes : nil
+        }()
+
+        // Badge only when there's something to say: a non-zero delay or a
+        // cancellation. An on-time live leg shows no "+0".
         let status = outgoingTransit?.liveStatus ?? .scheduled
         let delay = outgoingTransit?.delayMinutes ?? 0
         let showsDelayBadge = status == .cancelled || (status != .scheduled && delay != 0)
@@ -122,14 +159,31 @@ enum RouteTimelineBuilder {
         return PlaceNode(
             id: id,
             name: point.name ?? "Stop",
-            time: time,
+            role: role(incoming: incoming, outgoing: outgoing),
+            arrivalTime: arrival,
+            departureTime: departure,
+            waitMinutes: wait,
             delayMinutes: outgoingTransit?.delayMinutes,
             liveStatus: status,
             showsDelayBadge: showsDelayBadge,
             platform: outgoingTransit?.platform,
+            transferWarning: outgoingTransit?.transferWarning,
             railAbove: incoming.map(railStyle(for:)),
             railBelow: outgoing.map(railStyle(for:))
         )
+    }
+
+    /// Classifies a place from the modes of the legs meeting there. A direct
+    /// ride→ride change is a `.transfer`; a walk between two rides splits into an
+    /// `.alight` (get off) and a `.board` (get on) with the walk segment between.
+    private static func role(incoming: RoutePlan.Leg?, outgoing: RoutePlan.Leg?) -> PlaceNode.Role {
+        guard let incoming else { return .origin }
+        guard let outgoing else { return .destination }
+        switch (incoming.transportKind == .transit, outgoing.transportKind == .transit) {
+        case (true, true): return .transfer
+        case (true, false): return .alight
+        default: return .board
+        }
     }
 
     // MARK: - Segment
@@ -155,10 +209,9 @@ enum RouteTimelineBuilder {
             kind: kind,
             mode: leg.mode,
             badgeText: kind == .transit ? leg.routeName : nil,
-            headsign: kind == .transit ? (leg.headsign ?? leg.destination.name) : nil,
+            headsign: kind == .transit ? leg.headsign : nil,
             durationMinutes: durationMinutes(of: leg),
             distanceMeters: kind == .transit ? nil : leg.distanceMeters,
-            transferWarning: leg.transferWarning,
             rail: railStyle(for: leg)
         )
     }

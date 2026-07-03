@@ -14,11 +14,11 @@ struct StopListRow: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
-                Image(systemName: iconName)
+                Image(systemName: stop.modes.primaryMode.symbolName)
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)
                     .frame(width: 38, height: 38)
-                    .background(transitColor.gradient, in: RoundedRectangle(cornerRadius: 8))
+                    .background(transitColor.gradient, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -71,22 +71,11 @@ struct StopListRow: View {
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10))
-            .overlay {
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(.separator.opacity(0.35), lineWidth: 0.5)
-            }
+            .cardSurface(radius: Radius.row)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
-    }
-
-    private var iconName: String {
-        if stop.modes.contains(.train) { return "train.side.front.car" }
-        if stop.modes.contains(.tram) { return "tram.fill" }
-        if stop.modes.contains(.funicular) { return "cablecar.fill" }
-        return "bus.fill"
     }
 
     private var transitColor: Color {
