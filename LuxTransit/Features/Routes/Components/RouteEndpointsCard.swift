@@ -13,8 +13,6 @@ struct RouteEndpointsCard: View {
     let selectRouteDestination: (RoutePlace) -> Void
     let swapRouteEndpoints: () -> Void
 
-    @Environment(\.gtfsService) private var gtfsService
-    @Environment(\.placeSearchService) private var placeSearchService
     @State private var showOriginSearch = false
     @State private var showDestinationSearch = false
 
@@ -40,21 +38,13 @@ struct RouteEndpointsCard: View {
                 .stroke(.separator.opacity(0.22), lineWidth: 0.5)
         }
         .sheet(isPresented: $showOriginSearch) {
-            RouteStopSearchSheet(
-                title: "Search Origin",
-                gtfsService: gtfsService,
-                placeSearchService: placeSearchService
-            ) { place in
+            RouteStopSearchSheet(title: "Search Origin") { place in
                 selectRouteOrigin(place)
                 showOriginSearch = false
             }
         }
         .sheet(isPresented: $showDestinationSearch) {
-            RouteStopSearchSheet(
-                title: "Search Destination",
-                gtfsService: gtfsService,
-                placeSearchService: placeSearchService
-            ) { place in
+            RouteStopSearchSheet(title: "Search Destination") { place in
                 selectRouteDestination(place)
                 showDestinationSearch = false
             }
@@ -220,10 +210,10 @@ struct RouteEndpointsCard: View {
 /// POIs), reporting the chosen ``RoutePlace`` via ``onSelect``.
 private struct RouteStopSearchSheet: View {
     let title: String
-    let gtfsService: any GTFSService
-    let placeSearchService: any PlaceSearchService
     let onSelect: (RoutePlace) -> Void
 
+    @Environment(\.gtfsService) private var gtfsService
+    @Environment(\.placeSearchService) private var placeSearchService
     @Environment(\.dismiss) private var dismiss
     @State private var query = ""
     @State private var results: [RoutePlace] = []
