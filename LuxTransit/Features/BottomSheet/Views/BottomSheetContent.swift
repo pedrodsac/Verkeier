@@ -16,6 +16,11 @@ struct BottomSheetContent: View {
                 checkGTFSUpdate: actions.checkGTFSUpdate,
                 setDebugDataMode: actions.setDebugDataMode
             )
+        } else if viewModel.context == .lineDetail {
+            LineDetailView(
+                viewModel: viewModel.lineDetail,
+                actions: LineDetailActions(from: actions)
+            )
         } else {
             ScrollView {
                 switch viewModel.context {
@@ -31,6 +36,11 @@ struct BottomSheetContent: View {
                         query: $searchQuery,
                         viewModel: viewModel.search,
                         actions: SearchActions(from: actions)
+                    )
+                case .stopGroup:
+                    StopGroupView(
+                        viewModel: viewModel.stopGroup,
+                        selectStop: actions.selectStop
                     )
                 case .stopDetail:
                     StopDetailView(
@@ -48,10 +58,7 @@ struct BottomSheetContent: View {
                         openInAppleMaps: actions.openRouteInAppleMaps
                     )
                 case .lineDetail:
-                    LineDetailView(
-                        viewModel: viewModel.lineDetail,
-                        actions: LineDetailActions(from: actions)
-                    )
+                    EmptyView()
                 case .alerts:
                     AlertsView(
                         viewModel: viewModel.alerts

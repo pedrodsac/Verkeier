@@ -62,6 +62,8 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable {
         let liveStatus: RouteLegLiveStatus
         /// Non-`nil` when the transfer onto this leg is tight or at risk.
         let transferWarning: String?
+        /// Pickup/return station and availability details for a bike-share leg.
+        let bikeShareDetails: BikeShareLegDetails?
 
         init(
             id: String,
@@ -88,7 +90,8 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable {
             platform: String? = nil,
             delayMinutes: Int? = nil,
             liveStatus: RouteLegLiveStatus = .scheduled,
-            transferWarning: String? = nil
+            transferWarning: String? = nil,
+            bikeShareDetails: BikeShareLegDetails? = nil
         ) {
             self.id = id
             self.mode = mode
@@ -115,6 +118,7 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable {
             self.delayMinutes = delayMinutes
             self.liveStatus = liveStatus
             self.transferWarning = transferWarning
+            self.bikeShareDetails = bikeShareDetails
         }
     }
 
@@ -134,6 +138,13 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable {
     let dataSource: DataSource
 }
 
+/// The stations and live counts associated with one bike-share rental.
+nonisolated struct BikeShareLegDetails: Codable, Hashable, Sendable {
+    let pickupStation: BikeShareStation
+    let returnStation: BikeShareStation
+    let isAvailabilityWarning: Bool
+}
+
 /// Coarse classification of a ``RoutePlan/Leg``.
 enum RouteLegTransportKind: String, Codable, Hashable {
     /// A ride on a transit line.
@@ -142,6 +153,8 @@ enum RouteLegTransportKind: String, Codable, Hashable {
     case walking
     /// A driving segment (Apple Maps fallback).
     case automobile
+    /// A vel’OH! bike-share ride.
+    case bikeShare
     case unknown
 
     /// Human-readable name for the kind.
@@ -150,6 +163,7 @@ enum RouteLegTransportKind: String, Codable, Hashable {
         case .transit: "Transit"
         case .walking: "Walking"
         case .automobile: "Driving"
+        case .bikeShare: "Bike share"
         case .unknown: "Route"
         }
     }
@@ -162,6 +176,8 @@ enum RouteLegRoadRoutingHint: String, Codable, Hashable {
     case none
     case automobile
     case walking
+    /// MapKit walking geometry used as a bicycle-path approximation.
+    case bicycle
 }
 
 /// Live-status classification for a transit ``RoutePlan/Leg``.

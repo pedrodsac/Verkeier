@@ -10,6 +10,19 @@
     "%lld" : {
 
     },
+    "%lld min" : {
+
+    },
+    "%lld min · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld min · %2$@"
+          }
+        }
+      }
+    },
     "%lld min before" : {
 
     },
@@ -59,6 +72,9 @@
 
     },
     "Attribution" : {
+
+    },
+    "Availability may have changed" : {
 
     },
     "Avoid tight transfers" : {
@@ -145,6 +161,9 @@
     "Checks data.public.lu for a newer GTFS feed" : {
 
     },
+    "Choose a stop at this location" : {
+
+    },
     "Choose travel time" : {
 
     },
@@ -185,10 +204,10 @@
     "Close stop details" : {
 
     },
-    "Closest stops from mobiliteit.lu" : {
+    "Close stop list" : {
 
     },
-    "Collapse departures" : {
+    "Closest stops from mobiliteit.lu" : {
 
     },
     "Commute suggestion, %@, leave now" : {
@@ -207,9 +226,6 @@
 
     },
     "Default lead time" : {
-
-    },
-    "Delayed +%lld" : {
 
     },
     "Delete all favourites, recent stops, trips, and commute presets?" : {
@@ -301,9 +317,6 @@
     "Edit Label" : {
 
     },
-    "Expand departures" : {
-
-    },
     "Export support bundle" : {
 
     },
@@ -386,6 +399,9 @@
 
     },
     "GTFS Data" : {
+
+    },
+    "Information" : {
 
     },
     "Journey Alerts" : {
@@ -494,6 +510,9 @@
     "Name this trip so you can re-plan it in one tap. Use “Home → Work” for time-of-day commute suggestions." : {
 
     },
+    "Nearby" : {
+
+    },
     "Nearby Stops" : {
 
     },
@@ -524,9 +543,6 @@
           }
         }
       }
-    },
-    "Next departure" : {
-
     },
     "Night bus" : {
 
@@ -563,9 +579,6 @@
     "No favourites" : {
 
     },
-    "No live departures available" : {
-
-    },
     "No matches" : {
 
     },
@@ -579,9 +592,6 @@
 
     },
     "Offline mode" : {
-
-    },
-    "Offline timetable preview when live ATP departures are missing or delayed." : {
 
     },
     "On time" : {
@@ -826,9 +836,6 @@
     "Remove Label" : {
 
     },
-    "Ride %lld min" : {
-
-    },
     "Route options" : {
       "localizations" : {
         "de" : {
@@ -928,9 +935,6 @@
         }
       }
     },
-    "Scheduled from GTFS" : {
-
-    },
     "Search" : {
 
     },
@@ -1012,9 +1016,6 @@
       }
     },
     "Show alerts" : {
-
-    },
-    "Show line details for %@" : {
 
     },
     "Show more routes" : {
@@ -1133,9 +1134,6 @@
     "Time" : {
 
     },
-    "toward %@" : {
-
-    },
     "Track departure" : {
 
     },
@@ -1168,6 +1166,16 @@
     },
     "Upcoming Timetable" : {
 
+    },
+    "vel’OH! %@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "vel’OH! %1$@, %2$@"
+          }
+        }
+      }
     },
     "Ville de Luxembourg - AVL Autobus" : {
 

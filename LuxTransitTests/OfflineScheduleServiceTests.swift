@@ -3,6 +3,47 @@ import Testing
 @testable import LuxTransit
 
 struct OfflineScheduleServiceTests {
+    @Test func departureBoardMergerPrefersLiveAndMarksScheduledStatusUnknown() {
+        let firstDeparture = Date(timeIntervalSince1970: 1_800)
+        let live = Departure(
+            id: "live-t1",
+            stopId: "stop-1",
+            lineName: "T1",
+            destination: "Luxexpo",
+            scheduledDeparture: firstDeparture,
+            realtimeDeparture: firstDeparture.addingTimeInterval(60),
+            delayMinutes: 1,
+            platform: "2",
+            dataSource: .atpOpenAPI
+        )
+        let scheduled = [
+            OfflineScheduleDeparture(
+                id: "duplicate-t1",
+                lineName: "T1",
+                destination: "",
+                departureDate: firstDeparture,
+                platform: nil,
+                mode: .tram
+            ),
+            OfflineScheduleDeparture(
+                id: "scheduled-t1",
+                lineName: "T1",
+                destination: "Luxexpo",
+                departureDate: firstDeparture.addingTimeInterval(120),
+                platform: "2",
+                mode: .tram
+            )
+        ]
+
+        let merged = DepartureBoardMerger.merge(
+            live: [live], scheduled: scheduled, stopID: "stop-1"
+        )
+
+        #expect(merged.map(\.id) == ["live-t1", "gtfs-scheduled-t1"])
+        #expect(merged.last?.status == .unknown)
+        #expect(merged.last?.stopId == "stop-1")
+    }
+
     @Test func upcomingDeparturesUsesActiveServiceAndSortsByTime() {
         let service = OfflineScheduleService(calendar: luxCalendar)
         let stop = Stop(

@@ -37,7 +37,7 @@ struct FavouritesView: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: { stop in
-            Text(stop.name)
+            Text(stop.name.stationDisplayName)
         }
     }
 
@@ -50,7 +50,11 @@ struct FavouritesView: View {
                     .padding(.horizontal, 4)
             }
             ForEach(section.stops) { entity in
-                StopListRow(stop: entity.stop, markerColor: .yellow) {
+                StopListRow(
+                    stop: entity.stop,
+                    markerColor: .blue,
+                    surface: .favourite
+                ) {
                     selectStop(entity.stop)
                 }
                 .contextMenu {

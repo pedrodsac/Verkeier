@@ -19,6 +19,15 @@ struct StopDetailPresentationModel {
     let liveActivityStaleMessage: String
     let activeReminder: SharedTrackedDepartureReminder?
     let departureReminderErrorMessage: String?
+
+    var mergedDepartures: [Departure] {
+        guard let stop else { return departures }
+        return DepartureBoardMerger.merge(
+            live: departures,
+            scheduled: offlineScheduledDepartures,
+            stopID: stop.id
+        )
+    }
 }
 
 /// Callbacks the stop-detail sheet needs, sliced from ``TransitSheetActions``.

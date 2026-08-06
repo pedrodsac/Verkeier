@@ -23,7 +23,7 @@ struct DepartureCountdownActivityWidget: Widget {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(context.attributes.destination)
                             .font(.subheadline.weight(.semibold))
-                        Text(context.attributes.stopName)
+                        Text(context.attributes.stopName.stationDisplayName)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -56,31 +56,50 @@ private struct DepartureLockScreenView: View {
                 .frame(width: 48, height: 42)
                 .background(Color.accentColor.gradient, in: RoundedRectangle(cornerRadius: 8))
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text(context.attributes.destination)
-                    .font(.headline)
-                    .lineLimit(1)
-                Text(context.attributes.stopName)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(context.attributes.destination)
+                        .font(.headline)
+                        .lineLimit(1)
+                        .layoutPriority(1)
 
-            Spacer()
+                    Spacer(minLength: 8)
 
-            VStack(alignment: .trailing, spacing: 3) {
-                if let departureDate = context.state.displayDepartureDate {
-                    Text(timerInterval: .now ... departureDate, countsDown: true)
-                        .font(.headline.monospacedDigit())
-                } else {
-                    Text("Time unknown")
-                        .font(.caption)
+                    countdownView
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Color.accentColor.opacity(0.18), in: Capsule())
+                        .background(.thinMaterial, in: Capsule())
                 }
-                Text(context.state.statusText)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(statusColor)
+
+                HStack(alignment: .lastTextBaseline, spacing: 8) {
+                    Text(context.attributes.stopName.stationDisplayName)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+
+                    Spacer(minLength: 8)
+
+                    Text(context.state.statusText)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(statusColor)
+                        .lineLimit(1)
+                }
             }
+            .layoutPriority(1)
         }
         .padding()
+    }
+
+    @ViewBuilder
+    private var countdownView: some View {
+        if let departureDate = context.state.displayDepartureDate {
+            Text(timerInterval: .now ... departureDate, countsDown: true)
+                .font(.headline.monospacedDigit())
+        } else {
+            Text("Time unknown")
+                .font(.caption)
+        }
     }
 
     private var statusColor: Color {

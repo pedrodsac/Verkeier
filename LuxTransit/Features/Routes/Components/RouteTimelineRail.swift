@@ -25,6 +25,8 @@ struct TimelineRail: View {
         case pin
         /// A walk / transfer segment — the walking glyph on a material disc.
         case walk
+        /// A bike-share segment — the bicycle glyph on a material disc.
+        case bicycle
     }
 
     @ScaledMetric(relativeTo: .headline) private var dotSize = RouteTimelineLayout.dotSize
@@ -72,6 +74,12 @@ struct TimelineRail: View {
             Image(systemName: "figure.walk")
                 .font(.system(size: walkSize * 0.6, weight: .semibold))
                 .foregroundStyle(.green)
+                .frame(width: walkSize, height: walkSize)
+                .background(.regularMaterial, in: Circle())
+        case .bicycle:
+            Image(systemName: "bicycle")
+                .font(.system(size: walkSize * 0.6, weight: .semibold))
+                .foregroundStyle(.teal)
                 .frame(width: walkSize, height: walkSize)
                 .background(.regularMaterial, in: Circle())
         }

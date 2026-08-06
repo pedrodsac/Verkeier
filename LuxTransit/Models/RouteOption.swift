@@ -20,11 +20,15 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable {
     }
 
     /// Departure time of the first transit leg, preferring realtime over
-    /// scheduled times.
+    /// scheduled times. Bike-only plans fall back to their first leg so the
+    /// value remains useful to callers that need a journey start time.
     var firstTransitDepartureTime: Date? {
-        transitLegs.compactMap {
+        let transitDeparture = transitLegs.compactMap {
             $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime
         }.min()
+        return transitDeparture ?? plan.legs.first.flatMap {
+            $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime
+        }
     }
 
     /// Door-to-door departure of the whole journey — the effective departure of
@@ -68,6 +72,23 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable {
         }
     }
 
+    var usesBikeShare: Bool {
+        plan.legs.contains { $0.transportKind == .bikeShare }
+    }
+
+    /// True for a vel'OH! journey with only the walking access/egress legs
+    /// needed to reach its stations. Transit-bike combinations remain regular
+    /// transit options for time-range and missed-departure presentation.
+    var isVelohOnly: Bool {
+        usesBikeShare && plan.legs.allSatisfy {
+            $0.transportKind == .bikeShare || $0.transportKind == .walking
+        }
+    }
+
+    var hasBikeAvailabilityWarning: Bool {
+        plan.legs.contains { $0.bikeShareDetails?.isAvailabilityWarning == true }
+    }
+
     /// Total walking distance across all walking legs, in metres.
     var walkingDistanceMeters: Double {
         plan.legs
@@ -88,9 +109,9 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable {
 
     /// Resolves the option's status relative to a reference time.
     ///
-    /// Resolution order: cancelled → missed (first departure already gone, with
-    /// a 30s grace) → at-risk (any tight transfer) → viable (uses live data) →
-    /// scheduled-only.
+    /// Resolution order: cancelled → missed (transit first departure already
+    /// gone, with a 30s grace) → at-risk (any tight transfer) → viable (uses
+    /// live data) → scheduled-only. Vel'OH!-only plans never become missed.
     ///
     /// - Parameter now: The reference time, usually the current date.
     func status(at now: Date) -> RouteOptionStatus {
@@ -98,7 +119,8 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable {
             return .cancelled
         }
 
-        if let firstTransitDepartureTime,
+        if !isVelohOnly,
+           let firstTransitDepartureTime,
            firstTransitDepartureTime.addingTimeInterval(30) < now {
             return .missed
         }

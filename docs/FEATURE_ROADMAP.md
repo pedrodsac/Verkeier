@@ -61,7 +61,7 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 - [x] **P2** Park+Ride locations as a separate map layer <!-- ponytail: stubbed — no P+R dataset -->
 - [x] **P2** Real-time vehicle positions on the map (trains/trams as moving dots) if ATP provides location streams <!-- ponytail: stubbed — no ATP vehicle stream -->
 - [x] **P2** Disruption-affected stops highlighted on the map when an active AVL alert is linked to them
-- [x] **P2** Bike-sharing station layer (Vël'OK in Luxembourg City) as an optional overlay <!-- ponytail: stubbed — no bike-share feed -->
+- [x] **P2** vel’OH! bike-sharing stations, live bike/dock counts, and bike/transit route alternatives
 - [x] **P3** Elevation and terrain hints for walking legs <!-- ponytail: stubbed — no elevation data source -->
 
 ---

@@ -73,7 +73,6 @@ extension TransitMapScreen {
             selectLineDetailDirection: selectLineDetailDirection,
             showSettings: showSettings,
             toggleFavourite: toggleSelectedFavourite,
-            toggleFavouriteExpansion: toggleFavouriteExpansion,
             refreshDepartures: refreshDepartures,
             refreshAlerts: refreshAlerts,
             calculateRoute: calculateRoute,
@@ -114,6 +113,12 @@ extension TransitMapScreen {
             await viewModel.updateSelectedStopRoutes(using: gtfsService)
             await viewModel.loadOfflineScheduledDepartures(using: gtfsService)
             await viewModel.loadGTFSMapStops(using: gtfsService, location: locationService.currentLocation)
+        }
+    }
+
+    func selectStopGroup(_ stops: [Stop], _ bikeShareStations: [BikeShareStation]) {
+        animateSheetChange {
+            viewModel.selectStopGroup(stops, bikeShareStations: bikeShareStations)
         }
     }
 
@@ -229,12 +234,6 @@ extension TransitMapScreen {
     func showSettings() {
         animateSheetChange {
             viewModel.showSettings()
-        }
-    }
-
-    func toggleFavouriteExpansion(_ stopId: String) {
-        animateSheetChange {
-            viewModel.toggleFavouriteExpansion(stopId: stopId)
         }
     }
 

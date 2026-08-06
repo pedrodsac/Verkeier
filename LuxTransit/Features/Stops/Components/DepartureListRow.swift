@@ -12,7 +12,6 @@ struct DepartureListRow: View {
     var cancelReminder: () -> Void = {}
 
     @Environment(AppPreferences.self) private var preferences
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: 12) {
@@ -34,11 +33,10 @@ struct DepartureListRow: View {
             )
 
             VStack(alignment: .leading, spacing: 4) {
-                VStack {
-                    Text(departure.destination)
-                        .font(.body.weight(.semibold))
-                        .lineLimit(1)
-                }
+                OverflowMarqueeText(
+                    text: departure.destination.isEmpty ? "Destination unknown" : departure.destination,
+                    font: .body.weight(.semibold)
+                )
 
                 if isLastOfDay {
                     Text("Last service today")
@@ -48,10 +46,10 @@ struct DepartureListRow: View {
                 }
 
                 HStack(spacing: 6) {
-                    Text(departureTimeText)
+                    departureTimeView
                     Divider()
                         .frame(height: 10)
-                    if let platform = departure.platform {
+                    if let platform = departure.platform, !platform.isEmpty {
                         Text("Platform \(platform)")
                     }
 
@@ -82,6 +80,8 @@ struct DepartureListRow: View {
                 }
             }
             .frame(maxWidth: .infinity)
+            .clipped()
+            .layoutPriority(0)
 
             DepartureTimingStatus(
                 countdownText: countdownText,
@@ -89,31 +89,11 @@ struct DepartureListRow: View {
                 statusBadge: statusBadge,
                 statusColor: statusColor
             )
+            .fixedSize(horizontal: true, vertical: false)
+            .layoutPriority(1)
 
-            if showsControls {
-                VStack(spacing: 8) {
-                    Button(action: isTracked ? stopTrackingDeparture : startTrackingDeparture) {
-                        Image(systemName: isTracked ? "timer.circle.fill" : "timer")
-                            .font(.headline.weight(.semibold))
-                            .symbolRenderingMode(.hierarchical)
-                            .foregroundStyle(isTracked ? .blue : .secondary)
-                            .frame(width: 34, height: 34)
-                            .background(.thinMaterial, in: Circle())
-                            .overlay {
-                                Circle().stroke(.separator.opacity(0.20), lineWidth: 0.7)
-                            }
-                            .contentTransition(.symbolEffect(.replace))
-                            .symbolEffect(.bounce, value: isTracked)
-                            .symbolEffectsRemoved(reduceMotion)
-                            .accessibilityHidden(true)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(isTracked ? "Stop tracking departure" : "Track departure")
-
-                    reminderMenu
-                }
-            }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 10)
         .padding(.horizontal, 12)
         .background(
@@ -122,6 +102,18 @@ struct DepartureListRow: View {
         .overlay {
             RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
                 .stroke(.separator.opacity(0.16), lineWidth: 0.7)
+        }
+        .contextMenu {
+            if showsControls {
+                Button(action: isTracked ? stopTrackingDeparture : startTrackingDeparture) {
+                    Label(
+                        isTracked ? "Stop tracking departure" : "Track departure",
+                        systemImage: isTracked ? "timer.circle.fill" : "timer"
+                    )
+                }
+
+                reminderContextMenu
+            }
         }
         // Swipe a tracked row left to stop tracking it.
         .gesture(
@@ -138,7 +130,7 @@ struct DepartureListRow: View {
         .accessibilityElement(children: .combine)
     }
 
-    private var reminderMenu: some View {
+    private var reminderContextMenu: some View {
         Menu {
             let defaultMinutes = preferences.defaultReminderLeadTimeMinutes
             Button("Remind \(defaultMinutes) min before (default)") {
@@ -153,21 +145,11 @@ struct DepartureListRow: View {
                 Button("Cancel reminder", role: .destructive, action: cancelReminder)
             }
         } label: {
-            Image(systemName: isReminderActive ? "bell.badge.fill" : "bell")
-                .font(.subheadline.weight(.semibold))
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(isReminderActive ? .orange : .secondary)
-                .frame(width: 34, height: 34)
-                .background(.thinMaterial, in: Circle())
-                .overlay {
-                    Circle().stroke(.separator.opacity(0.20), lineWidth: 0.7)
-                }
-                .contentTransition(.symbolEffect(.replace))
-                .symbolEffect(.bounce, value: isReminderActive)
-                .symbolEffectsRemoved(reduceMotion)
-                .accessibilityHidden(true)
+            Label(
+                isReminderActive ? "Change departure reminder" : "Add departure reminder",
+                systemImage: isReminderActive ? "bell.badge.fill" : "bell"
+            )
         }
-        .accessibilityLabel(isReminderActive ? "Change departure reminder" : "Add departure reminder")
     }
 
     private var departureDate: Date? {
@@ -176,6 +158,25 @@ struct DepartureListRow: View {
 
     private var departureTimeText: String {
         departureDate?.formatted(date: .omitted, time: .shortened) ?? "Time unknown"
+    }
+
+    @ViewBuilder
+    private var departureTimeView: some View {
+        if case .delayed = departure.status,
+           let scheduledDeparture = departure.scheduledDeparture,
+           let realtimeDeparture = departure.realtimeDeparture {
+            Text(formattedTime(scheduledDeparture))
+                .strikethrough()
+                .foregroundStyle(.secondary)
+            Text(formattedTime(realtimeDeparture))
+                .foregroundStyle(.orange)
+        } else {
+            Text(departureTimeText)
+        }
+    }
+
+    private func formattedTime(_ date: Date) -> String {
+        date.formatted(date: .omitted, time: .shortened)
     }
 
     private var countdownText: String {
@@ -226,6 +227,159 @@ struct DepartureListRow: View {
 
     private var transportKind: DepartureTransportKind {
         DepartureTransportKind(lineName: departure.lineName)
+    }
+}
+
+/// Shows long one-line labels as a slow, readable marquee instead of hiding
+/// the destination behind a tail ellipsis. Shared by departure and route rows.
+/// The duplicate label makes the loop seamless, while the mask softens both
+/// edges of the visible window.
+struct OverflowMarqueeText: View {
+    let text: String
+    let font: Font
+    var initialLeadingInset: CGFloat = 0
+    /// Lets a parent that already measured the available space select the
+    /// scrolling branch. This avoids a second, slightly different width
+    /// calculation falling back to tail truncation.
+    var forceScroll = false
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var contentWidth: CGFloat = 0
+    @State private var isScrolling = false
+
+    private let copySpacing: CGFloat = 28
+    private let edgeFade: CGFloat = 16
+
+    var body: some View {
+        GeometryReader { proxy in
+            let shouldScroll = contentWidth > 0
+                && !reduceMotion
+                && (forceScroll || contentWidth > proxy.size.width + 1)
+
+            ZStack(alignment: .leading) {
+                if shouldScroll {
+                    HStack(spacing: copySpacing) {
+                        label
+                        label
+                            .accessibilityHidden(true)
+                    }
+                    .fixedSize(horizontal: true, vertical: false)
+                    // Keep the same leading inset when the duplicate copy
+                    // enters the loop. The text may still travel underneath
+                    // the overlapping line badge while moving, but it never
+                    // snaps to a different horizontal alignment at the seam.
+                    .offset(
+                        x: isScrolling
+                            ? -(contentWidth + copySpacing) + initialLeadingInset
+                            : initialLeadingInset
+                    )
+                    .animation(
+                        .linear(duration: scrollDuration)
+                            .delay(0.9)
+                            .repeatForever(autoreverses: false),
+                        value: isScrolling
+                    )
+                } else {
+                    Text(text)
+                        .font(font)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .padding(.leading, initialLeadingInset)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+            // Expand to the row's proposed height so the moving label is
+            // centered vertically instead of staying at its intrinsic top.
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity,
+                alignment: Alignment(horizontal: .leading, vertical: .center)
+            )
+            .clipped()
+            .mask {
+                if shouldScroll {
+                    LinearGradient(
+                        stops: [
+                            .init(color: .black, location: 0),
+                            .init(color: .black, location: 1 - edgeFadeLocation),
+                            .init(color: .clear, location: 1)
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                } else {
+                    Rectangle().fill(.black)
+                }
+            }
+            .onAppear {
+                restartScrolling(if: shouldScroll)
+            }
+            .onChange(of: shouldScroll) { _, newValue in
+                restartScrolling(if: newValue)
+            }
+            .onChange(of: text) { _, _ in
+                restartScrolling(if: shouldScroll)
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 20, alignment: .leading)
+        .overlay(alignment: .topLeading) {
+            Text(text)
+                .font(font)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .background {
+                    GeometryReader { proxy in
+                        Color.clear
+                            .preference(key: MarqueeTextWidthKey.self, value: proxy.size.width)
+                    }
+                }
+                .hidden()
+                .allowsHitTesting(false)
+        }
+        .onPreferenceChange(MarqueeTextWidthKey.self) { width in
+            guard abs(contentWidth - width) > 0.5 else { return }
+            contentWidth = width
+        }
+        .accessibilityLabel(text)
+    }
+
+    private var label: some View {
+        Text(text)
+            .font(font)
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
+    }
+
+    private var edgeFadeLocation: CGFloat {
+        // Keep the fade subtle for short rows while still making the moving
+        // text feel naturally clipped at the card edges.
+        min(0.14, edgeFade / max(contentWidth + copySpacing, 1))
+    }
+
+    private var scrollDuration: Double {
+        // About 51 points/second keeps stop names readable without making a
+        // long destination take an unreasonably long time to reveal itself.
+        max(7, Double(contentWidth + copySpacing + initialLeadingInset) / 51)
+    }
+
+    private func restartScrolling(if shouldScroll: Bool) {
+        isScrolling = false
+        guard shouldScroll else { return }
+
+        // Let SwiftUI render the resting position before moving to the end;
+        // this gives the first part of the destination a readable pause.
+        DispatchQueue.main.async {
+            guard !reduceMotion else { return }
+            isScrolling = true
+        }
+    }
+}
+
+private struct MarqueeTextWidthKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
     }
 }
 

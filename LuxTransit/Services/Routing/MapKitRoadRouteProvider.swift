@@ -5,6 +5,7 @@ import MapKit
 enum RoadRouteTransport: String {
     case automobile
     case walking
+    case bicycle
 }
 
 struct MapKitRoadRouteProvider: RoadRouteProviding {
@@ -57,6 +58,8 @@ extension RoadRouteTransport {
             self = .automobile
         case .walking:
             self = .walking
+        case .bicycle:
+            self = .bicycle
         }
     }
 
@@ -64,6 +67,7 @@ extension RoadRouteTransport {
         switch self {
         case .automobile: .automobile
         case .walking: .walking
+        case .bicycle: .walking
         }
     }
 }

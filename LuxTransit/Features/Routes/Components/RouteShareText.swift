@@ -20,9 +20,17 @@ extension RouteOption {
         for leg in plan.legs {
             if leg.transportKind == .transit {
                 let line = leg.routeName ?? "Transit"
-                let from = leg.origin.name ?? "?"
-                let to = leg.destination.name ?? "?"
+                let from = leg.origin.name?.stationDisplayName ?? "?"
+                let to = leg.destination.name?.stationDisplayName ?? "?"
                 lines.append("• \(line)  \(clock(leg.departureTime)) \(from) → \(clock(leg.arrivalTime)) \(to)")
+            } else if leg.transportKind == .bikeShare {
+                let from = leg.bikeShareDetails?.pickupStation.displayName
+                    ?? leg.origin.name?.stationDisplayName ?? "station"
+                let to = leg.bikeShareDetails?.returnStation.displayName
+                    ?? leg.destination.name?.stationDisplayName ?? "station"
+                let bikes = leg.bikeShareDetails?.pickupStation.bikesAvailable.map { "\($0) bikes" } ?? "availability unknown"
+                let docks = leg.bikeShareDetails?.returnStation.docksAvailable.map { "\($0) free docks" } ?? "availability unknown"
+                lines.append("• vel’OH! bike \(clock(leg.departureTime)) \(from) → \(clock(leg.arrivalTime)) \(to) (\(bikes), \(docks))")
             } else {
                 let dist = leg.distanceMeters.map {
                     $0 >= 1000 ? String(format: "%.1f km", $0 / 1000) : "\(Int($0)) m"
@@ -31,6 +39,9 @@ extension RouteOption {
             }
         }
 
+        if usesBikeShare {
+            lines.append("Bike station data: JCDecaux vel’OH!")
+        }
         lines.append("Planned with LuxTransit")
         return lines.joined(separator: "\n")
     }

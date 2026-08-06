@@ -3,3 +3,4 @@
 
 ATP_ACCESS_ID =
 AVL_MESSAGES_URL = https:/$()/web.vdl.lu/autobus/data/messages/messages.xml
+JCDECAUX_API_KEY =

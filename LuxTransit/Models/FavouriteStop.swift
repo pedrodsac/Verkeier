@@ -32,7 +32,7 @@ struct FavouriteStop: Codable, Hashable, Identifiable, Sendable {
     ) {
         self.id = id ?? stopId
         self.stopId = stopId
-        self.name = name
+        self.name = name.stationDisplayName
         self.locality = locality
         self.location = location
         self.createdAt = createdAt

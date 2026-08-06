@@ -30,6 +30,9 @@ struct Stop: Codable, Hashable, Identifiable {
     /// Human-readable stop name, e.g. `"Luxembourg, Gare Centrale"`.
     let name: String
     /// Optional town or district the stop belongs to.
+    ///
+    /// When a feed omits this field but prefixes the stop name with a
+    /// locality, the initializer derives it from that prefix.
     let locality: String?
     /// Geographic position of the stop.
     let location: LocationPoint
@@ -62,8 +65,9 @@ struct Stop: Codable, Hashable, Identifiable {
         wheelchairBoarding: WheelchairAccess = .unknown
     ) {
         self.id = id
-        self.name = name
-        self.locality = locality
+        let displayName = name.stationDisplayName
+        self.name = displayName
+        self.locality = Self.normalizedLocality(locality, from: name)
         self.location = location
         self.modes = modes
         self.dataSource = dataSource
@@ -90,8 +94,13 @@ struct Stop: Codable, Hashable, Identifiable {
         let id = try container.decode(String.self, forKey: .id)
 
         self.id = id
-        name = try container.decode(String.self, forKey: .name)
-        locality = try container.decodeIfPresent(String.self, forKey: .locality)
+        let rawName = try container.decode(String.self, forKey: .name)
+        let name = rawName.stationDisplayName
+        self.name = name
+        locality = Self.normalizedLocality(
+            try container.decodeIfPresent(String.self, forKey: .locality),
+            from: rawName
+        )
         location = try container.decode(LocationPoint.self, forKey: .location)
         modes = try container.decode([TransportMode].self, forKey: .modes)
         dataSource = try container.decode(DataSource.self, forKey: .dataSource)
@@ -109,6 +118,53 @@ struct Stop: Codable, Hashable, Identifiable {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
         return normalized.isEmpty ? [fallbackId] : Array(dictOrderedSet: normalized)
+    }
+
+    /// The rider-facing name without a locality prefix that is already shown
+    /// separately in the UI.
+    nonisolated var displayName: String {
+        let cleanedName = name.stationDisplayName
+        let trimmedName = cleanedName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let locality,
+              !locality.isEmpty,
+              trimmedName.count > locality.count + 1 else {
+            return cleanedName
+        }
+
+        let prefix = "\(locality),"
+        guard trimmedName.prefix(prefix.count).caseInsensitiveCompare(prefix) == .orderedSame else {
+            return cleanedName
+        }
+
+        let strippedName = trimmedName.dropFirst(prefix.count)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return strippedName.isEmpty ? cleanedName : String(strippedName)
+    }
+
+    private nonisolated static func normalizedLocality(_ locality: String?, from name: String) -> String? {
+        if let locality = locality?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !locality.isEmpty {
+            return locality
+        }
+
+        let firstComponent = name
+            .components(separatedBy: ",")
+            .first?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if let firstComponent, !firstComponent.isEmpty, name.contains(",") {
+            return firstComponent
+        }
+
+        guard name.contains("(") else { return nil }
+        let nameWithoutQualifier = name
+            .components(separatedBy: "(")
+            .first?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? name
+        guard let separator = nameWithoutQualifier.lastIndex(of: "-") else { return nil }
+
+        let inferredLocality = nameWithoutQualifier[nameWithoutQualifier.index(after: separator)...]
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return inferredLocality.isEmpty ? nil : String(inferredLocality)
     }
 }
 

@@ -94,6 +94,12 @@ struct TimelinePlaceRow: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
+            if let bikeAvailabilityText {
+                Text(bikeAvailabilityText)
+                    .font(.footnote)
+                    .foregroundStyle(bikeAvailabilityColor)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             if let warning = node.transferWarning {
                 Label(warning, systemImage: "exclamationmark.triangle.fill")
                     .font(.footnote.weight(.semibold))
@@ -113,6 +119,30 @@ struct TimelinePlaceRow: View {
             parts.append("\(wait) min to change")
         }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+
+    private var bikeAvailabilityText: String? {
+        guard let station = node.bikeShareStation else { return nil }
+        switch node.bikeShareStationRole {
+        case .pickup:
+            guard let count = station.bikesAvailable else { return nil }
+            return "\(count) bikes available"
+        case .returnStation:
+            guard let count = station.docksAvailable else { return nil }
+            return "\(count) spots available for return"
+        case nil:
+            return nil
+        }
+    }
+
+    private var bikeAvailabilityColor: Color {
+        switch node.bikeShareStationRole {
+        case .pickup where node.bikeShareStation?.bikesAvailable == 0,
+             .returnStation where node.bikeShareStation?.docksAvailable == 0:
+            return .orange
+        default:
+            return .secondary
+        }
     }
 
     // MARK: - Role styling
@@ -179,6 +209,7 @@ struct TimelinePlaceRow: View {
             var s = "Board at \(node.name)"
             if let platform = node.platform, !platform.isEmpty { s += ", platform \(platform)" }
             if let depart { s += ", departs \(depart)" }
+            if let bikeAvailabilityText { s += ". \(bikeAvailabilityText)" }
             s += "."
             if node.showsDelayBadge { s += " \(delaySpoken)." }
             if let warning = node.transferWarning { s += " Warning: \(warning)." }
@@ -194,9 +225,13 @@ struct TimelinePlaceRow: View {
             if let warning = node.transferWarning { s += " Warning: \(warning)." }
             return s
         case .alight:
-            return "Get off at \(node.name)\(arrive.map { ", arrives \($0)" } ?? "")."
+            var s = "Get off at \(node.name)\(arrive.map { ", arrives \($0)" } ?? "")."
+            if let bikeAvailabilityText { s += " \(bikeAvailabilityText)." }
+            return s
         case .destination:
-            return "Arrive at \(node.name)\(arrive.map { " at \($0)" } ?? "")."
+            var s = "Arrive at \(node.name)\(arrive.map { " at \($0)" } ?? "")."
+            if let bikeAvailabilityText { s += " \(bikeAvailabilityText)." }
+            return s
         }
     }
 

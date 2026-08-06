@@ -143,6 +143,12 @@ enum RoutingError: Error, Equatable {
 `RouteOption` wraps a `RoutePlan` and computed properties: `transferCount`,
 `walkingDistanceMeters`, `usesLiveData`, `status(at:)`.
 
+`BikeShareService` provides vel’OH! static station data and on-demand dynamic
+availability. The public-transport routing engine merges direct bike journeys
+and bike rentals into walking gaps around transit legs. Bike legs carry pickup
+and return station counts in `BikeShareLegDetails` so route cards, timelines,
+and map annotations can show the same snapshot.
+
 ---
 
 ## GTFSUpdateError — `LuxTransit/Services/GTFS/GTFSUpdateError.swift`

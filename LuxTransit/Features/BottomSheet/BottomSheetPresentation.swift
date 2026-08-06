@@ -4,6 +4,7 @@ import Foundation
 struct TransitSheetPresentationModel {
     let context: TransitSheetContext
     let nearby: NearbyStopsPresentationModel
+    let stopGroup: StopGroupPresentationModel
     let commute: CommuteDashboardViewModel
     let search: SearchPresentationModel
     let stopDetail: StopDetailPresentationModel
@@ -25,7 +26,6 @@ struct TransitSheetActions {
     let selectLineDetailDirection: (String) -> Void
     let showSettings: () -> Void
     let toggleFavourite: () -> Void
-    let toggleFavouriteExpansion: (String) -> Void
     let refreshDepartures: () async -> Void
     let refreshAlerts: () -> Void
     let calculateRoute: () -> Void
@@ -60,6 +60,13 @@ struct NearbyStopsPresentationModel {
     var routesByStopId: [String: [TransitRoute]] = [:]
 }
 
+struct StopGroupPresentationModel {
+    let stops: [Stop]
+    let bikeShareStations: [BikeShareStation]
+    let referenceLocation: CLLocation?
+    let routesByStopId: [String: [TransitRoute]]
+}
+
 // MARK: - Search
 
 struct SearchPresentationModel {
@@ -67,6 +74,7 @@ struct SearchPresentationModel {
     let nearbySuggestions: [Stop]
     let isLoadingNearbySuggestions: Bool
     let referenceLocation: CLLocation?
+    var recentStops: [Stop] = []
 }
 
 /// Callbacks the search sheet needs, sliced from ``TransitSheetActions``.

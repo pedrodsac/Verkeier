@@ -43,7 +43,7 @@ private struct DeparturesSummaryWidgetView: View {
             }
 
             if let stop = entry.selectedStop {
-                Text(stop.name)
+                Text(stop.name.stationDisplayName)
                     .font(.title3.weight(.semibold))
                     .lineLimit(1)
                 Text("Open LuxTransit for live ATP departures, delay updates, and cancellation details.")

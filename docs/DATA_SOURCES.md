@@ -103,3 +103,25 @@ MapKit is the visual/routing layer. ATP is the live departure layer.
 
 Do not claim ATP provides full route planning.
 Do not claim Apple Maps exposes all live transit data as raw API data.
+
+## JCDecaux vel’OH! bike sharing
+
+Purpose:
+
+- static Luxembourg City station identities and coordinates
+- live station status, available bikes, and free docking stands
+- route-planner bike legs before, after, or between public-transport legs
+
+Sources:
+
+- static stations: `https://developer.jcdecaux.com/rest/vls/stations/luxembourg.csv`
+- dynamic stations: `https://api.jcdecaux.com/vls/v1/stations?contract=luxembourg`
+
+Implementation rules:
+
+- refresh the 12 KB static CSV at app startup and retain the last valid snapshot
+- refresh dynamic availability when calculating or explicitly refreshing a route
+- keep the API key in ignored local build configuration; never commit or log it
+- zero or unknown bike/dock counts remain selectable but are shown as warnings
+- MapKit walking geometry is used as a documented bicycle-path approximation;
+  bicycle duration uses a 15 km/h estimate plus pickup/return overhead

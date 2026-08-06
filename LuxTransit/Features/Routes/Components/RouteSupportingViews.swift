@@ -131,7 +131,6 @@ struct RouteOptionSkeletonRow: View {
 #if DEBUG
 #Preview(traits: .sizeThatFitsLayout) {
     VStack(spacing: 12) {
-        RouteInfoBanner(title: "Refreshing routes", systemImage: "arrow.trianglehead.clockwise")
         RouteStatusMessage(text: "Fastest option from your current location.")
         RouteOptionSkeletonRow()
         RouteOptionSkeletonRow()

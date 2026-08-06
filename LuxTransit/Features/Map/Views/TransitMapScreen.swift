@@ -12,6 +12,7 @@ struct TransitMapScreen: View {
     @Environment(\.gtfsService) var gtfsService
     @Environment(\.gtfsUpdateController) var gtfsUpdateController
     @Environment(\.routeService) var routeService
+    @Environment(\.bikeShareService) private var bikeShareService
     @Environment(\.accessibilityReduceMotion) var reduceMotion
     @Environment(\.avlClient) var avlClient
     @Environment(\.liveActivityManager) var liveActivityManager
@@ -28,6 +29,7 @@ struct TransitMapScreen: View {
     @State var shouldCenterOnNextLocation = false
     @State var isMainSheetPresented = true
     @State var favouriteStopIds: Set<String> = []
+    @State private var bikeShareStations: [BikeShareStation] = []
     @AppStorage("hasCompletedOnboarding") var hasCompletedOnboarding = false
 
     let locationService: LocationService
@@ -86,6 +88,9 @@ struct TransitMapScreen: View {
         .task {
             viewModel.loadRoutePlanner()
             locationService.startUpdatingIfAllowed()
+            await bikeShareService.refreshStaticStations()
+            await bikeShareService.refreshAvailability()
+            bikeShareStations = await bikeShareService.snapshot()?.stations ?? []
             await viewModel.loadGTFSMapStops(
                 using: gtfsService, location: locationService.currentLocation
             )
@@ -181,9 +186,11 @@ struct TransitMapScreen: View {
                 selectedStopId: viewModel.selectedStop?.id,
                 favouriteStopIds: favouriteStopIds,
                 alertStopIds: Set(viewModel.alerts.flatMap(\.affectedStopIds)),
+                bikeShareStations: mapBikeShareStations,
                 routeOverlay: viewModel.activeMapOverlay
             ),
             selectStop: selectStop,
+            selectStopGroup: selectStopGroup,
             regionDidChange: scheduleMapRegionUpdate
         )
         .ignoresSafeArea()
@@ -198,6 +205,30 @@ struct TransitMapScreen: View {
     func stopsForMode(_ stops: [Stop]) -> [Stop] {
         guard let mode = viewModel.mapModeFilter else { return stops }
         return stops.filter { $0.modes.contains(mode) }
+    }
+
+    var selectedBikeShareStations: [BikeShareStation] {
+        guard let option = viewModel.selectedRouteOption else { return [] }
+        var seen = Set<String>()
+        return option.plan.legs.compactMap { $0.bikeShareDetails }
+            .flatMap { [$0.pickupStation, $0.returnStation] }
+            .filter { seen.insert($0.id).inserted }
+    }
+
+    var mapBikeShareStations: [BikeShareStation] {
+        var stations = bikeShareStations
+        var indexByID = Dictionary(uniqueKeysWithValues: stations.enumerated().map { ($1.id, $0) })
+
+        for station in selectedBikeShareStations {
+            if let index = indexByID[station.id] {
+                stations[index] = station
+            } else {
+                indexByID[station.id] = stations.endIndex
+                stations.append(station)
+            }
+        }
+
+        return stations
     }
 
     var favouriteStops: [Stop] {

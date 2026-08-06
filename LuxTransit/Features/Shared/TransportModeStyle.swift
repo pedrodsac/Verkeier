@@ -13,6 +13,7 @@ extension TransportMode {
         case .tram: "tram.fill"
         case .bus: "bus.fill"
         case .funicular: "cablecar.fill"
+        case .bicycle: "bicycle"
         case .walking: "figure.walk"
         case .unknown: "tram.fill"
         }
@@ -25,6 +26,7 @@ extension TransportMode {
         case .tram: .orange
         case .bus: .blue
         case .funicular: .purple
+        case .bicycle: .teal
         case .walking: .green
         case .unknown: .secondary
         }

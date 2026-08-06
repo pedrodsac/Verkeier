@@ -11,6 +11,8 @@ extension TransitMapViewModel {
     func showHome() {
         sheetContext = .home
         sheetDetent = .medium
+        selectedStopGroup = []
+        selectedBikeShareStations = []
         clearRoute()
         clearLineDetail()
     }
@@ -67,11 +69,4 @@ extension TransitMapViewModel {
         selectedLineDetailDirectionID = directionID
     }
 
-    func toggleFavouriteExpansion(stopId: String) {
-        if expandedFavouriteStopIds.contains(stopId) {
-            expandedFavouriteStopIds.remove(stopId)
-        } else {
-            expandedFavouriteStopIds.insert(stopId)
-        }
-    }
 }

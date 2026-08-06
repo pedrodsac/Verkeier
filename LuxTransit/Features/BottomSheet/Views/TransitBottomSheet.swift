@@ -37,8 +37,10 @@ struct TransitBottomSheet: View {
             viewModel.commute.hasFavourites ? "Commute" : "Nearby"
         case .search:
             "Search"
+        case .stopGroup:
+            "Stops at this location"
         case .stopDetail:
-            viewModel.stopDetail.stop?.name ?? "Selected Stop"
+            viewModel.stopDetail.stop?.displayName ?? "Selected Stop"
         case .directions:
             "Directions"
         case .routeTimeline:
@@ -54,94 +56,99 @@ struct TransitBottomSheet: View {
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            leadingToolbarView
+        }
+        ToolbarItemGroup(placement: .topBarTrailing) {
+            trailingToolbarView
+        }
+    }
+
+    @ViewBuilder
+    private var leadingToolbarView: some View {
         switch viewModel.context {
         case .home:
-            if viewModel.commute.activeAlertCount > 0 {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: actions.showAlerts) {
-                        Label("Show alerts", systemImage: "exclamationmark.triangle.fill")
-                    }
-                    .tint(.orange)
-                }
-            }
+            EmptyView()
 
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: actions.showSettings) {
-                    Label("Settings and diagnostics", systemImage: "gearshape")
-                }
-            }
-
-        case .search:
-            ToolbarItem(placement: .topBarTrailing) {
-                EmptyView()
+        case .stopGroup:
+            Button(action: actions.showHome) {
+                Label("Close stop list", systemImage: "chevron.down")
             }
 
         case .stopDetail:
-            ToolbarItem(placement: .topBarLeading) {
-                Button(action: actions.showHome) {
-                    Label("Close stop details", systemImage: "chevron.down")
-                }
-            }
-
-            ToolbarItem(placement: .topBarTrailing) {
-                let isFavourite = viewModel.stopDetail.isFavourite
-                Button(action: actions.toggleFavourite) {
-                    Label(
-                        isFavourite ? "Remove favourite" : "Save favourite",
-                        systemImage: isFavourite ? "star.fill" : "star"
-                    )
-                }
-                .tint(isFavourite ? .yellow : nil)
+            Button(action: actions.showHome) {
+                Label("Close stop details", systemImage: "chevron.down")
             }
 
         case .directions:
-            ToolbarItem(placement: .topBarLeading) {
-                Button(action: actions.showStopDetail) {
-                    Label("Back to stop", systemImage: "chevron.left")
-                }
-            }
-
-            ToolbarItem(placement: .topBarTrailing) {
-                RoutePlanningTimeButton(
-                    current: viewModel.route.planningTime,
-                    onChange: actions.setRoutePlanningTime
-                )
+            Button(action: actions.showStopDetail) {
+                Label("Back to stop", systemImage: "chevron.left")
             }
 
         case .routeTimeline:
-            ToolbarItem(placement: .topBarLeading) {
-                Button(action: actions.showRouteOptions) {
-                    Label("Back to route options", systemImage: "chevron.left")
-                }
+            Button(action: actions.showRouteOptions) {
+                Label("Back to route options", systemImage: "chevron.left")
             }
 
         case .lineDetail:
-            ToolbarItem(placement: .topBarLeading) {
-                Button(action: actions.showStopDetail) {
-                    Label("Back to stop", systemImage: "chevron.left")
-                }
+            Button(action: actions.showStopDetail) {
+                Label("Back to stop", systemImage: "chevron.left")
             }
+
+        case .search:
+            EmptyView()
 
         case .alerts:
-            ToolbarItem(placement: .topBarLeading) {
-                Button(action: actions.showHome) {
-                    Label("Close alerts", systemImage: "chevron.down")
-                }
-            }
-
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: actions.refreshAlerts) {
-                    Label("Refresh alerts", systemImage: "arrow.clockwise")
-                }
-                .disabled(viewModel.alerts.isLoading)
+            Button(action: actions.showHome) {
+                Label("Close alerts", systemImage: "chevron.down")
             }
 
         case .settings:
-            ToolbarItem(placement: .topBarLeading) {
-                Button(action: actions.showHome) {
-                    Label("Close settings", systemImage: "chevron.down")
-                }
+            Button(action: actions.showHome) {
+                Label("Close settings", systemImage: "chevron.down")
             }
+        }
+    }
+
+    @ViewBuilder
+    private var trailingToolbarView: some View {
+        switch viewModel.context {
+        case .home:
+            if viewModel.commute.activeAlertCount > 0 {
+                Button(action: actions.showAlerts) {
+                    Label("Show alerts", systemImage: "exclamationmark.triangle.fill")
+                }
+                .tint(.orange)
+            }
+
+            Button(action: actions.showSettings) {
+                Label("Settings and diagnostics", systemImage: "gearshape")
+            }
+
+        case .search, .stopGroup, .routeTimeline, .lineDetail, .settings:
+            EmptyView()
+
+        case .stopDetail:
+            let isFavourite = viewModel.stopDetail.isFavourite
+            Button(action: actions.toggleFavourite) {
+                Label(
+                    isFavourite ? "Remove favourite" : "Save favourite",
+                    systemImage: isFavourite ? "star.fill" : "star"
+                )
+            }
+            .tint(isFavourite ? .yellow : nil)
+
+        case .directions:
+            RoutePlanningTimeButton(
+                current: viewModel.route.planningTime,
+                onChange: actions.setRoutePlanningTime
+            )
+
+        case .alerts:
+            Button(action: actions.refreshAlerts) {
+                Label("Refresh alerts", systemImage: "arrow.clockwise")
+            }
+            .disabled(viewModel.alerts.isLoading)
         }
     }
 }

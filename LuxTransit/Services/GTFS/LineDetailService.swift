@@ -52,7 +52,7 @@ struct LineDetailService {
             guard let sample = groupedTrips[key]?.first else { return nil }
             return LineDetailDirection(
                 id: key,
-                title: directionTitle(for: sample, route: routeEntry),
+                title: directionTitle(for: sample, route: routeEntry).stationDisplayName,
                 subtitle: sample.directionId.map { "Direction \($0)" }
             )
         }
@@ -83,7 +83,7 @@ struct LineDetailService {
             guard let stop = stopEntriesById[stopTime.stopId] else { return nil }
             return LineStopSequenceEntry(
                 id: stop.id,
-                name: stop.name,
+                name: stop.name.stationDisplayName,
                 platform: stop.platformCode,
                 location: stop.location
             )
@@ -247,8 +247,9 @@ struct LineDetailService {
                 return LineTimetableEntry(
                     id: "\(trip.id)-\(stopTime.stopId)",
                     departureTime: departureTime,
-                    originName: stopEntriesById[originStopId]?.name ?? "Origin",
-                    destinationName: stopEntriesById[destinationStopId]?.name ?? (trip.headsign ?? "Destination")
+                    originName: stopEntriesById[originStopId]?.name.stationDisplayName ?? "Origin",
+                    destinationName: stopEntriesById[destinationStopId]?.name.stationDisplayName
+                        ?? trip.headsign?.stationDisplayName ?? "Destination"
                 )
             }
             .sorted { $0.departureTime < $1.departureTime }
@@ -265,8 +266,8 @@ struct LineDetailService {
         guard let earliest = activeTrips.compactMap(\.stopTimes.first?.departureSeconds).min(),
               let latest = activeTrips.compactMap(\.stopTimes.last?.arrivalSeconds).max(),
               let firstTrip = activeTrips.first,
-              let originName = firstTrip.stopTimes.first.flatMap({ stopEntriesById[$0.stopId]?.name }),
-              let destinationName = firstTrip.stopTimes.last.flatMap({ stopEntriesById[$0.stopId]?.name }) else {
+              let originName = firstTrip.stopTimes.first.flatMap({ stopEntriesById[$0.stopId]?.name.stationDisplayName }),
+              let destinationName = firstTrip.stopTimes.last.flatMap({ stopEntriesById[$0.stopId]?.name.stationDisplayName }) else {
             return "Static timetable preview"
         }
 

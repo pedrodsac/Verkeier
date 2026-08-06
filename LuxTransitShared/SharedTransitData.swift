@@ -56,7 +56,7 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
 
     nonisolated init(id: String, name: String, locality: String?, platformIds: [String]? = nil) {
         self.id = id
-        self.name = name
+        self.name = name.stationDisplayName
         self.locality = locality
         self.platformIds = Self.normalizedPlatformIds(platformIds, fallbackId: id)
     }
@@ -73,7 +73,7 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
         let id = try container.decode(String.self, forKey: .id)
 
         self.id = id
-        name = try container.decode(String.self, forKey: .name)
+        name = try container.decode(String.self, forKey: .name).stationDisplayName
         locality = try container.decodeIfPresent(String.self, forKey: .locality)
         platformIds = Self.normalizedPlatformIds(
             try container.decodeIfPresent([String].self, forKey: .platformIds),
@@ -139,7 +139,7 @@ struct SharedTrackedDepartureReminder: Codable, Hashable, Sendable {
     ) {
         self.departureId = departureId
         self.stopId = stopId
-        self.stopName = stopName
+        self.stopName = stopName.stationDisplayName
         self.lineName = lineName
         self.destination = destination
         self.scheduledDeparture = scheduledDeparture
@@ -156,7 +156,7 @@ struct SharedTrackedDepartureReminder: Codable, Hashable, Sendable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         departureId = try container.decode(String.self, forKey: .departureId)
         stopId = try container.decode(String.self, forKey: .stopId)
-        stopName = try container.decode(String.self, forKey: .stopName)
+        stopName = try container.decode(String.self, forKey: .stopName).stationDisplayName
         lineName = try container.decode(String.self, forKey: .lineName)
         destination = try container.decode(String.self, forKey: .destination)
         scheduledDeparture = try container.decodeIfPresent(Date.self, forKey: .scheduledDeparture)

@@ -46,7 +46,9 @@ extension PublicTransportRoutingEngine {
         let departure = date(seconds: boardTime.departureSeconds, from: context.serviceStart)
         let arrival = date(seconds: alightTime.arrivalSeconds, from: context.serviceStart)
         let routeName = route.shortName.isEmpty ? route.longName : route.shortName
-        let destinationName = alightTime.headsign ?? trip.headsign ?? alightStop.name
+        let destinationName = alightTime.headsign?.stationDisplayName
+            ?? trip.headsign?.stationDisplayName
+            ?? alightStop.name.stationDisplayName
         let coordinates: [RouteMapCoordinate]
         let roadRoutingHint: RouteLegRoadRoutingHint
         if route.transportMode == .bus,
@@ -182,8 +184,8 @@ extension PublicTransportRoutingEngine {
         realtimeArrivalTime: Date? = nil,
         platform: String? = nil,
         delayMinutes: Int? = nil,
-        liveStatus: RouteLegLiveStatus? = nil,
-        transferWarning: String? = nil,
+            liveStatus: RouteLegLiveStatus? = nil,
+            transferWarning: String? = nil,
         mapCoordinates: [RouteMapCoordinate]? = nil
     ) -> RoutePlan.Leg {
         RoutePlan.Leg(
@@ -211,7 +213,8 @@ extension PublicTransportRoutingEngine {
             platform: platform ?? leg.platform,
             delayMinutes: delayMinutes ?? leg.delayMinutes,
             liveStatus: liveStatus ?? leg.liveStatus,
-            transferWarning: transferWarning ?? leg.transferWarning
+            transferWarning: transferWarning ?? leg.transferWarning,
+            bikeShareDetails: leg.bikeShareDetails
         )
     }
 

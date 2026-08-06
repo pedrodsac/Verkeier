@@ -9,6 +9,7 @@ struct LuxTransitApp: App {
     @State private var preferences = AppPreferences.shared
     private let configuration: AppConfiguration
     private let gtfsService: any GTFSService
+    private let bikeShareService: any BikeShareService
     private let modelContainer: ModelContainer
     @State private var liveActivityManager = LiveActivityManager()
     @State private var departureReminderService = DepartureReminderService()
@@ -19,6 +20,7 @@ struct LuxTransitApp: App {
         let configuration = AppConfiguration.current
         self.configuration = configuration
         gtfsService = LocalGTFSService()
+        bikeShareService = JCDecauxBikeShareService(configuration: configuration)
         modelContainer = AppModelContainer.make()
     }
 
@@ -30,6 +32,7 @@ struct LuxTransitApp: App {
                 .environment(\.gtfsService, gtfsService)
                 .environment(\.gtfsUpdateController, gtfsUpdateController)
                 .environment(\.routeService, routeService)
+                .environment(\.bikeShareService, bikeShareService)
                 .environment(\.avlClient, avlClient)
                 .environment(\.liveActivityManager, liveActivityManager)
                 .environment(\.departureReminderService, departureReminderService)
@@ -37,11 +40,13 @@ struct LuxTransitApp: App {
                 .environment(preferences)
                 .modelContainer(modelContainer)
                 .preferredColorScheme(preferences.appearance.colorScheme)
-                .task { GTFSBackgroundRefresh.schedule() }
+                .task {
+                    GTFSBackgroundRefresh.schedule()
+                }
         }
         .backgroundTask(.appRefresh(GTFSBackgroundRefresh.identifier)) {
             await GTFSBackgroundRefresh.run()
-            GTFSBackgroundRefresh.schedule()
+            await GTFSBackgroundRefresh.schedule()
         }
     }
 
@@ -85,6 +90,7 @@ struct LuxTransitApp: App {
         PublicTransportRouteService(
             gtfsService: gtfsService,
             atpClient: atpClient,
+            bikeShareService: bikeShareService,
             offlineMode: preferences.offlineMode
         )
     }

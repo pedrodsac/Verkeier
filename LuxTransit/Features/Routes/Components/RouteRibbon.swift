@@ -13,7 +13,11 @@ struct RouteRibbon: View {
     let legs: [RoutePlan.Leg]
 
     private var displayLegs: [RoutePlan.Leg] {
-        legs.filter { $0.transportKind == .transit || $0.transportKind == .walking }
+        legs.filter {
+            $0.transportKind == .transit
+                || $0.transportKind == .walking
+                || $0.transportKind == .bikeShare
+        }
     }
 
     var body: some View {
@@ -45,6 +49,8 @@ struct RouteRibbon: View {
                 routeName: leg.routeName ?? leg.mode.displayName,
                 mode: leg.mode
             )
+        case .bikeShare:
+            TransitBadge(routeName: "vel’OH!", mode: .bicycle)
         case .walking:
             WalkingSegment(minutes: walkMinutes(for: leg))
         default:

@@ -33,6 +33,12 @@ enum RouteTimelineItem: Identifiable, Equatable {
     }
 }
 
+/// Which side of a vel'OH! rental a place represents.
+enum BikeSharePlaceRole: Equatable {
+    case pickup
+    case returnStation
+}
+
 /// A station / address where the journey starts, ends, or changes legs.
 struct PlaceNode: Identifiable, Equatable {
     /// The place's part in the journey, driving its marker and typography.
@@ -71,6 +77,10 @@ struct PlaceNode: Identifiable, Equatable {
     /// warning belongs to the leg being *boarded* (see ``RoutePlan/Leg/transferWarning``),
     /// so it lands on the place where you board it, not the ride segment.
     let transferWarning: String?
+    /// The vel'OH! station at this place, when it is a pickup or return point.
+    let bikeShareStation: BikeShareStation?
+    /// Whether the station is used to pick up a bike or return one.
+    let bikeShareStationRole: BikeSharePlaceRole?
     /// Rail style entering from above (`nil` for the first place).
     let railAbove: RailStyle?
     /// Rail style leaving below (`nil` for the final place).
@@ -83,6 +93,7 @@ struct SegmentNode: Identifiable, Equatable {
         case walk
         case transfer
         case transit
+        case bikeShare
     }
 
     let id: String
@@ -97,6 +108,7 @@ struct SegmentNode: Identifiable, Equatable {
     let durationMinutes: Int?
     let distanceMeters: Double?
     let rail: RailStyle
+    let bikeShareDetails: BikeShareLegDetails?
 }
 
 // MARK: - Builder
@@ -155,6 +167,20 @@ enum RouteTimelineBuilder {
         let status = outgoingTransit?.liveStatus ?? .scheduled
         let delay = outgoingTransit?.delayMinutes ?? 0
         let showsDelayBadge = status == .cancelled || (status != .scheduled && delay != 0)
+        let pickupStation = outgoing?.transportKind == .bikeShare
+            ? outgoing?.bikeShareDetails?.pickupStation
+            : nil
+        let returnStation = incoming?.transportKind == .bikeShare
+            ? incoming?.bikeShareDetails?.returnStation
+            : nil
+        let bikeShareStation = pickupStation ?? returnStation
+        let bikeShareStationRole: BikeSharePlaceRole? = if pickupStation != nil {
+            .pickup
+        } else if returnStation != nil {
+            .returnStation
+        } else {
+            nil
+        }
 
         return PlaceNode(
             id: id,
@@ -168,6 +194,8 @@ enum RouteTimelineBuilder {
             showsDelayBadge: showsDelayBadge,
             platform: outgoingTransit?.platform,
             transferWarning: outgoingTransit?.transferWarning,
+            bikeShareStation: bikeShareStation,
+            bikeShareStationRole: bikeShareStationRole,
             railAbove: incoming.map(railStyle(for:)),
             railBelow: outgoing.map(railStyle(for:))
         )
@@ -196,6 +224,8 @@ enum RouteTimelineBuilder {
     ) -> SegmentNode {
         let kind: SegmentNode.Kind = if leg.transportKind == .transit {
             .transit
+        } else if leg.transportKind == .bikeShare {
+            .bikeShare
         } else if leg.transportKind == .walking,
                   prev?.transportKind == .transit, next?.transportKind == .transit {
             // A walk wedged between two rides is a transfer, not an access walk.
@@ -208,18 +238,21 @@ enum RouteTimelineBuilder {
             id: id,
             kind: kind,
             mode: leg.mode,
-            badgeText: kind == .transit ? leg.routeName : nil,
+            badgeText: kind == .transit ? leg.routeName : (kind == .bikeShare ? "vel’OH!" : nil),
             headsign: kind == .transit ? leg.headsign : nil,
             durationMinutes: durationMinutes(of: leg),
             distanceMeters: kind == .transit ? nil : leg.distanceMeters,
-            rail: railStyle(for: leg)
+            rail: railStyle(for: leg),
+            bikeShareDetails: leg.bikeShareDetails
         )
     }
 
     // MARK: - Helpers
 
     private nonisolated static func railStyle(for leg: RoutePlan.Leg) -> RailStyle {
-        leg.transportKind == .transit ? .transit(leg.mode) : .walk
+        leg.transportKind == .transit || leg.transportKind == .bikeShare
+            ? .transit(leg.mode)
+            : .walk
     }
 
     private static func departureTime(of leg: RoutePlan.Leg) -> Date? {

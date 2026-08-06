@@ -4,6 +4,259 @@ import HeapModule
 import MapKit
 
 extension PublicTransportRoutingEngine {
+    /// Builds direct vel’OH! alternatives. Bike stations are represented as
+    /// ordinary journey nodes so the result can be combined with transit
+    /// candidates by the same enrichment and presentation pipeline.
+    func bikeJourneys(
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        stations: [BikeShareStation],
+        context: RouteSearchContext
+    ) -> [ScheduledJourney] {
+        let usable = stations.filter { $0.isOpen != false }
+        guard usable.count >= 2 else { return [] }
+
+        let candidates = usable.flatMap { pickup in
+            usable.compactMap { dropoff -> ScheduledJourney? in
+                guard pickup.id != dropoff.id else { return nil }
+
+                let accessDistance = routeSearchDistanceMeters(from: origin, to: pickup.location)
+                let bikeDistance = routeSearchDistanceMeters(from: pickup.location, to: dropoff.location)
+                let egressDistance = routeSearchDistanceMeters(from: dropoff.location, to: destination)
+                guard bikeDistance >= 100 else { return nil }
+
+                let accessSeconds = walkingSeconds(for: accessDistance)
+                let bikeSeconds = max(60, Int((bikeDistance / bikeSpeedMetersPerSecond).rounded(.up)))
+                    + bikeUnlockSeconds
+                let egressSeconds = walkingSeconds(for: egressDistance)
+                let accessStart = context.currentSeconds
+                let pickupTime = accessStart + accessSeconds
+                let dropoffTime = pickupTime + bikeSeconds
+                let arrivalTime = dropoffTime + egressSeconds
+                let warning = bikeAvailabilityWarning(
+                    pickup: pickup,
+                    dropoff: dropoff
+                )
+
+                var legs: [RoutePlan.Leg] = []
+                if accessDistance > minimumWalkLegMeters {
+                    legs.append(walkingLeg(
+                        id: "bike-access-\(pickup.id)",
+                        from: origin,
+                        to: pickup.location,
+                        departureSeconds: accessStart,
+                        arrivalSeconds: pickupTime,
+                        serviceStart: context.serviceStart,
+                        distanceMeters: accessDistance,
+                        instruction: "Walk to vel’OH! station \(pickup.displayName)"
+                    ))
+                }
+
+                let bikeDetails = BikeShareLegDetails(
+                    pickupStation: pickup,
+                    returnStation: dropoff,
+                    isAvailabilityWarning: warning
+                )
+                legs.append(RoutePlan.Leg(
+                    id: "bike-\(pickup.id)-\(dropoff.id)",
+                    mode: .bicycle,
+                        instruction: "Take a vel’OH! bike to \(dropoff.displayName)",
+                    transportKind: .bikeShare,
+                    routeName: "vel’OH!",
+                    origin: pickup.location,
+                    destination: dropoff.location,
+                    departureTime: date(seconds: pickupTime, from: context.serviceStart),
+                    arrivalTime: date(seconds: dropoffTime, from: context.serviceStart),
+                    distanceMeters: bikeDistance,
+                    mapCoordinates: [RouteMapCoordinate(pickup.location), RouteMapCoordinate(dropoff.location)],
+                    roadRoutingHint: .bicycle,
+                    bikeShareDetails: bikeDetails
+                ))
+
+                if egressDistance > minimumWalkLegMeters {
+                    legs.append(walkingLeg(
+                        id: "bike-egress-\(dropoff.id)",
+                        from: dropoff.location,
+                        to: destination,
+                        departureSeconds: dropoffTime,
+                        arrivalSeconds: arrivalTime,
+                        serviceStart: context.serviceStart,
+                        distanceMeters: egressDistance,
+                        instruction: "Walk to \(destination.name ?? "your destination")"
+                    ))
+                }
+                return ScheduledJourney(legs: legs)
+            }
+        }
+
+        return candidates
+            .sorted { $0.arrivalTime < $1.arrivalTime }
+            .prefix(evaluatedCandidateLimit)
+            .map { $0 }
+    }
+
+    /// Adds bike legs to the walking gaps already present in transit journeys.
+    /// Each gap can independently become a rental, so a journey may contain
+    /// multiple rentals without introducing a separate transit search engine.
+    func mixedBikeJourneys(
+        from baseJourneys: [ScheduledJourney],
+        stations: [BikeShareStation],
+        context: RouteSearchContext
+    ) -> [ScheduledJourney] {
+        let walkIndicesByJourney = baseJourneys.map { journey in
+            journey.legs.indices.filter { journey.legs[$0].transportKind == .walking }
+        }
+        var results: [ScheduledJourney] = []
+
+        for (journeyIndex, journey) in baseJourneys.enumerated() {
+            let walkIndices = walkIndicesByJourney[journeyIndex]
+            guard !walkIndices.isEmpty else { continue }
+
+            var replacements: [Int: [RoutePlan.Leg]] = [:]
+            for index in walkIndices {
+                let walk = journey.legs[index]
+                guard let departure = walk.departureTime,
+                      let arrival = walk.arrivalTime else { continue }
+                let departureSeconds = max(
+                    context.currentSeconds,
+                    Int(departure.timeIntervalSince(context.serviceStart).rounded())
+                )
+                let deadline = Int(arrival.timeIntervalSince(context.serviceStart).rounded())
+                if let connection = bestBikeConnection(
+                    from: walk.origin,
+                    to: walk.destination,
+                    departureSeconds: departureSeconds,
+                    deadlineSeconds: deadline,
+                    stations: stations,
+                    context: context
+                ) {
+                    replacements[index] = connection
+                }
+            }
+
+            guard !replacements.isEmpty else { continue }
+            let indices = Array(replacements.keys).sorted()
+            let subsetCount = 1 << indices.count
+            for mask in 1 ..< subsetCount {
+                var legs: [RoutePlan.Leg] = []
+                for index in journey.legs.indices {
+                    guard let subsetIndex = indices.firstIndex(of: index),
+                          mask & (1 << subsetIndex) != 0,
+                          let replacement = replacements[index] else {
+                        legs.append(journey.legs[index])
+                        continue
+                    }
+                    legs.append(contentsOf: replacement)
+                }
+                results.append(ScheduledJourney(legs: legs))
+            }
+        }
+
+        return results
+            .filter { $0.legs.contains { $0.transportKind == .bikeShare } }
+            .sorted { $0.arrivalTime < $1.arrivalTime }
+            .prefix(evaluatedCandidateLimit)
+            .map { $0 }
+    }
+
+    private func bestBikeConnection(
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        departureSeconds: Int,
+        deadlineSeconds: Int?,
+        stations: [BikeShareStation],
+        context: RouteSearchContext
+    ) -> [RoutePlan.Leg]? {
+        let usable = stations.filter { $0.isOpen != false }
+        var best: ([RoutePlan.Leg], Int)?
+        for pickup in usable {
+            for dropoff in usable where pickup.id != dropoff.id {
+                let accessDistance = routeSearchDistanceMeters(from: origin, to: pickup.location)
+                let bikeDistance = routeSearchDistanceMeters(from: pickup.location, to: dropoff.location)
+                let egressDistance = routeSearchDistanceMeters(from: dropoff.location, to: destination)
+                guard bikeDistance >= 100 else { continue }
+                let accessSeconds = walkingSeconds(for: accessDistance)
+                let bikeSeconds = max(60, Int((bikeDistance / bikeSpeedMetersPerSecond).rounded(.up)))
+                    + bikeUnlockSeconds
+                let egressSeconds = walkingSeconds(for: egressDistance)
+                let pickupTime = departureSeconds + accessSeconds
+                let dropoffTime = pickupTime + bikeSeconds
+                let arrivalSeconds = dropoffTime + egressSeconds
+                if let deadlineSeconds, arrivalSeconds > deadlineSeconds { continue }
+                let score = arrivalSeconds
+                guard best == nil || score < best!.1 else { continue }
+
+                let warning = bikeAvailabilityWarning(
+                    pickup: pickup,
+                    dropoff: dropoff
+                )
+                var legs: [RoutePlan.Leg] = []
+                if accessDistance > minimumWalkLegMeters {
+                    legs.append(walkingLeg(
+                        id: "bike-access-\(pickup.id)-\(departureSeconds)",
+                        from: origin,
+                        to: pickup.location,
+                        departureSeconds: departureSeconds,
+                        arrivalSeconds: pickupTime,
+                        serviceStart: context.serviceStart,
+                        distanceMeters: accessDistance,
+                        instruction: "Walk to vel’OH! station \(pickup.displayName)"
+                    ))
+                }
+                legs.append(RoutePlan.Leg(
+                    id: "bike-\(pickup.id)-\(dropoff.id)-\(departureSeconds)",
+                    mode: .bicycle,
+                        instruction: "Take a vel’OH! bike to \(dropoff.displayName)",
+                    transportKind: .bikeShare,
+                    routeName: "vel’OH!",
+                    origin: pickup.location,
+                    destination: dropoff.location,
+                    departureTime: date(seconds: pickupTime, from: context.serviceStart),
+                    arrivalTime: date(seconds: dropoffTime, from: context.serviceStart),
+                    distanceMeters: bikeDistance,
+                    mapCoordinates: [RouteMapCoordinate(pickup.location), RouteMapCoordinate(dropoff.location)],
+                    roadRoutingHint: .bicycle,
+                    bikeShareDetails: BikeShareLegDetails(
+                        pickupStation: pickup,
+                        returnStation: dropoff,
+                        isAvailabilityWarning: warning
+                    )
+                ))
+                if egressDistance > minimumWalkLegMeters {
+                    legs.append(walkingLeg(
+                        id: "bike-egress-\(dropoff.id)-\(departureSeconds)",
+                        from: dropoff.location,
+                        to: destination,
+                        departureSeconds: dropoffTime,
+                        arrivalSeconds: arrivalSeconds,
+                        serviceStart: context.serviceStart,
+                        distanceMeters: egressDistance,
+                        instruction: "Walk to \(destination.name ?? "your destination")"
+                    ))
+                }
+                best = (legs, score)
+            }
+        }
+        return best?.0
+    }
+
+    private func bikeAvailabilityWarning(
+        pickup: BikeShareStation,
+        dropoff: BikeShareStation
+    ) -> Bool {
+        func isStale(_ station: BikeShareStation) -> Bool {
+            guard let lastUpdated = station.lastUpdated else { return true }
+            return Date.now.timeIntervalSince(lastUpdated) > bikeAvailabilityStaleAfter
+        }
+
+        return pickup.bikesAvailable == nil
+            || dropoff.docksAvailable == nil
+            || pickup.bikesAvailable == 0
+            || dropoff.docksAvailable == 0
+            || isStale(pickup)
+            || isStale(dropoff)
+    }
+
     func scheduledJourneys(
         from origin: LocationPoint,
         to destination: LocationPoint,

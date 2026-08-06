@@ -20,7 +20,7 @@ final class StopMapAnnotation: NSObject, MKAnnotation {
     }
 
     var title: String? {
-        stop.name
+        stop.displayName
     }
 
     init(stop: Stop, layer: Layer) {
@@ -50,6 +50,27 @@ final class RouteTransferAnnotation: NSObject, MKAnnotation {
 
     nonisolated init(marker: RouteTransferMarker) {
         self.marker = marker
+    }
+}
+
+final class BikeShareMapAnnotation: NSObject, MKAnnotation {
+    private(set) var station: BikeShareStation
+
+    var key: String { "bike-share-\(station.id)" }
+    var coordinate: CLLocationCoordinate2D { station.location.coordinate }
+    var title: String? { station.displayName }
+    var subtitle: String? {
+        let bikes = station.bikesAvailable.map { "\($0) bikes" } ?? "bikes unknown"
+        let docks = station.docksAvailable.map { "\($0) free docks" } ?? "docks unknown"
+        return "\(bikes) · \(docks)"
+    }
+
+    nonisolated init(station: BikeShareStation) {
+        self.station = station
+    }
+
+    func update(station: BikeShareStation) {
+        self.station = station
     }
 }
 
@@ -88,7 +109,7 @@ struct StopMapMarker: View {
             .contentShape(Circle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Stop \(stop.name)")
+        .accessibilityLabel("Stop \(stop.displayName)")
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 

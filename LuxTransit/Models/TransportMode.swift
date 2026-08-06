@@ -6,6 +6,8 @@ enum TransportMode: String, Codable, CaseIterable, Identifiable, Sendable {
     case tram
     case bus
     case funicular
+    /// A shared bicycle leg.
+    case bicycle
     /// An on-foot leg, used by the route planner for walking segments.
     case walking
     /// Mode could not be determined from the source feed.
@@ -20,6 +22,7 @@ enum TransportMode: String, Codable, CaseIterable, Identifiable, Sendable {
         case .tram: "Tram"
         case .bus: "Bus"
         case .funicular: "Funicular"
+        case .bicycle: "Bike"
         case .walking: "Walking"
         case .unknown: "Unknown"
         }

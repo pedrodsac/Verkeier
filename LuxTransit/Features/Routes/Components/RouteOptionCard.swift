@@ -18,15 +18,21 @@ struct RouteOptionCard: View {
             VStack(alignment: .leading, spacing: 8) {
                 // ── Header: time range / duration / status badge ──────────
                 HStack(alignment: .firstTextBaseline, spacing: 0) {
-                    Text(timeRangeText)
-                        .font(.callout.weight(.bold))
-                        .monospacedDigit()
-                        .foregroundStyle(.primary)
-
-                    Text("  ·  \(durationText)")
-                        .font(.callout.weight(.semibold))
-                        .monospacedDigit()
-                        .foregroundStyle(.secondary)
+                    if option.isVelohOnly {
+                        Text(durationText)
+                            .font(.callout.weight(.bold))
+                            .monospacedDigit()
+                            .foregroundStyle(.primary)
+                    } else {
+                        Text(timeRangeText)
+                            .font(.callout.weight(.bold))
+                            .monospacedDigit()
+                            .foregroundStyle(.primary)
+                        Text("  ·  \(durationText)")
+                            .font(.callout.weight(.semibold))
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                    }
 
                     Spacer(minLength: 8)
 
@@ -87,7 +93,11 @@ struct RouteOptionCard: View {
         }
 
         let distance = preferences.formattedDistance(option.plan.distanceMeters ?? 0)
-        let dataNote = option.usesLiveData ? "Live" : "Scheduled"
+        let dataNote = if option.usesBikeShare {
+            option.hasBikeAvailabilityWarning ? "Bike availability uncertain" : "Bike availability live"
+        } else {
+            option.usesLiveData ? "Live" : "Scheduled"
+        }
 
         return "\(transfers)  ·  \(distance)  ·  \(dataNote)"
     }
@@ -106,7 +116,10 @@ struct RouteOptionCard: View {
     }
 
     private var accessibilityLabel: String {
-        "\(timeRangeText), \(durationText). \(secondarySummary)"
+        let heading = option.isVelohOnly
+            ? durationText
+            : "\(timeRangeText), \(durationText)"
+        return "\(heading). \(secondarySummary)"
     }
 }
 

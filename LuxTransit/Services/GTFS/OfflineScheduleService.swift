@@ -16,6 +16,59 @@ struct OfflineScheduleDeparture: Identifiable, Equatable {
     let mode: TransportMode
 }
 
+/// Combines ATP's live board with timetable departures that have no live
+/// status. Live entries win when both feeds describe the same trip.
+nonisolated enum DepartureBoardMerger {
+    static func merge(
+        live: [Departure],
+        scheduled: [OfflineScheduleDeparture],
+        stopID: String
+    ) -> [Departure] {
+        var merged = live
+        var seenKeys = Set(live.map(key(for:)))
+
+        for scheduledDeparture in scheduled {
+            let departure = Departure(
+                id: "gtfs-\(scheduledDeparture.id)",
+                stopId: stopID,
+                lineName: scheduledDeparture.lineName,
+                destination: scheduledDeparture.destination,
+                scheduledDeparture: scheduledDeparture.departureDate,
+                platform: scheduledDeparture.platform,
+                isStatusUnknown: true,
+                dataSource: .gtfs
+            )
+
+            guard seenKeys.insert(key(for: departure)).inserted else { continue }
+            merged.append(departure)
+        }
+
+        return merged.sorted { lhs, rhs in
+            let lhsDate = lhs.realtimeDeparture ?? lhs.scheduledDeparture ?? .distantFuture
+            let rhsDate = rhs.realtimeDeparture ?? rhs.scheduledDeparture ?? .distantFuture
+            if lhsDate != rhsDate { return lhsDate < rhsDate }
+            return lhs.lineName.localizedStandardCompare(rhs.lineName) == .orderedAscending
+        }
+    }
+
+    private static func key(for departure: Departure) -> String {
+        let date = departure.scheduledDeparture ?? departure.realtimeDeparture
+        let minute = date.map { Int($0.timeIntervalSince1970 / 60) } ?? -1
+        return [
+            departure.lineName.normalizedForDepartureMerge,
+            String(minute)
+        ].joined(separator: "|")
+    }
+}
+
+private extension String {
+    nonisolated var normalizedForDepartureMerge: String {
+        folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            .replacingOccurrences(of: "[^a-z0-9]+", with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
 /// Computes upcoming departures for a stop purely from the offline GTFS
 /// timetable, with no network access.
 ///
@@ -80,12 +133,27 @@ struct OfflineScheduleService {
 
                     let stopEntry = stopsById[stopTime.stopId]
                     let departureDate = startOfDay.addingTimeInterval(TimeInterval(stopTime.departureSeconds))
+                    let destination = [
+                        stopTime.headsign,
+                        trip.headsign,
+                        route.longName,
+                        stop.name
+                    ]
+                    .compactMap { value in
+                        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines)
+                        return trimmed?.isEmpty == false ? trimmed : nil
+                    }
+                    .first ?? "Destination unknown"
+                    let platform = stopEntry?.platformCode.flatMap { value in
+                        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+                        return trimmed.isEmpty ? nil : trimmed
+                    }
                     return OfflineScheduleDeparture(
                         id: "\(trip.id)-\(stopTime.stopId)-\(stopTime.sequence)",
                         lineName: route.shortName,
-                        destination: stopTime.headsign ?? trip.headsign ?? route.longName ?? stop.name,
+                        destination: destination,
                         departureDate: departureDate,
-                        platform: stopEntry?.platformCode,
+                        platform: platform,
                         mode: route.transportMode
                     )
                 }

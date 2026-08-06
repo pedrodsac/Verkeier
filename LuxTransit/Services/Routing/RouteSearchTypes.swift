@@ -301,7 +301,9 @@ nonisolated struct ScheduledJourney {
 
     var firstTransitDeparture: Date {
         legs.first { $0.transportKind == .transit }
-            .flatMap { $0.scheduledDepartureTime ?? $0.departureTime } ?? .distantPast
+            .flatMap { $0.scheduledDepartureTime ?? $0.departureTime }
+            ?? legs.first.flatMap { $0.scheduledDepartureTime ?? $0.departureTime }
+            ?? .distantPast
     }
 
     /// Scheduled arrival of the first transit leg — later means the rider stays aboard
@@ -356,7 +358,9 @@ nonisolated struct RouteCandidate {
 
     var firstTransitDeparture: Date {
         legs.first { $0.transportKind == .transit }
-            .flatMap { $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime } ?? .distantPast
+            .flatMap { $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime }
+            ?? legs.first.flatMap { $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime }
+            ?? .distantPast
     }
 
     var transitLegCount: Int {

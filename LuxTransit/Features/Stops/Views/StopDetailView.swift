@@ -22,9 +22,9 @@ struct StopDetailView: View {
                     showLineDetail: actions.showLineDetail
                 )
 
-                if !viewModel.departures.isEmpty {
+                if !viewModel.mergedDepartures.isEmpty {
                     ShareLink(
-                        item: stopDeparturesShareText(stop: stop, departures: viewModel.departures)
+                        item: stopDeparturesShareText(stop: stop, departures: viewModel.mergedDepartures)
                     ) {
                         Label("Share next departures", systemImage: "square.and.arrow.up")
                             .font(.callout.weight(.medium))
@@ -65,8 +65,6 @@ struct StopDetailView: View {
                     }
 
                 StopDisruptionSection(alerts: viewModel.alerts)
-
-                OfflineScheduleSection(departures: viewModel.offlineScheduledDepartures)
 
                 Spacer(minLength: 0)
             }

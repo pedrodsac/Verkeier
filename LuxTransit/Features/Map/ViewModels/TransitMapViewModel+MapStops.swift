@@ -82,6 +82,8 @@ extension TransitMapViewModel {
     }
 
     func selectStop(_ stop: Stop, using store: RoutePlannerStore = .shared) {
+        selectedStopGroup = []
+        selectedBikeShareStations = []
         selectedStop = stop
         recentStops = store.recordRecentStop(stop)
         routeDestination = RoutePlace(stop: stop, source: .selectedStop)
@@ -101,6 +103,42 @@ extension TransitMapViewModel {
             for: stop.location.coordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.012, longitudeDelta: 0.012)
         ))
+    }
+
+    func selectStopGroup(
+        _ stops: [Stop],
+        bikeShareStations: [BikeShareStation] = []
+    ) {
+        var seen = Set<String>()
+        let uniqueStops = stops.filter { seen.insert($0.id).inserted }
+        var seenBikeShareStations = Set<String>()
+        let uniqueBikeShareStations = bikeShareStations.filter {
+            seenBikeShareStations.insert($0.id).inserted
+        }
+        guard uniqueStops.count + uniqueBikeShareStations.count > 1 else {
+            if let stop = uniqueStops.first {
+                selectStop(stop)
+            }
+            return
+        }
+
+        selectedStop = nil
+        selectedStopGroup = uniqueStops
+        selectedBikeShareStations = uniqueBikeShareStations
+        routeOrigin = nil
+        routeDestination = nil
+        clearLineDetail()
+        clearRoute()
+        sheetContext = .stopGroup
+        sheetDetent = .medium
+
+        if let coordinate = uniqueStops.first?.location.coordinate
+            ?? uniqueBikeShareStations.first?.location.coordinate {
+            moveCamera(to: anchoredRegion(
+                for: coordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.012, longitudeDelta: 0.012)
+            ))
+        }
     }
 
     func searchStops(using gtfsService: any GTFSService) async {

@@ -3,6 +3,7 @@ import SwiftUI
 enum TransitSheetContext: String, CaseIterable, Identifiable, Hashable {
     case home
     case search
+    case stopGroup
     case stopDetail
     case directions
     case routeTimeline
@@ -16,6 +17,7 @@ enum TransitSheetContext: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .home: "Commute"
         case .search: "Search"
+        case .stopGroup: "Stops at this location"
         case .stopDetail: "Selected stop"
         case .directions: "Directions"
         case .routeTimeline: "Selected route"

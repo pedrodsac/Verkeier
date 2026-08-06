@@ -16,6 +16,19 @@ struct TransitMapViewModelTests {
         #expect(viewModel.selectedDeparturePlatform == nil)
     }
 
+    @Test func selectingStopGroupShowsChooserAndDeduplicatesStops() {
+        let firstStop = makeStop(id: "stop-1")
+        let secondStop = makeStop(id: "stop-2")
+        let viewModel = TransitMapViewModel()
+
+        viewModel.selectStopGroup([firstStop, secondStop, firstStop])
+
+        #expect(viewModel.sheetContext == .stopGroup)
+        #expect(viewModel.sheetDetent == .medium)
+        #expect(viewModel.selectedStop == nil)
+        #expect(viewModel.selectedStopGroup.map(\.id) == ["stop-1", "stop-2"])
+    }
+
     @Test func selectingLineFiltersDeparturesToThatLine() {
         let viewModel = configuredViewModel()
 
@@ -680,7 +693,7 @@ private enum MockRouteError: Error {
     case unavailable
 }
 
-private final class MockRouteService: RouteService, @unchecked Sendable {
+private nonisolated final class MockRouteService: RouteService, @unchecked Sendable {
     private let result: Result<RouteCalculation, Error>
     private(set) var calculateCallCount = 0
 

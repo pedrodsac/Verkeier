@@ -10,7 +10,7 @@ struct RouteTimelineSummaryCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(timeRangeText)
+                Text(option.isVelohOnly ? (durationText ?? "Scheduled route") : timeRangeText)
                     .font(.title3.weight(.bold))
                     .monospacedDigit()
                     .foregroundStyle(.primary)
@@ -53,7 +53,9 @@ struct RouteTimelineSummaryCard: View {
         let dist = meters >= 1000
             ? String(format: "%.1f km", meters / 1000)
             : "\(Int(meters)) m"
-        return [durationText, transfers, dist].compactMap(\.self).joined(separator: "  ·  ")
+        let bikeNote = option.hasBikeAvailabilityWarning ? "Bike availability uncertain" : nil
+        let duration = option.isVelohOnly ? nil : durationText
+        return [duration, transfers, dist, bikeNote].compactMap(\.self).joined(separator: "  ·  ")
     }
 
     /// Duration from the journey's own endpoints so it always equals

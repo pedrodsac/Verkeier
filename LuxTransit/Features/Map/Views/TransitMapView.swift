@@ -12,16 +12,22 @@ struct MapViewState {
     let selectedStopId: String?
     let favouriteStopIds: Set<String>
     let alertStopIds: Set<String>
+    let bikeShareStations: [BikeShareStation]
     let routeOverlay: RouteMapOverlay?
 }
 
 struct TransitMapView: UIViewRepresentable {
     let state: MapViewState
     let selectStop: (Stop) -> Void
+    let selectStopGroup: ([Stop], [BikeShareStation]) -> Void
     let regionDidChange: (MKCoordinateRegion) -> Void
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(selectStop: selectStop, regionDidChange: regionDidChange)
+        Coordinator(
+            selectStop: selectStop,
+            selectStopGroup: selectStopGroup,
+            regionDidChange: regionDidChange
+        )
     }
 
     func makeUIView(context: Context) -> MapContainerView {
@@ -30,6 +36,7 @@ struct TransitMapView: UIViewRepresentable {
 
     func updateUIView(_ view: MapContainerView, context: Context) {
         context.coordinator.selectStop = selectStop
+        context.coordinator.selectStopGroup = selectStopGroup
         context.coordinator.regionDidChange = regionDidChange
         context.coordinator.selectedStopId = state.selectedStopId
         context.coordinator.favouriteStopIds = state.favouriteStopIds
@@ -44,6 +51,7 @@ struct TransitMapView: UIViewRepresentable {
             }
             : []
         let transferAnnotations = state.routeOverlay?.transferMarkers.map(RouteTransferAnnotation.init) ?? []
+        let bikeAnnotations = state.bikeShareStations.map(BikeShareMapAnnotation.init)
 
         view.update(
             snapshot: MapSnapshot(
@@ -51,6 +59,7 @@ struct TransitMapView: UIViewRepresentable {
                 cameraUpdateToken: state.cameraUpdateToken,
                 annotations: stopAnnotations,
                 transferAnnotations: transferAnnotations,
+                bikeShareAnnotations: bikeAnnotations,
                 selectedStopId: state.selectedStopId,
                 favouriteStopIds: state.favouriteStopIds,
                 alertStopIds: state.alertStopIds,
@@ -64,6 +73,7 @@ struct TransitMapView: UIViewRepresentable {
         let cameraUpdateToken: Int
         let annotations: [StopMapAnnotation]
         let transferAnnotations: [RouteTransferAnnotation]
+        let bikeShareAnnotations: [BikeShareMapAnnotation]
         let selectedStopId: String?
         let favouriteStopIds: Set<String>
         let alertStopIds: Set<String>
@@ -74,6 +84,9 @@ struct TransitMapView: UIViewRepresentable {
                 cameraUpdateToken: cameraUpdateToken,
                 annotationKeys: annotations.map(\.key),
                 transferAnnotationKeys: transferAnnotations.map(\.key),
+                bikeShareAnnotationKeys: bikeShareAnnotations.map {
+                    "\($0.key):\($0.station.bikesAvailable ?? -1):\($0.station.docksAvailable ?? -1)"
+                },
                 selectedStopId: selectedStopId,
                 favouriteStopIds: favouriteStopIds,
                 alertStopIds: alertStopIds,
@@ -86,6 +99,7 @@ struct TransitMapView: UIViewRepresentable {
         let cameraUpdateToken: Int
         let annotationKeys: [String]
         let transferAnnotationKeys: [String]
+        let bikeShareAnnotationKeys: [String]
         let selectedStopId: String?
         let favouriteStopIds: Set<String>
         let alertStopIds: Set<String>
@@ -156,13 +170,18 @@ struct TransitMapView: UIViewRepresentable {
 
             coordinator.syncAnnotations(snapshot.annotations, in: mapView)
             coordinator.syncTransferAnnotations(snapshot.transferAnnotations, in: mapView)
+            coordinator.syncBikeShareAnnotations(snapshot.bikeShareAnnotations, in: mapView)
             coordinator.syncRoute(snapshot.routeOverlay, in: mapView)
             appliedSnapshotKey = snapshotKey
         }
     }
 
     final class Coordinator: NSObject, MKMapViewDelegate {
+        private static let bicycleRouteColor = UIColor.systemTeal
+        private static let transitStopClusteringIdentifier = "transit-stops"
+
         var selectStop: (Stop) -> Void
+        var selectStopGroup: ([Stop], [BikeShareStation]) -> Void
         var regionDidChange: (MKCoordinateRegion) -> Void
         var selectedStopId: String?
         var favouriteStopIds: Set<String> = []
@@ -170,6 +189,7 @@ struct TransitMapView: UIViewRepresentable {
         var isApplyingRegion = false
         private var annotationsByKey: [String: StopMapAnnotation] = [:]
         private var transferAnnotationsByKey: [String: RouteTransferAnnotation] = [:]
+        private var bikeShareAnnotationsByKey: [String: BikeShareMapAnnotation] = [:]
         private var routeOverlay: RouteMapOverlay?
         private var routePolylines: [MKPolyline] = []
         private var routePolylineSegments: [ObjectIdentifier: RouteMapSegment] = [:]
@@ -179,9 +199,11 @@ struct TransitMapView: UIViewRepresentable {
 
         init(
             selectStop: @escaping (Stop) -> Void,
+            selectStopGroup: @escaping ([Stop], [BikeShareStation]) -> Void,
             regionDidChange: @escaping (MKCoordinateRegion) -> Void
         ) {
             self.selectStop = selectStop
+            self.selectStopGroup = selectStopGroup
             self.regionDidChange = regionDidChange
         }
 
@@ -242,6 +264,28 @@ struct TransitMapView: UIViewRepresentable {
             }
         }
 
+        func syncBikeShareAnnotations(
+            _ annotations: [BikeShareMapAnnotation],
+            in mapView: MKMapView
+        ) {
+            let nextKeys = Set(annotations.map(\.key))
+            let staleKeys = Set(bikeShareAnnotationsByKey.keys).subtracting(nextKeys)
+            let stale = staleKeys.compactMap { bikeShareAnnotationsByKey.removeValue(forKey: $0) }
+            mapView.removeAnnotations(stale)
+
+            for annotation in annotations {
+                if let existing = bikeShareAnnotationsByKey[annotation.key] {
+                    existing.update(station: annotation.station)
+                    if let view = mapView.view(for: existing) as? MKMarkerAnnotationView {
+                        view.annotation = existing
+                    }
+                    continue
+                }
+                bikeShareAnnotationsByKey[annotation.key] = annotation
+                mapView.addAnnotation(annotation)
+            }
+        }
+
         func syncRoute(_ overlay: RouteMapOverlay?, in mapView: MKMapView) {
             if routeOverlay == overlay {
                 return
@@ -278,6 +322,18 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, didSelect annotation: MKAnnotation) {
+            if let cluster = annotation as? MKClusterAnnotation {
+                let stops = cluster.memberAnnotations.compactMap { annotation in
+                    (annotation as? StopMapAnnotation)?.stop
+                }
+                let bikeShareStations = cluster.memberAnnotations.compactMap { annotation in
+                    (annotation as? BikeShareMapAnnotation)?.station
+                }
+                selectStopGroup(stops, bikeShareStations)
+                mapView.deselectAnnotation(annotation, animated: true)
+                return
+            }
+
             guard let annotation = annotation as? StopMapAnnotation else { return }
             selectStop(annotation.stop)
             mapView.deselectAnnotation(annotation, animated: true)
@@ -296,6 +352,23 @@ struct TransitMapView: UIViewRepresentable {
                     )
                 view.annotation = annotation
                 configureTransfer(view, for: annotation)
+                return view
+            }
+
+            if let annotation = annotation as? BikeShareMapAnnotation {
+                let identifier = "BikeShareMapAnnotation"
+                let view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+                    as? MKMarkerAnnotationView
+                    ?? MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                view.annotation = annotation
+                view.markerTintColor = Self.bicycleRouteColor
+                view.glyphImage = UIImage(systemName: "bicycle")
+                view.glyphTintColor = .white
+                view.titleVisibility = .visible
+                view.subtitleVisibility = .visible
+                view.displayPriority = .defaultHigh
+                view.clusteringIdentifier = Self.transitStopClusteringIdentifier
+                view.canShowCallout = true
                 return view
             }
 
@@ -362,6 +435,8 @@ struct TransitMapView: UIViewRepresentable {
                 ]
             case .funicular:
                 [.systemTeal]
+            case .bicycle:
+                [Self.bicycleRouteColor]
             case .walking:
                 [.secondaryLabel]
             case .unknown:
@@ -410,10 +485,13 @@ struct TransitMapView: UIViewRepresentable {
             view.displayPriority = isSelected ? .required : .defaultHigh
             view.canShowCallout = false
             // Native clustering for dense regular stops; selected / favourite /
-            // alert markers stay unclustered so they're always visible.
+            // alert markers stay unclustered so they're always visible. Use a
+            // unique non-nil identifier for the latter instead of assigning
+            // `nil`: on iOS 27's MapKit simulator, clearing this property on a
+            // reused marker can throw an Objective-C dictionary exception.
             view.clusteringIdentifier = (isSelected || isFavourite || hasAlert)
-                ? nil
-                : "stop-\(annotation.layer)"
+                ? "stop-single-\(annotation.key)"
+                : Self.transitStopClusteringIdentifier
         }
 
         private func markerColor(

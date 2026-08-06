@@ -6,6 +6,7 @@ import MapKit
 actor PublicTransportRoutingEngine {
     let gtfsService: any GTFSService
     let atpClient: any ATPClient
+    let bikeShareService: any BikeShareService
     let roadRouteProvider: any RoadRouteProviding
     let now: @Sendable () -> Date
     let calendar: Calendar
@@ -25,6 +26,10 @@ actor PublicTransportRoutingEngine {
     let arriveByLookbackSeconds: TimeInterval = 3 * 60 * 60
     let maximumTransitLegs = 3
     let walkingSpeedMetersPerSecond = 1.33
+    /// Estimated vel’OH! speed because MapKit has no bicycle directions API.
+    let bikeSpeedMetersPerSecond = 15_000.0 / 3_600.0
+    let bikeUnlockSeconds = 120
+    let bikeAvailabilityStaleAfter: TimeInterval = 15 * 60
     let evaluatedCandidateLimit = 18
     let returnedOptionLimit = 18
     /// Below this, an access/egress walk is too short to be worth showing as its own leg.
@@ -41,6 +46,7 @@ actor PublicTransportRoutingEngine {
     init(
         gtfsService: any GTFSService,
         atpClient: any ATPClient,
+        bikeShareService: any BikeShareService,
         roadRouteProvider: any RoadRouteProviding,
         offlineMode: Bool,
         now: @escaping @Sendable () -> Date,
@@ -48,6 +54,7 @@ actor PublicTransportRoutingEngine {
     ) {
         self.gtfsService = gtfsService
         self.atpClient = atpClient
+        self.bikeShareService = bikeShareService
         self.roadRouteProvider = roadRouteProvider
         self.offlineMode = offlineMode
         self.now = now
@@ -61,6 +68,10 @@ actor PublicTransportRoutingEngine {
         time: RoutePlanningTime = .leaveNow,
         filters: RoutePlannerFilters = RoutePlannerFilters()
     ) async throws -> RouteCalculation {
+        await bikeShareService.refreshAvailability()
+        let bikeStations = await bikeShareService.bikeShareStations(
+            near: from
+        )
         guard let timetable = await gtfsService.timetableIndex(), !timetable.trips.isEmpty else {
             throw RoutingError.timetableUnavailable
         }
@@ -89,6 +100,18 @@ actor PublicTransportRoutingEngine {
         }
 
         var scheduledCandidates = scheduledJourneys(from: from, to: to, context: context)
+        let transitBaseCandidates = scheduledCandidates
+        scheduledCandidates.append(contentsOf: mixedBikeJourneys(
+            from: transitBaseCandidates,
+            stations: bikeStations,
+            context: context
+        ))
+        scheduledCandidates.append(contentsOf: bikeJourneys(
+            from: from,
+            to: to,
+            stations: bikeStations,
+            context: context
+        ))
         if let arriveByLimit {
             scheduledCandidates = scheduledCandidates.filter { $0.arrivalTime <= arriveByLimit }
         }

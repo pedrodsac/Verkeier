@@ -7,13 +7,10 @@ struct CommuteDashboardViewModel {
     let errorMessage: String?
     let lastUpdated: Date?
     let isStale: Bool
-    let expandedStopIds: Set<String>
     let nearby: NearbyStopsPresentationModel
     let activeAlertCount: Int
     /// Time-of-day commute preset to surface at the top of the dashboard, if any.
     var suggestedCommutePreset: RouteCommutePreset?
-    /// Recently opened stops, most-recent first.
-    var recentStops: [Stop] = []
 
     var hasFavourites: Bool {
         !favourites.isEmpty
@@ -36,7 +33,6 @@ struct CommuteDashboardViewModel {
 struct CommuteActions {
     var showAlerts: () -> Void = {}
     var selectStop: (Stop) -> Void = { _ in }
-    var toggleExpansion: (String) -> Void = { _ in }
     var applyCommutePreset: (String) -> Void = { _ in }
 }
 
@@ -45,7 +41,6 @@ extension CommuteActions {
         self.init()
         showAlerts = actions.showAlerts
         selectStop = actions.selectStop
-        toggleExpansion = actions.toggleFavouriteExpansion
         applyCommutePreset = actions.applyCommutePreset
     }
 }

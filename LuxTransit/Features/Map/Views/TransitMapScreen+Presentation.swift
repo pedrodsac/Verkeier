@@ -18,6 +18,12 @@ extension TransitMapScreen {
         return TransitSheetPresentationModel(
             context: viewModel.sheetContext,
             nearby: nearby,
+            stopGroup: StopGroupPresentationModel(
+                stops: viewModel.selectedStopGroup,
+                bikeShareStations: viewModel.selectedBikeShareStations,
+                referenceLocation: locationService.currentLocation,
+                routesByStopId: viewModel.nearbyStopRoutes
+            ),
             commute: CommuteDashboardViewModel(
                 favourites: favouriteStops,
                 departuresByStopId: viewModel.favouriteDeparturesByStopId,
@@ -25,17 +31,16 @@ extension TransitMapScreen {
                 errorMessage: viewModel.favouriteDeparturesErrorMessage,
                 lastUpdated: viewModel.favouriteDeparturesLastUpdated,
                 isStale: viewModel.areFavouriteDeparturesStale,
-                expandedStopIds: viewModel.expandedFavouriteStopIds,
                 nearby: nearby,
                 activeAlertCount: viewModel.activeAlertCount,
-                suggestedCommutePreset: viewModel.suggestedCommutePreset,
-                recentStops: viewModel.recentStops
+                suggestedCommutePreset: viewModel.suggestedCommutePreset
             ),
             search: SearchPresentationModel(
                 results: viewModel.searchResults,
                 nearbySuggestions: viewModel.nearbyStops,
                 isLoadingNearbySuggestions: viewModel.isLoadingNearbyStops,
-                referenceLocation: locationService.currentLocation
+                referenceLocation: locationService.currentLocation,
+                recentStops: viewModel.recentStops
             ),
             stopDetail: StopDetailPresentationModel(
                 stop: viewModel.selectedStop,

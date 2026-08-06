@@ -132,7 +132,7 @@ nonisolated struct RoutePlace: Codable, Hashable, Identifiable {
         source: RoutePlaceSource
     ) {
         self.id = id ?? stopId ?? location.id
-        self.title = title
+        self.title = title.stationDisplayName
         self.subtitle = subtitle
         self.location = location
         self.stopId = stopId
@@ -144,7 +144,7 @@ nonisolated struct RoutePlace: Codable, Hashable, Identifiable {
     init(stop: Stop, source: RoutePlaceSource) {
         self.init(
             id: stop.id,
-            title: stop.name,
+            title: stop.displayName,
             subtitle: stop.locality,
             location: stop.location,
             stopId: stop.id,

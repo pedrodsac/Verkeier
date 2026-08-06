@@ -112,7 +112,9 @@ extension PublicTransportRoutingEngine {
         context _: RouteSearchContext
     ) async -> RouteOption? {
         let legs = legsWithTransferWarnings(candidate.legs)
-        guard legs.contains(where: { $0.transportKind == .transit }) else {
+        guard legs.contains(where: {
+            $0.transportKind == .transit || $0.transportKind == .bikeShare
+        }) else {
             return nil
         }
         let overlayLegs = await legsWithRoadRoutedSegments(legs)

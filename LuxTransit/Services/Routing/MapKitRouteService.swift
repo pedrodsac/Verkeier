@@ -141,6 +141,7 @@ private extension RouteLegTransportKind {
     nonisolated var transportMode: TransportMode {
         switch self {
         case .walking: .walking
+        case .bikeShare: .bicycle
         case .transit, .automobile, .unknown: .unknown
         }
     }

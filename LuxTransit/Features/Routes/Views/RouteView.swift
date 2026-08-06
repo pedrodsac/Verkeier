@@ -169,14 +169,6 @@ struct RouteView: View {
             }
         }
 
-        // Inline refresh banner when results are already visible
-        if viewModel.isCalculating, !viewModel.routeOptions.isEmpty {
-            RouteInfoBanner(
-                title: "Refreshing routes",
-                systemImage: "arrow.trianglehead.clockwise"
-            )
-        }
-
         // Error
         if let errorMessage = viewModel.errorMessage {
             CompactUnavailableCard(

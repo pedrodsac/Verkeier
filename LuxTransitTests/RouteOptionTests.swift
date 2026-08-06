@@ -106,6 +106,48 @@ struct RouteOptionTests {
         #expect(option(legs: [leg]).status(at: now) == .missed)
     }
 
+    @Test func velohOnlyRouteShowsAsScheduledAfterItsDeparture() {
+        let bike = RoutePlan.Leg(
+            id: "veloh",
+            mode: .bicycle,
+            transportKind: .bikeShare,
+            routeName: "vel’OH!",
+            origin: hamilius,
+            destination: luxexpo,
+            departureTime: Date(timeIntervalSince1970: 1000),
+            arrivalTime: Date(timeIntervalSince1970: 1600),
+            distanceMeters: 1200
+        )
+        let route = option(legs: [bike])
+
+        #expect(route.isVelohOnly)
+        #expect(route.status(at: Date(timeIntervalSince1970: 10000)) == .scheduledOnly)
+    }
+
+    @Test func mixedVelohAndTransitRouteStillUsesTransitMissedStatus() {
+        let now = Date(timeIntervalSince1970: 10000)
+        let bike = RoutePlan.Leg(
+            id: "veloh",
+            mode: .bicycle,
+            transportKind: .bikeShare,
+            routeName: "vel’OH!",
+            origin: hamilius,
+            destination: luxexpo,
+            departureTime: now.addingTimeInterval(-1200),
+            arrivalTime: now.addingTimeInterval(-600),
+            distanceMeters: 1200
+        )
+        let bus = transitLeg(
+            from: luxexpo,
+            to: hamilius,
+            departure: now.addingTimeInterval(-500)
+        )
+        let route = option(legs: [bike, bus])
+
+        #expect(!route.isVelohOnly)
+        #expect(route.status(at: now) == .missed)
+    }
+
     // MARK: - Door-to-door departure
 
     @Test func departureTimeIncludesLeadingAccessWalk() {

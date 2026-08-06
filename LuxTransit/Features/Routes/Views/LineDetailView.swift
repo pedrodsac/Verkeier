@@ -6,19 +6,7 @@ struct LineDetailView: View {
 
     var body: some View {
         if let detail = viewModel.detail {
-            VStack(alignment: .leading, spacing: 16) {
-                header(detail.route)
-
-                if !viewModel.alerts.isEmpty {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Disruption Impact")
-                            .font(.headline.weight(.semibold))
-                        ForEach(viewModel.alerts.prefix(3)) { alert in
-                            LineAlertRow(alert: alert)
-                        }
-                    }
-                }
-
+            List {
                 if detail.directions.count > 1 {
                     Picker(
                         "Direction",
@@ -34,13 +22,7 @@ struct LineDetailView: View {
                     .pickerStyle(.segmented)
                 }
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Stop Sequence")
-                        .font(.headline.weight(.semibold))
-                    Text(detail.serviceSummary)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-
+                Section("Stop Sequence") {
                     ForEach(Array(detail.stopSequence.enumerated()), id: \.element.id) { index, stop in
                         Button {
                             actions.selectStop(
@@ -73,16 +55,21 @@ struct LineDetailView: View {
                                     .font(.caption.weight(.bold))
                                     .foregroundStyle(.tertiary)
                             }
-                            .padding(.vertical, 8)
                         }
                         .buttonStyle(.plain)
                     }
                 }
 
+                if !viewModel.alerts.isEmpty {
+                    Section("Disruption Impact") {
+                        ForEach(viewModel.alerts.prefix(3)) { alert in
+                            LineAlertRow(alert: alert)
+                        }
+                    }
+                }
+
                 if !detail.upcomingDepartures.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Upcoming Timetable")
-                            .font(.headline.weight(.semibold))
+                    Section("Upcoming Timetable") {
                         ForEach(detail.upcomingDepartures) { departure in
                             HStack(alignment: .firstTextBaseline, spacing: 10) {
                                 Text(departure.departureTime, style: .time)
@@ -96,14 +83,11 @@ struct LineDetailView: View {
                                 }
                                 Spacer()
                             }
-                            .padding(.vertical, 6)
                         }
                     }
                 }
-
-                Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .listStyle(.insetGrouped)
         } else if let route = viewModel.route {
             CompactUnavailableCard(
                 title: "Line details unavailable",
@@ -116,39 +100,6 @@ struct LineDetailView: View {
                 message: "Choose a line from stop detail to open its timetable and stop sequence.",
                 systemImage: "tram.fill"
             )
-        }
-    }
-
-    private func header(_ route: TransitRoute) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 10) {
-                Text(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
-                    .font(.title3.weight(.bold))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(lineColor(for: route).gradient, in: Capsule())
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(route.longName ?? route.shortName)
-                        .font(.headline.weight(.semibold))
-                    if let operatorName = route.operatorName {
-                        Text(operatorName)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-        }
-    }
-
-    private func lineColor(for route: TransitRoute) -> Color {
-        switch route.mode {
-        case .train: .red
-        case .tram: .orange
-        case .bus: .blue
-        case .funicular: .teal
-        case .walking, .unknown: .secondary
         }
     }
 }

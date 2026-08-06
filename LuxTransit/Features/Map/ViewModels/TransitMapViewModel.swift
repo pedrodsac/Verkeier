@@ -10,6 +10,8 @@ final class TransitMapViewModel {
     var cameraUpdateToken = 0
     var sheetContext: TransitSheetContext = .home
     var sheetDetent: BottomSheetDetent = .medium
+    var selectedStopGroup: [Stop] = []
+    var selectedBikeShareStations: [BikeShareStation] = []
     var nearbyStops: [Stop] = [] {
         didSet { rebuildGTFSOnlyMapStops() }
     }
@@ -52,7 +54,6 @@ final class TransitMapViewModel {
     var isLoadingFavouriteDepartures = false
     var favouriteDeparturesErrorMessage: String?
     var favouriteDeparturesLastUpdated: Date?
-    var expandedFavouriteStopIds: Set<String> = []
     var searchQuery = ""
     var searchResults: [Stop] = []
     var routeOrigin: RoutePlace?

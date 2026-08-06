@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 
 struct RoutePlannerStore {
@@ -76,7 +77,7 @@ struct RoutePlannerStore {
     }
 
     func recentStops() -> [Stop] {
-        load([Stop].self, forKey: recentStopsKey) ?? []
+        deduplicatedRecentStops(load([Stop].self, forKey: recentStopsKey) ?? [])
     }
 
     func saveRecentStops(_ stops: [Stop]) {
@@ -97,6 +98,33 @@ struct RoutePlannerStore {
         return updated
     }
 
+    /// ATP and GTFS can describe the same physical stop with different IDs.
+    /// Keep the newest representation in recents while retaining genuinely
+    /// distinct stops that are farther apart.
+    private func deduplicatedRecentStops(_ stops: [Stop]) -> [Stop] {
+        var unique: [Stop] = []
+        for stop in stops where !unique.contains(where: { representSamePlace($0, stop) }) {
+            unique.append(stop)
+        }
+        return unique
+    }
+
+    private func representSamePlace(_ lhs: Stop, _ rhs: Stop) -> Bool {
+        guard lhs.name.normalizedForRecentStop == rhs.name.normalizedForRecentStop else {
+            return false
+        }
+
+        let lhsLocation = CLLocation(
+            latitude: lhs.location.latitude,
+            longitude: lhs.location.longitude
+        )
+        let rhsLocation = CLLocation(
+            latitude: rhs.location.latitude,
+            longitude: rhs.location.longitude
+        )
+        return lhsLocation.distance(from: rhsLocation) <= 100
+    }
+
     private func save(_ value: some Encodable, forKey key: String) {
         guard let data = try? JSONEncoder().encode(value) else { return }
         defaults.set(data, forKey: key)
@@ -105,5 +133,13 @@ struct RoutePlannerStore {
     private func load<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
         guard let data = defaults.data(forKey: key) else { return nil }
         return try? JSONDecoder().decode(type, from: data)
+    }
+}
+
+private extension String {
+    var normalizedForRecentStop: String {
+        folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            .replacingOccurrences(of: "[^a-z0-9]+", with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

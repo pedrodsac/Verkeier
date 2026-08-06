@@ -71,26 +71,64 @@ struct UnavailableVehiclePositionService: VehiclePositionService {
 
 // MARK: - Bike sharing
 
-/// A bike-share station (e.g. Vël'OK in Luxembourg City).
-struct BikeShareStation: Identifiable, Hashable {
+/// A vel’OH! station in Luxembourg City.
+nonisolated struct BikeShareStation: Identifiable, Hashable, Codable, Sendable {
     let id: String
     let name: String
     let location: LocationPoint
     let bikesAvailable: Int?
     let docksAvailable: Int?
+    let capacity: Int?
+    let isOpen: Bool?
+    let lastUpdated: Date?
+
+    nonisolated var displayName: String {
+        name.stationDisplayName
+    }
+
+    nonisolated init(
+        id: String,
+        name: String,
+        location: LocationPoint,
+        bikesAvailable: Int? = nil,
+        docksAvailable: Int? = nil,
+        capacity: Int? = nil,
+        isOpen: Bool? = nil,
+        lastUpdated: Date? = nil
+    ) {
+        self.id = id
+        self.name = name.stationDisplayName
+        self.location = location
+        self.bikesAvailable = bikesAvailable
+        self.docksAvailable = docksAvailable
+        self.capacity = capacity
+        self.isOpen = isOpen
+        self.lastUpdated = lastUpdated
+    }
 }
 
-/// Bike-share stations near a coordinate. No bike-share feed is bundled yet, so
-/// the live implementation returns nothing and the overlay stays hidden.
-// ponytail: stubbed — wire when a Vël'OK bike-share feed is confirmed.
+/// The latest station snapshot used by routing and route presentation.
+nonisolated struct BikeShareSnapshot: Hashable, Codable, Sendable {
+    let stations: [BikeShareStation]
+    let fetchedAt: Date
+}
+
+/// Bike-share stations near a coordinate.
 protocol BikeShareService: Sendable {
     func bikeShareStations(near location: LocationPoint) async -> [BikeShareStation]
+    func refreshStaticStations() async
+    func refreshAvailability() async
+    func snapshot() async -> BikeShareSnapshot?
 }
 
 struct UnavailableBikeShareService: BikeShareService {
     func bikeShareStations(near _: LocationPoint) async -> [BikeShareStation] {
         []
     }
+
+    func refreshStaticStations() async {}
+    func refreshAvailability() async {}
+    func snapshot() async -> BikeShareSnapshot? { nil }
 }
 
 // MARK: - Station facilities (amenities, elevator status, imagery)

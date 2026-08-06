@@ -25,9 +25,24 @@ nonisolated struct LocationPoint: Codable, Hashable, Identifiable, Sendable {
         longitude: Double
     ) {
         self.id = id ?? "\(latitude),\(longitude)"
-        self.name = name
+        self.name = name?.stationDisplayName
         self.latitude = latitude
         self.longitude = longitude
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case latitude
+        case longitude
+    }
+
+    nonisolated init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decodeIfPresent(String.self, forKey: .name)?.stationDisplayName
+        latitude = try container.decode(Double.self, forKey: .latitude)
+        longitude = try container.decode(Double.self, forKey: .longitude)
     }
 
     /// The point as a MapKit / CoreLocation coordinate.

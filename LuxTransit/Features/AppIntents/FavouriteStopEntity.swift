@@ -13,7 +13,7 @@ struct FavouriteStopEntity: AppEntity, Identifiable {
 
     nonisolated init(id: String, name: String, locality: String?, platformIds: [String]? = nil) {
         self.id = id
-        self.name = name
+        self.name = name.stationDisplayName
         self.locality = locality
         let ids = (platformIds ?? [])
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }

@@ -38,6 +38,29 @@ struct RoutePlannerStoreTests {
         #expect(store.recentPlaces().isEmpty)
     }
 
+    @Test func recentStopsDeduplicateCrossFeedCopies() {
+        let (store, _) = makeStore()
+        let atpStop = Stop(
+            id: "atp-hamilius",
+            name: "Hamilius (Bus)",
+            location: LocationPoint(latitude: 49.6110, longitude: 6.1260),
+            modes: [.bus],
+            dataSource: .atpOpenAPI
+        )
+        let gtfsStop = Stop(
+            id: "gtfs-hamilius",
+            name: "Hamilius (Bus)",
+            location: LocationPoint(latitude: 49.6114, longitude: 6.1261),
+            modes: [.bus],
+            dataSource: .gtfs
+        )
+
+        _ = store.recordRecentStop(atpStop)
+        _ = store.recordRecentStop(gtfsStop)
+
+        #expect(store.recentStops().map(\.id) == ["gtfs-hamilius"])
+    }
+
     @Test func recentTripsDedupeByEndpointsAndCapAtTen() {
         let (store, _) = makeStore()
         for index in 0 ..< 12 {

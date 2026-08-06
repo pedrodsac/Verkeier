@@ -5,7 +5,7 @@ struct DepartureBoardView: View {
     let actions: StopDetailActions
 
     private var departures: [Departure] {
-        viewModel.departures
+        viewModel.mergedDepartures
     }
 
     private var isLoading: Bool {
@@ -27,21 +27,22 @@ struct DepartureBoardView: View {
     var body: some View {
         if isLoading, departures.isEmpty {
             DepartureLoadingCard(title: "Loading departures")
-        } else if let errorMessage {
-            CompactUnavailableCard(
-                title: "Departures unavailable",
-                message: errorMessage,
-                systemImage: "wifi.exclamationmark"
-            )
         } else if departures.isEmpty {
-            CompactUnavailableCard(
-                title: "No departures",
-                message: "No live departures are available for this stop.",
-                systemImage: "clock.badge.exclamationmark"
-            )
+            if let errorMessage {
+                CompactUnavailableCard(
+                    title: "Departures unavailable",
+                    message: errorMessage,
+                    systemImage: "wifi.exclamationmark"
+                )
+            } else {
+                CompactUnavailableCard(
+                    title: "No departures",
+                    message: "No live or scheduled departures are available for this stop.",
+                    systemImage: "clock.badge.exclamationmark"
+                )
+            }
         } else {
             let trackedDeparture = departures.first(where: { $0.id == trackedDepartureId })
-            let showsTrackingCard = trackedDeparture != nil || activeReminder != nil
             let lastOfDayIDs = lastServiceDepartureIDs(in: departures)
 
             VStack(alignment: .leading, spacing: 8) {
@@ -51,12 +52,6 @@ struct DepartureBoardView: View {
                     stopTrackingDeparture: actions.stopTrackingDeparture,
                     cancelDepartureReminder: actions.cancelDepartureReminder
                 )
-
-                // Hero card for the next ride — hidden while a tracking card is shown.
-                if !showsTrackingCard,
-                   let next = departures.first(where: { !$0.isCancelled }) {
-                    NextDepartureHeroCard(departure: next)
-                }
 
                 let now = Date()
                 let departed = departures
@@ -98,6 +93,37 @@ struct DepartureBoardView: View {
             }
         }
     }
+}
+
+/// IDs of departures that are the last service of the day for their line.
+///
+/// A departure qualifies when no later departure for the same line exists in
+/// `departures` and it leaves after 18:00 local time. Cancelled trips are
+/// ignored.
+nonisolated func lastServiceDepartureIDs(
+    in departures: [Departure],
+    calendar: Calendar = .current
+) -> Set<String> {
+    func time(_ departure: Departure) -> Date? {
+        departure.realtimeDeparture ?? departure.scheduledDeparture
+    }
+
+    var latestByLine: [String: Departure] = [:]
+    for departure in departures where !departure.isCancelled {
+        guard let departureTime = time(departure) else { continue }
+        if let existing = latestByLine[departure.lineName],
+           let existingTime = time(existing),
+           existingTime >= departureTime {
+            continue
+        }
+        latestByLine[departure.lineName] = departure
+    }
+
+    return Set(latestByLine.values.compactMap { departure in
+        guard let departureTime = time(departure),
+              calendar.component(.hour, from: departureTime) >= 18 else { return nil }
+        return departure.id
+    })
 }
 
 private struct DepartureTrackingStatusCard: View {

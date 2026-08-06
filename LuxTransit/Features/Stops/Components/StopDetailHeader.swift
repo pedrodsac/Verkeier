@@ -65,6 +65,7 @@ private struct StopMetadataPanel: View {
                         RouteLineCard(
                             route: route,
                             isSelected: route.id == selectedLine,
+                            isDimmed: selectedLine != nil && route.id != selectedLine,
                             toggleDepartureLine: { toggleDepartureLine(route) },
                             showLineDetail: { showLineDetail(route) }
                         )
@@ -79,6 +80,7 @@ private struct StopMetadataPanel: View {
 private struct RouteLineCard: View {
     let route: TransitRoute
     let isSelected: Bool
+    let isDimmed: Bool
     let toggleDepartureLine: () -> Void
     let showLineDetail: () -> Void
 
@@ -90,20 +92,15 @@ private struct RouteLineCard: View {
                         .accessibilityHidden(true)
                     Text(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
                         .lineLimit(1)
-                    if isSelected {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.caption.weight(.bold))
-                            .accessibilityHidden(true)
-                    }
                 }
                 .font(.callout.weight(.bold))
                 .foregroundStyle(.primary)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 7)
-                .background(routeColor.opacity(isSelected ? 0.20 : 0.14), in: Capsule())
+                .background(cardColor.opacity(isSelected ? 0.20 : 0.14), in: Capsule())
                 .overlay {
                     Capsule().stroke(
-                        routeColor.opacity(isSelected ? 0.55 : 0.25),
+                        cardColor.opacity(isSelected ? 0.55 : 0.25),
                         lineWidth: isSelected ? 1.1 : 0.7
                     )
                 }
@@ -112,29 +109,24 @@ private struct RouteLineCard: View {
             .buttonStyle(.plain)
             .accessibilityLabel(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
             .accessibilityAddTraits(isSelected ? [.isSelected] : [])
-
+        }
+        .contextMenu {
             Button(action: showLineDetail) {
-                Image(systemName: "info.circle")
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(routeColor)
-                    .frame(width: 28, height: 28)
-                    .background(.background.opacity(0.6), in: Circle())
+                Label("Information", systemImage: "info.circle")
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(
-                "Show line details for \(route.shortName.isEmpty ? route.mode.displayName : route.shortName)"
-            )
         }
     }
 
     init(
         route: TransitRoute,
         isSelected: Bool = false,
+        isDimmed: Bool = false,
         toggleDepartureLine: @escaping () -> Void = {},
         showLineDetail: @escaping () -> Void = {}
     ) {
         self.route = route
         self.isSelected = isSelected
+        self.isDimmed = isDimmed
         self.toggleDepartureLine = toggleDepartureLine
         self.showLineDetail = showLineDetail
     }
@@ -145,6 +137,7 @@ private struct RouteLineCard: View {
         case .tram: "tram.fill"
         case .bus: "bus.fill"
         case .funicular: "cablecar.fill"
+        case .bicycle: "bicycle"
         case .walking: "figure.walk"
         case .unknown: "circle"
         }
@@ -156,8 +149,13 @@ private struct RouteLineCard: View {
         case .tram: .orange
         case .bus: .blue
         case .funicular: .purple
+        case .bicycle: .teal
         case .walking, .unknown: .secondary
         }
+    }
+
+    private var cardColor: Color {
+        isDimmed ? .secondary : routeColor
     }
 }
 
@@ -191,6 +189,7 @@ struct RouteChip: View {
         case .tram: "tram.fill"
         case .bus: "bus.fill"
         case .funicular: "cablecar.fill"
+        case .bicycle: "bicycle"
         case .walking: "figure.walk"
         case .unknown: "circle"
         }
@@ -202,6 +201,7 @@ struct RouteChip: View {
         case .tram: .orange
         case .bus: .blue
         case .funicular: .purple
+        case .bicycle: .teal
         case .walking, .unknown: .secondary
         }
     }

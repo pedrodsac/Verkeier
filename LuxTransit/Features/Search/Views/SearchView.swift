@@ -14,12 +14,22 @@ struct SearchView: View {
                 .padding(.top, 12)
 
             if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                NearbySearchSuggestions(
-                    stops: viewModel.nearbySuggestions,
-                    isLoading: viewModel.isLoadingNearbySuggestions,
-                    referenceLocation: viewModel.referenceLocation,
-                    selectStop: actions.selectStop
-                )
+                Group {
+                    if viewModel.recentStops.isEmpty {
+                        NearbySearchSuggestions(
+                            stops: viewModel.nearbySuggestions,
+                            isLoading: viewModel.isLoadingNearbySuggestions,
+                            referenceLocation: viewModel.referenceLocation,
+                            selectStop: actions.selectStop
+                        )
+                    } else {
+                        RecentSearchStops(
+                            stops: viewModel.recentStops,
+                            referenceLocation: viewModel.referenceLocation,
+                            selectStop: actions.selectStop
+                        )
+                    }
+                }
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             } else if viewModel.results.isEmpty {
                 ContentUnavailableView(
@@ -102,6 +112,35 @@ struct SearchView: View {
                 }
             }
             .padding(.bottom, 24)
+        }
+    }
+}
+
+private struct RecentSearchStops: View {
+    let stops: [Stop]
+    let referenceLocation: CLLocation?
+    let selectStop: (Stop) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Recent")
+                .font(.headline.weight(.semibold))
+
+            ScrollView {
+                LazyVStack(spacing: 10) {
+                    ForEach(stops.prefix(8)) { stop in
+                        StopListRow(
+                            stop: stop,
+                            markerColor: .blue,
+                            accessorySystemName: "arrow.right",
+                            referenceLocation: referenceLocation
+                        ) {
+                            selectStop(stop)
+                        }
+                    }
+                }
+                .padding(.bottom, 24)
+            }
         }
     }
 }

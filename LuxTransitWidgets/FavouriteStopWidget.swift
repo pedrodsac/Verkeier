@@ -37,14 +37,14 @@ private struct FavouriteStopWidgetView: View {
     var body: some View {
         switch family {
         case .accessoryInline:
-            Label(entry.selectedStop?.name ?? "No favourite", systemImage: "star.fill")
+            Label(entry.selectedStop?.name.stationDisplayName ?? "No favourite", systemImage: "star.fill")
         case .accessoryCircular:
             Image(systemName: "star.fill")
                 .font(.title2)
                 .widgetAccentable()
         case .accessoryRectangular:
             VStack(alignment: .leading, spacing: 2) {
-                Label(entry.selectedStop?.name ?? "No favourite", systemImage: "star.fill")
+                Label(entry.selectedStop?.name.stationDisplayName ?? "No favourite", systemImage: "star.fill")
                     .font(.headline)
                     .lineLimit(1)
                 Text(entry.selectedStop?.locality ?? "Open for live departures")
@@ -64,7 +64,7 @@ private struct FavouriteStopWidgetView: View {
                 Image(systemName: "star.fill")
                     .foregroundStyle(.yellow)
                 Spacer(minLength: 0)
-                Text(stop.name)
+                Text(stop.name.stationDisplayName)
                     .font(.headline)
                     .lineLimit(2)
                 Text(stop.locality ?? "Favourite stop")

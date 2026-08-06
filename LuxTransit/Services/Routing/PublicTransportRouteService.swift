@@ -12,6 +12,7 @@ struct PublicTransportRouteService: RouteService {
     init(
         gtfsService: any GTFSService,
         atpClient: any ATPClient,
+        bikeShareService: any BikeShareService = UnavailableBikeShareService(),
         roadRouteProvider: any RoadRouteProviding = MapKitRoadRouteProvider(),
         offlineMode: Bool = false,
         now: @escaping @Sendable () -> Date = { .now },
@@ -24,6 +25,7 @@ struct PublicTransportRouteService: RouteService {
         engine = PublicTransportRoutingEngine(
             gtfsService: gtfsService,
             atpClient: atpClient,
+            bikeShareService: bikeShareService,
             roadRouteProvider: roadRouteProvider,
             offlineMode: offlineMode,
             now: now,
