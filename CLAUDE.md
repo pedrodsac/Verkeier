@@ -4,32 +4,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-LuxTransit is a native SwiftUI iOS app for Luxembourg public transport, built to feel like Apple Maps (full-screen MapKit map with a persistent draggable bottom sheet). It is being built in phases from the design documents in `docs/`. Treat it as a serious maintainable project, not a prototype.
+Verkéier is a native SwiftUI iOS app for Luxembourg public transport, built to feel like Apple Maps (full-screen MapKit map with a persistent draggable bottom sheet). It is being built in phases from the design documents in `docs/`. Treat it as a serious maintainable project, not a prototype.
 
 ## Commands
 
 Build for simulator:
 
 ```sh
-xcodebuild -project LuxTransit.xcodeproj -scheme LuxTransit -destination 'platform=iOS Simulator,name=iPhone 17' build
+xcodebuild -project Verkéier.xcodeproj -scheme Verkéier -destination 'platform=iOS Simulator,name=iPhone 17' build
 ```
 
 Run the full test suite:
 
 ```sh
-xcodebuild -project LuxTransit.xcodeproj -scheme LuxTransit -destination 'platform=iOS Simulator,name=iPhone 17' test
+xcodebuild -project Verkéier.xcodeproj -scheme Verkéier -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```
 
 Run a single test class or method (Swift Testing):
 
 ```sh
-xcodebuild -project LuxTransit.xcodeproj -scheme LuxTransit -destination 'platform=iOS Simulator,name=iPhone 17' test -only-testing:LuxTransitTests/GTFSValidatorTests
+xcodebuild -project Verkéier.xcodeproj -scheme Verkéier -destination 'platform=iOS Simulator,name=iPhone 17' test -only-testing:VerkéierTests/GTFSValidatorTests
 ```
 
 Regenerate the bundled GTFS resource from a downloaded feed (use `--max-stops` for small fixtures):
 
 ```sh
-python3 Scripts/preprocess_gtfs.py ~/Downloads/gtfs.zip LuxTransit/Resources/gtfs-compact.json
+python3 Scripts/preprocess_gtfs.py ~/Downloads/gtfs.zip Verkéier/Resources/gtfs-compact.json
 ```
 
 Local config (git-ignored; holds `ATP_ACCESS_ID` and an optional `AVL_MESSAGES_URL` override):
@@ -48,18 +48,18 @@ SwiftUI View → ViewModel/Observable State → Service Protocol → API Client/
 
 - **No networking or business logic in views or view bodies.** Route everything through view models and injected services.
 - **Every service is a protocol** with multiple implementations: `Live*` (production), `*Mock`/`Empty*` (previews/tests), and often `Local*` (on-device data). E.g. `ATPClient` has `LiveATPClient`, `ATPMockClient`, `EmptyATPClient`.
-- **Dependency injection is via SwiftUI `EnvironmentValues`** using `@Entry` (see `LuxTransit/App/AppDependencies.swift`). Each service has a default value there; views read it with `@Environment(\.serviceName)`. Override the environment to inject mocks in previews/tests.
+- **Dependency injection is via SwiftUI `EnvironmentValues`** using `@Entry` (see `Verkéier/App/AppDependencies.swift`). Each service has a default value there; views read it with `@Environment(\.serviceName)`. Override the environment to inject mocks in previews/tests.
 - UI must be previewable with mock data; API/parsing code must be testable without UI.
 
 ### Module layout
 
-- `LuxTransit/App/` — entry point (`LuxTransitApp`), config (`AppConfiguration`), DI (`AppDependencies`), SwiftData container, debug data fixtures/modes.
-- `LuxTransit/Features/<Domain>/` — feature UI grouped as `Views/`, `ViewModels/`, `Components/`. Domains: `Map`, `BottomSheet`, `Stops`, `Departures`, `Search`, `Routes`, `Favourites`, `Alerts`, `Settings`, `LiveActivities`, `AppIntents`.
-- `LuxTransit/Services/` — `ATP/` (mobiliteit.lu OpenAPI departures/nearby stops), `GTFS/` (local stop search, timetable index, download/update/validation pipeline, offline schedules), `AVL/` (Ville de Luxembourg alerts XML), `Location/`, `Routing/` (MapKit route + Apple Maps handoff, public-transport route service), `Notifications/`.
-- `LuxTransit/Models/` — typed domain models (`Stop`, `Departure`, `RoutePlan`, `AlertMessage`, etc.).
-- `LuxTransit/Storage/` — SwiftData persistence (e.g. favourites).
-- `LuxTransitShared/` + `LuxTransitWidgets/` — shared widget/Live Activity types and the WidgetKit extension (separate `LuxTransitWidgets` scheme/target).
-- `LuxTransitTests/` — Swift Testing suites, named after the unit under test (`ATPMapperTests`, `GTFSValidatorTests`).
+- `Verkéier/App/` — entry point (`VerkéierApp`), config (`AppConfiguration`), DI (`AppDependencies`), SwiftData container, debug data fixtures/modes.
+- `Verkéier/Features/<Domain>/` — feature UI grouped as `Views/`, `ViewModels/`, `Components/`. Domains: `Map`, `BottomSheet`, `Stops`, `Departures`, `Search`, `Routes`, `Favourites`, `Alerts`, `Settings`, `LiveActivities`, `AppIntents`.
+- `Verkéier/Services/` — `ATP/` (mobiliteit.lu OpenAPI departures/nearby stops), `GTFS/` (local stop search, timetable index, download/update/validation pipeline, offline schedules), `AVL/` (Ville de Luxembourg alerts XML), `Location/`, `Routing/` (MapKit route + Apple Maps handoff, public-transport route service), `Notifications/`.
+- `Verkéier/Models/` — typed domain models (`Stop`, `Departure`, `RoutePlan`, `AlertMessage`, etc.).
+- `Verkéier/Storage/` — SwiftData persistence (e.g. favourites).
+- `VerkéierShared/` + `VerkéierWidgets/` — shared widget/Live Activity types and the WidgetKit extension (separate `VerkéierWidgets` scheme/target).
+- `VerkéierTests/` — Swift Testing suites, named after the unit under test (`ATPMapperTests`, `GTFSValidatorTests`).
 
 ### Data sources & external assumptions
 

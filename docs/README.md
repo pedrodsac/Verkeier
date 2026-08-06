@@ -1,4 +1,4 @@
-# LuxTransit Docs
+# Verkéier Docs
 
 **Start here.** Navigation map for every doc in this directory.
 

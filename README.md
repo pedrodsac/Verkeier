@@ -1,6 +1,6 @@
-# LuxTransit
+# Verkéier
 
-LuxTransit is a native SwiftUI iOS app for Luxembourg public transport. The codebase is being built in phases from the documents in `docs/`.
+Verkéier is a native SwiftUI iOS app for Luxembourg public transport. The codebase is being built in phases from the documents in `docs/`.
 
 ## Current Phase
 
@@ -42,10 +42,10 @@ The app handles a missing ATP access id during early phases. Do not hardcode API
 
 ## Build
 
-Open `LuxTransit.xcodeproj` in Xcode or build from the command line:
+Open `Verkéier.xcodeproj` in Xcode or build from the command line:
 
 ```sh
-xcodebuild -project LuxTransit.xcodeproj -scheme LuxTransit -destination 'platform=iOS Simulator,name=iPhone 17' build
+xcodebuild -project Verkéier.xcodeproj -scheme Verkéier -destination 'platform=iOS Simulator,name=iPhone 17' build
 ```
 
 ## GTFS Preprocessing
@@ -53,7 +53,7 @@ xcodebuild -project LuxTransit.xcodeproj -scheme LuxTransit -destination 'platfo
 Download the current Luxembourg GTFS ZIP from data.public.lu, then generate a compact app resource:
 
 ```sh
-python3 Scripts/preprocess_gtfs.py ~/Downloads/gtfs.zip LuxTransit/Resources/gtfs-compact.json
+python3 Scripts/preprocess_gtfs.py ~/Downloads/gtfs.zip Verkéier/Resources/gtfs-compact.json
 ```
 
 Use `--max-stops` when producing a small fixture. Do not commit oversized generated feeds without checking app size and update cadence.

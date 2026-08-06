@@ -1,8 +1,8 @@
-# LuxTransit PRD
+# Verkéier PRD
 
 ## Product Summary
 
-LuxTransit is a native iOS app for Luxembourg public transport. It provides a map-first interface for nearby stops, live departures, delay awareness, favourites, route handoff, alerts, Live Activities, App Intents, and widgets.
+Verkéier is a native iOS app for Luxembourg public transport. It provides a map-first interface for nearby stops, live departures, delay awareness, favourites, route handoff, alerts, Live Activities, App Intents, and widgets.
 
 The app is not official and must not imply endorsement by Administration des transports publics, Ville de Luxembourg, mobiliteit.lu, AVL, Luxtram, or Apple.
 

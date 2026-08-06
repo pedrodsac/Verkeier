@@ -178,15 +178,15 @@
 
 ## Surprising Connections (you probably didn't know these)
 - `OfflineScheduleService` --references--> `GTFSService protocol`  [INFERRED]
-  LuxTransit/LuxTransit.docc/LuxTransit.md → docs/SERVICES.md
+  Verkéier/Verkéier.docc/Verkéier.md → docs/SERVICES.md
 - `StopDetailPresentationModel` --references--> `SharedTrackedDepartureReminder`  [EXTRACTED]
-  LuxTransit/Features/BottomSheet/BottomSheetPresentation.swift → LuxTransitShared/SharedTransitData.swift
+  Verkéier/Features/BottomSheet/BottomSheetPresentation.swift → VerkéierShared/SharedTransitData.swift
 - `DepartureLockScreenView` --references--> `View`  [EXTRACTED]
-  LuxTransitWidgets/LuxTransitWidgets.swift → LuxTransit/Features/BottomSheet/Views/BottomSheetContent.swift
+  VerkéierWidgets/VerkéierWidgets.swift → Verkéier/Features/BottomSheet/Views/BottomSheetContent.swift
 - `DeparturesSummaryWidgetView` --references--> `View`  [EXTRACTED]
-  LuxTransitWidgets/LuxTransitWidgets.swift → LuxTransit/Features/BottomSheet/Views/BottomSheetContent.swift
+  VerkéierWidgets/VerkéierWidgets.swift → Verkéier/Features/BottomSheet/Views/BottomSheetContent.swift
 - `FavouriteStopWidgetView` --references--> `View`  [EXTRACTED]
-  LuxTransitWidgets/LuxTransitWidgets.swift → LuxTransit/Features/BottomSheet/Views/BottomSheetContent.swift
+  VerkéierWidgets/VerkéierWidgets.swift → Verkéier/Features/BottomSheet/Views/BottomSheetContent.swift
 
 ## Import Cycles
 - None detected.
@@ -272,7 +272,7 @@ Nodes (20): BottomSheetDetent, LineDetail, AlertMessage, Bool, Date, Double, Loc
 
 ### Community 18 - "Test Imports & Frameworks"
 Cohesion: 0.21
-Nodes (3): Foundation, LuxTransit, Testing
+Nodes (3): Foundation, Verkéier, Testing
 
 ### Community 19 - "Station Facilities & Env"
 Cohesion: 0.14
@@ -328,7 +328,7 @@ Nodes (16): PlaceholderPanel, String, View, RouteOptionBadge, Color, RouteAlerts
 
 ### Community 32 - "App Intents"
 Cohesion: 0.18
-Nodes (13): AppIntent, AppShortcut, AppShortcutsProvider, GetNextDeparturesIntent, LuxTransitShortcuts, OpenFavouriteStopIntent, PlanRouteIntent, ShowNearbyStopsIntent (+5 more)
+Nodes (13): AppIntent, AppShortcut, AppShortcutsProvider, GetNextDeparturesIntent, VerkéierShortcuts, OpenFavouriteStopIntent, PlanRouteIntent, ShowNearbyStopsIntent (+5 more)
 
 ### Community 33 - "GTFS Download & Metadata Fetch"
 Cohesion: 0.14
@@ -412,7 +412,7 @@ Nodes (12): Decodable, KeyedDecodingContainer, ATPDeparture, ATPDepartureBoardRe
 
 ### Community 53 - "Architecture Docs & Patterns"
 Cohesion: 0.17
-Nodes (16): Dependency Injection via @Entry EnvironmentValues, Strict Layering Pattern, Forbidden Patterns (no networking in views, no god objects, no hardcoded keys), ATP mobiliteit.lu OpenAPI feed, Live Departures workflow, LuxTransit product (map-first transit app), Nearby Stops workflow, Non-Goals (no accounts/ads/subscriptions/backend, not official) (+8 more)
+Nodes (16): Dependency Injection via @Entry EnvironmentValues, Strict Layering Pattern, Forbidden Patterns (no networking in views, no god objects, no hardcoded keys), ATP mobiliteit.lu OpenAPI feed, Live Departures workflow, Verkéier product (map-first transit app), Nearby Stops workflow, Non-Goals (no accounts/ads/subscriptions/backend, not official) (+8 more)
 
 ### Community 54 - "Map ViewModel: Navigation"
 Cohesion: 0.17
@@ -468,7 +468,7 @@ Nodes (4): GTFSResourceSelector, Bool, GTFSUpdateDecisionTests, String
 
 ### Community 67 - "App Entry & Disruption Alerts"
 Cohesion: 0.19
-Nodes (8): App, ModelContainer, LuxTransitApp, ModelContainer, DisruptionAlertService, Set, String, Scene
+Nodes (8): App, ModelContainer, VerkéierApp, ModelContainer, DisruptionAlertService, Set, String, Scene
 
 ### Community 68 - "Map ViewModel: Departures"
 Cohesion: 0.17
@@ -612,7 +612,7 @@ Nodes (4): DisplayRepresentation, String, WidgetFavouriteStopEntity, WidgetFavou
 
 ### Community 103 - "App Icon Design"
 Cohesion: 0.33
-Nodes (7): LuxTransit App Icon (1024x1024), Emerald Green (Top), LuxTransit Brand, Minimalist Flat Design, Teal-Blue (Bottom), Public Transit / Mobility Theme, Vertical Green-to-Blue Gradient
+Nodes (7): Verkéier App Icon (1024x1024), Emerald Green (Top), Verkéier Brand, Minimalist Flat Design, Teal-Blue (Bottom), Public Transit / Mobility Theme, Vertical Green-to-Blue Gradient
 
 ### Community 104 - "GTFS Archive Service"
 Cohesion: 0.33

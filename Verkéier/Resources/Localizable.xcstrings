@@ -1,0 +1,1219 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "  ·  %@" : {
+
+    },
+    "%@" : {
+
+    },
+    "%lld" : {
+
+    },
+    "%lld min" : {
+
+    },
+    "%lld min · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld min · %2$@"
+          }
+        }
+      }
+    },
+    "%lld min before" : {
+
+    },
+    "%lldm" : {
+
+    },
+    "0 transfers  ·  0.0 km  ·  Scheduled GTFS times" : {
+
+    },
+    "00:00 – 00:00  ·  00 min" : {
+
+    },
+    "About & Legal" : {
+
+    },
+    "Add departure reminder" : {
+
+    },
+    "Administration des transports publics - GTFS public transport schedules and stops" : {
+
+    },
+    "Administration des transports publics - mobiliteit.lu OpenAPI" : {
+
+    },
+    "Advanced" : {
+
+    },
+    "All" : {
+
+    },
+    "All stops" : {
+
+    },
+    "API" : {
+
+    },
+    "Appearance" : {
+
+    },
+    "Apple Maps / MapKit" : {
+
+    },
+    "Arrive" : {
+
+    },
+    "Arrive by…" : {
+
+    },
+    "Attribution" : {
+
+    },
+    "Availability may have changed" : {
+
+    },
+    "Avoid tight transfers" : {
+
+    },
+    "Back to route options" : {
+
+    },
+    "Back to stop" : {
+
+    },
+    "Bus 000" : {
+
+    },
+    "Cancel" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ofbriechen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
+          }
+        }
+      }
+    },
+    "Cancel reminder" : {
+
+    },
+    "Cancelled" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgefallen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annulé"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuléiert"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelado"
+          }
+        }
+      }
+    },
+    "Change departure reminder" : {
+
+    },
+    "Check for GTFS update" : {
+
+    },
+    "Checking…" : {
+
+    },
+    "Checks data.public.lu for a newer GTFS feed" : {
+
+    },
+    "Choose a stop at this location" : {
+
+    },
+    "Choose travel time" : {
+
+    },
+    "Clear search" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche löschen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer la recherche"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sich läschen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpar pesquisa"
+          }
+        }
+      }
+    },
+    "Close alerts" : {
+
+    },
+    "Close settings" : {
+
+    },
+    "Close stop details" : {
+
+    },
+    "Close stop list" : {
+
+    },
+    "Closest stops from mobiliteit.lu" : {
+
+    },
+    "Commute suggestion, %@, leave now" : {
+
+    },
+    "Continues as %@ — no change needed" : {
+
+    },
+    "Current Location" : {
+
+    },
+    "Data" : {
+
+    },
+    "Data Status" : {
+
+    },
+    "Default lead time" : {
+
+    },
+    "Delete all favourites, recent stops, trips, and commute presets?" : {
+
+    },
+    "Delete all local data" : {
+
+    },
+    "Delete everything" : {
+
+    },
+    "Departures" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Départs"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Departuren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partidas"
+          }
+        }
+      }
+    },
+    "Destination" : {
+
+    },
+    "Direction" : {
+
+    },
+    "Directions" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Itinéraire"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wee"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Itinerário"
+          }
+        }
+      }
+    },
+    "Disruption" : {
+
+    },
+    "Disruption affects this leg" : {
+
+    },
+    "Disruption Impact" : {
+
+    },
+    "Distance" : {
+
+    },
+    "Done" : {
+
+    },
+    "Edit Label" : {
+
+    },
+    "Export support bundle" : {
+
+    },
+    "Fastest" : {
+
+    },
+    "Favourite Stop" : {
+
+    },
+    "Favourite Stops" : {
+
+    },
+    "Find Routes" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Routen suchen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher des itinéraires"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weeër sichen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Procurar rotas"
+          }
+        }
+      }
+    },
+    "Finding nearby stops" : {
+
+    },
+    "From %@" : {
+
+    },
+    "Get directions" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route anzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenir l’itinéraire"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wee weisen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obter itinerário"
+          }
+        }
+      }
+    },
+    "Get Next Departures" : {
+
+    },
+    "Get started" : {
+
+    },
+    "GTFS Data" : {
+
+    },
+    "Information" : {
+
+    },
+    "Journey Alerts" : {
+
+    },
+    "Label (e.g. Home → Work)" : {
+
+    },
+    "Label (e.g. Home, Work)" : {
+
+    },
+    "Last service today" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzte Fahrt heute"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernier service aujourd’hui"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lescht Faart haut"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Último serviço hoje"
+          }
+        }
+      }
+    },
+    "Leave at…" : {
+
+    },
+    "Leave now" : {
+
+    },
+    "Live Activity tracking %@ to %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Live Activity tracking %1$@ to %2$@"
+          }
+        }
+      }
+    },
+    "Loading departures" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrten werden geladen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement des départs"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Departure lueden"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A carregar partidas"
+          }
+        }
+      }
+    },
+    "Loading stops" : {
+
+    },
+    "Location" : {
+
+    },
+    "Luxembourg public transport — departures, journeys, and disruptions." : {
+
+    },
+    "Luxembourg transit map" : {
+
+    },
+    "Verkéier" : {
+
+    },
+    "Maps:" : {
+
+    },
+    "Mode preference" : {
+
+    },
+    "Name this trip so you can re-plan it in one tap. Use “Home → Work” for time-of-day commute suggestions." : {
+
+    },
+    "Nearby" : {
+
+    },
+    "Nearby Stops" : {
+
+    },
+    "Nearby Suggestions" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschläge in der Nähe"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggestions à proximité"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Virschléi an der Géigend"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sugestões próximas"
+          }
+        }
+      }
+    },
+    "Night bus" : {
+
+    },
+    "No departures" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Abfahrten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun départ"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keng Departuren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem partidas"
+          }
+        }
+      }
+    },
+    "No favourites" : {
+
+    },
+    "No matches" : {
+
+    },
+    "No nearby stops" : {
+
+    },
+    "Not wheelchair accessible" : {
+
+    },
+    "Notifications" : {
+
+    },
+    "Offline mode" : {
+
+    },
+    "On time" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pünktlich"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À l’heure"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Op der Zäit"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pontual"
+          }
+        }
+      }
+    },
+    "Open Favourite Stop" : {
+
+    },
+    "Open in Apple Maps" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Karten öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir dans Plans"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An Apple Maps opmaachen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir no Mapas"
+          }
+        }
+      }
+    },
+    "Open iOS Settings" : {
+
+    },
+    "Open Verkéier route planning for a destination." : {
+
+    },
+    "Open Verkéier to a saved favourite stop." : {
+
+    },
+    "Open Verkéier to nearby public transport stops." : {
+
+    },
+    "Open Verkéier to track the next departure from a favourite stop." : {
+
+    },
+    "Open Stop" : {
+
+    },
+    "Opening %@." : {
+
+    },
+    "Opening departure tracking." : {
+
+    },
+    "Opening nearby stops." : {
+
+    },
+    "Opening route planning." : {
+
+    },
+    "Opens route step-by-step timeline" : {
+
+    },
+    "Permissions" : {
+
+    },
+    "Plan Route" : {
+
+    },
+    "Platform" : {
+
+    },
+    "Platform %@" : {
+
+    },
+    "Platform changed from %@" : {
+
+    },
+    "Platform filter" : {
+
+    },
+    "Prefer accessible options" : {
+
+    },
+    "Prefer step-free routes" : {
+
+    },
+    "Preferred mode" : {
+
+    },
+    "Privacy" : {
+
+    },
+    "Quick destinations" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schnellziele"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destinations rapides"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Séier Destinatiounen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destinos rápidos"
+          }
+        }
+      }
+    },
+    "Recent" : {
+
+    },
+    "Recent Places" : {
+
+    },
+    "Recently departed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kürzlich abgefahren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partis récemment"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viru kuerzem fortgefuer"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partiu recentemente"
+          }
+        }
+      }
+    },
+    "Refresh alerts" : {
+
+    },
+    "Refresh Routes" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Routen aktualisieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiser les itinéraires"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weeër aktualiséieren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualizar rotas"
+          }
+        }
+      }
+    },
+    "Remind %lld min before" : {
+
+    },
+    "Remind %lld min before (default)" : {
+
+    },
+    "Reminder set for %lld min before %@ to %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reminder set for %1$lld min before %2$@ to %3$@"
+          }
+        }
+      }
+    },
+    "Reminders" : {
+
+    },
+    "Remove favourite" : {
+
+    },
+    "Remove Label" : {
+
+    },
+    "Route options" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Routenoptionen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options d’itinéraire"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weeoptiounen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opções de rota"
+          }
+        }
+      }
+    },
+    "Route Planner Defaults" : {
+
+    },
+    "Save" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Späicheren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar"
+          }
+        }
+      }
+    },
+    "Save a stop from its detail view." : {
+
+    },
+    "Save commute" : {
+
+    },
+    "Save Commute…" : {
+
+    },
+    "Save favourite" : {
+
+    },
+    "Scheduled" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geplant"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planifié"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geplangt"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Programado"
+          }
+        }
+      }
+    },
+    "Search" : {
+
+    },
+    "Search settings" : {
+
+    },
+    "Search stops" : {
+
+    },
+    "Search stops & places" : {
+
+    },
+    "Search stops…" : {
+
+    },
+    "Settings" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astellungen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definições"
+          }
+        }
+      }
+    },
+    "Settings and diagnostics" : {
+
+    },
+    "Settings and information" : {
+
+    },
+    "Share next departures" : {
+
+    },
+    "Share route" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route teilen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partager l’itinéraire"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wee deelen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partilhar rota"
+          }
+        }
+      }
+    },
+    "Show alerts" : {
+
+    },
+    "Show more routes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Routen anzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher plus d’itinéraires"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Méi Weeër weisen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar mais rotas"
+          }
+        }
+      }
+    },
+    "Show Nearby Stops" : {
+
+    },
+    "Show only stops labelled “Work” and your commute preset while this Focus is on." : {
+
+    },
+    "Show the next departures for a favourite stop." : {
+
+    },
+    "Sort by" : {
+
+    },
+    "Sort routes" : {
+
+    },
+    "Start typing to find a stop, address, or place." : {
+
+    },
+    "Start typing to find stops from local GTFS data." : {
+
+    },
+    "Step-free, wheelchair accessible" : {
+
+    },
+    "Stop" : {
+
+    },
+    "Stop %@" : {
+
+    },
+    "Stop search" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestellensuche"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recherche d’arrêt"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statiounssich"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisa de paragem"
+          }
+        }
+      }
+    },
+    "Stop Sequence" : {
+
+    },
+    "Stop tracking departure" : {
+
+    },
+    "Stops unavailable" : {
+
+    },
+    "Support" : {
+
+    },
+    "Swap origin and destination" : {
+
+    },
+    "Tap a stop to see departures and save it to your commute." : {
+
+    },
+    "Theme" : {
+
+    },
+    "These AVL alerts affect this stop or its served lines." : {
+
+    },
+    "This app is not an official Luxembourg public transport app." : {
+
+    },
+    "Time" : {
+
+    },
+    "Track departure" : {
+
+    },
+    "Track Departure" : {
+
+    },
+    "Track Next Departure" : {
+
+    },
+    "Tram T0" : {
+
+    },
+    "Transfers" : {
+
+    },
+    "Transport data:" : {
+
+    },
+    "Try again when your location is available." : {
+
+    },
+    "Try another stop name." : {
+
+    },
+    "Try another stop, address, or place name." : {
+
+    },
+    "Units" : {
+
+    },
+    "Upcoming Timetable" : {
+
+    },
+    "vel’OH! %@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "vel’OH! %1$@, %2$@"
+          }
+        }
+      }
+    },
+    "Ville de Luxembourg - AVL Autobus" : {
+
+    },
+    "Walking" : {
+
+    },
+    "Wheelchair accessible" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rollstuhlgerecht"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessible en fauteuil roulant"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rollstullzougänglech"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acessível a cadeira de rodas"
+          }
+        }
+      }
+    },
+    "Work stops only" : {
+
+    }
+  },
+  "version" : "1.0"
+}

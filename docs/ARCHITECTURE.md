@@ -52,7 +52,7 @@ Rules:
 ## Main Modules
 
 ```text
-LuxTransit/
+Verkéier/
 ├── App/
 ├── Features/
 │   ├── Map/
@@ -128,7 +128,7 @@ func endTracking()
 ## Dependency Injection
 
 Services are injected via SwiftUI `EnvironmentValues` using `@Entry`
-(Swift 5.10+). All entries are declared in `LuxTransit/App/AppDependencies.swift`.
+(Swift 5.10+). All entries are declared in `Verkéier/App/AppDependencies.swift`.
 
 ```swift
 // Read in any view:
@@ -140,14 +140,14 @@ Services are injected via SwiftUI `EnvironmentValues` using `@Entry`
 }
 ```
 
-The app entry point (`LuxTransitApp`) wires live implementations at launch.
+The app entry point (`VerkéierApp`) wires live implementations at launch.
 Default values in `AppDependencies.swift` are the safe no-op stubs
 (`EmptyATPClient`, `LocalGTFSService`). See `docs/SERVICES.md` for all
 protocol signatures and mock implementations.
 
 ## Domain Model Inventory
 
-15 model files in `LuxTransit/Models/`. Key ones:
+15 model files in `Verkéier/Models/`. Key ones:
 
 - **Stop** — canonical place: id, name, locality, location, modes, platformIds
 - **Departure** — one departure row; scheduled/realtime times, delayMinutes, isCancelled

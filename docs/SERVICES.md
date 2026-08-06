@@ -1,12 +1,12 @@
 # Services
 
-All service protocols live in `LuxTransit/Services/`. Every protocol has a
+All service protocols live in `Verkéier/Services/`. Every protocol has a
 production implementation, at least one mock, and an empty stub. Inject via
 SwiftUI `@Environment` — never construct services inside views.
 
 ## Dependency Injection
 
-Entries are declared in `LuxTransit/App/AppDependencies.swift`:
+Entries are declared in `Verkéier/App/AppDependencies.swift`:
 
 ```swift
 extension EnvironmentValues {
@@ -54,7 +54,7 @@ public interface.
 
 ---
 
-## ATPClient — `LuxTransit/Services/ATP/ATPClient.swift`
+## ATPClient — `Verkéier/Services/ATP/ATPClient.swift`
 
 Live transit data from the mobiliteit.lu OpenAPI. Gated behind `ATP_ACCESS_ID`;
 `EmptyATPClient` is used when the key is absent.
@@ -77,7 +77,7 @@ enum ATPClientError: Error, Equatable {
 
 ---
 
-## GTFSService — `LuxTransit/Services/GTFS/GTFSService.swift`
+## GTFSService — `Verkéier/Services/GTFS/GTFSService.swift`
 
 On-device GTFS lookups. All methods are non-throwing and work fully offline.
 Production implementation: `LocalGTFSService`.
@@ -96,7 +96,7 @@ protocol GTFSService: Sendable {
 
 ---
 
-## AVLClient — `LuxTransit/Services/AVL/AVLClient.swift`
+## AVLClient — `Verkéier/Services/AVL/AVLClient.swift`
 
 Ville de Luxembourg disruption XML feed.
 
@@ -114,7 +114,7 @@ enum AVLClientError: Error {
 
 ---
 
-## RouteService — `LuxTransit/Services/Routing/RouteService.swift`
+## RouteService — `Verkéier/Services/Routing/RouteService.swift`
 
 Journey planning and Apple Maps handoff.
 
@@ -151,7 +151,7 @@ and map annotations can show the same snapshot.
 
 ---
 
-## GTFSUpdateError — `LuxTransit/Services/GTFS/GTFSUpdateError.swift`
+## GTFSUpdateError — `Verkéier/Services/GTFS/GTFSUpdateError.swift`
 
 ```swift
 enum GTFSUpdateError: Error {
@@ -167,7 +167,7 @@ enum GTFSUpdateError: Error {
 
 ---
 
-## Domain model inventory — `LuxTransit/Models/`
+## Domain model inventory — `Verkéier/Models/`
 
 | Model | Purpose |
 |---|---|

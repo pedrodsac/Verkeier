@@ -68,7 +68,7 @@ When working in this codebase as an AI agent:
 - Start with `docs/README.md` to orient yourself, then read `docs/SERVICES.md`
   for service contracts before touching any feature code.
 - Never guess a protocol method signature — read the protocol file directly
-  (`LuxTransit/Services/<Name>/<Name>.swift`).
+  (`Verkéier/Services/<Name>/<Name>.swift`).
 - Inject mocks via `.environment(\.serviceName, MockImpl())` in previews;
   pass mock implementations directly to view model constructors in tests.
 - `DataSource.mock` must never appear in production code paths — it is

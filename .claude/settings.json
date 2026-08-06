@@ -1,8 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xcodebuild -project LuxTransit.xcodeproj -scheme LuxTransit -destination *)",
-      "Bash(xcodebuild -project LuxTransit.xcodeproj -list)",
+      "Bash(xcodebuild -project Verkéier.xcodeproj -scheme Verkéier -destination *)",
+      "Bash(xcodebuild -project Verkéier.xcodeproj -list)",
       "Bash(python3 Scripts/preprocess_gtfs.py *)"
     ],
     "deny": []

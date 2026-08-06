@@ -60,7 +60,7 @@ The current dataset page exposes dated ZIP resources such as:
 Preprocessing:
 
 ```sh
-python3 Scripts/preprocess_gtfs.py /path/to/gtfs.zip LuxTransit/Resources/gtfs-compact.json
+python3 Scripts/preprocess_gtfs.py /path/to/gtfs.zip Verkéier/Resources/gtfs-compact.json
 ```
 
 The app loads cached/generated GTFS data when available. It does not fall back to bundled sample stops; if no GTFS data has been fetched or bundled, GTFS stop results remain empty.

@@ -5,8 +5,8 @@
       "name": "iOS Simulator",
       "runtimeExecutable": "xcodebuild",
       "runtimeArgs": [
-        "-project", "LuxTransit.xcodeproj",
-        "-scheme", "LuxTransit",
+        "-project", "Verkéier.xcodeproj",
+        "-scheme", "Verkéier",
         "-destination", "platform=iOS Simulator,name=iPhone 17",
         "build-for-testing"
       ],

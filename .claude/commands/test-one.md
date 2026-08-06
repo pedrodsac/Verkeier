@@ -6,5 +6,5 @@ argument-hint: <TestClass[/testMethod]>
 Run only the test target `$ARGUMENTS` and summarize the result.
 
 ```sh
-xcodebuild -project LuxTransit.xcodeproj -scheme LuxTransit -destination 'platform=iOS Simulator,name=iPhone 17' test -only-testing:LuxTransitTests/$ARGUMENTS
+xcodebuild -project Verkéier.xcodeproj -scheme Verkéier -destination 'platform=iOS Simulator,name=iPhone 17' test -only-testing:VerkéierTests/$ARGUMENTS
 ```

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Preprocess a GTFS feed into the compact JSON used by LuxTransit.
+"""Preprocess a GTFS feed into the compact JSON used by Verkéier.
 
 Input may be either a GTFS zip file or an extracted GTFS directory. The output
 keeps stop search and route metadata small enough for app-bundle use.

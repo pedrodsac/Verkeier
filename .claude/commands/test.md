@@ -1,9 +1,9 @@
 ---
-description: Run the full LuxTransit test suite
+description: Run the full Verkéier test suite
 ---
 
 Run the full Swift Testing suite and summarize failures (file:line + reason).
 
 ```sh
-xcodebuild -project LuxTransit.xcodeproj -scheme LuxTransit -destination 'platform=iOS Simulator,name=iPhone 17' test
+xcodebuild -project Verkéier.xcodeproj -scheme Verkéier -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```

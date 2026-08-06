@@ -29,682 +29,682 @@
     "ast_hash": "4508d8ca8843328cb617a99c240c3383",
     "semantic_hash": "4508d8ca8843328cb617a99c240c3383"
   },
-  "LuxTransit/App/AppConfiguration.swift": {
+  "Verkéier/App/AppConfiguration.swift": {
     "mtime": 1782111463.6041803,
     "ast_hash": "26adf1abf8ef7d440b0003e713c6b661",
     "semantic_hash": "26adf1abf8ef7d440b0003e713c6b661"
   },
-  "LuxTransit/App/AppDependencies.swift": {
+  "Verkéier/App/AppDependencies.swift": {
     "mtime": 1782683199.272293,
     "ast_hash": "77b5bbe95c3020f61afcddf8fbbd444e",
     "semantic_hash": "77b5bbe95c3020f61afcddf8fbbd444e"
   },
-  "LuxTransit/App/AppModelContainer.swift": {
+  "Verkéier/App/AppModelContainer.swift": {
     "mtime": 1782111463.6043603,
     "ast_hash": "1de2a89491ed550cb671dbf1a710e48c",
     "semantic_hash": "1de2a89491ed550cb671dbf1a710e48c"
   },
-  "LuxTransit/App/AppPreferences.swift": {
+  "Verkéier/App/AppPreferences.swift": {
     "mtime": 1782927467.940526,
     "ast_hash": "fea09e5b288d675f8965037b9b7f3554",
     "semantic_hash": "fea09e5b288d675f8965037b9b7f3554"
   },
-  "LuxTransit/App/DebugTransitDataMode.swift": {
+  "Verkéier/App/DebugTransitDataMode.swift": {
     "mtime": 1782111463.6044443,
     "ast_hash": "ed75b46dd039aed3172a02b188639743",
     "semantic_hash": "ed75b46dd039aed3172a02b188639743"
   },
-  "LuxTransit/App/DebugTransitFixtures.swift": {
+  "Verkéier/App/DebugTransitFixtures.swift": {
     "mtime": 1782480051.3508654,
     "ast_hash": "526d3ccb04690efb8c812a6b82fba1e6",
     "semantic_hash": "526d3ccb04690efb8c812a6b82fba1e6"
   },
-  "LuxTransit/App/LuxTransitApp.swift": {
+  "Verkéier/App/VerkéierApp.swift": {
     "mtime": 1782927500.6977053,
     "ast_hash": "28020783ed1344132692e3dac37d3b5a",
     "semantic_hash": "28020783ed1344132692e3dac37d3b5a"
   },
-  "LuxTransit/App/SettingsSupport.swift": {
+  "Verkéier/App/SettingsSupport.swift": {
     "mtime": 1782111463.604762,
     "ast_hash": "f385bc485d611a0d99ef0dcd1167e54f",
     "semantic_hash": "f385bc485d611a0d99ef0dcd1167e54f"
   },
-  "LuxTransit/Assets.xcassets/AppIcon.appiconset/Contents.json": {
+  "Verkéier/Assets.xcassets/AppIcon.appiconset/Contents.json": {
     "mtime": 1782929961.720244,
     "ast_hash": "cc0fa974a2eb9d06669de8f7d07455fc",
     "semantic_hash": "cc0fa974a2eb9d06669de8f7d07455fc"
   },
-  "LuxTransit/Assets.xcassets/Contents.json": {
+  "Verkéier/Assets.xcassets/Contents.json": {
     "mtime": 1782929965.5493343,
     "ast_hash": "9deb2ada1cc834bbebf8bbad9c8978a1",
     "semantic_hash": "9deb2ada1cc834bbebf8bbad9c8978a1"
   },
-  "LuxTransit/Features/Alerts/Views/AlertsView.swift": {
+  "Verkéier/Features/Alerts/Views/AlertsView.swift": {
     "mtime": 1782111463.605028,
     "ast_hash": "2567b82dbfe9cf05d7154c856be052cd",
     "semantic_hash": "2567b82dbfe9cf05d7154c856be052cd"
   },
-  "LuxTransit/Features/AppIntents/FavouriteStopEntity.swift": {
+  "Verkéier/Features/AppIntents/FavouriteStopEntity.swift": {
     "mtime": 1782111463.605157,
     "ast_hash": "48bc5edc2002ad21cbc78033f9f999c4",
     "semantic_hash": "48bc5edc2002ad21cbc78033f9f999c4"
   },
-  "LuxTransit/Features/AppIntents/FavouriteStopSpotlightIndexer.swift": {
+  "Verkéier/Features/AppIntents/FavouriteStopSpotlightIndexer.swift": {
     "mtime": 1782667570.479938,
     "ast_hash": "b9472105ce2623b9161022a45575da0f",
     "semantic_hash": "b9472105ce2623b9161022a45575da0f"
   },
-  "LuxTransit/Features/AppIntents/NextDeparturesIntentService.swift": {
+  "Verkéier/Features/AppIntents/NextDeparturesIntentService.swift": {
     "mtime": 1782111463.6052432,
     "ast_hash": "529620a51f5d30012282051737dafa98",
     "semantic_hash": "529620a51f5d30012282051737dafa98"
   },
-  "LuxTransit/Features/AppIntents/TransitAppIntents.swift": {
+  "Verkéier/Features/AppIntents/TransitAppIntents.swift": {
     "mtime": 1782111463.6053486,
     "ast_hash": "448650a2a343fb92775823624cfb8e36",
     "semantic_hash": "448650a2a343fb92775823624cfb8e36"
   },
-  "LuxTransit/Features/AppIntents/TransitFocusFilter.swift": {
+  "Verkéier/Features/AppIntents/TransitFocusFilter.swift": {
     "mtime": 1782683380.7545502,
     "ast_hash": "41c1cf6343749f64e0541d247733618c",
     "semantic_hash": "41c1cf6343749f64e0541d247733618c"
   },
-  "LuxTransit/Features/AppIntents/TransitIntentHandoff.swift": {
+  "Verkéier/Features/AppIntents/TransitIntentHandoff.swift": {
     "mtime": 1782111463.6054246,
     "ast_hash": "8e4fed69a73b4c26737108f30e071926",
     "semantic_hash": "8e4fed69a73b4c26737108f30e071926"
   },
-  "LuxTransit/Features/BottomSheet/BottomSheetMode.swift": {
+  "Verkéier/Features/BottomSheet/BottomSheetMode.swift": {
     "mtime": 1782111463.6055572,
     "ast_hash": "d45fcb2255fa90f9695cd654de12883c",
     "semantic_hash": "d45fcb2255fa90f9695cd654de12883c"
   },
-  "LuxTransit/Features/BottomSheet/BottomSheetPresentation.swift": {
+  "Verkéier/Features/BottomSheet/BottomSheetPresentation.swift": {
     "mtime": 1782681282.9435027,
     "ast_hash": "985513407991b4ceda03044f54ce5edd",
     "semantic_hash": "985513407991b4ceda03044f54ce5edd"
   },
-  "LuxTransit/Features/BottomSheet/Components/PlaceholderPanel.swift": {
+  "Verkéier/Features/BottomSheet/Components/PlaceholderPanel.swift": {
     "mtime": 1782111463.6057985,
     "ast_hash": "4df0fb02ac370c0e4fc644debda140f3",
     "semantic_hash": "4df0fb02ac370c0e4fc644debda140f3"
   },
-  "LuxTransit/Features/BottomSheet/Views/BottomSheetContent.swift": {
+  "Verkéier/Features/BottomSheet/Views/BottomSheetContent.swift": {
     "mtime": 1782667471.0494595,
     "ast_hash": "ed96caf3975aa37abb33d2d4ed450857",
     "semantic_hash": "ed96caf3975aa37abb33d2d4ed450857"
   },
-  "LuxTransit/Features/BottomSheet/Views/TransitBottomSheet.swift": {
+  "Verkéier/Features/BottomSheet/Views/TransitBottomSheet.swift": {
     "mtime": 1782250146.982261,
     "ast_hash": "72930ff0b0ffb2250a5775ca88fe8004",
     "semantic_hash": "72930ff0b0ffb2250a5775ca88fe8004"
   },
-  "LuxTransit/Features/Favourites/Views/CommuteDashboardView.swift": {
+  "Verkéier/Features/Favourites/Views/CommuteDashboardView.swift": {
     "mtime": 1782680256.9689765,
     "ast_hash": "1ab422c67c55851a01949b8745945dbb",
     "semantic_hash": "1ab422c67c55851a01949b8745945dbb"
   },
-  "LuxTransit/Features/Favourites/Views/FavouritesView.swift": {
+  "Verkéier/Features/Favourites/Views/FavouritesView.swift": {
     "mtime": 1782683349.8172731,
     "ast_hash": "1e5425a103276674536b6eca8f33e45b",
     "semantic_hash": "1e5425a103276674536b6eca8f33e45b"
   },
-  "LuxTransit/Features/LiveActivities/DepartureTrackingSelection.swift": {
+  "Verkéier/Features/LiveActivities/DepartureTrackingSelection.swift": {
     "mtime": 1782111463.6065612,
     "ast_hash": "bbaa009720250c430031a5404141331c",
     "semantic_hash": "bbaa009720250c430031a5404141331c"
   },
-  "LuxTransit/Features/LiveActivities/LiveActivityManager.swift": {
+  "Verkéier/Features/LiveActivities/LiveActivityManager.swift": {
     "mtime": 1782111463.606642,
     "ast_hash": "c53f18e71cf98f9cced06401edecb344",
     "semantic_hash": "c53f18e71cf98f9cced06401edecb344"
   },
-  "LuxTransit/Features/Map/ViewModels/TransitMapViewModel+DataLoading.swift": {
+  "Verkéier/Features/Map/ViewModels/TransitMapViewModel+DataLoading.swift": {
     "mtime": 1782732745.287293,
     "ast_hash": "605043e6c55398411cc0586bb888fced",
     "semantic_hash": "605043e6c55398411cc0586bb888fced"
   },
-  "LuxTransit/Features/Map/ViewModels/TransitMapViewModel.swift": {
+  "Verkéier/Features/Map/ViewModels/TransitMapViewModel.swift": {
     "mtime": 1782950011.7275243,
     "ast_hash": "8feabfb7c371bb199de486e44acf0e9c",
     "semantic_hash": "8feabfb7c371bb199de486e44acf0e9c"
   },
-  "LuxTransit/Features/Map/Views/MapModeFilterBar.swift": {
+  "Verkéier/Features/Map/Views/MapModeFilterBar.swift": {
     "mtime": 1782666570.7365751,
     "ast_hash": "cdea2bd94c74f760a8fbe583ce5f778c",
     "semantic_hash": "cdea2bd94c74f760a8fbe583ce5f778c"
   },
-  "LuxTransit/Features/Map/Views/TransitMapAnnotations.swift": {
+  "Verkéier/Features/Map/Views/TransitMapAnnotations.swift": {
     "mtime": 1782732210.254255,
     "ast_hash": "a96e04b74c81d69d9e68749bcf871bd8",
     "semantic_hash": "a96e04b74c81d69d9e68749bcf871bd8"
   },
-  "LuxTransit/Features/Map/Views/TransitMapScreen.swift": {
+  "Verkéier/Features/Map/Views/TransitMapScreen.swift": {
     "mtime": 1782732296.2543743,
     "ast_hash": "749aff0a62c29c29b7609e348bf3ec92",
     "semantic_hash": "749aff0a62c29c29b7609e348bf3ec92"
   },
-  "LuxTransit/Features/Map/Views/TransitMapView.swift": {
+  "Verkéier/Features/Map/Views/TransitMapView.swift": {
     "mtime": 1782732296.254224,
     "ast_hash": "362f88ef991f010135252b772cdef668",
     "semantic_hash": "362f88ef991f010135252b772cdef668"
   },
-  "LuxTransit/Features/Routes/Components/RouteEndpointsCard.swift": {
+  "Verkéier/Features/Routes/Components/RouteEndpointsCard.swift": {
     "mtime": 1782680677.6232295,
     "ast_hash": "b83c9be06f7e388626f18b97913f8e65",
     "semantic_hash": "b83c9be06f7e388626f18b97913f8e65"
   },
-  "LuxTransit/Features/Routes/Components/RouteOptionBadge.swift": {
+  "Verkéier/Features/Routes/Components/RouteOptionBadge.swift": {
     "mtime": 1782731804.4599562,
     "ast_hash": "51daa19c780029ea6c25e819f3844285",
     "semantic_hash": "51daa19c780029ea6c25e819f3844285"
   },
-  "LuxTransit/Features/Routes/Components/RouteOptionCard.swift": {
+  "Verkéier/Features/Routes/Components/RouteOptionCard.swift": {
     "mtime": 1782680258.3661172,
     "ast_hash": "7ccdb9ac3e42f99beb958591ac2b3fd7",
     "semantic_hash": "7ccdb9ac3e42f99beb958591ac2b3fd7"
   },
-  "LuxTransit/Features/Routes/Components/RouteOptionsBar.swift": {
+  "Verkéier/Features/Routes/Components/RouteOptionsBar.swift": {
     "mtime": 1782681109.5684807,
     "ast_hash": "ee07ecd2683ffe92bbdb0842222e8dc3",
     "semantic_hash": "ee07ecd2683ffe92bbdb0842222e8dc3"
   },
-  "LuxTransit/Features/Routes/Components/RouteRibbon.swift": {
+  "Verkéier/Features/Routes/Components/RouteRibbon.swift": {
     "mtime": 1782131283.3119774,
     "ast_hash": "55c1092b00863526f2180df4fe71bae1",
     "semantic_hash": "55c1092b00863526f2180df4fe71bae1"
   },
-  "LuxTransit/Features/Routes/Components/RouteShareText.swift": {
+  "Verkéier/Features/Routes/Components/RouteShareText.swift": {
     "mtime": 1782681485.6540825,
     "ast_hash": "c5b9a9198bb5a8a8f6f2316f9267051a",
     "semantic_hash": "c5b9a9198bb5a8a8f6f2316f9267051a"
   },
-  "LuxTransit/Features/Routes/Components/RouteSupportingViews.swift": {
+  "Verkéier/Features/Routes/Components/RouteSupportingViews.swift": {
     "mtime": 1782127515.5984306,
     "ast_hash": "a51fd81c62e083780d9a86d45bf4bef0",
     "semantic_hash": "a51fd81c62e083780d9a86d45bf4bef0"
   },
-  "LuxTransit/Features/Routes/Components/RouteTimeline.swift": {
+  "Verkéier/Features/Routes/Components/RouteTimeline.swift": {
     "mtime": 1782666639.8701482,
     "ast_hash": "c4c7e637d00f7b8fc3b3d82d8bafec2c",
     "semantic_hash": "c4c7e637d00f7b8fc3b3d82d8bafec2c"
   },
-  "LuxTransit/Features/Routes/Components/RouteTimelineModel.swift": {
+  "Verkéier/Features/Routes/Components/RouteTimelineModel.swift": {
     "mtime": 1782480003.049171,
     "ast_hash": "ac15dd4f911bf451a99cf23c87e871b6",
     "semantic_hash": "ac15dd4f911bf451a99cf23c87e871b6"
   },
-  "LuxTransit/Features/Routes/Views/LineDetailView.swift": {
+  "Verkéier/Features/Routes/Views/LineDetailView.swift": {
     "mtime": 1782111463.6072717,
     "ast_hash": "f244472abdc4b2d377af2738766c4cc0",
     "semantic_hash": "f244472abdc4b2d377af2738766c4cc0"
   },
-  "LuxTransit/Features/Routes/Views/RouteTimelineView.swift": {
+  "Verkéier/Features/Routes/Views/RouteTimelineView.swift": {
     "mtime": 1782732102.234804,
     "ast_hash": "fdd8359167a817dd258aedc0980f34a7",
     "semantic_hash": "fdd8359167a817dd258aedc0980f34a7"
   },
-  "LuxTransit/Features/Routes/Views/RouteView.swift": {
+  "Verkéier/Features/Routes/Views/RouteView.swift": {
     "mtime": 1782732120.4787436,
     "ast_hash": "bba448c675af02662aab72d7f230ff43",
     "semantic_hash": "bba448c675af02662aab72d7f230ff43"
   },
-  "LuxTransit/Features/Search/Views/SearchView.swift": {
+  "Verkéier/Features/Search/Views/SearchView.swift": {
     "mtime": 1782731812.142933,
     "ast_hash": "16821856558f976a772de693dda05c9d",
     "semantic_hash": "16821856558f976a772de693dda05c9d"
   },
-  "LuxTransit/Features/Settings/Views/SettingsAboutView.swift": {
+  "Verkéier/Features/Settings/Views/SettingsAboutView.swift": {
     "mtime": 1782731675.7561479,
     "ast_hash": "d88a30895b8778d8a52581ea48f2b711",
     "semantic_hash": "d88a30895b8778d8a52581ea48f2b711"
   },
-  "LuxTransit/Features/Settings/Views/SettingsAdvancedView.swift": {
+  "Verkéier/Features/Settings/Views/SettingsAdvancedView.swift": {
     "mtime": 1782135786.3683717,
     "ast_hash": "17685bb54c278e474877f8c2a302806b",
     "semantic_hash": "17685bb54c278e474877f8c2a302806b"
   },
-  "LuxTransit/Features/Settings/Views/SettingsView.swift": {
+  "Verkéier/Features/Settings/Views/SettingsView.swift": {
     "mtime": 1782927512.626029,
     "ast_hash": "c5d87758bf0bfcfcaebe308c2e7a2005",
     "semantic_hash": "c5d87758bf0bfcfcaebe308c2e7a2005"
   },
-  "LuxTransit/Features/Shared/FirstRunOnboardingView.swift": {
+  "Verkéier/Features/Shared/FirstRunOnboardingView.swift": {
     "mtime": 1782731282.815182,
     "ast_hash": "aeaba23d0341aa70a7d0f58292120695",
     "semantic_hash": "aeaba23d0341aa70a7d0f58292120695"
   },
-  "LuxTransit/Features/Shared/ReduceMotionAnimation.swift": {
+  "Verkéier/Features/Shared/ReduceMotionAnimation.swift": {
     "mtime": 1782680210.8568006,
     "ast_hash": "259c4bd4e2baceacbe48754946aa2def",
     "semantic_hash": "259c4bd4e2baceacbe48754946aa2def"
   },
-  "LuxTransit/Features/Shared/TransportModeStyle.swift": {
+  "Verkéier/Features/Shared/TransportModeStyle.swift": {
     "mtime": 1782122728.7049847,
     "ast_hash": "6e34f95839fc74bd88ead76426627fff",
     "semantic_hash": "6e34f95839fc74bd88ead76426627fff"
   },
-  "LuxTransit/Features/Stops/Components/NextDepartureHeroCard.swift": {
+  "Verkéier/Features/Stops/Components/NextDepartureHeroCard.swift": {
     "mtime": 1782665563.571199,
     "ast_hash": "228c5df91c54be1f9f3086156c514c2c",
     "semantic_hash": "228c5df91c54be1f9f3086156c514c2c"
   },
-  "LuxTransit/Features/Stops/Components/StopListRow.swift": {
+  "Verkéier/Features/Stops/Components/StopListRow.swift": {
     "mtime": 1782682978.1300142,
     "ast_hash": "6e9df4a3a073509c8b6c3dd18f6e4cac",
     "semantic_hash": "6e9df4a3a073509c8b6c3dd18f6e4cac"
   },
-  "LuxTransit/Features/Stops/Views/NearbyStopsView.swift": {
+  "Verkéier/Features/Stops/Views/NearbyStopsView.swift": {
     "mtime": 1782666620.8086839,
     "ast_hash": "43824c4b29c44fe2942b5baf0ef17636",
     "semantic_hash": "43824c4b29c44fe2942b5baf0ef17636"
   },
-  "LuxTransit/Features/Stops/Views/StopDetailView.swift": {
+  "Verkéier/Features/Stops/Views/StopDetailView.swift": {
     "mtime": 1782731892.2841208,
     "ast_hash": "58fabc7db57b3a2282129afe9a244380",
     "semantic_hash": "58fabc7db57b3a2282129afe9a244380"
   },
-  "LuxTransit/Models/AlertMessage.swift": {
+  "Verkéier/Models/AlertMessage.swift": {
     "mtime": 1782111854.0152094,
     "ast_hash": "40aef5b6fba1451d3b81c428676f47f1",
     "semantic_hash": "40aef5b6fba1451d3b81c428676f47f1"
   },
-  "LuxTransit/Models/DataReadinessSnapshot.swift": {
+  "Verkéier/Models/DataReadinessSnapshot.swift": {
     "mtime": 1782112026.5089755,
     "ast_hash": "4d1543d39554b9fe4d72fb7cd4544059",
     "semantic_hash": "4d1543d39554b9fe4d72fb7cd4544059"
   },
-  "LuxTransit/Models/DataSource.swift": {
+  "Verkéier/Models/DataSource.swift": {
     "mtime": 1782111826.308126,
     "ast_hash": "76096938f4a8d493551b9f8f2ebbfe56",
     "semantic_hash": "76096938f4a8d493551b9f8f2ebbfe56"
   },
-  "LuxTransit/Models/Departure.swift": {
+  "Verkéier/Models/Departure.swift": {
     "mtime": 1782682063.5897806,
     "ast_hash": "bdd71346527822ef3101184b21e63f1e",
     "semantic_hash": "bdd71346527822ef3101184b21e63f1e"
   },
-  "LuxTransit/Models/FavouriteStop.swift": {
+  "Verkéier/Models/FavouriteStop.swift": {
     "mtime": 1782111861.5364478,
     "ast_hash": "c1973aa1bb68d765b37700c7aec0d901",
     "semantic_hash": "c1973aa1bb68d765b37700c7aec0d901"
   },
-  "LuxTransit/Models/LineDetail.swift": {
+  "Verkéier/Models/LineDetail.swift": {
     "mtime": 1782112011.1851568,
     "ast_hash": "616b2badf1587a75d91de272476c657b",
     "semantic_hash": "616b2badf1587a75d91de272476c657b"
   },
-  "LuxTransit/Models/LocationPoint.swift": {
+  "Verkéier/Models/LocationPoint.swift": {
     "mtime": 1782111844.9185421,
     "ast_hash": "7a1eb06d6032012c8ca8922f1a756404",
     "semantic_hash": "7a1eb06d6032012c8ca8922f1a756404"
   },
-  "LuxTransit/Models/RouteLoadingPhase.swift": {
+  "Verkéier/Models/RouteLoadingPhase.swift": {
     "mtime": 1782112017.6452458,
     "ast_hash": "edb112962de301fd264d2a2780c5e8f0",
     "semantic_hash": "edb112962de301fd264d2a2780c5e8f0"
   },
-  "LuxTransit/Models/RouteMapOverlay.swift": {
+  "Verkéier/Models/RouteMapOverlay.swift": {
     "mtime": 1782111955.9851398,
     "ast_hash": "5f8cf241243c16e919d854bdf82a08c4",
     "semantic_hash": "5f8cf241243c16e919d854bdf82a08c4"
   },
-  "LuxTransit/Models/RouteOption.swift": {
+  "Verkéier/Models/RouteOption.swift": {
     "mtime": 1782681516.8063374,
     "ast_hash": "bfabed13ee250eec5b1ea2b19bfb4fd9",
     "semantic_hash": "bfabed13ee250eec5b1ea2b19bfb4fd9"
   },
-  "LuxTransit/Models/RoutePlan.swift": {
+  "Verkéier/Models/RoutePlan.swift": {
     "mtime": 1782253520.4859655,
     "ast_hash": "851b2a36ddc3e264bd72d38f0c9a1a3c",
     "semantic_hash": "851b2a36ddc3e264bd72d38f0c9a1a3c"
   },
-  "LuxTransit/Models/RoutePlannerModels.swift": {
+  "Verkéier/Models/RoutePlannerModels.swift": {
     "mtime": 1782249491.6521835,
     "ast_hash": "9e46346581a9f7df8939468375aa51ed",
     "semantic_hash": "9e46346581a9f7df8939468375aa51ed"
   },
-  "LuxTransit/Models/Stop.swift": {
+  "Verkéier/Models/Stop.swift": {
     "mtime": 1782682649.1848307,
     "ast_hash": "07caf69e713aa4a8f0f3931e14204619",
     "semantic_hash": "07caf69e713aa4a8f0f3931e14204619"
   },
-  "LuxTransit/Models/TransitRoute.swift": {
+  "Verkéier/Models/TransitRoute.swift": {
     "mtime": 1782682955.7805188,
     "ast_hash": "1d267f77a5f3c0f42ad80245eb12bb91",
     "semantic_hash": "1d267f77a5f3c0f42ad80245eb12bb91"
   },
-  "LuxTransit/Models/TransportMode.swift": {
+  "Verkéier/Models/TransportMode.swift": {
     "mtime": 1782111818.0885122,
     "ast_hash": "c3a789b59dd481f10a3f0709780f02d4",
     "semantic_hash": "c3a789b59dd481f10a3f0709780f02d4"
   },
-  "LuxTransit/Resources/gtfs-compact.json": {
+  "Verkéier/Resources/gtfs-compact.json": {
     "mtime": 1782684399.9002042,
     "ast_hash": "9704812bede7eedc679e2a84344cba63",
     "semantic_hash": "9704812bede7eedc679e2a84344cba63"
   },
-  "LuxTransit/Services/ATP/ATPClient.swift": {
+  "Verkéier/Services/ATP/ATPClient.swift": {
     "mtime": 1782682187.0952163,
     "ast_hash": "edaa9ac457dccb840f6c17301eca672a",
     "semantic_hash": "edaa9ac457dccb840f6c17301eca672a"
   },
-  "LuxTransit/Services/ATP/ATPDTOs.swift": {
+  "Verkéier/Services/ATP/ATPDTOs.swift": {
     "mtime": 1782111463.6098514,
     "ast_hash": "059070857ac275484cd967deba645601",
     "semantic_hash": "059070857ac275484cd967deba645601"
   },
-  "LuxTransit/Services/ATP/ATPMapper.swift": {
+  "Verkéier/Services/ATP/ATPMapper.swift": {
     "mtime": 1782125160.8730166,
     "ast_hash": "91d7f0028810e80ab149863e65054045",
     "semantic_hash": "91d7f0028810e80ab149863e65054045"
   },
-  "LuxTransit/Services/ATP/ATPMockClient.swift": {
+  "Verkéier/Services/ATP/ATPMockClient.swift": {
     "mtime": 1782111463.610035,
     "ast_hash": "772388edd1766c8e27ea85a88edbc9f9",
     "semantic_hash": "772388edd1766c8e27ea85a88edbc9f9"
   },
-  "LuxTransit/Services/ATP/LiveATPClient.swift": {
+  "Verkéier/Services/ATP/LiveATPClient.swift": {
     "mtime": 1782111463.6101496,
     "ast_hash": "0ef9adf11a45d881cd99a73f38043b0f",
     "semantic_hash": "0ef9adf11a45d881cd99a73f38043b0f"
   },
-  "LuxTransit/Services/AVL/AVLClient.swift": {
+  "Verkéier/Services/AVL/AVLClient.swift": {
     "mtime": 1782112076.6442118,
     "ast_hash": "f526e9687cd16a27494a3ee32e6a3c98",
     "semantic_hash": "f526e9687cd16a27494a3ee32e6a3c98"
   },
-  "LuxTransit/Services/AVL/AVLXMLParser.swift": {
+  "Verkéier/Services/AVL/AVLXMLParser.swift": {
     "mtime": 1782111463.6103892,
     "ast_hash": "a4116138eb943d77b2ac7dd420d39b6a",
     "semantic_hash": "a4116138eb943d77b2ac7dd420d39b6a"
   },
-  "LuxTransit/Services/AVL/LiveAVLClient.swift": {
+  "Verkéier/Services/AVL/LiveAVLClient.swift": {
     "mtime": 1782111463.6104674,
     "ast_hash": "8591b380d7eded3eb93797adb89ac106",
     "semantic_hash": "8591b380d7eded3eb93797adb89ac106"
   },
-  "LuxTransit/Services/AVL/MockAVLClient.swift": {
+  "Verkéier/Services/AVL/MockAVLClient.swift": {
     "mtime": 1782111463.6105363,
     "ast_hash": "0ba4d7ff11537bfcbbcbc70115487c36",
     "semantic_hash": "0ba4d7ff11537bfcbbcbc70115487c36"
   },
-  "LuxTransit/Services/GTFS/GTFSArchiveService.swift": {
+  "Verkéier/Services/GTFS/GTFSArchiveService.swift": {
     "mtime": 1782111463.6106577,
     "ast_hash": "f9ce41dd53f52c375912c53c8152e099",
     "semantic_hash": "f9ce41dd53f52c375912c53c8152e099"
   },
-  "LuxTransit/Services/GTFS/GTFSBackgroundRefresh.swift": {
+  "Verkéier/Services/GTFS/GTFSBackgroundRefresh.swift": {
     "mtime": 1782731181.6431258,
     "ast_hash": "01a055f4b2fd490c03159541c8b027e0",
     "semantic_hash": "01a055f4b2fd490c03159541c8b027e0"
   },
-  "LuxTransit/Services/GTFS/GTFSDownloadService.swift": {
+  "Verkéier/Services/GTFS/GTFSDownloadService.swift": {
     "mtime": 1782111463.610734,
     "ast_hash": "47b3e0c6b99b3c71f6db41e159547943",
     "semantic_hash": "47b3e0c6b99b3c71f6db41e159547943"
   },
-  "LuxTransit/Services/GTFS/GTFSIndexBuilder.swift": {
+  "Verkéier/Services/GTFS/GTFSIndexBuilder.swift": {
     "mtime": 1782111463.6108303,
     "ast_hash": "24ccfd93130bf22273ff2e1017f30f86",
     "semantic_hash": "24ccfd93130bf22273ff2e1017f30f86"
   },
-  "LuxTransit/Services/GTFS/GTFSMetadataClient.swift": {
+  "Verkéier/Services/GTFS/GTFSMetadataClient.swift": {
     "mtime": 1782111463.6109183,
     "ast_hash": "88d5f80e87713ca442a9cae329a921a7",
     "semantic_hash": "88d5f80e87713ca442a9cae329a921a7"
   },
-  "LuxTransit/Services/GTFS/GTFSResourceSelector.swift": {
+  "Verkéier/Services/GTFS/GTFSResourceSelector.swift": {
     "mtime": 1782111463.6109917,
     "ast_hash": "b571301a742e4bde11dca6ebc07de1f9",
     "semantic_hash": "b571301a742e4bde11dca6ebc07de1f9"
   },
-  "LuxTransit/Services/GTFS/GTFSService.swift": {
+  "Verkéier/Services/GTFS/GTFSService.swift": {
     "mtime": 1782112065.0416296,
     "ast_hash": "8449463ef22212d510b3dd81ad713c85",
     "semantic_hash": "8449463ef22212d510b3dd81ad713c85"
   },
-  "LuxTransit/Services/GTFS/GTFSTimetableIndex.swift": {
+  "Verkéier/Services/GTFS/GTFSTimetableIndex.swift": {
     "mtime": 1782111463.6111722,
     "ast_hash": "ab7094d4ea7de27ef0a81c9518cdeca8",
     "semantic_hash": "ab7094d4ea7de27ef0a81c9518cdeca8"
   },
-  "LuxTransit/Services/GTFS/GTFSUpdateError.swift": {
+  "Verkéier/Services/GTFS/GTFSUpdateError.swift": {
     "mtime": 1782111463.61124,
     "ast_hash": "8dce8267f1676a0e8151ba3cea8eb8b8",
     "semantic_hash": "8dce8267f1676a0e8151ba3cea8eb8b8"
   },
-  "LuxTransit/Services/GTFS/GTFSUpdateService.swift": {
+  "Verkéier/Services/GTFS/GTFSUpdateService.swift": {
     "mtime": 1782112118.2960045,
     "ast_hash": "9b50d51e4633bb20d16ec854155910f2",
     "semantic_hash": "9b50d51e4633bb20d16ec854155910f2"
   },
-  "LuxTransit/Services/GTFS/GTFSValidator.swift": {
+  "Verkéier/Services/GTFS/GTFSValidator.swift": {
     "mtime": 1782111463.611408,
     "ast_hash": "083393b408546ef24d1ba0d2395d283a",
     "semantic_hash": "083393b408546ef24d1ba0d2395d283a"
   },
-  "LuxTransit/Services/GTFS/LineDetailService.swift": {
+  "Verkéier/Services/GTFS/LineDetailService.swift": {
     "mtime": 1782112144.7723057,
     "ast_hash": "2f4855152810b7b04f1c49f6ad43b636",
     "semantic_hash": "2f4855152810b7b04f1c49f6ad43b636"
   },
-  "LuxTransit/Services/GTFS/LocalGTFSService.swift": {
+  "Verkéier/Services/GTFS/LocalGTFSService.swift": {
     "mtime": 1782682629.447459,
     "ast_hash": "ceb0f66423acd8bd418350f62f0b883c",
     "semantic_hash": "ceb0f66423acd8bd418350f62f0b883c"
   },
-  "LuxTransit/Services/GTFS/Models/DataPublicDataset.swift": {
+  "Verkéier/Services/GTFS/Models/DataPublicDataset.swift": {
     "mtime": 1782111463.611683,
     "ast_hash": "8c96a232b72974a90765b096b1b31662",
     "semantic_hash": "8c96a232b72974a90765b096b1b31662"
   },
-  "LuxTransit/Services/GTFS/Models/LocalGTFSMetadata.swift": {
+  "Verkéier/Services/GTFS/Models/LocalGTFSMetadata.swift": {
     "mtime": 1782111463.6117523,
     "ast_hash": "2b8f3b7dccb58a4d5938ec80daf15d48",
     "semantic_hash": "2b8f3b7dccb58a4d5938ec80daf15d48"
   },
-  "LuxTransit/Services/GTFS/OfflineScheduleService.swift": {
+  "Verkéier/Services/GTFS/OfflineScheduleService.swift": {
     "mtime": 1782555243.328472,
     "ast_hash": "e52bc57b7d494a77c845911266ef80c6",
     "semantic_hash": "e52bc57b7d494a77c845911266ef80c6"
   },
-  "LuxTransit/Services/Location/LocationService.swift": {
+  "Verkéier/Services/Location/LocationService.swift": {
     "mtime": 1782112169.1714408,
     "ast_hash": "56ed09222a4ee9a6e844961904542907",
     "semantic_hash": "56ed09222a4ee9a6e844961904542907"
   },
-  "LuxTransit/Services/Location/PlaceSearchService.swift": {
+  "Verkéier/Services/Location/PlaceSearchService.swift": {
     "mtime": 1782680728.3467324,
     "ast_hash": "eaf2b108220653dbd924c9fb95f76fe7",
     "semantic_hash": "eaf2b108220653dbd924c9fb95f76fe7"
   },
-  "LuxTransit/Services/Notifications/DepartureReminderService.swift": {
+  "Verkéier/Services/Notifications/DepartureReminderService.swift": {
     "mtime": 1782112153.4801939,
     "ast_hash": "4aa8305292760d2f826d04461bb3242d",
     "semantic_hash": "4aa8305292760d2f826d04461bb3242d"
   },
-  "LuxTransit/Services/Notifications/DisruptionAlertService.swift": {
+  "Verkéier/Services/Notifications/DisruptionAlertService.swift": {
     "mtime": 1782667609.415512,
     "ast_hash": "a0bd1bd43d48373e553f72788fd8bdb6",
     "semantic_hash": "a0bd1bd43d48373e553f72788fd8bdb6"
   },
-  "LuxTransit/Services/Routing/MapKitRouteService.swift": {
+  "Verkéier/Services/Routing/MapKitRouteService.swift": {
     "mtime": 1782466550.8570213,
     "ast_hash": "186baa24d6af57947b51cc2a901a5830",
     "semantic_hash": "186baa24d6af57947b51cc2a901a5830"
   },
-  "LuxTransit/Services/Routing/PublicTransportRouteService.swift": {
+  "Verkéier/Services/Routing/PublicTransportRouteService.swift": {
     "mtime": 1782950544.16366,
     "ast_hash": "58a71957f8b7dbc4f809a56ed61cdc1e",
     "semantic_hash": "58a71957f8b7dbc4f809a56ed61cdc1e"
   },
-  "LuxTransit/Services/Routing/RouteCalculation.swift": {
+  "Verkéier/Services/Routing/RouteCalculation.swift": {
     "mtime": 1782112184.46089,
     "ast_hash": "f92e83f396c26c3d1bb068e8e40bb729",
     "semantic_hash": "f92e83f396c26c3d1bb068e8e40bb729"
   },
-  "LuxTransit/Services/Routing/RouteSearchTypes.swift": {
+  "Verkéier/Services/Routing/RouteSearchTypes.swift": {
     "mtime": 1782732498.9434257,
     "ast_hash": "5a7351c4ac2506330b75ca89d8a6ba6d",
     "semantic_hash": "5a7351c4ac2506330b75ca89d8a6ba6d"
   },
-  "LuxTransit/Services/Routing/RouteService.swift": {
+  "Verkéier/Services/Routing/RouteService.swift": {
     "mtime": 1782466518.3209314,
     "ast_hash": "fb8bd69e4d552432a311039f996a7c13",
     "semantic_hash": "fb8bd69e4d552432a311039f996a7c13"
   },
-  "LuxTransit/Services/Routing/StubbedPlannerSignals.swift": {
+  "Verkéier/Services/Routing/StubbedPlannerSignals.swift": {
     "mtime": 1782683192.55678,
     "ast_hash": "83f7974e233821a11ec6554daf0044ea",
     "semantic_hash": "83f7974e233821a11ec6554daf0044ea"
   },
-  "LuxTransit/Storage/GTFSLocalStore.swift": {
+  "Verkéier/Storage/GTFSLocalStore.swift": {
     "mtime": 1782111463.612668,
     "ast_hash": "8f3ca2836497ad1aae5c5610add95403",
     "semantic_hash": "8f3ca2836497ad1aae5c5610add95403"
   },
-  "LuxTransit/Storage/PersistedFavouriteStop.swift": {
+  "Verkéier/Storage/PersistedFavouriteStop.swift": {
     "mtime": 1782667293.595361,
     "ast_hash": "4c483d670584caa84457178ee578cde7",
     "semantic_hash": "4c483d670584caa84457178ee578cde7"
   },
-  "LuxTransit/Storage/RoutePlannerStore.swift": {
+  "Verkéier/Storage/RoutePlannerStore.swift": {
     "mtime": 1782731599.4433181,
     "ast_hash": "85117b0215550d4c6783ebf6f4265185",
     "semantic_hash": "85117b0215550d4c6783ebf6f4265185"
   },
-  "LuxTransitShared/DepartureActivityAttributes.swift": {
+  "VerkéierShared/DepartureActivityAttributes.swift": {
     "mtime": 1782111463.6129234,
     "ast_hash": "7de2c6ef88d9c24931af278e95aa11ff",
     "semantic_hash": "7de2c6ef88d9c24931af278e95aa11ff"
   },
-  "LuxTransitShared/SharedTransitData.swift": {
+  "VerkéierShared/SharedTransitData.swift": {
     "mtime": 1782111463.6130004,
     "ast_hash": "5608e432a0b88fea89cf8b7639de3e1b",
     "semantic_hash": "5608e432a0b88fea89cf8b7639de3e1b"
   },
-  "LuxTransitTests/ATPClientTests.swift": {
+  "VerkéierTests/ATPClientTests.swift": {
     "mtime": 1782111463.6131365,
     "ast_hash": "2774991734adc0d04fdf8278566259ea",
     "semantic_hash": "2774991734adc0d04fdf8278566259ea"
   },
-  "LuxTransitTests/ATPMapperTests.swift": {
+  "VerkéierTests/ATPMapperTests.swift": {
     "mtime": 1782111463.613237,
     "ast_hash": "66360ff7771173d51e0e49264830b5cd",
     "semantic_hash": "66360ff7771173d51e0e49264830b5cd"
   },
-  "LuxTransitTests/ATPRequestBuilderTests.swift": {
+  "VerkéierTests/ATPRequestBuilderTests.swift": {
     "mtime": 1782111463.6133068,
     "ast_hash": "2ce3078d3d98594ef0c7ccfbf54c6861",
     "semantic_hash": "2ce3078d3d98594ef0c7ccfbf54c6861"
   },
-  "LuxTransitTests/AVLXMLParserTests.swift": {
+  "VerkéierTests/AVLXMLParserTests.swift": {
     "mtime": 1782111463.6133819,
     "ast_hash": "393886a6184c13a2fdaa9e539bbc4616",
     "semantic_hash": "393886a6184c13a2fdaa9e539bbc4616"
   },
-  "LuxTransitTests/AppIntentSharedDataTests.swift": {
+  "VerkéierTests/AppIntentSharedDataTests.swift": {
     "mtime": 1782111463.613482,
     "ast_hash": "5a5918bf98fbaea32fd5d0cc895fb2a2",
     "semantic_hash": "5a5918bf98fbaea32fd5d0cc895fb2a2"
   },
-  "LuxTransitTests/DepartureBoardLogicTests.swift": {
+  "VerkéierTests/DepartureBoardLogicTests.swift": {
     "mtime": 1782665542.592539,
     "ast_hash": "e405e4535d321bc2be6976a12999fac0",
     "semantic_hash": "e405e4535d321bc2be6976a12999fac0"
   },
-  "LuxTransitTests/DepartureReminderServiceTests.swift": {
+  "VerkéierTests/DepartureReminderServiceTests.swift": {
     "mtime": 1782111463.6135938,
     "ast_hash": "96cbe9312324e01e3278b84ca922f310",
     "semantic_hash": "96cbe9312324e01e3278b84ca922f310"
   },
-  "LuxTransitTests/DepartureStatusTests.swift": {
+  "VerkéierTests/DepartureStatusTests.swift": {
     "mtime": 1782111463.613677,
     "ast_hash": "2edb6d8f57c0ec3c39225be0ac8fea89",
     "semantic_hash": "2edb6d8f57c0ec3c39225be0ac8fea89"
   },
-  "LuxTransitTests/FavouritesPersonalizationTests.swift": {
+  "VerkéierTests/FavouritesPersonalizationTests.swift": {
     "mtime": 1782667767.8189442,
     "ast_hash": "07cb6126b4c5ebc2a04e57f28fba64be",
     "semantic_hash": "07cb6126b4c5ebc2a04e57f28fba64be"
   },
-  "LuxTransitTests/GTFSArchiveServiceTests.swift": {
+  "VerkéierTests/GTFSArchiveServiceTests.swift": {
     "mtime": 1782111463.613745,
     "ast_hash": "fbd81340fddd364dbb8766f8bb79569e",
     "semantic_hash": "fbd81340fddd364dbb8766f8bb79569e"
   },
-  "LuxTransitTests/GTFSIndexBuilderTests.swift": {
+  "VerkéierTests/GTFSIndexBuilderTests.swift": {
     "mtime": 1782111463.613814,
     "ast_hash": "fbd8170839bd553a704436096e640c3b",
     "semantic_hash": "fbd8170839bd553a704436096e640c3b"
   },
-  "LuxTransitTests/GTFSMetadataSelectionTests.swift": {
+  "VerkéierTests/GTFSMetadataSelectionTests.swift": {
     "mtime": 1782111463.6138873,
     "ast_hash": "c5c552d7ee606f10b5a23d9347ac5ae7",
     "semantic_hash": "c5c552d7ee606f10b5a23d9347ac5ae7"
   },
-  "LuxTransitTests/GTFSServiceTests.swift": {
+  "VerkéierTests/GTFSServiceTests.swift": {
     "mtime": 1782111463.6141632,
     "ast_hash": "9a64f2f2f8190f45dda490ec54c69479",
     "semantic_hash": "9a64f2f2f8190f45dda490ec54c69479"
   },
-  "LuxTransitTests/GTFSUpdateDecisionTests.swift": {
+  "VerkéierTests/GTFSUpdateDecisionTests.swift": {
     "mtime": 1782111463.6142306,
     "ast_hash": "e66bb2a2f1aa218de7257296c4922d16",
     "semantic_hash": "e66bb2a2f1aa218de7257296c4922d16"
   },
-  "LuxTransitTests/GTFSUpdateServiceTests.swift": {
+  "VerkéierTests/GTFSUpdateServiceTests.swift": {
     "mtime": 1782111463.614329,
     "ast_hash": "3d176d2c460a14168f720e679a631f15",
     "semantic_hash": "3d176d2c460a14168f720e679a631f15"
   },
-  "LuxTransitTests/GTFSValidatorTests.swift": {
+  "VerkéierTests/GTFSValidatorTests.swift": {
     "mtime": 1782111463.614397,
     "ast_hash": "9c12c7459e0c8b54adb7a0a5f976d7b0",
     "semantic_hash": "9c12c7459e0c8b54adb7a0a5f976d7b0"
   },
-  "LuxTransitTests/LineDetailServiceTests.swift": {
+  "VerkéierTests/LineDetailServiceTests.swift": {
     "mtime": 1782111463.6144989,
     "ast_hash": "70684c7cb47d0a9807ca62787bbbd0bf",
     "semantic_hash": "70684c7cb47d0a9807ca62787bbbd0bf"
   },
-  "LuxTransitTests/OfflineScheduleServiceTests.swift": {
+  "VerkéierTests/OfflineScheduleServiceTests.swift": {
     "mtime": 1782732967.2326622,
     "ast_hash": "3795e0c349e63f4902e7c5ab9a86341c",
     "semantic_hash": "3795e0c349e63f4902e7c5ab9a86341c"
   },
-  "LuxTransitTests/PublicTransportRouteServiceTests.swift": {
+  "VerkéierTests/PublicTransportRouteServiceTests.swift": {
     "mtime": 1782927548.5572872,
     "ast_hash": "f296c40184d3d3222a182b179fb27dd6",
     "semantic_hash": "f296c40184d3d3222a182b179fb27dd6"
   },
-  "LuxTransitTests/RouteOptionTests.swift": {
+  "VerkéierTests/RouteOptionTests.swift": {
     "mtime": 1782732930.3627486,
     "ast_hash": "950021a3eded16cd2ce4e630f9ea6b80",
     "semantic_hash": "950021a3eded16cd2ce4e630f9ea6b80"
   },
-  "LuxTransitTests/RoutePlannerStoreTests.swift": {
+  "VerkéierTests/RoutePlannerStoreTests.swift": {
     "mtime": 1782732893.933454,
     "ast_hash": "0feffd3e761e9c6c9fc5d3029c7e651d",
     "semantic_hash": "0feffd3e761e9c6c9fc5d3029c7e651d"
   },
-  "LuxTransitTests/RouteTimelineBuilderTests.swift": {
+  "VerkéierTests/RouteTimelineBuilderTests.swift": {
     "mtime": 1782248705.3439379,
     "ast_hash": "cd03e14f2dbdf24ed3effc1088f0b4b7",
     "semantic_hash": "cd03e14f2dbdf24ed3effc1088f0b4b7"
   },
-  "LuxTransitTests/RouteValidationTests.swift": {
+  "VerkéierTests/RouteValidationTests.swift": {
     "mtime": 1782555050.7307565,
     "ast_hash": "5937f674f79dc4deefdcd233f3599338",
     "semantic_hash": "5937f674f79dc4deefdcd233f3599338"
   },
-  "LuxTransitTests/TransitMapViewModelTests.swift": {
+  "VerkéierTests/TransitMapViewModelTests.swift": {
     "mtime": 1782666686.7920349,
     "ast_hash": "86fcfaf4d541f9e5c49f3a375055e525",
     "semantic_hash": "86fcfaf4d541f9e5c49f3a375055e525"
   },
-  "LuxTransitWidgets/LuxTransitWidgets.swift": {
+  "VerkéierWidgets/VerkéierWidgets.swift": {
     "mtime": 1782683774.5282803,
     "ast_hash": "cda0f10564a193feb08a881922f5a143",
     "semantic_hash": "cda0f10564a193feb08a881922f5a143"
@@ -759,7 +759,7 @@
     "ast_hash": "083ad8b4900ac09dd227ab428e007242",
     "semantic_hash": "083ad8b4900ac09dd227ab428e007242"
   },
-  "LuxTransit/LuxTransit.docc/LuxTransit.md": {
+  "Verkéier/Verkéier.docc/Verkéier.md": {
     "mtime": 1782111756.6332545,
     "ast_hash": "6cea7275884bdc69d79655d0a54b727e",
     "semantic_hash": "6cea7275884bdc69d79655d0a54b727e"
@@ -809,57 +809,57 @@
     "ast_hash": "9bd8c80077c5f8dd25b8266d6abd40d3",
     "semantic_hash": "9bd8c80077c5f8dd25b8266d6abd40d3"
   },
-  "LuxTransit/Assets.xcassets/AppIcon.appiconset/icon-1024.png": {
+  "Verkéier/Assets.xcassets/AppIcon.appiconset/icon-1024.png": {
     "mtime": 1782929956.6060026,
     "ast_hash": "53e9d800adeb39c45dc85ad14022e7c0",
     "semantic_hash": "53e9d800adeb39c45dc85ad14022e7c0"
   },
-  "LuxTransit/Features/Map/ViewModels/TransitMapViewModel+Alerts.swift": {
+  "Verkéier/Features/Map/ViewModels/TransitMapViewModel+Alerts.swift": {
     "mtime": 1782949955.1902156,
     "ast_hash": "90cf2d71dc1787bf82251e3582d21a21",
     "semantic_hash": "90cf2d71dc1787bf82251e3582d21a21"
   },
-  "LuxTransit/Features/Map/ViewModels/TransitMapViewModel+Departures.swift": {
+  "Verkéier/Features/Map/ViewModels/TransitMapViewModel+Departures.swift": {
     "mtime": 1782949955.190016,
     "ast_hash": "1e377cc3654c4e5c10bea50eb7fbf39e",
     "semantic_hash": "1e377cc3654c4e5c10bea50eb7fbf39e"
   },
-  "LuxTransit/Features/Map/ViewModels/TransitMapViewModel+MapStops.swift": {
+  "Verkéier/Features/Map/ViewModels/TransitMapViewModel+MapStops.swift": {
     "mtime": 1782949955.1899292,
     "ast_hash": "07b36696eea279b234b5c2353c54781f",
     "semantic_hash": "07b36696eea279b234b5c2353c54781f"
   },
-  "LuxTransit/Features/Map/ViewModels/TransitMapViewModel+Navigation.swift": {
+  "Verkéier/Features/Map/ViewModels/TransitMapViewModel+Navigation.swift": {
     "mtime": 1782949955.189841,
     "ast_hash": "5c7894920aee7b5ab748f295623d1501",
     "semantic_hash": "5c7894920aee7b5ab748f295623d1501"
   },
-  "LuxTransit/Features/Map/ViewModels/TransitMapViewModel+RoutePlanning.swift": {
+  "Verkéier/Features/Map/ViewModels/TransitMapViewModel+RoutePlanning.swift": {
     "mtime": 1782949955.1901248,
     "ast_hash": "9ef75d9b6dc2f3539cf9f1a97af217ea",
     "semantic_hash": "9ef75d9b6dc2f3539cf9f1a97af217ea"
   },
-  "LuxTransit/Services/Routing/MapKitRoadRouteProvider.swift": {
+  "Verkéier/Services/Routing/MapKitRoadRouteProvider.swift": {
     "mtime": 1782950592.062785,
     "ast_hash": "06d8ea1e7da3d2425543281c33760ad3",
     "semantic_hash": "06d8ea1e7da3d2425543281c33760ad3"
   },
-  "LuxTransit/Services/Routing/PublicTransportRoutingEngine+Enrichment.swift": {
+  "Verkéier/Services/Routing/PublicTransportRoutingEngine+Enrichment.swift": {
     "mtime": 1782950544.164085,
     "ast_hash": "d5a525332296930196e733c3482e7286",
     "semantic_hash": "d5a525332296930196e733c3482e7286"
   },
-  "LuxTransit/Services/Routing/PublicTransportRoutingEngine+Geometry.swift": {
+  "Verkéier/Services/Routing/PublicTransportRoutingEngine+Geometry.swift": {
     "mtime": 1782950544.1641743,
     "ast_hash": "f1a816cf8755b263947672bb9b89f414",
     "semantic_hash": "f1a816cf8755b263947672bb9b89f414"
   },
-  "LuxTransit/Services/Routing/PublicTransportRoutingEngine+Search.swift": {
+  "Verkéier/Services/Routing/PublicTransportRoutingEngine+Search.swift": {
     "mtime": 1782950544.163981,
     "ast_hash": "356de094ef8d7d034b5dec90a2687a18",
     "semantic_hash": "356de094ef8d7d034b5dec90a2687a18"
   },
-  "LuxTransit/Services/Routing/PublicTransportRoutingEngine.swift": {
+  "Verkéier/Services/Routing/PublicTransportRoutingEngine.swift": {
     "mtime": 1782950544.1638596,
     "ast_hash": "e52fa128bfea4b59a85a338900df8a3f",
     "semantic_hash": "e52fa128bfea4b59a85a338900df8a3f"

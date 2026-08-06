@@ -1,4 +1,4 @@
-# SwiftFormat config for LuxTransit
+# SwiftFormat config for Verkéier
 --swiftversion 6.0
 
 # Indentation & layout
