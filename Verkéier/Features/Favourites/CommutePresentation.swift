@@ -28,35 +28,3 @@ struct CommuteDashboardViewModel {
         return isStale ? "Stale, last updated \(formatted)" : "Updated \(formatted)"
     }
 }
-
-/// Callbacks the commute dashboard needs, sliced from ``TransitSheetActions``.
-struct CommuteActions {
-    var showAlerts: () -> Void = {}
-    var selectStop: (Stop) -> Void = { _ in }
-    var applyCommutePreset: (String) -> Void = { _ in }
-}
-
-extension CommuteActions {
-    init(from actions: TransitSheetActions) {
-        self.init()
-        showAlerts = actions.showAlerts
-        selectStop = actions.selectStop
-        applyCommutePreset = actions.applyCommutePreset
-    }
-}
-
-/// Callbacks the home sheet needs: its header buttons plus the commute dashboard's.
-struct HomeActions {
-    var showSearch: () -> Void = {}
-    var showSettings: () -> Void = {}
-    var commute = CommuteActions()
-}
-
-extension HomeActions {
-    init(from actions: TransitSheetActions) {
-        self.init()
-        showSearch = actions.showSearch
-        showSettings = actions.showSettings
-        commute = CommuteActions(from: actions)
-    }
-}

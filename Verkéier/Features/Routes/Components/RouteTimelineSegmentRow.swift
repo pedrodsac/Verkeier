@@ -192,6 +192,7 @@ private struct TimelineDestinationCard: View {
 
     private let leadingInset: CGFloat = 18
     private let trailingInset: CGFloat = 12
+    private let destinationFont = Font.subheadline.weight(.semibold)
 
     var body: some View {
         GeometryReader { proxy in
@@ -204,7 +205,7 @@ private struct TimelineDestinationCard: View {
                 if isOverflowing {
                     OverflowMarqueeText(
                         text: text,
-                        font: .subheadline,
+                        font: destinationFont,
                         initialLeadingInset: leadingInset,
                         forceScroll: true
                     )
@@ -212,7 +213,7 @@ private struct TimelineDestinationCard: View {
                     .padding(.trailing, trailingInset)
                 } else {
                     Text(text)
-                        .font(.subheadline)
+                        .font(destinationFont)
                         .fixedSize(horizontal: true, vertical: false)
                         .padding(.leading, leadingInset)
                         .padding(.trailing, trailingInset)
@@ -227,7 +228,7 @@ private struct TimelineDestinationCard: View {
         .frame(maxWidth: .infinity, minHeight: 28, alignment: .leading)
         .overlay(alignment: .topLeading) {
             Text(text)
-                .font(.subheadline)
+                .font(destinationFont)
                 .lineLimit(1)
                 .fixedSize(horizontal: true, vertical: false)
                 .background {

@@ -10,16 +10,15 @@ struct CommuteDashboardView: View {
 
     let viewModel: CommuteDashboardViewModel
     var displayStyle: DisplayStyle = .regular
-    let actions: CommuteActions
 
     var body: some View {
         VStack(alignment: .leading, spacing: displayStyle == .mapsMedium ? 18 : 16) {
             if viewModel.activeAlertCount > 0 {
-                AlertsSummaryRow(alertCount: viewModel.activeAlertCount, action: actions.showAlerts)
+                AlertsSummaryRow(alertCount: viewModel.activeAlertCount)
             }
 
             if let preset = viewModel.suggestedCommutePreset {
-                CommuteSuggestionRow(preset: preset) { actions.applyCommutePreset(preset.id) }
+                CommuteSuggestionRow(preset: preset)
             }
 
             if viewModel.hasFavourites {
@@ -36,10 +35,9 @@ struct CommuteDashboardView: View {
             StopListRow(
                 stop: stop,
                 markerColor: .blue,
-                surface: .favourite
-            ) {
-                actions.selectStop(stop)
-            }
+                surface: .favourite,
+                navigationValue: .stopDetail(stop)
+            )
         }
     }
 
@@ -71,10 +69,9 @@ struct CommuteDashboardView: View {
                         stop: stop,
                         markerColor: .blue,
                         referenceLocation: viewModel.nearby.referenceLocation,
-                        routes: viewModel.nearby.routesByStopId[stop.id] ?? []
-                    ) {
-                        actions.selectStop(stop)
-                    }
+                        routes: viewModel.nearby.routesByStopId[stop.id] ?? [],
+                        navigationValue: .stopDetail(stop)
+                    )
                 }
 
                 Text("Tap a stop to see departures and save it to your commute.")

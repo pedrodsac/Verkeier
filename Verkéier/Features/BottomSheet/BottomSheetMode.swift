@@ -1,29 +1,93 @@
 import SwiftUI
 
-enum TransitSheetContext: String, CaseIterable, Identifiable, Hashable {
-    case home
+enum TransitSheetRoute: Hashable {
     case search
     case stopGroup
-    case stopDetail
+    case stopDetail(Stop)
     case directions
-    case routeTimeline
-    case lineDetail
+    case directionsForPreset(String)
+    case routeTimeline(String)
+    case lineDetail(TransitRoute)
     case alerts
-    case settings
 
-    var id: String { rawValue }
-
-    var accessibilityLabel: String {
+    var defaultDetent: BottomSheetDetent {
         switch self {
-        case .home: "Commute"
-        case .search: "Search"
-        case .stopGroup: "Stops at this location"
-        case .stopDetail: "Selected stop"
-        case .directions: "Directions"
-        case .routeTimeline: "Selected route"
-        case .lineDetail: "Line details"
-        case .alerts: "Alerts"
-        case .settings: "Settings"
+        case .search, .routeTimeline, .lineDetail, .alerts:
+            .expanded
+        case .stopGroup, .stopDetail, .directions, .directionsForPreset:
+            .medium
+        }
+    }
+
+    var navigationTitle: String {
+        switch self {
+        case .search:
+            "Search"
+        case .stopGroup:
+            "Stops at this location"
+        case let .stopDetail(stop):
+            stop.displayName
+        case .directions, .directionsForPreset:
+            "Directions"
+        case .routeTimeline:
+            "Selected route"
+        case let .lineDetail(route):
+            route.shortName.isEmpty ? "Line details" : route.shortName
+        case .alerts:
+            "Service Alerts"
+        }
+    }
+}
+
+@MainActor
+struct TransitSheetRouteActivationCoordinator {
+    let selectStop: (Stop, Bool) -> Void
+    let loadSelectedStopData: () -> Void
+    let calculateRoute: () -> Void
+    let applyCommutePreset: (String) -> Void
+    let selectRouteOption: (String) -> Void
+    let prepareLineDetail: (TransitRoute) -> Bool
+    let loadLineDetail: () -> Void
+
+    func activate(
+        _ route: TransitSheetRoute?,
+        previousRoute: TransitSheetRoute?,
+        isBackNavigation: Bool = false
+    ) {
+        guard let route else {
+            return
+        }
+
+        guard !isBackNavigation else { return }
+
+        switch route {
+        case .search, .stopGroup, .alerts:
+            break
+
+        case let .stopDetail(stop):
+            let preservesLineDetail: Bool
+            if case .lineDetail = previousRoute {
+                preservesLineDetail = true
+            } else {
+                preservesLineDetail = false
+            }
+            selectStop(stop, preservesLineDetail)
+            loadSelectedStopData()
+
+        case .directions:
+            calculateRoute()
+
+        case let .directionsForPreset(presetID):
+            applyCommutePreset(presetID)
+            calculateRoute()
+
+        case let .routeTimeline(optionID):
+            selectRouteOption(optionID)
+
+        case let .lineDetail(route):
+            if prepareLineDetail(route) {
+                loadLineDetail()
+            }
         }
     }
 }
@@ -33,7 +97,7 @@ enum BottomSheetDetent: CaseIterable {
     case medium
     case expanded
 
-    static let collapsedPresentationDetent = PresentationDetent.height(70)
+    static let collapsedPresentationDetent = PresentationDetent.height(140)
     static let mediumPresentationDetent = PresentationDetent.fraction(0.50)
     static let expandedPresentationDetent = PresentationDetent.large
 

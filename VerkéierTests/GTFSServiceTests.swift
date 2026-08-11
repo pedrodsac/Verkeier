@@ -21,6 +21,22 @@ struct GTFSServiceTests {
         #expect(results.map(\.id) == ["accented"])
     }
 
+    @Test func searchUsesFullNameWhenDisplayNameOmitsLocality() async {
+        let stop = Stop(
+            id: "arlon-gare",
+            name: "Gare",
+            locality: "Arlon",
+            location: LocationPoint(name: "Gare", latitude: 49.6833, longitude: 5.8167),
+            modes: [.train],
+            dataSource: .gtfs
+        )
+        let service = LocalGTFSService(stops: [stop], routesByStopId: [:])
+
+        #expect(stop.displayName == "Gare")
+        #expect(stop.fullName == "Arlon, Gare")
+        #expect(await service.searchStops(query: "Arlon").map(\.id) == [stop.id])
+    }
+
     @Test func emptySearchReturnsNoStops() async {
         let service = LocalGTFSService(stops: [makeStop()], routesByStopId: [:])
 

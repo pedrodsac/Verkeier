@@ -38,29 +38,80 @@ nonisolated enum ATPMapper {
     }
 
     static func mapDepartures(_ response: ATPDepartureBoardResponse, stopId: String) -> [Departure] {
-        (response.departure ?? []).enumerated().map { index, dto in
+        let dtos = response.departure ?? []
+        let inferredPlatforms = inferredPlatforms(for: dtos, fallbackStopId: stopId)
+
+        return dtos.enumerated().map { index, dto in
             let scheduled = date(dateString: dto.date, timeString: dto.time)
             let realtime = date(dateString: dto.rtDate ?? dto.date, timeString: dto.rtTime)
             let delayMinutes = delayMinutes(scheduled: scheduled, realtime: realtime)
             let lineName = dto.product?.line ?? dto.name ?? dto.product?.name ?? "?"
+            let departureStopId = departureStopIdentifier(dto, fallback: stopId)
+            let platformResolution = platformResolution(for: dto)
+            let platform = platformResolution.effective
+                ?? inferredPlatforms[departureStopId]
 
             return Departure(
                 id: "\(stopId)-\(dto.name ?? lineName)-\(dto.date ?? "")-\(dto.time ?? "")-\(index)",
-                stopId: dto.stopExtId ?? dto.stopid ?? stopId,
+                stopId: departureStopId,
                 routeId: dto.product?.line,
                 lineName: lineName,
                 destination: dto.direction ?? "",
                 scheduledDeparture: scheduled,
                 realtimeDeparture: realtime,
                 delayMinutes: delayMinutes,
-                platform: dto.platform,
+                platform: platform,
                 operatorName: dto.product?.operatorName,
                 isCancelled: dto.cancelled ?? false,
                 isStatusUnknown: scheduled == nil,
                 dataSource: .atpOpenAPI,
-                lastUpdated: .now
+                lastUpdated: .now,
+                previousPlatform: platformResolution.previous
             )
         }
+    }
+
+    private static func platformResolution(for departure: ATPDeparture) -> PlatformResolution {
+        // ATP's realtime track is the freshest explicit assignment. The
+        // structured platform fields remain useful fallbacks for responses
+        // where the scalar track fields are absent.
+        let realtime = departure.rtTrack ?? departure.rtPlatform
+        let scheduled = departure.track ?? departure.platform
+        let effective = realtime ?? scheduled
+        let previous = realtime != nil && scheduled != nil && realtime != scheduled
+            ? scheduled
+            : nil
+        return PlatformResolution(effective: effective, previous: previous)
+    }
+
+    /// ATP can omit platform data on later departures while still identifying
+    /// the physical stop. Infer it only when every explicit assignment for
+    /// that physical stop agrees, avoiding guesses at stations where platforms
+    /// legitimately vary by departure.
+    private static func inferredPlatforms(
+        for departures: [ATPDeparture],
+        fallbackStopId: String
+    ) -> [String: String] {
+        var candidatesByStopID: [String: Set<String>] = [:]
+
+        for departure in departures {
+            guard let platform = platformResolution(for: departure).effective else { continue }
+            let stopID = departureStopIdentifier(departure, fallback: fallbackStopId)
+            candidatesByStopID[stopID, default: []].insert(platform)
+        }
+
+        return candidatesByStopID.compactMapValues { candidates in
+            candidates.count == 1 ? candidates.first : nil
+        }
+    }
+
+    private struct PlatformResolution {
+        let effective: String?
+        let previous: String?
+    }
+
+    private static func departureStopIdentifier(_ departure: ATPDeparture, fallback: String) -> String {
+        departure.stopExtId ?? departure.stopid ?? fallback
     }
 
     static func mergedDepartures(_ departures: [Departure]) -> [Departure] {

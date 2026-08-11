@@ -22,36 +22,46 @@ struct StopDetailPresentationModel {
 
     var mergedDepartures: [Departure] {
         guard let stop else { return departures }
-        return DepartureBoardMerger.merge(
+        let merged = DepartureBoardMerger.merge(
             live: departures,
             scheduled: offlineScheduledDepartures,
             stopID: stop.id
         )
+
+        let lineFiltered: [Departure]
+        if let selectedLine,
+           let route = routes.first(where: { $0.id == selectedLine }) {
+            lineFiltered = merged.filter { departure in
+                departure.routeId?.caseInsensitiveCompare(route.id) == .orderedSame
+                    || departure.lineName.caseInsensitiveCompare(route.shortName) == .orderedSame
+            }
+        } else {
+            lineFiltered = merged
+        }
+
+        guard let selectedPlatform else { return lineFiltered }
+        return lineFiltered.filter { $0.platform == selectedPlatform }
     }
 }
 
 /// Callbacks the stop-detail sheet needs, sliced from ``TransitSheetActions``.
 struct StopDetailActions {
-    var openDirections: () -> Void = {}
     var startTrackingDeparture: (Departure) -> Void = { _ in }
     var stopTrackingDeparture: () -> Void = {}
     var scheduleDepartureReminder: (Departure, Int) -> Void = { _, _ in }
     var cancelDepartureReminder: () -> Void = {}
     var toggleDepartureLine: (TransitRoute) -> Void = { _ in }
-    var showLineDetail: (TransitRoute) -> Void = { _ in }
     var selectDeparturePlatform: (String?) -> Void = { _ in }
 }
 
 extension StopDetailActions {
     init(from actions: TransitSheetActions) {
         self.init()
-        openDirections = actions.showDirections
         startTrackingDeparture = actions.startTrackingDeparture
         stopTrackingDeparture = actions.stopTrackingDeparture
         scheduleDepartureReminder = actions.scheduleDepartureReminder
         cancelDepartureReminder = actions.cancelDepartureReminder
         toggleDepartureLine = actions.toggleDepartureLine
-        showLineDetail = actions.showLineDetail
         selectDeparturePlatform = actions.selectDeparturePlatform
     }
 }

@@ -41,6 +41,9 @@ struct GTFSIndexBuilderTests {
         let shape = try #require(payload.shapes.first { $0.id == "shape-f1" })
 
         #expect(payload.stops.map(\.id).sorted() == ["S1", "S2"])
+        let platformStop = try #require(payload.stops.first { $0.id == "S2" })
+        #expect(platformStop.parentStation == "P1")
+        #expect(platformStop.platformCode == "5")
         #expect(payload.routes.map(\.id) == ["F1"])
         #expect(trip.stopTimes.map(\.departureSeconds) == [28_800, 87_000])
         #expect(trip.stopTimes.compactMap(\.shapeDistanceTraveled) == [0, 1.4])
@@ -56,9 +59,9 @@ struct GTFSIndexBuilderTests {
 
         let files = [
             "stops.txt": """
-            stop_id,stop_name,stop_lat,stop_lon,zone_id,location_type
-            S1,Hill Lift,49.6289,6.21474,Test City,
-            S2,Upper Station,49.61779,6.12589,Test City,0
+            stop_id,stop_name,stop_lat,stop_lon,zone_id,location_type,parent_station,platform_code
+            S1,Hill Lift,49.6289,6.21474,Test City,,,
+            S2,Upper Station,49.61779,6.12589,Test City,0,P1,5
             """,
             "routes.txt": """
             route_id,agency_id,route_short_name,route_long_name,route_type

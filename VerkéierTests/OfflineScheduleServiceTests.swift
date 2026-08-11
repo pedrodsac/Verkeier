@@ -44,6 +44,90 @@ struct OfflineScheduleServiceTests {
         #expect(merged.last?.stopId == "stop-1")
     }
 
+    @Test func departureBoardMergerSharesPlatformHintsAcrossLiveAndScheduledRows() {
+        let firstDeparture = Date(timeIntervalSince1970: 1_800)
+        let live = [
+            Departure(
+                id: "live-outbound",
+                stopId: "platform-2",
+                lineName: "2",
+                destination: "Bonnevoie",
+                scheduledDeparture: firstDeparture,
+                platform: "2",
+                dataSource: .atpOpenAPI
+            ),
+            Departure(
+                id: "live-inbound",
+                stopId: "platform-1",
+                lineName: "2",
+                destination: "Limpertsberg",
+                scheduledDeparture: firstDeparture.addingTimeInterval(60),
+                platform: "1",
+                dataSource: .atpOpenAPI
+            ),
+        ]
+        let scheduled = [
+            OfflineScheduleDeparture(
+                id: "scheduled-outbound",
+                lineName: "2",
+                destination: "Bonnevoie",
+                departureDate: firstDeparture.addingTimeInterval(120),
+                platform: nil,
+                mode: .bus
+            ),
+            OfflineScheduleDeparture(
+                id: "scheduled-inbound",
+                lineName: "2",
+                destination: "Limpertsberg",
+                departureDate: firstDeparture.addingTimeInterval(180),
+                platform: nil,
+                mode: .bus
+            ),
+        ]
+
+        let merged = DepartureBoardMerger.merge(live: live, scheduled: scheduled, stopID: "stop-1")
+
+        #expect(merged.map(\.platform) == ["2", "1", "2", "1"])
+    }
+
+    @Test func departureBoardMergerDoesNotGuessAcrossConflictingDestinations() {
+        let firstDeparture = Date(timeIntervalSince1970: 1_800)
+        let live = [
+            Departure(
+                id: "live-one",
+                stopId: "platform-1",
+                lineName: "2",
+                destination: "North",
+                scheduledDeparture: firstDeparture,
+                platform: "1",
+                dataSource: .atpOpenAPI
+            ),
+            Departure(
+                id: "live-two",
+                stopId: "platform-2",
+                lineName: "2",
+                destination: "South",
+                scheduledDeparture: firstDeparture.addingTimeInterval(60),
+                platform: "2",
+                dataSource: .atpOpenAPI
+            ),
+        ]
+        let scheduled = [
+            OfflineScheduleDeparture(
+                id: "scheduled-unknown",
+                lineName: "2",
+                destination: "",
+                departureDate: firstDeparture.addingTimeInterval(120),
+                platform: nil,
+                mode: .bus
+            )
+        ]
+
+        let merged = DepartureBoardMerger.merge(live: live, scheduled: scheduled, stopID: "stop-1")
+
+        #expect(merged.last?.platform == nil)
+    }
+
     @Test func upcomingDeparturesUsesActiveServiceAndSortsByTime() {
         let service = OfflineScheduleService(calendar: luxCalendar)
         let stop = Stop(
@@ -87,6 +171,55 @@ struct OfflineScheduleServiceTests {
 
         #expect(departures.count == 2)
         #expect(departures.first?.lineName == "4")
+    }
+
+    @Test func upcomingDeparturesMatchesLeadingZeroIDsAndUsesPlatformCode() {
+        let service = OfflineScheduleService(calendar: luxCalendar)
+        let stop = Stop(
+            id: "200405060",
+            name: "Platformed Stop",
+            location: LocationPoint(name: "Platformed Stop", latitude: 49.6116, longitude: 6.1319),
+            modes: [.bus],
+            dataSource: .atpOpenAPI,
+            platformIds: ["200405060"]
+        )
+
+        let departures = service.upcomingDepartures(
+            for: stop,
+            timetable: leadingZeroPlatformTimetable,
+            now: makeDate(year: 2026, month: 6, day: 22, hour: 8, minute: 5),
+            limit: 4
+        )
+
+        #expect(departures.count == 1)
+        #expect(departures.first?.platform == "4")
+    }
+
+    @Test func upcomingDeparturesUsesOnlyExplicitNumberedStopNamePlatformSuffix() {
+        let service = OfflineScheduleService(calendar: luxCalendar)
+        let stop = Stop(
+            id: "named-stop",
+            name: "Cloche d'Or",
+            location: LocationPoint(name: "Cloche d'Or", latitude: 49.6116, longitude: 6.1319),
+            modes: [.bus],
+            dataSource: .gtfs
+        )
+
+        let numbered = service.upcomingDepartures(
+            for: stop,
+            timetable: namedPlatformTimetable(stopName: "Gasperich, prov. Cloche d'Or Quai 4"),
+            now: makeDate(year: 2026, month: 6, day: 22, hour: 8, minute: 5),
+            limit: 4
+        )
+        let unnumbered = service.upcomingDepartures(
+            for: stop,
+            timetable: namedPlatformTimetable(stopName: "Gasperich, prov. Cloche d'Or Quais"),
+            now: makeDate(year: 2026, month: 6, day: 22, hour: 8, minute: 5),
+            limit: 4
+        )
+
+        #expect(numbered.first?.platform == "4")
+        #expect(unnumbered.first?.platform == nil)
     }
 
     @Test func stopNotInIndexReturnsEmpty() {
@@ -239,6 +372,107 @@ struct OfflineScheduleServiceTests {
             transfers: [],
             shapes: []
         )
+    }
+
+    private var leadingZeroPlatformTimetable: GTFSTimetableIndexPayload {
+        GTFSTimetableIndexPayload(
+            source: "test",
+            stops: [
+                GTFSTimetableStopEntry(
+                    id: "000200405060",
+                    name: "Platformed Stop",
+                    latitude: 49.6116,
+                    longitude: 6.1319,
+                    parentStation: nil,
+                    platformCode: "4"
+                )
+            ],
+            routes: [
+                GTFSTimetableRouteEntry(
+                    id: "route-platform",
+                    shortName: "P",
+                    longName: "Platformed",
+                    mode: "bus",
+                    operatorName: nil
+                )
+            ],
+            services: [
+                GTFSTimetableServiceEntry(
+                    id: "weekday",
+                    weekdays: [2],
+                    startDate: "20260601",
+                    endDate: "20260630",
+                    addedDates: [],
+                    removedDates: []
+                )
+            ],
+            trips: [
+                GTFSTimetableTripEntry(
+                    id: "trip-platform",
+                    routeId: "route-platform",
+                    serviceId: "weekday",
+                    headsign: "Centre",
+                    directionId: nil,
+                    shapeId: nil,
+                    stopTimes: [
+                        GTFSTimetableStopTimeEntry(
+                            stopId: "000200405060",
+                            arrivalSeconds: 8 * 3600 + 10 * 60,
+                            departureSeconds: 8 * 3600 + 10 * 60,
+                            sequence: 1,
+                            headsign: "Centre",
+                            pickupType: nil,
+                            dropOffType: nil,
+                            shapeDistanceTraveled: nil
+                        )
+                    ]
+                )
+            ],
+            transfers: [],
+            shapes: []
+        )
+    }
+
+    private func namedPlatformTimetable(stopName: String) -> GTFSTimetableIndexPayload {
+        var timetable = leadingZeroPlatformTimetable
+        let stop = GTFSTimetableStopEntry(
+            id: "named-stop",
+            name: stopName,
+            latitude: 49.6116,
+            longitude: 6.1319,
+            parentStation: nil,
+            platformCode: nil
+        )
+        let trip = GTFSTimetableTripEntry(
+            id: "trip-named-platform",
+            routeId: "route-platform",
+            serviceId: "weekday",
+            headsign: "Centre",
+            directionId: nil,
+            shapeId: nil,
+            stopTimes: [
+                GTFSTimetableStopTimeEntry(
+                    stopId: "named-stop",
+                    arrivalSeconds: 8 * 3600 + 10 * 60,
+                    departureSeconds: 8 * 3600 + 10 * 60,
+                    sequence: 1,
+                    headsign: "Centre",
+                    pickupType: nil,
+                    dropOffType: nil,
+                    shapeDistanceTraveled: nil
+                )
+            ]
+        )
+        timetable = GTFSTimetableIndexPayload(
+            source: timetable.source,
+            stops: [stop],
+            routes: timetable.routes,
+            services: timetable.services,
+            trips: [trip],
+            transfers: [],
+            shapes: []
+        )
+        return timetable
     }
 
     private func makeDate(year: Int, month: Int, day: Int, hour: Int, minute: Int) -> Date {

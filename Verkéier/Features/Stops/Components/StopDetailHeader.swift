@@ -4,17 +4,14 @@ struct StopDetailHeader: View {
     let stop: Stop
     let routes: [TransitRoute]
     let selectedLine: String?
-    let openDirections: () -> Void
     let toggleDepartureLine: (TransitRoute) -> Void
-    let showLineDetail: (TransitRoute) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             StopMetadataPanel(
                 routes: routes,
                 selectedLine: selectedLine,
-                toggleDepartureLine: toggleDepartureLine,
-                showLineDetail: showLineDetail
+                toggleDepartureLine: toggleDepartureLine
             )
 
             if stop.wheelchairBoarding != .unknown {
@@ -32,7 +29,7 @@ struct StopDetailHeader: View {
                 )
             }
 
-            DirectionsButton(openDirections: openDirections)
+            DirectionsButton()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -55,7 +52,6 @@ private struct StopMetadataPanel: View {
     let routes: [TransitRoute]
     let selectedLine: String?
     let toggleDepartureLine: (TransitRoute) -> Void
-    let showLineDetail: (TransitRoute) -> Void
 
     var body: some View {
         if !routes.isEmpty {
@@ -66,8 +62,7 @@ private struct StopMetadataPanel: View {
                             route: route,
                             isSelected: route.id == selectedLine,
                             isDimmed: selectedLine != nil && route.id != selectedLine,
-                            toggleDepartureLine: { toggleDepartureLine(route) },
-                            showLineDetail: { showLineDetail(route) }
+                            toggleDepartureLine: { toggleDepartureLine(route) }
                         )
                     }
                 }
@@ -82,7 +77,6 @@ private struct RouteLineCard: View {
     let isSelected: Bool
     let isDimmed: Bool
     let toggleDepartureLine: () -> Void
-    let showLineDetail: () -> Void
 
     var body: some View {
         HStack(spacing: 6) {
@@ -111,7 +105,7 @@ private struct RouteLineCard: View {
             .accessibilityAddTraits(isSelected ? [.isSelected] : [])
         }
         .contextMenu {
-            Button(action: showLineDetail) {
+            NavigationLink(value: TransitSheetRoute.lineDetail(route)) {
                 Label("Information", systemImage: "info.circle")
             }
         }
@@ -121,14 +115,12 @@ private struct RouteLineCard: View {
         route: TransitRoute,
         isSelected: Bool = false,
         isDimmed: Bool = false,
-        toggleDepartureLine: @escaping () -> Void = {},
-        showLineDetail: @escaping () -> Void = {}
+        toggleDepartureLine: @escaping () -> Void = {}
     ) {
         self.route = route
         self.isSelected = isSelected
         self.isDimmed = isDimmed
         self.toggleDepartureLine = toggleDepartureLine
-        self.showLineDetail = showLineDetail
     }
 
     private var iconName: String {
@@ -208,10 +200,8 @@ struct RouteChip: View {
 }
 
 private struct DirectionsButton: View {
-    let openDirections: () -> Void
-
     var body: some View {
-        Button(action: openDirections) {
+        NavigationLink(value: TransitSheetRoute.directions) {
             Label("Directions", systemImage: "arrow.triangle.turn.up.right.diamond.fill")
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(.white)

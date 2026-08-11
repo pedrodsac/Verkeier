@@ -19,8 +19,7 @@ struct SettingsView: View {
 
     var body: some View {
         @Bindable var prefs = preferences
-        NavigationStack {
-            List {
+        List {
                 if matches("appearance theme dark light system") {
                     Section("Appearance") {
                         Picker("Theme", selection: $prefs.appearance) {
@@ -91,18 +90,8 @@ struct SettingsView: View {
                     SettingsPermissionsSection()
                 }
 
-                if matches("advanced about legal diagnostics gtfs data status export") {
+                if matches("about legal privacy attribution transport data") {
                     Section {
-                        NavigationLink {
-                            SettingsAdvancedView(
-                                viewModel: viewModel,
-                                checkGTFSUpdate: checkGTFSUpdate,
-                                setDebugDataMode: setDebugDataMode
-                            )
-                        } label: {
-                            Label("Advanced", systemImage: "gearshape.2")
-                        }
-
                         NavigationLink {
                             SettingsAboutView()
                         } label: {
@@ -110,18 +99,15 @@ struct SettingsView: View {
                         }
                     }
                 }
-            }
-            .listStyle(.insetGrouped)
-            // Give every settings glyph subtle layered depth without per-row changes.
-            .symbolRenderingMode(.hierarchical)
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.large)
-            .searchable(
-                text: $searchText,
-                placement: .navigationBarDrawer(displayMode: .automatic),
-                prompt: "Search settings"
-            )
         }
+        .listStyle(.insetGrouped)
+        // Give every settings glyph subtle layered depth without per-row changes.
+        .symbolRenderingMode(.hierarchical)
+        .searchable(
+            text: $searchText,
+            placement: .toolbarPrincipal,
+            prompt: "Search settings"
+        )
     }
 }
 

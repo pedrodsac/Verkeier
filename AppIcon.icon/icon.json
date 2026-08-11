@@ -1,0 +1,52 @@
+{
+  "fill" : {
+    "automatic-gradient" : "extended-srgb:1.00000,0.21961,0.23529,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "value" : "system-light"
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "display-p3:1.00000,0.38030,0.36898,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "system-light"
+            }
+          ],
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "train.side.front.car.png",
+          "name" : "train.side.front.car",
+          "position" : {
+            "scale" : 0.4,
+            "translation-in-points" : [
+              20,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.6
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.2
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : [
+      "iOS"
+    ]
+  }
+}

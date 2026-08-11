@@ -13,10 +13,7 @@ extension TransitMapViewModel {
     }
 
     var activeMapOverlay: RouteMapOverlay? {
-        if sheetContext == .lineDetail {
-            return selectedLineDetail?.mapOverlay
-        }
-        return routeMapOverlay
+        selectedLineDetail?.mapOverlay ?? routeMapOverlay
     }
 
     var isWaitingForRouteLocation: Bool {
@@ -174,8 +171,6 @@ extension TransitMapViewModel {
         routeLoadingPhase = .calculating
         routeErrorMessage = nil
         routeStatusMessage = nil
-        sheetContext = .directions
-
         do {
             let calculation = try await routeService.calculateRoute(
                 from: origin, to: destination.location, time: routePlanningTime, filters: routeFilters
@@ -203,7 +198,6 @@ extension TransitMapViewModel {
         clearRouteResult()
         routeLoadingPhase = .idle
         routeErrorMessage = "Current location is required to calculate a route."
-        sheetContext = .directions
     }
 
     @discardableResult

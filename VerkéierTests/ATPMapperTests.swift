@@ -172,6 +172,274 @@ struct ATPMapperTests {
         #expect(departures[0].operatorName == "Ville de Luxembourg - Service Autobus")
     }
 
+    @Test func mapsRealtimePlatformWhenStaticPlatformIsMissing() throws {
+        let response: ATPDepartureBoardResponse = try decode(
+            """
+            {
+              "Departure": [
+                {
+                  "name": "Train RE 1",
+                  "type": "ST",
+                  "stopExtId": "gare-1",
+                  "time": "14:00:00",
+                  "date": "2026-06-15",
+                  "rtTime": "14:01:00",
+                  "rtDate": "2026-06-15",
+                  "direction": "Ettelbruck",
+                  "rtPlatform": { "type": "ST", "text": "4" },
+                  "Product": {
+                    "name": "Train RE 1",
+                    "line": "RE 1",
+                    "catOutL": "Train"
+                  }
+                }
+              ]
+            }
+            """,
+            as: ATPDepartureBoardResponse.self
+        )
+
+        let departure = try #require(ATPMapper.mapDepartures(response, stopId: "gare-1").first)
+
+        #expect(departure.platform == "4")
+        #expect(departure.previousPlatform == nil)
+    }
+
+    @Test func prefersRealtimePlatformAndKeepsStaticPlatformAsPreviousAssignment() throws {
+        let response: ATPDepartureBoardResponse = try decode(
+            """
+            {
+              "Departure": [
+                {
+                  "name": "Train RE 1",
+                  "type": "ST",
+                  "stopExtId": "gare-1",
+                  "time": "14:00:00",
+                  "date": "2026-06-15",
+                  "direction": "Ettelbruck",
+                  "platform": "2",
+                  "rtPlatform": "4",
+                  "Product": {
+                    "name": "Train RE 1",
+                    "line": "RE 1",
+                    "catOutL": "Train"
+                  }
+                }
+              ]
+            }
+            """,
+            as: ATPDepartureBoardResponse.self
+        )
+
+        let departure = try #require(ATPMapper.mapDepartures(response, stopId: "gare-1").first)
+
+        #expect(departure.platform == "4")
+        #expect(departure.previousPlatform == "2")
+        #expect(departure.hasPlatformChange)
+    }
+
+    @Test func mapsTrackFieldsWithRealtimeTrackTakingPrecedence() throws {
+        let response: ATPDepartureBoardResponse = try decode(
+            """
+            {
+              "Departure": [
+                {
+                  "name": "Train RE 1",
+                  "stopExtId": "gare-1",
+                  "time": "14:00:00",
+                  "date": "2026-06-15",
+                  "direction": "Ettelbruck",
+                  "platform": { "type": "ST", "text": "1" },
+                  "rtPlatform": { "type": "ST", "text": "3" },
+                  "track": "2",
+                  "rtTrack": "4",
+                  "Product": { "line": "RE 1", "catOutL": "Train" }
+                }
+              ]
+            }
+            """,
+            as: ATPDepartureBoardResponse.self
+        )
+
+        let departure = try #require(ATPMapper.mapDepartures(response, stopId: "gare-1").first)
+
+        #expect(departure.platform == "4")
+        #expect(departure.previousPlatform == "2")
+        #expect(departure.hasPlatformChange)
+    }
+
+    @Test func mapsTrackWhenPlatformFieldsAreMissingAndIgnoresBlankTrack() throws {
+        let response: ATPDepartureBoardResponse = try decode(
+            """
+            {
+              "Departure": [
+                {
+                  "name": "Bus 1",
+                  "stopExtId": "stop-1",
+                  "time": "14:00:00",
+                  "date": "2026-06-15",
+                  "track": " 2 ",
+                  "Product": { "line": "1", "catOutL": "Bus" }
+                },
+                {
+                  "name": "Bus 2",
+                  "stopExtId": "stop-1",
+                  "time": "14:10:00",
+                  "date": "2026-06-15",
+                  "track": " ",
+                  "platform": "3",
+                  "Product": { "line": "2", "catOutL": "Bus" }
+                },
+                {
+                  "name": "Bus 3",
+                  "stopExtId": "stop-1",
+                  "time": "14:20:00",
+                  "date": "2026-06-15",
+                  "rtTrack": "4",
+                  "Product": { "line": "3", "catOutL": "Bus" }
+                }
+              ]
+            }
+            """,
+            as: ATPDepartureBoardResponse.self
+        )
+
+        let departures = ATPMapper.mapDepartures(response, stopId: "stop-1")
+
+        #expect(departures.map(\.platform) == ["2", "3", "4"])
+    }
+
+    @Test func infersOmittedPlatformsFromOtherDeparturesAtTheSamePhysicalStop() throws {
+        let response: ATPDepartureBoardResponse = try decode(
+            """
+            {
+              "Departure": [
+                {
+                  "name": "Bus 2",
+                  "stopExtId": "300469001",
+                  "time": "19:54:00",
+                  "date": "2026-06-15",
+                  "direction": "Bonnevoie, Lycée Bouneweg PE",
+                  "platform": { "type": "ST", "text": "2" },
+                  "Product": { "line": "2", "catOutL": "Bus" }
+                },
+                {
+                  "name": "Bus 2",
+                  "stopExtId": "300469001",
+                  "time": "20:24:00",
+                  "date": "2026-06-15",
+                  "direction": "Bonnevoie, Lycée Bouneweg PE",
+                  "Product": { "line": "2", "catOutL": "Bus" }
+                },
+                {
+                  "name": "Bus 2",
+                  "stopExtId": "300469002",
+                  "time": "20:11:00",
+                  "date": "2026-06-15",
+                  "direction": "Limpertsberg, Lycée Michel Lucius",
+                  "platform": "1",
+                  "Product": { "line": "2", "catOutL": "Bus" }
+                },
+                {
+                  "name": "Bus 2",
+                  "stopExtId": "300469002",
+                  "time": "20:41:00",
+                  "date": "2026-06-15",
+                  "direction": "Limpertsberg, Lycée Michel Lucius",
+                  "Product": { "line": "2", "catOutL": "Bus" }
+                }
+              ]
+            }
+            """,
+            as: ATPDepartureBoardResponse.self
+        )
+
+        let departures = ATPMapper.mapDepartures(response, stopId: "300469001")
+
+        #expect(departures.map(\.platform) == ["2", "2", "1", "1"])
+    }
+
+    @Test func doesNotInferWhenOnePhysicalStopReportsMultiplePlatforms() throws {
+        let response: ATPDepartureBoardResponse = try decode(
+            """
+            {
+              "Departure": [
+                {
+                  "name": "Train RE 1",
+                  "stopExtId": "gare-1",
+                  "time": "14:00:00",
+                  "date": "2026-06-15",
+                  "direction": "Ettelbruck",
+                  "platform": "2",
+                  "Product": { "line": "RE 1", "catOutL": "Train" }
+                },
+                {
+                  "name": "Train RE 2",
+                  "stopExtId": "gare-1",
+                  "time": "14:10:00",
+                  "date": "2026-06-15",
+                  "direction": "Liège",
+                  "platform": "4",
+                  "Product": { "line": "RE 2", "catOutL": "Train" }
+                },
+                {
+                  "name": "Train RE 3",
+                  "stopExtId": "gare-1",
+                  "time": "14:20:00",
+                  "date": "2026-06-15",
+                  "direction": "Trier",
+                  "Product": { "line": "RE 3", "catOutL": "Train" }
+                }
+              ]
+            }
+            """,
+            as: ATPDepartureBoardResponse.self
+        )
+
+        let departures = ATPMapper.mapDepartures(response, stopId: "gare-1")
+
+        #expect(departures[2].platform == nil)
+    }
+
+    @Test func doesNotInferWhenTrackAssignmentsConflict() throws {
+        let response: ATPDepartureBoardResponse = try decode(
+            """
+            {
+              "Departure": [
+                {
+                  "name": "Train RE 1",
+                  "stopExtId": "gare-1",
+                  "time": "14:00:00",
+                  "date": "2026-06-15",
+                  "track": "2",
+                  "Product": { "line": "RE 1", "catOutL": "Train" }
+                },
+                {
+                  "name": "Train RE 2",
+                  "stopExtId": "gare-1",
+                  "time": "14:10:00",
+                  "date": "2026-06-15",
+                  "track": "4",
+                  "Product": { "line": "RE 2", "catOutL": "Train" }
+                },
+                {
+                  "name": "Train RE 3",
+                  "stopExtId": "gare-1",
+                  "time": "14:20:00",
+                  "date": "2026-06-15",
+                  "Product": { "line": "RE 3", "catOutL": "Train" }
+                }
+              ]
+            }
+            """,
+            as: ATPDepartureBoardResponse.self
+        )
+
+        let departures = ATPMapper.mapDepartures(response, stopId: "gare-1")
+
+        #expect(departures[2].platform == nil)
+    }
+
     @Test func mergedDeparturesDeduplicatesAndSortsBoards() {
         let now = Date(timeIntervalSince1970: 1_000)
         let duplicateWithoutRealtime = Departure(

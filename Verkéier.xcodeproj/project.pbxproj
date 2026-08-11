@@ -7,11 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		000000000000000370000000 /* VerkéierWidgets.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 000000000000000000000320 /* VerkéierWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		000000000000000370000000 /* VerkéierWidgets.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 000000000000000000000320 /* VerkéierWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		627757813024D6D30012B2EF /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 627757803024D6D30012B2EF /* AppIcon.icon */; };
+		627757823024D6D30012B2EF /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 627757803024D6D30012B2EF /* AppIcon.icon */; };
 		62FE86412FEE000000000001 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000101 /* ZIPFoundation */; };
 		62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000102 /* AsyncAlgorithms */; };
 		62FE86412FEE000000000003 /* HeapModule in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000103 /* HeapModule */; };
 		62FE86412FEE000000000004 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000104 /* ZIPFoundation */; };
+		62FE86412FEE000000000005 /* UIOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000105 /* UIOnboarding */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,60 +40,61 @@
 			dstPath = "";
 			dstSubfolder = PlugIns;
 			files = (
-				000000000000000370000000 /* VerkéierWidgets.appex in Embed App Extensions */,
+				000000000000000370000000 /* VerkéierWidgets.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		000000000000000000000120 /* Verkéier.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Verkéier.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		000000000000000000000220 /* VerkéierTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "VerkéierTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		000000000000000000000320 /* VerkéierWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "VerkéierWidgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000120 /* Verkéier.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Verkéier.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000220 /* VerkéierTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "VerkéierTests.xctest"; path = "VerkéierTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000320 /* VerkéierWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "VerkéierWidgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		627757803024D6D30012B2EF /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		62FE86412FDDDDC400081C59 /* AppConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppConfig.xcconfig; sourceTree = "<group>"; };
 		62FE86412FDDDDC400081C5A /* LocalConfig.xcconfig.example */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = LocalConfig.xcconfig.example; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		62FE86412FDDDDC400081C57 /* Exceptions for "Verkéier" folder in "Verkéier" target */ = {
+		62FE86412FDDDDC400081C57 /* Exceptions for "Verkéier" folder in "Verkéier" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 000000000000000100000000 /* Verkéier */;
+			target = 000000000000000100000000 /* Verkéier */;
 		};
-		62FE86412FDDDDC400081C58 /* Exceptions for "VerkéierWidgets" folder in "VerkéierWidgets" target */ = {
+		62FE86412FDDDDC400081C58 /* Exceptions for "VerkéierWidgets" folder in "VerkéierWidgets" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 000000000000000300000000 /* VerkéierWidgets */;
+			target = 000000000000000300000000 /* VerkéierWidgets */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		62FE86412FDDDDC400081C53 /* Verkéier */ = {
+		62FE86412FDDDDC400081C53 /* Verkéier */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				62FE86412FDDDDC400081C57 /* Exceptions for "Verkéier" folder in "Verkéier" target */,
+				62FE86412FDDDDC400081C57 /* Exceptions for "Verkéier" folder in "Verkéier" target */,
 			);
 			path = "Verkéier";
 			sourceTree = "<group>";
 		};
-		62FE86412FDDDDC400081C54 /* VerkéierTests */ = {
+		62FE86412FDDDDC400081C54 /* VerkéierTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "VerkéierTests";
 			sourceTree = "<group>";
 		};
-		62FE86412FDDDDC400081C55 /* VerkéierShared */ = {
+		62FE86412FDDDDC400081C55 /* VerkéierShared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "VerkéierShared";
 			sourceTree = "<group>";
 		};
-		62FE86412FDDDDC400081C56 /* VerkéierWidgets */ = {
+		62FE86412FDDDDC400081C56 /* VerkéierWidgets */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				62FE86412FDDDDC400081C58 /* Exceptions for "VerkéierWidgets" folder in "VerkéierWidgets" target */,
+				62FE86412FDDDDC400081C58 /* Exceptions for "VerkéierWidgets" folder in "VerkéierWidgets" target */,
 			);
 			path = "VerkéierWidgets";
 			sourceTree = "<group>";
@@ -104,6 +108,7 @@
 				62FE86412FEE000000000001 /* ZIPFoundation in Frameworks */,
 				62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */,
 				62FE86412FEE000000000003 /* HeapModule in Frameworks */,
+				62FE86412FEE000000000005 /* UIOnboarding in Frameworks */,
 			);
 		};
 		000000000000000230000000 /* Frameworks */ = {
@@ -123,11 +128,12 @@
 		000000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
+				627757803024D6D30012B2EF /* AppIcon.icon */,
 				62FE86412FDDDDC400081C5B /* Config */,
-				62FE86412FDDDDC400081C53 /* Verkéier */,
-				62FE86412FDDDDC400081C55 /* VerkéierShared */,
-				62FE86412FDDDDC400081C54 /* VerkéierTests */,
-				62FE86412FDDDDC400081C56 /* VerkéierWidgets */,
+				62FE86412FDDDDC400081C53 /* Verkéier */,
+				62FE86412FDDDDC400081C55 /* VerkéierShared */,
+				62FE86412FDDDDC400081C54 /* VerkéierTests */,
+				62FE86412FDDDDC400081C56 /* VerkéierWidgets */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -135,9 +141,9 @@
 		000000000000000000000020 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				000000000000000000000120 /* Verkéier.app */,
-				000000000000000000000220 /* VerkéierTests.xctest */,
-				000000000000000000000320 /* VerkéierWidgets.appex */,
+				000000000000000000000120 /* Verkéier.app */,
+				000000000000000000000220 /* VerkéierTests.xctest */,
+				000000000000000000000320 /* VerkéierWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -154,9 +160,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		000000000000000100000000 /* Verkéier */ = {
+		000000000000000100000000 /* Verkéier */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "Verkéier" */;
+			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "Verkéier" */;
 			buildPhases = (
 				000000000000000120000000 /* Sources */,
 				000000000000000130000000 /* Frameworks */,
@@ -169,22 +175,23 @@
 				000000000000000350000000 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				62FE86412FDDDDC400081C53 /* Verkéier */,
-				62FE86412FDDDDC400081C55 /* VerkéierShared */,
+				62FE86412FDDDDC400081C53 /* Verkéier */,
+				62FE86412FDDDDC400081C55 /* VerkéierShared */,
 			);
 			name = "Verkéier";
 			packageProductDependencies = (
 				62FE86412FEE000000000101 /* ZIPFoundation */,
 				62FE86412FEE000000000102 /* AsyncAlgorithms */,
 				62FE86412FEE000000000103 /* HeapModule */,
+				62FE86412FEE000000000105 /* UIOnboarding */,
 			);
 			productName = "Verkéier";
-			productReference = 000000000000000000000120 /* Verkéier.app */;
+			productReference = 000000000000000000000120 /* Verkéier.app */;
 			productType = "com.apple.product-type.application";
 		};
-		000000000000000200000000 /* VerkéierTests */ = {
+		000000000000000200000000 /* VerkéierTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000210000000 /* Build configuration list for PBXNativeTarget "VerkéierTests" */;
+			buildConfigurationList = 000000000000000210000000 /* Build configuration list for PBXNativeTarget "VerkéierTests" */;
 			buildPhases = (
 				000000000000000220000000 /* Sources */,
 				000000000000000230000000 /* Frameworks */,
@@ -196,19 +203,19 @@
 				000000000000000250000000 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				62FE86412FDDDDC400081C54 /* VerkéierTests */,
+				62FE86412FDDDDC400081C54 /* VerkéierTests */,
 			);
 			name = "VerkéierTests";
 			packageProductDependencies = (
 				62FE86412FEE000000000104 /* ZIPFoundation */,
 			);
 			productName = "VerkéierTests";
-			productReference = 000000000000000000000220 /* VerkéierTests.xctest */;
+			productReference = 000000000000000000000220 /* VerkéierTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		000000000000000300000000 /* VerkéierWidgets */ = {
+		000000000000000300000000 /* VerkéierWidgets */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000310000000 /* Build configuration list for PBXNativeTarget "VerkéierWidgets" */;
+			buildConfigurationList = 000000000000000310000000 /* Build configuration list for PBXNativeTarget "VerkéierWidgets" */;
 			buildPhases = (
 				000000000000000320000000 /* Sources */,
 				000000000000000330000000 /* Frameworks */,
@@ -217,12 +224,12 @@
 			buildRules = (
 			);
 			fileSystemSynchronizedGroups = (
-				62FE86412FDDDDC400081C55 /* VerkéierShared */,
-				62FE86412FDDDDC400081C56 /* VerkéierWidgets */,
+				62FE86412FDDDDC400081C55 /* VerkéierShared */,
+				62FE86412FDDDDC400081C56 /* VerkéierWidgets */,
 			);
 			name = "VerkéierWidgets";
 			productName = "VerkéierWidgets";
-			productReference = 000000000000000000000320 /* VerkéierWidgets.appex */;
+			productReference = 000000000000000000000320 /* VerkéierWidgets.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -247,7 +254,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 000000000000000010000000 /* Build configuration list for PBXProject "Verkéier" */;
+			buildConfigurationList = 000000000000000010000000 /* Build configuration list for PBXProject "Verkéier" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -264,15 +271,16 @@
 				62FE86412FEE000000000201 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				62FE86412FEE000000000203 /* XCRemoteSwiftPackageReference "swift-collections" */,
+				62FE86412FEE000000000204 /* XCRemoteSwiftPackageReference "UIOnboarding" */,
 			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				000000000000000100000000 /* Verkéier */,
-				000000000000000200000000 /* VerkéierTests */,
-				000000000000000300000000 /* VerkéierWidgets */,
+				000000000000000100000000 /* Verkéier */,
+				000000000000000200000000 /* VerkéierTests */,
+				000000000000000300000000 /* VerkéierWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -281,6 +289,7 @@
 		000000000000000140000000 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				627757823024D6D30012B2EF /* AppIcon.icon in Resources */,
 			);
 		};
 		000000000000000240000000 /* Resources */ = {
@@ -291,6 +300,7 @@
 		000000000000000340000000 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				627757813024D6D30012B2EF /* AppIcon.icon in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
@@ -316,18 +326,18 @@
 /* Begin PBXTargetDependency section */
 		000000000000000250000000 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 000000000000000100000000 /* Verkéier */;
+			target = 000000000000000100000000 /* Verkéier */;
 			targetProxy = 000000000000000260000000 /* PBXContainerItemProxy */;
 		};
 		000000000000000350000000 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 000000000000000300000000 /* VerkéierWidgets */;
+			target = 000000000000000300000000 /* VerkéierWidgets */;
 			targetProxy = 000000000000000360000000 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		000000000000000011000000 /* Debug configuration for PBXProject "Verkéier" */ = {
+		000000000000000011000000 /* Debug configuration for PBXProject "Verkéier" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -397,7 +407,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000012000000 /* Release configuration for PBXProject "Verkéier" */ = {
+		000000000000000012000000 /* Release configuration for PBXProject "Verkéier" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -459,7 +469,7 @@
 			};
 			name = Release;
 		};
-		000000000000000111000000 /* Debug configuration for PBXNativeTarget "Verkéier" */ = {
+		000000000000000111000000 /* Debug configuration for PBXNativeTarget "Verkéier" */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 62FE86412FDDDDC400081C59 /* AppConfig.xcconfig */;
 			buildSettings = {
@@ -473,6 +483,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Verkéier/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
@@ -499,7 +510,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000112000000 /* Release configuration for PBXNativeTarget "Verkéier" */ = {
+		000000000000000112000000 /* Release configuration for PBXNativeTarget "Verkéier" */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 62FE86412FDDDDC400081C59 /* AppConfig.xcconfig */;
 			buildSettings = {
@@ -513,6 +524,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Verkéier/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
@@ -539,7 +551,7 @@
 			};
 			name = Release;
 		};
-		000000000000000211000000 /* Debug configuration for PBXNativeTarget "VerkéierTests" */ = {
+		000000000000000211000000 /* Debug configuration for PBXNativeTarget "VerkéierTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -569,7 +581,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000212000000 /* Release configuration for PBXNativeTarget "VerkéierTests" */ = {
+		000000000000000212000000 /* Release configuration for PBXNativeTarget "VerkéierTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -599,7 +611,7 @@
 			};
 			name = Release;
 		};
-		000000000000000311000000 /* Debug configuration for PBXNativeTarget "VerkéierWidgets" */ = {
+		000000000000000311000000 /* Debug configuration for PBXNativeTarget "VerkéierWidgets" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -632,7 +644,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000312000000 /* Release configuration for PBXNativeTarget "VerkéierWidgets" */ = {
+		000000000000000312000000 /* Release configuration for PBXNativeTarget "VerkéierWidgets" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -668,35 +680,35 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		000000000000000010000000 /* Build configuration list for PBXProject "Verkéier" */ = {
+		000000000000000010000000 /* Build configuration list for PBXProject "Verkéier" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000011000000 /* Debug configuration for PBXProject "Verkéier" */,
-				000000000000000012000000 /* Release configuration for PBXProject "Verkéier" */,
+				000000000000000011000000 /* Debug configuration for PBXProject "Verkéier" */,
+				000000000000000012000000 /* Release configuration for PBXProject "Verkéier" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		000000000000000110000000 /* Build configuration list for PBXNativeTarget "Verkéier" */ = {
+		000000000000000110000000 /* Build configuration list for PBXNativeTarget "Verkéier" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000111000000 /* Debug configuration for PBXNativeTarget "Verkéier" */,
-				000000000000000112000000 /* Release configuration for PBXNativeTarget "Verkéier" */,
+				000000000000000111000000 /* Debug configuration for PBXNativeTarget "Verkéier" */,
+				000000000000000112000000 /* Release configuration for PBXNativeTarget "Verkéier" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		000000000000000210000000 /* Build configuration list for PBXNativeTarget "VerkéierTests" */ = {
+		000000000000000210000000 /* Build configuration list for PBXNativeTarget "VerkéierTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000211000000 /* Debug configuration for PBXNativeTarget "VerkéierTests" */,
-				000000000000000212000000 /* Release configuration for PBXNativeTarget "VerkéierTests" */,
+				000000000000000211000000 /* Debug configuration for PBXNativeTarget "VerkéierTests" */,
+				000000000000000212000000 /* Release configuration for PBXNativeTarget "VerkéierTests" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		000000000000000310000000 /* Build configuration list for PBXNativeTarget "VerkéierWidgets" */ = {
+		000000000000000310000000 /* Build configuration list for PBXNativeTarget "VerkéierWidgets" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000311000000 /* Debug configuration for PBXNativeTarget "VerkéierWidgets" */,
-				000000000000000312000000 /* Release configuration for PBXNativeTarget "VerkéierWidgets" */,
+				000000000000000311000000 /* Debug configuration for PBXNativeTarget "VerkéierWidgets" */,
+				000000000000000312000000 /* Release configuration for PBXNativeTarget "VerkéierWidgets" */,
 			);
 			defaultConfigurationName = Release;
 		};
@@ -727,6 +739,14 @@
 				minimumVersion = 1.6.0;
 			};
 		};
+		62FE86412FEE000000000204 /* XCRemoteSwiftPackageReference "UIOnboarding" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/lascic/UIOnboarding.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -749,6 +769,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 62FE86412FEE000000000201 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
 			productName = ZIPFoundation;
+		};
+		62FE86412FEE000000000105 /* UIOnboarding */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 62FE86412FEE000000000204 /* XCRemoteSwiftPackageReference "UIOnboarding" */;
+			productName = UIOnboarding;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -8,8 +8,6 @@ import SwiftUI
 final class TransitMapViewModel {
     var cameraRegion: MKCoordinateRegion
     var cameraUpdateToken = 0
-    var sheetContext: TransitSheetContext = .home
-    var sheetDetent: BottomSheetDetent = .medium
     var selectedStopGroup: [Stop] = []
     var selectedBikeShareStations: [BikeShareStation] = []
     var nearbyStops: [Stop] = [] {
@@ -21,8 +19,6 @@ final class TransitMapViewModel {
     }
 
     private(set) var gtfsOnlyMapStops: [Stop] = []
-    /// When set, only stops served by this mode are shown on the map. `nil` = all.
-    var mapModeFilter: TransportMode?
     /// Routes serving each nearby stop, keyed by stop id, for the nearby list.
     var nearbyStopRoutes: [String: [TransitRoute]] = [:]
     var selectedStop: Stop?

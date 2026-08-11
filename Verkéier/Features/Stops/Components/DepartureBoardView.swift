@@ -69,6 +69,7 @@ struct DepartureBoardView: View {
                                         .opacity(0.55)
                                 }
                             }
+                            .disclosureGroupStyle(ChevronDisclosureGroupStyle())
                             .font(.subheadline.weight(.semibold))
                             .tint(.secondary)
                         }
@@ -88,6 +89,7 @@ struct DepartureBoardView: View {
                             )
                         }
                     }
+					.safeAreaPadding(.top, 5)
                     .padding(.bottom, 28)
                 }
             }

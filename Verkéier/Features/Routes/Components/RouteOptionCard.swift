@@ -8,13 +8,12 @@ import SwiftUI
 struct RouteOptionCard: View {
     let option: RouteOption
     let isSelected: Bool
-    let selectRouteOption: () -> Void
 
     @Environment(AppPreferences.self) private var preferences
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        Button(action: selectRouteOption) {
+        NavigationLink(value: TransitSheetRoute.routeTimeline(option.id)) {
             VStack(alignment: .leading, spacing: 8) {
                 // ── Header: time range / duration / status badge ──────────
                 HStack(alignment: .firstTextBaseline, spacing: 0) {
@@ -128,13 +127,11 @@ struct RouteOptionCard: View {
         VStack(spacing: 10) {
             RouteOptionCard(
                 option: .previewTramOption,
-                isSelected: true,
-                selectRouteOption: {}
+                isSelected: true
             )
             RouteOptionCard(
                 option: .previewBusOption,
-                isSelected: false,
-                selectRouteOption: {}
+                isSelected: false
             )
         }
         .padding()

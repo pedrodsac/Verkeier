@@ -16,7 +16,6 @@ extension TransitMapScreen {
         )
 
         return TransitSheetPresentationModel(
-            context: viewModel.sheetContext,
             nearby: nearby,
             stopGroup: StopGroupPresentationModel(
                 stops: viewModel.selectedStopGroup,
@@ -45,7 +44,7 @@ extension TransitMapScreen {
             stopDetail: StopDetailPresentationModel(
                 stop: viewModel.selectedStop,
                 routes: viewModel.selectedStopRoutes,
-                departures: viewModel.filteredDepartures,
+                departures: viewModel.departures,
                 offlineScheduledDepartures: viewModel.offlineScheduledDepartures,
                 alerts: viewModel.stopDetailAlerts,
                 availablePlatforms: viewModel.availableDeparturePlatforms,
@@ -146,10 +145,10 @@ extension TransitMapScreen {
     var sheetPresentationDetent: Binding<PresentationDetent> {
         Binding(
             get: {
-                viewModel.sheetDetent.presentationDetent
+                sheetDetent.presentationDetent
             },
             set: { presentationDetent in
-                viewModel.sheetDetent = BottomSheetDetent(presentationDetent: presentationDetent)
+                sheetDetent = BottomSheetDetent(presentationDetent: presentationDetent)
             }
         )
     }

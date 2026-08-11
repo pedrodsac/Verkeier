@@ -52,6 +52,9 @@ struct ATPDeparture: Decodable {
     let rtDate: String?
     let direction: String?
     let platform: String?
+    let rtPlatform: String?
+    let track: String?
+    let rtTrack: String?
     let cancelled: Bool?
     let product: ATPProduct?
 
@@ -67,6 +70,9 @@ struct ATPDeparture: Decodable {
         case rtDate
         case direction
         case platform
+        case rtPlatform
+        case track
+        case rtTrack
         case cancelled
         case product = "Product"
     }
@@ -85,18 +91,30 @@ struct ATPDeparture: Decodable {
         rtDate = try container.decodeIfPresent(String.self, forKey: .rtDate)
         direction = try container.decodeIfPresent(String.self, forKey: .direction)
         cancelled = try container.decodeIfPresent(Bool.self, forKey: .cancelled)
-        platform = Self.decodePlatform(from: container)
+        platform = Self.decodePlatform(from: container, key: .platform)
+        rtPlatform = Self.decodePlatform(from: container, key: .rtPlatform)
+        track = Self.decodePlatform(from: container, key: .track)
+        rtTrack = Self.decodePlatform(from: container, key: .rtTrack)
         product = Self.decodeProduct(from: container)
     }
 
-    private static func decodePlatform(from container: KeyedDecodingContainer<CodingKeys>) -> String? {
-        if let platform = try? container.decodeIfPresent(String.self, forKey: .platform) {
-            return platform
+    private static func decodePlatform(
+        from container: KeyedDecodingContainer<CodingKeys>,
+        key: CodingKeys
+    ) -> String? {
+        if let platform = try? container.decodeIfPresent(String.self, forKey: key) {
+            return normalizedPlatform(platform)
         }
-        if let platform = try? container.decodeIfPresent(ATPPlatform.self, forKey: .platform) {
-            return platform.text
+        if let platform = try? container.decodeIfPresent(ATPPlatform.self, forKey: key) {
+            return normalizedPlatform(platform.text)
         }
         return nil
+    }
+
+    private static func normalizedPlatform(_ platform: String?) -> String? {
+        guard let platform else { return nil }
+        let trimmed = platform.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
     }
 
     private static func decodeProduct(from container: KeyedDecodingContainer<CodingKeys>) -> ATPProduct? {

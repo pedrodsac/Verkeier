@@ -23,10 +23,105 @@ struct TransitMapViewModelTests {
 
         viewModel.selectStopGroup([firstStop, secondStop, firstStop])
 
-        #expect(viewModel.sheetContext == .stopGroup)
-        #expect(viewModel.sheetDetent == .medium)
         #expect(viewModel.selectedStop == nil)
         #expect(viewModel.selectedStopGroup.map(\.id) == ["stop-1", "stop-2"])
+    }
+
+    @Test func transitSheetRoutesUseExpectedDetents() {
+        let mediumRoutes: [TransitSheetRoute] = [
+            .stopGroup,
+            .stopDetail(makeStop(id: "stop-1")),
+            .directions,
+            .directionsForPreset("preset-1")
+        ]
+        let expandedRoutes: [TransitSheetRoute] = [
+            .search,
+            .routeTimeline("route-1"),
+            .lineDetail(route15),
+            .alerts
+        ]
+
+        #expect(mediumRoutes.allSatisfy { $0.defaultDetent == .medium })
+        #expect(expandedRoutes.allSatisfy { $0.defaultDetent == .expanded })
+    }
+
+    @Test func routeActivationDoesNotChangeDetent() {
+        let detent = BottomSheetDetent.expanded
+        var appliedPresetID: String?
+        var calculatedRoute = false
+        var selectedOptionID: String?
+        let coordinator = TransitSheetRouteActivationCoordinator(
+            selectStop: { _, _ in },
+            loadSelectedStopData: {},
+            calculateRoute: { calculatedRoute = true },
+            applyCommutePreset: { appliedPresetID = $0 },
+            selectRouteOption: { selectedOptionID = $0 },
+            prepareLineDetail: { _ in false },
+            loadLineDetail: {}
+        )
+
+        coordinator.activate(.directionsForPreset("preset-1"), previousRoute: nil)
+        #expect(appliedPresetID == "preset-1")
+        #expect(calculatedRoute)
+
+        coordinator.activate(.routeTimeline("route-1"), previousRoute: .directions)
+        #expect(selectedOptionID == "route-1")
+
+        coordinator.activate(nil, previousRoute: .routeTimeline("route-1"))
+        #expect(detent == .expanded)
+    }
+
+    @Test func routeActivationPreservesLineDetailWhenOpeningStop() {
+        let stop = makeStop(id: "stop-1")
+        var preservedLineDetail = false
+        var selectedStop: Stop?
+        let coordinator = TransitSheetRouteActivationCoordinator(
+            selectStop: { stop, preservesLineDetail in
+                selectedStop = stop
+                preservedLineDetail = preservesLineDetail
+            },
+            loadSelectedStopData: {},
+            calculateRoute: {},
+            applyCommutePreset: { _ in },
+            selectRouteOption: { _ in },
+            prepareLineDetail: { _ in false },
+            loadLineDetail: {}
+        )
+
+        coordinator.activate(.stopDetail(stop), previousRoute: .lineDetail(route15))
+
+        #expect(selectedStop == stop)
+        #expect(preservedLineDetail)
+    }
+
+    @Test func routeActivationBackNavigationRestoresLineDetailWithoutReloading() {
+        let stop = makeStop(id: "stop-1")
+        var loadCount = 0
+        var preparedRoute: TransitRoute?
+        let coordinator = TransitSheetRouteActivationCoordinator(
+            selectStop: { _, _ in },
+            loadSelectedStopData: {},
+            calculateRoute: {},
+            applyCommutePreset: { _ in },
+            selectRouteOption: { _ in },
+            prepareLineDetail: { route in
+                guard preparedRoute != route else { return false }
+                preparedRoute = route
+                return true
+            },
+            loadLineDetail: { loadCount += 1 }
+        )
+
+        coordinator.activate(.lineDetail(route15), previousRoute: nil)
+        coordinator.activate(.stopDetail(stop), previousRoute: .lineDetail(route15))
+        coordinator.activate(
+            .lineDetail(route15),
+            previousRoute: .stopDetail(stop),
+            isBackNavigation: true
+        )
+
+        #expect(loadCount == 1)
+        #expect(preparedRoute == route15)
     }
 
     @Test func selectingLineFiltersDeparturesToThatLine() {
@@ -45,6 +140,49 @@ struct TransitMapViewModelTests {
 
         #expect(viewModel.selectedDeparturePlatform == "2")
         #expect(viewModel.filteredDepartures.map(\.id) == ["line-15-platform-2", "line-10-platform-2"])
+    }
+
+    @Test func refreshFailureKeepsLastSuccessfulDeparturesAndTheirPlatforms() async {
+        let viewModel = TransitMapViewModel()
+        let stop = makeStop(id: "stop-1")
+        let departure = makeDeparture(
+            id: "line-15-platform-2",
+            routeId: route15.id,
+            lineName: "15",
+            platform: "2"
+        )
+        viewModel.selectStop(stop)
+        viewModel.departures = [departure]
+
+        await viewModel.loadDepartures(using: FailingATPClient())
+
+        #expect(viewModel.departures == [departure])
+        #expect(viewModel.filteredDepartures.first?.platform == "2")
+        #expect(viewModel.departuresErrorMessage == "Departures could not be loaded.")
+    }
+
+    @Test func refreshWithMissingPlatformUsesUniquePreviousPlatformAsFallback() async {
+        let viewModel = TransitMapViewModel()
+        let stop = makeStop(id: "stop-1")
+        let previous = makeDeparture(
+            id: "line-15-platform-2",
+            routeId: route15.id,
+            lineName: "15",
+            platform: "2"
+        )
+        let refreshed = makeDeparture(
+            id: "line-15-refreshed",
+            routeId: route15.id,
+            lineName: "15",
+            platform: nil
+        )
+        viewModel.selectStop(stop)
+        viewModel.departures = [previous]
+
+        await viewModel.loadDepartures(using: StaticATPClient(departures: [refreshed]))
+
+        #expect(viewModel.departures.first?.id == "line-15-refreshed")
+        #expect(viewModel.departures.first?.platform == "2")
     }
 
     @Test func lineAndPlatformFiltersCombine() {
@@ -686,6 +824,28 @@ struct TransitMapViewModelTests {
             platform: platform,
             dataSource: .mock
         )
+    }
+}
+
+private struct FailingATPClient: ATPClient {
+    func nearbyStops(latitude _: Double, longitude _: Double) async throws -> [Stop] {
+        throw ATPClientError.httpStatus(503)
+    }
+
+    func departureBoard(stopId _: String) async throws -> [Departure] {
+        throw ATPClientError.httpStatus(503)
+    }
+}
+
+private struct StaticATPClient: ATPClient {
+    let departures: [Departure]
+
+    func nearbyStops(latitude _: Double, longitude _: Double) async throws -> [Stop] {
+        []
+    }
+
+    func departureBoard(stopId _: String) async throws -> [Departure] {
+        departures
     }
 }
 

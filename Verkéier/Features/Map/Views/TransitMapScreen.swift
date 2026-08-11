@@ -27,8 +27,11 @@ struct TransitMapScreen: View {
     @State var searchUpdateContinuation: AsyncStream<String>.Continuation?
     @State var nearbyStopsUpdateTask: Task<Void, Never>?
     @State var shouldCenterOnNextLocation = false
-    @State var isMainSheetPresented = true
+    @State var isMainSheetPresented = false
+    @State var isOnboardingPresented = false
     @State var favouriteStopIds: Set<String> = []
+    @State var sheetPath: [TransitSheetRoute] = []
+    @State var sheetDetent: BottomSheetDetent = .medium
     @State private var bikeShareStations: [BikeShareStation] = []
     @AppStorage("hasCompletedOnboarding") var hasCompletedOnboarding = false
 
@@ -55,33 +58,51 @@ struct TransitMapScreen: View {
         .sheet(isPresented: $isMainSheetPresented) {
             TransitBottomSheet(
                 searchQuery: $viewModel.searchQuery,
-                detent: viewModel.sheetDetent,
+                path: $sheetPath,
+                detent: sheetDetent,
                 viewModel: sheetPresentationModel,
-                actions: sheetActions
+                actions: sheetActions,
+                activateRoute: activateSheetRoute
             )
             .presentationDetents(
                 BottomSheetDetent.presentationDetents,
                 selection: sheetPresentationDetent
             )
-            .presentationDragIndicator(.visible)
-            .presentationBackground(.regularMaterial)
+            .presentationDragIndicator(.hidden)
+            .presentationBackground {
+                Rectangle().fill(.regularMaterial)
+            }
             .presentationBackgroundInteraction(
                 .enabled(upThrough: BottomSheetDetent.mediumPresentationDetent)
             )
-            .presentationCornerRadius(28)
+            .presentationCornerRadius(40)
             .interactiveDismissDisabled()
         }
-        .fullScreenCover(isPresented: .init(
-            get: { !hasCompletedOnboarding },
-            set: { if !$0 { hasCompletedOnboarding = true } }
-        )) {
-            FirstRunOnboardingView(readiness: settingsReadinessSnapshot) {
+        .fullScreenCover(
+            isPresented: onboardingPresentationBinding,
+            onDismiss: {
+                if hasCompletedOnboarding {
+                    isMainSheetPresented = true
+                }
+            }
+        ) {
+            OnboardingView {
                 hasCompletedOnboarding = true
+                isOnboardingPresented = false
                 gtfsUpdateController.checkAutomatically()
+            }
+            .ignoresSafeArea()
+        }
+        .onAppear {
+            guard !isMainSheetPresented, !isOnboardingPresented else { return }
+            if hasCompletedOnboarding {
+                isMainSheetPresented = true
+            } else {
+                isOnboardingPresented = true
             }
         }
         .onChange(of: isMainSheetPresented) {
-            if !isMainSheetPresented {
+            if !isMainSheetPresented, hasCompletedOnboarding, !isOnboardingPresented {
                 isMainSheetPresented = true
             }
         }
@@ -122,7 +143,7 @@ struct TransitMapScreen: View {
             calculateWaitingRouteIfNeeded()
         }
         .task(id: departureRefreshKey) {
-            guard viewModel.selectedStop != nil, viewModel.sheetContext == .stopDetail else {
+            guard viewModel.selectedStop != nil, isShowingStopDetail else {
                 return
             }
             await viewModel.loadDepartures(using: atpClient)
@@ -181,30 +202,20 @@ struct TransitMapScreen: View {
             state: MapViewState(
                 region: viewModel.cameraRegion,
                 cameraUpdateToken: viewModel.cameraUpdateToken,
-                liveStops: stopsForMode(viewModel.nearbyStops),
-                gtfsStops: stopsForMode(viewModel.gtfsOnlyMapStops),
+                liveStops: viewModel.nearbyStops,
+                gtfsStops: viewModel.gtfsOnlyMapStops,
                 selectedStopId: viewModel.selectedStop?.id,
                 favouriteStopIds: favouriteStopIds,
                 alertStopIds: Set(viewModel.alerts.flatMap(\.affectedStopIds)),
                 bikeShareStations: mapBikeShareStations,
-                routeOverlay: viewModel.activeMapOverlay
+                routeOverlay: mapRouteOverlay
             ),
             selectStop: selectStop,
             selectStopGroup: selectStopGroup,
             regionDidChange: scheduleMapRegionUpdate
         )
         .ignoresSafeArea()
-        .overlay(alignment: .bottom) {
-            MapModeFilterBar(selected: viewModel.mapModeFilter, select: setMapModeFilter)
-                // Sit just above the collapsed sheet edge (collapsed detent = 70pt).
-                .padding(.bottom, 82)
-        }
         .accessibilityLabel("Luxembourg transit map")
-    }
-
-    func stopsForMode(_ stops: [Stop]) -> [Stop] {
-        guard let mode = viewModel.mapModeFilter else { return stops }
-        return stops.filter { $0.modes.contains(mode) }
     }
 
     var selectedBikeShareStations: [BikeShareStation] {
@@ -240,7 +251,34 @@ struct TransitMapScreen: View {
     }
 
     var departureRefreshKey: String {
-        "\(viewModel.selectedStop?.id ?? "none")|\(viewModel.sheetContext)"
+        "\(viewModel.selectedStop?.id ?? "none")|\(isShowingStopDetail)"
+    }
+
+    var isShowingStopDetail: Bool {
+        if case .stopDetail = sheetPath.last { return true }
+        return false
+    }
+
+    var mapRouteOverlay: RouteMapOverlay? {
+        if case .lineDetail = sheetPath.last {
+            return viewModel.selectedLineDetail?.mapOverlay
+        }
+        return viewModel.routeMapOverlay
+    }
+
+    var onboardingPresentationBinding: Binding<Bool> {
+        Binding(
+            get: { isOnboardingPresented },
+            set: { presented in
+                isOnboardingPresented = presented
+                if !presented {
+                    // Preserve the previous swipe-to-dismiss behaviour while
+                    // waiting for the cover's dismissal callback before
+                    // presenting the main sheet.
+                    hasCompletedOnboarding = true
+                }
+            }
+        )
     }
 }
 

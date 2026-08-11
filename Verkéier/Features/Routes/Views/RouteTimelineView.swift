@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The route step-by-step timeline sheet context (``TransitSheetContext/routeTimeline``).
+/// The route step-by-step timeline navigation destination.
 ///
 /// Shows a summary card for the selected option (ribbon + times) followed by
 /// the vertical-rail leg list. Falls back to an unavailable card if no option

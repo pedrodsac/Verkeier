@@ -34,6 +34,30 @@ struct Stop: Codable, Hashable, Identifiable {
     /// When a feed omits this field but prefixes the stop name with a
     /// locality, the initializer derives it from that prefix.
     let locality: String?
+
+    /// The complete stop name used for search, including its locality when
+    /// the feed stores that part separately.
+    ///
+    /// The UI may present ``displayName`` without the locality because the
+    /// locality is shown as a subtitle. Search must continue to use this full
+    /// value so a query such as "Arlon" can find "Arlon, Gare".
+    nonisolated var fullName: String {
+        let cleanedName = name.stationDisplayName
+        guard let locality = locality?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !locality.isEmpty else {
+            return cleanedName
+        }
+
+        let trimmedName = cleanedName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let localityPrefix = "\(locality),"
+        if trimmedName.prefix(localityPrefix.count).caseInsensitiveCompare(localityPrefix) == .orderedSame
+            || trimmedName.caseInsensitiveCompare(locality) == .orderedSame {
+            return trimmedName
+        }
+
+        return "\(locality), \(trimmedName)"
+    }
+
     /// Geographic position of the stop.
     let location: LocationPoint
     /// Transport modes that serve this stop (bus, tram, train, …).

@@ -2,92 +2,710 @@
   "sourceLanguage" : "en",
   "strings" : {
     "  ·  %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "  ·  %1$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "  ·  %1$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "  ·  %1$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "  ·  %1$@"
+          }
+        }
+      }
     },
     "%@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@"
+          }
+        }
+      }
     },
     "%lld" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld"
+          }
+        }
+      }
     },
     "%lld min" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Min."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld min"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Min."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld min"
+          }
+        }
+      }
     },
     "%lld min · %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Min. · %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "%1$lld min · %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld min · %2$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Min. · %2$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "%1$lld min · %2$@"
           }
         }
       }
     },
     "%lld min before" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Min. vorher"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld min avant"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Min. virdrun"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld min antes"
+          }
+        }
+      }
     },
     "%lldm" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld m"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld m"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld m"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld m"
+          }
+        }
+      }
     },
     "0 transfers  ·  0.0 km  ·  Scheduled GTFS times" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0 Umstiege  ·  0,0 km  ·  GTFS-Fahrplanzeiten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0 correspondances  ·  0,0 km  ·  Horaires GTFS planifiés"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0 Ëmsteigen  ·  0,0 km  ·  geplangten GTFS-Fuerplang"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0 transbordos  ·  0,0 km  ·  Horários GTFS programados"
+          }
+        }
+      }
     },
     "00:00 – 00:00  ·  00 min" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "00:00 – 00:00  ·  00 Min."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "00:00 – 00:00  ·  00 min"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "00:00 – 00:00  ·  00 Min."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "00:00 – 00:00  ·  00 min"
+          }
+        }
+      }
     },
     "About & Legal" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über & Rechtliches"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À propos et mentions légales"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iwwer & Rechtleches"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre e informações legais"
+          }
+        }
+      }
     },
     "Add departure reminder" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrtserinnerung hinzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un rappel de départ"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erënnerung un d’Depart bäisetzen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar lembrete de partida"
+          }
+        }
+      }
     },
     "Administration des transports publics - GTFS public transport schedules and stops" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Administration des transports publics - öffentliche GTFS-Fahrpläne und Haltestellen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Administration des transports publics - horaires et arrêts de transports publics GTFS"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Administration des transports publics - GTFS-Fuerpläng an Arrête vum ëffentlechen Transport"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Administration des transports publics - horários e paragens de transporte público GTFS"
+          }
+        }
+      }
     },
     "Administration des transports publics - mobiliteit.lu OpenAPI" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Administration des transports publics - mobiliteit.lu OpenAPI"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Administration des transports publics - mobiliteit.lu OpenAPI"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Administration des transports publics - mobiliteit.lu OpenAPI"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Administration des transports publics - mobiliteit.lu OpenAPI"
+          }
+        }
+      }
     },
     "Advanced" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweitert"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avancé"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweidert"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avançado"
+          }
+        }
+      }
     },
     "All" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tous"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos"
+          }
+        }
+      }
     },
     "All stops" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Haltestellen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tous les arrêts"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Arrêten"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas as paragens"
+          }
+        }
+      }
     },
     "API" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API"
+          }
+        }
+      }
     },
     "Appearance" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erscheinungsbild"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apparence"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgesinn"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aspeto"
+          }
+        }
+      }
     },
     "Apple Maps / MapKit" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Maps / MapKit"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Plans / MapKit"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Maps / MapKit"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Maps / MapKit"
+          }
+        }
+      }
     },
     "Arrive" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ankunft"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrivée"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukënft"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chegada"
+          }
+        }
+      }
     },
     "Arrive by…" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ankommen bis …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arriver avant…"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukënft bis …"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chegar até…"
+          }
+        }
+      }
     },
     "Attribution" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quellenangaben"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crédits"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quellen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atribuição"
+          }
+        }
+      }
     },
     "Availability may have changed" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verfügbarkeit kann sich geändert haben"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La disponibilité a peut-être changé"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D’Disponibilitéit kann geännert hunn"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A disponibilidade pode ter sido alterada"
+          }
+        }
+      }
     },
     "Avoid tight transfers" : {
-
-    },
-    "Back to route options" : {
-
-    },
-    "Back to stop" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enge Umstiege vermeiden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Éviter les correspondances trop courtes"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kuerz Ëmsteigen vermeiden"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evitar ligações muito curtas"
+          }
+        }
+      }
     },
     "Bus 000" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bus 000"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bus 000"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bus 000"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autocarro 000"
+          }
+        }
+      }
     },
     "Cancel" : {
       "localizations" : {
@@ -118,7 +736,32 @@
       }
     },
     "Cancel reminder" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerung abbrechen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler le rappel"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erënnerung ofbriechen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar lembrete"
+          }
+        }
+      }
     },
     "Cancelled" : {
       "extractionState" : "stale",
@@ -150,24 +793,175 @@
       }
     },
     "Change departure reminder" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrtserinnerung ändern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le rappel de départ"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depart-Erënnerung änneren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alterar lembrete de partida"
+          }
+        }
+      }
     },
     "Check for GTFS update" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf GTFS-Aktualisierung prüfen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher une mise à jour GTFS"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No GTFS-Aktualiséierung kucken"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificar atualização do GTFS"
+          }
+        }
+      }
     },
     "Checking…" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird geprüft …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification…"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gëtt iwwerpréift…"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A verificar…"
+          }
+        }
+      }
     },
     "Checks data.public.lu for a newer GTFS feed" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prüft data.public.lu auf einen neueren GTFS-Datenfeed"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifie si data.public.lu propose un flux GTFS plus récent"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kuckt op data.public.lu no engem méi neie GTFS-Feed"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verifica se existe um feed GTFS mais recente em data.public.lu"
+          }
+        }
+      }
     },
     "Choose a stop at this location" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestelle an diesem Ort auswählen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir un arrêt à cet emplacement"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Arrêt op dëser Plaz auswielen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolher uma paragem neste local"
+          }
+        }
+      }
     },
     "Choose travel time" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrzeit auswählen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir l’heure de trajet"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reeszäit auswielen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolher a hora da viagem"
+          }
+        }
+      }
     },
     "Clear search" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -195,47 +989,288 @@
         }
       }
     },
-    "Close alerts" : {
-
-    },
-    "Close settings" : {
-
-    },
-    "Close stop details" : {
-
-    },
-    "Close stop list" : {
-
-    },
     "Closest stops from mobiliteit.lu" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächstgelegene Haltestellen von mobiliteit.lu"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêts les plus proches depuis mobiliteit.lu"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déi noosten Arrêten vu mobiliteit.lu"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragens mais próximas do mobiliteit.lu"
+          }
+        }
+      }
+    },
+    "Collapsed" : {
 
     },
     "Commute suggestion, %@, leave now" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pendlerempfehlung, %1$@, jetzt losgehen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggestion de trajet, %1$@, partir maintenant"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pendler-Virschlag, %1$@, elo fortgoen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sugestão de deslocação, %1$@, sair agora"
+          }
+        }
+      }
     },
     "Continues as %@ — no change needed" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter als %1$@ — kein Umstieg nötig"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue comme %1$@ — aucun changement nécessaire"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geet weider als %1$@ — keng Ännerung néideg"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continua como %1$@ — não é necessária qualquer alteração"
+          }
+        }
+      }
     },
     "Current Location" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktueller Standort"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position actuelle"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuell Plaz"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Localização atual"
+          }
+        }
+      }
     },
     "Data" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Données"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Donnéeën"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dados"
+          }
+        }
+      }
     },
     "Data Status" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenstatus"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "État des données"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Donnéeëstatus"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado dos dados"
+          }
+        }
+      }
     },
     "Default lead time" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardvorlauf"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Délai par défaut"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard-Vorlafzäit"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antecedência predefinida"
+          }
+        }
+      }
     },
     "Delete all favourites, recent stops, trips, and commute presets?" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Favoriten, zuletzt verwendeten Haltestellen, Fahrten und Pendelprofile löschen?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer tous les favoris, arrêts récents, trajets et préréglages de trajet domicile-travail ?"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Favoritten, rezent Arrêten, Reesen a Pendel-Presets läschen?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todos os favoritos, paragens recentes, viagens e predefinições de deslocação?"
+          }
+        }
+      }
     },
     "Delete all local data" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle lokalen Daten löschen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer toutes les données locales"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All lokal Donnéeë läschen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todos os dados locais"
+          }
+        }
+      }
     },
     "Delete everything" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles löschen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout supprimer"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles läschen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar tudo"
+          }
+        }
+      }
     },
     "Departures" : {
       "localizations" : {
@@ -266,10 +1301,60 @@
       }
     },
     "Destination" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziel"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destination"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destinatioun"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destino"
+          }
+        }
+      }
     },
     "Direction" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richtung"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direction"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richtung"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direção"
+          }
+        }
+      }
     },
     "Directions" : {
       "localizations" : {
@@ -300,34 +1385,287 @@
       }
     },
     "Disruption" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Störung"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perturbation"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stéierung"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perturbação"
+          }
+        }
+      }
     },
     "Disruption affects this leg" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Störung betrifft diesen Abschnitt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La perturbation affecte cette portion"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D’Stéierung betrëfft dësen Deel vun der Rees"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A perturbação afeta este segmento"
+          }
+        }
+      }
     },
     "Disruption Impact" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auswirkungen der Störung"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impact de la perturbation"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auswierkung vun der Stéierung"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impacto da perturbação"
+          }
+        }
+      }
     },
     "Distance" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernung"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distance"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distanz"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distância"
+          }
+        }
+      }
     },
     "Done" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminé"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fäerdeg"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Concluído"
+          }
+        }
+      }
     },
     "Edit Label" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bezeichnung bearbeiten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le libellé"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Label änneren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar etiqueta"
+          }
+        }
+      }
+    },
+    "Expanded" : {
 
     },
     "Export support bundle" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support-Paket exportieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter le paquet d’assistance"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support-Pak exportéieren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar pacote de suporte"
+          }
+        }
+      }
     },
     "Fastest" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schnellste"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le plus rapide"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schnellsten"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mais rápido"
+          }
+        }
+      }
     },
     "Favourite Stop" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoriten-Haltestelle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêt favori"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoritten-Arrêt"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragem favorita"
+          }
+        }
+      }
     },
     "Favourite Stops" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoriten-Haltestellen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêts favoris"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoritten-Arrêten"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragens favoritas"
+          }
+        }
+      }
     },
     "Find Routes" : {
       "extractionState" : "stale",
@@ -359,10 +1697,60 @@
       }
     },
     "Finding nearby stops" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestellen in der Nähe werden gesucht"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recherche d’arrêts à proximité"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No nooste Arrête sichen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A procurar paragens próximas"
+          }
+        }
+      }
     },
     "From %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von %1$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depuis %1$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vu %1$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De %1$@"
+          }
+        }
+      }
     },
     "Get directions" : {
       "localizations" : {
@@ -393,25 +1781,204 @@
       }
     },
     "Get Next Departures" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächste Abfahrten abrufen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenir les prochains départs"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächst Departuren ofruffen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obter próximas partidas"
+          }
+        }
+      }
     },
     "Get started" : {
-
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loslegen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commencer"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ufänken"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Começar"
+          }
+        }
+      }
     },
     "GTFS Data" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GTFS-Daten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Données GTFS"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GTFS-Donnéeën"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dados GTFS"
+          }
+        }
+      }
+    },
+    "Home" : {
 
     },
     "Information" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informationen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informations"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informatiounen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informações"
+          }
+        }
+      }
     },
     "Journey Alerts" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrtwarnungen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alertes de trajet"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reeswarnungen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alertas da viagem"
+          }
+        }
+      }
     },
     "Label (e.g. Home → Work)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bezeichnung (z. B. Zuhause → Arbeit)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libellé (p. ex. Maison → Travail)"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Label (z. B. Doheem → Schaffen)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etiqueta (por ex., Casa → Trabalho)"
+          }
+        }
+      }
     },
     "Label (e.g. Home, Work)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bezeichnung (z. B. Zuhause, Arbeit)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libellé (p. ex. Maison, Travail)"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Label (z. B. Doheem, Schaffen)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etiqueta (por ex., Casa, Trabalho)"
+          }
+        }
+      }
     },
     "Last service today" : {
       "localizations" : {
@@ -442,17 +2009,91 @@
       }
     },
     "Leave at…" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrt um …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partir à…"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortfueren um…"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partir às…"
+          }
+        }
+      }
     },
     "Leave now" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetzt los"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partir maintenant"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elo fortgoen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partir agora"
+          }
+        }
+      }
     },
     "Live Activity tracking %@ to %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live-Aktivität verfolgt %1$@ bis %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Live Activity tracking %1$@ to %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’activité en direct suit %1$@ vers %2$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live-Aktivitéit verfollegt %1$@ bis %2$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Atividade em tempo real está a acompanhar %1$@ até %2$@"
           }
         }
       }
@@ -487,34 +2128,257 @@
       }
     },
     "Loading stops" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestellen werden geladen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement des arrêts"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêten ginn gelueden"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A carregar paragens"
+          }
+        }
+      }
     },
     "Location" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standort"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plaz"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Localização"
+          }
+        }
+      }
     },
-    "Luxembourg public transport — departures, journeys, and disruptions." : {
-
+    "Location is optional. You can search for stops without sharing your location." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Standort ist optional. Du kannst ohne Standortfreigabe nach Haltestellen suchen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La position est facultative. Vous pouvez rechercher des arrêts sans partager votre position."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D’Plaz ass fakultativ. Du kanns no Arrête sichen, ouni deng Plaz ze deelen."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A localização é opcional. Pode procurar paragens sem partilhar a sua localização."
+          }
+        }
+      }
     },
     "Luxembourg transit map" : {
-
-    },
-    "Verkéier" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ÖPNV-Karte von Luxemburg"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carte des transports publics du Luxembourg"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaart vum ëffentlechen Transport zu Lëtzebuerg"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa de transportes do Luxemburgo"
+          }
+        }
+      }
     },
     "Maps:" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Karten:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartes :"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaarten:"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapas:"
+          }
+        }
+      }
     },
     "Mode preference" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bevorzugtes Verkehrsmittel"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mode préféré"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferéierte Modus"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferência de modo"
+          }
+        }
+      }
     },
     "Name this trip so you can re-plan it in one tap. Use “Home → Work” for time-of-day commute suggestions." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benenne diese Fahrt, um sie mit einem Fingertipp neu zu planen. Verwende „Zuhause → Arbeit“ für Pendelvorschläge nach Tageszeit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nommez ce trajet pour pouvoir le replanifier d’un geste. Utilisez « Maison → Travail » pour les suggestions de trajet selon l’heure."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gëff dëser Rees en Numm, fir se mat engem Klick nei ze plangen. Benotz „Doheem → Schaffen“ fir Pendelvirschléi no Dageszäit."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dê um nome a esta viagem para a poder planear novamente com um toque. Use “Casa → Trabalho” para sugestões de deslocação consoante a hora do dia."
+          }
+        }
+      }
     },
     "Nearby" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In der Nähe"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À proximité"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An der Géigend"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Próximas"
+          }
+        }
+      }
     },
     "Nearby Stops" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestellen in der Nähe"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêts à proximité"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêten an der Géigend"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragens próximas"
+          }
+        }
+      }
     },
     "Nearby Suggestions" : {
       "localizations" : {
@@ -545,7 +2409,32 @@
       }
     },
     "Night bus" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachtbus"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bus de nuit"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuetsbus"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autocarro noturno"
+          }
+        }
+      }
     },
     "No departures" : {
       "extractionState" : "stale",
@@ -577,22 +2466,172 @@
       }
     },
     "No favourites" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Favoriten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun favori"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keng Favoritten"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem favoritos"
+          }
+        }
+      }
     },
     "No matches" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Treffer"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun résultat"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keng Resultater"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem correspondências"
+          }
+        }
+      }
     },
     "No nearby stops" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Haltestellen in der Nähe"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun arrêt à proximité"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keng Arrêten an der Géigend"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem paragens próximas"
+          }
+        }
+      }
     },
     "Not wheelchair accessible" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht rollstuhlgerecht"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non accessible en fauteuil roulant"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Net rollstullgerecht"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não acessível a cadeiras de rodas"
+          }
+        }
+      }
     },
     "Notifications" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifikatiounen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notificações"
+          }
+        }
+      }
     },
     "Offline mode" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline-Modus"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mode hors ligne"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline-Modus"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo offline"
+          }
+        }
+      }
     },
     "On time" : {
       "extractionState" : "stale",
@@ -624,7 +2663,32 @@
       }
     },
     "Open Favourite Stop" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoriten-Haltestelle öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir l’arrêt favori"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoritten-Arrêt opmaachen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir paragem favorita"
+          }
+        }
+      }
     },
     "Open in Apple Maps" : {
       "localizations" : {
@@ -655,67 +2719,627 @@
       }
     },
     "Open iOS Settings" : {
-
-    },
-    "Open Verkéier route planning for a destination." : {
-
-    },
-    "Open Verkéier to a saved favourite stop." : {
-
-    },
-    "Open Verkéier to nearby public transport stops." : {
-
-    },
-    "Open Verkéier to track the next departure from a favourite stop." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS-Einstellungen öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les réglages iOS"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS-Astellungen opmaachen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Definições do iOS"
+          }
+        }
+      }
     },
     "Open Stop" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestelle öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir l’arrêt"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêt opmaachen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir paragem"
+          }
+        }
+      }
+    },
+    "Open Verkéier route planning for a destination." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier-Routenplanung für ein Ziel öffnen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir la planification d’itinéraire Verkéier vers une destination."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier-Routeplanung fir eng Destinatioun opmaachen."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir o planeamento de rotas do Verkéier para um destino."
+          }
+        }
+      }
+    },
+    "Open Verkéier to a saved favourite stop." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier für eine gespeicherte Favoriten-Haltestelle öffnen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir Verkéier vers un arrêt favori enregistré."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier fir e gespäicherten Favoritten-Arrêt opmaachen."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir o Verkéier para uma paragem favorita guardada."
+          }
+        }
+      }
+    },
+    "Open Verkéier to nearby public transport stops." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier für nahegelegene ÖPNV-Haltestellen öffnen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir Verkéier vers les arrêts de transports publics à proximité."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier fir ëffentlech Arrêten an der Géigend opmaachen."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir o Verkéier para paragens de transportes públicos próximas."
+          }
+        }
+      }
+    },
+    "Open Verkéier to track the next departure from a favourite stop." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier öffnen, um die nächste Abfahrt einer Favoriten-Haltestelle zu verfolgen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir Verkéier pour suivre le prochain départ depuis un arrêt favori."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier opmaachen, fir déi nächst Depart vun engem Favoritten-Arrêt ze verfollegen."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir o Verkéier para acompanhar a próxima partida de uma paragem favorita."
+          }
+        }
+      }
     },
     "Opening %@." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ wird geöffnet."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouverture de %1$@."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ gëtt opgemaach."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A abrir %1$@."
+          }
+        }
+      }
     },
     "Opening departure tracking." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrtsverfolgung wird geöffnet."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouverture du suivi des départs."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depart-Verfollegung gëtt opgemaach."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A abrir o acompanhamento de partidas."
+          }
+        }
+      }
     },
     "Opening nearby stops." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestellen in der Nähe werden geöffnet."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouverture des arrêts à proximité."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêten an der Géigend ginn opgemaach."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A abrir paragens próximas."
+          }
+        }
+      }
     },
     "Opening route planning." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Routenplanung wird geöffnet."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouverture de la planification d’itinéraire."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Routeplanung gëtt opgemaach."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A abrir o planeamento de rotas."
+          }
+        }
+      }
     },
     "Opens route step-by-step timeline" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet die Schritt-für-Schritt-Routenansicht"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre la chronologie détaillée de l’itinéraire"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet d’Schrëtt-fir-Schrëtt-Routechronologie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre a cronologia passo a passo da rota"
+          }
+        }
+      }
     },
     "Permissions" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berechtigungen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorisations"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berechtigungen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permissões"
+          }
+        }
+      }
+    },
+    "Placeholder 1" : {
+
+    },
+    "Placeholder 2" : {
 
     },
     "Plan Route" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route planen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planifier un itinéraire"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route plangen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planear rota"
+          }
+        }
+      }
     },
     "Platform" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bahnsteig"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quai"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perrong"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plataforma"
+          }
+        }
+      }
     },
     "Platform %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bahnsteig %1$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quai %1$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perrong %1$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plataforma %1$@"
+          }
+        }
+      }
     },
     "Platform changed from %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bahnsteig geändert von %1$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quai changé de %1$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perrong geännert vun %1$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plataforma alterada de %1$@"
+          }
+        }
+      }
     },
     "Platform filter" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bahnsteigfilter"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtre de quais"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perrongsfilter"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtro de plataformas"
+          }
+        }
+      }
     },
     "Prefer accessible options" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Barrierefreie Optionen bevorzugen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privilégier les options accessibles"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibel Optioune bevorzugen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferir opções acessíveis"
+          }
+        }
+      }
     },
     "Prefer step-free routes" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stufenlose Routen bevorzugen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privilégier les itinéraires sans marches"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route ouni Träppleke bevorzugen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferir rotas sem degraus"
+          }
+        }
+      }
     },
     "Preferred mode" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bevorzugtes Verkehrsmittel"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mode préféré"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bevorzugte Modus"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo preferido"
+          }
+        }
+      }
     },
     "Privacy" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutz"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confidentialité"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateschutz"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacidade"
+          }
+        }
+      }
+    },
+    "Public transport in Luxembourg, made easy." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffentlicher Verkehr in Luxemburg, ganz einfach."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les transports publics au Luxembourg, en toute simplicité."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ëffentlechen Transport zu Lëtzebuerg, einfach gemaach."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transportes públicos no Luxemburgo, de forma simples."
+          }
+        }
+      }
     },
     "Quick destinations" : {
       "localizations" : {
@@ -746,10 +3370,60 @@
       }
     },
     "Recent" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt verwendet"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Récent"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rezent"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recentes"
+          }
+        }
+      }
     },
     "Recent Places" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt verwendete Orte"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lieux récents"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rezent Plazen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Locais recentes"
+          }
+        }
+      }
     },
     "Recently departed" : {
       "localizations" : {
@@ -780,7 +3454,32 @@
       }
     },
     "Refresh alerts" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meldungen aktualisieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiser les alertes"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warnungen aktualiséieren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualizar alertas"
+          }
+        }
+      }
     },
     "Refresh Routes" : {
       "extractionState" : "stale",
@@ -812,29 +3511,178 @@
       }
     },
     "Remind %lld min before" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerung %1$lld Min. vorher"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rappeler %1$lld min avant"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erënnerung %1$lld Min. virdrun"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lembrar %1$lld min antes"
+          }
+        }
+      }
     },
     "Remind %lld min before (default)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerung %1$lld Min. vorher (Standard)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rappeler %1$lld min avant (par défaut)"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erënnerung %1$lld Min. virdrun (Standard)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lembrar %1$lld min antes (predefinição)"
+          }
+        }
+      }
     },
     "Reminder set for %lld min before %@ to %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerung für %1$lld Min. vor %2$@ nach %3$@ festgelegt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Reminder set for %1$lld min before %2$@ to %3$@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rappel défini %1$lld min avant %2$@ vers %3$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erënnerung fir %1$lld Min. virun %2$@ op %3$@ agestallt"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lembrete definido para %1$lld min antes de %2$@ para %3$@"
+          }
         }
       }
     },
     "Reminders" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerungen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rappels"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erënnerungen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lembretes"
+          }
+        }
+      }
     },
     "Remove favourite" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorit entfernen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le favori"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorit ewechhuelen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remover favorito"
+          }
+        }
+      }
     },
     "Remove Label" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bezeichnung entfernen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le libellé"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Label ewechhuelen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remover etiqueta"
+          }
+        }
+      }
     },
     "Route options" : {
       "localizations" : {
@@ -865,7 +3713,32 @@
       }
     },
     "Route Planner Defaults" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardwerte der Routenplanung"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paramètres par défaut du planificateur d’itinéraire"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardastellunge vun der Routeplanung"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Predefinições do planeador de rotas"
+          }
+        }
+      }
     },
     "Save" : {
       "localizations" : {
@@ -896,16 +3769,116 @@
       }
     },
     "Save a stop from its detail view." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestelle aus der Detailansicht speichern."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrez un arrêt depuis sa fiche détaillée."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Späicher en Arrêt aus senger Detailvisiicht."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarde uma paragem a partir da respetiva vista de detalhes."
+          }
+        }
+      }
     },
     "Save commute" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pendelstrecke speichern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer le trajet"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pendlerroute späicheren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar deslocação"
+          }
+        }
+      }
     },
     "Save Commute…" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pendelstrecke speichern …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer le trajet…"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pendlerroute späicheren…"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar deslocação…"
+          }
+        }
+      }
     },
     "Save favourite" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorit speichern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer le favori"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorit späicheren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar favorito"
+          }
+        }
+      }
     },
     "Scheduled" : {
       "localizations" : {
@@ -936,19 +3909,145 @@
       }
     },
     "Search" : {
-
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisar"
+          }
+        }
+      }
     },
     "Search settings" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sucheinstellungen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages de recherche"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichastellungen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definições de pesquisa"
+          }
+        }
+      }
     },
     "Search stops" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestellen suchen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher des arrêts"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Arrête sichen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisar paragens"
+          }
+        }
+      }
     },
     "Search stops & places" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestellen und Orte suchen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher des arrêts et des lieux"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Arrêten a Plaze sichen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisar paragens e locais"
+          }
+        }
+      }
     },
     "Search stops…" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestellen suchen …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher des arrêts…"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Arrête sichen…"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisar paragens…"
+          }
+        }
+      }
     },
     "Settings" : {
       "localizations" : {
@@ -978,14 +4077,62 @@
         }
       }
     },
-    "Settings and diagnostics" : {
-
-    },
     "Settings and information" : {
-
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen und Informationen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages et informations"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astellungen an Informatiounen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definições e informações"
+          }
+        }
+      }
     },
     "Share next departures" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächste Abfahrten teilen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partager les prochains départs"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächst Departuren deelen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partilhar próximas partidas"
+          }
+        }
+      }
     },
     "Share route" : {
       "localizations" : {
@@ -1014,9 +4161,6 @@
           }
         }
       }
-    },
-    "Show alerts" : {
-
     },
     "Show more routes" : {
       "localizations" : {
@@ -1047,36 +4191,287 @@
       }
     },
     "Show Nearby Stops" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestellen in der Nähe anzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher les arrêts à proximité"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêten an der Géigend weisen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar paragens próximas"
+          }
+        }
+      }
     },
     "Show only stops labelled “Work” and your commute preset while this Focus is on." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Während dieses Fokus aktiv ist, nur Haltestellen mit der Bezeichnung „Arbeit“ und dein Pendelprofil anzeigen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher uniquement les arrêts portant le libellé « Travail » et votre trajet domicile-travail lorsque ce mode de concentration est actif."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nëmmen Arrête mam Label „Schaffen“ an däi Pendler-Preset weisen, soulaang dëse Focus aktiv ass."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar apenas paragens com a etiqueta “Trabalho” e a sua predefinição de deslocação enquanto este modo de concentração estiver ativo."
+          }
+        }
+      }
     },
     "Show the next departures for a favourite stop." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächste Abfahrten für eine Favoriten-Haltestelle anzeigen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher les prochains départs d’un arrêt favori."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déi nächst Departuren fir e Favoritten-Arrêt weisen."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar as próximas partidas de uma paragem favorita."
+          }
+        }
+      }
     },
     "Sort by" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortieren nach"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trier par"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortéieren no"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar por"
+          }
+        }
+      }
     },
     "Sort routes" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Routen sortieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trier les itinéraires"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weeër sortéieren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar rotas"
+          }
+        }
+      }
     },
     "Start typing to find a stop, address, or place." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib etwas ein, um eine Haltestelle, Adresse oder einen Ort zu finden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commencez à saisir un arrêt, une adresse ou un lieu."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fänkt un ze tippen, fir en Arrêt, eng Adress oder eng Plaz ze fannen."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comece a escrever para encontrar uma paragem, morada ou local."
+          }
+        }
+      }
     },
     "Start typing to find stops from local GTFS data." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib etwas ein, um Haltestellen aus den lokalen GTFS-Daten zu finden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commencez à saisir pour rechercher des arrêts dans les données GTFS locales."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fänkt un ze tippen, fir Arrêten aus de lokale GTFS-Donnéeën ze fannen."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comece a escrever para encontrar paragens nos dados GTFS locais."
+          }
+        }
+      }
     },
     "Step-free, wheelchair accessible" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stufenlos, rollstuhlgerecht"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans marches, accessible en fauteuil roulant"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouni Träppleker, rollstullgerecht"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem degraus, acessível a cadeiras de rodas"
+          }
+        }
+      }
     },
     "Stop" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestelle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêt"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêt"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragem"
+          }
+        }
+      }
     },
     "Stop %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestelle %1$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêt %1$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêt %1$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragem %1$@"
+          }
+        }
+      }
     },
     "Stop search" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1105,83 +4500,743 @@
       }
     },
     "Stop Sequence" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestellenfolge"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Séquence des arrêts"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêtsequenz"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sequência de paragens"
+          }
+        }
+      }
     },
     "Stop tracking departure" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrtsverfolgung beenden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêter le suivi du départ"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depart-Verfollegung stoppen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parar acompanhamento da partida"
+          }
+        }
+      }
     },
     "Stops unavailable" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestellen nicht verfügbar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêts indisponibles"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêten net verfügbar"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragens indisponíveis"
+          }
+        }
+      }
     },
     "Support" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assistance"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suporte"
+          }
+        }
+      }
     },
     "Swap origin and destination" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start und Ziel tauschen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inverser le départ et la destination"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start an Destinatioun tauschen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trocar origem e destino"
+          }
+        }
+      }
     },
     "Tap a stop to see departures and save it to your commute." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe auf eine Haltestelle, um Abfahrten anzuzeigen und sie deinem Pendelprofil hinzuzufügen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez un arrêt pour voir les départs et l’enregistrer dans votre trajet."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippt op en Arrêt, fir Departuren ze gesinn an en an Äre Pendlerplang ze späicheren."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toque numa paragem para ver as partidas e guardá-la na sua deslocação."
+          }
+        }
+      }
     },
     "Theme" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thema"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thème"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thema"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tema"
+          }
+        }
+      }
     },
     "These AVL alerts affect this stop or its served lines." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese AVL-Meldungen betreffen diese Haltestelle oder die von ihr bedienten Linien."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ces alertes AVL concernent cet arrêt ou les lignes qu’il dessert."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dës AVL-Warnunge betreffen dësen Arrêt oder seng Linnen."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estes alertas AVL afetam esta paragem ou as linhas que serve."
+          }
+        }
+      }
     },
     "This app is not an official Luxembourg public transport app." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese App ist keine offizielle Luxemburger ÖPNV-App."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette app n’est pas une application officielle des transports publics luxembourgeois."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dës App ass keng offiziell App vum ëffentlechen Transport zu Lëtzebuerg."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta app não é uma aplicação oficial dos transportes públicos luxemburgueses."
+          }
+        }
+      }
+    },
+    "This tab is reserved for a future feature." : {
 
     },
     "Time" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeit"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heure"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zäit"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hora"
+          }
+        }
+      }
     },
     "Track departure" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrt verfolgen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivre le départ"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depart verfollegen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acompanhar partida"
+          }
+        }
+      }
     },
     "Track Departure" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrt verfolgen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivre le départ"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depart verfollegen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acompanhar partida"
+          }
+        }
+      }
     },
     "Track Next Departure" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächste Abfahrt verfolgen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivre le prochain départ"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächst Depart verfollegen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acompanhar próxima partida"
+          }
+        }
+      }
     },
     "Tram T0" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tram T0"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tram T0"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tram T0"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elétrico T0"
+          }
+        }
+      }
     },
     "Transfers" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umstiege"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correspondances"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ëmsteigen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transbordos"
+          }
+        }
+      }
     },
     "Transport data:" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkehrsdaten:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Données de transport :"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transportdaten:"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dados de transporte:"
+          }
+        }
+      }
     },
     "Try again when your location is available." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versuche es erneut, sobald dein Standort verfügbar ist."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessayez lorsque votre position sera disponible."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probéier et nach eng Kéier, wann deng Plaz verfügbar ass."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tente novamente quando a sua localização estiver disponível."
+          }
+        }
+      }
     },
     "Try another stop name." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versuche es mit einem anderen Haltestellennamen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayez un autre nom d’arrêt."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probéier en aneren Numm vun engem Arrêt."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimente outro nome de paragem."
+          }
+        }
+      }
     },
     "Try another stop, address, or place name." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versuche es mit einer anderen Haltestelle, Adresse oder Ortsbezeichnung."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayez un autre arrêt, une autre adresse ou un autre lieu."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probéier en aneren Arrêt, eng aner Adress oder eng aner Plaz."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimente outra paragem, morada ou local."
+          }
+        }
+      }
     },
     "Units" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einheiten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unités"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eenheeten"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unidades"
+          }
+        }
+      }
     },
     "Upcoming Timetable" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kommender Fahrplan"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prochains horaires"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kommende Fuerplang"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Horário futuro"
+          }
+        }
+      }
     },
     "vel’OH! %@, %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vel’OH! %1$@, %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "vel’OH! %1$@, %2$@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vel’OH! %1$@, %2$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vel’OH! %1$@, %2$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vel’OH! %1$@, %2$@"
+          }
+        }
+      }
+    },
+    "Verkéier" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier"
+          }
         }
       }
     },
     "Ville de Luxembourg - AVL Autobus" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ville de Luxembourg - AVL Autobus"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ville de Luxembourg - AVL Autobus"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ville de Luxembourg - AVL Autobus"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ville de Luxembourg - AVL Autobus"
+          }
+        }
+      }
     },
     "Walking" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu Fuß"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À pied"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu Fouss"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A pé"
+          }
+        }
+      }
+    },
+    "Welcome to Verkéier" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Willkommen bei Verkéier"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bienvenue dans Verkéier"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wëllkomm bei Verkéier"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bem-vindo ao Verkéier"
+          }
+        }
+      }
     },
     "Wheelchair accessible" : {
       "localizations" : {
@@ -1212,7 +5267,61 @@
       }
     },
     "Work stops only" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Haltestellen für Arbeit"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêts de travail uniquement"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nëmmen Arrête fir Schaffen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apenas paragens de trabalho"
+          }
+        }
+      }
+    },
+    "You can change permissions later in Settings." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst die Berechtigungen später in den Einstellungen ändern."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pourrez modifier les autorisations plus tard dans Réglages."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kanns d’Berechtigungen spéider an den Astellunge änneren."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pode alterar as permissões mais tarde nas Definições."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

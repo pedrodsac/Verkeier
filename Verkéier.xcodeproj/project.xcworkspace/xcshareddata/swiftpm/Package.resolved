@@ -20,6 +20,15 @@
       }
     },
     {
+      "identity" : "uionboarding",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lascic/UIOnboarding.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "52b656c820cdb26e40a261bb2e79e60f847410de"
+      }
+    },
+    {
       "identity" : "zipfoundation",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/weichsel/ZIPFoundation.git",

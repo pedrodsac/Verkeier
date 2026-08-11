@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - RouteView
 
-/// The route-planner sheet context (``TransitSheetContext/directions``).
+/// The route-planner navigation destination.
 ///
 /// Composes a unified endpoints card, compact filter bar, state-driven middle
 /// section (loading skeletons, error/empty cards, results list), and a primary
@@ -258,7 +258,6 @@ struct RouteView: View {
                 RouteOptionCard(
                     option: option,
                     isSelected: option.id == viewModel.selectedRouteOptionID,
-                    selectRouteOption: { actions.selectRouteOption(option.id) }
                 )
             }
 

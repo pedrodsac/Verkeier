@@ -62,22 +62,13 @@ extension TransitMapScreen {
 
     var sheetActions: TransitSheetActions {
         TransitSheetActions(
-            selectStop: selectStop,
-            showHome: showHome,
-            showSearch: showSearch,
-            showAlerts: showAlerts,
-            showStopDetail: showStopDetail,
-            showDirections: showDirections,
-            showRouteOptions: showRouteOptions,
-            showLineDetail: showLineDetail,
-            selectLineDetailDirection: selectLineDetailDirection,
-            showSettings: showSettings,
             toggleFavourite: toggleSelectedFavourite,
             refreshDepartures: refreshDepartures,
             refreshAlerts: refreshAlerts,
             calculateRoute: calculateRoute,
-            selectRouteOption: selectRouteOption,
             showMoreRouteOptions: showMoreRouteOptions,
+            showHome: showHome,
+            expandSheet: expandSheet,
             openRouteInAppleMaps: openRouteInAppleMaps,
             selectRouteOrigin: selectRouteOrigin,
             selectRouteDestination: selectRouteDestination,
@@ -93,79 +84,51 @@ extension TransitMapScreen {
             toggleDepartureLine: toggleDepartureLine,
             selectDeparturePlatform: selectDeparturePlatform,
             updateSearch: updateSearch,
+            selectLineDetailDirection: selectLineDetailDirection,
             checkGTFSUpdate: checkGTFSUpdate,
-            setDebugDataMode: setDebugDataMode,
-            setMapModeFilter: setMapModeFilter
+            setDebugDataMode: setDebugDataMode
         )
     }
 
-    func setMapModeFilter(_ mode: TransportMode?) {
-        animateSheetChange {
-            viewModel.setMapModeFilter(mode)
-        }
-    }
-
     func selectStop(_ stop: Stop) {
-        animateSheetChange {
-            viewModel.selectStop(stop)
-        }
-        Task {
-            await viewModel.updateSelectedStopRoutes(using: gtfsService)
-            await viewModel.loadOfflineScheduledDepartures(using: gtfsService)
-            await viewModel.loadGTFSMapStops(using: gtfsService, location: locationService.currentLocation)
-        }
+        navigateToSheet([.stopDetail(stop)])
     }
 
     func selectStopGroup(_ stops: [Stop], _ bikeShareStations: [BikeShareStation]) {
-        animateSheetChange {
-            viewModel.selectStopGroup(stops, bikeShareStations: bikeShareStations)
+        viewModel.selectStopGroup(stops, bikeShareStations: bikeShareStations)
+        if let selectedStop = viewModel.selectedStop {
+            navigateToSheet([.stopDetail(selectedStop)])
+        } else {
+            navigateToSheet([.stopGroup])
         }
     }
 
     func showHome() {
         animateSheetChange {
-            viewModel.showHome()
+            sheetPath = []
+            sheetDetent = .medium
+            viewModel.selectedStopGroup = []
+            viewModel.selectedBikeShareStations = []
+            viewModel.clearRoute()
+            viewModel.clearLineDetail()
+        }
+    }
+
+    func expandSheet() {
+        animateSheetChange {
+            sheetDetent = .expanded
         }
     }
 
     func showSearch() {
-        animateSheetChange {
-            viewModel.showSearch()
-        }
+        viewModel.clearRoute()
+        viewModel.clearLineDetail()
+        navigateToSheet([.search], detent: .expanded)
     }
 
     func showAlerts() {
-        animateSheetChange {
-            viewModel.showAlerts()
-        }
-    }
-
-    func showStopDetail() {
-        animateSheetChange {
-            viewModel.showStopDetail()
-        }
-    }
-
-    func showDirections() {
-        animateSheetChange {
-            viewModel.showDirections()
-        }
-        calculateRoute()
-    }
-
-    func showRouteOptions() {
-        animateSheetChange {
-            viewModel.showDirections()
-        }
-    }
-
-    func showLineDetail(_ route: TransitRoute) {
-        animateSheetChange {
-            viewModel.showLineDetail(route)
-        }
-        Task {
-            await viewModel.loadLineDetail(using: gtfsService)
-        }
+        viewModel.clearRoute()
+        navigateToSheet([.alerts], detent: .expanded)
     }
 
     func selectLineDetailDirection(_ directionID: String) {
@@ -176,29 +139,21 @@ extension TransitMapScreen {
     }
 
     func selectRouteOrigin(_ place: RoutePlace?) {
-        animateSheetChange {
-            viewModel.selectRouteOrigin(place)
-        }
+        viewModel.selectRouteOrigin(place)
     }
 
     func selectRouteDestination(_ place: RoutePlace) {
-        animateSheetChange {
-            viewModel.selectRouteDestination(place)
-            if let stop = stopForRoutePlace(place) {
-                viewModel.selectedStop = stop
-            }
-            viewModel.showDirections()
+        viewModel.selectRouteDestination(place)
+        if let stop = stopForRoutePlace(place) {
+            viewModel.selectedStop = stop
         }
     }
 
     func applyCommutePreset(_ presetID: String) {
-        animateSheetChange {
-            viewModel.applyCommutePreset(presetID)
-            if let destination = viewModel.routeDestination,
-               let stop = stopForRoutePlace(destination) {
-                viewModel.selectedStop = stop
-            }
-            viewModel.showDirections()
+        viewModel.applyCommutePreset(presetID)
+        if let destination = viewModel.routeDestination,
+           let stop = stopForRoutePlace(destination) {
+            viewModel.selectedStop = stop
         }
     }
 
@@ -231,12 +186,6 @@ extension TransitMapScreen {
         viewModel.selectDeparturePlatform(platform)
     }
 
-    func showSettings() {
-        animateSheetChange {
-            viewModel.showSettings()
-        }
-    }
-
     func stopForRoutePlace(_ place: RoutePlace) -> Stop? {
         if let stopId = place.stopId {
             if let favourite = favouriteStops.first(where: { $0.id == stopId }) {
@@ -260,6 +209,65 @@ extension TransitMapScreen {
             withAnimation(animation) { changes() }
         } else {
             changes()
+        }
+    }
+
+    func navigateToSheet(
+        _ routes: [TransitSheetRoute],
+        detent: BottomSheetDetent? = nil
+    ) {
+        animateSheetChange {
+            sheetPath = routes
+            sheetDetent = detent ?? routes.last?.defaultDetent ?? .medium
+        }
+    }
+
+    func navigateToSheet(
+        _ route: TransitSheetRoute,
+        reset: Bool = true,
+        detent: BottomSheetDetent? = nil
+    ) {
+        let routes = reset ? [route] : sheetPath + [route]
+        navigateToSheet(routes, detent: detent)
+    }
+
+    func activateSheetRoute(
+        _ route: TransitSheetRoute?,
+        _ previousRoute: TransitSheetRoute?,
+        _ isBackNavigation: Bool
+    ) {
+        TransitSheetRouteActivationCoordinator(
+            selectStop: { stop, preservesLineDetail in
+                viewModel.selectStop(stop, preservingLineDetail: preservesLineDetail)
+            },
+            loadSelectedStopData: loadSelectedStopData,
+            calculateRoute: calculateRoute,
+            applyCommutePreset: applyCommutePreset,
+            selectRouteOption: { optionID in
+                _ = viewModel.selectRouteOption(id: optionID)
+            },
+            prepareLineDetail: { viewModel.prepareLineDetail($0) || viewModel.selectedLineDetail == nil },
+            loadLineDetail: {
+                Task {
+                    await viewModel.loadLineDetail(using: gtfsService)
+                }
+            }
+        )
+        .activate(
+            route,
+            previousRoute: previousRoute,
+            isBackNavigation: isBackNavigation
+        )
+    }
+
+    func loadSelectedStopData() {
+        Task {
+            await viewModel.updateSelectedStopRoutes(using: gtfsService)
+            await viewModel.loadOfflineScheduledDepartures(using: gtfsService)
+            await viewModel.loadGTFSMapStops(
+                using: gtfsService,
+                location: locationService.currentLocation
+            )
         }
     }
 
@@ -345,14 +353,6 @@ extension TransitMapScreen {
         viewModel.openSelectedRouteInAppleMaps(
             using: routeService, from: locationService.currentLocation
         )
-    }
-
-    func selectRouteOption(_ id: String) {
-        animateSheetChange {
-            if viewModel.selectRouteOption(id: id) {
-                viewModel.showRouteTimeline()
-            }
-        }
     }
 
     func showMoreRouteOptions() {

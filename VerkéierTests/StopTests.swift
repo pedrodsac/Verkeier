@@ -23,6 +23,7 @@ struct StopTests {
 
         #expect(stop.locality == "Kirchberg")
         #expect(stop.displayName == "École européenne")
+        #expect(stop.fullName == "Kirchberg, École européenne")
     }
 
     @Test func keepsExplicitLocalityWhenItDiffersFromNamePrefix() {

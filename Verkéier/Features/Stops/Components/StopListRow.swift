@@ -15,7 +15,8 @@ struct StopListRow: View {
     var surface: StopListRowSurface = .standard
     var accessoryAction: (() -> Void)?
     var accessoryAccessibilityLabel: String?
-    let action: () -> Void
+    var action: (() -> Void)? = nil
+    var navigationValue: TransitSheetRoute? = nil
 
     @Environment(AppPreferences.self) private var preferences
     @Environment(\.colorScheme) private var colorScheme
@@ -25,7 +26,7 @@ struct StopListRow: View {
         if let accessoryAction {
             surface {
                 HStack(spacing: 0) {
-                    Button(action: action) {
+                    Button(action: action ?? {}) {
                         rowContent(showsAccessory: false)
                     }
                     .buttonStyle(.pressable)
@@ -42,10 +43,17 @@ struct StopListRow: View {
             .accessibilityElement(children: .contain)
         } else {
             surface {
-                Button(action: action) {
-                    rowContent(showsAccessory: true)
+                if let navigationValue {
+                    NavigationLink(value: navigationValue) {
+                        rowContent(showsAccessory: true)
+                    }
+                    .buttonStyle(.pressable)
+                } else {
+                    Button(action: action ?? {}) {
+                        rowContent(showsAccessory: true)
+                    }
+                    .buttonStyle(.pressable)
                 }
-                .buttonStyle(.pressable)
             }
             .accessibilityElement(children: .combine)
             .accessibilityLabel(accessibilityLabel)
@@ -55,10 +63,10 @@ struct StopListRow: View {
     @ViewBuilder
     private func surface<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         content()
-            .background(
-                surfaceBackground,
-                in: RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
-            )
+            .background {
+                RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
+                    .fill(surfaceBackground)
+            }
             .overlay {
                 RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
                     .stroke(surfaceBorder, lineWidth: 0.5)
@@ -119,6 +127,7 @@ struct StopListRow: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
     }
 
     private var accessoryContent: some View {

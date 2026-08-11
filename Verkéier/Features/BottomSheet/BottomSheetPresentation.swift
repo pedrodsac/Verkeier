@@ -2,7 +2,6 @@ import CoreLocation
 import Foundation
 
 struct TransitSheetPresentationModel {
-    let context: TransitSheetContext
     let nearby: NearbyStopsPresentationModel
     let stopGroup: StopGroupPresentationModel
     let commute: CommuteDashboardViewModel
@@ -15,22 +14,13 @@ struct TransitSheetPresentationModel {
 }
 
 struct TransitSheetActions {
-    let selectStop: (Stop) -> Void
-    let showHome: () -> Void
-    let showSearch: () -> Void
-    let showAlerts: () -> Void
-    let showStopDetail: () -> Void
-    let showDirections: () -> Void
-    let showRouteOptions: () -> Void
-    let showLineDetail: (TransitRoute) -> Void
-    let selectLineDetailDirection: (String) -> Void
-    let showSettings: () -> Void
     let toggleFavourite: () -> Void
     let refreshDepartures: () async -> Void
     let refreshAlerts: () -> Void
     let calculateRoute: () -> Void
-    let selectRouteOption: (String) -> Void
     let showMoreRouteOptions: () -> Void
+    let showHome: () -> Void
+    let expandSheet: () -> Void
     let openRouteInAppleMaps: () -> Void
     let selectRouteOrigin: (RoutePlace?) -> Void
     let selectRouteDestination: (RoutePlace) -> Void
@@ -46,9 +36,9 @@ struct TransitSheetActions {
     let toggleDepartureLine: (TransitRoute) -> Void
     let selectDeparturePlatform: (String?) -> Void
     let updateSearch: () -> Void
+    let selectLineDetailDirection: (String) -> Void
     let checkGTFSUpdate: () -> Void
     let setDebugDataMode: (DebugTransitDataMode) -> Void
-    let setMapModeFilter: (TransportMode?) -> Void
 }
 
 struct NearbyStopsPresentationModel {
@@ -80,16 +70,12 @@ struct SearchPresentationModel {
 /// Callbacks the search sheet needs, sliced from ``TransitSheetActions``.
 struct SearchActions {
     var updateSearch: () -> Void = {}
-    var selectStop: (Stop) -> Void = { _ in }
-    var cancel: () -> Void = {}
 }
 
 extension SearchActions {
     init(from actions: TransitSheetActions) {
         self.init()
         updateSearch = actions.updateSearch
-        selectStop = actions.selectStop
-        cancel = actions.showHome
     }
 }
 

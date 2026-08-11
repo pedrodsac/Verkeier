@@ -22,19 +22,16 @@ struct LineDetailView: View {
                     .pickerStyle(.segmented)
                 }
 
-                Section("Stop Sequence") {
-                    ForEach(Array(detail.stopSequence.enumerated()), id: \.element.id) { index, stop in
-                        Button {
-                            actions.selectStop(
-                                Stop(
-                                    id: stop.id,
-                                    name: stop.name,
-                                    location: stop.location,
-                                    modes: [detail.route.mode],
-                                    dataSource: .gtfs
-                                )
-                            )
-                        } label: {
+                    Section("Stop Sequence") {
+                        ForEach(Array(detail.stopSequence.enumerated()), id: \.element.id) { index, stop in
+                        let destinationStop = Stop(
+                            id: stop.id,
+                            name: stop.name,
+                            location: stop.location,
+                            modes: [detail.route.mode],
+                            dataSource: .gtfs
+                        )
+                        NavigationLink(value: TransitSheetRoute.stopDetail(destinationStop)) {
                             HStack(alignment: .firstTextBaseline, spacing: 10) {
                                 Text("\(index + 1)")
                                     .font(.caption.weight(.bold))

@@ -328,7 +328,7 @@ private nonisolated struct GTFSStopIndex {
 
     func search(query: String) -> [Stop] {
         searchableStops.compactMap { entry in
-            guard entry.name.contains(query) || entry.locality?.contains(query) == true else {
+            guard entry.fullName.contains(query) else {
                 return nil
             }
             return entry.stop
@@ -391,13 +391,11 @@ private nonisolated struct GTFSStopIndex {
 
 private nonisolated struct SearchableStop {
     let stop: Stop
-    let name: String
-    let locality: String?
+    let fullName: String
 
     init(stop: Stop) {
         self.stop = stop
-        name = stop.name.normalizedForSearch
-        locality = stop.locality?.normalizedForSearch
+        fullName = stop.fullName.normalizedForSearch
     }
 }
 

@@ -93,12 +93,14 @@ struct DepartureListRow: View {
             .layoutPriority(1)
 
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 10)
         .padding(.horizontal, 12)
-        .background(
-            .background.opacity(0.82), in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
-        )
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background {
+            RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
+                .fill(.background.opacity(0.82))
+                .shadow(color: .black.opacity(0.14), radius: showsControls ? 2 : 0, x: 0, y: 0)
+        }
         .overlay {
             RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
                 .stroke(.separator.opacity(0.16), lineWidth: 0.7)

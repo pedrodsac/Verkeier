@@ -92,6 +92,34 @@ struct Departure: Codable, Hashable, Identifiable {
         return previousPlatform != platform
     }
 
+    /// Returns a copy with a platform supplied by another trusted feed.
+    ///
+    /// Live and timetable feeds can describe the same departure with
+    /// different completeness. Keeping this operation on the value model
+    /// lets merge layers enrich only the missing field without dropping any
+    /// live status or tracking metadata.
+    nonisolated func replacingPlatform(with platform: String) -> Departure {
+        Departure(
+            id: id,
+            stopId: stopId,
+            routeId: routeId,
+            lineName: lineName,
+            destination: destination,
+            scheduledDeparture: scheduledDeparture,
+            realtimeDeparture: realtimeDeparture,
+            delayMinutes: delayMinutes,
+            platform: platform,
+            operatorName: operatorName,
+            isCancelled: isCancelled,
+            isStatusUnknown: isStatusUnknown,
+            dataSource: dataSource,
+            lastUpdated: lastUpdated,
+            previousPlatform: previousPlatform,
+            continuesAs: continuesAs,
+            occupancy: occupancy
+        )
+    }
+
     /// The rider-facing status, resolved from cancellation, realtime presence,
     /// and ``delayMinutes``.
     ///

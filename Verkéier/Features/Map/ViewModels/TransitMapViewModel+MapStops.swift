@@ -81,13 +81,19 @@ extension TransitMapViewModel {
         )
     }
 
-    func selectStop(_ stop: Stop, using store: RoutePlannerStore = .shared) {
+    func selectStop(
+        _ stop: Stop,
+        preservingLineDetail: Bool = false,
+        using store: RoutePlannerStore = .shared
+    ) {
         selectedStopGroup = []
         selectedBikeShareStations = []
         selectedStop = stop
         recentStops = store.recordRecentStop(stop)
         routeDestination = RoutePlace(stop: stop, source: .selectedStop)
-        clearLineDetail()
+        if !preservingLineDetail {
+            clearLineDetail()
+        }
         selectedStopRoutes = []
         departures = []
         offlineScheduledDepartures = []
@@ -97,8 +103,6 @@ extension TransitMapViewModel {
         departuresLastUpdated = nil
         routeErrorMessage = nil
         clearRoute()
-        sheetContext = .stopDetail
-        sheetDetent = .medium
         moveCamera(to: anchoredRegion(
             for: stop.location.coordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.012, longitudeDelta: 0.012)
@@ -129,9 +133,6 @@ extension TransitMapViewModel {
         routeDestination = nil
         clearLineDetail()
         clearRoute()
-        sheetContext = .stopGroup
-        sheetDetent = .medium
-
         if let coordinate = uniqueStops.first?.location.coordinate
             ?? uniqueBikeShareStations.first?.location.coordinate {
             moveCamera(to: anchoredRegion(

@@ -76,12 +76,11 @@ extension TransitMapScreen {
 
         let stopId = String(identifier.dropFirst("stop.".count))
         guard let stop = favouriteEntities.first(where: { $0.stopId == stopId })?.stop else {
-            viewModel.showSearch()
+            showSearch()
             return
         }
 
-        selectStop(stop)
-        viewModel.sheetDetent = .expanded
+        navigateToSheet([.stopDetail(stop)], detent: .expanded)
     }
 
     func handleDeepLink(_ url: URL) {
@@ -97,39 +96,32 @@ extension TransitMapScreen {
     func handle(_ handoff: TransitIntentHandoff) {
         switch handoff {
         case .showNearbyStops:
-            viewModel.showHome()
+            showHome()
         case let .openFavouriteStop(stopId):
             if let favourite = favouriteEntities.first(where: { $0.stopId == stopId })?.stop {
                 viewModel.selectStop(favourite)
-                Task {
-                    await viewModel.updateSelectedStopRoutes(using: gtfsService)
-                    await viewModel.loadOfflineScheduledDepartures(using: gtfsService)
-                }
-                viewModel.sheetDetent = .expanded
+                navigateToSheet([.stopDetail(favourite)], detent: .expanded)
             } else {
-                viewModel.showSearch()
+                showSearch()
             }
         case let .trackNextDeparture(stopId):
             if let favourite = favouriteEntities.first(where: { $0.stopId == stopId })?.stop {
                 viewModel.selectStop(favourite)
-                Task {
-                    await viewModel.updateSelectedStopRoutes(using: gtfsService)
-                    await viewModel.loadOfflineScheduledDepartures(using: gtfsService)
-                }
-                viewModel.sheetDetent = .expanded
+                navigateToSheet([.stopDetail(favourite)], detent: .expanded)
                 trackNextDeparture(for: favourite)
             } else {
-                viewModel.showSearch()
+                showSearch()
             }
         case let .planRoute(destinationName):
             viewModel.searchQuery = destinationName
             Task {
                 await viewModel.searchStops(using: gtfsService)
                 if let stop = confidentRouteDestinationMatch(for: destinationName) {
-                    selectStop(stop)
-                    showDirections()
+                    viewModel.selectStop(stop)
+                    loadSelectedStopData()
+                    navigateToSheet([.directions])
                 } else {
-                    viewModel.showSearch()
+                    showSearch()
                 }
             }
         }

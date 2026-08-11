@@ -2,10 +2,9 @@ import SwiftUI
 
 struct CommuteSuggestionRow: View {
     let preset: RouteCommutePreset
-    let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        NavigationLink(value: TransitSheetRoute.directionsForPreset(preset.id)) {
             HStack(spacing: 10) {
                 Image(systemName: "arrow.right.circle.fill")
                     .font(.title3.weight(.semibold))
@@ -43,10 +42,9 @@ struct CommuteSuggestionRow: View {
 
 struct AlertsSummaryRow: View {
     let alertCount: Int
-    let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        NavigationLink(value: TransitSheetRoute.alerts) {
             HStack(spacing: 10) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.subheadline.weight(.semibold))
@@ -78,6 +76,6 @@ struct AlertsSummaryRow: View {
 }
 
 #Preview(traits: .sizeThatFitsLayout) {
-    AlertsSummaryRow(alertCount: 3, action: {})
+    AlertsSummaryRow(alertCount: 3)
         .padding(.horizontal, 16)
 }

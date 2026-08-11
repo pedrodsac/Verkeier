@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "000000000000000100000000"
-               BuildableName = "Verkéier.app"
-               BlueprintName = "Verkéier"
-               ReferencedContainer = "container:Verkéier.xcodeproj">
+               BuildableName = "Verke&#x301;ier.app"
+               BlueprintName = "Verk&#xe9;ier"
+               ReferencedContainer = "container:Verke&#x301;ier.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -36,8 +36,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "000000000000000200000000"
-               BuildableName = "VerkéierTests.xctest"
-               ReferencedContainer = "container:Verkéier.xcodeproj">
+               BuildableName = "Verke&#x301;ierTests.xctest"
+               ReferencedContainer = "container:Verke&#x301;ier.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -58,9 +58,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "000000000000000100000000"
-            BuildableName = "Verkéier.app"
-            BlueprintName = "Verkéier"
-            ReferencedContainer = "container:Verkéier.xcodeproj">
+            BuildableName = "Verke&#x301;ier.app"
+            BlueprintName = "Verk&#xe9;ier"
+            ReferencedContainer = "container:Verke&#x301;ier.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <EnvironmentVariables>
@@ -87,9 +87,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "000000000000000100000000"
-            BuildableName = "Verkéier.app"
-            BlueprintName = "Verkéier"
-            ReferencedContainer = "container:Verkéier.xcodeproj">
+            BuildableName = "Verke&#x301;ier.app"
+            BlueprintName = "Verk&#xe9;ier"
+            ReferencedContainer = "container:Verke&#x301;ier.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

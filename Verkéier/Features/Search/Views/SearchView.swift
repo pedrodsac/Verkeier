@@ -1,18 +1,100 @@
 import CoreLocation
 import SwiftUI
+import UIKit
+
+struct StopSearchBar: UIViewRepresentable {
+    @Binding var text: String
+    @Binding var isActive: Bool
+    @Binding var focusRequested: Bool
+    let onActivate: () -> Void
+    let onCancel: () -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    func makeUIView(context: Context) -> UISearchBar {
+        let searchBar = UISearchBar()
+        searchBar.delegate = context.coordinator
+        searchBar.backgroundImage = UIImage()
+        searchBar.backgroundColor = .clear
+        searchBar.barTintColor = .clear
+        searchBar.placeholder = "Search stops"
+        searchBar.accessibilityIdentifier = "stop-search"
+        searchBar.searchTextField.accessibilityLabel = "Stop search"
+        return searchBar
+    }
+
+    func updateUIView(_ uiView: UISearchBar, context: Context) {
+        context.coordinator.parent = self
+
+        if uiView.text != text {
+            uiView.text = text
+        }
+
+        if uiView.showsCancelButton != isActive {
+            uiView.setShowsCancelButton(isActive, animated: true)
+        }
+
+        if focusRequested, !uiView.isFirstResponder {
+            DispatchQueue.main.async {
+                guard self.focusRequested else { return }
+                guard !uiView.isFirstResponder else { return }
+                uiView.becomeFirstResponder()
+            }
+        } else if !isActive, uiView.isFirstResponder {
+            DispatchQueue.main.async {
+                guard !self.isActive else { return }
+                uiView.resignFirstResponder()
+            }
+        }
+    }
+
+    final class Coordinator: NSObject, UISearchBarDelegate {
+        var parent: StopSearchBar
+
+        init(_ parent: StopSearchBar) {
+            self.parent = parent
+        }
+
+        func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+            parent.isActive = true
+            parent.focusRequested = false
+            parent.onActivate()
+        }
+
+        func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+            parent.text = searchText
+        }
+
+        func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+            parent.onCancel()
+        }
+    }
+}
 
 struct SearchView: View {
+    @Binding var query: String
+    let viewModel: SearchPresentationModel
+    let actions: SearchActions
+
+    var body: some View {
+        SearchResultsContent(
+            query: $query,
+            viewModel: viewModel,
+            actions: actions
+        )
+    }
+}
+
+struct SearchResultsContent: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Binding var query: String
     let viewModel: SearchPresentationModel
     let actions: SearchActions
-    @FocusState private var isSearchFocused: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            searchHeader
-                .padding(.top, 12)
-
             if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 Group {
                     if viewModel.recentStops.isEmpty {
@@ -20,13 +102,11 @@ struct SearchView: View {
                             stops: viewModel.nearbySuggestions,
                             isLoading: viewModel.isLoadingNearbySuggestions,
                             referenceLocation: viewModel.referenceLocation,
-                            selectStop: actions.selectStop
                         )
                     } else {
                         RecentSearchStops(
                             stops: viewModel.recentStops,
-                            referenceLocation: viewModel.referenceLocation,
-                            selectStop: actions.selectStop
+                            referenceLocation: viewModel.referenceLocation
                         )
                     }
                 }
@@ -40,7 +120,7 @@ struct SearchView: View {
                 .transition(.opacity)
             } else {
                 resultsList
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -50,52 +130,8 @@ struct SearchView: View {
             value: viewModel.results.count
         )
         .onAppear {
-            isSearchFocused = true
             actions.updateSearch()
         }
-    }
-
-    private var searchHeader: some View {
-        HStack(spacing: 12) {
-            searchField
-
-            Button("Cancel", action: actions.cancel)
-                .font(.body)
-                .foregroundStyle(.blue)
-        }
-    }
-
-    private var searchField: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "magnifyingglass")
-                .font(.body.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .accessibilityHidden(true)
-            TextField("Search", text: $query)
-                .textInputAutocapitalization(.words)
-                .autocorrectionDisabled()
-                .focused($isSearchFocused)
-                .onSubmit(actions.updateSearch)
-                .accessibilityLabel("Stop search")
-
-            if !query.isEmpty {
-                Button {
-                    query = ""
-                    actions.updateSearch()
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.tertiary)
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                        .accessibilityHidden(true)
-                }
-                .buttonStyle(.pressable)
-                .accessibilityLabel("Clear search")
-            }
-        }
-        .frame(maxWidth: .infinity, minHeight: 44)
-        .padding(.horizontal, 12)
-        .background(.quaternary.opacity(0.7), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private var resultsList: some View {
@@ -105,10 +141,9 @@ struct SearchView: View {
                     StopListRow(
                         stop: stop,
                         markerColor: .blue,
-                        accessorySystemName: "arrow.right"
-                    ) {
-                        actions.selectStop(stop)
-                    }
+                        accessorySystemName: "chevron.right",
+                        navigationValue: .stopDetail(stop)
+                    )
                 }
             }
             .padding(.bottom, 24)
@@ -119,7 +154,6 @@ struct SearchView: View {
 private struct RecentSearchStops: View {
     let stops: [Stop]
     let referenceLocation: CLLocation?
-    let selectStop: (Stop) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -132,11 +166,10 @@ private struct RecentSearchStops: View {
                         StopListRow(
                             stop: stop,
                             markerColor: .blue,
-                            accessorySystemName: "arrow.right",
-                            referenceLocation: referenceLocation
-                        ) {
-                            selectStop(stop)
-                        }
+                            accessorySystemName: "chevron.right",
+                            referenceLocation: referenceLocation,
+                            navigationValue: .stopDetail(stop)
+                        )
                     }
                 }
                 .padding(.bottom, 24)
@@ -149,7 +182,6 @@ private struct NearbySearchSuggestions: View {
     let stops: [Stop]
     let isLoading: Bool
     let referenceLocation: CLLocation?
-    let selectStop: (Stop) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -172,10 +204,9 @@ private struct NearbySearchSuggestions: View {
                             StopListRow(
                                 stop: stop,
                                 markerColor: .teal,
-                                referenceLocation: referenceLocation
-                            ) {
-                                selectStop(stop)
-                            }
+                                referenceLocation: referenceLocation,
+                                navigationValue: .stopDetail(stop)
+                            )
                         }
                     }
                     .padding(.bottom, 24)

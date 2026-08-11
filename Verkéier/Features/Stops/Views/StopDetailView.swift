@@ -17,9 +17,7 @@ struct StopDetailView: View {
                     stop: stop,
                     routes: viewModel.routes,
                     selectedLine: viewModel.selectedLine,
-                    openDirections: actions.openDirections,
-                    toggleDepartureLine: actions.toggleDepartureLine,
-                    showLineDetail: actions.showLineDetail
+                    toggleDepartureLine: actions.toggleDepartureLine
                 )
 
                 if !viewModel.mergedDepartures.isEmpty {

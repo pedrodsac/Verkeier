@@ -13,8 +13,23 @@ struct RouteEndpointsCard: View {
     let selectRouteDestination: (RoutePlace) -> Void
     let swapRouteEndpoints: () -> Void
 
-    @State private var showOriginSearch = false
-    @State private var showDestinationSearch = false
+    @State private var searchPresentation: SearchPresentation?
+
+    private enum SearchPresentation: Hashable, Identifiable {
+        case origin
+        case destination
+
+        var id: Self { self }
+
+        var title: String {
+            switch self {
+            case .origin:
+                "Search Origin"
+            case .destination:
+                "Search Destination"
+            }
+        }
+    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
@@ -37,16 +52,15 @@ struct RouteEndpointsCard: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(.separator.opacity(0.22), lineWidth: 0.5)
         }
-        .sheet(isPresented: $showOriginSearch) {
-            RouteStopSearchSheet(title: "Search Origin") { place in
-                selectRouteOrigin(place)
-                showOriginSearch = false
-            }
-        }
-        .sheet(isPresented: $showDestinationSearch) {
-            RouteStopSearchSheet(title: "Search Destination") { place in
-                selectRouteDestination(place)
-                showDestinationSearch = false
+        .sheet(item: $searchPresentation) { presentation in
+            RouteStopSearchSheet(title: presentation.title) { place in
+                switch presentation {
+                case .origin:
+                    selectRouteOrigin(place)
+                case .destination:
+                    selectRouteDestination(place)
+                }
+                searchPresentation = nil
             }
         }
     }
@@ -89,7 +103,7 @@ struct RouteEndpointsCard: View {
             }
 
             Button {
-                showOriginSearch = true
+                searchPresentation = .origin
             } label: {
                 Label("Search stops…", systemImage: "magnifyingglass")
             }
@@ -130,7 +144,7 @@ struct RouteEndpointsCard: View {
             }
 
             Button {
-                showDestinationSearch = true
+                searchPresentation = .destination
             } label: {
                 Label("Search stops…", systemImage: "magnifyingglass")
             }
@@ -217,7 +231,6 @@ private struct RouteStopSearchSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var query = ""
     @State private var results: [RoutePlace] = []
-    @FocusState private var isSearchFocused: Bool
 
     private var trimmedQuery: String {
         query.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -226,10 +239,6 @@ private struct RouteStopSearchSheet: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 12) {
-                searchField
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-
                 if trimmedQuery.isEmpty {
                     ContentUnavailableView(
                         "Search stops & places",
@@ -269,8 +278,11 @@ private struct RouteStopSearchSheet: View {
 
                 Spacer(minLength: 0)
             }
-            .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
+            .searchable(
+                text: $query,
+                placement: .toolbarPrincipal,
+                prompt: title
+            )
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -292,33 +304,6 @@ private struct RouteStopSearchSheet: View {
             guard !Task.isCancelled else { return }
             results = await stopPlaces + places
         }
-        .onAppear { isSearchFocused = true }
-    }
-
-    private var searchField: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
-                .accessibilityHidden(true)
-            TextField("Search", text: $query)
-                .textInputAutocapitalization(.words)
-                .autocorrectionDisabled()
-                .focused($isSearchFocused)
-                .accessibilityLabel("Stop search")
-            if !query.isEmpty {
-                Button {
-                    query = ""
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.tertiary)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Clear search")
-            }
-        }
-        .frame(maxWidth: .infinity, minHeight: 44)
-        .padding(.horizontal, 12)
-        .background(.quaternary.opacity(0.7), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 

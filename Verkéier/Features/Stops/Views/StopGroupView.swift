@@ -2,7 +2,6 @@ import SwiftUI
 
 struct StopGroupView: View {
     let viewModel: StopGroupPresentationModel
-    let selectStop: (Stop) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -16,10 +15,9 @@ struct StopGroupView: View {
                         stop: stop,
                         markerColor: .blue,
                         referenceLocation: viewModel.referenceLocation,
-                        routes: viewModel.routesByStopId[stop.id] ?? []
-                    ) {
-                        selectStop(stop)
-                    }
+                        routes: viewModel.routesByStopId[stop.id] ?? [],
+                        navigationValue: .stopDetail(stop)
+                    )
                 }
 
                 ForEach(viewModel.bikeShareStations) { station in
@@ -56,7 +54,6 @@ struct StopGroupView: View {
             referenceLocation: nil,
             routesByStopId: [:]
         ),
-        selectStop: { _ in }
     )
     .padding(.horizontal, 16)
 }
