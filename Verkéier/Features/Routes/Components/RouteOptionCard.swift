@@ -51,7 +51,7 @@ struct RouteOptionCard: View {
             .background(cardBackground, in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
-                    .stroke(cardStroke, lineWidth: isSelected ? 1.5 : 0.5)
+                    .stroke(.separator.opacity(0.3), lineWidth: 0.5)
             }
             .contentShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
         }
@@ -102,16 +102,7 @@ struct RouteOptionCard: View {
     }
 
     private var cardBackground: AnyShapeStyle {
-        AnyShapeStyle(
-            Color(uiColor: .systemBackground)
-                .opacity(isSelected ? 0.95 : 0.78)
-        )
-    }
-
-    private var cardStroke: Color {
-        isSelected
-            ? .blue.opacity(0.5)
-            : Color(uiColor: .separator).opacity(0.22)
+        AnyShapeStyle(.thinMaterial)
     }
 
     private var accessibilityLabel: String {

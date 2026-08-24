@@ -67,7 +67,7 @@ struct SettingsAboutView: View {
         }
         .listStyle(.insetGrouped)
         .navigationTitle("About & Legal")
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbarTitleDisplayMode(.inline)
     }
 
     private func deleteAllLocalData() {
@@ -75,7 +75,6 @@ struct SettingsAboutView: View {
         try? modelContext.save()
         RoutePlannerStore.shared.clearAll()
         SharedTransitDataStore.saveTrackedReminder(nil)
-        FocusFilterStore.shared.isWorkFocusActive = false
     }
 }
 

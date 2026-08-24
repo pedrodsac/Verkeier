@@ -72,10 +72,12 @@ struct AppIntentSharedDataTests {
         )
 
         let persisted = PersistedFavouriteStop(stop: stop)
+        persisted.replaceLabels(with: ["Home", "Work"])
         let restored = persisted.stop
 
         #expect(restored.id == "grouped-stop")
         #expect(restored.platformIds == ["300362001", "300362002"])
+        #expect(restored.name == stop.name)
     }
 
     @Test func deepLinksRoundTripToIntentHandoff() throws {

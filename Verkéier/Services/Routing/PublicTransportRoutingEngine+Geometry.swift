@@ -46,6 +46,9 @@ extension PublicTransportRoutingEngine {
         let departure = date(seconds: boardTime.departureSeconds, from: context.serviceStart)
         let arrival = date(seconds: alightTime.arrivalSeconds, from: context.serviceStart)
         let routeName = route.shortName.isEmpty ? route.longName : route.shortName
+        let stopCount = trip.stopTimes.filter {
+            $0.sequence > boardTime.sequence && $0.sequence <= alightTime.sequence
+        }.count
         let destinationName = alightTime.headsign?.stationDisplayName
             ?? trip.headsign?.stationDisplayName
             ?? alightStop.name.stationDisplayName
@@ -93,6 +96,7 @@ extension PublicTransportRoutingEngine {
             tripId: trip.id,
             originStopId: boardStop.id,
             destinationStopId: alightStop.id,
+            stopCount: stopCount,
             origin: boardStop.location,
             destination: alightStop.location,
             departureTime: departure,
@@ -180,6 +184,8 @@ extension PublicTransportRoutingEngine {
         _ leg: RoutePlan.Leg,
         departureTime: Date? = nil,
         arrivalTime: Date? = nil,
+        scheduledDepartureTime: Date? = nil,
+        scheduledArrivalTime: Date? = nil,
         realtimeDepartureTime: Date? = nil,
         realtimeArrivalTime: Date? = nil,
         platform: String? = nil,
@@ -199,12 +205,13 @@ extension PublicTransportRoutingEngine {
             tripId: leg.tripId,
             originStopId: leg.originStopId,
             destinationStopId: leg.destinationStopId,
+            stopCount: leg.stopCount,
             origin: leg.origin,
             destination: leg.destination,
             departureTime: departureTime ?? leg.departureTime,
             arrivalTime: arrivalTime ?? leg.arrivalTime,
-            scheduledDepartureTime: leg.scheduledDepartureTime,
-            scheduledArrivalTime: leg.scheduledArrivalTime,
+            scheduledDepartureTime: scheduledDepartureTime ?? leg.scheduledDepartureTime,
+            scheduledArrivalTime: scheduledArrivalTime ?? leg.scheduledArrivalTime,
             realtimeDepartureTime: realtimeDepartureTime ?? leg.realtimeDepartureTime,
             realtimeArrivalTime: realtimeArrivalTime ?? leg.realtimeArrivalTime,
             distanceMeters: leg.distanceMeters,

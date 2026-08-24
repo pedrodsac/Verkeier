@@ -1,8 +1,8 @@
 import SwiftUI
 
 /// One station / address in the route timeline. The role drives everything:
-/// which time(s) show in the gutter, the marker on the rail, the name's weight,
-/// and the detail lines (platform, wait, tight-transfer warning) beneath it.
+/// which time(s) show in the gutter, the marker on the rail, and the detail
+/// lines (platform, wait, tight-transfer warning) beneath it.
 struct TimelinePlaceRow: View {
     let node: PlaceNode
 
@@ -156,7 +156,7 @@ struct TimelinePlaceRow: View {
     }
 
     private var nameFont: Font {
-        node.role == .origin ? .subheadline.weight(.medium) : .headline
+        .headline
     }
 
     /// Time shown for non-transfer roles: departure when leaving, arrival when landing.

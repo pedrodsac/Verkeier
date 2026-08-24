@@ -6,13 +6,14 @@ enum TransitSheetRoute: Hashable {
     case stopDetail(Stop)
     case directions
     case directionsForPreset(String)
+    case routePlaceSearch(RouteEndpoint)
     case routeTimeline(String)
     case lineDetail(TransitRoute)
     case alerts
 
     var defaultDetent: BottomSheetDetent {
         switch self {
-        case .search, .routeTimeline, .lineDetail, .alerts:
+        case .search, .routePlaceSearch, .routeTimeline, .lineDetail, .alerts:
             .expanded
         case .stopGroup, .stopDetail, .directions, .directionsForPreset:
             .medium
@@ -29,6 +30,8 @@ enum TransitSheetRoute: Hashable {
             stop.displayName
         case .directions, .directionsForPreset:
             "Directions"
+        case let .routePlaceSearch(endpoint):
+            endpoint.searchTitle
         case .routeTimeline:
             "Selected route"
         case let .lineDetail(route):
@@ -61,7 +64,7 @@ struct TransitSheetRouteActivationCoordinator {
         guard !isBackNavigation else { return }
 
         switch route {
-        case .search, .stopGroup, .alerts:
+        case .search, .stopGroup, .routePlaceSearch, .alerts:
             break
 
         case let .stopDetail(stop):
@@ -97,7 +100,7 @@ enum BottomSheetDetent: CaseIterable {
     case medium
     case expanded
 
-    static let collapsedPresentationDetent = PresentationDetent.height(140)
+	static let collapsedPresentationDetent = PresentationDetent.height(87.5)
     static let mediumPresentationDetent = PresentationDetent.fraction(0.50)
     static let expandedPresentationDetent = PresentationDetent.large
 

@@ -21,9 +21,6 @@ actor PublicTransportRoutingEngine {
     // even though they're still feasible (>= transferBufferSeconds).
     let tightTransferThresholdSeconds = 300
     let searchHorizonSeconds = 4 * 60 * 60
-    // ponytail: arrive-by reuses the forward search from this far before the target
-    // and filters to journeys arriving in time; widen if long journeys get dropped.
-    let arriveByLookbackSeconds: TimeInterval = 3 * 60 * 60
     let maximumTransitLegs = 3
     let walkingSpeedMetersPerSecond = 1.33
     /// Estimated vel’OH! speed because MapKit has no bicycle directions API.
@@ -76,9 +73,8 @@ actor PublicTransportRoutingEngine {
             throw RoutingError.timetableUnavailable
         }
 
-        // The forward search is anchored at `requestNow`. "Leave at" anchors there
-        // directly; "arrive by" anchors a few hours earlier and filters results to
-        // those reaching the destination in time.
+        // Departures search forward from their requested time. Arrive-by searches
+        // backward from the deadline, so later connections remain viable labels.
         let requestNow: Date
         let arriveByLimit: Date?
         switch time {
@@ -89,7 +85,7 @@ actor PublicTransportRoutingEngine {
             requestNow = date
             arriveByLimit = nil
         case let .arriveBy(date):
-            requestNow = date.addingTimeInterval(-arriveByLookbackSeconds)
+            requestNow = date
             arriveByLimit = date
         }
 
@@ -99,7 +95,11 @@ actor PublicTransportRoutingEngine {
             throw RoutingError.noPublicTransportRoute
         }
 
-        var scheduledCandidates = scheduledJourneys(from: from, to: to, context: context)
+        var scheduledCandidates = if arriveByLimit != nil {
+            arriveByJourneys(from: from, to: to, context: context)
+        } else {
+            scheduledJourneys(from: from, to: to, context: context)
+        }
         let transitBaseCandidates = scheduledCandidates
         scheduledCandidates.append(contentsOf: mixedBikeJourneys(
             from: transitBaseCandidates,
@@ -110,11 +110,12 @@ actor PublicTransportRoutingEngine {
             from: from,
             to: to,
             stations: bikeStations,
-            context: context
+            context: context,
+            arriveByDeadlineSeconds: arriveByLimit == nil ? nil : context.currentSeconds
         ))
-        if let arriveByLimit {
-            scheduledCandidates = scheduledCandidates.filter { $0.arrivalTime <= arriveByLimit }
-        }
+        scheduledCandidates = deduplicatedJourneys(scheduledCandidates.map {
+            ScheduledJourney(legs: retimedWalkingLegs($0.legs))
+        })
 
         // Honour a mode preference before truncation, so a valid (e.g.) tram itinerary
         // can't be discarded by cheaper buses. Relax if nothing matches rather than
@@ -141,30 +142,50 @@ actor PublicTransportRoutingEngine {
         // Keep low-transfer journeys alive through truncation: drop only journeys that
         // are strictly worse on every axis, then rank by the active objective rather
         // than the earliest-arriving alone.
-        let selectedScheduled = paretoFiltered(
-            scheduledCandidates,
-            departure: \.firstTransitDeparture,
-            arrival: \.arrivalTime,
-            transfers: \.transitLegCount
-        )
+        let scheduledPool = if arriveByLimit != nil {
+            // A scheduled-dominated journey may become the best fallback once a later
+            // departure is cancelled or predicted late. Keep those alternatives until
+            // realtime has established the actual arrive-by frontier.
+            scheduledCandidates
+        } else {
+            paretoFiltered(
+                scheduledCandidates,
+                departure: \.departureTime,
+                arrival: \.arrivalTime,
+                transfers: \.transitLegCount
+            )
+        }
+        let selectedScheduled = scheduledPool
         .sorted { lhs, rhs in
-            preferLatestDeparture
-                ? departsLater(lhs, rhs)
-                : scheduledComfortCostSeconds(lhs) < scheduledComfortCostSeconds(rhs)
+            if preferLatestDeparture {
+                arriveByRanksBefore(lhs, rhs, filters: filters)
+            } else {
+                scheduledComfortCostSeconds(lhs) < scheduledComfortCostSeconds(rhs)
+            }
         }
         .prefix(evaluatedCandidateLimit)
 
         let enrichedCandidates = await enrich(Array(selectedScheduled), context: context)
-        let sortedCandidates = paretoFiltered(
-            enrichedCandidates,
-            departure: \.firstTransitDeparture,
-            arrival: \.arrivalTime,
-            transfers: \.transitLegCount
-        )
+        let enrichedPool = if arriveByLimit != nil {
+            // Penalty/deadline class is part of arrive-by dominance. The generic
+            // scheduled frontier does not know about either and could otherwise drop
+            // the only connected, on-time alternative before final ranking.
+            enrichedCandidates
+        } else {
+            paretoFiltered(
+                enrichedCandidates,
+                departure: \.departureTime,
+                arrival: \.arrivalTime,
+                transfers: \.transitLegCount
+            )
+        }
+        let sortedCandidates = enrichedPool
         .sorted { lhs, rhs in
-            preferLatestDeparture
-                ? departsLater(lhs, rhs)
-                : comfortCostSeconds(lhs) < comfortCostSeconds(rhs)
+            if let arriveByLimit {
+                arriveByRanksBefore(lhs, rhs, deadline: arriveByLimit, filters: filters)
+            } else {
+                comfortCostSeconds(lhs) < comfortCostSeconds(rhs)
+            }
         }
         .prefix(returnedOptionLimit)
         var options: [RouteOption] = []

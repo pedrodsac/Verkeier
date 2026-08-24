@@ -13,6 +13,10 @@ final class PersistedFavouriteStop {
     var createdAt: Date
     /// Optional rider-set grouping label, e.g. "Home", "Work". `nil` = unlabelled.
     var label: String?
+    /// Additive storage for multiple rider-defined labels. The legacy `label`
+    /// remains populated with the first label so existing stores and older
+    /// app versions continue to render a sensible group.
+    var labelsData: Data?
 
     init(stop: Stop, createdAt: Date = .now) {
         stopId = stop.id
@@ -46,5 +50,29 @@ final class PersistedFavouriteStop {
             .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
         return ids.isEmpty ? [stopId] : ids
+    }
+
+    var labels: [String] {
+        let decoded = labelsData.flatMap { try? JSONDecoder().decode([String].self, from: $0) }
+        if let decoded, !decoded.isEmpty {
+            return Self.normalizedLabels(decoded)
+        }
+        return Self.normalizedLabels(label.map { [$0] } ?? [])
+    }
+
+    func replaceLabels(with values: [String]) {
+        let normalized = Self.normalizedLabels(values)
+        labelsData = try? JSONEncoder().encode(normalized)
+        label = normalized.first
+    }
+
+    static func normalizedLabels(_ values: [String]) -> [String] {
+        var seen = Set<String>()
+        return values.compactMap { value in
+            let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { return nil }
+            let key = trimmed.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+            return seen.insert(key).inserted ? trimmed : nil
+        }
     }
 }

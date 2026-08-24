@@ -32,6 +32,8 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable {
         let originStopId: String?
         /// Destination stop identifier for transit legs.
         let destinationStopId: String?
+        /// Number of stops traveled on a transit leg, including the alighting stop.
+        let stopCount: Int?
         /// Where the leg starts.
         let origin: LocationPoint
         /// Where the leg ends.
@@ -76,6 +78,7 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable {
             tripId: String? = nil,
             originStopId: String? = nil,
             destinationStopId: String? = nil,
+            stopCount: Int? = nil,
             origin: LocationPoint,
             destination: LocationPoint,
             departureTime: Date? = nil,
@@ -103,6 +106,7 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable {
             self.tripId = tripId
             self.originStopId = originStopId
             self.destinationStopId = destinationStopId
+            self.stopCount = stopCount
             self.origin = origin
             self.destination = destination
             self.departureTime = departureTime

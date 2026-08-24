@@ -86,6 +86,7 @@
       }
     },
     "%lld min" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -287,6 +288,63 @@
         }
       }
     },
+    "Actions for %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktionen für %1$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actions pour %1$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktioune fir %1$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ações para %1$@"
+          }
+        }
+      }
+    },
+    "Add" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dobäisetzen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar"
+          }
+        }
+      }
+    },
     "Add departure reminder" : {
       "localizations" : {
         "de" : {
@@ -311,6 +369,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adicionar lembrete de partida"
+          }
+        }
+      }
+    },
+    "Add label" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Label hinzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une étiquette"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Label dobäisetzen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar etiqueta"
           }
         }
       }
@@ -428,6 +514,7 @@
       }
     },
     "All stops" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1077,6 +1164,7 @@
       }
     },
     "Current Location" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1105,6 +1193,7 @@
       }
     },
     "Data" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1272,6 +1361,35 @@
         }
       }
     },
+    "Departure refresh failed. %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktualisierung der Abfahrten fehlgeschlagen. %1$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’actualisation des départs a échoué. %1$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D’Aktualiséierung vun den Departuren ass net gelongen. %1$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A atualização das partidas falhou. %1$@"
+          }
+        }
+      }
+    },
     "Departures" : {
       "localizations" : {
         "de" : {
@@ -1296,6 +1414,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Partidas"
+          }
+        }
+      }
+    },
+    "Departures unavailable" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrten nicht verfügbar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Départs indisponibles"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Departuren net verfügbar"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partidas indisponíveis"
           }
         }
       }
@@ -1525,6 +1672,7 @@
       }
     },
     "Edit Label" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1548,6 +1696,118 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Editar etiqueta"
+          }
+        }
+      }
+    },
+    "Edit labels" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labels bearbeiten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier les étiquettes"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labels änneren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar etiquetas"
+          }
+        }
+      }
+    },
+    "Edit Labels" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labels bearbeiten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier les étiquettes"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labels änneren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar etiquetas"
+          }
+        }
+      }
+    },
+    "Edit labels for %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labels für %1$@ bearbeiten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier les étiquettes de %1$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labels fir %1$@ änneren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar etiquetas de %1$@"
+          }
+        }
+      }
+    },
+    "Existing labels" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorhandene Labels"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étiquettes existantes"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestehend Labels"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etiquetas existentes"
           }
         }
       }
@@ -1640,6 +1900,7 @@
       }
     },
     "Favourite Stops" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1663,6 +1924,91 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paragens favoritas"
+          }
+        }
+      }
+    },
+    "Favourites" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoriten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoris"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoritten"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoritos"
+          }
+        }
+      }
+    },
+    "Favourites refreshed" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoriten aktualisiert"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoris actualisés"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoritten aktualiséiert"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoritos atualizados"
+          }
+        }
+      }
+    },
+    "Find a stop" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haltestelle suchen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trouver un arrêt"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêt sichen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encontrar uma paragem"
           }
         }
       }
@@ -1720,6 +2066,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A procurar paragens próximas"
+          }
+        }
+      }
+    },
+    "From" : {
+      "comment" : "Route-planner origin field label.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Départ"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vun"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De"
           }
         }
       }
@@ -1924,6 +2300,34 @@
         }
       }
     },
+    "Label" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Label"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étiquette"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Label"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etiqueta"
+          }
+        }
+      }
+    },
     "Label (e.g. Home → Work)" : {
       "localizations" : {
         "de" : {
@@ -1953,6 +2357,7 @@
       }
     },
     "Label (e.g. Home, Work)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1979,6 +2384,37 @@
           }
         }
       }
+    },
+    "Labels" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labels"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étiquettes"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labels"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etiquetas"
+          }
+        }
+      }
+    },
+    "Labels: %@" : {
+
     },
     "Last service today" : {
       "localizations" : {
@@ -2094,6 +2530,122 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A Atividade em tempo real está a acompanhar %1$@ até %2$@"
+          }
+        }
+      }
+    },
+    "Live departure data is unavailable in offline mode or without an ATP connection." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live-Abfahrtsdaten sind im Offline-Modus oder ohne ATP-Verbindung nicht verfügbar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les données de départ en direct ne sont pas disponibles hors ligne ou sans connexion ATP."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live-Departuredonnéeën sinn am Offline-Modus oder ouni ATP-Verbindung net verfügbar."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os dados de partidas em tempo real não estão disponíveis no modo offline ou sem ligação ATP."
+          }
+        }
+      }
+    },
+    "Live departures are unavailable in offline mode or without an ATP connection." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live-Abfahrten sind im Offline-Modus oder ohne ATP-Verbindung nicht verfügbar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les départs en direct ne sont pas disponibles hors ligne ou sans connexion ATP."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live-Departuren sinn am Offline-Modus oder ouni ATP-Verbindung net verfügbar."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As partidas em tempo real não estão disponíveis no modo offline ou sem ligação ATP."
+          }
+        }
+      }
+    },
+    "Live departures could not be loaded for this stop." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live-Abfahrten für diese Haltestelle konnten nicht geladen werden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les départs en direct pour cet arrêt n’ont pas pu être chargés."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D’Live-Departure fir dësen Arrêt konnten net geluede ginn."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível carregar as partidas em tempo real desta paragem."
+          }
+        }
+      }
+    },
+    "Live departures unavailable" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live-Abfahrten nicht verfügbar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Départs en direct indisponibles"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live-Departuren net verfügbar"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partidas em tempo real indisponíveis"
           }
         }
       }
@@ -2296,6 +2848,35 @@
         }
       }
     },
+    "More actions" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Aktionen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autres actions"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Méi Aktiounen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mais ações"
+          }
+        }
+      }
+    },
     "Name this trip so you can re-plan it in one tap. Use “Home → Work” for time-of-day commute suggestions." : {
       "localizations" : {
         "de" : {
@@ -2493,6 +3074,63 @@
         }
       }
     },
+    "No labels assigned" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Labels zugewiesen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune étiquette attribuée"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keng Labels zougedeelt"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhuma etiqueta atribuída"
+          }
+        }
+      }
+    },
+    "No live departures are currently available for this stop." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für diese Haltestelle sind derzeit keine Live-Abfahrten verfügbar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun départ en direct n’est actuellement disponible pour cet arrêt."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Et si momentan keng Live-Departure fir dësen Arrêt verfügbar."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não há partidas em tempo real disponíveis para esta paragem."
+          }
+        }
+      }
+    },
     "No matches" : {
       "localizations" : {
         "de" : {
@@ -2545,6 +3183,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sem paragens próximas"
+          }
+        }
+      }
+    },
+    "No upcoming departures" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine bevorstehenden Abfahrten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun départ à venir"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keng nächst Departuren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem próximas partidas"
           }
         }
       }
@@ -2658,6 +3325,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pontual"
+          }
+        }
+      }
+    },
+    "Open departures" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrten öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les départs"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Departuren opmaachen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir partidas"
+          }
+        }
+      }
+    },
+    "Open departures for %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrten für %1$@ öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les départs pour %1$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Departuren fir %1$@ opmaachen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir partidas para %1$@"
           }
         }
       }
@@ -3054,11 +3777,90 @@
         }
       }
     },
-    "Placeholder 1" : {
-
+    "Plan" : {
+      "comment" : "Transit journey-planner tab title; use an imperative or noun appropriate for planning a trip.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route planen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Itinéraire"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route plangen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planear"
+          }
+        }
+      }
     },
-    "Placeholder 2" : {
-
+    "Plan from %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route ab %1$@ planen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planifier depuis %1$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vun %1$@ plangen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planear a partir de %1$@"
+          }
+        }
+      }
+    },
+    "Plan from this stop" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route ab dieser Haltestelle planen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planifier depuis cet arrêt"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vun dësem Arrêt plangen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planear a partir desta paragem"
+          }
+        }
+      }
     },
     "Plan Route" : {
       "localizations" : {
@@ -3084,6 +3886,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Planear rota"
+          }
+        }
+      }
+    },
+    "Plan to %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route nach %1$@ planen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planifier vers %1$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Op %1$@ plangen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planear para %1$@"
+          }
+        }
+      }
+    },
+    "Plan to this stop" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route zu dieser Haltestelle planen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planifier vers cet arrêt"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Op dësen Arrêt plangen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planear para esta paragem"
           }
         }
       }
@@ -3398,6 +4256,7 @@
       }
     },
     "Recent Places" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3453,6 +4312,9 @@
         }
       }
     },
+    "Recents" : {
+
+    },
     "Refresh alerts" : {
       "localizations" : {
         "de" : {
@@ -3477,6 +4339,90 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Atualizar alertas"
+          }
+        }
+      }
+    },
+    "Refresh departures" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrten aktualisieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiser les départs"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Departuren aktualiséieren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualizar partidas"
+          }
+        }
+      }
+    },
+    "Refresh departures for %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrten für %1$@ aktualisieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiser les départs pour %1$@"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Departuren fir %1$@ aktualiséieren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualizar partidas para %1$@"
+          }
+        }
+      }
+    },
+    "Refresh favourites" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoriten aktualisieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiser les favoris"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoritten aktualiséieren"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualizar favoritos"
           }
         }
       }
@@ -3506,6 +4452,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Atualizar rotas"
+          }
+        }
+      }
+    },
+    "Refreshing departures" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrten werden aktualisiert"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualisation des départs"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Departure ginn aktualiséiert"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A atualizar partidas"
           }
         }
       }
@@ -3628,6 +4603,62 @@
         }
       }
     },
+    "Remove" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ewechhuelen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remover"
+          }
+        }
+      }
+    },
+    "Remove %@ from favourites" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ aus Favoriten entfernen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retirer %1$@ des favoris"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ aus de Favoritten ewechhuelen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remover %1$@ dos favoritos"
+          }
+        }
+      }
+    },
     "Remove favourite" : {
       "localizations" : {
         "de" : {
@@ -3657,6 +4688,7 @@
       }
     },
     "Remove Label" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3680,6 +4712,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remover etiqueta"
+          }
+        }
+      }
+    },
+    "Results" : {
+
+    },
+    "Retry departures" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfahrten erneut laden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessayer les départs"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Departuren nach eemol lueden"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tentar partidas novamente"
           }
         }
       }
@@ -3736,6 +4800,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Predefinições do planeador de rotas"
+          }
+        }
+      }
+    },
+    "Routes could not be refreshed. Showing the last available results." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Routen konnten nicht aktualisiert werden. Die letzten verfügbaren Ergebnisse werden angezeigt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les itinéraires n’ont pas pu être actualisés. Les derniers résultats disponibles sont affichés."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D’Routen konnten net aktualiséiert ginn. Déi lescht verfügbar Resultater gi gewisen."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível atualizar as rotas. São apresentados os últimos resultados disponíveis."
+          }
+        }
+      }
+    },
+    "Routes may have changed. Refresh routes for the latest information." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Routen können sich geändert haben. Aktualisieren Sie sie für die neuesten Informationen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les itinéraires ont peut-être changé. Actualisez-les pour obtenir les dernières informations."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D’Routen hu sech vläicht geännert. Aktualiséier se fir déi lescht Informatiounen."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As rotas podem ter mudado. Atualize-as para obter as informações mais recentes."
           }
         }
       }
@@ -3880,6 +5002,34 @@
         }
       }
     },
+    "Saved Stops" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Haltestellen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêts enregistrés"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespäichert Arrêten"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragens guardadas"
+          }
+        }
+      }
+    },
     "Scheduled" : {
       "localizations" : {
         "de" : {
@@ -3938,6 +5088,7 @@
       }
     },
     "Search settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3994,6 +5145,7 @@
       }
     },
     "Search stops & places" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4022,6 +5174,7 @@
       }
     },
     "Search stops…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4219,6 +5372,7 @@
       }
     },
     "Show only stops labelled “Work” and your commute preset while this Focus is on." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4331,6 +5485,7 @@
       }
     },
     "Start typing to find a stop, address, or place." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4751,9 +5906,6 @@
         }
       }
     },
-    "This tab is reserved for a future feature." : {
-
-    },
     "Time" : {
       "localizations" : {
         "de" : {
@@ -4778,6 +5930,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hora"
+          }
+        }
+      }
+    },
+    "To" : {
+      "comment" : "Route-planner destination field label.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrivée"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Op"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para"
           }
         }
       }
@@ -5262,34 +6444,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Acessível a cadeira de rodas"
-          }
-        }
-      }
-    },
-    "Work stops only" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nur Haltestellen für Arbeit"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arrêts de travail uniquement"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nëmmen Arrête fir Schaffen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apenas paragens de trabalho"
           }
         }
       }

@@ -17,10 +17,10 @@ struct StopListRow: View {
     var accessoryAccessibilityLabel: String?
     var action: (() -> Void)? = nil
     var navigationValue: TransitSheetRoute? = nil
-
+	
     @Environment(AppPreferences.self) private var preferences
     @Environment(\.colorScheme) private var colorScheme
-
+	
     @ViewBuilder
     var body: some View {
         if let accessoryAction {

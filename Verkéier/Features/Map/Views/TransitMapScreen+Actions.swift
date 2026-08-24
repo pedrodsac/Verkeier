@@ -73,8 +73,10 @@ extension TransitMapScreen {
             selectRouteOrigin: selectRouteOrigin,
             selectRouteDestination: selectRouteDestination,
             applyCommutePreset: applyCommutePreset,
+            applyAndCalculatePreset: applyAndCalculatePreset,
             saveCurrentCommutePreset: saveCurrentCommutePreset,
             swapRouteEndpoints: swapRouteEndpoints,
+            showRoutePlaceSearch: showRoutePlaceSearch,
             updateRouteFilters: updateRouteFilters,
             setRoutePlanningTime: setRoutePlanningTime,
             startTrackingDeparture: startTrackingDeparture,
@@ -86,12 +88,81 @@ extension TransitMapScreen {
             updateSearch: updateSearch,
             selectLineDetailDirection: selectLineDetailDirection,
             checkGTFSUpdate: checkGTFSUpdate,
-            setDebugDataMode: setDebugDataMode
+            setDebugDataMode: setDebugDataMode,
+            favourites: FavouritesActions(
+                openStop: openFavouriteStop,
+                planTo: planToFavouriteStop,
+                planFrom: planFromFavouriteStop,
+                refreshStop: refreshFavouriteStop,
+                refreshAll: refreshFavouriteStops,
+                updateLabels: updateFavouriteLabels,
+                removeFavourite: removeFavourite,
+                findStop: showSearch
+            )
         )
     }
 
     func selectStop(_ stop: Stop) {
         navigateToSheet([.stopDetail(stop)])
+    }
+
+    func openFavouriteStop(_ stop: Stop) {
+        animateSheetChange {
+            sheetNavigation.selectedTab = .favourites
+            sheetNavigation.favouritesPath.append(.stopDetail(stop))
+            sheetDetent = .medium
+        }
+    }
+
+    func planToFavouriteStop(_ stop: Stop) {
+        selectRouteDestination(RoutePlace(stop: stop, source: .favourite))
+        showPlanTab()
+    }
+
+    func planFromFavouriteStop(_ stop: Stop) {
+        selectRouteOrigin(RoutePlace(stop: stop, source: .favourite))
+        showPlanTab()
+    }
+
+    func showPlanTab() {
+        animateSheetChange {
+            sheetNavigation.selectedTab = .plan
+            sheetNavigation.planPath = []
+            if sheetDetent == .collapsed {
+                sheetDetent = .medium
+            }
+        }
+    }
+
+    func refreshFavouriteStop(_ stop: Stop) async {
+        guard canLoadLiveFavouriteDepartures else {
+            viewModel.markFavouriteDeparturesUnavailable(for: [stop])
+            return
+        }
+        await viewModel.refreshFavouriteDeparture(using: atpClient, stop: stop)
+    }
+
+    func refreshFavouriteStops() async {
+        guard canLoadLiveFavouriteDepartures else {
+            viewModel.markFavouriteDeparturesUnavailable(for: favouriteStops)
+            return
+        }
+        await viewModel.loadFavouriteDepartures(using: atpClient, favourites: favouriteStops)
+    }
+
+    func updateFavouriteLabels(stopID: String, labels: [String]) {
+        guard let favourite = favouriteEntities.first(where: { $0.stopId == stopID }) else { return }
+        favourite.replaceLabels(with: labels)
+        try? modelContext.save()
+        mirrorFavouriteEntitiesForIntents()
+    }
+
+    func removeFavourite(stopID: String) {
+        guard let favourite = favouriteEntities.first(where: { $0.stopId == stopID }) else { return }
+        modelContext.delete(favourite)
+        viewModel.favouriteDepartureBoards.removeValue(forKey: stopID)
+        try? modelContext.save()
+        mirrorFavouriteEntitiesForIntents()
     }
 
     func selectStopGroup(_ stops: [Stop], _ bikeShareStations: [BikeShareStation]) {
@@ -105,7 +176,8 @@ extension TransitMapScreen {
 
     func showHome() {
         animateSheetChange {
-            sheetPath = []
+            sheetNavigation.selectedTab = .home
+            sheetNavigation.homePath = []
             sheetDetent = .medium
             viewModel.selectedStopGroup = []
             viewModel.selectedBikeShareStations = []
@@ -157,6 +229,11 @@ extension TransitMapScreen {
         }
     }
 
+    func applyAndCalculatePreset(_ presetID: String) {
+        applyCommutePreset(presetID)
+        calculateRoute()
+    }
+
     func saveCurrentCommutePreset(_ title: String) {
         viewModel.saveCurrentCommutePreset(title: title)
     }
@@ -167,15 +244,26 @@ extension TransitMapScreen {
         }
     }
 
+    func showRoutePlaceSearch(_ endpoint: RouteEndpoint) {
+        animateSheetChange {
+            sheetNavigation.selectedTab = .plan
+            sheetNavigation.planPath.append(.routePlaceSearch(endpoint))
+            sheetDetent = .expanded
+        }
+    }
+
     func updateRouteFilters(_ filters: RoutePlannerFilters) {
         viewModel.updateRouteFilters(filters)
     }
 
     func setRoutePlanningTime(_ time: RoutePlanningTime) {
         guard viewModel.routePlanningTime != time else { return }
-        viewModel.routePlanningTime = time
-        // Re-query the service: a new time means different departures.
-        calculateRoute()
+        viewModel.setRoutePlanningTime(time)
+        // A future time can be picked before an endpoint exists. In that case
+        // remember it without surfacing a destination error.
+        if viewModel.routeDestination != nil || viewModel.selectedStop != nil {
+            calculateRoute()
+        }
     }
 
     func toggleDepartureLine(_ route: TransitRoute) {
@@ -217,7 +305,8 @@ extension TransitMapScreen {
         detent: BottomSheetDetent? = nil
     ) {
         animateSheetChange {
-            sheetPath = routes
+            sheetNavigation.selectedTab = .home
+            sheetNavigation.homePath = routes
             sheetDetent = detent ?? routes.last?.defaultDetent ?? .medium
         }
     }
@@ -227,8 +316,17 @@ extension TransitMapScreen {
         reset: Bool = true,
         detent: BottomSheetDetent? = nil
     ) {
-        let routes = reset ? [route] : sheetPath + [route]
+        let routes = reset ? [route] : sheetNavigation.homePath + [route]
         navigateToSheet(routes, detent: detent)
+    }
+
+    func showSheetTab(_ tab: TransitSheetTab) {
+        animateSheetChange {
+            sheetNavigation.selectedTab = tab
+            if sheetDetent == .collapsed, tab != .home {
+                sheetDetent = .medium
+            }
+        }
     }
 
     func activateSheetRoute(
@@ -314,7 +412,7 @@ extension TransitMapScreen {
             await viewModel.loadNearbyStops(using: atpClient, location: locationService.currentLocation)
             await viewModel.loadNearbyStopRoutes(using: gtfsService)
             await loadAlertsAndCheckDisruptions()
-            await viewModel.loadFavouriteDepartures(using: atpClient, favourites: favouriteStops)
+            await refreshFavouriteStops()
             if viewModel.selectedStop != nil {
                 await viewModel.loadDepartures(using: atpClient)
             }

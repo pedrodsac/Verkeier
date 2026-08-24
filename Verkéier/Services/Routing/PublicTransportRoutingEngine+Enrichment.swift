@@ -7,7 +7,8 @@ extension PublicTransportRoutingEngine {
     func justInTimeLeadingWalk(_ legs: [RoutePlan.Leg]) -> [RoutePlan.Leg] {
         guard let firstTransitIndex = legs.firstIndex(where: { $0.transportKind == .transit }),
               firstTransitIndex > 0,
-              let board = legs[firstTransitIndex].scheduledDepartureTime
+              let board = legs[firstTransitIndex].realtimeDepartureTime
+              ?? legs[firstTransitIndex].scheduledDepartureTime
               ?? legs[firstTransitIndex].departureTime else {
             return legs
         }
@@ -21,12 +22,104 @@ extension PublicTransportRoutingEngine {
                   let arrival = leg.arrivalTime else {
                 break
             }
-            let duration = arrival.timeIntervalSince(departure)
+            let duration = physicalWalkingDuration(leg, fallback: arrival.timeIntervalSince(departure))
             let shiftedDeparture = anchor.addingTimeInterval(-duration)
-            result[index] = copy(leg, departureTime: shiftedDeparture, arrivalTime: anchor)
+            result[index] = copy(
+                leg,
+                departureTime: shiftedDeparture,
+                arrivalTime: anchor,
+                scheduledDepartureTime: shiftedDeparture,
+                scheduledArrivalTime: anchor
+            )
             anchor = shiftedDeparture
         }
         return result
+    }
+
+    /// Walking is synthetic routing data, so keep it physically attached to the
+    /// preceding leg after realtime enrichment. Any remaining time before the next
+    /// vehicle is then presented as waiting at the boarding stop, not as walking.
+    func retimedWalkingLegs(_ legs: [RoutePlan.Leg]) -> [RoutePlan.Leg] {
+        var result = justInTimeLeadingWalk(normalizedWalkingLegs(legs))
+        guard result.count > 1 else { return result }
+
+        for index in result.indices.dropFirst() where result[index].transportKind == .walking {
+            guard let previousArrival = effectiveArrivalTime(result[index - 1]) else { continue }
+            let duration = physicalWalkingDuration(result[index], fallback: 0)
+            let arrival = previousArrival.addingTimeInterval(duration)
+            result[index] = copy(
+                result[index],
+                departureTime: previousArrival,
+                arrivalTime: arrival,
+                scheduledDepartureTime: previousArrival,
+                scheduledArrivalTime: arrival
+            )
+        }
+        return result
+    }
+
+    func normalizedWalkingLegs(_ legs: [RoutePlan.Leg]) -> [RoutePlan.Leg] {
+        var result: [RoutePlan.Leg] = []
+        result.reserveCapacity(legs.count)
+        for leg in legs {
+            if leg.transportKind == .walking,
+               let previous = result.last,
+               previous.transportKind == .walking {
+                result[result.count - 1] = mergedWalkingLeg(previous, leg)
+            } else {
+                result.append(leg)
+            }
+        }
+        return result
+    }
+
+    func mergedWalkingLeg(_ first: RoutePlan.Leg, _ second: RoutePlan.Leg) -> RoutePlan.Leg {
+        var coordinates = first.mapCoordinates
+        if coordinates.isEmpty {
+            coordinates = [RouteMapCoordinate(first.origin), RouteMapCoordinate(first.destination)]
+        }
+        let secondCoordinates = second.mapCoordinates.isEmpty
+            ? [RouteMapCoordinate(second.origin), RouteMapCoordinate(second.destination)]
+            : second.mapCoordinates
+        if coordinates.last == secondCoordinates.first {
+            coordinates.append(contentsOf: secondCoordinates.dropFirst())
+        } else {
+            coordinates.append(contentsOf: secondCoordinates)
+        }
+
+        let departure = effectiveDepartureTime(first) ?? first.departureTime
+        let firstDuration = physicalWalkingDuration(first, fallback: 0)
+        let secondDuration = physicalWalkingDuration(second, fallback: 0)
+        let arrival = departure?.addingTimeInterval(firstDuration + secondDuration)
+        return RoutePlan.Leg(
+            id: "\(first.id)-\(second.id)",
+            mode: .walking,
+            instruction: second.instruction,
+            transportKind: .walking,
+            origin: first.origin,
+            destination: second.destination,
+            departureTime: departure,
+            arrivalTime: arrival,
+            scheduledDepartureTime: departure,
+            scheduledArrivalTime: arrival,
+            distanceMeters: (first.distanceMeters ?? 0) + (second.distanceMeters ?? 0),
+            mapCoordinates: coordinates,
+            roadRoutingHint: .walking,
+            liveStatus: .scheduled
+        )
+    }
+
+    func physicalWalkingDuration(_ leg: RoutePlan.Leg, fallback: TimeInterval) -> TimeInterval {
+        guard let distance = leg.distanceMeters else { return max(0, fallback) }
+        return TimeInterval(walkingSeconds(for: distance))
+    }
+
+    func effectiveDepartureTime(_ leg: RoutePlan.Leg) -> Date? {
+        leg.realtimeDepartureTime ?? leg.scheduledDepartureTime ?? leg.departureTime
+    }
+
+    func effectiveArrivalTime(_ leg: RoutePlan.Leg) -> Date? {
+        leg.realtimeArrivalTime ?? leg.scheduledArrivalTime ?? leg.arrivalTime
     }
 
     func enrich(
@@ -37,7 +130,8 @@ extension PublicTransportRoutingEngine {
         // no-realtime penalty (which would otherwise flag every leg as unverified).
         guard !offlineMode else {
             return candidates.map {
-                RouteCandidate(legs: $0.legs, penalty: brokenConnectionPenalty(for: $0.legs))
+                let legs = retimedWalkingLegs($0.legs)
+                return RouteCandidate(legs: legs, penalty: brokenConnectionPenalty(for: legs))
             }
         }
 
@@ -75,8 +169,9 @@ extension PublicTransportRoutingEngine {
                 }
             }
 
-            penalty += brokenConnectionPenalty(for: legs)
-            enriched.append(RouteCandidate(legs: legs, penalty: penalty))
+            let retimedLegs = retimedWalkingLegs(legs)
+            penalty += brokenConnectionPenalty(for: retimedLegs)
+            enriched.append(RouteCandidate(legs: retimedLegs, penalty: penalty))
         }
 
         return enriched
@@ -111,7 +206,7 @@ extension PublicTransportRoutingEngine {
         destination: LocationPoint,
         context _: RouteSearchContext
     ) async -> RouteOption? {
-        let legs = legsWithTransferWarnings(candidate.legs)
+        let legs = legsWithTransferWarnings(retimedWalkingLegs(candidate.legs))
         guard legs.contains(where: {
             $0.transportKind == .transit || $0.transportKind == .bikeShare
         }) else {
@@ -361,19 +456,13 @@ extension PublicTransportRoutingEngine {
 
     func legsWithTransferWarnings(_ legs: [RoutePlan.Leg]) -> [RoutePlan.Leg] {
         var result = legs
-
-        for index in result.indices.dropLast() {
-            let current = result[index]
-            let next = result[index + 1]
-            guard current.transportKind == .transit,
-                  next.transportKind == .transit,
-                  let arrival = current.realtimeArrivalTime ?? current.scheduledArrivalTime ?? current.arrivalTime,
-                  let nextDeparture = next.realtimeDepartureTime ?? next.scheduledDepartureTime ?? next.departureTime
-            else {
-                continue
-            }
-
-            let slack = nextDeparture.timeIntervalSince(arrival)
+        let transitIndices = result.indices.filter { result[$0].transportKind == .transit }
+        for pair in zip(transitIndices, transitIndices.dropFirst()) {
+            guard let slack = transferSlackSeconds(
+                fromTransitAt: pair.0,
+                toTransitAt: pair.1,
+                in: result
+            ) else { continue }
             guard slack < Double(tightTransferThresholdSeconds) else { continue }
 
             let warning = if slack < Double(transferBufferSeconds) {
@@ -381,7 +470,9 @@ extension PublicTransportRoutingEngine {
             } else {
                 "Tight connection — \(max(1, Int(slack / 60))) min to change"
             }
-            result[index] = copy(current, transferWarning: warning)
+            // The warning belongs to the ride being boarded so the timeline displays
+            // it at that boarding place, including when a walking leg sits between rides.
+            result[pair.1] = copy(result[pair.1], transferWarning: warning)
         }
 
         return result

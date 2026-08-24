@@ -46,10 +46,8 @@ final class TransitMapViewModel {
     var isLoadingDepartures = false
     var departuresErrorMessage: String?
     var departuresLastUpdated: Date?
-    var favouriteDeparturesByStopId: [String: [Departure]] = [:]
+    var favouriteDepartureBoards: [String: FavouriteDepartureBoardSnapshot] = [:]
     var isLoadingFavouriteDepartures = false
-    var favouriteDeparturesErrorMessage: String?
-    var favouriteDeparturesLastUpdated: Date?
     var searchQuery = ""
     var searchResults: [Stop] = []
     var routeOrigin: RoutePlace?
@@ -66,6 +64,7 @@ final class TransitMapViewModel {
     var routeLoadingPhase: RouteLoadingPhase = .idle
     var routeErrorMessage: String?
     var routeStatusMessage: String?
+    var routeLastCalculatedAt: Date?
     var alerts: [AlertMessage] = []
     var selectedLineDetailRoute: TransitRoute?
     var selectedLineDetailDirectionID: String?
@@ -139,6 +138,7 @@ final class TransitMapViewModel {
         selectedRouteOptionID = nil
         visibleRouteOptionCount = 0
         routeStatusMessage = nil
+        routeLastCalculatedAt = nil
     }
 
     func squaredDistance(from lhs: LocationPoint, to rhs: LocationPoint) -> Double {

@@ -5,32 +5,72 @@ import SwiftUI
 
 extension TransitMapViewModel {
     func loadFavouriteDepartures(using atpClient: any ATPClient, favourites: [Stop]) async {
-        let limitedFavourites = Array(favourites.prefix(6))
-
-        guard !limitedFavourites.isEmpty else {
-            favouriteDeparturesByStopId = [:]
-            favouriteDeparturesErrorMessage = nil
-            favouriteDeparturesLastUpdated = nil
+        guard !favourites.isEmpty else {
+            favouriteDepartureBoards = [:]
             isLoadingFavouriteDepartures = false
             return
         }
 
         isLoadingFavouriteDepartures = true
-        favouriteDeparturesErrorMessage = nil
+        for stop in favourites {
+            var snapshot = favouriteDepartureBoards[stop.id] ?? FavouriteDepartureBoardSnapshot()
+            snapshot.phase = .loading
+            snapshot.errorMessage = nil
+            favouriteDepartureBoards[stop.id] = snapshot
+        }
 
         let results = await loadFavouriteDepartureBoards(
             using: atpClient,
-            favourites: limitedFavourites
+            favourites: favourites
         )
-        let boards = Dictionary(uniqueKeysWithValues: results.map { ($0.stopId, $0.departures) })
-        let failedCount = results.filter(\.didFail).count
-
-        favouriteDeparturesByStopId = boards
-        favouriteDeparturesLastUpdated = .now
-        favouriteDeparturesErrorMessage =
-            failedCount == limitedFavourites.count
-                ? "Favourite departures could not be loaded." : nil
+        let refreshedAt = Date.now
+        for result in results {
+            var snapshot = favouriteDepartureBoards[result.stopId] ?? FavouriteDepartureBoardSnapshot()
+            if result.didFail {
+                snapshot.phase = .failed
+                snapshot.errorMessage = "Favourite departures could not be loaded."
+            } else {
+                snapshot.phase = .loaded
+                snapshot.departures = result.departures
+                snapshot.lastUpdated = refreshedAt
+                snapshot.errorMessage = nil
+            }
+            favouriteDepartureBoards[result.stopId] = snapshot
+        }
         isLoadingFavouriteDepartures = false
+    }
+
+    func refreshFavouriteDeparture(using atpClient: any ATPClient, stop: Stop) async {
+        var snapshot = favouriteDepartureBoards[stop.id] ?? FavouriteDepartureBoardSnapshot()
+        snapshot.phase = .loading
+        snapshot.errorMessage = nil
+        favouriteDepartureBoards[stop.id] = snapshot
+
+        let result = await Self.loadFavouriteDepartureBoard(using: atpClient, stop: stop, index: 0)
+        snapshot = favouriteDepartureBoards[stop.id] ?? FavouriteDepartureBoardSnapshot()
+        if result.didFail {
+            snapshot.phase = .failed
+            snapshot.errorMessage = "Favourite departures could not be loaded."
+        } else {
+            snapshot.phase = .loaded
+            snapshot.departures = result.departures
+            snapshot.lastUpdated = .now
+            snapshot.errorMessage = nil
+        }
+        favouriteDepartureBoards[stop.id] = snapshot
+    }
+
+    /// Represent unavailable live data explicitly instead of allowing the
+    /// injected empty ATP client to look like a confirmed empty departure
+    /// board. Existing successful rows remain available, but are marked stale.
+    func markFavouriteDeparturesUnavailable(for favourites: [Stop]) {
+        isLoadingFavouriteDepartures = false
+        for stop in favourites {
+            var snapshot = favouriteDepartureBoards[stop.id] ?? FavouriteDepartureBoardSnapshot()
+            snapshot.phase = .failed
+            snapshot.errorMessage = "Live departures are unavailable in offline mode or without an ATP connection."
+            favouriteDepartureBoards[stop.id] = snapshot
+        }
     }
 
     func loadDepartures(using atpClient: any ATPClient) async {
@@ -93,8 +133,7 @@ extension TransitMapViewModel {
     }
 
     var areFavouriteDeparturesStale: Bool {
-        guard let favouriteDeparturesLastUpdated else { return false }
-        return Date().timeIntervalSince(favouriteDeparturesLastUpdated) > 90
+        favouriteDepartureBoards.values.contains { $0.isStale() }
     }
 
     private func departuresWithPlatformFallback(

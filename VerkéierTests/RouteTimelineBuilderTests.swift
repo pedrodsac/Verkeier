@@ -35,6 +35,7 @@ struct RouteTimelineBuilderTests {
         delay: Int? = nil,
         status: RouteLegLiveStatus = .scheduled,
         transferWarning: String? = nil,
+        stopCount: Int? = nil,
         departure: Double = 100,
         arrival: Double = 900
     ) -> RoutePlan.Leg {
@@ -44,6 +45,7 @@ struct RouteTimelineBuilderTests {
             transportKind: .transit,
             routeName: line,
             headsign: headsign,
+            stopCount: stopCount,
             origin: point(from),
             destination: point(to),
             departureTime: Date(timeIntervalSince1970: departure),
@@ -130,6 +132,14 @@ struct RouteTimelineBuilderTests {
         }
         #expect(segments[0].rail == .walk)
         #expect(segments[1].rail == .transit(.bus))
+    }
+
+    @Test func transitSegmentsCarryStopCount() {
+        let segment = segments([
+            transit("t1", from: "a", to: "b", stopCount: 3)
+        ]).first
+
+        #expect(segment?.stopCount == 3)
     }
 
     @Test func boardingPlaceCarriesOutgoingPlatformAndDelay() {

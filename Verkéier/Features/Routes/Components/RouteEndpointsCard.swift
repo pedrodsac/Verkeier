@@ -3,33 +3,13 @@ import SwiftUI
 /// An Apple Maps-style unified From/To card with a vertical connector rail
 /// and an inline swap button.
 ///
-/// The card hosts two `Menu`s (origin and destination) whose content is derived
-/// from the view model — favourites, nearby stops, recent places, and the
-/// currently selected stop. Tapping outside the menus is handled by the
-/// ``swapRouteEndpoints`` action on the swap button.
+/// Tapping either endpoint pushes the planner's place search. Tapping outside
+/// the endpoint rows is handled by the ``swapRouteEndpoints`` action on the
+/// swap button.
 struct RouteEndpointsCard: View {
     let viewModel: RoutePresentationModel
-    let selectRouteOrigin: (RoutePlace?) -> Void
-    let selectRouteDestination: (RoutePlace) -> Void
+    let showRoutePlaceSearch: (RouteEndpoint) -> Void
     let swapRouteEndpoints: () -> Void
-
-    @State private var searchPresentation: SearchPresentation?
-
-    private enum SearchPresentation: Hashable, Identifiable {
-        case origin
-        case destination
-
-        var id: Self { self }
-
-        var title: String {
-            switch self {
-            case .origin:
-                "Search Origin"
-            case .destination:
-                "Search Destination"
-            }
-        }
-    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
@@ -44,25 +24,7 @@ struct RouteEndpointsCard: View {
 
             swapButton
         }
-        .background(
-            .background.opacity(0.86),
-            in: RoundedRectangle(cornerRadius: 18, style: .continuous)
-        )
-        .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.separator.opacity(0.22), lineWidth: 0.5)
-        }
-        .sheet(item: $searchPresentation) { presentation in
-            RouteStopSearchSheet(title: presentation.title) { place in
-                switch presentation {
-                case .origin:
-                    selectRouteOrigin(place)
-                case .destination:
-                    selectRouteDestination(place)
-                }
-                searchPresentation = nil
-            }
-        }
+        .cardSurface(radius: 18)
     }
 
     // MARK: - Connector rail
@@ -71,7 +33,7 @@ struct RouteEndpointsCard: View {
         VStack(spacing: 0) {
             // Origin dot — sits in the centre of the From row
             Circle()
-                .fill(.background.opacity(0.2))
+                .fill(Color(uiColor: .systemBackground))
                 .overlay(Circle().stroke(.secondary.opacity(0.6), lineWidth: 1.5))
                 .frame(width: 10, height: 10)
                 .frame(maxHeight: .infinity)
@@ -82,7 +44,7 @@ struct RouteEndpointsCard: View {
                 .foregroundStyle(.red)
                 .frame(maxHeight: .infinity)
         }
-        .overlay(alignment: .center) {
+        .background(alignment: .center) {
             // Vertical line connecting the two markers
             Rectangle()
                 .fill(.separator.opacity(0.55))
@@ -90,39 +52,14 @@ struct RouteEndpointsCard: View {
                 .padding(.vertical, 30)
         }
         .frame(width: 40)
-        .padding(.vertical, 6)
         .accessibilityHidden(true)
     }
 
     // MARK: - Endpoint rows
 
     private var fromRow: some View {
-        Menu {
-            Button("Current Location") {
-                selectRouteOrigin(nil)
-            }
-
-            Button {
-                searchPresentation = .origin
-            } label: {
-                Label("Search stops…", systemImage: "magnifyingglass")
-            }
-
-            if !viewModel.favouritePlaces.isEmpty {
-                Section("Favourite Stops") {
-                    ForEach(viewModel.favouritePlaces) { place in
-                        Button(place.title) { selectRouteOrigin(place) }
-                    }
-                }
-            }
-
-            if !viewModel.recentPlaces.isEmpty {
-                Section("Recent Places") {
-                    ForEach(viewModel.recentPlaces) { place in
-                        Button(place.title) { selectRouteOrigin(place) }
-                    }
-                }
-            }
+        Button {
+            showRoutePlaceSearch(.origin)
         } label: {
             endpointLabel(
                 tag: "FROM",
@@ -134,44 +71,8 @@ struct RouteEndpointsCard: View {
     }
 
     private var toRow: some View {
-        Menu {
-            if let selectedStop = viewModel.selectedStop {
-                Button(selectedStop.name) {
-                    selectRouteDestination(
-                        RoutePlace(stop: selectedStop, source: .selectedStop)
-                    )
-                }
-            }
-
-            Button {
-                searchPresentation = .destination
-            } label: {
-                Label("Search stops…", systemImage: "magnifyingglass")
-            }
-
-            if !viewModel.favouritePlaces.isEmpty {
-                Section("Favourite Stops") {
-                    ForEach(viewModel.favouritePlaces) { place in
-                        Button(place.title) { selectRouteDestination(place) }
-                    }
-                }
-            }
-
-            if !viewModel.nearbyPlaces.isEmpty {
-                Section("Nearby Stops") {
-                    ForEach(Array(viewModel.nearbyPlaces.prefix(6))) { place in
-                        Button(place.title) { selectRouteDestination(place) }
-                    }
-                }
-            }
-
-            if !viewModel.recentPlaces.isEmpty {
-                Section("Recent Places") {
-                    ForEach(viewModel.recentPlaces) { place in
-                        Button(place.title) { selectRouteDestination(place) }
-                    }
-                }
-            }
+        Button {
+            showRoutePlaceSearch(.destination)
         } label: {
             endpointLabel(
                 tag: "TO",
@@ -215,104 +116,11 @@ struct RouteEndpointsCard: View {
     }
 }
 
-// MARK: - Stop search sheet
-
-/// A self-contained stop-search sheet for picking a trip origin or destination.
-///
-/// Mirrors the search field + results list of ``SearchView`` but queries both
-/// the local GTFS service (stops) and the place-search service (addresses /
-/// POIs), reporting the chosen ``RoutePlace`` via ``onSelect``.
-private struct RouteStopSearchSheet: View {
-    let title: String
-    let onSelect: (RoutePlace) -> Void
-
-    @Environment(\.gtfsService) private var gtfsService
-    @Environment(\.placeSearchService) private var placeSearchService
-    @Environment(\.dismiss) private var dismiss
-    @State private var query = ""
-    @State private var results: [RoutePlace] = []
-
-    private var trimmedQuery: String {
-        query.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 12) {
-                if trimmedQuery.isEmpty {
-                    ContentUnavailableView(
-                        "Search stops & places",
-                        systemImage: "magnifyingglass",
-                        description: Text("Start typing to find a stop, address, or place.")
-                    )
-                } else if results.isEmpty {
-                    ContentUnavailableView(
-                        "No matches",
-                        systemImage: "mappin.slash",
-                        description: Text("Try another stop, address, or place name.")
-                    )
-                } else {
-                    List(results) { place in
-                        Button {
-                            onSelect(place)
-                        } label: {
-                            Label {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(place.title)
-                                        .font(.body.weight(.semibold))
-                                        .foregroundStyle(.primary)
-                                    if let subtitle = place.subtitle {
-                                        Text(subtitle)
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                            } icon: {
-                                Image(systemName: place.stopId != nil ? "tram.fill" : "mappin.circle.fill")
-                                    .foregroundStyle(place.stopId != nil ? Color.blue : Color.red)
-                            }
-                        }
-                    }
-                    .listStyle(.plain)
-                }
-
-                Spacer(minLength: 0)
-            }
-            .searchable(
-                text: $query,
-                placement: .toolbarPrincipal,
-                prompt: title
-            )
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-            }
-        }
-        .task(id: query) {
-            let current = trimmedQuery
-            guard !current.isEmpty else {
-                results = []
-                return
-            }
-            // Debounce: a new keystroke cancels this task before the sleep ends.
-            try? await Task.sleep(for: .milliseconds(250))
-            guard !Task.isCancelled else { return }
-            async let stops = gtfsService.searchStops(query: current)
-            async let places = placeSearchService.searchPlaces(query: current, near: nil)
-            let stopPlaces = await stops.map { RoutePlace(stop: $0, source: .search) }
-            guard !Task.isCancelled else { return }
-            results = await stopPlaces + places
-        }
-    }
-}
-
 #if DEBUG
     #Preview(traits: .sizeThatFitsLayout) {
         RouteEndpointsCard(
             viewModel: .previewForCard,
-            selectRouteOrigin: { _ in },
-            selectRouteDestination: { _ in },
+            showRoutePlaceSearch: { _ in },
             swapRouteEndpoints: {}
         )
         .padding()
@@ -338,6 +146,7 @@ private struct RouteStopSearchSheet: View {
                     stopId: "stop-luxexpo",
                     source: .selectedStop
                 ),
+                currentLocation: nil,
                 favouritePlaces: [],
                 nearbyPlaces: [],
                 recentPlaces: [],

@@ -24,6 +24,16 @@ extension TransitMapViewModel {
         routeLoadingPhase.isCalculating
     }
 
+    var areRouteResultsStale: Bool {
+        guard routePlanningTime.isNow,
+              let routeLastCalculatedAt,
+              !routeOptions.isEmpty
+        else {
+            return false
+        }
+        return now().timeIntervalSince(routeLastCalculatedAt) > 90
+    }
+
     var selectedRouteOption: RouteOption? {
         guard !routeOptions.isEmpty else { return nil }
         if let selectedRouteOptionID,
@@ -135,6 +145,12 @@ extension TransitMapViewModel {
         applyRouteOptions(preferredID: selectedRouteOptionID, announceFallback: true)
     }
 
+    func setRoutePlanningTime(_ time: RoutePlanningTime) {
+        guard routePlanningTime != time else { return }
+        routePlanningTime = time
+        clearRoute()
+    }
+
     func calculateRoute(using routeService: any RouteService, from location: CLLocation?) async {
         guard let destination = effectiveRouteDestination else {
             routeLoadingPhase = .idle
@@ -179,13 +195,18 @@ extension TransitMapViewModel {
             unfilteredRouteOptions = calculation.options
             applyRouteOptions(preferredID: calculation.selectedOptionID, announceFallback: false)
             if !calculation.options.isEmpty {
+                routeLastCalculatedAt = now()
                 recentTrips = RoutePlannerStore.shared.recordRecentTrip(
                     origin: routeOrigin, destination: destination
                 )
             }
         } catch {
             guard requestGeneration == routeCalculationGeneration else { return }
-            clearRouteResult()
+            if routeOptions.isEmpty {
+                clearRouteResult()
+            } else {
+                routeStatusMessage = "Routes could not be refreshed. Showing the last available results."
+            }
             routeErrorMessage = routeErrorMessage(for: error)
         }
 
@@ -310,6 +331,27 @@ extension TransitMapViewModel {
     }
 
     private func compareRouteOptions(_ lhs: RouteOption, _ rhs: RouteOption) -> Bool {
+        if case let .arriveBy(deadline) = routePlanningTime {
+            let lhsSevere = isSeverelyUnusable(lhs)
+            let rhsSevere = isSeverelyUnusable(rhs)
+            if lhsSevere != rhsSevere { return rhsSevere }
+
+            let lhsArrival = lhs.arrivalTime ?? .distantFuture
+            let rhsArrival = rhs.arrivalTime ?? .distantFuture
+            let lhsOnTime = lhsArrival <= deadline
+            let rhsOnTime = rhsArrival <= deadline
+            if lhsOnTime != rhsOnTime { return lhsOnTime }
+            if !lhsOnTime {
+                let lhsLateness = lhsArrival.timeIntervalSince(deadline)
+                let rhsLateness = rhsArrival.timeIntervalSince(deadline)
+                if lhsLateness != rhsLateness { return lhsLateness < rhsLateness }
+            }
+
+            let lhsDeparture = lhs.departureTime ?? .distantPast
+            let rhsDeparture = rhs.departureTime ?? .distantPast
+            if lhsDeparture != rhsDeparture { return lhsDeparture > rhsDeparture }
+        }
+
         let preferredMode = routeFilters.modePreference.transportMode
         let lhsModeRank = preferredMode.map { mode in
             lhs.transitLegs.contains(where: { $0.mode == mode }) ? 0 : 1
@@ -341,6 +383,12 @@ extension TransitMapViewModel {
         }
 
         return lhs.id < rhs.id
+    }
+
+    private func isSeverelyUnusable(_ option: RouteOption) -> Bool {
+        option.transitLegs.contains {
+            $0.liveStatus == .cancelled || $0.transferWarning == "Connection may be missed"
+        }
     }
 
     private func routeErrorMessage(for error: Error) -> String {

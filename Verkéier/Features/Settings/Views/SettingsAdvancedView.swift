@@ -114,7 +114,7 @@ struct SettingsAdvancedView: View {
         }
         .listStyle(.insetGrouped)
         .navigationTitle("Advanced")
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbarTitleDisplayMode(.inline)
     }
 
     // MARK: - Computed

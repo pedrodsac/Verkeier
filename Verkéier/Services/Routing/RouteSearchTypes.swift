@@ -31,8 +31,20 @@ nonisolated struct RouteSearchContext {
         staticContext.tripReferencesByStopId
     }
 
+    var alightReferencesByStopId: [String: [TripStopReference]] {
+        staticContext.alightReferencesByStopId
+    }
+
     var transfersByFromStopId: [String: [GTFSTimetableTransferEntry]] {
         staticContext.transfersByFromStopId
+    }
+
+    var transfersByToStopId: [String: [GTFSTimetableTransferEntry]] {
+        staticContext.transfersByToStopId
+    }
+
+    var sameStopMinimumTransferSecondsByStopId: [String: Int] {
+        staticContext.sameStopMinimumTransferSecondsByStopId
     }
 
     init(staticContext: CachedRouteSearchContext, now: Date) {
@@ -50,7 +62,10 @@ nonisolated struct CachedRouteSearchContext {
     let shapesById: [String: GTFSTimetableShapeEntry]
     let activeTrips: [GTFSTimetableTripEntry]
     let tripReferencesByStopId: [String: [TripStopReference]]
+    let alightReferencesByStopId: [String: [TripStopReference]]
     let transfersByFromStopId: [String: [GTFSTimetableTransferEntry]]
+    let transfersByToStopId: [String: [GTFSTimetableTransferEntry]]
+    let sameStopMinimumTransferSecondsByStopId: [String: Int]
 
     init(
         key: RouteSearchCacheKey,
@@ -86,29 +101,53 @@ nonisolated struct CachedRouteSearchContext {
             .map { Self.shiftedBackADay($0) }
         combinedTrips.append(contentsOf: yesterdayLateTrips)
 
-        var references: [String: [TripStopReference]] = [:]
+        var boardingReferences: [String: [TripStopReference]] = [:]
+        var alightingReferences: [String: [TripStopReference]] = [:]
         for tripIndex in combinedTrips.indices {
             let trip = combinedTrips[tripIndex]
             for stopTimeIndex in trip.stopTimes.indices.dropLast() {
                 let stopTime = trip.stopTimes[stopTimeIndex]
-                references[stopTime.stopId, default: []].append(
+                boardingReferences[stopTime.stopId, default: []].append(
+                    TripStopReference(tripIndex: tripIndex, stopTimeIndex: stopTimeIndex)
+                )
+            }
+            for stopTimeIndex in trip.stopTimes.indices.dropFirst() {
+                let stopTime = trip.stopTimes[stopTimeIndex]
+                alightingReferences[stopTime.stopId, default: []].append(
                     TripStopReference(tripIndex: tripIndex, stopTimeIndex: stopTimeIndex)
                 )
             }
         }
-        let sortedReferences = references.mapValues {
+        let sortedBoardingReferences = boardingReferences.mapValues {
             $0.sorted {
                 combinedTrips[$0.tripIndex].stopTimes[$0.stopTimeIndex].departureSeconds
                     < combinedTrips[$1.tripIndex].stopTimes[$1.stopTimeIndex].departureSeconds
             }
         }
+        let sortedAlightingReferences = alightingReferences.mapValues {
+            $0.sorted {
+                combinedTrips[$0.tripIndex].stopTimes[$0.stopTimeIndex].arrivalSeconds
+                    > combinedTrips[$1.tripIndex].stopTimes[$1.stopTimeIndex].arrivalSeconds
+            }
+        }
 
         activeTrips = combinedTrips
-        tripReferencesByStopId = sortedReferences
-        transfersByFromStopId = Self.transfers(
+        tripReferencesByStopId = sortedBoardingReferences
+        alightReferencesByStopId = sortedAlightingReferences
+        let transfers = Self.transfers(
             stops: timetable.stops,
             declaredTransfers: timetable.transfers
         )
+        transfersByFromStopId = transfers
+        transfersByToStopId = Dictionary(
+            grouping: transfers.values.flatMap(\.self),
+            by: \.toStopId
+        )
+        sameStopMinimumTransferSecondsByStopId = timetable.transfers.reduce(into: [:]) { result, transfer in
+            guard transfer.fromStopId == transfer.toStopId,
+                  let minimum = transfer.minimumTransferSeconds else { return }
+            result[transfer.fromStopId] = max(result[transfer.fromStopId, default: 0], minimum)
+        }
     }
 
     private static let secondsPerDay = 86400
@@ -276,16 +315,42 @@ nonisolated struct StopCandidate {
     let distanceMeters: Double
 }
 
+nonisolated struct RouteSearchLabelKey: Hashable {
+    let stopId: String
+    let transitLegCount: Int
+}
+
 nonisolated struct JourneyState: Comparable {
     let stopId: String
+    /// Physical arrival at `stopId`.
     let readySeconds: Int
+    /// Earliest safe boarding after walking and one transfer buffer.
+    let boardingReadySeconds: Int
     let legs: [RoutePlan.Leg]
     let transitLegCount: Int
     let visitedStopIds: Set<String>
+    /// Start of a chained transfer walk, used to merge its physical segments.
+    let transferStartSeconds: Int?
+    let transferWalkSeconds: Int
+    let transferMinimumSeconds: Int
 
     static func < (lhs: JourneyState, rhs: JourneyState) -> Bool {
         lhs.readySeconds < rhs.readySeconds
     }
+}
+
+nonisolated struct ReverseJourneyState {
+    let stopId: String
+    /// Latest time an incoming vehicle may reach `stopId` and still complete the suffix.
+    let latestSeconds: Int
+    /// Forward-ordered suffix from `stopId` to the destination.
+    let legs: [RoutePlan.Leg]
+    let transitLegCount: Int
+    let visitedStopIds: Set<String>
+    /// Departure of the next transit leg after a chained transfer walk.
+    let transferDeadlineSeconds: Int?
+    let transferWalkSeconds: Int
+    let transferMinimumSeconds: Int
 }
 
 nonisolated struct ScheduledJourney {
@@ -363,8 +428,34 @@ nonisolated struct RouteCandidate {
             ?? .distantPast
     }
 
+    var departureTime: Date {
+        legs.first.flatMap {
+            $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime
+        } ?? .distantPast
+    }
+
+    var totalWalkingMeters: Double {
+        legs.lazy
+            .filter { $0.transportKind == .walking }
+            .compactMap(\.distanceMeters)
+            .reduce(0, +)
+    }
+
     var transitLegCount: Int {
         legs.reduce(0) { $0 + ($1.transportKind == .transit ? 1 : 0) }
+    }
+
+    var signature: String {
+        legs.map { leg in
+            [
+                leg.transportKind.rawValue,
+                leg.routeId ?? leg.routeName ?? leg.id,
+                leg.originStopId ?? leg.origin.id,
+                leg.destinationStopId ?? leg.destination.id,
+                String(Int((leg.scheduledDepartureTime ?? leg.departureTime)?.timeIntervalSince1970 ?? 0)),
+                String(Int((leg.scheduledArrivalTime ?? leg.arrivalTime)?.timeIntervalSince1970 ?? 0))
+            ].joined(separator: "|")
+        }.joined(separator: "->")
     }
 }
 
@@ -413,6 +504,36 @@ nonisolated struct QueuedJourneyState: Comparable {
     static func < (lhs: QueuedJourneyState, rhs: QueuedJourneyState) -> Bool {
         if lhs.state.readySeconds != rhs.state.readySeconds {
             return lhs.state.readySeconds < rhs.state.readySeconds
+        }
+        return lhs.sequence < rhs.sequence
+    }
+}
+
+nonisolated struct ReverseJourneyPriorityQueue {
+    private var storage = Heap<QueuedReverseJourneyState>()
+    private var nextSequence = 0
+
+    mutating func push(_ element: ReverseJourneyState) {
+        storage.insert(QueuedReverseJourneyState(state: element, sequence: nextSequence))
+        nextSequence += 1
+    }
+
+    mutating func popMax() -> ReverseJourneyState? {
+        storage.popMin()?.state
+    }
+}
+
+nonisolated struct QueuedReverseJourneyState: Comparable {
+    let state: ReverseJourneyState
+    let sequence: Int
+
+    static func == (lhs: QueuedReverseJourneyState, rhs: QueuedReverseJourneyState) -> Bool {
+        lhs.sequence == rhs.sequence && lhs.state.latestSeconds == rhs.state.latestSeconds
+    }
+
+    static func < (lhs: QueuedReverseJourneyState, rhs: QueuedReverseJourneyState) -> Bool {
+        if lhs.state.latestSeconds != rhs.state.latestSeconds {
+            return lhs.state.latestSeconds > rhs.state.latestSeconds
         }
         return lhs.sequence < rhs.sequence
     }

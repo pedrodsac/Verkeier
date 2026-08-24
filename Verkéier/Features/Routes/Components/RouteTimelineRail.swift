@@ -59,7 +59,11 @@ struct TimelineRail: View {
             EmptyView()
         case .ring:
             Circle()
-                .strokeBorder(.tertiary, lineWidth: RouteTimelineLayout.railWidth)
+                .fill(.thinMaterial)
+                .overlay {
+                    Circle()
+                        .strokeBorder(.tertiary, lineWidth: RouteTimelineLayout.railWidth)
+                }
                 .frame(width: ringSize, height: ringSize)
         case .dot:
             Circle()

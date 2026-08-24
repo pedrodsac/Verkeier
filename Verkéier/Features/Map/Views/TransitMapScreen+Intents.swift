@@ -43,13 +43,12 @@ extension TransitMapScreen {
         guard let selectedStop = viewModel.selectedStop else { return }
 
         if let existing = favouriteEntities.first(where: { $0.stopId == selectedStop.id }) {
-            modelContext.delete(existing)
+            removeFavourite(stopID: existing.stopId)
         } else {
             modelContext.insert(PersistedFavouriteStop(stop: selectedStop))
+            try? modelContext.save()
+            mirrorFavouriteEntitiesForIntents()
         }
-
-        try? modelContext.save()
-        mirrorFavouriteEntitiesForIntents()
     }
 
     func mirrorFavouriteEntitiesForIntents() {
@@ -119,7 +118,7 @@ extension TransitMapScreen {
                 if let stop = confidentRouteDestinationMatch(for: destinationName) {
                     viewModel.selectStop(stop)
                     loadSelectedStopData()
-                    navigateToSheet([.directions])
+                    showPlanTab()
                 } else {
                     showSearch()
                 }

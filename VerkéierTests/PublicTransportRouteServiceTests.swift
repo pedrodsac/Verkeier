@@ -44,6 +44,41 @@ struct PublicTransportRouteServiceTests {
         #expect(calculation.mapOverlay?.segments.contains { $0.mode == .bus } == true)
     }
 
+    @Test func realtimeRetimesLeadingWalkAndScheduledTimestamps() async throws {
+        let now = luxembourgDate(hour: 8, minute: 0)
+        let liveDeparture = luxembourgDate(hour: 8, minute: 8)
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: makeTimetable()),
+            atpClient: MockATPClient(departuresByStopId: [
+                "S1": [Departure(
+                    id: "live-15",
+                    stopId: "S1",
+                    routeId: "R15",
+                    lineName: "15",
+                    destination: "Central",
+                    scheduledDeparture: luxembourgDate(hour: 8, minute: 5),
+                    realtimeDeparture: liveDeparture,
+                    delayMinutes: 3,
+                    dataSource: .atpOpenAPI
+                )]
+            ]),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { now }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(name: "Door", latitude: 49.599, longitude: 6.1),
+            to: LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11)
+        )
+
+        let walk = try #require(calculation.plan.legs.first { $0.transportKind == .walking })
+        let transit = try #require(calculation.plan.legs.first { $0.transportKind == .transit })
+        #expect(walk.arrivalTime == liveDeparture)
+        #expect(walk.scheduledArrivalTime == liveDeparture)
+        #expect(walk.departureTime == walk.scheduledDepartureTime)
+        #expect(walk.arrivalTime == transit.realtimeDepartureTime)
+    }
+
     @Test func offlineModeIgnoresLiveDelaysAndUsesScheduledTimes() async throws {
         // Offline mode must plan on the static schedule only: even with a delayed live
         // departure available, the leg stays scheduled (no delay/live status).
@@ -540,6 +575,7 @@ struct PublicTransportRouteServiceTests {
     private func makeTimetable(
         routes: [GTFSTimetableRouteEntry]? = nil,
         trips: [GTFSTimetableTripEntry]? = nil,
+        transfers: [GTFSTimetableTransferEntry] = [],
         shapes: [GTFSTimetableShapeEntry] = []
     ) -> GTFSTimetableIndexPayload {
         GTFSTimetableIndexPayload(
@@ -586,7 +622,7 @@ struct PublicTransportRouteServiceTests {
                 )
             ],
             trips: trips ?? [makeTrip(id: "T15", routeId: "R15", departure: 8 * 3600 + 5 * 60)],
-            transfers: [],
+            transfers: transfers,
             shapes: shapes
         )
     }
@@ -687,6 +723,53 @@ struct PublicTransportRouteServiceTests {
         #expect(!arriveBy.options.isEmpty)
     }
 
+    @Test func arriveBySchedulesDirectBikeShareBackwardsFromDeadline() async throws {
+        let deadline = luxembourgDate(hour: 8, minute: 30)
+        let origin = LocationPoint(name: "Bike origin", latitude: 49.600, longitude: 6.100)
+        let destination = LocationPoint(name: "Bike destination", latitude: 49.610, longitude: 6.110)
+        let stations = [
+            BikeShareStation(
+                id: "bike-origin",
+                name: "Origin station",
+                location: origin,
+                bikesAvailable: 4,
+                docksAvailable: 4,
+                isOpen: true,
+                lastUpdated: deadline
+            ),
+            BikeShareStation(
+                id: "bike-destination",
+                name: "Destination station",
+                location: destination,
+                bikesAvailable: 4,
+                docksAvailable: 4,
+                isOpen: true,
+                lastUpdated: deadline
+            )
+        ]
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: makeTimetable()),
+            atpClient: MockATPClient(),
+            bikeShareService: MockBikeShareService(stations: stations, fetchedAt: deadline),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { luxembourgDate(hour: 8, minute: 0) }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: origin,
+            to: destination,
+            time: .arriveBy(deadline)
+        )
+
+        let bikeOption = try #require(calculation.options.first { option in
+            option.plan.legs.contains { $0.transportKind == .bikeShare }
+        })
+        #expect(bikeOption.arrivalTime == deadline)
+        let departure = try #require(bikeOption.departureTime)
+        #expect(departure < deadline)
+        #expect(bikeOption.plan.expectedTravelTime == deadline.timeIntervalSince(departure))
+    }
+
     @Test func skipsNoPickupTripButStillBoardsLaterTrip() async throws {
         // A1: the earlier trip forbids boarding at S1 (pickup_type = 1). The scan must skip
         // it and still board the later trip rather than breaking out of the stop entirely.
@@ -764,6 +847,350 @@ struct PublicTransportRouteServiceTests {
         #expect(calculation.options.contains { option in
             option.plan.legs.contains { $0.routeId == "R-early" }
         })
+    }
+
+    @Test func arriveByReverseSearchKeepsLaterConnectingJourney() async throws {
+        // Regression for the old `deadline - 3h` forward anchor: the early arrival at
+        // S2 used to prune the later connection before arrive-by ranking could see it.
+        let deadline = luxembourgDate(hour: 18, minute: 50)
+        let timetable = makeTimetable(
+            routes: [
+                makeRoute(id: "R-early-1", shortName: "E1"),
+                makeRoute(id: "R-early-2", shortName: "E2"),
+                makeRoute(id: "R-late-1", shortName: "L1"),
+                makeRoute(id: "R-late-2", shortName: "L2")
+            ],
+            trips: [
+                timedTrip(id: "T-early-1", routeId: "R-early-1", stops: [
+                    ("S1", t(16, 0), t(16, 0)),
+                    ("S2", t(16, 10), t(16, 10))
+                ]),
+                timedTrip(id: "T-early-2", routeId: "R-early-2", stops: [
+                    ("S2", t(16, 15), t(16, 15)),
+                    ("S3", t(16, 30), t(16, 30))
+                ]),
+                timedTrip(id: "T-late-1", routeId: "R-late-1", stops: [
+                    ("S1", t(17, 40), t(17, 40)),
+                    ("S2", t(18, 5), t(18, 5))
+                ]),
+                timedTrip(id: "T-late-2", routeId: "R-late-2", stops: [
+                    ("S2", t(18, 10), t(18, 10)),
+                    ("S3", t(18, 40), t(18, 40))
+                ])
+            ]
+        )
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { luxembourgDate(hour: 15, minute: 0) }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(id: "S1", name: "Hill Lift", latitude: 49.6, longitude: 6.1),
+            to: LocationPoint(id: "S3", name: "Airport", latitude: 49.62, longitude: 6.12),
+            time: .arriveBy(deadline)
+        )
+
+        let selected = try #require(calculation.options.first)
+        #expect(selected.transitLegs.map(\.routeId) == ["R-late-1", "R-late-2"])
+        #expect(selected.departureTime == luxembourgDate(hour: 17, minute: 40))
+        #expect(selected.arrivalTime == luxembourgDate(hour: 18, minute: 40))
+        #expect(selected.arrivalTime.map { $0 <= deadline } == true)
+    }
+
+    @Test func arriveByRanksRealtimeOnTimeRouteAheadOfLaterDelayedRoute() async throws {
+        let deadline = luxembourgDate(hour: 8, minute: 30)
+        let timetable = makeTimetable(
+            routes: [
+                makeRoute(id: "R-on-time", shortName: "O"),
+                makeRoute(id: "R-delayed", shortName: "D")
+            ],
+            trips: [
+                timedTrip(id: "T-on-time", routeId: "R-on-time", stops: [
+                    ("S1", t(8, 0), t(8, 0)),
+                    ("S2", t(8, 28), t(8, 28))
+                ]),
+                timedTrip(id: "T-delayed", routeId: "R-delayed", stops: [
+                    ("S1", t(8, 10), t(8, 10)),
+                    ("S2", t(8, 25), t(8, 25))
+                ])
+            ]
+        )
+        let delayedDeparture = Departure(
+            id: "live-delayed",
+            stopId: "S1",
+            routeId: "R-delayed",
+            lineName: "D",
+            destination: "Central",
+            scheduledDeparture: luxembourgDate(hour: 8, minute: 10),
+            realtimeDeparture: luxembourgDate(hour: 8, minute: 20),
+            delayMinutes: 10,
+            dataSource: .atpOpenAPI
+        )
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(departuresByStopId: ["S1": [delayedDeparture]]),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { luxembourgDate(hour: 8, minute: 0) }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(id: "S1", name: "Hill Lift", latitude: 49.6, longitude: 6.1),
+            to: LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11),
+            time: .arriveBy(deadline)
+        )
+
+        #expect(calculation.options.first?.transitLegs.first?.routeId == "R-on-time")
+        let delayed = try #require(calculation.options.first {
+            $0.transitLegs.first?.routeId == "R-delayed"
+        })
+        #expect(delayed.arrivalTime == luxembourgDate(hour: 8, minute: 35))
+    }
+
+    @Test func arriveByRanksLeastLateRouteWhenEveryLiveOptionMissesDeadline() async throws {
+        let deadline = luxembourgDate(hour: 8, minute: 30)
+        let timetable = makeTimetable(
+            routes: [
+                makeRoute(id: "R-less-late", shortName: "A"),
+                makeRoute(id: "R-more-late", shortName: "B")
+            ],
+            trips: [
+                timedTrip(id: "T-less-late", routeId: "R-less-late", stops: [
+                    ("S1", t(8, 10), t(8, 10)),
+                    ("S2", t(8, 25), t(8, 25))
+                ]),
+                timedTrip(id: "T-more-late", routeId: "R-more-late", stops: [
+                    ("S1", t(8, 12), t(8, 12)),
+                    ("S2", t(8, 28), t(8, 28))
+                ])
+            ]
+        )
+        let liveDepartures = [
+            Departure(
+                id: "less-late", stopId: "S1", routeId: "R-less-late", lineName: "A",
+                destination: "Central", scheduledDeparture: luxembourgDate(hour: 8, minute: 10),
+                realtimeDeparture: luxembourgDate(hour: 8, minute: 20), delayMinutes: 10,
+                dataSource: .atpOpenAPI
+            ),
+            Departure(
+                id: "more-late", stopId: "S1", routeId: "R-more-late", lineName: "B",
+                destination: "Central", scheduledDeparture: luxembourgDate(hour: 8, minute: 12),
+                realtimeDeparture: luxembourgDate(hour: 8, minute: 32), delayMinutes: 20,
+                dataSource: .atpOpenAPI
+            )
+        ]
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(departuresByStopId: ["S1": liveDepartures]),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { luxembourgDate(hour: 8, minute: 0) }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(id: "S1", name: "Hill Lift", latitude: 49.6, longitude: 6.1),
+            to: LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11),
+            time: .arriveBy(deadline)
+        )
+
+        #expect(calculation.options.first?.transitLegs.first?.routeId == "R-less-late")
+        #expect(calculation.options.first?.arrivalTime == luxembourgDate(hour: 8, minute: 35))
+    }
+
+    @Test func chainedFootTransfersBecomeOnePhysicalWalkWithOneBuffer() async throws {
+        let now = luxembourgDate(hour: 8, minute: 0)
+        let timetable = GTFSTimetableIndexPayload(
+            source: "test",
+            stops: [
+                GTFSTimetableStopEntry(
+                    id: "O", name: "Origin", latitude: 49.600, longitude: 6.100,
+                    parentStation: nil, platformCode: nil
+                ),
+                GTFSTimetableStopEntry(
+                    id: "A", name: "Transfer A", latitude: 49.610, longitude: 6.100,
+                    parentStation: nil, platformCode: nil
+                ),
+                GTFSTimetableStopEntry(
+                    id: "B", name: "Transfer B", latitude: 49.611, longitude: 6.100,
+                    parentStation: nil, platformCode: nil
+                ),
+                GTFSTimetableStopEntry(
+                    id: "C", name: "Transfer C", latitude: 49.612, longitude: 6.100,
+                    parentStation: nil, platformCode: nil
+                ),
+                GTFSTimetableStopEntry(
+                    id: "D", name: "Destination", latitude: 49.622, longitude: 6.100,
+                    parentStation: nil, platformCode: nil
+                )
+            ],
+            routes: [makeRoute(id: "R-1", shortName: "1"), makeRoute(id: "R-2", shortName: "2")],
+            services: [GTFSTimetableServiceEntry(
+                id: "WEEK", weekdays: [], startDate: nil, endDate: nil,
+                addedDates: ["20260614"], removedDates: []
+            )],
+            trips: [
+                timedTrip(id: "T-1", routeId: "R-1", stops: [
+                    ("O", t(8, 5), t(8, 5)),
+                    ("A", t(8, 15), t(8, 15))
+                ]),
+                timedTrip(id: "T-2", routeId: "R-2", stops: [
+                    ("C", t(8, 20), t(8, 20)),
+                    ("D", t(8, 35), t(8, 35))
+                ])
+            ],
+            transfers: [],
+            shapes: []
+        )
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { now }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(id: "O", name: "Origin", latitude: 49.600, longitude: 6.100),
+            to: LocationPoint(id: "D", name: "Destination", latitude: 49.622, longitude: 6.100)
+        )
+
+        let option = try #require(calculation.options.first)
+        #expect(option.transitLegs.map(\.routeId) == ["R-1", "R-2"])
+        #expect(zip(option.plan.legs, option.plan.legs.dropFirst()).allSatisfy { pair in
+            (pair.0.transportKind == .walking && pair.1.transportKind == .walking) == false
+        })
+        let walk = try #require(option.plan.legs.first { $0.transportKind == .walking })
+        #expect((210.0 ... 235.0).contains(walk.distanceMeters ?? 0))
+        let walkStart = try #require(walk.scheduledDepartureTime)
+        let walkEnd = try #require(walk.scheduledArrivalTime)
+        #expect((160 ... 180).contains(Int(walkEnd.timeIntervalSince(walkStart))))
+        let secondDeparture = try #require(option.transitLegs.last?.scheduledDepartureTime)
+        #expect((120 ... 150).contains(Int(secondDeparture.timeIntervalSince(walkEnd))))
+    }
+
+    @Test func arriveByRespectsSameStopGTFSMinimumTransferTime() async throws {
+        let deadline = luxembourgDate(hour: 8, minute: 45)
+        let timetable = makeTimetable(
+            routes: [
+                makeRoute(id: "R-in", shortName: "I"),
+                makeRoute(id: "R-tight", shortName: "T"),
+                makeRoute(id: "R-safe", shortName: "S")
+            ],
+            trips: [
+                timedTrip(id: "T-in", routeId: "R-in", stops: [
+                    ("S1", t(8, 5), t(8, 5)),
+                    ("S2", t(8, 15), t(8, 15))
+                ]),
+                timedTrip(id: "T-tight", routeId: "R-tight", stops: [
+                    ("S2", t(8, 20), t(8, 20)),
+                    ("S3", t(8, 30), t(8, 30))
+                ]),
+                timedTrip(id: "T-safe", routeId: "R-safe", stops: [
+                    ("S2", t(8, 26), t(8, 26)),
+                    ("S3", t(8, 40), t(8, 40))
+                ])
+            ],
+            transfers: [GTFSTimetableTransferEntry(
+                fromStopId: "S2",
+                toStopId: "S2",
+                minimumTransferSeconds: 10 * 60
+            )]
+        )
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { luxembourgDate(hour: 8, minute: 0) }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(id: "S1", name: "Hill Lift", latitude: 49.6, longitude: 6.1),
+            to: LocationPoint(id: "S3", name: "Airport", latitude: 49.62, longitude: 6.12),
+            time: .arriveBy(deadline)
+        )
+
+        #expect(calculation.options.first?.transitLegs.map(\.routeId) == ["R-in", "R-safe"])
+        #expect(calculation.options.allSatisfy { option in
+            option.transitLegs.contains { $0.routeId == "R-tight" } == false
+        })
+    }
+
+    @Test func realtimeBrokenWalkingConnectionWarnsBoardingLegAndIsDemoted() async throws {
+        let now = luxembourgDate(hour: 8, minute: 0)
+        let timetable = GTFSTimetableIndexPayload(
+            source: "test",
+            stops: [
+                GTFSTimetableStopEntry(
+                    id: "S1", name: "Origin", latitude: 49.600, longitude: 6.100,
+                    parentStation: nil, platformCode: nil
+                ),
+                GTFSTimetableStopEntry(
+                    id: "A", name: "Transfer A", latitude: 49.6100, longitude: 6.110,
+                    parentStation: nil, platformCode: nil
+                ),
+                GTFSTimetableStopEntry(
+                    id: "B", name: "Transfer B", latitude: 49.6105, longitude: 6.110,
+                    parentStation: nil, platformCode: nil
+                ),
+                GTFSTimetableStopEntry(
+                    id: "S3", name: "Destination", latitude: 49.620, longitude: 6.120,
+                    parentStation: nil, platformCode: nil
+                )
+            ],
+            routes: [
+                makeRoute(id: "R-in", shortName: "I"),
+                makeRoute(id: "R-next", shortName: "N"),
+                makeRoute(id: "R-direct", shortName: "D")
+            ],
+            services: [GTFSTimetableServiceEntry(
+                id: "WEEK", weekdays: [], startDate: nil, endDate: nil,
+                addedDates: ["20260614"], removedDates: []
+            )],
+            trips: [
+                timedTrip(id: "T-in", routeId: "R-in", stops: [
+                    ("S1", t(8, 5), t(8, 5)),
+                    ("A", t(8, 10), t(8, 10))
+                ]),
+                timedTrip(id: "T-next", routeId: "R-next", stops: [
+                    ("B", t(8, 15), t(8, 15)),
+                    ("S3", t(8, 25), t(8, 25))
+                ]),
+                timedTrip(id: "T-direct", routeId: "R-direct", stops: [
+                    ("S1", t(8, 5), t(8, 5)),
+                    ("S3", t(8, 30), t(8, 30))
+                ])
+            ],
+            transfers: [],
+            shapes: []
+        )
+        let delayedIncoming = Departure(
+            id: "live-in",
+            stopId: "S1",
+            routeId: "R-in",
+            lineName: "I",
+            destination: "Transfer A",
+            scheduledDeparture: luxembourgDate(hour: 8, minute: 5),
+            realtimeDeparture: luxembourgDate(hour: 8, minute: 11),
+            delayMinutes: 6,
+            dataSource: .atpOpenAPI
+        )
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(departuresByStopId: ["S1": [delayedIncoming]]),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { now }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(id: "S1", name: "Origin", latitude: 49.600, longitude: 6.100),
+            to: LocationPoint(id: "S3", name: "Destination", latitude: 49.620, longitude: 6.120)
+        )
+
+        #expect(calculation.options.first?.transitLegs.first?.routeId == "R-direct")
+        let broken = try #require(calculation.options.first { option in
+            option.transitLegs.map(\.routeId) == ["R-in", "R-next"]
+        })
+        #expect(broken.transitLegs.last?.transferWarning == "Connection may be missed")
+        #expect(broken.transitLegs.first?.transferWarning == nil)
     }
 
     @Test func modePreferenceKeepsTramOptionDespiteCheaperBus() async throws {
@@ -956,6 +1383,13 @@ struct PublicTransportRouteServiceTests {
 
         let transitLeg = try #require(calculation.plan.legs.first { $0.transportKind == .transit })
         #expect(transitLeg.routeId == "R-night")
+
+        let arriveBy = try await routeService.calculateRoute(
+            from: LocationPoint(name: "Current Location", latitude: 49.6001, longitude: 6.1001),
+            to: LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11),
+            time: .arriveBy(luxembourgDate(hour: 0, minute: 55))
+        )
+        #expect(arriveBy.options.first?.transitLegs.first?.routeId == "R-night")
     }
 
     @Test func leaveNowOptionIDsAreStableAcrossRecalculation() async throws {
@@ -1113,6 +1547,22 @@ private struct MockATPClient: ATPClient {
 
     func departureBoards(stopIds: [String]) async throws -> [Departure] {
         ATPMapper.mergedDepartures(stopIds.flatMap { departuresByStopId[$0, default: []] })
+    }
+}
+
+private struct MockBikeShareService: BikeShareService {
+    let stations: [BikeShareStation]
+    let fetchedAt: Date
+
+    func bikeShareStations(near _: LocationPoint) async -> [BikeShareStation] {
+        stations
+    }
+
+    func refreshStaticStations() async {}
+    func refreshAvailability() async {}
+
+    func snapshot() async -> BikeShareSnapshot? {
+        BikeShareSnapshot(stations: stations, fetchedAt: fetchedAt)
     }
 }
 

@@ -302,6 +302,52 @@ struct TransitMapViewModelTests {
         #expect(viewModel.routeErrorMessage == "Choose a route destination first.")
     }
 
+    @Test func changingPlanningTimeWithoutDestinationDoesNotCreateRouteError() {
+        let viewModel = TransitMapViewModel()
+        let future = Date.now.addingTimeInterval(600)
+
+        viewModel.setRoutePlanningTime(.departAt(future))
+
+        #expect(viewModel.routePlanningTime == .departAt(future))
+        #expect(viewModel.routeErrorMessage == nil)
+        #expect(viewModel.routeOptions.isEmpty)
+    }
+
+    @Test func favouriteBoardsLoadEveryStopWithThreeRequestsAtMost() async {
+        let favourites = (0 ..< 8).map { makeStop(id: "favourite-\($0)") }
+        let client = ConcurrencyTrackingATPClient()
+        let viewModel = TransitMapViewModel()
+
+        await viewModel.loadFavouriteDepartures(using: client, favourites: favourites)
+
+        #expect(viewModel.favouriteDepartureBoards.count == favourites.count)
+        #expect(viewModel.favouriteDepartureBoards.values.allSatisfy { $0.phase == .loaded })
+        #expect(client.boardCallCount == favourites.count)
+        #expect(client.maximumConcurrentBoardRequests <= 3)
+    }
+
+    @Test func favouritePartialFailureRetainsOnlyTheFailedStopPreviousBoard() async {
+        let first = makeStop(id: "first")
+        let second = makeStop(id: "second")
+        let oldDeparture = makeDeparture(id: "old", routeId: nil, lineName: "16", platform: nil)
+        let viewModel = TransitMapViewModel()
+        viewModel.favouriteDepartureBoards[first.id] = FavouriteDepartureBoardSnapshot(
+            phase: .loaded,
+            departures: [oldDeparture],
+            lastUpdated: .now
+        )
+
+        await viewModel.loadFavouriteDepartures(
+            using: SelectiveFavouriteATPClient(failingStopIDs: [first.id]),
+            favourites: [first, second]
+        )
+
+        #expect(viewModel.favouriteDepartureBoards[first.id]?.phase == .failed)
+        #expect(viewModel.favouriteDepartureBoards[first.id]?.departures == [oldDeparture])
+        #expect(viewModel.favouriteDepartureBoards[second.id]?.phase == .loaded)
+        #expect(viewModel.favouriteDepartureBoards[second.id]?.departures.isEmpty == true)
+    }
+
     @Test func calculatingRouteWithoutLocationWaitsForLocation() async {
         let destination = makeStop(id: "stop-1")
         let option = makeRouteOption(id: "route-1", plan: makeRoutePlan(destination: destination))
@@ -371,7 +417,7 @@ struct TransitMapViewModelTests {
         #expect(viewModel.routeErrorMessage == nil)
     }
 
-    @Test func routeServiceFailureClearsStaleRouteAndShowsError() async {
+    @Test func routeServiceFailureRetainsPreviousRouteAndShowsRefreshError() async {
         let destination = makeStop(id: "stop-1")
         let viewModel = TransitMapViewModel()
         viewModel.selectStop(destination)
@@ -391,12 +437,14 @@ struct TransitMapViewModelTests {
             from: CLLocation(latitude: 49.61, longitude: 6.13)
         )
 
-        #expect(viewModel.routePlan == nil)
-        #expect(viewModel.routeOptions.isEmpty)
-        #expect(viewModel.routeMapOverlay == nil)
+        #expect(viewModel.routePlan == option.plan)
+        #expect(viewModel.routeOptions == [option])
+        #expect(viewModel.routeMapOverlay == option.mapOverlay)
         #expect(viewModel.isWaitingForRouteLocation == false)
         #expect(viewModel.isCalculatingRoute == false)
         #expect(viewModel.routeErrorMessage == "A public transport route could not be calculated.")
+        #expect(viewModel.routeStatusMessage == "Routes could not be refreshed. Showing the last available results.")
+        #expect(viewModel.routeLastCalculatedAt != nil)
     }
 
     @Test func selectingRouteOptionUpdatesSelectedPlanAndOverlay() async {
@@ -536,6 +584,40 @@ struct TransitMapViewModelTests {
 
         #expect(viewModel.routeOptions.map(\.id) == ["route-tram"])
         #expect(viewModel.selectedRouteOptionID == "route-tram")
+    }
+
+    @Test func arriveByOrderingKeepsLatestDepartureAheadOfShorterEarlyRoute() async {
+        let destination = makeStop(id: "stop-1")
+        let deadline = Date(timeIntervalSince1970: 10_000)
+        let earlyShortOption = makeTimedRouteOption(
+            id: "route-early-short",
+            destination: destination,
+            departure: deadline.addingTimeInterval(-7_200),
+            arrival: deadline.addingTimeInterval(-6_000),
+            routeName: "Early"
+        )
+        let laterLongOption = makeTimedRouteOption(
+            id: "route-later-long",
+            destination: destination,
+            departure: deadline.addingTimeInterval(-3_600),
+            arrival: deadline.addingTimeInterval(-600),
+            routeName: "Late"
+        )
+        let routeService = MockRouteService(result: .success(RouteCalculation(
+            options: [earlyShortOption, laterLongOption],
+            selectedOptionID: laterLongOption.id
+        )))
+        let viewModel = TransitMapViewModel(now: { deadline.addingTimeInterval(-10_000) })
+        viewModel.selectStop(destination)
+        viewModel.setRoutePlanningTime(.arriveBy(deadline))
+
+        await viewModel.calculateRoute(
+            using: routeService,
+            from: CLLocation(latitude: 49.61, longitude: 6.13)
+        )
+
+        #expect(viewModel.routeOptions.map(\.id) == ["route-later-long", "route-early-short"])
+        #expect(viewModel.selectedRouteOptionID == "route-later-long")
     }
 
     @Test func accessiblePreferenceFallsBackWhenNoRouteMatches() async {
@@ -846,6 +928,56 @@ private struct StaticATPClient: ATPClient {
 
     func departureBoard(stopId _: String) async throws -> [Departure] {
         departures
+    }
+}
+
+private struct SelectiveFavouriteATPClient: ATPClient {
+    let failingStopIDs: Set<String>
+
+    func nearbyStops(latitude _: Double, longitude _: Double) async throws -> [Stop] {
+        []
+    }
+
+    func departureBoard(stopId: String) async throws -> [Departure] {
+        if failingStopIDs.contains(stopId) {
+            throw ATPClientError.httpStatus(503)
+        }
+        return []
+    }
+}
+
+private nonisolated final class ConcurrencyTrackingATPClient: ATPClient, @unchecked Sendable {
+    private let lock = NSLock()
+    private var activeBoardRequests = 0
+    private var maximumActiveBoardRequests = 0
+    private var calls = 0
+
+    var boardCallCount: Int {
+        lock.withLock { calls }
+    }
+
+    var maximumConcurrentBoardRequests: Int {
+        lock.withLock { maximumActiveBoardRequests }
+    }
+
+    func nearbyStops(latitude _: Double, longitude _: Double) async throws -> [Stop] {
+        []
+    }
+
+    func departureBoard(stopId _: String) async throws -> [Departure] {
+        lock.withLock {
+            activeBoardRequests += 1
+            calls += 1
+            maximumActiveBoardRequests = max(maximumActiveBoardRequests, activeBoardRequests)
+        }
+
+        defer {
+            lock.withLock {
+                activeBoardRequests -= 1
+            }
+        }
+        try? await Task.sleep(for: .milliseconds(20))
+        return []
     }
 }
 

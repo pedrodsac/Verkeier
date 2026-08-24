@@ -17,8 +17,7 @@ struct RouteView: View {
             // ── From / To unified card ────────────────────────────────────
             RouteEndpointsCard(
                 viewModel: viewModel,
-                selectRouteOrigin: actions.selectRouteOrigin,
-                selectRouteDestination: actions.selectRouteDestination,
+                showRoutePlaceSearch: actions.showRoutePlaceSearch,
                 swapRouteEndpoints: actions.swapRouteEndpoints
             )
 
@@ -86,7 +85,7 @@ struct RouteView: View {
             HStack(spacing: 8) {
                 ForEach(viewModel.commutePresets) { preset in
                     Button {
-                        actions.applyCommutePreset(preset.id)
+                        actions.applyAndCalculatePreset(preset.id)
                     } label: {
                         Label(preset.title, systemImage: "bookmark.fill")
                     }
@@ -95,7 +94,7 @@ struct RouteView: View {
                     .tint(.blue)
                 }
             }
-            .padding(.horizontal, 1) // avoid clipping focus rings
+            .safeAreaPadding(.horizontal, 1) // avoid clipping focus rings
         }
     }
 
@@ -106,7 +105,7 @@ struct RouteView: View {
             HStack(spacing: 8) {
                 ForEach(viewModel.recentTrips) { trip in
                     Button {
-                        actions.applyCommutePreset(trip.id)
+                        actions.applyAndCalculatePreset(trip.id)
                     } label: {
                         Label(trip.title, systemImage: "clock.arrow.circlepath")
                             .lineLimit(1)
@@ -116,7 +115,7 @@ struct RouteView: View {
                     .tint(.secondary)
                 }
             }
-            .padding(.horizontal, 1)
+            .safeAreaPadding(.horizontal, 1)
         }
     }
 
@@ -144,7 +143,7 @@ struct RouteView: View {
     }
 
     private var calculateButtonTitle: String {
-        if viewModel.isWaitingForLocation { return "Waiting for Location" }
+        if viewModel.isWaitingForLocation { return "Waiting for Location..." }
         if viewModel.isCalculating { return "Finding Routes…" }
         return viewModel.routeOptions.isEmpty ? "Find Routes" : "Refresh Routes"
     }
@@ -153,16 +152,10 @@ struct RouteView: View {
 
     @ViewBuilder
     private var stateBody: some View {
-        // Waiting for GPS
-        if viewModel.isWaitingForLocation {
-            DepartureLoadingCard(title: "Waiting for current location")
-        }
 
         // Initial load: show skeleton cards instead of a lone spinner
         if viewModel.isCalculating, viewModel.routeOptions.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Route options")
-                    .font(.headline.weight(.semibold))
                 RouteOptionSkeletonRow()
                 RouteOptionSkeletonRow()
                 RouteOptionSkeletonRow()
@@ -170,7 +163,7 @@ struct RouteView: View {
         }
 
         // Error
-        if let errorMessage = viewModel.errorMessage {
+        if let errorMessage = viewModel.errorMessage, viewModel.routeOptions.isEmpty {
             CompactUnavailableCard(
                 title: "Route unavailable",
                 message: errorMessage,
@@ -189,6 +182,10 @@ struct RouteView: View {
         // Status note
         if let statusMessage = viewModel.statusMessage {
             RouteStatusMessage(text: statusMessage)
+        }
+
+        if viewModel.isStale {
+            RouteStatusMessage(text: "Routes may have changed. Refresh routes for the latest information.")
         }
 
         // Journey alerts
@@ -251,9 +248,6 @@ struct RouteView: View {
 
     private var routeResultsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Route options")
-                .font(.headline.weight(.semibold))
-
             ForEach(viewModel.visibleRouteOptions) { option in
                 RouteOptionCard(
                     option: option,

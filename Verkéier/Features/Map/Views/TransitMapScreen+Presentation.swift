@@ -17,6 +17,18 @@ extension TransitMapScreen {
 
         return TransitSheetPresentationModel(
             nearby: nearby,
+            favourites: FavouritesPresentationModel(
+                stops: favouriteEntities.map { favourite in
+                    FavouriteStopPresentationModel(
+                        stop: favourite.stop,
+                        labels: favourite.labels,
+                        departures: viewModel.favouriteDepartureBoards[favourite.stopId]
+                            ?? FavouriteDepartureBoardSnapshot()
+                    )
+                },
+                isRefreshing: viewModel.isLoadingFavouriteDepartures,
+                liveDeparturesAvailable: canLoadLiveFavouriteDepartures
+            ),
             stopGroup: StopGroupPresentationModel(
                 stops: viewModel.selectedStopGroup,
                 bikeShareStations: viewModel.selectedBikeShareStations,
@@ -25,11 +37,6 @@ extension TransitMapScreen {
             ),
             commute: CommuteDashboardViewModel(
                 favourites: favouriteStops,
-                departuresByStopId: viewModel.favouriteDeparturesByStopId,
-                isLoadingDepartures: viewModel.isLoadingFavouriteDepartures,
-                errorMessage: viewModel.favouriteDeparturesErrorMessage,
-                lastUpdated: viewModel.favouriteDeparturesLastUpdated,
-                isStale: viewModel.areFavouriteDeparturesStale,
                 nearby: nearby,
                 activeAlertCount: viewModel.activeAlertCount,
                 suggestedCommutePreset: viewModel.suggestedCommutePreset
@@ -65,6 +72,15 @@ extension TransitMapScreen {
                 selectedStop: viewModel.selectedStop,
                 origin: viewModel.routeOrigin,
                 destination: viewModel.routeDestination,
+                currentLocation: locationService.currentLocation.map { location in
+                    RoutePlace.currentLocation(
+                        LocationPoint(
+                            name: "Current Location",
+                            latitude: location.coordinate.latitude,
+                            longitude: location.coordinate.longitude
+                        )
+                    )
+                },
                 favouritePlaces: favouriteStops.map { RoutePlace(stop: $0, source: .favourite) },
                 nearbyPlaces: viewModel.nearbyStops.map { RoutePlace(stop: $0, source: .nearby) },
                 recentPlaces: viewModel.recentRoutePlaces,
@@ -79,7 +95,8 @@ extension TransitMapScreen {
                 visibleRouteOptionCount: viewModel.visibleRouteOptionCount,
                 loadingPhase: viewModel.routeLoadingPhase,
                 errorMessage: viewModel.routeErrorMessage,
-                statusMessage: viewModel.routeStatusMessage
+                statusMessage: viewModel.routeStatusMessage,
+                lastCalculatedAt: viewModel.routeLastCalculatedAt
             ),
             lineDetail: LineDetailPresentationModel(
                 route: viewModel.selectedLineDetailRoute,

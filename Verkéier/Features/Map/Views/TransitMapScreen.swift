@@ -30,7 +30,7 @@ struct TransitMapScreen: View {
     @State var isMainSheetPresented = false
     @State var isOnboardingPresented = false
     @State var favouriteStopIds: Set<String> = []
-    @State var sheetPath: [TransitSheetRoute] = []
+    @State var sheetNavigation = TransitSheetNavigationState()
     @State var sheetDetent: BottomSheetDetent = .medium
     @State private var bikeShareStations: [BikeShareStation] = []
     @AppStorage("hasCompletedOnboarding") var hasCompletedOnboarding = false
@@ -58,20 +58,18 @@ struct TransitMapScreen: View {
         .sheet(isPresented: $isMainSheetPresented) {
             TransitBottomSheet(
                 searchQuery: $viewModel.searchQuery,
-                path: $sheetPath,
                 detent: sheetDetent,
+                navigation: sheetNavigation,
                 viewModel: sheetPresentationModel,
                 actions: sheetActions,
-                activateRoute: activateSheetRoute
+                activateRoute: activateSheetRoute,
+                selectedTab: showSheetTab
             )
             .presentationDetents(
                 BottomSheetDetent.presentationDetents,
                 selection: sheetPresentationDetent
             )
-            .presentationDragIndicator(.hidden)
-            .presentationBackground {
-                Rectangle().fill(.regularMaterial)
-            }
+			.presentationBackground(sheetDetent == .collapsed ? .clear : Color(uiColor: .systemBackground))
             .presentationBackgroundInteraction(
                 .enabled(upThrough: BottomSheetDetent.mediumPresentationDetent)
             )
@@ -120,7 +118,6 @@ struct TransitMapScreen: View {
             )
             await viewModel.loadNearbyStopRoutes(using: gtfsService)
             await loadAlertsAndCheckDisruptions()
-            await viewModel.loadFavouriteDepartures(using: atpClient, favourites: favouriteStops)
             gtfsUpdateController.loadSnapshot()
             gtfsUpdateController.checkAutomatically()
         }
@@ -156,14 +153,24 @@ struct TransitMapScreen: View {
                 await updateTrackedDepartureIfNeeded()
             }
         }
-        .task(id: favouriteRefreshKey) {
-            await viewModel.loadFavouriteDepartures(using: atpClient, favourites: favouriteStops)
+        .task(id: favouriteRefreshTaskKey) {
+            guard sheetNavigation.selectedTab == .favourites else { return }
+            await refreshFavouriteStops()
+            while !Task.isCancelled, sheetNavigation.selectedTab == .favourites {
+                try? await Task.sleep(for: .seconds(45))
+                guard !Task.isCancelled, sheetNavigation.selectedTab == .favourites else { return }
+                await refreshFavouriteStops()
+            }
         }
         .onChange(of: viewModel.searchQuery) {
             scheduleSearchUpdate()
         }
         .onChange(of: favouriteEntities) {
             favouriteStopIds = Set(favouriteEntities.map(\.stopId))
+            let activeIDs = favouriteStopIds
+            viewModel.favouriteDepartureBoards = viewModel.favouriteDepartureBoards.filter {
+                activeIDs.contains($0.key)
+            }
             mirrorFavouriteEntitiesForIntents()
         }
         .onAppear {
@@ -250,17 +257,26 @@ struct TransitMapScreen: View {
         favouriteEntities.map(\.stopId).joined(separator: "|")
     }
 
+    var favouriteRefreshTaskKey: String {
+        "\(favouriteRefreshKey)|\(sheetNavigation.selectedTab == .favourites)|\(canLoadLiveFavouriteDepartures)"
+    }
+
+    var canLoadLiveFavouriteDepartures: Bool {
+        !AppPreferences.shared.offlineMode
+            && (appConfiguration.hasATPAccessId || debugTransitDataMode != .normal)
+    }
+
     var departureRefreshKey: String {
         "\(viewModel.selectedStop?.id ?? "none")|\(isShowingStopDetail)"
     }
 
     var isShowingStopDetail: Bool {
-        if case .stopDetail = sheetPath.last { return true }
+        if case .stopDetail = sheetNavigation.activePath.last { return true }
         return false
     }
 
     var mapRouteOverlay: RouteMapOverlay? {
-        if case .lineDetail = sheetPath.last {
+        if case .lineDetail = sheetNavigation.activePath.last {
             return viewModel.selectedLineDetail?.mapOverlay
         }
         return viewModel.routeMapOverlay

@@ -1,140 +1,192 @@
-import SwiftData
 import SwiftUI
 
 struct FavouritesView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query(sort: \PersistedFavouriteStop.createdAt) private var favourites: [PersistedFavouriteStop]
-    let selectStop: (Stop) -> Void
+    let viewModel: FavouritesPresentationModel
+    let actions: FavouritesActions
 
-    @State private var editingStop: PersistedFavouriteStop?
-    @State private var labelDraft = ""
+    @State private var editingFavourite: FavouriteStopPresentationModel?
+    @State private var lastEditedFavouriteID: String?
+    @AccessibilityFocusState private var focusedFavouriteID: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            if favourites.isEmpty {
-                ContentUnavailableView(
-                    "No favourites",
-                    systemImage: "star",
-                    description: Text("Save a stop from its detail view.")
-                )
+        Group {
+            if visibleStops.isEmpty {
+                ContentUnavailableView {
+                    Label(emptyTitle, systemImage: "star")
+                } description: {
+                    Text(emptyDescription)
+                } actions: {
+                    Button("Find a stop", action: actions.findStop)
+                        .buttonStyle(.borderedProminent)
+                }
             } else {
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 16) {
-                        ForEach(sections, id: \.title) { section in
+                    LazyVStack(alignment: .leading, spacing: 18) {
+                        ForEach(sections) { section in
                             sectionView(section)
                         }
                     }
-                    .padding(.bottom, 24)
+                    .padding(.vertical, 12)
                 }
+                .refreshable { await refreshAll() }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .alert("Edit Label", isPresented: isEditing, presenting: editingStop) { stop in
-            TextField("Label (e.g. Home, Work)", text: $labelDraft)
-            Button("Save") { saveLabel(for: stop) }
-            if stop.label != nil {
-                Button("Remove Label", role: .destructive) { setLabel(nil, for: stop) }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    Task { await refreshAll() }
+                } label: {
+                    Label("Refresh favourites", systemImage: "arrow.clockwise")
+                }
+                .disabled(!viewModel.liveDeparturesAvailable || viewModel.isRefreshing || visibleStops.isEmpty)
             }
-            Button("Cancel", role: .cancel) {}
-        } message: { stop in
-            Text(stop.name.stationDisplayName)
+        }
+        .sheet(item: $editingFavourite, onDismiss: restoreEditedFavouriteFocus) { favourite in
+            FavouriteLabelsEditor(
+                favourite: favourite,
+                availableLabels: viewModel.availableLabels,
+                save: { labels in
+                    actions.updateLabels(favourite.stop.id, labels)
+                }
+            )
         }
     }
 
-    private func sectionView(_ section: LabelSection) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if isGrouped {
-                Text(section.title)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 4)
+    private var visibleStops: [FavouriteStopPresentationModel] {
+        viewModel.stops
+    }
+
+    private let emptyTitle: LocalizedStringKey = "No favourites"
+
+    private let emptyDescription: LocalizedStringKey = "Save a stop from its detail view."
+
+    private var sections: [FavouriteLabelSection] {
+        viewModel.labelSections(for: visibleStops)
+    }
+
+    private func sectionView(_ section: FavouriteLabelSection) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(section.title)
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 4)
+
+            ForEach(section.stops) { favourite in
+                FavouriteStopDepartureCard(
+                    favourite: favourite,
+                    actions: actions,
+                    editLabels: {
+                        lastEditedFavouriteID = favourite.id
+                        editingFavourite = favourite
+                    }
+                )
+                .accessibilityFocused($focusedFavouriteID, equals: favourite.id)
             }
-            ForEach(section.stops) { entity in
-                StopListRow(
-                    stop: entity.stop,
-                    markerColor: .blue,
-                    surface: .favourite
-                ) {
-                    selectStop(entity.stop)
+        }
+    }
+
+    private func refreshAll() async {
+        guard viewModel.liveDeparturesAvailable else { return }
+        await actions.refreshAll()
+        UIAccessibility.post(notification: .announcement, argument: "Favourites refreshed")
+    }
+
+    private func restoreEditedFavouriteFocus() {
+        guard let lastEditedFavouriteID else { return }
+        Task { @MainActor in
+            focusedFavouriteID = lastEditedFavouriteID
+            self.lastEditedFavouriteID = nil
+        }
+    }
+
+}
+
+private struct FavouriteLabelsEditor: View {
+    let favourite: FavouriteStopPresentationModel
+    let availableLabels: [String]
+    let save: ([String]) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var labels: [String]
+    @State private var draft = ""
+
+    init(
+        favourite: FavouriteStopPresentationModel,
+        availableLabels: [String],
+        save: @escaping ([String]) -> Void
+    ) {
+        self.favourite = favourite
+        self.availableLabels = availableLabels
+        self.save = save
+        _labels = State(initialValue: favourite.labels)
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Labels") {
+                    if labels.isEmpty {
+                        Text("No labels assigned")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(labels, id: \.self) { label in
+                            HStack {
+                                Text(label)
+                                Spacer()
+                                Button("Remove", role: .destructive) {
+                                    labels.removeAll { $0 == label }
+                                }
+                            }
+                        }
+                    }
                 }
-                .contextMenu {
-                    Button {
-                        beginEditing(entity)
-                    } label: {
-                        Label("Edit Label", systemImage: "tag")
+
+                Section("Add label") {
+                    HStack {
+                        TextField("Label", text: $draft)
+                            .onSubmit(addDraft)
+                        Button("Add", action: addDraft)
+                            .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                }
+
+                let suggestions = availableLabels.filter { candidate in
+                    !labels.contains { $0.compare(candidate, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame }
+                }
+                if !suggestions.isEmpty {
+                    Section("Existing labels") {
+                        ForEach(suggestions, id: \.self) { label in
+                            Button(label) { labels.append(label) }
+                        }
                     }
                 }
             }
+            .navigationTitle("Edit Labels")
+            .toolbarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        save(labels)
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
         }
     }
 
-    /// True once any favourite carries a label, which switches the flat list into
-    /// labelled sections (with unlabelled stops collected under "Saved Stops").
-    private var isGrouped: Bool {
-        favourites.contains { ($0.label?.isEmpty == false) }
-    }
-
-    /// Favourites after applying the active Focus filter. In a work Focus only
-    /// stops labelled with "work" are shown.
-    private var visibleFavourites: [PersistedFavouriteStop] {
-        guard FocusFilterStore.shared.isWorkFocusActive else { return favourites }
-        let workOnly = favourites.filter { $0.label?.lowercased().contains("work") == true }
-        return workOnly.isEmpty ? favourites : workOnly
-    }
-
-    private var sections: [LabelSection] {
-        let favourites = visibleFavourites
-        guard isGrouped else {
-            return [LabelSection(title: "Saved Stops", stops: favourites)]
+    private func addDraft() {
+        let trimmed = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty,
+              !labels.contains(where: { $0.compare(trimmed, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame })
+        else {
+            return
         }
-
-        let groups = Dictionary(grouping: favourites) { stop -> String in
-            stop.label?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty ?? ""
-        }
-
-        var result = groups
-            .filter { !$0.key.isEmpty }
-            .map { LabelSection(title: $0.key, stops: $0.value) }
-            .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
-
-        if let unlabelled = groups[""], !unlabelled.isEmpty {
-            result.append(LabelSection(title: "Saved Stops", stops: unlabelled))
-        }
-        return result
+        labels.append(trimmed)
+        draft = ""
     }
-
-    private var isEditing: Binding<Bool> {
-        Binding(get: { editingStop != nil }, set: { if !$0 { editingStop = nil } })
-    }
-
-    private func beginEditing(_ stop: PersistedFavouriteStop) {
-        labelDraft = stop.label ?? ""
-        editingStop = stop
-    }
-
-    private func saveLabel(for stop: PersistedFavouriteStop) {
-        setLabel(labelDraft.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty, for: stop)
-    }
-
-    private func setLabel(_ label: String?, for stop: PersistedFavouriteStop) {
-        stop.label = label
-        try? modelContext.save()
-    }
-
-    private struct LabelSection {
-        let title: String
-        let stops: [PersistedFavouriteStop]
-    }
-}
-
-private extension String {
-    var nilIfEmpty: String? {
-        isEmpty ? nil : self
-    }
-}
-
-#Preview {
-    FavouritesView(selectStop: { _ in })
-        .modelContainer(for: PersistedFavouriteStop.self, inMemory: true)
-        .environment(AppPreferences())
 }

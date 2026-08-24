@@ -43,7 +43,7 @@ struct TimelineSegmentRow: View {
                     direction: node.headsign
                 )
                 if let mins = node.durationMinutes {
-                    Text("\(mins) min")
+                    Text(durationText(minutes: mins, stopCount: node.stopCount))
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -90,6 +90,12 @@ struct TimelineSegmentRow: View {
         case let (.none, .some(d)): return "Walk \(d)"
         case (.none, .none): return "Walk"
         }
+    }
+
+    private func durationText(minutes: Int, stopCount: Int?) -> String {
+        guard let stopCount else { return "\(minutes) min" }
+        let stopLabel = stopCount == 1 ? "stop" : "stops"
+        return "\(minutes) min · \(stopCount) \(stopLabel)"
     }
 
     private var railMarker: TimelineRail.Marker {

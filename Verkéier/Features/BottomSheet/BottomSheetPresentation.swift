@@ -3,6 +3,7 @@ import Foundation
 
 struct TransitSheetPresentationModel {
     let nearby: NearbyStopsPresentationModel
+    let favourites: FavouritesPresentationModel
     let stopGroup: StopGroupPresentationModel
     let commute: CommuteDashboardViewModel
     let search: SearchPresentationModel
@@ -25,8 +26,10 @@ struct TransitSheetActions {
     let selectRouteOrigin: (RoutePlace?) -> Void
     let selectRouteDestination: (RoutePlace) -> Void
     let applyCommutePreset: (String) -> Void
+    let applyAndCalculatePreset: (String) -> Void
     let saveCurrentCommutePreset: (String) -> Void
     let swapRouteEndpoints: () -> Void
+    let showRoutePlaceSearch: (RouteEndpoint) -> Void
     let updateRouteFilters: (RoutePlannerFilters) -> Void
     let setRoutePlanningTime: (RoutePlanningTime) -> Void
     let startTrackingDeparture: (Departure) -> Void
@@ -39,6 +42,7 @@ struct TransitSheetActions {
     let selectLineDetailDirection: (String) -> Void
     let checkGTFSUpdate: () -> Void
     let setDebugDataMode: (DebugTransitDataMode) -> Void
+    let favourites: FavouritesActions
 }
 
 struct NearbyStopsPresentationModel {

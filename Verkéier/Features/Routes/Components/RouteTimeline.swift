@@ -231,5 +231,4 @@ struct RouteLegList: View {
         }
         .background(Color(uiColor: .systemGroupedBackground))
     }
-
 #endif

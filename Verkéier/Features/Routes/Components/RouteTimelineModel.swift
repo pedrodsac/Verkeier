@@ -106,6 +106,7 @@ struct SegmentNode: Identifiable, Equatable {
     /// misread as "where you get off").
     let headsign: String?
     let durationMinutes: Int?
+    let stopCount: Int?
     let distanceMeters: Double?
     let rail: RailStyle
     let bikeShareDetails: BikeShareLegDetails?
@@ -241,6 +242,7 @@ enum RouteTimelineBuilder {
             badgeText: kind == .transit ? leg.routeName : (kind == .bikeShare ? "vel’OH!" : nil),
             headsign: kind == .transit ? leg.headsign : nil,
             durationMinutes: durationMinutes(of: leg),
+            stopCount: kind == .transit ? leg.stopCount : nil,
             distanceMeters: kind == .transit ? nil : leg.distanceMeters,
             rail: railStyle(for: leg),
             bikeShareDetails: leg.bikeShareDetails

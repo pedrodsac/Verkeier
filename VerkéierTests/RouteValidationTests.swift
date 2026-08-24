@@ -60,6 +60,95 @@ struct RouteValidationTests {
         #expect(!calculation.options.isEmpty)
     }
 
+    @Test func senningerbergGromscheedToMerschArriveBy() async throws {
+        guard ProcessInfo.processInfo.environment["LUXTRANSIT_VALIDATE"] == "1" else {
+            print("[route-validation] LUXTRANSIT_VALIDATE != 1 — skipping.")
+            return
+        }
+
+        let payload = try await loadTimetable()
+        let originStop = try #require(payload.stops.first {
+            $0.name.normalizedForSearch == "senningerberg, gromscheed".normalizedForSearch
+        })
+        let destinationStop = try #require(payload.stops.first {
+            $0.name.normalizedForSearch == "mersch, gare".normalizedForSearch
+        })
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Europe/Luxembourg")!
+        let deadline = try #require(calendar.date(from: DateComponents(
+            timeZone: calendar.timeZone,
+            year: 2026,
+            month: 8,
+            day: 23,
+            hour: 18,
+            minute: 50
+        )))
+        let origin = LocationPoint(
+            id: originStop.id,
+            name: originStop.name,
+            latitude: originStop.latitude,
+            longitude: originStop.longitude
+        )
+        let destination = LocationPoint(
+            id: destinationStop.id,
+            name: destinationStop.name,
+            latitude: destinationStop.latitude,
+            longitude: destinationStop.longitude
+        )
+        let service = PublicTransportRouteService(
+            gtfsService: PayloadGTFSService(payload: payload),
+            atpClient: EmptyATPClient(),
+            roadRouteProvider: NoRoadRouteProvider(),
+            now: { deadline }
+        )
+
+        var calculation: RouteCalculation?
+        var timings: [Double] = []
+        for _ in 0 ..< 10 {
+            let started = DispatchTime.now().uptimeNanoseconds
+            calculation = try await service.calculateRoute(
+                from: origin,
+                to: destination,
+                time: .arriveBy(deadline),
+                filters: RoutePlannerFilters()
+            )
+            let elapsed = DispatchTime.now().uptimeNanoseconds - started
+            timings.append(Double(elapsed) / 1_000_000)
+        }
+
+        let result = try #require(calculation)
+        let medianMilliseconds = timings.sorted()[timings.count / 2]
+        print("[route-validation] arrive-by 10-run median: \(Int(medianMilliseconds)) ms")
+        printRoute(result, depart: deadline)
+
+        let selected = try #require(result.options.first)
+        let selectedDeparture = try #require(selected.departureTime)
+        let selectedArrival = try #require(selected.arrivalTime)
+        #expect(selectedArrival <= deadline)
+        #expect(result.options.filter { ($0.arrivalTime ?? .distantFuture) <= deadline }.allSatisfy {
+            ($0.departureTime ?? .distantPast) <= selectedDeparture
+        })
+        #expect(zip(selected.plan.legs, selected.plan.legs.dropFirst()).allSatisfy { pair in
+            (pair.0.transportKind == .walking && pair.1.transportKind == .walking) == false
+        })
+        let dommeldangeWalks = selected.plan.legs.filter { leg in
+            guard leg.transportKind == .walking else { return false }
+            return leg.origin.name?.localizedCaseInsensitiveContains("Dommeldange") == true
+                || leg.destination.name?.localizedCaseInsensitiveContains("Dommeldange") == true
+        }
+        let summary = ([
+            "10-run median: \(Int(medianMilliseconds)) ms",
+            "Selected: \(selectedDeparture) -> \(selectedArrival)",
+            "Dommeldange walks: \(dommeldangeWalks.count)"
+        ] + selected.plan.legs.map { leg in
+            "\(leg.transportKind.rawValue): \(leg.origin.name ?? leg.origin.id) -> "
+                + "\(leg.destination.name ?? leg.destination.id) "
+                + "[\(leg.departureTime?.description ?? "-") -> \(leg.arrivalTime?.description ?? "-")]"
+        }).joined(separator: "\n")
+        Attachment.record(summary, named: "Senningerberg-Mersch-arrive-by.txt")
+        #expect(dommeldangeWalks.count == 1)
+    }
+
     // MARK: - Index loading (download → unzip → build, all in sandbox temp)
 
     private func loadTimetable() async throws -> GTFSTimetableIndexPayload {

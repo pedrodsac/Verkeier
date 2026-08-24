@@ -1,9 +1,33 @@
 import Foundation
 
+enum RouteEndpoint: Hashable {
+    case origin
+    case destination
+
+    var searchTitle: String {
+        switch self {
+        case .origin:
+            "Search Origin"
+        case .destination:
+            "Search Destination"
+        }
+    }
+
+    var searchPrompt: String {
+        switch self {
+        case .origin:
+            "Search origin"
+        case .destination:
+            "Search destination"
+        }
+    }
+}
+
 struct RoutePresentationModel {
     let selectedStop: Stop?
     let origin: RoutePlace?
     let destination: RoutePlace?
+    let currentLocation: RoutePlace?
     let favouritePlaces: [RoutePlace]
     let nearbyPlaces: [RoutePlace]
     let recentPlaces: [RoutePlace]
@@ -20,6 +44,7 @@ struct RoutePresentationModel {
     let loadingPhase: RouteLoadingPhase
     let errorMessage: String?
     let statusMessage: String?
+    var lastCalculatedAt: Date? = nil
 
     var selectedRouteOption: RouteOption? {
         guard !routeOptions.isEmpty else { return nil }
@@ -62,12 +87,38 @@ struct RoutePresentationModel {
         destination != nil || selectedStop != nil
     }
 
+    func selectedPlace(for endpoint: RouteEndpoint) -> RoutePlace? {
+        switch endpoint {
+        case .origin:
+            origin
+        case .destination:
+            destination ?? selectedStop.map { RoutePlace(stop: $0, source: .selectedStop) }
+        }
+    }
+
+    func recentPlacesExcludingPinned(for endpoint: RouteEndpoint) -> [RoutePlace] {
+        let pinnedIDs = Set(
+            [currentLocation?.id, selectedPlace(for: endpoint)?.id].compactMap { $0 }
+        )
+        return recentPlaces.filter { !pinnedIDs.contains($0.id) }
+    }
+
     var visibleRouteOptions: [RouteOption] {
         Array(routeOptions.prefix(visibleRouteOptionCount))
     }
 
     var canShowMoreRouteOptions: Bool {
         visibleRouteOptionCount < routeOptions.count
+    }
+
+    var isStale: Bool {
+        guard planningTime.isNow,
+              let lastCalculatedAt,
+              !routeOptions.isEmpty
+        else {
+            return false
+        }
+        return Date.now.timeIntervalSince(lastCalculatedAt) > 90
     }
 }
 
@@ -79,9 +130,12 @@ struct RouteActions {
     var selectRouteOrigin: (RoutePlace?) -> Void = { _ in }
     var selectRouteDestination: (RoutePlace) -> Void = { _ in }
     var applyCommutePreset: (String) -> Void = { _ in }
+    var applyAndCalculatePreset: (String) -> Void = { _ in }
     var saveCurrentCommutePreset: (String) -> Void = { _ in }
     var swapRouteEndpoints: () -> Void = {}
+    var showRoutePlaceSearch: (RouteEndpoint) -> Void = { _ in }
     var updateRouteFilters: (RoutePlannerFilters) -> Void = { _ in }
+    var setRoutePlanningTime: (RoutePlanningTime) -> Void = { _ in }
 }
 
 extension RouteActions {
@@ -93,8 +147,11 @@ extension RouteActions {
         selectRouteOrigin = actions.selectRouteOrigin
         selectRouteDestination = actions.selectRouteDestination
         applyCommutePreset = actions.applyCommutePreset
+        applyAndCalculatePreset = actions.applyAndCalculatePreset
         saveCurrentCommutePreset = actions.saveCurrentCommutePreset
         swapRouteEndpoints = actions.swapRouteEndpoints
+        showRoutePlaceSearch = actions.showRoutePlaceSearch
         updateRouteFilters = actions.updateRouteFilters
+        setRoutePlanningTime = actions.setRoutePlanningTime
     }
 }
