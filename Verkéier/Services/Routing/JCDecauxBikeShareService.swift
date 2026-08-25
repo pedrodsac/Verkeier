@@ -104,15 +104,23 @@ actor JCDecauxBikeShareStore {
         if staticStations.isEmpty {
             await refreshStaticStations()
         }
-        guard let key = configuration.bikeShareAPIKey else { return }
 
         do {
-            var components = URLComponents(url: configuration.bikeShareAPIURL, resolvingAgainstBaseURL: false)
-            components?.queryItems = [
-                URLQueryItem(name: "contract", value: "luxembourg"),
-                URLQueryItem(name: "apiKey", value: key)
-            ]
-            guard let url = components?.url else { return }
+            let url: URL
+            if configuration.hasAPIProxyURL, let apiProxyURL = configuration.apiProxyURL {
+                url = apiProxyURL.appending(path: "bike-share/stations")
+            } else if let key = configuration.bikeShareAPIKey {
+                var components = URLComponents(url: configuration.bikeShareAPIURL, resolvingAgainstBaseURL: false)
+                components?.queryItems = [
+                    URLQueryItem(name: "contract", value: "luxembourg"),
+                    URLQueryItem(name: "apiKey", value: key)
+                ]
+                guard let directURL = components?.url else { return }
+                url = directURL
+            } else {
+                return
+            }
+
             let (data, response) = try await session.data(from: url)
             try Self.validate(response: response, data: data)
             // JCDecaux's dynamic endpoint uses snake_case keys

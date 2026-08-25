@@ -123,16 +123,23 @@ enum ATPRequestBuilder {
         configuration: AppConfiguration,
         queryItems: [URLQueryItem]
     ) throws -> URL {
-        guard configuration.hasATPAccessId, let accessId = configuration.atpAccessId else {
+        let baseURL: URL
+        var requestQueryItems = queryItems
+
+        if configuration.hasAPIProxyURL, let apiProxyURL = configuration.apiProxyURL {
+            baseURL = apiProxyURL.appending(path: "atp/\(path)")
+        } else if configuration.hasATPAccessId, let accessId = configuration.atpAccessId {
+            baseURL = configuration.apiBaseURL.appending(path: path)
+            requestQueryItems.insert(URLQueryItem(name: "accessId", value: accessId), at: 0)
+        } else {
             throw ATPClientError.missingAccessId
         }
 
-        let baseURL = configuration.apiBaseURL.appending(path: path)
         guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
             throw ATPClientError.invalidResponse
         }
 
-        components.queryItems = [URLQueryItem(name: "accessId", value: accessId)] + queryItems
+        components.queryItems = requestQueryItems
 
         guard let url = components.url else {
             throw ATPClientError.invalidResponse

@@ -29,7 +29,7 @@ struct SettingsAdvancedView: View {
                 AdvancedDiagnosticRow(label: "ATP mode", value: atpMode)
                 AdvancedDiagnosticRow(
                     label: "ATP endpoint",
-                    value: configuration.apiBaseURL.host() ?? "Configured"
+                    value: configuration.apiProxyURL?.host() ?? "Unavailable"
                 )
                 AdvancedDiagnosticRow(label: "GTFS cache", value: gtfsSummary)
                 AdvancedDiagnosticRow(

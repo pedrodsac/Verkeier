@@ -45,8 +45,8 @@ The bottom sheet uses a compact contextual header with a section menu, not a lar
 ### Nearby Stops
 
 - Request location permission when needed.
-- Load nearby stops from ATP mobiliteit.lu OpenAPI when an access ID is configured.
-- Fall back to mock fixtures when no ATP access ID is configured.
+- Load nearby stops from ATP mobiliteit.lu OpenAPI through the configured proxy.
+- Fall back to mock fixtures when no API proxy is configured.
 - Show loading, error, and empty states.
 - Selecting a stop centers the map and opens stop details.
 
@@ -137,7 +137,9 @@ Exact production wording must be confirmed before release.
 
 ### ATP mobiliteit.lu OpenAPI
 
-Used for nearby stops and realtime departures. Requires `ATP_ACCESS_ID`, which must not be committed. Missing access ID must be handled gracefully through mocks.
+Used for nearby stops and realtime departures. The app calls the allowlisted
+Cloudflare Worker, which stores `ATP_ACCESS_ID` as a Worker secret. Missing
+proxy configuration must be handled gracefully through mocks.
 
 ### GTFS
 

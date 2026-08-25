@@ -31,7 +31,7 @@ enum SettingsSupport {
                 status: configuration.hasATPAccessId ? "Live API configured" : "Mock or unavailable",
                 detail: configuration.hasATPAccessId
                     ? "Nearby stops and live departure boards can use the ATP OpenAPI."
-                    : "No ATP access ID is configured, so live departure behavior falls back to development-safe data."
+                    : "No API proxy is configured, so live departure behavior falls back to development-safe data."
                 ,
                 iconName: "dot.radiowaves.left.and.right"
             ),
@@ -103,7 +103,7 @@ enum SettingsSupport {
         Last failure: \(gtfsSnapshot.lastFailureMessage ?? "None")
 
         Endpoints
-        ATP: \(configuration.apiBaseURL.absoluteString)
+        ATP proxy: \(configuration.apiProxyURL?.absoluteString ?? "Unavailable")
         AVL: \(configuration.avlMessagesURL.absoluteString)
         """
     }

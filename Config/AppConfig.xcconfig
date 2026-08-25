@@ -1,8 +1,7 @@
 // Shared build settings for app-provided runtime configuration.
 // Local secrets belong in Config/LocalConfig.xcconfig, which is ignored.
 
-ATP_ACCESS_ID =
+API_PROXY_URL =
 AVL_MESSAGES_URL = https:/$()/web.vdl.lu/autobus/data/messages/messages.xml
-JCDECAUX_API_KEY =
 
 #include? "LocalConfig.xcconfig"

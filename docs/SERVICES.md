@@ -56,8 +56,9 @@ public interface.
 
 ## ATPClient — `Verkéier/Services/ATP/ATPClient.swift`
 
-Live transit data from the mobiliteit.lu OpenAPI. Gated behind `ATP_ACCESS_ID`;
-`EmptyATPClient` is used when the key is absent.
+Live transit data from the mobiliteit.lu OpenAPI. Production requests go
+through the allowlisted Cloudflare Worker configured by `API_PROXY_URL`;
+`EmptyATPClient` is used when the proxy is absent.
 
 ```swift
 protocol ATPClient: Sendable {

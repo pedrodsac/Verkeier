@@ -32,7 +32,7 @@ Regenerate the bundled GTFS resource from a downloaded feed (use `--max-stops` f
 python3 Scripts/preprocess_gtfs.py ~/Downloads/gtfs.zip Verkéier/Resources/gtfs-compact.json
 ```
 
-Local config (git-ignored; holds `ATP_ACCESS_ID` and an optional `AVL_MESSAGES_URL` override):
+Local config (git-ignored; holds the non-secret `API_PROXY_URL` and an optional `AVL_MESSAGES_URL` override):
 
 ```sh
 cp Config/LocalConfig.xcconfig.example Config/LocalConfig.xcconfig
@@ -63,7 +63,7 @@ SwiftUI View → ViewModel/Observable State → Service Protocol → API Client/
 
 ### Data sources & external assumptions
 
-ATP (mobiliteit.lu) access is gated behind `ATP_ACCESS_ID`; the app tolerates a missing id during early phases (`EmptyATPClient`). When an external API contract is uncertain, add a `TODO` rather than guessing. See `docs/DATA_SOURCES.md` and `docs/ARCHITECTURE.md` for the source of truth on contracts.
+ATP (mobiliteit.lu) access is routed through the Cloudflare Worker in the `verkeier-relay` repository; the app tolerates a missing proxy URL during early phases (`EmptyATPClient`). When an external API contract is uncertain, add a `TODO` rather than guessing. See `docs/DATA_SOURCES.md` and `docs/ARCHITECTURE.md` for the source of truth on contracts.
 
 ## Conventions
 

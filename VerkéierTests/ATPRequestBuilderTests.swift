@@ -46,6 +46,24 @@ struct ATPRequestBuilderTests {
         }
     }
 
+    @Test func proxyURLUsesWorkerRouteWithoutForwardingAccessId() throws {
+        let url = try ATPRequestBuilder.departureBoardURL(
+            stopId: "200405060",
+            configuration: AppConfiguration(
+                atpAccessId: nil,
+                apiBaseURL: URL(string: "https://example.com/opendata/apiserver")!,
+                avlMessagesURL: URL(string: "https://example.com/messages.xml")!,
+                apiProxyURL: URL(string: "https://proxy.example.com")!
+            )
+        )
+        let components = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false))
+        let query = queryItems(from: components)
+
+        #expect(url.path == "/atp/departureBoard")
+        #expect(query["accessId"] == nil)
+        #expect(query["id"] == "200405060")
+    }
+
     private func configuration(accessId: String?) -> AppConfiguration {
         AppConfiguration(
             atpAccessId: accessId,

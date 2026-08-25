@@ -1,5 +1,0 @@
-# Machine-specific / transient graphify state — not portable across clones
-.graphify_python
-.graphify_root
-.graphify_labels.json
-cache/

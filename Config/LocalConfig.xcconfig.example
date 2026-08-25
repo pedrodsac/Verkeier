@@ -1,6 +1,7 @@
 // Copy this file to Config/LocalConfig.xcconfig for local development.
 // Do not commit Config/LocalConfig.xcconfig.
 
-ATP_ACCESS_ID =
+// Deployed Cloudflare Worker URL, for example:
+// API_PROXY_URL = https:/$()/verkeier-api.example.workers.dev
+API_PROXY_URL =
 AVL_MESSAGES_URL = https:/$()/web.vdl.lu/autobus/data/messages/messages.xml
-JCDECAUX_API_KEY =

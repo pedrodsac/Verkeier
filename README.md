@@ -19,7 +19,7 @@ Implemented:
 
 Not implemented yet:
 
-- production ATP access-id confirmation, quotas, and exact attribution wording
+- production ATP access-id confirmation, proxy quotas, and exact attribution wording
 - full production GTFS preprocessing pipeline
 - broad manual QA across all simulator/device surfaces
 
@@ -35,10 +35,15 @@ cp Config/LocalConfig.xcconfig.example Config/LocalConfig.xcconfig
 
 Required later:
 
-- `ATP_ACCESS_ID`: mobiliteit.lu OpenAPI access id
+- `API_PROXY_URL`: deployed Cloudflare Worker URL for keyed ATP and JCDecaux requests
 - `AVL_MESSAGES_URL`: optional override for the Ville de Luxembourg AVL messages XML feed
 
-The app handles a missing ATP access id during early phases. Do not hardcode API keys in Swift files.
+The upstream ATP and JCDecaux credentials belong in the Worker’s Cloudflare
+secrets, not in the iOS build settings or app bundle. The app handles a
+missing proxy URL during early phases.
+
+See the [verkeier-relay repository](https://github.com/pedrodsac/verkeier-relay)
+for local development and deploy instructions.
 
 ## Build
 

@@ -3,8 +3,8 @@ import Foundation
 /// Access to live transit data from the mobiliteit.lu (ATP) OpenAPI.
 ///
 /// This is the seam for realtime departures and nearby stops. Production uses
-/// `LiveATPClient` (gated behind `ATP_ACCESS_ID`); previews and early phases use
-/// `EmptyATPClient`/`ATPMockClient`. Inject an implementation via the
+/// `LiveATPClient` through the configured API proxy; previews and early phases
+/// use `EmptyATPClient`/`ATPMockClient`. Inject an implementation via the
 /// environment rather than constructing one in a view.
 protocol ATPClient: Sendable {
     /// Fetches stops near a coordinate.
@@ -54,7 +54,7 @@ extension ATPClient {
 
 /// Errors thrown by an ``ATPClient``.
 enum ATPClientError: Error, Equatable {
-    /// No `ATP_ACCESS_ID` is configured, so live requests cannot be made.
+    /// Neither an API proxy nor a direct ATP access id is configured.
     case missingAccessId
     /// The response body was missing or could not be decoded.
     case invalidResponse

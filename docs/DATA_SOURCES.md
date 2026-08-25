@@ -17,10 +17,11 @@ Main endpoints:
 
 Implementation rules:
 
-- API key / `accessId` must not be hardcoded
-- use an ignored local config file, `.xcconfig`, or another safe placeholder
-- app must handle missing key gracefully
-- add setup instructions
+- API key / `accessId` must not be hardcoded or shipped in the app bundle
+- route keyed requests through the allowlisted Cloudflare Worker in the `verkeier-relay` repository
+- keep upstream credentials in Cloudflare Worker secrets
+- app must handle a missing proxy URL gracefully
+- see the `verkeier-relay` repository README for setup instructions
 - add mock fixtures for development and tests
 - mark uncertain response fields with TODOs
 - do not invent live status
@@ -121,7 +122,7 @@ Implementation rules:
 
 - refresh the 12 KB static CSV at app startup and retain the last valid snapshot
 - refresh dynamic availability when calculating or explicitly refreshing a route
-- keep the API key in ignored local build configuration; never commit or log it
+- route the dynamic request through the Cloudflare Worker; never commit or log the API key
 - zero or unknown bike/dock counts remain selectable but are shown as warnings
 - MapKit walking geometry is used as a documented bicycle-path approximation;
   bicycle duration uses a 15 km/h estimate plus pickup/return overhead

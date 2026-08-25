@@ -1,6 +1,9 @@
 .DS_Store
 DerivedData/
 Config/LocalConfig.xcconfig
+worker/.dev.vars
+worker/.env*
+worker/node_modules/
 *.xcuserstate
 .superpowers/
 
