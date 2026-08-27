@@ -123,15 +123,21 @@ Journey planning and Apple Maps handoff.
 protocol RouteService: Sendable {
     nonisolated func calculateRoute(
         from: LocationPoint, to: LocationPoint,
-        time: RoutePlanningTime, filters: RoutePlannerFilters
+        time: RoutePlanningTime, filters: RoutePlannerFilters,
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy
     ) async throws -> RouteCalculation
 
     @MainActor func openInAppleMaps(from: LocationPoint, to: LocationPoint)
 }
 
-// Convenience default implementations (no filters / no time):
+// Convenience default implementations (no refresh policy / no filters / no time):
 //   calculateRoute(from:to:)          → .leaveNow, default filters
 //   calculateRoute(from:to:time:)     → default filters
+
+enum RouteRealtimeRefreshPolicy {
+    case useCache
+    case forceRefresh
+}
 
 enum RoutingError: Error, Equatable {
     case noRouteFound
@@ -142,7 +148,13 @@ enum RoutingError: Error, Equatable {
 
 `RouteCalculation` holds `options: [RouteOption]` and `selectedOptionID`.
 `RouteOption` wraps a `RoutePlan` and computed properties: `transferCount`,
-`walkingDistanceMeters`, `usesLiveData`, `status(at:)`.
+`walkingDistanceMeters`, `usesLiveData`, `realtimeCoverage`, `status(at:)`.
+
+`PublicTransportRouteService` coordinates one active calculation at a time;
+starting a newer request cancels the previous one. Internally, the actor-owned
+routing engine uses bounded structured concurrency (four CPU/search workers,
+four realtime-board requests, and four road-geometry requests by default).
+Tests can inject `RouteCalculationConcurrency.serial` or custom limits.
 
 `BikeShareService` provides vel’OH! static station data and on-demand dynamic
 availability. The public-transport routing engine merges direct bike journeys

@@ -39,12 +39,25 @@ struct TimelinePlaceRow: View {
     private var timeColumn: some View {
         VStack(alignment: .trailing, spacing: 1) {
             if node.role == .transfer {
-                timeText(node.arrivalTime, font: .subheadline, color: .secondary)
-                timeText(node.departureTime, font: .subheadline.weight(.semibold), color: .primary)
-                delayBadge
+                timePair(
+                    effective: node.arrivalTime,
+                    scheduled: node.scheduledArrivalTime,
+                    font: .subheadline,
+                    color: .secondary
+                )
+                timePair(
+                    effective: node.departureTime,
+                    scheduled: node.scheduledDepartureTime,
+                    font: .subheadline.weight(.semibold),
+                    color: .primary
+                )
             } else {
-                timeText(primaryTime, font: primaryTimeFont, color: primaryTimeColor)
-                delayBadge
+                timePair(
+                    effective: primaryTime,
+                    scheduled: scheduledPrimaryTime,
+                    font: primaryTimeFont,
+                    color: primaryTimeColor
+                )
             }
         }
         .frame(width: timeColumnWidth, alignment: .trailing)
@@ -65,12 +78,33 @@ struct TimelinePlaceRow: View {
     }
 
     @ViewBuilder
-    private var delayBadge: some View {
-        if node.showsDelayBadge {
-            Text(delayText)
-                .font(.footnote.weight(.bold))
-                .foregroundStyle(delayColor)
-                .monospacedDigit()
+    private func timePair(effective: Date?, scheduled: Date?, font: Font, color: Color) -> some View {
+        if let effective {
+            VStack(alignment: .trailing, spacing: 0) {
+                if shouldShowScheduledTime(scheduled, insteadOf: effective), let scheduled {
+                    Text(scheduled.formatted(date: .omitted, time: .shortened))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .strikethrough(true, color: .secondary)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                }
+                timeText(effective, font: font, color: color)
+            }
+        }
+    }
+
+    private func shouldShowScheduledTime(_ scheduled: Date?, insteadOf effective: Date) -> Bool {
+        guard node.liveStatus != .cancelled, let scheduled else { return false }
+        return abs(effective.timeIntervalSince(scheduled)) >= 30
+    }
+
+    private var scheduledPrimaryTime: Date? {
+        switch node.role {
+        case .origin, .board: node.scheduledDepartureTime
+        case .alight, .destination: node.scheduledArrivalTime
+        case .transfer: node.scheduledDepartureTime
         }
     }
 
@@ -100,10 +134,15 @@ struct TimelinePlaceRow: View {
                     .foregroundStyle(bikeAvailabilityColor)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            if let warning = node.transferWarning {
+            if node.liveStatus == .cancelled {
+                Label("Cancelled", systemImage: "xmark.circle.fill")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.red)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else if let warning = node.transferWarning {
                 Label(warning, systemImage: "exclamationmark.triangle.fill")
                     .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(transferWarningColor)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -145,6 +184,10 @@ struct TimelinePlaceRow: View {
         }
     }
 
+    private var transferWarningColor: Color {
+        node.transferWarning == "Connection miss" ? .red : .orange
+    }
+
     // MARK: - Role styling
 
     private var marker: TimelineRail.Marker {
@@ -182,21 +225,6 @@ struct TimelinePlaceRow: View {
         node.role == .origin ? .secondary : .primary
     }
 
-    private var delayText: String {
-        if node.liveStatus == .cancelled { return "Cancelled" }
-        let mins = node.delayMinutes ?? 0
-        return mins > 0 ? "+\(mins)" : "\(mins)"
-    }
-
-    private var delayColor: Color {
-        switch node.liveStatus {
-        case .live: .green
-        case .delayed: .orange
-        case .cancelled: .red
-        case .scheduled, .unknown: .secondary
-        }
-    }
-
     // MARK: - Accessibility
 
     private var accessibilityLabel: String {
@@ -211,8 +239,12 @@ struct TimelinePlaceRow: View {
             if let depart { s += ", departs \(depart)" }
             if let bikeAvailabilityText { s += ". \(bikeAvailabilityText)" }
             s += "."
-            if node.showsDelayBadge { s += " \(delaySpoken)." }
-            if let warning = node.transferWarning { s += " Warning: \(warning)." }
+            if node.liveStatus == .cancelled {
+                s += " Cancelled."
+            } else {
+                if node.announcesDelay { s += " \(delaySpoken)." }
+                if let warning = node.transferWarning { s += " Warning: \(warning)." }
+            }
             return s
         case .transfer:
             var s = "Transfer at \(node.name)."
@@ -220,9 +252,13 @@ struct TimelinePlaceRow: View {
             if let depart { s += arrive == nil ? " Departs \(depart)" : ", departs \(depart)" }
             if let platform = node.platform, !platform.isEmpty { s += " from platform \(platform)" }
             s += "."
-            if node.showsDelayBadge { s += " \(delaySpoken)." }
-            if let wait = node.waitMinutes { s += " Wait \(wait) minutes." }
-            if let warning = node.transferWarning { s += " Warning: \(warning)." }
+            if node.liveStatus == .cancelled {
+                s += " Cancelled."
+            } else {
+                if node.announcesDelay { s += " \(delaySpoken)." }
+                if let wait = node.waitMinutes { s += " Wait \(wait) minutes." }
+                if let warning = node.transferWarning { s += " Warning: \(warning)." }
+            }
             return s
         case .alight:
             var s = "Get off at \(node.name)\(arrive.map { ", arrives \($0)" } ?? "")."

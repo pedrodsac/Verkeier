@@ -113,7 +113,7 @@ nonisolated func fetchMessages() async throws -> [AlertMessage]
 ### RouteService
 
 ```swift
-nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint, time: RoutePlanningTime, filters: RoutePlannerFilters) async throws -> RouteCalculation
+nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint, time: RoutePlanningTime, filters: RoutePlannerFilters, realtimeRefreshPolicy: RouteRealtimeRefreshPolicy) async throws -> RouteCalculation
 @MainActor func openInAppleMaps(from: LocationPoint, to: LocationPoint)
 ```
 

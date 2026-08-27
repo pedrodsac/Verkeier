@@ -62,15 +62,21 @@ struct PlaceNode: Identifiable, Equatable {
     let arrivalTime: Date?
     /// Effective departure of the outgoing leg (`nil` at the destination).
     let departureTime: Date?
+    /// Timetabled arrival before realtime changes. The row displays this only
+    /// when it differs from ``arrivalTime``.
+    let scheduledArrivalTime: Date?
+    /// Timetabled departure before realtime changes. The row displays this only
+    /// when it differs from ``departureTime``.
+    let scheduledDepartureTime: Date?
     /// Minutes spent here between arriving and departing, when `>= 1` — the
     /// "N min to change" figure at a transfer.
     let waitMinutes: Int?
     /// Realtime delay in minutes of the outgoing transit leg, when live.
     let delayMinutes: Int?
-    /// Live status of the outgoing transit leg, used to colour the delay badge.
+    /// Live status of the outgoing transit leg.
     let liveStatus: RouteLegLiveStatus
-    /// `true` when the outgoing leg has realtime data worth badging.
-    let showsDelayBadge: Bool
+    /// `true` when VoiceOver should announce a delay or cancellation.
+    let announcesDelay: Bool
     /// Boarding platform of the outgoing transit leg, when published.
     let platform: String?
     /// Tight-transfer warning for the leg boarded here, when at risk. The
@@ -163,11 +169,11 @@ enum RouteTimelineBuilder {
             return minutes >= 1 ? minutes : nil
         }()
 
-        // Badge only when there's something to say: a non-zero delay or a
-        // cancellation. An on-time live leg shows no "+0".
+        // Announce only when there's something to say: a non-zero delay or a
+        // cancellation. An on-time live leg needs no extra wording.
         let status = outgoingTransit?.liveStatus ?? .scheduled
         let delay = outgoingTransit?.delayMinutes ?? 0
-        let showsDelayBadge = status == .cancelled || (status != .scheduled && delay != 0)
+        let announcesDelay = status == .cancelled || (status != .scheduled && delay != 0)
         let pickupStation = outgoing?.transportKind == .bikeShare
             ? outgoing?.bikeShareDetails?.pickupStation
             : nil
@@ -189,10 +195,14 @@ enum RouteTimelineBuilder {
             role: role(incoming: incoming, outgoing: outgoing),
             arrivalTime: arrival,
             departureTime: departure,
+            scheduledArrivalTime: incoming?.transportKind == .transit
+                ? incoming?.scheduledArrivalTime
+                : nil,
+            scheduledDepartureTime: outgoingTransit?.scheduledDepartureTime,
             waitMinutes: wait,
             delayMinutes: outgoingTransit?.delayMinutes,
             liveStatus: status,
-            showsDelayBadge: showsDelayBadge,
+            announcesDelay: announcesDelay,
             platform: outgoingTransit?.platform,
             transferWarning: outgoingTransit?.transferWarning,
             bikeShareStation: bikeShareStation,

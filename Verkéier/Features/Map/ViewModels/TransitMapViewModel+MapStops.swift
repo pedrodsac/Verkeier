@@ -113,8 +113,7 @@ extension TransitMapViewModel {
         _ stops: [Stop],
         bikeShareStations: [BikeShareStation] = []
     ) {
-        var seen = Set<String>()
-        let uniqueStops = stops.filter { seen.insert($0.id).inserted }
+        let uniqueStops = stops.deduplicatedByExactName()
         var seenBikeShareStations = Set<String>()
         let uniqueBikeShareStations = bikeShareStations.filter {
             seenBikeShareStations.insert($0.id).inserted
@@ -155,7 +154,7 @@ extension TransitMapViewModel {
 
         // A newer keystroke may have superseded this query while MapKit ran.
         guard query == searchQuery else { return }
-        searchResults = gtfsResults + mapKitResults
+        searchResults = (gtfsResults + mapKitResults).deduplicatedByExactName()
     }
 
     func updateSelectedStopRoutes(using gtfsService: any GTFSService) async {

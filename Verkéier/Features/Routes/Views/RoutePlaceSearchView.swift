@@ -120,7 +120,10 @@ struct RoutePlaceSearchView: View {
             query: current,
             near: viewModel.currentLocation?.location
         )
-        let stopPlaces = await stops.map { RoutePlace(stop: $0, source: .search) }
+        let stopResults = await stops
+        let stopPlaces = stopResults
+            .deduplicatedByExactName()
+            .map { RoutePlace(stop: $0, source: .search) }
         let placeResults = await places
         guard !Task.isCancelled else { return }
 

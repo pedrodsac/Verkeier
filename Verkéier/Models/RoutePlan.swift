@@ -5,13 +5,13 @@ import Foundation
 /// A plan is an ordered list of ``RoutePlan/Leg`` values that alternate between
 /// walking and transit. It is produced by a ``RouteService`` and usually wrapped
 /// in a ``RouteOption`` (which adds map overlay and live-status derivations).
-nonisolated struct RoutePlan: Codable, Hashable, Identifiable {
+nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
     /// A single contiguous segment of a ``RoutePlan`` in one mode.
     ///
     /// Carries both scheduled and realtime times where known; the scheduled
     /// fields fall back to ``departureTime`` / ``arrivalTime`` when not given
     /// explicitly.
-    nonisolated struct Leg: Codable, Hashable, Identifiable {
+    nonisolated struct Leg: Codable, Hashable, Identifiable, Sendable {
         /// Stable identifier for the leg.
         let id: String
         /// Transport mode for this leg.
@@ -150,7 +150,7 @@ nonisolated struct BikeShareLegDetails: Codable, Hashable, Sendable {
 }
 
 /// Coarse classification of a ``RoutePlan/Leg``.
-enum RouteLegTransportKind: String, Codable, Hashable {
+enum RouteLegTransportKind: String, Codable, Hashable, Sendable {
     /// A ride on a transit line.
     case transit
     /// An on-foot segment.
@@ -175,7 +175,7 @@ enum RouteLegTransportKind: String, Codable, Hashable {
 
 /// Hint for whether a leg's geometry should be snapped to a road/path network
 /// when drawn, and by which profile.
-enum RouteLegRoadRoutingHint: String, Codable, Hashable {
+enum RouteLegRoadRoutingHint: String, Codable, Hashable, Sendable {
     /// Use the straight geometry as given.
     case none
     case automobile
@@ -185,7 +185,7 @@ enum RouteLegRoadRoutingHint: String, Codable, Hashable {
 }
 
 /// Live-status classification for a transit ``RoutePlan/Leg``.
-enum RouteLegLiveStatus: String, Codable, Hashable {
+enum RouteLegLiveStatus: String, Codable, Hashable, Sendable {
     /// No realtime data; timetable only.
     case scheduled
     /// Realtime data present and on schedule.

@@ -1,9 +1,271 @@
 import CoreLocation
 import Foundation
-import HeapModule
 
-nonisolated struct RouteSearchContext {
+/// Bounds the concurrent work performed by one route calculation.
+///
+/// The limits are deliberately small because realtime boards and MapKit route
+/// requests are shared system/network resources, while the CPU limit keeps a
+/// large GTFS search from competing with the rest of the app.
+nonisolated struct RouteCalculationConcurrency: Hashable, Sendable {
+    let cpuWorkerLimit: Int
+    let realtimeBoardLimit: Int
+    let roadRouteLimit: Int
+
+    init(
+        cpuWorkerLimit: Int = 4,
+        realtimeBoardLimit: Int = 4,
+        roadRouteLimit: Int = 4
+    ) {
+        self.cpuWorkerLimit = max(1, cpuWorkerLimit)
+        self.realtimeBoardLimit = max(1, realtimeBoardLimit)
+        self.roadRouteLimit = max(1, roadRouteLimit)
+    }
+
+    static let `default` = RouteCalculationConcurrency()
+    static let serial = RouteCalculationConcurrency(
+        cpuWorkerLimit: 1,
+        realtimeBoardLimit: 1,
+        roadRouteLimit: 1
+    )
+}
+
+/// The explicit boundary between the actor-owned routing coordinator and the
+/// immutable route-search work that may run on a concurrent executor.
+///
+/// The underlying engine contains only nonisolated pure methods for the work
+/// exposed here. Keeping this small wrapper avoids sharing the engine's mutable
+/// departure and road caches with worker tasks.
+nonisolated struct RouteSearchKernel: Sendable {
+    private let engine: PublicTransportRoutingEngine
+
+    init(engine: PublicTransportRoutingEngine) {
+        self.engine = engine
+    }
+
+    func transitJourneys(
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        context: RouteSearchContext,
+        arriveBy: Bool,
+        filters: RoutePlannerFilters,
+        includeLiveReserves: Bool
+    ) -> [ScheduledJourney] {
+        engine.profileScheduledJourneys(
+            from: origin,
+            to: destination,
+            context: context,
+            arriveBy: arriveBy,
+            filters: filters,
+            includeLiveReserves: includeLiveReserves
+        )
+    }
+
+    func directBikeJourneys(
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        stations: [BikeShareStation],
+        context: RouteSearchContext,
+        arriveByDeadlineSeconds: Int?
+    ) -> [ScheduledJourney] {
+        engine.bikeJourneys(
+            from: origin,
+            to: destination,
+            stations: stations,
+            context: context,
+            arriveByDeadlineSeconds: arriveByDeadlineSeconds
+        )
+    }
+
+    func mixedBikeJourneys(
+        from candidates: [ScheduledJourney],
+        stations: [BikeShareStation],
+        context: RouteSearchContext
+    ) -> [ScheduledJourney] {
+        engine.mixedBikeJourneys(from: candidates, stations: stations, context: context)
+    }
+
+    func combinedScheduledCandidates(
+        transit: [ScheduledJourney],
+        mixedBike: [ScheduledJourney],
+        directBike: [ScheduledJourney],
+        filters _: RoutePlannerFilters
+    ) -> [ScheduledJourney] {
+        var candidates = transit
+        candidates.append(contentsOf: mixedBike)
+        candidates.append(contentsOf: directBike)
+        candidates = engine.deduplicatedJourneys(candidates.map {
+            ScheduledJourney(legs: engine.retimedWalkingLegs($0.legs))
+        })
+
+        return candidates
+    }
+
+    func selectScheduledCandidates(
+        _ candidates: [ScheduledJourney],
+        arriveBy: Bool,
+        filters: RoutePlannerFilters
+    ) -> [ScheduledJourney] {
+        guard !candidates.isEmpty else { return [] }
+
+        let transit = candidates.filter { !engine.isBikeShareJourney($0) }
+        let bikeShare = candidates
+            .filter(engine.isBikeShareJourney)
+            .sorted { engine.scheduledRanksBefore($0, $1, filters: filters) }
+        let orderedTransit = transit.sorted {
+            if $0.departureTime != $1.departureTime {
+                return arriveBy
+                    ? $0.departureTime > $1.departureTime
+                    : $0.departureTime < $1.departureTime
+            }
+            return engine.scheduledRanksBefore($0, $1, filters: filters)
+        }
+        return Array(orderedTransit.prefix(engine.evaluatedCandidateLimit))
+            + Array(bikeShare.prefix(1))
+    }
+
+    func selectEnrichedCandidates(
+        _ candidates: [RouteCandidate],
+        arriveBy: Bool,
+        deadline: Date?,
+        filters: RoutePlannerFilters
+    ) -> [RouteCandidate] {
+        let transit = candidates.filter {
+            !$0.legs.contains { $0.transportKind == .bikeShare }
+        }
+        let primary = engine.enrichedDepartureProfile(
+            transit,
+            arriveBy: arriveBy,
+            deadline: deadline,
+            limit: engine.returnedOptionLimit
+        )
+        let bikeShare = candidates.filter {
+            $0.legs.contains { $0.transportKind == .bikeShare }
+        }.sorted { engine.candidateRanksBefore($0, $1, filters: filters) }.first
+        var result = primary
+        if let bikeShare {
+            result.append(bikeShare)
+        }
+        return result
+    }
+
+    func retimed(_ legs: [RoutePlan.Leg]) -> [RoutePlan.Leg] {
+        engine.retimedWalkingLegs(legs)
+    }
+
+    func deduplicated(_ candidates: [ScheduledJourney]) -> [ScheduledJourney] {
+        engine.deduplicatedJourneys(candidates)
+    }
+
+    func enrichedCandidates(
+        _ candidates: [ScheduledJourney],
+        boardsByStopId: [String: [Departure]]
+    ) -> [RouteCandidate] {
+        engine.enrichedCandidates(candidates, boardsByStopId: boardsByStopId)
+    }
+
+    func realtimeStopIDs(for candidates: [ScheduledJourney]) -> Set<String> {
+        Set(candidates.flatMap { journey in
+            journey.legs.compactMap { leg in
+                leg.transportKind == .transit ? leg.originStopId : nil
+            }
+        })
+    }
+
+    func firstUnusableTransitIndex(in legs: [RoutePlan.Leg]) -> Int? {
+        engine.firstUnusableTransitIndex(in: legs)
+    }
+
+    func repairStart(
+        for candidate: RouteCandidate,
+        brokenTransitIndex: Int,
+        origin: LocationPoint,
+        context: RouteSearchContext
+    ) -> (
+        origin: LocationPoint,
+        context: RouteSearchContext,
+        prefix: [RoutePlan.Leg],
+        prefixTransitLegCount: Int
+    )? {
+        engine.repairStart(
+            for: candidate,
+            brokenTransitIndex: brokenTransitIndex,
+            origin: origin,
+            context: context
+        )
+    }
+
+    func matchesModePreference(
+        _ candidate: RouteCandidate,
+        filters: RoutePlannerFilters
+    ) -> Bool {
+        engine.matchesModePreference(candidate, filters: filters)
+    }
+
+    func repairJobs(
+        from candidates: [RouteCandidate],
+        origin: LocationPoint,
+        destination: LocationPoint,
+        context: RouteSearchContext
+    ) throws -> [RealtimeRepairJob] {
+        var jobs: [RealtimeRepairJob] = []
+        for candidate in candidates {
+            try Task.checkCancellation()
+            guard let brokenTransitIndex = engine.firstUnusableTransitIndex(in: candidate.legs),
+                  let repairStart = engine.repairStart(
+                      for: candidate,
+                      brokenTransitIndex: brokenTransitIndex,
+                      origin: origin,
+                      context: context
+                  ) else {
+                continue
+            }
+
+            let suffixes = engine.profileScheduledJourneys(
+                from: repairStart.origin,
+                to: destination,
+                context: repairStart.context,
+                arriveBy: false,
+                filters: RoutePlannerFilters(),
+                includeLiveReserves: false,
+                candidateLimit: 6
+            )
+            for suffix in suffixes.prefix(6) {
+                try Task.checkCancellation()
+                guard repairStart.prefixTransitLegCount + suffix.transitLegCount
+                    <= engine.maximumTransitLegs else {
+                    continue
+                }
+
+                jobs.append(RealtimeRepairJob(
+                    originalSignature: candidate.signature,
+                    journey: ScheduledJourney(
+                        legs: engine.normalizedWalkingLegs(repairStart.prefix + suffix.legs)
+                    )
+                ))
+            }
+        }
+        return jobs
+    }
+}
+
+/// Runs synchronous, immutable routing work away from the caller's executor.
+/// Cancellation is wired explicitly because this is the one place where a
+/// concurrent task is intentionally created to use the global executor.
+nonisolated func routeCalculationConcurrent<T: Sendable>(
+    _ operation: @escaping @Sendable () throws -> T
+) async throws -> T {
+    let task = Task { @concurrent in
+        try operation()
+    }
+    return try await withTaskCancellationHandler(
+        operation: { try await task.value },
+        onCancel: { task.cancel() }
+    )
+}
+
+nonisolated struct RouteSearchContext: Sendable {
     private let staticContext: CachedRouteSearchContext
+    private let walkingDistances: [RoadRouteCacheKey: Double]
     let now: Date
     let currentSeconds: Int
 
@@ -27,45 +289,76 @@ nonisolated struct RouteSearchContext {
         staticContext.activeTrips
     }
 
-    var tripReferencesByStopId: [String: [TripStopReference]] {
-        staticContext.tripReferencesByStopId
-    }
-
-    var alightReferencesByStopId: [String: [TripStopReference]] {
-        staticContext.alightReferencesByStopId
-    }
-
     var transfersByFromStopId: [String: [GTFSTimetableTransferEntry]] {
         staticContext.transfersByFromStopId
-    }
-
-    var transfersByToStopId: [String: [GTFSTimetableTransferEntry]] {
-        staticContext.transfersByToStopId
     }
 
     var sameStopMinimumTransferSecondsByStopId: [String: Int] {
         staticContext.sameStopMinimumTransferSecondsByStopId
     }
 
-    init(staticContext: CachedRouteSearchContext, now: Date) {
+    var transitIndex: TransitSearchIndex {
+        staticContext.transitIndex
+    }
+
+    func nearbyStops(to point: LocationPoint, radiusMeters: Double) -> [GTFSTimetableStopEntry] {
+        staticContext.nearbyStops(to: point, radiusMeters: radiusMeters)
+    }
+
+    init(
+        staticContext: CachedRouteSearchContext,
+        now: Date,
+        walkingDistances: [RoadRouteCacheKey: Double] = [:]
+    ) {
         self.staticContext = staticContext
+        self.walkingDistances = walkingDistances
         self.now = now
         currentSeconds = max(0, Int(now.timeIntervalSince(staticContext.serviceStart)))
     }
+
+    /// Returns a road distance when it has been resolved for this calculation,
+    /// otherwise the straight-line distance used as a safe search fallback.
+    func walkingDistanceMeters(from origin: LocationPoint, to destination: LocationPoint) -> Double {
+        let key = RoadRouteCacheKey(
+            origin: RouteMapCoordinate(origin),
+            destination: RouteMapCoordinate(destination),
+            transport: .walking
+        )
+        return walkingDistances[key]
+            ?? routeSearchDistanceMeters(from: origin, to: destination)
+    }
+
+    func withWalkingDistances(_ walkingDistances: [RoadRouteCacheKey: Double]) -> RouteSearchContext {
+        RouteSearchContext(
+            staticContext: staticContext,
+            now: now,
+            walkingDistances: walkingDistances
+        )
+    }
+
+    /// Returns a search context anchored at an effective (potentially live-retimed)
+    /// instant while preserving the same immutable timetable indexes.
+    func rebased(at seconds: Int) -> RouteSearchContext {
+        RouteSearchContext(
+            staticContext: staticContext,
+            now: serviceStart.addingTimeInterval(TimeInterval(seconds)),
+            walkingDistances: walkingDistances
+        )
+    }
 }
 
-nonisolated struct CachedRouteSearchContext {
+nonisolated struct CachedRouteSearchContext: Sendable {
     let key: RouteSearchCacheKey
     let serviceStart: Date
     let stopsById: [String: GTFSTimetableStopEntry]
+    let spatialCellDegrees: Double
+    let stopsBySpatialCell: [GridCell: [GTFSTimetableStopEntry]]
     let routesById: [String: GTFSTimetableRouteEntry]
     let shapesById: [String: GTFSTimetableShapeEntry]
     let activeTrips: [GTFSTimetableTripEntry]
-    let tripReferencesByStopId: [String: [TripStopReference]]
-    let alightReferencesByStopId: [String: [TripStopReference]]
     let transfersByFromStopId: [String: [GTFSTimetableTransferEntry]]
-    let transfersByToStopId: [String: [GTFSTimetableTransferEntry]]
     let sameStopMinimumTransferSecondsByStopId: [String: Int]
+    let transitIndex: TransitSearchIndex
 
     init(
         key: RouteSearchCacheKey,
@@ -76,6 +369,10 @@ nonisolated struct CachedRouteSearchContext {
         self.key = key
         serviceStart = calendar.startOfDay(for: now)
         stopsById = Dictionary(uniqueKeysWithValues: timetable.stops.map { ($0.id, $0) })
+        spatialCellDegrees = 0.0025
+        stopsBySpatialCell = Dictionary(grouping: timetable.stops) {
+            GridCell(stop: $0, cellDegrees: 0.0025)
+        }
         routesById = Dictionary(uniqueKeysWithValues: timetable.routes.map { ($0.id, $0) })
         shapesById = Dictionary(uniqueKeysWithValues: timetable.shapes.map { ($0.id, $0) })
 
@@ -101,53 +398,43 @@ nonisolated struct CachedRouteSearchContext {
             .map { Self.shiftedBackADay($0) }
         combinedTrips.append(contentsOf: yesterdayLateTrips)
 
-        var boardingReferences: [String: [TripStopReference]] = [:]
-        var alightingReferences: [String: [TripStopReference]] = [:]
-        for tripIndex in combinedTrips.indices {
-            let trip = combinedTrips[tripIndex]
-            for stopTimeIndex in trip.stopTimes.indices.dropLast() {
-                let stopTime = trip.stopTimes[stopTimeIndex]
-                boardingReferences[stopTime.stopId, default: []].append(
-                    TripStopReference(tripIndex: tripIndex, stopTimeIndex: stopTimeIndex)
-                )
-            }
-            for stopTimeIndex in trip.stopTimes.indices.dropFirst() {
-                let stopTime = trip.stopTimes[stopTimeIndex]
-                alightingReferences[stopTime.stopId, default: []].append(
-                    TripStopReference(tripIndex: tripIndex, stopTimeIndex: stopTimeIndex)
-                )
-            }
-        }
-        let sortedBoardingReferences = boardingReferences.mapValues {
-            $0.sorted {
-                combinedTrips[$0.tripIndex].stopTimes[$0.stopTimeIndex].departureSeconds
-                    < combinedTrips[$1.tripIndex].stopTimes[$1.stopTimeIndex].departureSeconds
-            }
-        }
-        let sortedAlightingReferences = alightingReferences.mapValues {
-            $0.sorted {
-                combinedTrips[$0.tripIndex].stopTimes[$0.stopTimeIndex].arrivalSeconds
-                    > combinedTrips[$1.tripIndex].stopTimes[$1.stopTimeIndex].arrivalSeconds
-            }
-        }
-
         activeTrips = combinedTrips
-        tripReferencesByStopId = sortedBoardingReferences
-        alightReferencesByStopId = sortedAlightingReferences
         let transfers = Self.transfers(
             stops: timetable.stops,
             declaredTransfers: timetable.transfers
         )
         transfersByFromStopId = transfers
-        transfersByToStopId = Dictionary(
-            grouping: transfers.values.flatMap(\.self),
-            by: \.toStopId
-        )
         sameStopMinimumTransferSecondsByStopId = timetable.transfers.reduce(into: [:]) { result, transfer in
             guard transfer.fromStopId == transfer.toStopId,
                   let minimum = transfer.minimumTransferSeconds else { return }
             result[transfer.fromStopId] = max(result[transfer.fromStopId, default: 0], minimum)
         }
+        transitIndex = TransitSearchIndex(
+            stops: timetable.stops,
+            trips: combinedTrips,
+            transfersByFromStopId: transfers
+        )
+    }
+
+    func nearbyStops(to point: LocationPoint, radiusMeters: Double) -> [GTFSTimetableStopEntry] {
+        let base = GridCell(point: point, cellDegrees: spatialCellDegrees)
+        // A cell is roughly 250 m north/south. Use the same conservative range for
+        // longitude, which remains safely inclusive at Luxembourg's latitude.
+        let cellRadius = max(1, Int((radiusMeters / 200).rounded(.up)))
+        var result: [GTFSTimetableStopEntry] = []
+        result.reserveCapacity(32)
+        for deltaLatitude in -cellRadius ... cellRadius {
+            for deltaLongitude in -cellRadius ... cellRadius {
+                result.append(contentsOf: stopsBySpatialCell[
+                    GridCell(
+                        latitude: base.latitude + deltaLatitude,
+                        longitude: base.longitude + deltaLongitude
+                    ),
+                    default: []
+                ])
+            }
+        }
+        return result
     }
 
     private static let secondsPerDay = 86400
@@ -257,7 +544,31 @@ nonisolated struct CachedRouteSearchContext {
     }
 }
 
-nonisolated struct RouteSearchCacheKey: Equatable {
+/// Retains the expensive, immutable timetable indexes independently of a route
+/// service instance. SwiftUI may recreate the service value while redrawing the
+/// planner, but the loaded timetable and its derived indexes should remain hot.
+actor RouteSearchContextCache {
+    private var cachedContext: CachedRouteSearchContext?
+
+    func context(
+        for key: RouteSearchCacheKey,
+        build: @Sendable () async throws -> CachedRouteSearchContext
+    ) async throws -> CachedRouteSearchContext {
+        if let cachedContext, cachedContext.key == key {
+            return cachedContext
+        }
+
+        let context = try await build()
+        cachedContext = context
+        return context
+    }
+
+    func removeAll() {
+        cachedContext = nil
+    }
+}
+
+nonisolated struct RouteSearchCacheKey: Equatable, Sendable {
     let source: String
     let date: String
     let stopCount: Int
@@ -289,13 +600,8 @@ nonisolated struct RouteSearchCacheKey: Equatable {
     }
 }
 
-nonisolated struct TripStopReference {
-    let tripIndex: Int
-    let stopTimeIndex: Int
-}
-
 /// A fixed-size lat/lon bucket used to find nearby stops without an O(n²) scan.
-nonisolated struct GridCell: Hashable {
+nonisolated struct GridCell: Hashable, Sendable {
     let latitude: Int
     let longitude: Int
 
@@ -308,52 +614,19 @@ nonisolated struct GridCell: Hashable {
         latitude = Int((stop.latitude / cellDegrees).rounded(.down))
         longitude = Int((stop.longitude / cellDegrees).rounded(.down))
     }
+
+    init(point: LocationPoint, cellDegrees: Double) {
+        latitude = Int((point.latitude / cellDegrees).rounded(.down))
+        longitude = Int((point.longitude / cellDegrees).rounded(.down))
+    }
 }
 
-nonisolated struct StopCandidate {
+nonisolated struct StopCandidate: Sendable {
     let stop: GTFSTimetableStopEntry
     let distanceMeters: Double
 }
 
-nonisolated struct RouteSearchLabelKey: Hashable {
-    let stopId: String
-    let transitLegCount: Int
-}
-
-nonisolated struct JourneyState: Comparable {
-    let stopId: String
-    /// Physical arrival at `stopId`.
-    let readySeconds: Int
-    /// Earliest safe boarding after walking and one transfer buffer.
-    let boardingReadySeconds: Int
-    let legs: [RoutePlan.Leg]
-    let transitLegCount: Int
-    let visitedStopIds: Set<String>
-    /// Start of a chained transfer walk, used to merge its physical segments.
-    let transferStartSeconds: Int?
-    let transferWalkSeconds: Int
-    let transferMinimumSeconds: Int
-
-    static func < (lhs: JourneyState, rhs: JourneyState) -> Bool {
-        lhs.readySeconds < rhs.readySeconds
-    }
-}
-
-nonisolated struct ReverseJourneyState {
-    let stopId: String
-    /// Latest time an incoming vehicle may reach `stopId` and still complete the suffix.
-    let latestSeconds: Int
-    /// Forward-ordered suffix from `stopId` to the destination.
-    let legs: [RoutePlan.Leg]
-    let transitLegCount: Int
-    let visitedStopIds: Set<String>
-    /// Departure of the next transit leg after a chained transfer walk.
-    let transferDeadlineSeconds: Int?
-    let transferWalkSeconds: Int
-    let transferMinimumSeconds: Int
-}
-
-nonisolated struct ScheduledJourney {
+nonisolated struct ScheduledJourney: Sendable {
     let legs: [RoutePlan.Leg]
 
     var arrivalTime: Date {
@@ -413,7 +686,7 @@ nonisolated struct ScheduledJourney {
     }
 }
 
-nonisolated struct RouteCandidate {
+nonisolated struct RouteCandidate: Sendable {
     let legs: [RoutePlan.Leg]
     let penalty: Int
 
@@ -459,7 +732,25 @@ nonisolated struct RouteCandidate {
     }
 }
 
-nonisolated struct RoadRouteCacheKey: Hashable {
+/// A live-data repair replaces the broken suffix of a scheduled candidate. Keeping
+/// the original signature lets the caller suppress only that now-obsolete version,
+/// while unrelated broken fallbacks remain visible when no repair is available.
+nonisolated struct RealtimeRouteRepair: Sendable {
+    let originalSignature: String
+    let candidate: RouteCandidate
+}
+
+nonisolated struct RealtimeRepairJob: Sendable {
+    let originalSignature: String
+    let journey: ScheduledJourney
+}
+
+nonisolated struct CachedDepartureBoard: Sendable {
+    let departures: [Departure]
+    let fetchedAt: Date
+}
+
+nonisolated struct RoadRouteCacheKey: Hashable, Sendable {
     let transport: RoadRouteTransport
     let originLatitude: Double
     let originLongitude: Double
@@ -476,66 +767,6 @@ nonisolated struct RoadRouteCacheKey: Hashable {
         originLongitude = origin.longitude
         destinationLatitude = destination.latitude
         destinationLongitude = destination.longitude
-    }
-}
-
-nonisolated struct JourneyPriorityQueue {
-    private var storage = Heap<QueuedJourneyState>()
-    private var nextSequence = 0
-
-    var isEmpty: Bool {
-        storage.isEmpty
-    }
-
-    mutating func push(_ element: JourneyState) {
-        storage.insert(QueuedJourneyState(state: element, sequence: nextSequence))
-        nextSequence += 1
-    }
-
-    mutating func popMin() -> JourneyState? {
-        storage.popMin()?.state
-    }
-}
-
-nonisolated struct QueuedJourneyState: Comparable {
-    let state: JourneyState
-    let sequence: Int
-
-    static func < (lhs: QueuedJourneyState, rhs: QueuedJourneyState) -> Bool {
-        if lhs.state.readySeconds != rhs.state.readySeconds {
-            return lhs.state.readySeconds < rhs.state.readySeconds
-        }
-        return lhs.sequence < rhs.sequence
-    }
-}
-
-nonisolated struct ReverseJourneyPriorityQueue {
-    private var storage = Heap<QueuedReverseJourneyState>()
-    private var nextSequence = 0
-
-    mutating func push(_ element: ReverseJourneyState) {
-        storage.insert(QueuedReverseJourneyState(state: element, sequence: nextSequence))
-        nextSequence += 1
-    }
-
-    mutating func popMax() -> ReverseJourneyState? {
-        storage.popMin()?.state
-    }
-}
-
-nonisolated struct QueuedReverseJourneyState: Comparable {
-    let state: ReverseJourneyState
-    let sequence: Int
-
-    static func == (lhs: QueuedReverseJourneyState, rhs: QueuedReverseJourneyState) -> Bool {
-        lhs.sequence == rhs.sequence && lhs.state.latestSeconds == rhs.state.latestSeconds
-    }
-
-    static func < (lhs: QueuedReverseJourneyState, rhs: QueuedReverseJourneyState) -> Bool {
-        if lhs.state.latestSeconds != rhs.state.latestSeconds {
-            return lhs.state.latestSeconds > rhs.state.latestSeconds
-        }
-        return lhs.sequence < rhs.sequence
     }
 }
 

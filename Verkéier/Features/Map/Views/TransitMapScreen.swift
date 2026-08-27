@@ -19,6 +19,7 @@ struct TransitMapScreen: View {
     @Environment(\.departureReminderService) var departureReminderService
     @Environment(\.disruptionAlertService) var disruptionAlertService
     @Environment(\.appConfiguration) var appConfiguration
+    @Environment(AppPreferences.self) private var preferences
     @Environment(\.modelContext) var modelContext
     @Query(sort: \PersistedFavouriteStop.createdAt) var favouriteEntities:
         [PersistedFavouriteStop]
@@ -209,13 +210,14 @@ struct TransitMapScreen: View {
             state: MapViewState(
                 region: viewModel.cameraRegion,
                 cameraUpdateToken: viewModel.cameraUpdateToken,
-                liveStops: viewModel.nearbyStops,
-                gtfsStops: viewModel.gtfsOnlyMapStops,
+                liveStops: mapLiveStops,
+                gtfsStops: mapGTFSStops,
                 selectedStopId: viewModel.selectedStop?.id,
                 favouriteStopIds: favouriteStopIds,
                 alertStopIds: Set(viewModel.alerts.flatMap(\.affectedStopIds)),
                 bikeShareStations: mapBikeShareStations,
-                routeOverlay: mapRouteOverlay
+                routeOverlay: mapRouteOverlay,
+                hideMapPins: shouldHideMapPins
             ),
             selectStop: selectStop,
             selectStopGroup: selectStopGroup,
@@ -234,6 +236,8 @@ struct TransitMapScreen: View {
     }
 
     var mapBikeShareStations: [BikeShareStation] {
+        guard preferences.showBikeShareStations, !shouldHideMapPins else { return [] }
+
         var stations = bikeShareStations
         var indexByID = Dictionary(uniqueKeysWithValues: stations.enumerated().map { ($1.id, $0) })
 
@@ -247,6 +251,33 @@ struct TransitMapScreen: View {
         }
 
         return stations
+    }
+
+    var mapLiveStops: [Stop] {
+        guard !shouldHideMapPins else { return [] }
+        return viewModel.nearbyStops
+            .filter(shouldShowMapStop)
+            .deduplicatedByExactName()
+    }
+
+    var mapGTFSStops: [Stop] {
+        guard !shouldHideMapPins else { return [] }
+        let liveStopNames = Set(mapLiveStops.map(\.name))
+        return viewModel.gtfsOnlyMapStops
+            .filter(shouldShowMapStop)
+            .filter { !liveStopNames.contains($0.name) }
+            .deduplicatedByExactName()
+    }
+
+    private func shouldShowMapStop(_ stop: Stop) -> Bool {
+        let hasConfigurableMode = stop.modes.contains {
+            $0 == .bus || $0 == .tram || $0 == .train
+        }
+        guard hasConfigurableMode else { return true }
+
+        return (stop.modes.contains(.bus) && preferences.showBusStops)
+            || (stop.modes.contains(.tram) && preferences.showTramStops)
+            || (stop.modes.contains(.train) && preferences.showTrainStations)
     }
 
     var favouriteStops: [Stop] {
@@ -275,11 +306,24 @@ struct TransitMapScreen: View {
         return false
     }
 
+    var isShowingRouteDetail: Bool {
+        if case .routeTimeline = sheetNavigation.activePath.last { return true }
+        return false
+    }
+
+    var shouldHideMapPins: Bool {
+        isShowingRouteDetail || mapRouteOverlay != nil
+    }
+
     var mapRouteOverlay: RouteMapOverlay? {
-        if case .lineDetail = sheetNavigation.activePath.last {
+        switch sheetNavigation.activePath.last {
+        case .routeTimeline:
+            return viewModel.routeMapOverlay
+        case .lineDetail:
             return viewModel.selectedLineDetail?.mapOverlay
+        default:
+            return nil
         }
-        return viewModel.routeMapOverlay
     }
 
     var onboardingPresentationBinding: Binding<Bool> {
@@ -300,4 +344,5 @@ struct TransitMapScreen: View {
 
 #Preview {
     TransitMapScreen(locationService: LocationService())
+        .environment(AppPreferences())
 }

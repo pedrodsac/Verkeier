@@ -7,23 +7,52 @@ struct SettingsAboutView: View {
 
     var body: some View {
         List {
-            Section("Attribution") {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Transport data:")
-                        .font(.subheadline.weight(.semibold))
-                    Text("Administration des transports publics - mobiliteit.lu OpenAPI")
-                    Text(
-                        "Administration des transports publics - GTFS public transport schedules and stops"
-                    )
-                    Text("Ville de Luxembourg - AVL Autobus")
+            Section {
+                AboutAppHeader()
+            }
 
-                    Text("Maps:")
-                        .font(.subheadline.weight(.semibold))
-                        .padding(.top, 6)
-                    Text("Apple Maps / MapKit")
-                }
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+            Section("Schedules") {
+                AboutSourceRow(
+                    iconName: "bus.fill",
+                    title: "Bus schedules",
+                    source: "Administration des transports publics · data.public.lu GTFS"
+                )
+                AboutSourceRow(
+                    iconName: "tram.fill",
+                    title: "Tram schedules",
+                    source: "Administration des transports publics · data.public.lu GTFS"
+                )
+                AboutSourceRow(
+                    iconName: "train.side.front.car",
+                    title: "Train schedules",
+                    source: "Administration des transports publics · data.public.lu GTFS"
+                )
+            }
+
+            Section("Live information") {
+                AboutSourceRow(
+                    iconName: "antenna.radiowaves.left.and.right",
+                    title: "Live departures",
+                    source: "mobiliteit.lu OpenAPI"
+                )
+                AboutSourceRow(
+                    iconName: "exclamationmark.triangle.fill",
+                    title: "AVL service warnings",
+                    source: "Ville de Luxembourg · AVL Autobus"
+                )
+                AboutSourceRow(
+                    iconName: "bicycle",
+                    title: "vel'OH! bike share",
+                    source: "JCDecaux"
+                )
+            }
+
+            Section("Maps") {
+                AboutSourceRow(
+                    iconName: "map.fill",
+                    title: "Maps and walking routes",
+                    source: "Apple Maps / MapKit"
+                )
             }
 
             Section("Privacy") {
@@ -40,29 +69,50 @@ struct SettingsAboutView: View {
                     "Favourite stops are stored locally with SwiftData and mirrored to Shortcuts for App Intent suggestions."
                 )
                 AboutFactRow(
-                    iconName: "person.crop.circle.badge.xmark",
-                    title: "No account",
+                    iconName: "internaldrive.fill",
+                    title: "Data on your device",
                     message:
-                    "Verkéier does not add accounts, ads, subscriptions, or a backend service."
+                    "Recent places, trips, and commute presets are stored locally on your device."
                 )
+                AboutFactRow(
+                    iconName: "person.crop.circle.badge.xmark",
+                    title: "No account or ads",
+                    message: "Verkéier does not require an account or use advertising."
+                )
+            }
 
+            Section("Your data") {
                 Button("Delete all local data", role: .destructive) {
                     showDeleteConfirm = true
                 }
                 .confirmationDialog(
-                    "Delete all favourites, recent stops, trips, and commute presets?",
+                    "Delete local data?",
                     isPresented: $showDeleteConfirm,
                     titleVisibility: .visible
                 ) {
-                    Button("Delete everything", role: .destructive) { deleteAllLocalData() }
+                    Button("Delete everything", role: .destructive) {
+                        deleteAllLocalData()
+                    }
                     Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("This removes favourites, recent stops, trips, and commute presets from this device.")
                 }
             }
 
-            Section {
-                Text("This app is not an official Luxembourg public transport app.")
+            Section("Legal") {
+                Text("Verkéier is an independent app and is not affiliated with or endorsed by Luxembourg public transport operators.")
+                    .font(.footnote)
+                Text("Schedules, live departures, bike-share availability, and service warnings are provided by their respective data publishers and may be incomplete or delayed.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+            }
+
+            Section("More") {
+                NavigationLink {
+                    SettingsOpenSourceView()
+                } label: {
+                    Label("Open-source libraries", systemImage: "chevron.left.forwardslash.chevron.right")
+                }
             }
         }
         .listStyle(.insetGrouped)
@@ -75,6 +125,63 @@ struct SettingsAboutView: View {
         try? modelContext.save()
         RoutePlannerStore.shared.clearAll()
         SharedTransitDataStore.saveTrackedReminder(nil)
+    }
+}
+
+private struct AboutAppHeader: View {
+    private var versionText: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+        return "Version \(version) (\(build))"
+    }
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Image("Icon")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 64, height: 64)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Verkéier")
+                    .font(.title3.weight(.semibold))
+                Text("Public transport for Luxembourg")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Text(versionText)
+                    .font(.footnote)
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 6)
+    }
+}
+
+private struct AboutSourceRow: View {
+    let iconName: String
+    let title: String
+    let source: String
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 12) {
+            Image(systemName: iconName)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.tint)
+                .frame(width: 28, height: 28)
+                .background(.tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline)
+                Text(source)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -102,5 +209,7 @@ private struct AboutFactRow: View {
 }
 
 #Preview {
-    SettingsAboutView()
+    NavigationStack {
+        SettingsAboutView()
+    }
 }

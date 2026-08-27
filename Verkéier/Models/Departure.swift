@@ -5,7 +5,7 @@ import Foundation
 /// A departure carries both the scheduled time and, when available, the
 /// realtime estimate so the UI can show live delays. Derive the user-facing
 /// state with ``status`` rather than inspecting the raw fields.
-struct Departure: Codable, Hashable, Identifiable {
+struct Departure: Codable, Hashable, Identifiable, Sendable {
     /// Stable identifier for the departure entry.
     let id: String
     /// Identifier of the stop this departure leaves from.
@@ -151,7 +151,7 @@ struct Departure: Codable, Hashable, Identifiable {
 }
 
 /// Crowding level for a departure, surfaced when the feed provides occupancy.
-enum OccupancyLevel: String, Codable, Hashable, CaseIterable {
+enum OccupancyLevel: String, Codable, Hashable, CaseIterable, Sendable {
     case empty
     case manySeats
     case fewSeats

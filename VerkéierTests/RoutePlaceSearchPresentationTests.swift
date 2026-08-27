@@ -37,7 +37,6 @@ struct RoutePlaceSearchPresentationTests {
             routeOptions: [],
             alerts: [],
             selectedRouteOptionID: nil,
-            visibleRouteOptionCount: 0,
             loadingPhase: .idle,
             errorMessage: nil,
             statusMessage: nil
@@ -47,4 +46,3 @@ struct RoutePlaceSearchPresentationTests {
         #expect(model.recentPlacesExcludingPinned(for: .destination).map(\.id) == [recentPlace.id])
     }
 }
-

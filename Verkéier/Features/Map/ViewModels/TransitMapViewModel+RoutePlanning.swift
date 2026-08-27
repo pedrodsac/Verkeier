@@ -35,16 +35,13 @@ extension TransitMapViewModel {
     }
 
     var selectedRouteOption: RouteOption? {
-        guard !routeOptions.isEmpty else { return nil }
+        let allOptions = routeOptions + supplementalRouteOptions
+        guard !allOptions.isEmpty else { return nil }
         if let selectedRouteOptionID,
-           let match = routeOptions.first(where: { $0.id == selectedRouteOptionID }) {
+           let match = allOptions.first(where: { $0.id == selectedRouteOptionID }) {
             return match
         }
-        return routeOptions.first
-    }
-
-    var visibleRouteOptions: [RouteOption] {
-        Array(routeOptions.prefix(visibleRouteOptionCount))
+        return allOptions.first
     }
 
     func loadRoutePlanner(using store: RoutePlannerStore = .shared) {
@@ -188,21 +185,35 @@ extension TransitMapViewModel {
         routeErrorMessage = nil
         routeStatusMessage = nil
         do {
+            let shouldRefreshInBackground = unfilteredRouteOptions.isEmpty
             let calculation = try await routeService.calculateRoute(
-                from: origin, to: destination.location, time: routePlanningTime, filters: routeFilters
+                from: origin,
+                to: destination.location,
+                time: routePlanningTime,
+                filters: routeFilters,
+                realtimeRefreshPolicy: shouldRefreshInBackground ? .useCache : .forceRefresh
             )
             guard requestGeneration == routeCalculationGeneration else { return }
             unfilteredRouteOptions = calculation.options
+            supplementalRouteOptions = calculation.supplementalOptions
             applyRouteOptions(preferredID: calculation.selectedOptionID, announceFallback: false)
-            if !calculation.options.isEmpty {
+            if !calculation.allOptions.isEmpty {
                 routeLastCalculatedAt = now()
                 recentTrips = RoutePlannerStore.shared.recordRecentTrip(
                     origin: routeOrigin, destination: destination
                 )
             }
+            if shouldRefreshInBackground {
+                refreshRouteInBackground(
+                    using: routeService,
+                    origin: origin,
+                    destination: destination,
+                    requestGeneration: requestGeneration
+                )
+            }
         } catch {
             guard requestGeneration == routeCalculationGeneration else { return }
-            if routeOptions.isEmpty {
+            if routeOptions.isEmpty, supplementalRouteOptions.isEmpty {
                 clearRouteResult()
             } else {
                 routeStatusMessage = "Routes could not be refreshed. Showing the last available results."
@@ -223,19 +234,12 @@ extension TransitMapViewModel {
 
     @discardableResult
     func selectRouteOption(id: String) -> Bool {
-        guard routeOptions.contains(where: { $0.id == id }) else { return false }
+        guard (routeOptions + supplementalRouteOptions).contains(where: { $0.id == id }) else {
+            return false
+        }
         selectedRouteOptionID = id
         routeStatusMessage = nil
         return true
-    }
-
-    func showMoreRouteOptions() {
-        guard !routeOptions.isEmpty else { return }
-
-        if visibleRouteOptionCount < routeOptions.count {
-            visibleRouteOptionCount = min(routeOptions.count, visibleRouteOptionCount + 3)
-            routeStatusMessage = nil
-        }
     }
 
     func openSelectedRouteInAppleMaps(
@@ -267,14 +271,49 @@ extension TransitMapViewModel {
         return routeCalculationGeneration
     }
 
+    private func refreshRouteInBackground(
+        using routeService: any RouteService,
+        origin: LocationPoint,
+        destination: RoutePlace,
+        requestGeneration: Int
+    ) {
+        let planningTime = routePlanningTime
+        let filters = routeFilters
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                let calculation = try await routeService.calculateRoute(
+                    from: origin,
+                    to: destination.location,
+                    time: planningTime,
+                    filters: filters,
+                    realtimeRefreshPolicy: .forceRefresh
+                )
+                guard requestGeneration == routeCalculationGeneration else { return }
+                let preferredID = selectedRouteOptionID
+                unfilteredRouteOptions = calculation.options
+                supplementalRouteOptions = calculation.supplementalOptions
+                applyRouteOptions(preferredID: preferredID, announceFallback: true)
+                routeLastCalculatedAt = now()
+            } catch {
+                guard requestGeneration == routeCalculationGeneration else { return }
+                routeStatusMessage = "Live updates are unavailable. Showing scheduled routes."
+            }
+        }
+    }
+
     private func selectBestRouteOption(preferredID: String?, announceFallback: Bool) {
-        guard !routeOptions.isEmpty else {
+        let allOptions = routeOptions + supplementalRouteOptions
+        guard !allOptions.isEmpty else {
             selectedRouteOptionID = nil
             return
         }
 
-        let viableStatuses: Set<RouteOptionStatus> = [.viable, .scheduledOnly, .atRisk]
-        let optionsByID = Dictionary(uniqueKeysWithValues: routeOptions.map { ($0.id, $0) })
+        let viableStatuses: Set<RouteOptionStatus> = [.viable, .partiallyLive, .scheduledOnly, .atRisk]
+        // Route calculations normally deduplicate options before publication, but
+        // keep selection resilient to equivalent options arriving from a fallback
+        // or an older route-service implementation.
+        let optionsByID = Dictionary(allOptions.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
 
         if let preferredID,
            let preferred = optionsByID[preferredID],
@@ -283,7 +322,7 @@ extension TransitMapViewModel {
             return
         }
 
-        if let replacement = routeOptions.first(where: { viableStatuses.contains($0.status(at: now())) }) {
+        if let replacement = allOptions.first(where: { viableStatuses.contains($0.status(at: now())) }) {
             let changed = replacement.id != preferredID
             selectedRouteOptionID = replacement.id
             if announceFallback, changed, preferredID != nil {
@@ -292,15 +331,13 @@ extension TransitMapViewModel {
             return
         }
 
-        selectedRouteOptionID = routeOptions.first?.id
+        selectedRouteOptionID = allOptions.first?.id
     }
 
     private func applyRouteOptions(preferredID: String?, announceFallback: Bool) {
         let filtered = filteredRouteOptions(from: unfilteredRouteOptions)
         let didRelaxFilters = filtered.isEmpty && !unfilteredRouteOptions.isEmpty
-        routeOptions = (didRelaxFilters ? unfilteredRouteOptions : filtered)
-            .sorted(by: compareRouteOptions)
-        visibleRouteOptionCount = min(routeOptionInitialVisibleCount, routeOptions.count)
+        routeOptions = uniqueRouteOptions(didRelaxFilters ? unfilteredRouteOptions : filtered)
         selectBestRouteOption(preferredID: preferredID, announceFallback: announceFallback)
 
         if didRelaxFilters {
@@ -310,9 +347,15 @@ extension TransitMapViewModel {
         }
     }
 
+    private func uniqueRouteOptions(_ options: [RouteOption]) -> [RouteOption] {
+        var seenIDs: Set<String> = []
+        return options.filter { seenIDs.insert($0.id).inserted }
+    }
+
     private func filteredRouteOptions(from options: [RouteOption]) -> [RouteOption] {
         options.filter { option in
-            if routeFilters.avoidTightTransfers, option.status(at: now()) == .atRisk {
+            if routeFilters.avoidTightTransfers,
+               [.atRisk, .connectionMayBeMissed].contains(option.status(at: now())) {
                 return false
             }
 
@@ -363,31 +406,16 @@ extension TransitMapViewModel {
             return lhsModeRank < rhsModeRank
         }
 
-        switch routeFilters.sort {
-        case .fastest:
-            let lhsTime = lhs.plan.expectedTravelTime ?? .greatestFiniteMagnitude
-            let rhsTime = rhs.plan.expectedTravelTime ?? .greatestFiniteMagnitude
-            if lhsTime != rhsTime { return lhsTime < rhsTime }
-        case .fewestTransfers:
-            if lhs.transferCount != rhs.transferCount { return lhs.transferCount < rhs.transferCount }
-            let lhsTime = lhs.plan.expectedTravelTime ?? .greatestFiniteMagnitude
-            let rhsTime = rhs.plan.expectedTravelTime ?? .greatestFiniteMagnitude
-            if lhsTime != rhsTime { return lhsTime < rhsTime }
-        case .leastWalking:
-            let lhsWalking = lhs.walkingDistanceMeters
-            let rhsWalking = rhs.walkingDistanceMeters
-            if lhsWalking != rhsWalking { return lhsWalking < rhsWalking }
-            let lhsTime = lhs.plan.expectedTravelTime ?? .greatestFiniteMagnitude
-            let rhsTime = rhs.plan.expectedTravelTime ?? .greatestFiniteMagnitude
-            if lhsTime != rhsTime { return lhsTime < rhsTime }
-        }
+        let lhsArrival = lhs.arrivalTime ?? .distantFuture
+        let rhsArrival = rhs.arrivalTime ?? .distantFuture
+        if lhsArrival != rhsArrival { return lhsArrival < rhsArrival }
 
         return lhs.id < rhs.id
     }
 
     private func isSeverelyUnusable(_ option: RouteOption) -> Bool {
         option.transitLegs.contains {
-            $0.liveStatus == .cancelled || $0.transferWarning == "Connection may be missed"
+            $0.liveStatus == .cancelled || $0.transferWarning == "Connection miss"
         }
     }
 

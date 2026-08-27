@@ -105,7 +105,6 @@ import SwiftUI
                     )
                 ],
                 selectedRouteOptionID: "tram-route",
-                visibleRouteOptionCount: 2,
                 loadingPhase: .idle,
                 errorMessage: nil,
                 statusMessage: "Fastest option from your current location."
@@ -127,7 +126,6 @@ import SwiftUI
                 routeOptions: [],
                 alerts: [],
                 selectedRouteOptionID: nil,
-                visibleRouteOptionCount: 0,
                 loadingPhase: .calculating,
                 errorMessage: nil,
                 statusMessage: nil
@@ -149,7 +147,6 @@ import SwiftUI
                 routeOptions: [],
                 alerts: [],
                 selectedRouteOptionID: nil,
-                visibleRouteOptionCount: 0,
                 loadingPhase: .waitingForLocation,
                 errorMessage: nil,
                 statusMessage: nil
@@ -179,7 +176,6 @@ import SwiftUI
                 routeOptions: [],
                 alerts: [],
                 selectedRouteOptionID: nil,
-                visibleRouteOptionCount: 0,
                 loadingPhase: .idle,
                 errorMessage: nil,
                 statusMessage: nil
@@ -201,7 +197,6 @@ import SwiftUI
                 routeOptions: [],
                 alerts: [],
                 selectedRouteOptionID: nil,
-                visibleRouteOptionCount: 0,
                 loadingPhase: .idle,
                 errorMessage: "No public transport routes found between these locations. Try adjusting your destination.",
                 statusMessage: nil

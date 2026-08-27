@@ -4,6 +4,7 @@ struct TransitBottomSheet: View {
     private let searchBarContentTopPadding: CGFloat = 80
 
     @Binding var searchQuery: String
+    @Environment(AppPreferences.self) private var preferences
     let detent: BottomSheetDetent
     @Bindable var navigation: TransitSheetNavigationState
     let viewModel: TransitSheetPresentationModel
@@ -16,6 +17,10 @@ struct TransitBottomSheet: View {
 
     var body: some View {
         tabView
+            // A sheet has its own presentation host. Keep its preferred scheme
+            // connected to the shared preference so changing the theme while
+            // the sheet is open updates the sheet as well as the map window.
+            .preferredColorScheme(preferences.appearance.colorScheme)
             .toolbarBackground(.visible, for: .tabBar)
             .toolbarBackground(tabBarBackground, for: .tabBar)
             .onChange(of: navigation.homePath) { oldPath, newPath in

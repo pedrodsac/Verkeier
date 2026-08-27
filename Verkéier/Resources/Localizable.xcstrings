@@ -402,6 +402,7 @@
       }
     },
     "Administration des transports publics - GTFS public transport schedules and stops" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -430,6 +431,7 @@
       }
     },
     "Administration des transports publics - mobiliteit.lu OpenAPI" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -599,6 +601,7 @@
       }
     },
     "Apple Maps / MapKit" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -683,6 +686,7 @@
       }
     },
     "Attribution" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -766,6 +770,37 @@
         }
       }
     },
+    "Bike option" : {
+
+    },
+    "Bike share stations" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrradverleihstationen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stations de vélos en libre-service"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vëlosstatiounen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estações de bicicletas partilhadas"
+          }
+        }
+      }
+    },
     "Bus 000" : {
       "localizations" : {
         "de" : {
@@ -790,6 +825,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Autocarro 000"
+          }
+        }
+      }
+    },
+    "Bus stops" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bushaltestellen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêts de bus"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Busarrêten"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragens de autocarro"
           }
         }
       }
@@ -851,7 +914,6 @@
       }
     },
     "Cancelled" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1278,6 +1340,7 @@
       }
     },
     "Delete all favourites, recent stops, trips, and commute presets?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1360,6 +1423,9 @@
           }
         }
       }
+    },
+    "Delete local data?" : {
+
     },
     "Departure refresh failed. %@" : {
       "extractionState" : "stale",
@@ -1844,6 +1910,7 @@
       }
     },
     "Fastest" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2500,6 +2567,9 @@
         }
       }
     },
+    "Legal" : {
+
+    },
     "Live Activity tracking %@ to %@" : {
       "localizations" : {
         "de" : {
@@ -2650,6 +2720,9 @@
         }
       }
     },
+    "Live information" : {
+
+    },
     "Loading departures" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2792,7 +2865,39 @@
         }
       }
     },
+    "Map pins" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kartenmarkierungen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repères de carte"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaartmarkéierungen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pins do mapa"
+          }
+        }
+      }
+    },
+    "Maps" : {
+
+    },
     "Maps:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2847,6 +2952,9 @@
           }
         }
       }
+    },
+    "More" : {
+
     },
     "More actions" : {
       "extractionState" : "stale",
@@ -3609,6 +3717,15 @@
         }
       }
     },
+    "Open-source" : {
+
+    },
+    "Open-source libraries" : {
+
+    },
+    "Open-source libraries used by Verkéier." : {
+
+    },
     "Opening %@." : {
       "localizations" : {
         "de" : {
@@ -4169,6 +4286,9 @@
           }
         }
       }
+    },
+    "Public transport for Luxembourg" : {
+
     },
     "Public transport in Luxembourg, made easy." : {
       "extractionState" : "stale",
@@ -5058,6 +5178,12 @@
         }
       }
     },
+    "Schedules" : {
+
+    },
+    "Schedules, live departures, bike-share availability, and service warnings are provided by their respective data publishers and may be incomplete or delayed." : {
+
+    },
     "Search" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5316,6 +5442,7 @@
       }
     },
     "Show more routes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5429,6 +5556,7 @@
       }
     },
     "Sort by" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5457,6 +5585,7 @@
       }
     },
     "Sort routes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5879,6 +6008,7 @@
       }
     },
     "This app is not an official Luxembourg public transport app." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5905,6 +6035,9 @@
           }
         }
       }
+    },
+    "This removes favourites, recent stops, trips, and commute presets from this device." : {
+
     },
     "Time" : {
       "localizations" : {
@@ -6048,6 +6181,62 @@
         }
       }
     },
+    "Train stations" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bahnhöfe"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gares"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuchstatiounen"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estações de comboio"
+          }
+        }
+      }
+    },
+    "Tram stops" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Straßenbahnhaltestellen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêts de tramway"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tramarrêten"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragens de elétrico"
+          }
+        }
+      }
+    },
     "Tram T0" : {
       "localizations" : {
         "de" : {
@@ -6077,6 +6266,7 @@
       }
     },
     "Transfers" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6105,6 +6295,7 @@
       }
     },
     "Transport data:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6307,7 +6498,6 @@
       }
     },
     "Verkéier" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6335,7 +6525,11 @@
         }
       }
     },
+    "Verkéier is an independent app and is not affiliated with or endorsed by Luxembourg public transport operators." : {
+
+    },
     "Ville de Luxembourg - AVL Autobus" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6364,6 +6558,7 @@
       }
     },
     "Walking" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6476,6 +6671,9 @@
           }
         }
       }
+    },
+    "Your data" : {
+
     }
   },
   "version" : "1.0"

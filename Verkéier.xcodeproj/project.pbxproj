@@ -12,7 +12,6 @@
 		627757823024D6D30012B2EF /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 627757803024D6D30012B2EF /* AppIcon.icon */; };
 		62FE86412FEE000000000001 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000101 /* ZIPFoundation */; };
 		62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000102 /* AsyncAlgorithms */; };
-		62FE86412FEE000000000003 /* HeapModule in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000103 /* HeapModule */; };
 		62FE86412FEE000000000004 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000104 /* ZIPFoundation */; };
 		62FE86412FEE000000000005 /* UIOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000105 /* UIOnboarding */; };
 /* End PBXBuildFile section */
@@ -107,7 +106,6 @@
 			files = (
 				62FE86412FEE000000000001 /* ZIPFoundation in Frameworks */,
 				62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */,
-				62FE86412FEE000000000003 /* HeapModule in Frameworks */,
 				62FE86412FEE000000000005 /* UIOnboarding in Frameworks */,
 			);
 		};
@@ -182,7 +180,6 @@
 			packageProductDependencies = (
 				62FE86412FEE000000000101 /* ZIPFoundation */,
 				62FE86412FEE000000000102 /* AsyncAlgorithms */,
-				62FE86412FEE000000000103 /* HeapModule */,
 				62FE86412FEE000000000105 /* UIOnboarding */,
 			);
 			productName = "Verkéier";
@@ -270,7 +267,6 @@
 			packageReferences = (
 				62FE86412FEE000000000201 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
-				62FE86412FEE000000000203 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				62FE86412FEE000000000204 /* XCRemoteSwiftPackageReference "UIOnboarding" */,
 			);
 			preferredProjectObjectVersion = 90;
@@ -731,14 +727,6 @@
 				minimumVersion = 1.1.4;
 			};
 		};
-		62FE86412FEE000000000203 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-collections.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.6.0;
-			};
-		};
 		62FE86412FEE000000000204 /* XCRemoteSwiftPackageReference "UIOnboarding" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/lascic/UIOnboarding.git";
@@ -759,11 +747,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
-		};
-		62FE86412FEE000000000103 /* HeapModule */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 62FE86412FEE000000000203 /* XCRemoteSwiftPackageReference "swift-collections" */;
-			productName = HeapModule;
 		};
 		62FE86412FEE000000000104 /* ZIPFoundation */ = {
 			isa = XCSwiftPackageProductDependency;

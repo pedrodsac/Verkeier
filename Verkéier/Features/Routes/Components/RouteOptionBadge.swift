@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// A compact capsule badge showing the live/scheduled/at-risk/missed status
+/// A compact capsule badge showing the live/scheduled/transfer/missed status
 /// of a ``RouteOption``.
 struct RouteOptionBadge: View {
     let status: RouteOptionStatus
@@ -24,8 +24,9 @@ struct RouteOptionBadge: View {
     private var symbolName: String {
         switch status {
         case .viable: "checkmark.circle.fill"
-        case .scheduledOnly: "clock"
+        case .partiallyLive, .scheduledOnly: "clock.badge.exclamationmark"
         case .atRisk: "exclamationmark.triangle.fill"
+        case .connectionMayBeMissed: "xmark.circle.fill"
         case .missed, .cancelled: "xmark.circle.fill"
         }
     }
@@ -33,8 +34,9 @@ struct RouteOptionBadge: View {
     private var foregroundColor: Color {
         switch status {
         case .viable: .green
-        case .scheduledOnly: .secondary
+        case .partiallyLive, .scheduledOnly: .orange
         case .atRisk: .orange
+        case .connectionMayBeMissed: .red
         case .missed, .cancelled: .red
         }
     }
@@ -42,8 +44,9 @@ struct RouteOptionBadge: View {
     private var backgroundColor: Color {
         switch status {
         case .viable: .green.opacity(0.14)
-        case .scheduledOnly: .secondary.opacity(0.12)
+        case .partiallyLive, .scheduledOnly: .orange.opacity(0.14)
         case .atRisk: .orange.opacity(0.14)
+        case .connectionMayBeMissed: .red.opacity(0.14)
         case .missed, .cancelled: .red.opacity(0.14)
         }
     }
@@ -53,8 +56,10 @@ struct RouteOptionBadge: View {
     #Preview(traits: .sizeThatFitsLayout) {
         HStack {
             RouteOptionBadge(status: .viable)
+            RouteOptionBadge(status: .partiallyLive)
             RouteOptionBadge(status: .scheduledOnly)
             RouteOptionBadge(status: .atRisk)
+            RouteOptionBadge(status: .connectionMayBeMissed)
             RouteOptionBadge(status: .missed)
             RouteOptionBadge(status: .cancelled)
         }

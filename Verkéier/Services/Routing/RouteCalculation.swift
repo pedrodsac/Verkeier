@@ -5,20 +5,26 @@ import Foundation
 ///
 /// A calculation always holds at least one option; ``plan`` traps if asked for
 /// a plan when none exist, so treat an empty `options` as an error upstream.
-struct RouteCalculation {
-    /// The available route alternatives.
+struct RouteCalculation: Sendable {
+    /// The primary public-transport departure profile (at most five journeys).
     let options: [RouteOption]
+    /// A best-effort bike-inclusive alternative that never consumes a transit slot.
+    var supplementalOptions: [RouteOption] = []
     /// Identifier of the selected option; falls back to the first option.
     let selectedOptionID: String?
 
+    var allOptions: [RouteOption] {
+        options + supplementalOptions
+    }
+
     /// The selected option, or the first one when no valid selection is set.
     var selectedOption: RouteOption? {
-        guard !options.isEmpty else { return nil }
+        guard !allOptions.isEmpty else { return nil }
         if let selectedOptionID,
-           let match = options.first(where: { $0.id == selectedOptionID }) {
+           let match = allOptions.first(where: { $0.id == selectedOptionID }) {
             return match
         }
-        return options.first
+        return allOptions.first
     }
 
     /// The selected option's plan. Traps if `options` is empty.

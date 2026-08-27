@@ -149,6 +149,89 @@ struct RouteValidationTests {
         #expect(dommeldangeWalks.count == 1)
     }
 
+    @Test func scheduledProfileSearchP95StaysUnderFiveHundredMilliseconds() async throws {
+        guard ProcessInfo.processInfo.environment["LUXTRANSIT_VALIDATE"] == "1" else {
+            print("[route-validation] LUXTRANSIT_VALIDATE != 1 — skipping.")
+            return
+        }
+
+        let payload = try await loadTimetable()
+        func stop(id: String? = nil, name: String? = nil) throws -> LocationPoint {
+            let entry = try #require(payload.stops.first { candidate in
+                if let id { return candidate.id == id }
+                return candidate.name.normalizedForSearch == name?.normalizedForSearch
+            })
+            return LocationPoint(
+                id: entry.id,
+                name: entry.name,
+                latitude: entry.latitude,
+                longitude: entry.longitude
+            )
+        }
+        func date(hour: Int, minute: Int) throws -> Date {
+            var calendar = Calendar(identifier: .gregorian)
+            calendar.timeZone = TimeZone(identifier: "Europe/Luxembourg")!
+            return try #require(calendar.date(from: DateComponents(
+                timeZone: calendar.timeZone,
+                year: 2026,
+                month: 8,
+                day: 21,
+                hour: hour,
+                minute: minute
+            )))
+        }
+
+        let charlys = try stop(id: "000200508003")
+        let gromscheed = try stop(name: "Senningerberg, Gromscheed")
+        let hamilius = try stop(id: "000200405020")
+        let mersch = try stop(name: "Mersch, Gare")
+        let queries: [(String, LocationPoint, LocationPoint, Date)] = [
+            ("urban", charlys, hamilius, try date(hour: 8, minute: 0)),
+            ("regional", gromscheed, mersch, try date(hour: 8, minute: 0)),
+            ("transfer", charlys, mersch, try date(hour: 17, minute: 0)),
+            ("late-night", gromscheed, hamilius, try date(hour: 22, minute: 0))
+        ]
+        let service = PublicTransportRouteService(
+            gtfsService: PayloadGTFSService(payload: payload),
+            atpClient: EmptyATPClient(),
+            roadRouteProvider: NoRoadRouteProvider(),
+            now: { queries[0].3 }
+        )
+
+        var timings: [Double] = []
+        for (label, origin, destination, departure) in queries {
+            _ = try await service.calculateRoute(
+                from: origin,
+                to: destination,
+                time: .departAt(departure),
+                filters: RoutePlannerFilters(),
+                realtimeRefreshPolicy: .useCache
+            )
+            for _ in 0 ..< 5 {
+                let started = DispatchTime.now().uptimeNanoseconds
+                let result = try await service.calculateRoute(
+                    from: origin,
+                    to: destination,
+                    time: .departAt(departure),
+                    filters: RoutePlannerFilters(),
+                    realtimeRefreshPolicy: .useCache
+                )
+                let elapsed = Double(DispatchTime.now().uptimeNanoseconds - started) / 1_000_000
+                timings.append(elapsed)
+                let departures = result.options.compactMap(\.departureTime)
+                #expect((1 ... 5).contains(result.options.count))
+                #expect(zip(departures, departures.dropFirst()).allSatisfy { $0.0 < $0.1 })
+                print("[route-validation] \(label): \(Int(elapsed)) ms")
+            }
+        }
+
+        let ordered = timings.sorted()
+        let percentileIndex = min(ordered.count - 1, Int(ceil(Double(ordered.count) * 0.95)) - 1)
+        let p95 = ordered[percentileIndex]
+        print("[route-validation] scheduled profile p95: \(Int(p95)) ms")
+        #expect(p95 <= 500)
+    }
+
     // MARK: - Index loading (download → unzip → build, all in sandbox temp)
 
     private func loadTimetable() async throws -> GTFSTimetableIndexPayload {

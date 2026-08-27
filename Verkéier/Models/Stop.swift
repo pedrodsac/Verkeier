@@ -192,6 +192,16 @@ struct Stop: Codable, Hashable, Identifiable {
     }
 }
 
+extension Sequence where Element == Stop {
+    /// Keeps the first stop for each exact canonical name while preserving
+    /// the source order. This is for compact stop-choice surfaces; callers
+    /// should retain the original stops when their IDs or platforms matter.
+    nonisolated func deduplicatedByExactName() -> [Stop] {
+        var seenNames = Set<String>()
+        return filter { seenNames.insert($0.name).inserted }
+    }
+}
+
 private extension [String] {
     nonisolated init(dictOrderedSet values: [String]) {
         var seen: Set<String> = []

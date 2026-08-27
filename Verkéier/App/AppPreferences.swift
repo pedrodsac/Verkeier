@@ -55,10 +55,6 @@ final class AppPreferences {
         didSet { saveString(distanceUnit.rawValue, forKey: Keys.distanceUnit) }
     }
 
-    var defaultRouteSort: RoutePlannerSortOption {
-        didSet { saveString(defaultRouteSort.rawValue, forKey: Keys.defaultRouteSort) }
-    }
-
     var defaultModePreference: RoutePlannerModePreference {
         didSet { saveString(defaultModePreference.rawValue, forKey: Keys.defaultModePreference) }
     }
@@ -77,6 +73,22 @@ final class AppPreferences {
         didSet { defaults.set(offlineMode, forKey: Keys.offlineMode) }
     }
 
+    var showBikeShareStations: Bool {
+        didSet { defaults.set(showBikeShareStations, forKey: Keys.showBikeShareStations) }
+    }
+
+    var showBusStops: Bool {
+        didSet { defaults.set(showBusStops, forKey: Keys.showBusStops) }
+    }
+
+    var showTramStops: Bool {
+        didSet { defaults.set(showTramStops, forKey: Keys.showTramStops) }
+    }
+
+    var showTrainStations: Bool {
+        didSet { defaults.set(showTrainStations, forKey: Keys.showTrainStations) }
+    }
+
     var defaultReminderLeadTimeMinutes: Int {
         didSet { defaults.set(defaultReminderLeadTimeMinutes, forKey: Keys.defaultReminderLeadTime) }
     }
@@ -87,20 +99,24 @@ final class AppPreferences {
         self.defaults = defaults
         appearance = AppearancePreference(rawValue: defaults.string(forKey: Keys.appearance) ?? "") ?? .system
         distanceUnit = DistanceUnitPreference(rawValue: defaults.string(forKey: Keys.distanceUnit) ?? "") ?? .metric
-        defaultRouteSort = RoutePlannerSortOption(rawValue: defaults.string(forKey: Keys.defaultRouteSort) ?? "") ??
-            .fastest
         defaultModePreference = RoutePlannerModePreference(rawValue: defaults
             .string(forKey: Keys.defaultModePreference) ?? "") ?? .any
         avoidTightTransfers = defaults.bool(forKey: Keys.avoidTightTransfers)
         preferAccessible = defaults.bool(forKey: Keys.preferAccessible)
         offlineMode = defaults.bool(forKey: Keys.offlineMode)
+        showBikeShareStations = Self.savedBool(
+            forKey: Keys.showBikeShareStations,
+            defaults: defaults
+        )
+        showBusStops = Self.savedBool(forKey: Keys.showBusStops, defaults: defaults)
+        showTramStops = Self.savedBool(forKey: Keys.showTramStops, defaults: defaults)
+        showTrainStations = Self.savedBool(forKey: Keys.showTrainStations, defaults: defaults)
         let saved = defaults.integer(forKey: Keys.defaultReminderLeadTime)
         defaultReminderLeadTimeMinutes = saved > 0 ? saved : 5
     }
 
     var defaultRouteFilters: RoutePlannerFilters {
         RoutePlannerFilters(
-            sort: defaultRouteSort,
             modePreference: defaultModePreference,
             avoidTightTransfers: avoidTightTransfers,
             preferAccessible: preferAccessible
@@ -128,14 +144,21 @@ final class AppPreferences {
         defaults.set(value, forKey: key)
     }
 
+    private static func savedBool(forKey key: String, defaults: UserDefaults) -> Bool {
+        defaults.object(forKey: key) as? Bool ?? true
+    }
+
     private enum Keys {
         static let appearance = "AppPreferences.appearance"
         static let distanceUnit = "AppPreferences.distanceUnit"
-        static let defaultRouteSort = "AppPreferences.defaultRouteSort"
         static let defaultModePreference = "AppPreferences.defaultModePreference"
         static let avoidTightTransfers = "AppPreferences.avoidTightTransfers"
         static let preferAccessible = "AppPreferences.preferAccessible"
         static let offlineMode = "AppPreferences.offlineMode"
+        static let showBikeShareStations = "AppPreferences.showBikeShareStations"
+        static let showBusStops = "AppPreferences.showBusStops"
+        static let showTramStops = "AppPreferences.showTramStops"
+        static let showTrainStations = "AppPreferences.showTrainStations"
         static let defaultReminderLeadTime = "AppPreferences.defaultReminderLeadTime"
     }
 }

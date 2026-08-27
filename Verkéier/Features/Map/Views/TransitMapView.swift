@@ -14,6 +14,7 @@ struct MapViewState {
     let alertStopIds: Set<String>
     let bikeShareStations: [BikeShareStation]
     let routeOverlay: RouteMapOverlay?
+    let hideMapPins: Bool
 }
 
 struct TransitMapView: UIViewRepresentable {
@@ -42,7 +43,7 @@ struct TransitMapView: UIViewRepresentable {
         context.coordinator.favouriteStopIds = state.favouriteStopIds
         context.coordinator.alertStopIds = state.alertStopIds
 
-        let stopAnnotations = state.routeOverlay == nil
+        let stopAnnotations = !state.hideMapPins && state.routeOverlay == nil
             ? state.liveStops.map {
                 StopMapAnnotation(stop: $0, layer: .liveNearby)
             }
@@ -51,7 +52,9 @@ struct TransitMapView: UIViewRepresentable {
             }
             : []
         let transferAnnotations = state.routeOverlay?.transferMarkers.map(RouteTransferAnnotation.init) ?? []
-        let bikeAnnotations = state.bikeShareStations.map(BikeShareMapAnnotation.init)
+        let bikeAnnotations = !state.hideMapPins && state.routeOverlay == nil
+            ? state.bikeShareStations.map(BikeShareMapAnnotation.init)
+            : []
 
         view.update(
             snapshot: MapSnapshot(
@@ -63,7 +66,8 @@ struct TransitMapView: UIViewRepresentable {
                 selectedStopId: state.selectedStopId,
                 favouriteStopIds: state.favouriteStopIds,
                 alertStopIds: state.alertStopIds,
-                routeOverlay: state.routeOverlay
+                routeOverlay: state.routeOverlay,
+                hideMapPins: state.hideMapPins
             )
         )
     }
@@ -78,6 +82,7 @@ struct TransitMapView: UIViewRepresentable {
         let favouriteStopIds: Set<String>
         let alertStopIds: Set<String>
         let routeOverlay: RouteMapOverlay?
+        let hideMapPins: Bool
 
         var key: MapSnapshotKey {
             MapSnapshotKey(
@@ -90,7 +95,8 @@ struct TransitMapView: UIViewRepresentable {
                 selectedStopId: selectedStopId,
                 favouriteStopIds: favouriteStopIds,
                 alertStopIds: alertStopIds,
-                routeOverlay: routeOverlay
+                routeOverlay: routeOverlay,
+                hideMapPins: hideMapPins
             )
         }
     }
@@ -104,6 +110,7 @@ struct TransitMapView: UIViewRepresentable {
         let favouriteStopIds: Set<String>
         let alertStopIds: Set<String>
         let routeOverlay: RouteMapOverlay?
+        let hideMapPins: Bool
     }
 
     final class MapContainerView: UIView {

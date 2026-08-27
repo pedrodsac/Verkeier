@@ -15,6 +15,14 @@ struct PlanView: View {
         .navigationTitle("Plan")
         .toolbarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                RouteOptionsBar(
+                    filters: viewModel.filters,
+                    hasDestination: viewModel.hasDestination,
+                    updateRouteFilters: actions.updateRouteFilters,
+                    saveCurrentCommutePreset: actions.saveCurrentCommutePreset
+                )
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 RoutePlanningTimeButton(
                     current: viewModel.planningTime,

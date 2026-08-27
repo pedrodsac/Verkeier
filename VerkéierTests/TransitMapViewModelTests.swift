@@ -18,13 +18,25 @@ struct TransitMapViewModelTests {
 
     @Test func selectingStopGroupShowsChooserAndDeduplicatesStops() {
         let firstStop = makeStop(id: "stop-1")
-        let secondStop = makeStop(id: "stop-2")
+        let secondStop = makeStop(id: "stop-2", name: "Other Stop")
         let viewModel = TransitMapViewModel()
 
         viewModel.selectStopGroup([firstStop, secondStop, firstStop])
 
         #expect(viewModel.selectedStop == nil)
         #expect(viewModel.selectedStopGroup.map(\.id) == ["stop-1", "stop-2"])
+    }
+
+    @Test func selectingStopGroupCollapsesDifferentIDsWithSameName() {
+        let firstStop = makeStop(id: "stop-1")
+        let duplicateNameStop = makeStop(id: "stop-2")
+        let otherStop = makeStop(id: "stop-3", name: "Other Stop")
+        let viewModel = TransitMapViewModel()
+
+        viewModel.selectStopGroup([firstStop, duplicateNameStop, otherStop])
+
+        #expect(viewModel.selectedStop == nil)
+        #expect(viewModel.selectedStopGroup.map(\.id) == ["stop-1", "stop-3"])
     }
 
     @Test func transitSheetRoutesUseExpectedDetents() {
@@ -273,7 +285,6 @@ struct TransitMapViewModelTests {
         #expect(viewModel.routePlan == routePlan)
         #expect(viewModel.routeOptions == [option])
         #expect(viewModel.selectedRouteOptionID == option.id)
-        #expect(viewModel.visibleRouteOptionCount == 1)
         #expect(viewModel.routeMapOverlay == nil)
         #expect(viewModel.isWaitingForRouteLocation == false)
         #expect(viewModel.isCalculatingRoute == false)
@@ -477,28 +488,26 @@ struct TransitMapViewModelTests {
         #expect(viewModel.routeMapOverlay == secondOption.mapOverlay)
     }
 
-    @Test func showMoreRouteOptionsRevealsThreeMoreAndThenStopsAtAllAvailableOptions() {
+    @Test func duplicateRouteOptionIDsAreCollapsedBeforeSelection() async {
         let destination = makeStop(id: "stop-1")
+        let option = makeRouteOption(
+            id: "duplicate-route",
+            plan: makeRoutePlan(destination: destination)
+        )
+        let routeService = MockRouteService(result: .success(RouteCalculation(
+            options: [option, option],
+            selectedOptionID: option.id
+        )))
         let viewModel = TransitMapViewModel()
         viewModel.selectStop(destination)
-        viewModel.routeOptions = (0 ..< 8).map { index in
-            makeRouteOption(
-                id: "route-\(index)",
-                plan: makeRoutePlan(destination: destination, routeName: "\(index)")
-            )
-        }
-        viewModel.visibleRouteOptionCount = 5
-        viewModel.selectedRouteOptionID = viewModel.routeOptions.first?.id
 
-        viewModel.showMoreRouteOptions()
+        await viewModel.calculateRoute(
+            using: routeService,
+            from: CLLocation(latitude: 49.61, longitude: 6.13)
+        )
 
-        #expect(viewModel.visibleRouteOptionCount == 8)
-        #expect(viewModel.routeStatusMessage == nil)
-
-        viewModel.showMoreRouteOptions()
-
-        #expect(viewModel.visibleRouteOptionCount == 8)
-        #expect(viewModel.routeStatusMessage == nil)
+        #expect(viewModel.routeOptions == [option])
+        #expect(viewModel.selectedRouteOptionID == option.id)
     }
 
     @Test func missedPreferredRouteFallsBackToNextViableOption() async {
@@ -544,7 +553,7 @@ struct TransitMapViewModelTests {
         #expect(viewModel.routeDestination?.title == stop.name)
     }
 
-    @Test func routeFiltersPreferFewestTransfersAndMatchingMode() async {
+    @Test func routeFiltersKeepMatchingMode() async {
         let destination = makeStop(id: "stop-1")
         let busOption = makeTimedRouteOption(
             id: "route-bus",
@@ -571,7 +580,6 @@ struct TransitMapViewModelTests {
         let viewModel = TransitMapViewModel()
         viewModel.selectStop(destination)
         viewModel.updateRouteFilters(RoutePlannerFilters(
-            sort: .fewestTransfers,
             modePreference: .tram,
             avoidTightTransfers: false,
             preferAccessible: false
@@ -586,7 +594,39 @@ struct TransitMapViewModelTests {
         #expect(viewModel.selectedRouteOptionID == "route-tram")
     }
 
-    @Test func arriveByOrderingKeepsLatestDepartureAheadOfShorterEarlyRoute() async {
+    @Test func routeServiceProfileOrderIsPreserved() async {
+        let destination = makeStop(id: "stop-1")
+        let earlyArrival = makeTimedRouteOption(
+            id: "route-early-arrival",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_000),
+            arrival: Date(timeIntervalSince1970: 2_000),
+            routeName: "Early"
+        )
+        let lateArrival = makeTimedRouteOption(
+            id: "route-late-arrival",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_100),
+            arrival: Date(timeIntervalSince1970: 2_050),
+            routeName: "Late"
+        )
+        let routeService = MockRouteService(result: .success(RouteCalculation(
+            options: [lateArrival, earlyArrival],
+            selectedOptionID: nil
+        )))
+        let viewModel = TransitMapViewModel(now: { Date(timeIntervalSince1970: 0) })
+        viewModel.selectStop(destination)
+
+        await viewModel.calculateRoute(
+            using: routeService,
+            from: CLLocation(latitude: 49.61, longitude: 6.13)
+        )
+
+        #expect(viewModel.routeOptions.map(\.id) == ["route-late-arrival", "route-early-arrival"])
+        #expect(viewModel.selectedRouteOptionID == "route-late-arrival")
+    }
+
+    @Test func arriveByKeepsRouteServiceProfileOrder() async {
         let destination = makeStop(id: "stop-1")
         let deadline = Date(timeIntervalSince1970: 10_000)
         let earlyShortOption = makeTimedRouteOption(
@@ -616,7 +656,7 @@ struct TransitMapViewModelTests {
             from: CLLocation(latitude: 49.61, longitude: 6.13)
         )
 
-        #expect(viewModel.routeOptions.map(\.id) == ["route-later-long", "route-early-short"])
+        #expect(viewModel.routeOptions.map(\.id) == ["route-early-short", "route-later-long"])
         #expect(viewModel.selectedRouteOptionID == "route-later-long")
     }
 
@@ -639,7 +679,6 @@ struct TransitMapViewModelTests {
         let viewModel = TransitMapViewModel()
         viewModel.selectStop(destination)
         viewModel.updateRouteFilters(RoutePlannerFilters(
-            sort: .fastest,
             modePreference: .any,
             avoidTightTransfers: false,
             preferAccessible: true
@@ -755,11 +794,11 @@ struct TransitMapViewModelTests {
         )
     }
 
-    private func makeStop(id: String) -> Stop {
+    private func makeStop(id: String, name: String = "Test Stop") -> Stop {
         Stop(
             id: id,
-            name: "Test Stop",
-            location: LocationPoint(name: "Test Stop", latitude: 49.6, longitude: 6.1),
+            name: name,
+            location: LocationPoint(name: name, latitude: 49.6, longitude: 6.1),
             modes: [.bus],
             dataSource: .mock
         )
@@ -994,7 +1033,11 @@ private nonisolated final class MockRouteService: RouteService, @unchecked Senda
     }
 
     func calculateRoute(
-        from _: LocationPoint, to _: LocationPoint, time _: RoutePlanningTime, filters _: RoutePlannerFilters
+        from _: LocationPoint,
+        to _: LocationPoint,
+        time _: RoutePlanningTime,
+        filters _: RoutePlannerFilters,
+        realtimeRefreshPolicy _: RouteRealtimeRefreshPolicy
     ) async throws -> RouteCalculation {
         calculateCallCount += 1
         return try result.get()

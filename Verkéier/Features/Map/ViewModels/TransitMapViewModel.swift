@@ -59,8 +59,8 @@ final class TransitMapViewModel {
     var recentTrips: [RouteCommutePreset] = []
     var commutePresets: [RouteCommutePreset] = []
     var routeOptions: [RouteOption] = []
+    var supplementalRouteOptions: [RouteOption] = []
     var selectedRouteOptionID: String?
-    var visibleRouteOptionCount = 0
     var routeLoadingPhase: RouteLoadingPhase = .idle
     var routeErrorMessage: String?
     var routeStatusMessage: String?
@@ -81,7 +81,6 @@ final class TransitMapViewModel {
     let minimumMapSpan = 0.001
     let favouriteDepartureConcurrencyLimit = 3
     let nearbyRouteConcurrencyLimit = 10
-    let routeOptionInitialVisibleCount = 5
     var visibleMapRegion: MKCoordinateRegion?
     let now: @Sendable () -> Date
     var routeCalculationGeneration = 0
@@ -135,8 +134,8 @@ final class TransitMapViewModel {
     func clearRouteResult() {
         unfilteredRouteOptions = []
         routeOptions = []
+        supplementalRouteOptions = []
         selectedRouteOptionID = nil
-        visibleRouteOptionCount = 0
         routeStatusMessage = nil
         routeLastCalculatedAt = nil
     }

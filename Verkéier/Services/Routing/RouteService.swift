@@ -16,7 +16,11 @@ protocol RouteService: Sendable {
     /// - Returns: A ``RouteCalculation`` holding one or more options.
     /// - Throws: ``RoutingError`` when no usable route can be produced.
     nonisolated func calculateRoute(
-        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime, filters: RoutePlannerFilters
+        from: LocationPoint,
+        to: LocationPoint,
+        time: RoutePlanningTime,
+        filters: RoutePlannerFilters,
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy
     ) async throws -> RouteCalculation
 
     /// Opens the journey in Apple Maps for turn-by-turn navigation.
@@ -24,6 +28,23 @@ protocol RouteService: Sendable {
 }
 
 extension RouteService {
+    /// Default calculation path: reuse a snapshot that is still fresh enough to be
+    /// useful. The explicit planner refresh action passes `.forceRefresh` instead.
+    nonisolated func calculateRoute(
+        from: LocationPoint,
+        to: LocationPoint,
+        time: RoutePlanningTime,
+        filters: RoutePlannerFilters
+    ) async throws -> RouteCalculation {
+        try await calculateRoute(
+            from: from,
+            to: to,
+            time: time,
+            filters: filters,
+            realtimeRefreshPolicy: .useCache
+        )
+    }
+
     /// Convenience that plans for immediate departure with default filters.
     nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint) async throws -> RouteCalculation {
         try await calculateRoute(from: from, to: to, time: .leaveNow, filters: RoutePlannerFilters())
@@ -35,6 +56,13 @@ extension RouteService {
     ) async throws -> RouteCalculation {
         try await calculateRoute(from: from, to: to, time: time, filters: RoutePlannerFilters())
     }
+}
+
+/// Controls whether a planner calculation may reuse its short-lived ATP snapshot.
+/// The policy has no effect on offline and MapKit-only routing.
+nonisolated enum RouteRealtimeRefreshPolicy: Hashable, Sendable {
+    case useCache
+    case forceRefresh
 }
 
 /// Errors thrown by a ``RouteService``.

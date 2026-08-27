@@ -6,7 +6,7 @@ import Foundation
 /// The route planner returns several options; the computed properties here
 /// (transfer count, walking distance, live-data usage, and ``status(at:)``)
 /// drive both sorting and the badges shown for each alternative.
-nonisolated struct RouteOption: Codable, Hashable, Identifiable {
+nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     /// Stable identifier for the option.
     let id: String
     /// The underlying journey plan.
@@ -21,7 +21,7 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable {
 
     /// Departure time of the first transit leg, preferring realtime over
     /// scheduled times. Bike-only plans fall back to their first leg so the
-    /// value remains useful to callers that need a journey start time.
+    /// value remains useful to callers that need a transit departure time.
     var firstTransitDepartureTime: Date? {
         let transitDeparture = transitLegs.compactMap {
             $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime
@@ -35,7 +35,7 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable {
     /// the first leg, *including* any initial access walk. Mirrors ``arrivalTime``
     /// so the detail timeline's first row and the summary header open on the same
     /// minute. (``firstTransitDepartureTime`` remains the "when does my bus leave"
-    /// figure used for status and the options list.)
+    /// figure used for status and transit-specific presentation.)
     var departureTime: Date? {
         plan.legs.first.flatMap {
             $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime
@@ -70,6 +70,23 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable {
                 || leg.liveStatus == .delayed
                 || leg.liveStatus == .cancelled
         }
+    }
+
+    /// Routes may mix live and timetable-only services because ATP does not
+    /// provide predictions for every line. Those schedule-only legs remain useful,
+    /// but the option must not imply that every connection is live-confirmed.
+    var realtimeCoverage: RouteRealtimeCoverage {
+        let legs = transitLegs
+        guard !legs.isEmpty else { return .scheduleOnly }
+
+        let hasLiveLeg = legs.contains {
+            $0.liveStatus == .live || $0.liveStatus == .delayed || $0.liveStatus == .cancelled
+        }
+        let hasScheduledLeg = legs.contains {
+            $0.liveStatus == .scheduled || $0.liveStatus == .unknown
+        }
+        if hasLiveLeg, hasScheduledLeg { return .partial }
+        return hasLiveLeg ? .live : .scheduleOnly
     }
 
     var usesBikeShare: Bool {
@@ -110,8 +127,9 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable {
     /// Resolves the option's status relative to a reference time.
     ///
     /// Resolution order: cancelled → missed (transit first departure already
-    /// gone, with a 30s grace) → at-risk (any tight transfer) → viable (uses
-    /// live data) → scheduled-only. Vel'OH!-only plans never become missed.
+    /// gone, with a 30s grace) → Connection miss → at-risk (any tight
+    /// transfer) → live / partly-live / schedule-only. Vel'OH!-only plans never
+    /// become missed.
     ///
     /// - Parameter now: The reference time, usually the current date.
     func status(at now: Date) -> RouteOptionStatus {
@@ -125,15 +143,37 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable {
             return .missed
         }
 
+        if transitLegs.contains(where: { $0.transferWarning == "Connection miss" }) {
+            return .connectionMayBeMissed
+        }
+
         if transitLegs.contains(where: { $0.transferWarning != nil }) {
             return .atRisk
         }
 
-        if usesLiveData {
+        switch realtimeCoverage {
+        case .live:
             return .viable
+        case .partial:
+            return .partiallyLive
+        case .scheduleOnly:
+            return .scheduledOnly
         }
+    }
+}
 
-        return .scheduledOnly
+/// Completeness of realtime evidence across a route's transit legs.
+nonisolated enum RouteRealtimeCoverage: String, Codable, Hashable {
+    case live
+    case partial
+    case scheduleOnly
+
+    var displayText: String {
+        switch self {
+        case .live: "Live"
+        case .partial: "Partly live"
+        case .scheduleOnly: "Schedule only"
+        }
     }
 }
 
@@ -142,10 +182,14 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable {
 nonisolated enum RouteOptionStatus: String, Codable, Hashable {
     /// Backed by live data and currently catchable.
     case viable
+    /// Catchable, but one or more legs have timetable-only data.
+    case partiallyLive
     /// Timetable-only; no realtime confirmation.
     case scheduledOnly
     /// Reachable but contains a tight transfer.
     case atRisk
+    /// A transfer has insufficient time to be made reliably.
+    case connectionMayBeMissed
     /// The first departure has already left.
     case missed
     /// A leg has been cancelled.
@@ -155,8 +199,10 @@ nonisolated enum RouteOptionStatus: String, Codable, Hashable {
     var displayText: String {
         switch self {
         case .viable: "Live"
-        case .scheduledOnly: "Scheduled"
+        case .partiallyLive: "Partly live"
+        case .scheduledOnly: "Schedule only"
         case .atRisk: "Tight transfer"
+        case .connectionMayBeMissed: "Connection miss"
         case .missed: "Missed"
         case .cancelled: "Cancelled"
         }

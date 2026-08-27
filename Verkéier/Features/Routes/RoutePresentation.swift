@@ -36,23 +36,24 @@ struct RoutePresentationModel {
     let filters: RoutePlannerFilters
     let planningTime: RoutePlanningTime
     let routeOptions: [RouteOption]
+    var supplementalRouteOptions: [RouteOption] = []
     let alerts: [AlertMessage]
     /// Active disruptions affecting each transit leg, keyed by leg index string.
     var legAlerts: [String: [AlertMessage]] = [:]
     let selectedRouteOptionID: String?
-    let visibleRouteOptionCount: Int
     let loadingPhase: RouteLoadingPhase
     let errorMessage: String?
     let statusMessage: String?
     var lastCalculatedAt: Date? = nil
 
     var selectedRouteOption: RouteOption? {
-        guard !routeOptions.isEmpty else { return nil }
+        let allOptions = routeOptions + supplementalRouteOptions
+        guard !allOptions.isEmpty else { return nil }
         if let selectedRouteOptionID,
-           let match = routeOptions.first(where: { $0.id == selectedRouteOptionID }) {
+           let match = allOptions.first(where: { $0.id == selectedRouteOptionID }) {
             return match
         }
-        return routeOptions.first
+        return allOptions.first
     }
 
     var selectedRoutePlan: RoutePlan? {
@@ -103,14 +104,6 @@ struct RoutePresentationModel {
         return recentPlaces.filter { !pinnedIDs.contains($0.id) }
     }
 
-    var visibleRouteOptions: [RouteOption] {
-        Array(routeOptions.prefix(visibleRouteOptionCount))
-    }
-
-    var canShowMoreRouteOptions: Bool {
-        visibleRouteOptionCount < routeOptions.count
-    }
-
     var isStale: Bool {
         guard planningTime.isNow,
               let lastCalculatedAt,
@@ -125,7 +118,6 @@ struct RoutePresentationModel {
 /// Callbacks the route-planner sheet needs, sliced from ``TransitSheetActions``.
 struct RouteActions {
     var calculateRoute: () -> Void = {}
-    var showMoreRouteOptions: () -> Void = {}
     var openInAppleMaps: () -> Void = {}
     var selectRouteOrigin: (RoutePlace?) -> Void = { _ in }
     var selectRouteDestination: (RoutePlace) -> Void = { _ in }
@@ -142,7 +134,6 @@ extension RouteActions {
     init(from actions: TransitSheetActions) {
         self.init()
         calculateRoute = actions.calculateRoute
-        showMoreRouteOptions = actions.showMoreRouteOptions
         openInAppleMaps = actions.openRouteInAppleMaps
         selectRouteOrigin = actions.selectRouteOrigin
         selectRouteDestination = actions.selectRouteDestination

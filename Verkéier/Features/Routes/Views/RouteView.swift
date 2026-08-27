@@ -4,10 +4,10 @@ import SwiftUI
 
 /// The route-planner navigation destination.
 ///
-/// Composes a unified endpoints card, compact filter bar, state-driven middle
-/// section (loading skeletons, error/empty cards, results list), and a primary
-/// Find Routes action. All business logic lives upstream — this view is fully
-/// stateless, driven by ``RoutePresentationModel`` and closure callbacks.
+/// Composes a unified endpoints card, state-driven middle section (loading
+/// skeletons, error/empty cards, results list), and a primary Find Routes
+/// action. All business logic lives upstream — this view is fully stateless,
+/// driven by ``RoutePresentationModel`` and closure callbacks.
 struct RouteView: View {
     let viewModel: RoutePresentationModel
     let actions: RouteActions
@@ -30,14 +30,6 @@ struct RouteView: View {
             if !viewModel.recentTrips.isEmpty {
                 recentTripsRow
             }
-
-            // ── Sort + options bar ────────────────────────────────────────
-            RouteOptionsBar(
-                filters: viewModel.filters,
-                hasDestination: viewModel.hasDestination,
-                updateRouteFilters: actions.updateRouteFilters,
-                saveCurrentCommutePreset: actions.saveCurrentCommutePreset
-            )
 
             // ── Primary action ────────────────────────────────────────────
             findRoutesButton
@@ -202,7 +194,7 @@ struct RouteView: View {
         }
 
         // Results
-        if !viewModel.routeOptions.isEmpty {
+        if !viewModel.routeOptions.isEmpty || !viewModel.supplementalRouteOptions.isEmpty {
             routeResultsSection
         }
     }
@@ -248,21 +240,23 @@ struct RouteView: View {
 
     private var routeResultsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForEach(viewModel.visibleRouteOptions) { option in
+            ForEach(viewModel.routeOptions) { option in
                 RouteOptionCard(
                     option: option,
                     isSelected: option.id == viewModel.selectedRouteOptionID,
                 )
             }
 
-            if viewModel.canShowMoreRouteOptions {
-                Button(action: actions.showMoreRouteOptions) {
-                    Label("Show more routes", systemImage: "plus.circle")
-                        .font(.callout.weight(.semibold))
-                        .frame(maxWidth: .infinity)
+            if !viewModel.supplementalRouteOptions.isEmpty {
+                Text("Bike option")
+                    .font(.headline)
+                    .padding(.top, 6)
+                ForEach(viewModel.supplementalRouteOptions) { option in
+                    RouteOptionCard(
+                        option: option,
+                        isSelected: option.id == viewModel.selectedRouteOptionID
+                    )
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
             }
         }
     }

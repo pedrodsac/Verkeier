@@ -10,6 +10,8 @@ import Foundation
 final class LocalGTFSService: GTFSService {
     private let loader: GTFSDataLoader
     private let updateTask: Task<Void, Never>
+    /// Shared by route-service values that are recreated by SwiftUI.
+    let routeSearchContextCache = RouteSearchContextCache()
 
     init(
         bundle: Bundle = .main,
@@ -35,9 +37,11 @@ final class LocalGTFSService: GTFSService {
             initialSnapshot: initialSnapshot
         )
         self.loader = loader
-        updateTask = Task { [loader] in
+        let routeSearchContextCache = self.routeSearchContextCache
+        updateTask = Task { [loader, routeSearchContextCache] in
             for await _ in NotificationCenter.default.notifications(named: .gtfsDidUpdate) {
                 await loader.reloadFromDisk()
+                await routeSearchContextCache.removeAll()
             }
         }
     }

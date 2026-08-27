@@ -37,7 +37,11 @@ struct RouteTimelineBuilderTests {
         transferWarning: String? = nil,
         stopCount: Int? = nil,
         departure: Double = 100,
-        arrival: Double = 900
+        arrival: Double = 900,
+        scheduledDeparture: Double? = nil,
+        scheduledArrival: Double? = nil,
+        realtimeDeparture: Double? = nil,
+        realtimeArrival: Double? = nil
     ) -> RoutePlan.Leg {
         RoutePlan.Leg(
             id: id,
@@ -50,6 +54,10 @@ struct RouteTimelineBuilderTests {
             destination: point(to),
             departureTime: Date(timeIntervalSince1970: departure),
             arrivalTime: Date(timeIntervalSince1970: arrival),
+            scheduledDepartureTime: scheduledDeparture.map(Date.init(timeIntervalSince1970:)),
+            scheduledArrivalTime: scheduledArrival.map(Date.init(timeIntervalSince1970:)),
+            realtimeDepartureTime: realtimeDeparture.map(Date.init(timeIntervalSince1970:)),
+            realtimeArrivalTime: realtimeArrival.map(Date.init(timeIntervalSince1970:)),
             platform: platform,
             delayMinutes: delay,
             liveStatus: status,
@@ -153,12 +161,35 @@ struct RouteTimelineBuilderTests {
         // places[1] is the boarding stop: it owns the outgoing transit leg's data.
         #expect(places[1].platform == "2")
         #expect(places[1].delayMinutes == 3)
-        #expect(places[1].showsDelayBadge)
+        #expect(places[1].announcesDelay)
         #expect(places[1].departureTime == Date(timeIntervalSince1970: 100)) // boarding (departure) time
 
         // The final place has no outgoing leg: arrival time, no badge.
-        #expect(places.last?.showsDelayBadge == false)
+        #expect(places.last?.announcesDelay == false)
         #expect(places.last?.arrivalTime == Date(timeIntervalSince1970: 900))
+    }
+
+    @Test func delayedBoardingCarriesScheduledTimeAboveEffectiveTime() {
+        let board = places([
+            walk("w1", from: "origin", to: "stop"),
+            transit(
+                "t1",
+                from: "stop",
+                to: "dest",
+                delay: 10,
+                status: .delayed,
+                departure: 1_300,
+                arrival: 2_100,
+                scheduledDeparture: 700,
+                scheduledArrival: 1_500,
+                realtimeDeparture: 1_300,
+                realtimeArrival: 2_100
+            )
+        ])[1]
+
+        #expect(board.scheduledDepartureTime == Date(timeIntervalSince1970: 700))
+        #expect(board.departureTime == Date(timeIntervalSince1970: 1_300))
+        #expect(board.delayMinutes == 10)
     }
 
     // MARK: - Roles

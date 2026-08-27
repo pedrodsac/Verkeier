@@ -17,7 +17,9 @@ struct RouteTimelineSummaryCard: View {
 
                 Spacer(minLength: 8)
 
-                RouteOptionBadge(status: option.status(at: .now))
+                if !option.isVelohOnly {
+                    RouteOptionBadge(status: option.status(at: .now))
+                }
             }
 
             RouteRibbon(legs: option.plan.legs)

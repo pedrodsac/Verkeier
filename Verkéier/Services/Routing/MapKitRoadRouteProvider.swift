@@ -2,10 +2,21 @@ import CoreLocation
 import Foundation
 import MapKit
 
-enum RoadRouteTransport: String {
+enum RoadRouteTransport: String, Sendable {
     case automobile
     case walking
     case bicycle
+}
+
+/// A route returned by a road-routing provider.
+///
+/// `distanceMeters` is the distance traveled along the route, rather than the
+/// straight-line distance between its endpoints. Keeping it alongside the
+/// polyline prevents callers from having to infer travel distance from map
+/// presentation data.
+struct RoadRoute: Sendable {
+    let coordinates: [RouteMapCoordinate]
+    let distanceMeters: Double
 }
 
 struct MapKitRoadRouteProvider: RoadRouteProviding {
@@ -14,6 +25,14 @@ struct MapKitRoadRouteProvider: RoadRouteProviding {
         to destination: LocationPoint,
         transport: RoadRouteTransport
     ) async -> [RouteMapCoordinate]? {
+        await roadRoute(from: origin, to: destination, transport: transport)?.coordinates
+    }
+
+    nonisolated func roadRoute(
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        transport: RoadRouteTransport
+    ) async -> RoadRoute? {
         let request = MKDirections.Request()
         request.source = mapItem(for: origin)
         request.destination = mapItem(for: destination)
@@ -34,9 +53,12 @@ struct MapKitRoadRouteProvider: RoadRouteProviding {
             range: NSRange(location: 0, length: route.polyline.pointCount)
         )
 
-        return coordinates.map {
-            RouteMapCoordinate(latitude: $0.latitude, longitude: $0.longitude)
-        }
+        return RoadRoute(
+            coordinates: coordinates.map {
+                RouteMapCoordinate(latitude: $0.latitude, longitude: $0.longitude)
+            },
+            distanceMeters: route.distance
+        )
     }
 
     private nonisolated func mapItem(for point: LocationPoint) -> MKMapItem {

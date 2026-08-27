@@ -44,12 +44,21 @@ struct SettingsView: View {
 					}
 				}
 			}
-			Section("Route Planner Defaults") {
-				Picker("Sort by", selection: $prefs.defaultRouteSort) {
-					ForEach(RoutePlannerSortOption.allCases) { option in
-						Text(option.title).tag(option)
-					}
+			Section("Map pins") {
+				Toggle(isOn: $prefs.showBikeShareStations) {
+					mapPinLabel("Bike share stations", mode: .bicycle)
 				}
+				Toggle(isOn: $prefs.showBusStops) {
+					mapPinLabel("Bus stops", mode: .bus)
+				}
+				Toggle(isOn: $prefs.showTramStops) {
+					mapPinLabel("Tram stops", mode: .tram)
+				}
+				Toggle(isOn: $prefs.showTrainStations) {
+					mapPinLabel("Train stations", mode: .train)
+				}
+			}
+			Section("Route Planner Defaults") {
 				Picker("Preferred mode", selection: $prefs.defaultModePreference) {
 					ForEach(RoutePlannerModePreference.allCases) { mode in
 						Text(mode.title).tag(mode)
@@ -81,6 +90,17 @@ struct SettingsView: View {
         // Give every settings glyph subtle layered depth without per-row changes.
         .symbolRenderingMode(.hierarchical)
     }
+
+	@ViewBuilder
+	private func mapPinLabel(_ title: LocalizedStringKey, mode: TransportMode) -> some View {
+		Label {
+			Text(title)
+				.foregroundStyle(.primary)
+		} icon: {
+			Image(systemName: mode.symbolName)
+				.foregroundStyle(mode.tint)
+		}
+	}
 }
 
 /// A settings section showing notification and location permission status with a

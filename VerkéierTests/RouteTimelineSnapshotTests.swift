@@ -8,7 +8,7 @@ import Testing
 /// surface here fail loudly rather than in production.
 @MainActor
 struct RouteTimelineSnapshotTests {
-    // Future-relative so the option resolves to a live "Tight transfer" rather
+    // Future-relative so the option resolves to a live connection warning rather
     // than "Missed", and every time is monotonic.
     private let base = Date().addingTimeInterval(8 * 60)
     private func t(_ minutes: Int) -> Date {
@@ -45,7 +45,7 @@ struct RouteTimelineSnapshotTests {
                 realtimeDepartureTime: t(29),
                 realtimeArrivalTime: t(41),
                 platform: "5", delayMinutes: 7, liveStatus: .delayed,
-                transferWarning: "Connection may be missed"
+                transferWarning: "Connection miss"
             ),
             RoutePlan.Leg(
                 id: "b12", mode: .bus, transportKind: .transit, routeName: "12",

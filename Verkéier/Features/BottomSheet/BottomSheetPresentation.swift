@@ -19,7 +19,6 @@ struct TransitSheetActions {
     let refreshDepartures: () async -> Void
     let refreshAlerts: () -> Void
     let calculateRoute: () -> Void
-    let showMoreRouteOptions: () -> Void
     let showHome: () -> Void
     let expandSheet: () -> Void
     let openRouteInAppleMaps: () -> Void

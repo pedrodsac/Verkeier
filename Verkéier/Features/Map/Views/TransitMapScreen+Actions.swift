@@ -66,7 +66,6 @@ extension TransitMapScreen {
             refreshDepartures: refreshDepartures,
             refreshAlerts: refreshAlerts,
             calculateRoute: calculateRoute,
-            showMoreRouteOptions: showMoreRouteOptions,
             showHome: showHome,
             expandSheet: expandSheet,
             openRouteInAppleMaps: openRouteInAppleMaps,
@@ -254,6 +253,9 @@ extension TransitMapScreen {
 
     func updateRouteFilters(_ filters: RoutePlannerFilters) {
         viewModel.updateRouteFilters(filters)
+        if viewModel.routeDestination != nil || viewModel.selectedStop != nil {
+            calculateRoute()
+        }
     }
 
     func setRoutePlanningTime(_ time: RoutePlanningTime) {
@@ -451,10 +453,6 @@ extension TransitMapScreen {
         viewModel.openSelectedRouteInAppleMaps(
             using: routeService, from: locationService.currentLocation
         )
-    }
-
-    func showMoreRouteOptions() {
-        viewModel.showMoreRouteOptions()
     }
 
     func refreshAlerts() {

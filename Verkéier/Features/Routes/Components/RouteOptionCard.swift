@@ -33,9 +33,11 @@ struct RouteOptionCard: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    Spacer(minLength: 8)
+                    Spacer(minLength: -8)
 
-                    RouteOptionBadge(status: option.status(at: .now))
+                    if !option.isVelohOnly {
+                        RouteOptionBadge(status: option.status(at: .now))
+                    }
                 }
 
                 // ── Mode / line ribbon ────────────────────────────────────
@@ -65,7 +67,9 @@ struct RouteOptionCard: View {
     // MARK: - Computed properties
 
     private var timeRangeText: String {
-        let departure = option.firstTransitDepartureTime
+        // Show when the traveller needs to leave the origin, including any
+        // initial access walk. The transit departure is shown in the timeline.
+        let departure = option.departureTime
         let arrival = option.arrivalTime
 
         switch (departure, arrival) {
@@ -95,7 +99,7 @@ struct RouteOptionCard: View {
         let dataNote = if option.usesBikeShare {
             option.hasBikeAvailabilityWarning ? "Bike availability uncertain" : "Bike availability live"
         } else {
-            option.usesLiveData ? "Live" : "Scheduled"
+            option.realtimeCoverage.displayText
         }
 
         return "\(transfers)  ·  \(distance)  ·  \(dataNote)"

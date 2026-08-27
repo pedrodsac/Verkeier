@@ -25,6 +25,10 @@ struct RouteEndpointsCard: View {
             swapButton
         }
         .cardSurface(radius: 18)
+        // Keep the connector rail from using spare sheet height when the
+        // planner is empty. Without this, its flexible marker frames can
+        // make the endpoint card grow until routes or a destination appear.
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     // MARK: - Connector rail
@@ -156,7 +160,6 @@ struct RouteEndpointsCard: View {
                 routeOptions: [],
                 alerts: [],
                 selectedRouteOptionID: nil,
-                visibleRouteOptionCount: 0,
                 loadingPhase: .idle,
                 errorMessage: nil,
                 statusMessage: nil

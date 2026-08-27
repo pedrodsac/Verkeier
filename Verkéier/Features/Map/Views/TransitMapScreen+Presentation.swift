@@ -7,8 +7,10 @@ import SwiftUI
 
 extension TransitMapScreen {
     var sheetPresentationModel: TransitSheetPresentationModel {
+        let nearbyStops = viewModel.nearbyStops.deduplicatedByExactName()
+
         let nearby = NearbyStopsPresentationModel(
-            stops: viewModel.nearbyStops,
+            stops: nearbyStops,
             isLoading: viewModel.isLoadingNearbyStops,
             errorMessage: viewModel.nearbyStopsErrorMessage,
             referenceLocation: locationService.currentLocation,
@@ -30,7 +32,7 @@ extension TransitMapScreen {
                 liveDeparturesAvailable: canLoadLiveFavouriteDepartures
             ),
             stopGroup: StopGroupPresentationModel(
-                stops: viewModel.selectedStopGroup,
+                stops: viewModel.selectedStopGroup.deduplicatedByExactName(),
                 bikeShareStations: viewModel.selectedBikeShareStations,
                 referenceLocation: locationService.currentLocation,
                 routesByStopId: viewModel.nearbyStopRoutes
@@ -43,10 +45,10 @@ extension TransitMapScreen {
             ),
             search: SearchPresentationModel(
                 results: viewModel.searchResults,
-                nearbySuggestions: viewModel.nearbyStops,
+                nearbySuggestions: nearbyStops,
                 isLoadingNearbySuggestions: viewModel.isLoadingNearbyStops,
                 referenceLocation: locationService.currentLocation,
-                recentStops: viewModel.recentStops
+                recentStops: viewModel.recentStops.deduplicatedByExactName()
             ),
             stopDetail: StopDetailPresentationModel(
                 stop: viewModel.selectedStop,
@@ -82,17 +84,17 @@ extension TransitMapScreen {
                     )
                 },
                 favouritePlaces: favouriteStops.map { RoutePlace(stop: $0, source: .favourite) },
-                nearbyPlaces: viewModel.nearbyStops.map { RoutePlace(stop: $0, source: .nearby) },
+                nearbyPlaces: nearbyStops.map { RoutePlace(stop: $0, source: .nearby) },
                 recentPlaces: viewModel.recentRoutePlaces,
                 commutePresets: viewModel.commutePresets,
                 recentTrips: viewModel.recentTrips,
                 filters: viewModel.routeFilters,
                 planningTime: viewModel.routePlanningTime,
                 routeOptions: viewModel.routeOptions,
+                supplementalRouteOptions: viewModel.supplementalRouteOptions,
                 alerts: viewModel.routeAlerts,
                 legAlerts: viewModel.routeLegAlerts,
                 selectedRouteOptionID: viewModel.selectedRouteOptionID,
-                visibleRouteOptionCount: viewModel.visibleRouteOptionCount,
                 loadingPhase: viewModel.routeLoadingPhase,
                 errorMessage: viewModel.routeErrorMessage,
                 statusMessage: viewModel.routeStatusMessage,

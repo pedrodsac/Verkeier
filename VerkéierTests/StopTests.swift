@@ -52,4 +52,29 @@ struct StopTests {
         #expect(stop.locality == "Centre")
         #expect(stop.name == "Hamilius-Centre")
     }
+
+    @Test func deduplicatesStopsByExactCanonicalName() {
+        let first = Stop(
+            id: "first",
+            name: "Central",
+            location: LocationPoint(latitude: 49.6, longitude: 6.1),
+            dataSource: .gtfs
+        )
+        let duplicate = Stop(
+            id: "duplicate",
+            name: "Central",
+            location: LocationPoint(latitude: 49.601, longitude: 6.101),
+            dataSource: .gtfs
+        )
+        let differentCase = Stop(
+            id: "different-case",
+            name: "central",
+            location: LocationPoint(latitude: 49.602, longitude: 6.102),
+            dataSource: .gtfs
+        )
+
+        let result = [first, duplicate, differentCase].deduplicatedByExactName()
+
+        #expect(result.map(\.id) == ["first", "different-case"])
+    }
 }

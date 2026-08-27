@@ -1,27 +1,7 @@
 import Foundation
 
-/// How the route planner orders the alternatives it returns.
-nonisolated enum RoutePlannerSortOption: String, Codable, CaseIterable, Identifiable {
-    case fastest
-    case fewestTransfers
-    case leastWalking
-
-    var id: String {
-        rawValue
-    }
-
-    /// Localized title for the picker.
-    var title: String {
-        switch self {
-        case .fastest: "Fastest"
-        case .fewestTransfers: "Fewest Transfers"
-        case .leastWalking: "Least Walking"
-        }
-    }
-}
-
 /// A rider's preferred transport mode for route planning.
-nonisolated enum RoutePlannerModePreference: String, Codable, CaseIterable, Identifiable {
+nonisolated enum RoutePlannerModePreference: String, Codable, CaseIterable, Identifiable, Sendable {
     /// No mode preference.
     case any
     case bus
@@ -58,9 +38,7 @@ nonisolated enum RoutePlannerModePreference: String, Codable, CaseIterable, Iden
 }
 
 /// The set of user-configurable constraints applied to route planning.
-nonisolated struct RoutePlannerFilters: Codable, Hashable {
-    /// Ordering preference for the returned options.
-    var sort: RoutePlannerSortOption = .fastest
+nonisolated struct RoutePlannerFilters: Codable, Hashable, Sendable {
     /// Preferred transport mode.
     var modePreference: RoutePlannerModePreference = .any
     /// When `true`, avoid options with tight transfers.
@@ -71,7 +49,7 @@ nonisolated struct RoutePlannerFilters: Codable, Hashable {
 
 /// When the rider wants to travel: right now, departing at a chosen time, or
 /// arriving by a chosen time. Drives the route search anchor.
-nonisolated enum RoutePlanningTime: Hashable {
+nonisolated enum RoutePlanningTime: Hashable, Sendable {
     case leaveNow
     case departAt(Date)
     case arriveBy(Date)

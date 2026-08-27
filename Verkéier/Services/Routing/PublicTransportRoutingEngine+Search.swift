@@ -1,13 +1,73 @@
 import CoreLocation
 import Foundation
-import HeapModule
 import MapKit
 
 extension PublicTransportRoutingEngine {
+    nonisolated func enrichedDepartureProfile(
+        _ candidates: [RouteCandidate],
+        arriveBy: Bool,
+        deadline: Date?,
+        limit: Int
+    ) -> [RouteCandidate] {
+        guard limit > 0 else { return [] }
+        let usable = candidates.contains(where: { $0.penalty < severePenaltyThreshold })
+            ? candidates.filter { $0.penalty < severePenaltyThreshold }
+            : candidates
+
+        var bestByDeparture: [Int: RouteCandidate] = [:]
+        for candidate in usable {
+            let departure = Int(candidate.departureTime.timeIntervalSince1970.rounded())
+            if let existing = bestByDeparture[departure] {
+                if fastestCandidateRanksBefore(candidate, existing) {
+                    bestByDeparture[departure] = candidate
+                }
+            } else {
+                bestByDeparture[departure] = candidate
+            }
+        }
+        let unique = Array(bestByDeparture.values)
+
+        if arriveBy {
+            let onTime = unique.filter { candidate in
+                deadline.map { candidate.arrivalTime <= $0 } ?? true
+            }
+            return Array(onTime
+                .sorted { $0.departureTime > $1.departureTime }
+                .prefix(limit))
+        }
+
+        var result: [RouteCandidate] = []
+        var threshold = unique.map(\.departureTime).min() ?? .distantFuture
+        while result.count < limit {
+            let remaining = unique.filter { $0.departureTime >= threshold }
+            guard let best = remaining.min(by: { fastestCandidateRanksBefore($0, $1) }) else {
+                break
+            }
+            result.append(best)
+            threshold = best.departureTime.addingTimeInterval(1)
+        }
+        return result
+    }
+
+    private nonisolated func fastestCandidateRanksBefore(
+        _ lhs: RouteCandidate,
+        _ rhs: RouteCandidate
+    ) -> Bool {
+        if lhs.arrivalTime != rhs.arrivalTime { return lhs.arrivalTime < rhs.arrivalTime }
+        if lhs.transitLegCount != rhs.transitLegCount {
+            return lhs.transitLegCount < rhs.transitLegCount
+        }
+        if lhs.totalWalkingMeters != rhs.totalWalkingMeters {
+            return lhs.totalWalkingMeters < rhs.totalWalkingMeters
+        }
+        if lhs.departureTime != rhs.departureTime { return lhs.departureTime > rhs.departureTime }
+        return lhs.signature < rhs.signature
+    }
+
     /// Builds direct vel’OH! alternatives. Bike stations are represented as
     /// ordinary journey nodes so the result can be combined with transit
     /// candidates by the same enrichment and presentation pipeline.
-    func bikeJourneys(
+    nonisolated func bikeJourneys(
         from origin: LocationPoint,
         to destination: LocationPoint,
         stations: [BikeShareStation],
@@ -21,9 +81,9 @@ extension PublicTransportRoutingEngine {
             usable.compactMap { dropoff -> ScheduledJourney? in
                 guard pickup.id != dropoff.id else { return nil }
 
-                let accessDistance = routeSearchDistanceMeters(from: origin, to: pickup.location)
+                let accessDistance = context.walkingDistanceMeters(from: origin, to: pickup.location)
                 let bikeDistance = routeSearchDistanceMeters(from: pickup.location, to: dropoff.location)
-                let egressDistance = routeSearchDistanceMeters(from: dropoff.location, to: destination)
+                let egressDistance = context.walkingDistanceMeters(from: dropoff.location, to: destination)
                 guard bikeDistance >= 100 else { return nil }
 
                 let accessSeconds = walkingSeconds(for: accessDistance)
@@ -101,7 +161,7 @@ extension PublicTransportRoutingEngine {
     /// Adds bike legs to the walking gaps already present in transit journeys.
     /// Each gap can independently become a rental, so a journey may contain
     /// multiple rentals without introducing a separate transit search engine.
-    func mixedBikeJourneys(
+    nonisolated func mixedBikeJourneys(
         from baseJourneys: [ScheduledJourney],
         stations: [BikeShareStation],
         context: RouteSearchContext
@@ -162,7 +222,7 @@ extension PublicTransportRoutingEngine {
             .map { $0 }
     }
 
-    private func bestBikeConnection(
+    private nonisolated func bestBikeConnection(
         from origin: LocationPoint,
         to destination: LocationPoint,
         departureSeconds: Int,
@@ -174,9 +234,9 @@ extension PublicTransportRoutingEngine {
         var best: ([RoutePlan.Leg], Int)?
         for pickup in usable {
             for dropoff in usable where pickup.id != dropoff.id {
-                let accessDistance = routeSearchDistanceMeters(from: origin, to: pickup.location)
+                let accessDistance = context.walkingDistanceMeters(from: origin, to: pickup.location)
                 let bikeDistance = routeSearchDistanceMeters(from: pickup.location, to: dropoff.location)
-                let egressDistance = routeSearchDistanceMeters(from: dropoff.location, to: destination)
+                let egressDistance = context.walkingDistanceMeters(from: dropoff.location, to: destination)
                 guard bikeDistance >= 100 else { continue }
                 let accessSeconds = walkingSeconds(for: accessDistance)
                 let bikeSeconds = max(60, Int((bikeDistance / bikeSpeedMetersPerSecond).rounded(.up)))
@@ -243,7 +303,7 @@ extension PublicTransportRoutingEngine {
         return best?.0
     }
 
-    private func bikeAvailabilityWarning(
+    private nonisolated func bikeAvailabilityWarning(
         pickup: BikeShareStation,
         dropoff: BikeShareStation
     ) -> Bool {
@@ -260,319 +320,16 @@ extension PublicTransportRoutingEngine {
             || isStale(dropoff)
     }
 
-    func scheduledJourneys(
-        from origin: LocationPoint,
-        to destination: LocationPoint,
-        context: RouteSearchContext
-    ) -> [ScheduledJourney] {
-        let originStops = nearestStops(
-            to: origin,
-            in: context,
-            radiusMeters: accessRadiusMeters,
-            limit: 8
-        )
-        let destinationStops = destinationStopMatches(
-            for: destination,
-            in: context,
-            radiusMeters: destinationRadiusMeters
-        )
-        guard !originStops.isEmpty, !destinationStops.isEmpty else { return [] }
-
-        let destinationStopsById = Dictionary(uniqueKeysWithValues: destinationStops.map { ($0.stop.id, $0) })
-        var queue = JourneyPriorityQueue()
-        for originCandidate in originStops {
-            let walkSeconds = walkingSeconds(for: originCandidate.distanceMeters)
-            let accessLeg = walkingLeg(
-                id: "access-\(originCandidate.stop.id)",
-                from: origin,
-                to: originCandidate.stop.location,
-                departureSeconds: context.currentSeconds,
-                arrivalSeconds: context.currentSeconds + walkSeconds,
-                serviceStart: context.serviceStart,
-                distanceMeters: originCandidate.distanceMeters,
-                instruction: "Walk to \(originCandidate.stop.name)"
-            )
-
-            queue.push(JourneyState(
-                stopId: originCandidate.stop.id,
-                readySeconds: context.currentSeconds + walkSeconds,
-                boardingReadySeconds: context.currentSeconds + walkSeconds,
-                legs: originCandidate.distanceMeters > minimumWalkLegMeters ? [accessLeg] : [],
-                transitLegCount: 0,
-                visitedStopIds: [originCandidate.stop.id],
-                transferStartSeconds: nil,
-                transferWalkSeconds: 0,
-                transferMinimumSeconds: 0
-            ))
-        }
-
-        var candidates: [ScheduledJourney] = []
-        var bestArrivalByStopAndLegCount: [RouteSearchLabelKey: Int] = [:]
-        var expansionCount = 0
-
-        while let state = queue.popMin(), expansionCount < 5000 {
-            if Task.isCancelled { return [] }
-            expansionCount += 1
-
-            if let destinationCandidate = destinationStopsById[state.stopId],
-               state.transitLegCount > 0 {
-                let egressSeconds = walkingSeconds(for: destinationCandidate.distanceMeters)
-                let egressLeg = walkingLeg(
-                    id: "egress-\(state.stopId)",
-                    from: context.stopsById[state.stopId]?.location ?? destinationCandidate.stop.location,
-                    to: destination,
-                    departureSeconds: state.readySeconds,
-                    arrivalSeconds: state.readySeconds + egressSeconds,
-                    serviceStart: context.serviceStart,
-                    distanceMeters: destinationCandidate.distanceMeters,
-                    instruction: "Walk to \(destination.name ?? destinationCandidate.stop.name)"
-                )
-                let completeLegs = destinationCandidate.distanceMeters > minimumWalkLegMeters
-                    ? state.legs + [egressLeg]
-                    : state.legs
-                candidates.append(ScheduledJourney(
-                    legs: normalizedWalkingLegs(justInTimeLeadingWalk(completeLegs))
-                ))
-
-                if candidates.count >= evaluatedCandidateLimit {
-                    continue
-                }
-
-                // This state already reached a destination match. Expanding through more
-                // transfer edges only produces longer duplicates and adjacent walk chains.
-                continue
-            }
-
-            guard state.transitLegCount < maximumTransitLegs else { continue }
-
-            let boardingReadySeconds = state.boardingReadySeconds
-            guard boardingReadySeconds <= context.currentSeconds + searchHorizonSeconds else {
-                continue
-            }
-
-            let references = context.tripReferencesByStopId[state.stopId, default: []]
-            let firstReferenceIndex = firstBoardingReferenceIndex(
-                atOrAfter: boardingReadySeconds,
-                references: references,
-                context: context
-            )
-            for reference in references.dropFirst(firstReferenceIndex) {
-                let trip = context.activeTrips[reference.tripIndex]
-                let boardTime = trip.stopTimes[reference.stopTimeIndex]
-                // References are sorted by departure time, so the horizon check is
-                // monotonic (break). No-pickup is per-trip, so it must skip this trip
-                // only (continue) — breaking here would drop every later departure.
-                guard boardTime.departureSeconds <= context.currentSeconds + searchHorizonSeconds else {
-                    break
-                }
-                guard boardTime.pickupType != "1" else {
-                    continue
-                }
-
-                for downstreamIndex in trip.stopTimes.indices.dropFirst(reference.stopTimeIndex + 1) {
-                    let alightTime = trip.stopTimes[downstreamIndex]
-                    guard alightTime.dropOffType != "1",
-                          alightTime.arrivalSeconds > boardTime.departureSeconds,
-                          !state.visitedStopIds.contains(alightTime.stopId),
-                          let boardStop = context.stopsById[boardTime.stopId],
-                          let alightStop = context.stopsById[alightTime.stopId],
-                          let route = context.routesById[trip.routeId] else {
-                        continue
-                    }
-
-                    let isDestinationStop = destinationStopsById[alightTime.stopId] != nil
-                    if !isDestinationStop {
-                        // ponytail: time-only label pruning at (stop, legCount). Can drop a
-                        // slightly-later arrival that would enable a strictly better
-                        // continuation; add a small slack term here if optimality matters.
-                        let key = RouteSearchLabelKey(
-                            stopId: alightTime.stopId,
-                            transitLegCount: state.transitLegCount + 1
-                        )
-                        if let bestArrival = bestArrivalByStopAndLegCount[key],
-                           bestArrival <= alightTime.arrivalSeconds {
-                            continue
-                        }
-                        bestArrivalByStopAndLegCount[key] = alightTime.arrivalSeconds
-                    }
-
-                    let transitLeg = scheduledTransitLeg(
-                        sequence: state.legs.count,
-                        trip: trip,
-                        route: route,
-                        boardTime: boardTime,
-                        alightTime: alightTime,
-                        boardStop: boardStop,
-                        alightStop: alightStop,
-                        context: context
-                    )
-                    var visitedStopIds = state.visitedStopIds
-                    visitedStopIds.insert(alightTime.stopId)
-
-                    queue.push(JourneyState(
-                        stopId: alightTime.stopId,
-                        readySeconds: alightTime.arrivalSeconds,
-                        boardingReadySeconds: alightTime.arrivalSeconds + max(
-                            transferBufferSeconds,
-                            context.sameStopMinimumTransferSecondsByStopId[alightTime.stopId, default: 0]
-                        ),
-                        legs: state.legs + [transitLeg],
-                        transitLegCount: state.transitLegCount + 1,
-                        visitedStopIds: visitedStopIds,
-                        transferStartSeconds: nil,
-                        transferWalkSeconds: 0,
-                        transferMinimumSeconds: 0
-                    ))
-                }
-            }
-
-            guard state.transitLegCount > 0 else { continue }
-            for transfer in context.transfersByFromStopId[state.stopId, default: []] {
-                guard !state.visitedStopIds.contains(transfer.toStopId),
-                      let fromStop = context.stopsById[transfer.fromStopId],
-                      let toStop = context.stopsById[transfer.toStopId] else {
-                    continue
-                }
-                let distance = routeSearchDistanceMeters(from: fromStop.location, to: toStop.location)
-                let edgeWalkSeconds = walkingSeconds(for: distance)
-                let transferStartSeconds = state.transferStartSeconds ?? state.readySeconds
-                let cumulativeWalkSeconds = state.transferWalkSeconds + edgeWalkSeconds
-                let cumulativeMinimumSeconds = max(
-                    state.transferMinimumSeconds,
-                    transfer.minimumTransferSeconds ?? 0
-                )
-                let arrivalSeconds = transferStartSeconds + cumulativeWalkSeconds
-                let boardingReadySeconds = transferStartSeconds + max(
-                    cumulativeWalkSeconds + transferBufferSeconds,
-                    cumulativeMinimumSeconds
-                )
-                let key = RouteSearchLabelKey(
-                    stopId: transfer.toStopId,
-                    transitLegCount: state.transitLegCount
-                )
-                if let bestArrival = bestArrivalByStopAndLegCount[key],
-                   bestArrival <= boardingReadySeconds {
-                    continue
-                }
-                bestArrivalByStopAndLegCount[key] = boardingReadySeconds
-
-                let edgeLeg = walkingLeg(
-                    id: "transfer-\(transfer.fromStopId)-\(transfer.toStopId)",
-                    from: fromStop.location,
-                    to: toStop.location,
-                    departureSeconds: state.readySeconds,
-                    arrivalSeconds: state.readySeconds + edgeWalkSeconds,
-                    serviceStart: context.serviceStart,
-                    distanceMeters: distance,
-                    instruction: "Walk to \(toStop.name)"
-                )
-                var legs = state.legs
-                if state.transferStartSeconds != nil,
-                   let previousWalk = legs.last,
-                   previousWalk.transportKind == .walking {
-                    legs[legs.count - 1] = mergedWalkingLeg(previousWalk, edgeLeg)
-                } else {
-                    legs.append(edgeLeg)
-                }
-                var visitedStopIds = state.visitedStopIds
-                visitedStopIds.insert(transfer.toStopId)
-                queue.push(JourneyState(
-                    stopId: transfer.toStopId,
-                    readySeconds: arrivalSeconds,
-                    boardingReadySeconds: boardingReadySeconds,
-                    legs: legs,
-                    transitLegCount: state.transitLegCount,
-                    visitedStopIds: visitedStopIds,
-                    transferStartSeconds: transferStartSeconds,
-                    transferWalkSeconds: cumulativeWalkSeconds,
-                    transferMinimumSeconds: cumulativeMinimumSeconds
-                ))
-            }
-        }
-
-        return deduplicatedByTripSequence(
-            candidates
-                .filter { $0.legs.contains { $0.transportKind == .transit } }
-                .map { ScheduledJourney(legs: normalizedWalkingLegs(justInTimeLeadingWalk($0.legs))) }
-                .sorted { $0.arrivalTime < $1.arrivalTime }
-        )
+    nonisolated func isBikeShareJourney(_ journey: ScheduledJourney) -> Bool {
+        journey.legs.contains { $0.transportKind == .bikeShare }
     }
 
-    func firstBoardingReferenceIndex(
-        atOrAfter seconds: Int,
-        references: [TripStopReference],
-        context: RouteSearchContext
-    ) -> Int {
-        var lowerBound = 0
-        var upperBound = references.count
-        while lowerBound < upperBound {
-            let middle = (lowerBound + upperBound) / 2
-            let reference = references[middle]
-            let departure = context.activeTrips[reference.tripIndex]
-                .stopTimes[reference.stopTimeIndex].departureSeconds
-            if departure < seconds {
-                lowerBound = middle + 1
-            } else {
-                upperBound = middle
-            }
-        }
-        return lowerBound
-    }
-
-    /// Collapses dead time before boarding by snapping any leading walking legs to
-    /// abut the first transit departure (`arrival = board`, `departure = board − walk`).
-    /// Without this an arrive-by plan's access walk starts at the search anchor (hours
-    /// early); with it the plan reflects the real "leave by" time.
-    func deduplicatedByTripSequence(_ candidates: [ScheduledJourney]) -> [ScheduledJourney] {
-        var bestBySignature: [String: ScheduledJourney] = [:]
-        var order: [String] = []
-
-        for candidate in candidates {
-            let signature = candidate.tripSignature
-            guard let existing = bestBySignature[signature] else {
-                bestBySignature[signature] = candidate
-                order.append(signature)
-                continue
-            }
-            if isMoreComfortable(candidate, than: existing) {
-                bestBySignature[signature] = candidate
-            }
-        }
-
-        return order.compactMap { bestBySignature[$0] }
-    }
-
-    func deduplicatedJourneys(_ candidates: [ScheduledJourney]) -> [ScheduledJourney] {
+    nonisolated func deduplicatedJourneys(_ candidates: [ScheduledJourney]) -> [ScheduledJourney] {
         var seen = Set<String>()
         return candidates.filter { seen.insert($0.signature).inserted }
     }
 
-    /// Orders two journeys riding the same vehicles by rider comfort: earliest arrival,
-    /// then latest departure (least waiting before the first bus), then least walking,
-    /// then fewest legs (a same-stop change beats a walk transfer), then the latest
-    /// first-vehicle alight — i.e. stay aboard the first bus to the last shared stop
-    /// rather than hopping off at the earliest one.
-    func isMoreComfortable(_ lhs: ScheduledJourney, than rhs: ScheduledJourney) -> Bool {
-        if lhs.arrivalTime != rhs.arrivalTime { return lhs.arrivalTime < rhs.arrivalTime }
-        if lhs.departureTime != rhs.departureTime { return lhs.departureTime > rhs.departureTime }
-        if lhs.totalWalkingMeters != rhs.totalWalkingMeters {
-            return lhs.totalWalkingMeters < rhs.totalWalkingMeters
-        }
-        if lhs.legs.count != rhs.legs.count { return lhs.legs.count < rhs.legs.count }
-        return lhs.firstTransitAlightTime > rhs.firstTransitAlightTime
-    }
-
-    func isBetterArriveByRepresentative(_ lhs: ScheduledJourney, than rhs: ScheduledJourney) -> Bool {
-        if lhs.departureTime != rhs.departureTime { return lhs.departureTime > rhs.departureTime }
-        if lhs.arrivalTime != rhs.arrivalTime { return lhs.arrivalTime < rhs.arrivalTime }
-        if lhs.totalWalkingMeters != rhs.totalWalkingMeters {
-            return lhs.totalWalkingMeters < rhs.totalWalkingMeters
-        }
-        if lhs.legs.count != rhs.legs.count { return lhs.legs.count < rhs.legs.count }
-        return lhs.signature < rhs.signature
-    }
-
-    func brokenConnectionPenalty(for legs: [RoutePlan.Leg]) -> Int {
+    nonisolated func brokenConnectionPenalty(for legs: [RoutePlan.Leg]) -> Int {
         var penalty = 0
         let transitIndices = legs.indices.filter { legs[$0].transportKind == .transit }
         for pair in zip(transitIndices, transitIndices.dropFirst()) {
@@ -589,7 +346,7 @@ extension PublicTransportRoutingEngine {
     /// Time left after completing the physical movement between consecutive rides.
     /// Safety padding is intentionally excluded so callers can compare it once against
     /// the active online/offline transfer buffer.
-    func transferSlackSeconds(
+    nonisolated func transferSlackSeconds(
         fromTransitAt firstIndex: Int,
         toTransitAt secondIndex: Int,
         in legs: [RoutePlan.Leg]
@@ -615,21 +372,15 @@ extension PublicTransportRoutingEngine {
     /// penalty plus the live-data reliability penalty (cancelled/broken/no-realtime).
     /// Lower is better. This is what makes a slightly-later direct route outrank a
     /// faster multi-transfer one.
-    func comfortCostSeconds(_ candidate: RouteCandidate) -> Double {
+    nonisolated func comfortCostSeconds(_ candidate: RouteCandidate) -> Double {
         candidate.arrivalTime.timeIntervalSinceReferenceDate
             + Double(candidate.transitLegCount * transferPenaltySeconds)
             + Double(candidate.penalty)
     }
 
-    /// Pre-enrichment cost over scheduled data only (no live penalties known yet).
-    func scheduledComfortCostSeconds(_ journey: ScheduledJourney) -> Double {
-        journey.arrivalTime.timeIntervalSinceReferenceDate
-            + Double(journey.transitLegCount * transferPenaltySeconds)
-    }
-
     /// Scheduled arrive-by ranking. Door-to-door departure includes the access walk,
     /// which is the rider-facing answer to "when do I need to leave?".
-    func arriveByRanksBefore(
+    nonisolated func arriveByRanksBefore(
         _ lhs: ScheduledJourney,
         _ rhs: ScheduledJourney,
         filters: RoutePlannerFilters
@@ -649,7 +400,7 @@ extension PublicTransportRoutingEngine {
 
     /// Final arrive-by ranking after realtime enrichment. Routes still predicted to
     /// meet the deadline always precede late ones; broken/cancelled connections sink.
-    func arriveByRanksBefore(
+    nonisolated func arriveByRanksBefore(
         _ lhs: RouteCandidate,
         _ rhs: RouteCandidate,
         deadline: Date,
@@ -682,41 +433,67 @@ extension PublicTransportRoutingEngine {
         return lhs.signature < rhs.signature
     }
 
-    func scheduledPreferenceRanksBefore(
+    nonisolated func scheduledPreferenceRanksBefore(
         _ lhs: ScheduledJourney,
         _ rhs: ScheduledJourney,
-        filters: RoutePlannerFilters
+        filters _: RoutePlannerFilters
     ) -> Bool {
-        switch filters.sort {
-        case .fastest:
-            let lhsDuration = lhs.arrivalTime.timeIntervalSince(lhs.departureTime)
-            let rhsDuration = rhs.arrivalTime.timeIntervalSince(rhs.departureTime)
-            return lhsDuration < rhsDuration
-        case .fewestTransfers:
-            return lhs.transitLegCount < rhs.transitLegCount
-        case .leastWalking:
-            return lhs.totalWalkingMeters < rhs.totalWalkingMeters
-        }
+        let lhsDuration = lhs.arrivalTime.timeIntervalSince(lhs.departureTime)
+        let rhsDuration = rhs.arrivalTime.timeIntervalSince(rhs.departureTime)
+        return lhsDuration < rhsDuration
     }
 
-    func candidatePreferenceRanksBefore(
+    nonisolated func candidatePreferenceRanksBefore(
         _ lhs: RouteCandidate,
         _ rhs: RouteCandidate,
-        filters: RoutePlannerFilters
+        filters _: RoutePlannerFilters
     ) -> Bool {
-        switch filters.sort {
-        case .fastest:
-            let lhsDuration = lhs.arrivalTime.timeIntervalSince(lhs.departureTime)
-            let rhsDuration = rhs.arrivalTime.timeIntervalSince(rhs.departureTime)
-            return lhsDuration < rhsDuration
-        case .fewestTransfers:
-            return lhs.transitLegCount < rhs.transitLegCount
-        case .leastWalking:
-            return lhs.totalWalkingMeters < rhs.totalWalkingMeters
-        }
+        let lhsDuration = lhs.arrivalTime.timeIntervalSince(lhs.departureTime)
+        let rhsDuration = rhs.arrivalTime.timeIntervalSince(rhs.departureTime)
+        return lhsDuration < rhsDuration
     }
 
-    func departsLater(_ lhs: ScheduledJourney, _ rhs: ScheduledJourney) -> Bool {
+    /// Ordering for leave-now and depart-at searches. This deliberately mirrors the
+    /// planner tabs: Fastest means earliest destination arrival, not the shortest
+    /// elapsed duration or an implicit transfer-comfort score.
+    nonisolated func scheduledRanksBefore(
+        _ lhs: ScheduledJourney,
+        _ rhs: ScheduledJourney,
+        filters _: RoutePlannerFilters
+    ) -> Bool {
+        if lhs.arrivalTime != rhs.arrivalTime { return lhs.arrivalTime < rhs.arrivalTime }
+        if lhs.transitLegCount != rhs.transitLegCount {
+            return lhs.transitLegCount < rhs.transitLegCount
+        }
+        if lhs.totalWalkingMeters != rhs.totalWalkingMeters {
+            return lhs.totalWalkingMeters < rhs.totalWalkingMeters
+        }
+        if lhs.departureTime != rhs.departureTime { return lhs.departureTime > rhs.departureTime }
+        return lhs.signature < rhs.signature
+    }
+
+    nonisolated func candidateRanksBefore(
+        _ lhs: RouteCandidate,
+        _ rhs: RouteCandidate,
+        filters _: RoutePlannerFilters
+    ) -> Bool {
+        let lhsSevere = lhs.penalty >= severePenaltyThreshold
+        let rhsSevere = rhs.penalty >= severePenaltyThreshold
+        if lhsSevere != rhsSevere { return !lhsSevere }
+
+        if lhs.arrivalTime != rhs.arrivalTime { return lhs.arrivalTime < rhs.arrivalTime }
+        if lhs.transitLegCount != rhs.transitLegCount {
+            return lhs.transitLegCount < rhs.transitLegCount
+        }
+        if lhs.totalWalkingMeters != rhs.totalWalkingMeters {
+            return lhs.totalWalkingMeters < rhs.totalWalkingMeters
+        }
+        if lhs.penalty != rhs.penalty { return lhs.penalty < rhs.penalty }
+        if lhs.departureTime != rhs.departureTime { return lhs.departureTime > rhs.departureTime }
+        return lhs.signature < rhs.signature
+    }
+
+    nonisolated func departsLater(_ lhs: ScheduledJourney, _ rhs: ScheduledJourney) -> Bool {
         if lhs.departureTime != rhs.departureTime {
             return lhs.departureTime > rhs.departureTime
         }
@@ -726,7 +503,7 @@ extension PublicTransportRoutingEngine {
         return lhs.arrivalTime < rhs.arrivalTime
     }
 
-    func departsLater(_ lhs: RouteCandidate, _ rhs: RouteCandidate) -> Bool {
+    nonisolated func departsLater(_ lhs: RouteCandidate, _ rhs: RouteCandidate) -> Bool {
         let lhsSevere = lhs.penalty >= severePenaltyThreshold
         let rhsSevere = rhs.penalty >= severePenaltyThreshold
         if lhsSevere != rhsSevere {
@@ -744,7 +521,7 @@ extension PublicTransportRoutingEngine {
     /// Door-to-door duration: last arrival minus the first leg's actual departure.
     /// Uses the journey's own start (not the search anchor), so arrive-by plans don't
     /// report the hours of phantom wait baked into the anchored `now`.
-    func travelTime(for legs: [RoutePlan.Leg]) -> TimeInterval? {
+    nonisolated func travelTime(for legs: [RoutePlan.Leg]) -> TimeInterval? {
         guard let start = legs.compactMap(\.departureTime).first,
               let end = legs.compactMap(\.arrivalTime).last else {
             return nil
@@ -754,7 +531,7 @@ extension PublicTransportRoutingEngine {
 
     /// Stable per-itinerary identity from the transit trips and walk endpoints (never
     /// wall-clock), so a `.leaveNow` recalculation keeps the rider's selected option.
-    func optionSignature(for legs: [RoutePlan.Leg]) -> String {
+    nonisolated func optionSignature(for legs: [RoutePlan.Leg]) -> String {
         legs.map { leg in
             switch leg.transportKind {
             case .transit:
@@ -771,45 +548,19 @@ extension PublicTransportRoutingEngine {
         }.joined(separator: "-")
     }
 
-    /// Removes journeys dominated on all three axes — a dominated journey boards its
-    /// first transit leg no earlier, arrives no later, and uses no fewer transfers than
-    /// another, with at least one of those strictly worse. Keeping the departure axis
-    /// preserves distinct upcoming departures (which would collapse under an
-    /// arrival/transfers-only frontier).
-    func paretoFiltered<T>(
-        _ items: [T],
-        departure: (T) -> Date,
-        arrival: (T) -> Date,
-        transfers: (T) -> Int
-    ) -> [T] {
-        let keyed = items.map { (departure: departure($0), arrival: arrival($0), transfers: transfers($0), value: $0) }
-        return keyed.enumerated()
-            .filter { index, candidate in
-                !keyed.enumerated().contains { otherIndex, other in
-                    guard otherIndex != index else { return false }
-                    let noWorse = other.departure >= candidate.departure
-                        && other.arrival <= candidate.arrival
-                        && other.transfers <= candidate.transfers
-                    let strictlyBetter = other.departure > candidate.departure
-                        || other.arrival < candidate.arrival
-                        || other.transfers < candidate.transfers
-                    return noWorse && strictlyBetter
-                }
-            }
-            .map(\.element.value)
-    }
-
-    func nearestStops(
+    nonisolated func nearestStops(
         to point: LocationPoint,
         in context: RouteSearchContext,
         radiusMeters: Double,
         limit: Int
     ) -> [StopCandidate] {
-        context.stopsById.values
+        context.nearbyStops(to: point, radiusMeters: radiusMeters)
             .compactMap { stop -> StopCandidate? in
-                let distance = routeSearchDistanceMeters(from: point, to: stop.location)
-                guard distance <= radiusMeters else { return nil }
-                return StopCandidate(stop: stop, distanceMeters: distance)
+                let geometricDistance = routeSearchDistanceMeters(from: point, to: stop.location)
+                guard geometricDistance <= radiusMeters else { return nil }
+                let walkingDistance = context.walkingDistanceMeters(from: point, to: stop.location)
+                guard walkingDistance <= radiusMeters else { return nil }
+                return StopCandidate(stop: stop, distanceMeters: walkingDistance)
             }
             .sorted { $0.distanceMeters < $1.distanceMeters }
             .prefix(limit)

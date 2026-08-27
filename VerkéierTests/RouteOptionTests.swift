@@ -92,6 +92,35 @@ struct RouteOptionTests {
         #expect(option(legs: legs).status(at: now) == .atRisk)
     }
 
+    @Test func mixedLiveAndScheduledLegsAreFlaggedPartlyLive() {
+        let now = Date(timeIntervalSince1970: 10_000)
+        let future = now.addingTimeInterval(600)
+        let route = option(legs: [
+            transitLeg(from: hamilius, to: luxexpo, departure: future, liveStatus: .live),
+            transitLeg(from: luxexpo, to: hamilius, departure: future.addingTimeInterval(600))
+        ])
+
+        #expect(route.realtimeCoverage == .partial)
+        #expect(route.status(at: now) == .partiallyLive)
+        #expect(route.status(at: now).displayText == "Partly live")
+    }
+
+    @Test func missedConnectionMakesOptionConnectionMayBeMissed() {
+        let now = Date(timeIntervalSince1970: 10000)
+        let future = now.addingTimeInterval(600)
+        let legs = [
+            transitLeg(from: hamilius, to: luxexpo, departure: future, liveStatus: .live),
+            transitLeg(
+                from: luxexpo, to: hamilius, departure: future.addingTimeInterval(400),
+                transferWarning: "Connection miss"
+            )
+        ]
+
+        let route = option(legs: legs)
+        #expect(route.status(at: now) == .connectionMayBeMissed)
+        #expect(route.status(at: now).displayText == "Connection miss")
+    }
+
     @Test func cancelledLegMakesOptionCancelled() {
         let now = Date(timeIntervalSince1970: 10000)
         let leg = transitLeg(

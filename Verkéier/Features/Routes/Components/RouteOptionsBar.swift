@@ -1,11 +1,6 @@
 import SwiftUI
 
-/// A compact single-row filter bar: sort tabs on the left, an advanced
-/// options menu on the right.
-///
-/// The sort Picker collapses three options into a segmented control; the gear
-/// `Menu` contains mode-preference, accessibility toggles, and Save Commute —
-/// keeping the planner screen uncluttered.
+/// A compact menu for constraints that affect the fastest departure profile.
 struct RouteOptionsBar: View {
     let filters: RoutePlannerFilters
     let hasDestination: Bool
@@ -18,10 +13,7 @@ struct RouteOptionsBar: View {
     @State private var presetLabel = ""
 
     var body: some View {
-        HStack(spacing: 10) {
-            sortPicker
-            optionsMenu
-        }
+        optionsMenu
         .alert("Save commute", isPresented: $showingSaveAlert) {
             TextField("Label (e.g. Home → Work)", text: $presetLabel)
             Button("Save") {
@@ -36,28 +28,8 @@ struct RouteOptionsBar: View {
         }
     }
 
-    // MARK: - Sort picker
-
-    private var sortPicker: some View {
-        Picker(
-            "Sort routes",
-            selection: Binding(
-                get: { filters.sort },
-                set: { updated in apply(\.sort, value: updated) }
-            )
-        ) {
-            Text("Fastest").tag(RoutePlannerSortOption.fastest)
-            Text("Transfers").tag(RoutePlannerSortOption.fewestTransfers)
-            Text("Walking").tag(RoutePlannerSortOption.leastWalking)
-        }
-        .pickerStyle(.segmented)
-        .frame(maxWidth: .infinity)
-    }
-
-    // MARK: - Options menu
-
     private var optionsMenu: some View {
-        Menu {
+		Menu("Route options", systemImage: "slider.horizontal.3") {
             // Mode preference
             Picker(
                 "Mode preference",
@@ -99,21 +71,7 @@ struct RouteOptionsBar: View {
                 Divider()
                 Button("Save Commute…") { showingSaveAlert = true }
             }
-        } label: {
-            Image(systemName: "slider.horizontal.3")
-                .font(.callout.weight(.semibold))
-                .foregroundStyle(.primary)
-                .frame(width: 36, height: 36)
-                .background(
-                    .background.opacity(0.82),
-                    in: RoundedRectangle(cornerRadius: 10, style: .continuous)
-                )
-                .overlay {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(.separator.opacity(0.22), lineWidth: 0.5)
-                }
         }
-        .buttonStyle(.plain)
         .accessibilityLabel("Route options")
     }
 

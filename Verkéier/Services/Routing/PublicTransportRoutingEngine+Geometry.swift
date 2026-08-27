@@ -1,25 +1,32 @@
 import CoreLocation
 import Foundation
-import HeapModule
 import MapKit
 
 extension PublicTransportRoutingEngine {
-    func destinationStopMatches(
+    nonisolated func destinationStopMatches(
         for point: LocationPoint,
         in context: RouteSearchContext,
         radiusMeters: Double
     ) -> [StopCandidate] {
         let normalizedName = point.name?.normalizedForSearch
-        let matches = context.stopsById.values.compactMap { stop -> StopCandidate? in
-            let distance = routeSearchDistanceMeters(from: point, to: stop.location)
+        let searchRadius = max(radiusMeters, 2500)
+        var nearbyStopsByID = Dictionary(
+            uniqueKeysWithValues: context.nearbyStops(to: point, radiusMeters: searchRadius).map { ($0.id, $0) }
+        )
+        if let exactStop = context.stopsById[point.id] {
+            nearbyStopsByID[exactStop.id] = exactStop
+        }
+        let matches = nearbyStopsByID.values.compactMap { stop -> StopCandidate? in
+            let geometricDistance = routeSearchDistanceMeters(from: point, to: stop.location)
+            let walkingDistance = context.walkingDistanceMeters(from: point, to: stop.location)
             let idMatches = stop.id == point.id
             let nameMatches = normalizedName?.isEmpty == false
                 && stop.name.normalizedForSearch == normalizedName
-                && distance <= 2500
-            let distanceMatches = distance <= radiusMeters
+                && geometricDistance <= 2500
+            let distanceMatches = walkingDistance <= radiusMeters
 
             guard idMatches || nameMatches || distanceMatches else { return nil }
-            return StopCandidate(stop: stop, distanceMeters: idMatches ? 0 : distance)
+            return StopCandidate(stop: stop, distanceMeters: idMatches ? 0 : walkingDistance)
         }
 
         return matches
@@ -33,7 +40,7 @@ extension PublicTransportRoutingEngine {
             .map(\.self)
     }
 
-    func scheduledTransitLeg(
+    nonisolated func scheduledTransitLeg(
         sequence: Int,
         trip: GTFSTimetableTripEntry,
         route: GTFSTimetableRouteEntry,
@@ -110,7 +117,7 @@ extension PublicTransportRoutingEngine {
         )
     }
 
-    func walkingLeg(
+    nonisolated func walkingLeg(
         id: String,
         from origin: LocationPoint,
         to destination: LocationPoint,
@@ -139,7 +146,7 @@ extension PublicTransportRoutingEngine {
         )
     }
 
-    func overlay(from legs: [RoutePlan.Leg]) -> RouteMapOverlay? {
+    nonisolated func overlay(from legs: [RoutePlan.Leg]) -> RouteMapOverlay? {
         let segments = legs.enumerated().compactMap { index, leg -> RouteMapSegment? in
             let coordinates = leg.mapCoordinates.isEmpty
                 ? [RouteMapCoordinate(leg.origin), RouteMapCoordinate(leg.destination)]
@@ -160,7 +167,7 @@ extension PublicTransportRoutingEngine {
         return overlay.isEmpty ? nil : overlay
     }
 
-    func transferMarkers(from legs: [RoutePlan.Leg]) -> [RouteTransferMarker] {
+    nonisolated func transferMarkers(from legs: [RoutePlan.Leg]) -> [RouteTransferMarker] {
         var markers: [RouteTransferMarker] = []
         var seen: Set<RouteMapCoordinate> = []
 
@@ -180,7 +187,7 @@ extension PublicTransportRoutingEngine {
         return markers
     }
 
-    func copy(
+    nonisolated func copy(
         _ leg: RoutePlan.Leg,
         departureTime: Date? = nil,
         arrivalTime: Date? = nil,
@@ -190,8 +197,9 @@ extension PublicTransportRoutingEngine {
         realtimeArrivalTime: Date? = nil,
         platform: String? = nil,
         delayMinutes: Int? = nil,
-            liveStatus: RouteLegLiveStatus? = nil,
-            transferWarning: String? = nil,
+        liveStatus: RouteLegLiveStatus? = nil,
+        transferWarning: String? = nil,
+        distanceMeters: Double? = nil,
         mapCoordinates: [RouteMapCoordinate]? = nil
     ) -> RoutePlan.Leg {
         RoutePlan.Leg(
@@ -214,7 +222,7 @@ extension PublicTransportRoutingEngine {
             scheduledArrivalTime: scheduledArrivalTime ?? leg.scheduledArrivalTime,
             realtimeDepartureTime: realtimeDepartureTime ?? leg.realtimeDepartureTime,
             realtimeArrivalTime: realtimeArrivalTime ?? leg.realtimeArrivalTime,
-            distanceMeters: leg.distanceMeters,
+            distanceMeters: distanceMeters ?? leg.distanceMeters,
             mapCoordinates: mapCoordinates ?? leg.mapCoordinates,
             roadRoutingHint: leg.roadRoutingHint,
             platform: platform ?? leg.platform,
@@ -225,11 +233,11 @@ extension PublicTransportRoutingEngine {
         )
     }
 
-    func walkingSeconds(for distanceMeters: Double) -> Int {
+    nonisolated func walkingSeconds(for distanceMeters: Double) -> Int {
         max(0, Int((distanceMeters / walkingSpeedMetersPerSecond).rounded(.up)))
     }
 
-    func mapCoordinates(
+    nonisolated func mapCoordinates(
         trip: GTFSTimetableTripEntry,
         boardTime: GTFSTimetableStopTimeEntry,
         alightTime: GTFSTimetableStopTimeEntry,
@@ -252,7 +260,7 @@ extension PublicTransportRoutingEngine {
         )
     }
 
-    func shapeCoordinates(
+    nonisolated func shapeCoordinates(
         trip: GTFSTimetableTripEntry,
         boardTime: GTFSTimetableStopTimeEntry,
         alightTime: GTFSTimetableStopTimeEntry,
@@ -284,7 +292,7 @@ extension PublicTransportRoutingEngine {
             + [RouteMapCoordinate(alightStop.location)]
     }
 
-    func stopCoordinates(
+    nonisolated func stopCoordinates(
         trip: GTFSTimetableTripEntry,
         fromSequence: Int,
         toSequence: Int,
@@ -296,7 +304,7 @@ extension PublicTransportRoutingEngine {
             .map { RouteMapCoordinate($0) }
     }
 
-    func date(seconds: Int, from serviceStart: Date) -> Date {
+    nonisolated func date(seconds: Int, from serviceStart: Date) -> Date {
         serviceStart.addingTimeInterval(TimeInterval(seconds))
     }
 }
