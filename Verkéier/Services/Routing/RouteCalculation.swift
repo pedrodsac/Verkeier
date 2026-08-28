@@ -10,6 +10,9 @@ struct RouteCalculation: Sendable {
     let options: [RouteOption]
     /// A best-effort bike-inclusive alternative that never consumes a transit slot.
     var supplementalOptions: [RouteOption] = []
+    /// Scheduled option identifiers that realtime explicitly proved unusable.
+    /// Presentation may retain any other scheduled option when live coverage is incomplete.
+    var invalidatedOptionIDs: Set<String> = []
     /// Identifier of the selected option; falls back to the first option.
     let selectedOptionID: String?
 

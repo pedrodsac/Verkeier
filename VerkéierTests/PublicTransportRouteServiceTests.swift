@@ -84,6 +84,199 @@ struct PublicTransportRouteServiceTests {
         #expect(zip(departures, departures.dropFirst()).allSatisfy { $0.0 < $0.1 })
     }
 
+    @Test func laterPageReturnsThreeDeparturesStrictlyAfterBoundary() async throws {
+        let boundary = luxembourgDate(hour: 8, minute: 40)
+        let departureMinutes = [30, 40, 50, 60, 70, 80]
+        let timetable = makeTimetable(
+            routes: [makeRoute(id: "R-page", shortName: "P")],
+            trips: departureMinutes.map { minute in
+                makeTrip(id: "T-\(minute)", routeId: "R-page", departure: t(8, minute))
+            }
+        )
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { boundary },
+            concurrency: .serial
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(id: "S1", name: "Hill Lift", latitude: 49.6, longitude: 6.1),
+            to: LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11),
+            time: .arriveBy(boundary),
+            filters: RoutePlannerFilters(),
+            realtimeRefreshPolicy: .useCache,
+            page: .later(than: boundary, limit: 3)
+        )
+
+        #expect(calculation.options.count == 3)
+        #expect(calculation.options.allSatisfy { ($0.departureTime ?? .distantPast) > boundary })
+        #expect(calculation.options.contains { ($0.arrivalTime ?? .distantPast) > boundary })
+    }
+
+    @Test func earlierPageReturnsLatestThreeDeparturesStrictlyBeforeBoundary() async throws {
+        let boundary = luxembourgDate(hour: 8, minute: 40)
+        let departureMinutes = [0, 10, 20, 30, 40]
+        let timetable = makeTimetable(
+            routes: [makeRoute(id: "R-page", shortName: "P")],
+            trips: departureMinutes.map { minute in
+                makeTrip(id: "T-\(minute)", routeId: "R-page", departure: t(8, minute))
+            }
+        )
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { boundary },
+            concurrency: .serial
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(id: "S1", name: "Hill Lift", latitude: 49.6, longitude: 6.1),
+            to: LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11),
+            time: .leaveNow,
+            filters: RoutePlannerFilters(),
+            realtimeRefreshPolicy: .useCache,
+            page: .earlier(than: boundary, limit: 3)
+        )
+
+        #expect(calculation.options.count == 3)
+        #expect(calculation.options.allSatisfy { ($0.departureTime ?? .distantFuture) < boundary })
+        #expect(calculation.options.compactMap(\.departureTime) == [
+            luxembourgDate(hour: 8, minute: 30),
+            luxembourgDate(hour: 8, minute: 20),
+            luxembourgDate(hour: 8, minute: 10)
+        ])
+    }
+
+    @Test func laterPageFindsGTFSDepartureAfterMidnight() async throws {
+        let boundary = luxembourgDate(hour: 23, minute: 55)
+        let timetable = makeTimetable(
+            routes: [makeRoute(id: "R-night-page", shortName: "N")],
+            trips: [makeTrip(id: "T-night-page", routeId: "R-night-page", departure: t(24, 10))]
+        )
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { boundary },
+            concurrency: .serial
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(id: "S1", name: "Hill Lift", latitude: 49.6, longitude: 6.1),
+            to: LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11),
+            time: .departAt(boundary),
+            filters: RoutePlannerFilters(),
+            realtimeRefreshPolicy: .useCache,
+            page: .later(than: boundary, limit: 3)
+        )
+
+        let departure = try #require(calculation.options.first?.departureTime)
+        #expect(departure == luxembourgDate(hour: 24, minute: 10))
+    }
+
+    @Test func pagesAcrossMidnightUsingAdjacentCalendarServices() async throws {
+        let services = [GTFSTimetableServiceEntry(
+            id: "WEEK",
+            weekdays: [],
+            startDate: nil,
+            endDate: nil,
+            addedDates: ["20260614", "20260615"],
+            removedDates: []
+        )]
+        let origin = LocationPoint(id: "S1", name: "Hill Lift", latitude: 49.6, longitude: 6.1)
+        let destination = LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11)
+
+        let laterBoundary = luxembourgDate(hour: 23, minute: 55)
+        let laterService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: makeTimetable(
+                routes: [makeRoute(id: "R-next", shortName: "N")],
+                trips: [makeTrip(id: "T-next", routeId: "R-next", departure: t(0, 10))],
+                services: services
+            )),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { laterBoundary },
+            concurrency: .serial
+        )
+        let later = try await laterService.calculateRoute(
+            from: origin,
+            to: destination,
+            time: .leaveNow,
+            filters: RoutePlannerFilters(),
+            realtimeRefreshPolicy: .useCache,
+            page: .later(than: laterBoundary, limit: 3)
+        )
+        #expect(later.options.first?.departureTime == luxembourgDate(hour: 24, minute: 10))
+
+        let earlierBoundary = luxembourgDate(hour: 24, minute: 5)
+        let earlierService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: makeTimetable(
+                routes: [makeRoute(id: "R-prev", shortName: "P")],
+                trips: [makeTrip(id: "T-prev", routeId: "R-prev", departure: t(23, 50))],
+                services: services
+            )),
+            atpClient: MockATPClient(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { earlierBoundary },
+            concurrency: .serial
+        )
+        let earlier = try await earlierService.calculateRoute(
+            from: origin,
+            to: destination,
+            time: .leaveNow,
+            filters: RoutePlannerFilters(),
+            realtimeRefreshPolicy: .useCache,
+            page: .earlier(than: earlierBoundary, limit: 3)
+        )
+        #expect(earlier.options.first?.departureTime == luxembourgDate(hour: 23, minute: 50))
+    }
+
+    @Test func liveRefreshKeepsRoutesWithoutCompleteRealtimeCoverage() async throws {
+        let now = luxembourgDate(hour: 8, minute: 0)
+        let departureMinutes = [10, 20, 30, 40, 50]
+        let timetable = makeTimetable(
+            routes: departureMinutes.map { makeRoute(id: "R-\($0)", shortName: "\($0)") },
+            trips: departureMinutes.map { minute in
+                timedTrip(id: "T-\(minute)", routeId: "R-\(minute)", stops: [
+                    ("S1", t(8, minute), t(8, minute)),
+                    ("S2", t(8, minute + 10), t(8, minute + 10))
+                ])
+            }
+        )
+        let liveDeparture = Departure(
+            id: "live-10",
+            stopId: "S1",
+            routeId: "R-10",
+            lineName: "10",
+            destination: "Central",
+            scheduledDeparture: luxembourgDate(hour: 8, minute: 10),
+            realtimeDeparture: luxembourgDate(hour: 8, minute: 11),
+            delayMinutes: 1,
+            dataSource: .atpOpenAPI
+        )
+        let routeService = PublicTransportRouteService(
+            gtfsService: MockGTFSService(timetable: timetable),
+            atpClient: MockATPClient(departuresByStopId: ["S1": [liveDeparture]]),
+            roadRouteProvider: MockRoadRouteProvider(),
+            now: { now }
+        )
+
+        let calculation = try await routeService.calculateRoute(
+            from: LocationPoint(id: "S1", name: "Hill Lift", latitude: 49.6, longitude: 6.1),
+            to: LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11),
+            time: .departAt(now),
+            filters: RoutePlannerFilters(),
+            realtimeRefreshPolicy: .forceRefresh
+        )
+
+        #expect(calculation.options.count == 5)
+        #expect(calculation.options.contains { $0.realtimeCoverage == .live })
+        #expect(calculation.options.filter { $0.realtimeCoverage == .scheduleOnly }.count == 4)
+    }
+
     @Test func arriveByReturnsFiveProgressivelyEarlierDepartures() async throws {
         let deadline = luxembourgDate(hour: 8, minute: 30)
         let departureMinutes = [30, 40, 50, 60, 70, 80]
@@ -431,7 +624,8 @@ struct PublicTransportRouteServiceTests {
             atpClient: MockATPClient(),
             roadRouteProvider: roadProvider,
             now: { now },
-            concurrency: .serial
+            concurrency: .serial,
+            roadGeometryBudgetSeconds: 10
         )
         let from = LocationPoint(id: "S1", name: "Hill Lift", latitude: 49.6, longitude: 6.1)
         let to = LocationPoint(id: "S2", name: "Central", latitude: 49.61, longitude: 6.11)
@@ -1108,7 +1302,8 @@ struct PublicTransportRouteServiceTests {
         routes: [GTFSTimetableRouteEntry]? = nil,
         trips: [GTFSTimetableTripEntry]? = nil,
         transfers: [GTFSTimetableTransferEntry] = [],
-        shapes: [GTFSTimetableShapeEntry] = []
+        shapes: [GTFSTimetableShapeEntry] = [],
+        services: [GTFSTimetableServiceEntry]? = nil
     ) -> GTFSTimetableIndexPayload {
         GTFSTimetableIndexPayload(
             source: "test",
@@ -1143,7 +1338,7 @@ struct PublicTransportRouteServiceTests {
                 makeRoute(id: "R16", shortName: "16"),
                 makeRoute(id: "R17", shortName: "17")
             ],
-            services: [
+            services: services ?? [
                 GTFSTimetableServiceEntry(
                     id: "WEEK",
                     weekdays: [],

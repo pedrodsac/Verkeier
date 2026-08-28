@@ -4,6 +4,7 @@ nonisolated enum SharedTransitDataStore {
     static let appGroupIdentifier = "group.dev.pedrocordeiro.LuxTransit"
     static let favouriteStopsKey = "FavouriteStopEntities"
     static let trackedDepartureReminderKey = "TrackedDepartureReminder"
+    static let favouriteDepartureBoardsKey = "FavouriteDepartureBoards"
 
     nonisolated static var userDefaults: UserDefaults {
         UserDefaults(suiteName: appGroupIdentifier) ?? .standard
@@ -23,6 +24,27 @@ nonisolated enum SharedTransitDataStore {
         }
 
         return stops
+    }
+
+    nonisolated static func saveFavouriteDepartureBoard(
+        stopId: String,
+        departures: [SharedWidgetDeparture],
+        updatedAt: Date
+    ) {
+        var boards = favouriteDepartureBoards()
+        boards[stopId] = SharedDepartureBoard(stopId: stopId, departures: departures, updatedAt: updatedAt)
+        guard let data = try? JSONEncoder().encode(boards) else { return }
+        userDefaults.set(data, forKey: favouriteDepartureBoardsKey)
+        UserDefaults.standard.set(data, forKey: favouriteDepartureBoardsKey)
+    }
+
+    nonisolated static func favouriteDepartureBoards() -> [String: SharedDepartureBoard] {
+        guard let data = userDefaults.data(forKey: favouriteDepartureBoardsKey)
+                ?? UserDefaults.standard.data(forKey: favouriteDepartureBoardsKey),
+              let boards = try? JSONDecoder().decode([String: SharedDepartureBoard].self, from: data) else {
+            return [:]
+        }
+        return boards
     }
 
     nonisolated static func saveTrackedReminder(_ reminder: SharedTrackedDepartureReminder?) {
@@ -46,6 +68,25 @@ nonisolated enum SharedTransitDataStore {
 
         return reminder
     }
+}
+
+struct SharedDepartureBoard: Codable, Hashable, Sendable {
+    let stopId: String
+    let departures: [SharedWidgetDeparture]
+    let updatedAt: Date
+}
+
+struct SharedWidgetDeparture: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let lineName: String
+    let destination: String
+    let scheduledDeparture: Date?
+    let realtimeDeparture: Date?
+    let delayMinutes: Int?
+    let platform: String?
+    let isCancelled: Bool
+
+    var displayDepartureDate: Date? { realtimeDeparture ?? scheduledDeparture }
 }
 
 struct SharedFavouriteStop: Codable, Hashable, Identifiable {

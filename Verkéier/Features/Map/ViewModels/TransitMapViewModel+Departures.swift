@@ -2,6 +2,7 @@ import CoreLocation
 import MapKit
 import Observation
 import SwiftUI
+import WidgetKit
 
 extension TransitMapViewModel {
     func loadFavouriteDepartures(using atpClient: any ATPClient, favourites: [Stop]) async {
@@ -34,6 +35,7 @@ extension TransitMapViewModel {
                 snapshot.departures = result.departures
                 snapshot.lastUpdated = refreshedAt
                 snapshot.errorMessage = nil
+                cacheDeparturesForWidget(result.departures, stopId: result.stopId, updatedAt: refreshedAt)
             }
             favouriteDepartureBoards[result.stopId] = snapshot
         }
@@ -56,6 +58,7 @@ extension TransitMapViewModel {
             snapshot.departures = result.departures
             snapshot.lastUpdated = .now
             snapshot.errorMessage = nil
+            cacheDeparturesForWidget(result.departures, stopId: result.stopId, updatedAt: .now)
         }
         favouriteDepartureBoards[stop.id] = snapshot
     }
@@ -85,6 +88,7 @@ extension TransitMapViewModel {
                 from: departures
             )
             departuresLastUpdated = .now
+            cacheDeparturesForWidget(departures, stopId: selectedStop.id, updatedAt: .now)
         } catch {
             // Keep the last successful live board visible while the existing
             // data is marked stale. Clearing it here forces the UI onto the
@@ -93,6 +97,27 @@ extension TransitMapViewModel {
         }
 
         isLoadingDepartures = false
+    }
+
+    private func cacheDeparturesForWidget(_ departures: [Departure], stopId: String, updatedAt: Date) {
+        let shared = departures.prefix(8).map {
+            SharedWidgetDeparture(
+                id: $0.id,
+                lineName: $0.lineName,
+                destination: $0.destination,
+                scheduledDeparture: $0.scheduledDeparture,
+                realtimeDeparture: $0.realtimeDeparture,
+                delayMinutes: $0.delayMinutes,
+                platform: $0.platform,
+                isCancelled: $0.isCancelled
+            )
+        }
+        SharedTransitDataStore.saveFavouriteDepartureBoard(
+            stopId: stopId,
+            departures: shared,
+            updatedAt: updatedAt
+        )
+        WidgetCenter.shared.reloadTimelines(ofKind: "DeparturesSummaryWidget")
     }
 
     func toggleDepartureLine(_ route: TransitRoute) {

@@ -31,6 +31,8 @@ struct TransitSheetActions {
     let showRoutePlaceSearch: (RouteEndpoint) -> Void
     let updateRouteFilters: (RoutePlannerFilters) -> Void
     let setRoutePlanningTime: (RoutePlanningTime) -> Void
+    let loadEarlierRoutes: () -> Void
+    let loadLaterRoutes: () -> Void
     let startTrackingDeparture: (Departure) -> Void
     let stopTrackingDeparture: () -> Void
     let scheduleDepartureReminder: (Departure, Int) -> Void

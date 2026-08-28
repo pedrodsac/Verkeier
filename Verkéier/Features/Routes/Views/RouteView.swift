@@ -240,11 +240,30 @@ struct RouteView: View {
 
     private var routeResultsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForEach(viewModel.routeOptions) { option in
+            ForEach(viewModel.chronologicallyOrderedRouteOptions) { option in
                 RouteOptionCard(
                     option: option,
                     isSelected: option.id == viewModel.selectedRouteOptionID,
                 )
+            }
+
+            if !viewModel.routeOptions.isEmpty {
+                HStack(spacing: 10) {
+                    routePageButton(
+                        title: "Earlier",
+                        systemImage: "chevron.left",
+                        isLoading: viewModel.isLoadingEarlierRoutes,
+                        isEnabled: viewModel.canLoadEarlierRoutes,
+                        action: actions.loadEarlierRoutes
+                    )
+                    routePageButton(
+                        title: "Later",
+                        systemImage: "chevron.right",
+                        isLoading: viewModel.isLoadingLaterRoutes,
+                        isEnabled: viewModel.canLoadLaterRoutes,
+                        action: actions.loadLaterRoutes
+                    )
+                }
             }
 
             if !viewModel.supplementalRouteOptions.isEmpty {
@@ -259,5 +278,28 @@ struct RouteView: View {
                 }
             }
         }
+    }
+
+    private func routePageButton(
+        title: String,
+        systemImage: String,
+        isLoading: Bool,
+        isEnabled: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 7) {
+                if isLoading {
+                    ProgressView()
+                        .controlSize(.small)
+                } else {
+                    Image(systemName: systemImage)
+                }
+                Text(title)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .disabled(!isEnabled || viewModel.isLoadingEarlierRoutes || viewModel.isLoadingLaterRoutes)
     }
 }

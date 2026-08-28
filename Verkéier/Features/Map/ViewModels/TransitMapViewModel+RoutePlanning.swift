@@ -180,6 +180,7 @@ extension TransitMapViewModel {
             return
         }
 
+        resetRoutePagingState()
         let requestGeneration = startRouteRequest()
         routeLoadingPhase = .calculating
         routeErrorMessage = nil
@@ -223,6 +224,95 @@ extension TransitMapViewModel {
 
         if requestGeneration == routeCalculationGeneration {
             routeLoadingPhase = .idle
+        }
+    }
+
+    func loadEarlierRoutes(using routeService: any RouteService, from location: CLLocation?) async {
+        await loadRoutePage(.earlier, using: routeService, from: location)
+    }
+
+    func loadLaterRoutes(using routeService: any RouteService, from location: CLLocation?) async {
+        await loadRoutePage(.later, using: routeService, from: location)
+    }
+
+    private func loadRoutePage(
+        _ direction: RoutePagingDirection,
+        using routeService: any RouteService,
+        from location: CLLocation?
+    ) async {
+        guard !isLoadingEarlierRoutes, !isLoadingLaterRoutes else { return }
+        guard direction == .earlier ? canLoadEarlierRoutes : canLoadLaterRoutes else { return }
+        guard let destination = effectiveRouteDestination else { return }
+
+        let origin: LocationPoint
+        if let routeOrigin {
+            origin = routeOrigin.location
+        } else if let location {
+            origin = LocationPoint(
+                name: "Current Location",
+                latitude: location.coordinate.latitude,
+                longitude: location.coordinate.longitude
+            )
+        } else {
+            routeStatusMessage = "Current location is required to load more routes."
+            return
+        }
+
+        let departures = routeOptions.compactMap(\.departureTime)
+        guard let boundary = direction == .earlier ? departures.min() : departures.max() else {
+            return
+        }
+        let page: RouteSearchPage = switch direction {
+        case .earlier: .earlier(than: boundary, limit: 3)
+        case .later: .later(than: boundary, limit: 3)
+        }
+        let requestGeneration = startRouteRequest()
+        setRoutePageLoading(true, direction: direction)
+        routeStatusMessage = nil
+
+        do {
+            let calculation = try await routeService.calculateRoute(
+                from: origin,
+                to: destination.location,
+                time: routePlanningTime,
+                filters: routeFilters,
+                realtimeRefreshPolicy: .useCache,
+                page: page
+            )
+            guard requestGeneration == routeCalculationGeneration else { return }
+            let preferredID = selectedRouteOptionID
+            unfilteredRouteOptions = Self.mergingAccumulatedOptions(
+                existing: unfilteredRouteOptions,
+                incoming: calculation.options,
+                invalidatedOptionIDs: calculation.invalidatedOptionIDs
+            )
+            applyRouteOptions(preferredID: preferredID, announceFallback: true)
+            setRoutePageAvailable(calculation.options.count >= 3, direction: direction)
+            routeLastCalculatedAt = now()
+            refreshRoutePageInBackground(
+                page,
+                using: routeService,
+                origin: origin,
+                destination: destination,
+                requestGeneration: requestGeneration
+            )
+        } catch is CancellationError {
+            // A newer full search or page request owns the visible result set.
+        } catch let error as RoutingError where error == .noPublicTransportRoute {
+            guard requestGeneration == routeCalculationGeneration else { return }
+            setRoutePageAvailable(false, direction: direction)
+            routeStatusMessage = direction == .earlier
+                ? "No earlier routes were found within six hours."
+                : "No later routes were found within six hours."
+        } catch {
+            guard requestGeneration == routeCalculationGeneration else { return }
+            routeStatusMessage = direction == .earlier
+                ? "Earlier routes could not be loaded."
+                : "Later routes could not be loaded."
+        }
+
+        if requestGeneration == routeCalculationGeneration {
+            setRoutePageLoading(false, direction: direction)
         }
     }
 
@@ -291,8 +381,18 @@ extension TransitMapViewModel {
                 )
                 guard requestGeneration == routeCalculationGeneration else { return }
                 let preferredID = selectedRouteOptionID
-                unfilteredRouteOptions = calculation.options
-                supplementalRouteOptions = calculation.supplementalOptions
+                unfilteredRouteOptions = Self.mergingRefreshedOptions(
+                    scheduled: unfilteredRouteOptions,
+                    refreshed: calculation.options,
+                    invalidatedOptionIDs: calculation.invalidatedOptionIDs,
+                    limit: 5
+                )
+                supplementalRouteOptions = Self.mergingRefreshedOptions(
+                    scheduled: supplementalRouteOptions,
+                    refreshed: calculation.supplementalOptions,
+                    invalidatedOptionIDs: calculation.invalidatedOptionIDs,
+                    limit: 1
+                )
                 applyRouteOptions(preferredID: preferredID, announceFallback: true)
                 routeLastCalculatedAt = now()
             } catch {
@@ -302,8 +402,105 @@ extension TransitMapViewModel {
         }
     }
 
+    private func refreshRoutePageInBackground(
+        _ page: RouteSearchPage,
+        using routeService: any RouteService,
+        origin: LocationPoint,
+        destination: RoutePlace,
+        requestGeneration: Int
+    ) {
+        let planningTime = routePlanningTime
+        let filters = routeFilters
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                let calculation = try await routeService.calculateRoute(
+                    from: origin,
+                    to: destination.location,
+                    time: planningTime,
+                    filters: filters,
+                    realtimeRefreshPolicy: .forceRefresh,
+                    page: page
+                )
+                guard requestGeneration == routeCalculationGeneration else { return }
+                let preferredID = selectedRouteOptionID
+                unfilteredRouteOptions = Self.mergingAccumulatedOptions(
+                    existing: unfilteredRouteOptions,
+                    incoming: calculation.options,
+                    invalidatedOptionIDs: calculation.invalidatedOptionIDs
+                )
+                applyRouteOptions(preferredID: preferredID, announceFallback: true)
+                routeLastCalculatedAt = now()
+            } catch {
+                guard requestGeneration == routeCalculationGeneration else { return }
+                routeStatusMessage = "Live updates are unavailable. Showing scheduled routes."
+            }
+        }
+    }
+
+    /// Realtime coverage is sparse, so a refresh enriches the scheduled profile
+    /// in place instead of replacing it. Only a cancellation or broken connection
+    /// explicitly reported by the engine is allowed to remove a scheduled card.
+    static func mergingRefreshedOptions(
+        scheduled: [RouteOption],
+        refreshed: [RouteOption],
+        invalidatedOptionIDs: Set<String>,
+        limit: Int
+    ) -> [RouteOption] {
+        guard limit > 0 else { return [] }
+        var refreshedByID = Dictionary(
+            refreshed.map { ($0.id, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        var merged: [RouteOption] = []
+        var seenIDs: Set<String> = []
+
+        for scheduledOption in scheduled where merged.count < limit {
+            guard !invalidatedOptionIDs.contains(scheduledOption.id) else { continue }
+            let option = refreshedByID.removeValue(forKey: scheduledOption.id) ?? scheduledOption
+            if seenIDs.insert(option.id).inserted {
+                merged.append(option)
+            }
+        }
+
+        for option in refreshed where merged.count < limit {
+            guard refreshedByID[option.id] != nil else { continue }
+            if seenIDs.insert(option.id).inserted {
+                merged.append(option)
+            }
+        }
+        return merged
+    }
+
+    static func mergingAccumulatedOptions(
+        existing: [RouteOption],
+        incoming: [RouteOption],
+        invalidatedOptionIDs: Set<String>
+    ) -> [RouteOption] {
+        var incomingByID = Dictionary(
+            incoming.map { ($0.id, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        var merged: [RouteOption] = []
+        var seenIDs: Set<String> = []
+
+        for existingOption in existing {
+            guard !invalidatedOptionIDs.contains(existingOption.id) else { continue }
+            let option = incomingByID.removeValue(forKey: existingOption.id) ?? existingOption
+            if seenIDs.insert(option.id).inserted {
+                merged.append(option)
+            }
+        }
+        for option in incoming where incomingByID[option.id] != nil {
+            if seenIDs.insert(option.id).inserted {
+                merged.append(option)
+            }
+        }
+        return merged
+    }
+
     private func selectBestRouteOption(preferredID: String?, announceFallback: Bool) {
-        let allOptions = routeOptions + supplementalRouteOptions
+        let allOptions = Self.chronologicallyOrderedOptions(routeOptions) + supplementalRouteOptions
         guard !allOptions.isEmpty else {
             selectedRouteOptionID = nil
             return
@@ -337,13 +534,95 @@ extension TransitMapViewModel {
     private func applyRouteOptions(preferredID: String?, announceFallback: Bool) {
         let filtered = filteredRouteOptions(from: unfilteredRouteOptions)
         let didRelaxFilters = filtered.isEmpty && !unfilteredRouteOptions.isEmpty
-        routeOptions = uniqueRouteOptions(didRelaxFilters ? unfilteredRouteOptions : filtered)
+        routeOptions = Self.removingStrictlyDominatedOptions(
+            Self.uniqueRouteOptionsByDeparture(
+                uniqueRouteOptions(didRelaxFilters ? unfilteredRouteOptions : filtered)
+            )
+        )
         selectBestRouteOption(preferredID: preferredID, announceFallback: announceFallback)
 
         if didRelaxFilters {
             routeStatusMessage = "No routes matched all filters. Showing the closest alternatives."
         } else if routeOptions.isEmpty {
             routeStatusMessage = nil
+        }
+    }
+
+    static func removingStrictlyDominatedOptions(_ options: [RouteOption]) -> [RouteOption] {
+        options.filter { candidate in
+            guard let candidateDeparture = candidate.departureTime,
+                  let candidateArrival = candidate.arrivalTime else {
+                return true
+            }
+            return !options.contains { other in
+                guard other.id != candidate.id,
+                      let otherDeparture = other.departureTime,
+                      let otherArrival = other.arrivalTime else {
+                    return false
+                }
+                return otherDeparture > candidateDeparture && otherArrival < candidateArrival
+            }
+        }
+    }
+
+    static func uniqueRouteOptionsByDeparture(_ options: [RouteOption]) -> [RouteOption] {
+        var bestByDeparture: [Int: RouteOption] = [:]
+        var withoutDeparture: [RouteOption] = []
+        for option in options {
+            guard let departure = option.departureTime else {
+                withoutDeparture.append(option)
+                continue
+            }
+            let key = Int(departure.timeIntervalSince1970.rounded())
+            if let existing = bestByDeparture[key] {
+                if routeOptionRanksBefore(option, existing) {
+                    bestByDeparture[key] = option
+                }
+            } else {
+                bestByDeparture[key] = option
+            }
+        }
+        let deduplicated = options.compactMap { option -> RouteOption? in
+            guard let departure = option.departureTime else { return nil }
+            let key = Int(departure.timeIntervalSince1970.rounded())
+            guard bestByDeparture[key]?.id == option.id else { return nil }
+            bestByDeparture[key] = nil
+            return option
+        }
+        return deduplicated + withoutDeparture
+    }
+
+    static func chronologicallyOrderedOptions(_ options: [RouteOption]) -> [RouteOption] {
+        options.sorted { lhs, rhs in
+            let lhsDeparture = lhs.departureTime ?? .distantFuture
+            let rhsDeparture = rhs.departureTime ?? .distantFuture
+            if lhsDeparture != rhsDeparture { return lhsDeparture < rhsDeparture }
+            return routeOptionRanksBefore(lhs, rhs)
+        }
+    }
+
+    private static func routeOptionRanksBefore(_ lhs: RouteOption, _ rhs: RouteOption) -> Bool {
+        let lhsArrival = lhs.arrivalTime ?? .distantFuture
+        let rhsArrival = rhs.arrivalTime ?? .distantFuture
+        if lhsArrival != rhsArrival { return lhsArrival < rhsArrival }
+        if lhs.transferCount != rhs.transferCount { return lhs.transferCount < rhs.transferCount }
+        if lhs.walkingDistanceMeters != rhs.walkingDistanceMeters {
+            return lhs.walkingDistanceMeters < rhs.walkingDistanceMeters
+        }
+        return lhs.id < rhs.id
+    }
+
+    private func setRoutePageLoading(_ loading: Bool, direction: RoutePagingDirection) {
+        switch direction {
+        case .earlier: isLoadingEarlierRoutes = loading
+        case .later: isLoadingLaterRoutes = loading
+        }
+    }
+
+    private func setRoutePageAvailable(_ available: Bool, direction: RoutePagingDirection) {
+        switch direction {
+        case .earlier: canLoadEarlierRoutes = available
+        case .later: canLoadLaterRoutes = available
         }
     }
 
@@ -431,4 +710,9 @@ extension TransitMapViewModel {
             return "No public transport route was found."
         }
     }
+}
+
+private enum RoutePagingDirection {
+    case earlier
+    case later
 }

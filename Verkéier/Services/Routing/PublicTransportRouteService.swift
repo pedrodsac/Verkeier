@@ -21,7 +21,8 @@ struct PublicTransportRouteService: RouteService {
             return calendar
         }(),
         concurrency: RouteCalculationConcurrency = .default,
-        realtimeBoardBudgetSeconds: TimeInterval = 2
+        realtimeBoardBudgetSeconds: TimeInterval = 2,
+        roadGeometryBudgetSeconds: TimeInterval = 1
     ) {
         let engine = PublicTransportRoutingEngine(
             gtfsService: gtfsService,
@@ -32,7 +33,8 @@ struct PublicTransportRouteService: RouteService {
             now: now,
             calendar: calendar,
             concurrency: concurrency,
-            realtimeBoardBudgetSeconds: realtimeBoardBudgetSeconds
+            realtimeBoardBudgetSeconds: realtimeBoardBudgetSeconds,
+            roadGeometryBudgetSeconds: roadGeometryBudgetSeconds
         )
         calculationCoordinator = RouteCalculationCoordinator(engine: engine)
     }
@@ -42,14 +44,16 @@ struct PublicTransportRouteService: RouteService {
         to: LocationPoint,
         time: RoutePlanningTime,
         filters: RoutePlannerFilters,
-        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy,
+        page: RouteSearchPage
     ) async throws -> RouteCalculation {
         try await calculationCoordinator.calculate(
             from: from,
             to: to,
             time: time,
             filters: filters,
-            realtimeRefreshPolicy: realtimeRefreshPolicy
+            realtimeRefreshPolicy: realtimeRefreshPolicy,
+            page: page
         )
     }
 
@@ -92,7 +96,8 @@ private actor RouteCalculationCoordinator {
         to: LocationPoint,
         time: RoutePlanningTime,
         filters: RoutePlannerFilters,
-        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy,
+        page: RouteSearchPage
     ) async throws -> RouteCalculation {
         activeTask?.cancel()
         generation += 1
@@ -104,7 +109,8 @@ private actor RouteCalculationCoordinator {
                 to: to,
                 time: time,
                 filters: filters,
-                forceRealtimeRefresh: realtimeRefreshPolicy == .forceRefresh
+                forceRealtimeRefresh: realtimeRefreshPolicy == .forceRefresh,
+                page: page
             )
         }
         activeTask = task

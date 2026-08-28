@@ -60,6 +60,10 @@ final class TransitMapViewModel {
     var commutePresets: [RouteCommutePreset] = []
     var routeOptions: [RouteOption] = []
     var supplementalRouteOptions: [RouteOption] = []
+    var isLoadingEarlierRoutes = false
+    var isLoadingLaterRoutes = false
+    var canLoadEarlierRoutes = true
+    var canLoadLaterRoutes = true
     var selectedRouteOptionID: String?
     var routeLoadingPhase: RouteLoadingPhase = .idle
     var routeErrorMessage: String?
@@ -138,6 +142,14 @@ final class TransitMapViewModel {
         selectedRouteOptionID = nil
         routeStatusMessage = nil
         routeLastCalculatedAt = nil
+        resetRoutePagingState()
+    }
+
+    func resetRoutePagingState() {
+        isLoadingEarlierRoutes = false
+        isLoadingLaterRoutes = false
+        canLoadEarlierRoutes = true
+        canLoadLaterRoutes = true
     }
 
     func squaredDistance(from lhs: LocationPoint, to rhs: LocationPoint) -> Double {

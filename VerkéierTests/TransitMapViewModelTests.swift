@@ -623,7 +623,194 @@ struct TransitMapViewModelTests {
         )
 
         #expect(viewModel.routeOptions.map(\.id) == ["route-late-arrival", "route-early-arrival"])
-        #expect(viewModel.selectedRouteOptionID == "route-late-arrival")
+        #expect(viewModel.selectedRouteOptionID == "route-early-arrival")
+    }
+
+    @Test func backgroundRefreshKeepsUnconfirmedScheduledRoutes() {
+        let destination = makeStop(id: "stop-1")
+        let scheduled = (1 ... 5).map { index in
+            makeRouteOption(
+                id: "route-\(index)",
+                plan: makeRoutePlan(destination: destination, routeName: "Scheduled \(index)")
+            )
+        }
+        let enrichedFirst = makeRouteOption(
+            id: "route-1",
+            plan: makeRoutePlan(destination: destination, routeName: "Live 1")
+        )
+
+        let merged = TransitMapViewModel.mergingRefreshedOptions(
+            scheduled: scheduled,
+            refreshed: [enrichedFirst],
+            invalidatedOptionIDs: [],
+            limit: 5
+        )
+
+        #expect(merged.map(\.id) == scheduled.map(\.id))
+        #expect(merged.first?.routeNames == ["Live 1"])
+        #expect(merged.dropFirst().allSatisfy { $0.realtimeCoverage == .scheduleOnly })
+    }
+
+    @Test func backgroundRefreshReplacesExplicitlyInvalidatedRoute() {
+        let destination = makeStop(id: "stop-1")
+        let invalid = makeRouteOption(
+            id: "route-invalid",
+            plan: makeRoutePlan(destination: destination, routeName: "Cancelled")
+        )
+        let scheduled = makeRouteOption(
+            id: "route-scheduled",
+            plan: makeRoutePlan(destination: destination, routeName: "Scheduled")
+        )
+        let replacement = makeRouteOption(
+            id: "route-replacement",
+            plan: makeRoutePlan(destination: destination, routeName: "Replacement")
+        )
+
+        let merged = TransitMapViewModel.mergingRefreshedOptions(
+            scheduled: [invalid, scheduled],
+            refreshed: [replacement],
+            invalidatedOptionIDs: [invalid.id],
+            limit: 5
+        )
+
+        #expect(merged.map(\.id) == [scheduled.id, replacement.id])
+    }
+
+    @Test func strictDepartureAndArrivalDominanceRemovesOnlyStrictlyWorseRoute() {
+        let destination = makeStop(id: "stop-1")
+        let dominated = makeTimedRouteOption(
+            id: "dominated",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_000),
+            arrival: Date(timeIntervalSince1970: 2_000),
+            routeName: "Dominated"
+        )
+        let dominator = makeTimedRouteOption(
+            id: "dominator",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_100),
+            arrival: Date(timeIntervalSince1970: 1_900),
+            routeName: "Dominator"
+        )
+        let equalDeparture = makeTimedRouteOption(
+            id: "equal-departure",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_100),
+            arrival: Date(timeIntervalSince1970: 1_800),
+            routeName: "Equal departure"
+        )
+        let equalArrival = makeTimedRouteOption(
+            id: "equal-arrival",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_200),
+            arrival: Date(timeIntervalSince1970: 1_900),
+            routeName: "Equal arrival"
+        )
+
+        let result = TransitMapViewModel.removingStrictlyDominatedOptions([
+            dominated, dominator, equalDeparture, equalArrival
+        ])
+
+        #expect(!result.contains(dominated))
+        #expect(result.contains(equalDeparture))
+        #expect(result.contains(equalArrival))
+    }
+
+    @Test func equalDepartureOpportunityKeepsFastestRoute() {
+        let destination = makeStop(id: "stop-1")
+        let slower = makeTimedRouteOption(
+            id: "slower",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_000),
+            arrival: Date(timeIntervalSince1970: 2_000),
+            routeName: "Slower"
+        )
+        let faster = makeTimedRouteOption(
+            id: "faster",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_000),
+            arrival: Date(timeIntervalSince1970: 1_900),
+            routeName: "Faster"
+        )
+
+        let result = TransitMapViewModel.uniqueRouteOptionsByDeparture([slower, faster])
+
+        #expect(result.map(\.id) == [faster.id])
+    }
+
+    @Test func laterPageAccumulatesThreeRoutesAndPreservesSelection() async {
+        let destination = makeStop(id: "stop-1")
+        let initial = makeTimedRouteOption(
+            id: "initial",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_000),
+            arrival: Date(timeIntervalSince1970: 1_500),
+            routeName: "Initial"
+        )
+        let later = (1 ... 3).map { index in
+            makeTimedRouteOption(
+                id: "later-\(index)",
+                destination: destination,
+                departure: Date(timeIntervalSince1970: 1_000 + Double(index * 600)),
+                arrival: Date(timeIntervalSince1970: 1_500 + Double(index * 600)),
+                routeName: "Later \(index)"
+            )
+        }
+        let routeService = MockRouteService(result: .success(RouteCalculation(
+            options: later,
+            selectedOptionID: later.first?.id
+        )))
+        let viewModel = TransitMapViewModel(now: { Date(timeIntervalSince1970: 0) })
+        viewModel.selectStop(destination)
+        viewModel.unfilteredRouteOptions = [initial]
+        viewModel.routeOptions = [initial]
+        viewModel.selectedRouteOptionID = initial.id
+
+        await viewModel.loadLaterRoutes(
+            using: routeService,
+            from: CLLocation(latitude: 49.61, longitude: 6.13)
+        )
+
+        #expect(Set(viewModel.routeOptions.map(\.id)) == Set([initial.id] + later.map(\.id)))
+        #expect(viewModel.selectedRouteOptionID == initial.id)
+        #expect(viewModel.canLoadLaterRoutes)
+    }
+
+    @Test func sparseLaterPageDisablesOnlyLaterDirection() async {
+        let destination = makeStop(id: "stop-1")
+        let initial = makeTimedRouteOption(
+            id: "initial",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_000),
+            arrival: Date(timeIntervalSince1970: 1_500),
+            routeName: "Initial"
+        )
+        let later = (1 ... 2).map { index in
+            makeTimedRouteOption(
+                id: "later-\(index)",
+                destination: destination,
+                departure: Date(timeIntervalSince1970: 1_000 + Double(index * 600)),
+                arrival: Date(timeIntervalSince1970: 1_500 + Double(index * 600)),
+                routeName: "Later \(index)"
+            )
+        }
+        let routeService = MockRouteService(result: .success(RouteCalculation(
+            options: later,
+            selectedOptionID: nil
+        )))
+        let viewModel = TransitMapViewModel(now: { Date(timeIntervalSince1970: 0) })
+        viewModel.selectStop(destination)
+        viewModel.unfilteredRouteOptions = [initial]
+        viewModel.routeOptions = [initial]
+
+        await viewModel.loadLaterRoutes(
+            using: routeService,
+            from: CLLocation(latitude: 49.61, longitude: 6.13)
+        )
+
+        #expect(!viewModel.canLoadLaterRoutes)
+        #expect(viewModel.canLoadEarlierRoutes)
+        #expect(!viewModel.isLoadingLaterRoutes)
     }
 
     @Test func arriveByKeepsRouteServiceProfileOrder() async {
@@ -1037,7 +1224,8 @@ private nonisolated final class MockRouteService: RouteService, @unchecked Senda
         to _: LocationPoint,
         time _: RoutePlanningTime,
         filters _: RoutePlannerFilters,
-        realtimeRefreshPolicy _: RouteRealtimeRefreshPolicy
+        realtimeRefreshPolicy _: RouteRealtimeRefreshPolicy,
+        page _: RouteSearchPage
     ) async throws -> RouteCalculation {
         calculateCallCount += 1
         return try result.get()

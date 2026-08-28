@@ -51,22 +51,37 @@ struct SelectFavouriteStopIntent: WidgetConfigurationIntent {
 struct FavouriteStopEntry: TimelineEntry {
     let date: Date
     let selectedStop: SharedFavouriteStop?
+    let departureBoard: SharedDepartureBoard?
 }
 
 struct FavouriteStopTimelineProvider: AppIntentTimelineProvider {
     func placeholder(in _: Context) -> FavouriteStopEntry {
-        FavouriteStopEntry(date: .now, selectedStop: SharedTransitDataStore.favouriteStops().first)
+        let stop = SharedTransitDataStore.favouriteStops().first
+        return FavouriteStopEntry(
+            date: .now,
+            selectedStop: stop,
+            departureBoard: stop.flatMap { SharedTransitDataStore.favouriteDepartureBoards()[$0.id] }
+        )
     }
 
     func snapshot(for configuration: SelectFavouriteStopIntent, in _: Context) async
         -> FavouriteStopEntry {
-        FavouriteStopEntry(date: .now, selectedStop: selectedStop(from: configuration))
+        entry(for: configuration)
     }
 
     func timeline(for configuration: SelectFavouriteStopIntent, in _: Context) async
         -> Timeline<FavouriteStopEntry> {
-        let entry = FavouriteStopEntry(date: .now, selectedStop: selectedStop(from: configuration))
-        return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(30 * 60)))
+        let entry = entry(for: configuration)
+        return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(15 * 60)))
+    }
+
+    private func entry(for configuration: SelectFavouriteStopIntent) -> FavouriteStopEntry {
+        let stop = selectedStop(from: configuration)
+        return FavouriteStopEntry(
+            date: .now,
+            selectedStop: stop,
+            departureBoard: stop.flatMap { SharedTransitDataStore.favouriteDepartureBoards()[$0.id] }
+        )
     }
 
     private func selectedStop(from configuration: SelectFavouriteStopIntent) -> SharedFavouriteStop? {

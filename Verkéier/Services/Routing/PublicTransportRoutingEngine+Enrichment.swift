@@ -738,7 +738,7 @@ extension PublicTransportRoutingEngine {
         // Exact road geometry is applied only by the background force-refresh.
         let routedLegs = legs
 
-        let optionID = "gtfs-option-\(origin.id)-\(destination.id)-\(optionSignature(for: routedLegs))"
+        let optionID = optionID(for: routedLegs, origin: origin, destination: destination)
         let plan = RoutePlan(
             id: optionID,
             origin: origin,

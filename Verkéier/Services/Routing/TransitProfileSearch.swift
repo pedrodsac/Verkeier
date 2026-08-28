@@ -197,10 +197,123 @@ extension PublicTransportRoutingEngine {
         arriveBy: Bool,
         filters: RoutePlannerFilters,
         includeLiveReserves: Bool,
+        page: RouteSearchPage = .initial,
         candidateLimit: Int = 10
     ) -> [ScheduledJourney] {
         let windowStepSeconds = 90 * 60
         let maximumWindowSeconds = 6 * 60 * 60
+
+        if case let .later(_, requestedLimit) = page {
+            let limit = min(max(0, requestedLimit), candidateLimit)
+            guard limit > 0 else { return [] }
+            var selected: [ScheduledJourney] = []
+            var windowEndSeconds = context.currentSeconds + windowStepSeconds
+            for windowSeconds in stride(
+                from: windowStepSeconds,
+                through: maximumWindowSeconds,
+                by: windowStepSeconds
+            ) {
+                if Task.isCancelled { return [] }
+                windowEndSeconds = context.currentSeconds + windowSeconds
+                selected = departureProfile(
+                    from: origin,
+                    to: destination,
+                    context: context,
+                    filters: filters,
+                    requestedDepartureSeconds: context.currentSeconds + 1,
+                    departureWindowEndSeconds: windowEndSeconds,
+                    limit: limit,
+                    maximumTransitLegCount: maximumTransitLegs
+                )
+                if selected.count >= limit { break }
+            }
+            guard includeLiveReserves else { return selected }
+            let reserves = directPatternReserves(
+                from: origin,
+                to: destination,
+                context: context,
+                filters: filters,
+                requestedDepartureSeconds: context.currentSeconds + 1,
+                departureWindowEndSeconds: windowEndSeconds,
+                arriveByDeadlineSeconds: nil,
+                limit: 5
+            )
+            return boundedWorkingProfile(
+                selected + reserves,
+                descending: false,
+                limit: min(candidateLimit, limit + 5),
+                filters: filters
+            )
+        }
+
+        if case let .earlier(_, requestedLimit) = page {
+            let limit = min(max(0, requestedLimit), candidateLimit)
+            guard limit > 0 else { return [] }
+            var selected: [ScheduledJourney] = []
+            var processedEvents: Set<Int> = []
+            let latestSeconds = context.currentSeconds - 1
+            let earliestLimit = context.currentSeconds - maximumWindowSeconds
+            let departureEvents = originDepartureEvents(
+                from: origin,
+                context: context,
+                filters: filters,
+                earliestSeconds: earliestLimit,
+                latestSeconds: latestSeconds
+            )
+            for windowSeconds in stride(
+                from: windowStepSeconds,
+                through: maximumWindowSeconds,
+                by: windowStepSeconds
+            ) {
+                if Task.isCancelled { return [] }
+                let startSeconds = max(earliestLimit, context.currentSeconds - windowSeconds)
+                for departureEvent in departureEvents
+                    where departureEvent >= startSeconds
+                    && processedEvents.insert(departureEvent).inserted {
+                    if Task.isCancelled { return [] }
+                    guard let journey = earliestRaptorJourney(
+                        from: origin,
+                        to: destination,
+                        context: context,
+                        filters: filters,
+                        requestedDepartureSeconds: departureEvent,
+                        departureWindowEndSeconds: departureEvent,
+                        maximumTransitLegCount: maximumTransitLegs
+                    ), journey.departureTime
+                        < context.serviceStart.addingTimeInterval(TimeInterval(context.currentSeconds)) else {
+                        continue
+                    }
+                    if selected.contains(where: {
+                        $0.departureTime > journey.departureTime
+                            && $0.arrivalTime <= journey.arrivalTime
+                    }) {
+                        continue
+                    }
+                    selected.append(journey)
+                    selected = uniqueJourneysByDoorDeparture(selected, descending: true)
+                    if selected.count >= limit { break }
+                }
+                if selected.count >= limit { break }
+            }
+            guard includeLiveReserves else { return Array(selected.prefix(limit)) }
+            let reserves = directPatternReserves(
+                from: origin,
+                to: destination,
+                context: context,
+                filters: filters,
+                requestedDepartureSeconds: earliestLimit,
+                departureWindowEndSeconds: latestSeconds,
+                arriveByDeadlineSeconds: nil,
+                limit: 5
+            ).filter { $0.departureTime
+                < context.serviceStart.addingTimeInterval(TimeInterval(context.currentSeconds)) }
+            return boundedWorkingProfile(
+                selected + reserves,
+                descending: true,
+                limit: min(candidateLimit, limit + 5),
+                filters: filters
+            )
+        }
 
         if arriveBy {
             var selected: [ScheduledJourney] = []

@@ -37,6 +37,10 @@ struct RoutePresentationModel {
     let planningTime: RoutePlanningTime
     let routeOptions: [RouteOption]
     var supplementalRouteOptions: [RouteOption] = []
+    var isLoadingEarlierRoutes = false
+    var isLoadingLaterRoutes = false
+    var canLoadEarlierRoutes = true
+    var canLoadLaterRoutes = true
     let alerts: [AlertMessage]
     /// Active disruptions affecting each transit leg, keyed by leg index string.
     var legAlerts: [String: [AlertMessage]] = [:]
@@ -58,6 +62,18 @@ struct RoutePresentationModel {
 
     var selectedRoutePlan: RoutePlan? {
         selectedRouteOption?.plan
+    }
+
+    var chronologicallyOrderedRouteOptions: [RouteOption] {
+        routeOptions.sorted { lhs, rhs in
+            let lhsDeparture = lhs.departureTime ?? .distantFuture
+            let rhsDeparture = rhs.departureTime ?? .distantFuture
+            if lhsDeparture != rhsDeparture { return lhsDeparture < rhsDeparture }
+            let lhsArrival = lhs.arrivalTime ?? .distantFuture
+            let rhsArrival = rhs.arrivalTime ?? .distantFuture
+            if lhsArrival != rhsArrival { return lhsArrival < rhsArrival }
+            return lhs.id < rhs.id
+        }
     }
 
     var isWaitingForLocation: Bool {
@@ -128,6 +144,8 @@ struct RouteActions {
     var showRoutePlaceSearch: (RouteEndpoint) -> Void = { _ in }
     var updateRouteFilters: (RoutePlannerFilters) -> Void = { _ in }
     var setRoutePlanningTime: (RoutePlanningTime) -> Void = { _ in }
+    var loadEarlierRoutes: () -> Void = {}
+    var loadLaterRoutes: () -> Void = {}
 }
 
 extension RouteActions {
@@ -144,5 +162,7 @@ extension RouteActions {
         showRoutePlaceSearch = actions.showRoutePlaceSearch
         updateRouteFilters = actions.updateRouteFilters
         setRoutePlanningTime = actions.setRoutePlanningTime
+        loadEarlierRoutes = actions.loadEarlierRoutes
+        loadLaterRoutes = actions.loadLaterRoutes
     }
 }

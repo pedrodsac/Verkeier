@@ -3,5 +3,3 @@
 
 API_PROXY_URL = https:/$()/verkeier-api.pedrocordeiroo2.workers.dev
 AVL_MESSAGES_URL = https:/$()/web.vdl.lu/autobus/data/messages/messages.xml
-
-#include? "LocalConfig.xcconfig"

@@ -48,7 +48,8 @@ nonisolated struct RouteSearchKernel: Sendable {
         context: RouteSearchContext,
         arriveBy: Bool,
         filters: RoutePlannerFilters,
-        includeLiveReserves: Bool
+        includeLiveReserves: Bool,
+        page: RouteSearchPage
     ) -> [ScheduledJourney] {
         engine.profileScheduledJourneys(
             from: origin,
@@ -56,7 +57,8 @@ nonisolated struct RouteSearchKernel: Sendable {
             context: context,
             arriveBy: arriveBy,
             filters: filters,
-            includeLiveReserves: includeLiveReserves
+            includeLiveReserves: includeLiveReserves,
+            page: page
         )
     }
 
@@ -127,6 +129,7 @@ nonisolated struct RouteSearchKernel: Sendable {
         _ candidates: [RouteCandidate],
         arriveBy: Bool,
         deadline: Date?,
+        limit: Int,
         filters: RoutePlannerFilters
     ) -> [RouteCandidate] {
         let transit = candidates.filter {
@@ -136,7 +139,7 @@ nonisolated struct RouteSearchKernel: Sendable {
             transit,
             arriveBy: arriveBy,
             deadline: deadline,
-            limit: engine.returnedOptionLimit
+            limit: limit
         )
         let bikeShare = candidates.filter {
             $0.legs.contains { $0.transportKind == .bikeShare }
@@ -383,20 +386,40 @@ nonisolated struct CachedRouteSearchContext: Sendable {
         )
         var combinedTrips = timetable.trips.filter { activeServiceIds.contains($0.serviceId) }
 
-        // GTFS service days run past 24:00, so a just-after-midnight search must also see
-        // yesterday's late trips. Pull the previous day's services and shift their
-        // midnight-crossing trips back a day onto today's clock.
+        // A six-hour profile may cross midnight in either direction. Include the
+        // relevant tail of yesterday and head of tomorrow on today's integer clock;
+        // this covers both GTFS 24:xx trips and ordinary adjacent-day 23:xx/00:xx trips.
+        let currentSeconds = Int(now.timeIntervalSince(serviceStart).rounded())
+        let adjacentWindowSeconds = 6 * 60 * 60
         let previousDay = calendar.date(byAdding: .day, value: -1, to: now) ?? now
         let previousServiceIds = Self.activeServiceIds(
             in: timetable.services,
             on: previousDay,
             calendar: calendar
         )
-        let yesterdayLateTrips = timetable.trips
+        let yesterdayTrips = timetable.trips
             .filter { previousServiceIds.contains($0.serviceId) }
-            .filter { ($0.stopTimes.map(\.departureSeconds).max() ?? 0) >= Self.secondsPerDay }
             .map { Self.shiftedBackADay($0) }
-        combinedTrips.append(contentsOf: yesterdayLateTrips)
+            .filter {
+                ($0.stopTimes.map(\.departureSeconds).max() ?? .min)
+                    >= currentSeconds - adjacentWindowSeconds
+            }
+        combinedTrips.append(contentsOf: yesterdayTrips)
+
+        let nextDay = calendar.date(byAdding: .day, value: 1, to: now) ?? now
+        let nextServiceIds = Self.activeServiceIds(
+            in: timetable.services,
+            on: nextDay,
+            calendar: calendar
+        )
+        let tomorrowTrips = timetable.trips
+            .filter { nextServiceIds.contains($0.serviceId) }
+            .map { Self.shiftedForwardADay($0) }
+            .filter {
+                ($0.stopTimes.map(\.departureSeconds).min() ?? .max)
+                    <= currentSeconds + adjacentWindowSeconds
+            }
+        combinedTrips.append(contentsOf: tomorrowTrips)
 
         activeTrips = combinedTrips
         let transfers = Self.transfers(
@@ -442,8 +465,20 @@ nonisolated struct CachedRouteSearchContext: Sendable {
     /// Re-stamps a trip's stop times a day earlier so a previous-service-day trip that
     /// crosses midnight (e.g. `24:30`) lines up with today's `serviceStart` clock.
     private static func shiftedBackADay(_ trip: GTFSTimetableTripEntry) -> GTFSTimetableTripEntry {
+        shifted(trip, by: -secondsPerDay, idSuffix: "#prev")
+    }
+
+    private static func shiftedForwardADay(_ trip: GTFSTimetableTripEntry) -> GTFSTimetableTripEntry {
+        shifted(trip, by: secondsPerDay, idSuffix: "#next")
+    }
+
+    private static func shifted(
+        _ trip: GTFSTimetableTripEntry,
+        by seconds: Int,
+        idSuffix: String
+    ) -> GTFSTimetableTripEntry {
         GTFSTimetableTripEntry(
-            id: "\(trip.id)#prev",
+            id: "\(trip.id)\(idSuffix)",
             routeId: trip.routeId,
             serviceId: trip.serviceId,
             headsign: trip.headsign,
@@ -452,8 +487,8 @@ nonisolated struct CachedRouteSearchContext: Sendable {
             stopTimes: trip.stopTimes.map { stopTime in
                 GTFSTimetableStopTimeEntry(
                     stopId: stopTime.stopId,
-                    arrivalSeconds: stopTime.arrivalSeconds - secondsPerDay,
-                    departureSeconds: stopTime.departureSeconds - secondsPerDay,
+                    arrivalSeconds: stopTime.arrivalSeconds + seconds,
+                    departureSeconds: stopTime.departureSeconds + seconds,
                     sequence: stopTime.sequence,
                     headsign: stopTime.headsign,
                     pickupType: stopTime.pickupType,

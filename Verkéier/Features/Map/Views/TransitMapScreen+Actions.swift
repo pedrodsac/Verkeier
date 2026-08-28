@@ -78,6 +78,8 @@ extension TransitMapScreen {
             showRoutePlaceSearch: showRoutePlaceSearch,
             updateRouteFilters: updateRouteFilters,
             setRoutePlanningTime: setRoutePlanningTime,
+            loadEarlierRoutes: loadEarlierRoutes,
+            loadLaterRoutes: loadLaterRoutes,
             startTrackingDeparture: startTrackingDeparture,
             stopTrackingDeparture: stopTrackingDeparture,
             scheduleDepartureReminder: scheduleDepartureReminder,
@@ -436,6 +438,22 @@ extension TransitMapScreen {
 
         Task {
             await viewModel.calculateRoute(
+                using: routeService, from: locationService.currentLocation
+            )
+        }
+    }
+
+    func loadEarlierRoutes() {
+        Task {
+            await viewModel.loadEarlierRoutes(
+                using: routeService, from: locationService.currentLocation
+            )
+        }
+    }
+
+    func loadLaterRoutes() {
+        Task {
+            await viewModel.loadLaterRoutes(
                 using: routeService, from: locationService.currentLocation
             )
         }

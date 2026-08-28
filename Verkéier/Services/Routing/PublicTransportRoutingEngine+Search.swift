@@ -548,6 +548,14 @@ extension PublicTransportRoutingEngine {
         }.joined(separator: "-")
     }
 
+    nonisolated func optionID(
+        for legs: [RoutePlan.Leg],
+        origin: LocationPoint,
+        destination: LocationPoint
+    ) -> String {
+        "gtfs-option-\(origin.id)-\(destination.id)-\(optionSignature(for: legs))"
+    }
+
     nonisolated func nearestStops(
         to point: LocationPoint,
         in context: RouteSearchContext,

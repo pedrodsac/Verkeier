@@ -20,7 +20,8 @@ protocol RouteService: Sendable {
         to: LocationPoint,
         time: RoutePlanningTime,
         filters: RoutePlannerFilters,
-        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy,
+        page: RouteSearchPage
     ) async throws -> RouteCalculation
 
     /// Opens the journey in Apple Maps for turn-by-turn navigation.
@@ -41,7 +42,25 @@ extension RouteService {
             to: to,
             time: time,
             filters: filters,
-            realtimeRefreshPolicy: .useCache
+            realtimeRefreshPolicy: .useCache,
+            page: .initial
+        )
+    }
+
+    nonisolated func calculateRoute(
+        from: LocationPoint,
+        to: LocationPoint,
+        time: RoutePlanningTime,
+        filters: RoutePlannerFilters,
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy
+    ) async throws -> RouteCalculation {
+        try await calculateRoute(
+            from: from,
+            to: to,
+            time: time,
+            filters: filters,
+            realtimeRefreshPolicy: realtimeRefreshPolicy,
+            page: .initial
         )
     }
 
@@ -73,4 +92,30 @@ enum RoutingError: Error, Equatable {
     case timetableUnavailable
     /// A route exists but none of it uses public transport.
     case noPublicTransportRoute
+}
+
+/// Selects the portion of the departure profile returned by a route search.
+/// Page boundaries are exclusive door-to-door departure timestamps.
+nonisolated enum RouteSearchPage: Hashable, Sendable {
+    case initial
+    case earlier(than: Date, limit: Int)
+    case later(than: Date, limit: Int)
+
+    var resultLimit: Int {
+        switch self {
+        case .initial:
+            5
+        case let .earlier(_, limit), let .later(_, limit):
+            max(0, limit)
+        }
+    }
+
+    var boundary: Date? {
+        switch self {
+        case .initial:
+            nil
+        case let .earlier(boundary, _), let .later(boundary, _):
+            boundary
+        }
+    }
 }

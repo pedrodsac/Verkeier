@@ -6,7 +6,8 @@ struct MapKitRouteService: RouteService {
         to: LocationPoint,
         time: RoutePlanningTime,
         filters _: RoutePlannerFilters,
-        realtimeRefreshPolicy _: RouteRealtimeRefreshPolicy
+        realtimeRefreshPolicy _: RouteRealtimeRefreshPolicy,
+        page: RouteSearchPage
     ) async throws -> RouteCalculation {
         // MapKit transit routing has no per-mode/sort hook, so filters are advisory only
         // here; the public-transport engine is where they take effect.
@@ -15,7 +16,15 @@ struct MapKitRouteService: RouteService {
         request.destination = mapItem(for: to)
         request.transportType = [.transit, .walking]
         request.requestsAlternateRoutes = false
-        switch time {
+        let effectiveTime: RoutePlanningTime = switch page {
+        case .initial:
+            time
+        case let .earlier(boundary, _):
+            .arriveBy(boundary.addingTimeInterval(-1))
+        case let .later(boundary, _):
+            .departAt(boundary.addingTimeInterval(1))
+        }
+        switch effectiveTime {
         case .leaveNow: break
         case let .departAt(date): request.departureDate = date
         case let .arriveBy(date): request.arrivalDate = date

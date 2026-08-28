@@ -38,7 +38,7 @@ actor PublicTransportRoutingEngine {
     nonisolated let transferPenaltySeconds = 300
     /// Map geometry is useful, but it must never hold route cards hostage. A
     /// provider that is slow or unavailable simply leaves GTFS geometry in place.
-    nonisolated let roadGeometryBudgetSeconds: TimeInterval = 1
+    nonisolated let roadGeometryBudgetSeconds: TimeInterval
     /// Departure boards are shared by several candidate journeys in one search and
     /// commonly across a quick manual recalculation. Keep the snapshot short-lived
     /// so missing realtime data degrades to a clearly labelled schedule-only leg.
@@ -61,7 +61,8 @@ actor PublicTransportRoutingEngine {
         now: @escaping @Sendable () -> Date,
         calendar: Calendar,
         concurrency: RouteCalculationConcurrency = .default,
-        realtimeBoardBudgetSeconds: TimeInterval = 2
+        realtimeBoardBudgetSeconds: TimeInterval = 2,
+        roadGeometryBudgetSeconds: TimeInterval = 1
     ) {
         self.gtfsService = gtfsService
         self.atpClient = atpClient
@@ -72,6 +73,7 @@ actor PublicTransportRoutingEngine {
         self.calendar = calendar
         self.concurrency = concurrency
         self.realtimeBoardBudgetSeconds = realtimeBoardBudgetSeconds
+        self.roadGeometryBudgetSeconds = roadGeometryBudgetSeconds
         self.routeSearchContextCache = (gtfsService as? LocalGTFSService)?.routeSearchContextCache
         transferBufferSeconds = offlineMode ? 15 * 60 : 120
     }
@@ -81,9 +83,11 @@ actor PublicTransportRoutingEngine {
         to: LocationPoint,
         time: RoutePlanningTime = .leaveNow,
         filters: RoutePlannerFilters = RoutePlannerFilters(),
-        forceRealtimeRefresh: Bool = false
+        forceRealtimeRefresh: Bool = false,
+        page: RouteSearchPage = .initial
     ) async throws -> RouteCalculation {
         try Task.checkCancellation()
+        guard page.resultLimit > 0 else { throw RoutingError.noPublicTransportRoute }
 
         // Bike availability is optional enrichment. Refresh it independently so a
         // slow JCDecaux request cannot delay a direct bus or tram result; routing
@@ -106,16 +110,22 @@ actor PublicTransportRoutingEngine {
         // backward from the deadline, so later connections remain viable labels.
         let requestNow: Date
         let arriveByLimit: Date?
-        switch time {
-        case .leaveNow:
-            requestNow = now()
+        switch page {
+        case .initial:
+            switch time {
+            case .leaveNow:
+                requestNow = now()
+                arriveByLimit = nil
+            case let .departAt(date):
+                requestNow = date
+                arriveByLimit = nil
+            case let .arriveBy(date):
+                requestNow = date
+                arriveByLimit = date
+            }
+        case let .earlier(boundary, _), let .later(boundary, _):
+            requestNow = boundary
             arriveByLimit = nil
-        case let .departAt(date):
-            requestNow = date
-            arriveByLimit = nil
-        case let .arriveBy(date):
-            requestNow = date
-            arriveByLimit = date
         }
 
         let staticContext = try await cachedStaticContext(for: timetable, now: requestNow)
@@ -155,11 +165,13 @@ actor PublicTransportRoutingEngine {
                     context: context,
                     arriveBy: arriveBy,
                     filters: filters,
-                    includeLiveReserves: forceRealtimeRefresh
+                    includeLiveReserves: forceRealtimeRefresh,
+                    page: page
                 )
             }
-            directBikeCandidates = try await routeCalculationConcurrent {
+            directBikeCandidates = try await routeCalculationConcurrent { () -> [ScheduledJourney] in
                 try Task.checkCancellation()
+                guard case .initial = page else { return [] }
                 return kernel.directBikeJourneys(
                     from: from,
                     to: to,
@@ -179,11 +191,13 @@ actor PublicTransportRoutingEngine {
                     context: context,
                     arriveBy: arriveBy,
                     filters: filters,
-                    includeLiveReserves: forceRealtimeRefresh
+                    includeLiveReserves: forceRealtimeRefresh,
+                    page: page
                 )
             }
-            async let directBikeTask = routeCalculationConcurrent {
+            async let directBikeTask: [ScheduledJourney] = routeCalculationConcurrent {
                 try Task.checkCancellation()
+                guard case .initial = page else { return [] }
                 return kernel.directBikeJourneys(
                     from: from,
                     to: to,
@@ -206,13 +220,15 @@ actor PublicTransportRoutingEngine {
                     context: context,
                     arriveBy: arriveBy,
                     filters: RoutePlannerFilters(),
-                    includeLiveReserves: forceRealtimeRefresh
+                    includeLiveReserves: forceRealtimeRefresh,
+                    page: page
                 )
             }
         }
         let resolvedTransitCandidates = transitBaseCandidates
-        let mixedBikeCandidates = try await routeCalculationConcurrent {
+        let mixedBikeCandidates: [ScheduledJourney] = try await routeCalculationConcurrent {
             try Task.checkCancellation()
+            guard case .initial = page else { return [] }
             return kernel.mixedBikeJourneys(
                 from: resolvedTransitCandidates,
                 stations: bikeStations,
@@ -237,7 +253,12 @@ actor PublicTransportRoutingEngine {
 
         // Arrive-by wants the latest journey you can still board in time; leave-now
         // and depart-at use the rider-selected sort order (Fastest = earliest arrival).
-        let preferLatestDeparture = arriveByLimit != nil
+        let preferLatestDeparture: Bool = switch page {
+        case .earlier:
+            true
+        case .initial, .later:
+            arriveByLimit != nil
+        }
 
         // Keep low-transfer journeys alive through truncation: drop only journeys that
         // are strictly worse on every axis, then rank by the same rider-selected
@@ -262,6 +283,10 @@ actor PublicTransportRoutingEngine {
             forceRealtimeRefresh: forceRealtimeRefresh
         )
         let enrichedCandidates = enrichment.candidates
+        let invalidatedOptionIDs: Set<String> = Set(enrichedCandidates.compactMap { candidate in
+            guard candidate.penalty >= severePenaltyThreshold else { return nil }
+            return optionID(for: candidate.legs, origin: from, destination: to)
+        })
         let repairs = try await repairedCandidates(
             from: enrichedCandidates,
             origin: from,
@@ -286,8 +311,9 @@ actor PublicTransportRoutingEngine {
             try Task.checkCancellation()
             return kernel.selectEnrichedCandidates(
                 geometryCandidates,
-                arriveBy: arriveBy,
+                arriveBy: preferLatestDeparture,
                 deadline: arriveByLimit,
+                limit: page.resultLimit,
                 filters: filters
             )
         }
@@ -302,12 +328,13 @@ actor PublicTransportRoutingEngine {
             throw RoutingError.noPublicTransportRoute
         }
 
-        let primaryOptions = Array(options.filter { !$0.usesBikeShare }.prefix(returnedOptionLimit))
+        let primaryOptions = Array(options.filter { !$0.usesBikeShare }.prefix(page.resultLimit))
         let supplementalOptions = Array(options.filter(\.usesBikeShare).prefix(1))
         let selectedOptionID = primaryOptions.first?.id ?? supplementalOptions.first?.id
         return RouteCalculation(
             options: primaryOptions,
             supplementalOptions: supplementalOptions,
+            invalidatedOptionIDs: invalidatedOptionIDs,
             selectedOptionID: selectedOptionID
         )
     }

@@ -51,7 +51,6 @@
 		000000000000000000000320 /* VerkéierWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "VerkéierWidgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		627757803024D6D30012B2EF /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		62FE86412FDDDDC400081C59 /* AppConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppConfig.xcconfig; sourceTree = "<group>"; };
-		62FE86412FDDDDC400081C5A /* LocalConfig.xcconfig.example */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = LocalConfig.xcconfig.example; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -150,7 +149,6 @@
 			isa = PBXGroup;
 			children = (
 				62FE86412FDDDDC400081C59 /* AppConfig.xcconfig */,
-				62FE86412FDDDDC400081C5A /* LocalConfig.xcconfig.example */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -479,6 +477,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Verkéier/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Verkéier";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -520,6 +519,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Verkéier/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Verkéier";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
