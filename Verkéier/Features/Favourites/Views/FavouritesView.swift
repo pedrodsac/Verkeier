@@ -21,7 +21,7 @@ struct FavouritesView: View {
                 }
             } else {
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 18) {
+                    LazyVStack(alignment: .leading, spacing: 24) {
                         ForEach(sections) { section in
                             sectionView(section)
                         }
@@ -67,21 +67,32 @@ struct FavouritesView: View {
 
     private func sectionView(_ section: FavouriteLabelSection) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(section.title)
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 4)
+            if section.title != String(localized: "Saved Stops") {
+                Text(section.title)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 4)
+            }
 
-            ForEach(section.stops) { favourite in
-                FavouriteStopDepartureCard(
-                    favourite: favourite,
-                    actions: actions,
-                    editLabels: {
-                        lastEditedFavouriteID = favourite.id
-                        editingFavourite = favourite
-                    }
-                )
-                .accessibilityFocused($focusedFavouriteID, equals: favourite.id)
+            LazyVGrid(
+                columns: [
+                    GridItem(.flexible(), spacing: 12),
+                    GridItem(.flexible(), spacing: 12),
+                    GridItem(.flexible(), spacing: 12)
+                ],
+                spacing: 12
+            ) {
+                ForEach(section.stops) { favourite in
+                    FavouriteStopTile(
+                        favourite: favourite,
+                        actions: actions,
+                        editLabels: {
+                            lastEditedFavouriteID = favourite.id
+                            editingFavourite = favourite
+                        }
+                    )
+                    .accessibilityFocused($focusedFavouriteID, equals: favourite.id)
+                }
             }
         }
     }

@@ -202,11 +202,13 @@ extension PublicTransportRoutingEngine {
 
         let kernel = RouteSearchKernel(engine: self)
         let stopIds = kernel.realtimeStopIDs(for: candidates)
+        let optionsByStopID = departureOptionsByStopID(for: candidates)
 
         let boardsByStopId = try await departureBoardsByStopId(
             stopIds: stopIds,
+            optionsByStopID: optionsByStopID,
             forceRefresh: forceRealtimeRefresh,
-            allowNetwork: forceRealtimeRefresh
+            allowNetwork: true
         )
         return (
             try await enrichedCandidatesConcurrently(
@@ -433,6 +435,7 @@ extension PublicTransportRoutingEngine {
 
     func departureBoardsByStopId(
         stopIds: Set<String>,
+        optionsByStopID: [String: ATPDepartureBoardOptions] = [:],
         forceRefresh: Bool = false,
         allowNetwork: Bool = true
     ) async throws -> [String: [Departure]] {
@@ -443,7 +446,9 @@ extension PublicTransportRoutingEngine {
         var boardsByStopId: [String: [Departure]] = [:]
         var missingStopIds: [String] = []
         for stopId in requestedStopIds {
+            let options = optionsByStopID[stopId] ?? ATPDepartureBoardOptions()
             if !forceRefresh,
+               options.date == nil,
                let cached = cachedDepartureBoards[stopId],
                fetchedAt.timeIntervalSince(cached.fetchedAt) < realtimeBoardCacheLifetime {
                 boardsByStopId[stopId] = cached.departures
@@ -452,9 +457,8 @@ extension PublicTransportRoutingEngine {
             }
         }
 
-        // The initial planner pass is cards-first: use whatever ATP snapshot is
-        // already cached and let missing boards remain schedule-only. A user
-        // initiated refresh is the explicit opt-in for network enrichment.
+        // A fresh cached board is already suitable for final route selection. Any
+        // missing or stale board is fetched before the calculation is published.
         guard allowNetwork else { return boardsByStopId }
 
         let gtfsService = gtfsService
@@ -475,10 +479,11 @@ extension PublicTransportRoutingEngine {
                     group.addTask { @concurrent in
                         try Task.checkCancellation()
                         let platformIds = await gtfsService.stop(id: stopId)?.platformIds ?? [stopId]
+                        let options = optionsByStopID[stopId] ?? ATPDepartureBoardOptions()
                         let departures = await routingValueWithin(
                             seconds: max(0.001, remainingSeconds),
                             operation: {
-                                try await atpClient.departureBoards(stopIds: platformIds)
+                                try await atpClient.departureBoards(stopIds: platformIds, options: options)
                             }
                         ) ?? []
                         return (stopId, departures)
@@ -493,14 +498,48 @@ extension PublicTransportRoutingEngine {
             }
             for (stopId, departures) in fetchedBoards {
                 boardsByStopId[stopId] = departures
-                cachedDepartureBoards[stopId] = CachedDepartureBoard(
-                    departures: departures,
-                    fetchedAt: fetchedAt
-                )
+                // Current boards are short-lived and reusable. Future board
+                // requests are deliberately not written to this stop-only
+                // cache because their date, time and line filters differ.
+                if optionsByStopID[stopId]?.date == nil {
+                    cachedDepartureBoards[stopId] = CachedDepartureBoard(
+                        departures: departures,
+                        fetchedAt: fetchedAt
+                    )
+                }
             }
         }
 
         return boardsByStopId
+    }
+
+    /// ATP's board endpoint is departure-oriented, so GTFS still generates
+    /// route candidates. For future journeys, anchor the live lookup at the
+    /// scheduled leg departure rather than accidentally querying today's
+    /// board. Multiple candidates at one stop share the earliest board window;
+    /// the ATP result is then matched per leg below.
+    nonisolated func departureOptionsByStopID(
+        for candidates: [ScheduledJourney]
+    ) -> [String: ATPDepartureBoardOptions] {
+        var optionsByStopID: [String: ATPDepartureBoardOptions] = [:]
+        for leg in candidates.flatMap(\.legs) where leg.transportKind == .transit {
+            guard let stopID = leg.originStopId,
+                  let departure = leg.scheduledDepartureTime ?? leg.departureTime else { continue }
+            let line = leg.routeName ?? leg.routeId
+            let option = ATPDepartureBoardOptions(
+                date: departure,
+                durationMinutes: 45,
+                maximumJourneys: 6,
+                lines: line.map { [$0] } ?? []
+            )
+            if let existing = optionsByStopID[stopID],
+               let existingDate = existing.date,
+               existingDate <= departure {
+                continue
+            }
+            optionsByStopID[stopID] = option
+        }
+        return optionsByStopID
     }
 
     /// Builds final options through a bounded worker pool. Candidate geometry is
@@ -554,6 +593,79 @@ extension PublicTransportRoutingEngine {
             sawBikeShare = true
             return true
         }
+    }
+
+    /// Builds the exact all-the-way walking alternative used to decide whether
+    /// transit is worthwhile. Failure is intentionally non-fatal: the caller can
+    /// still publish transit without making a comparison against an estimate.
+    func directWalkingOption(
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        time: RoutePlanningTime,
+        leaveNowAnchor: Date
+    ) async -> RouteOption? {
+        guard let roadRoute = await routingValueWithin(
+            seconds: roadGeometryBudgetSeconds,
+            operation: { [self] in
+                await roadRoute(
+                    from: RouteMapCoordinate(origin),
+                    to: RouteMapCoordinate(destination),
+                    transport: .walking
+                )
+            }
+        ) ?? nil else {
+            return nil
+        }
+
+        let duration = TimeInterval(walkingSeconds(for: roadRoute.distanceMeters))
+        let departure: Date
+        let arrival: Date
+        switch time {
+        case .leaveNow:
+            departure = leaveNowAnchor
+            arrival = departure.addingTimeInterval(duration)
+        case let .departAt(date):
+            departure = date
+            arrival = date.addingTimeInterval(duration)
+        case let .arriveBy(date):
+            arrival = date
+            departure = date.addingTimeInterval(-duration)
+        }
+
+        let id = "mapkit-walking-\(origin.id)-\(destination.id)"
+        let leg = RoutePlan.Leg(
+            id: "\(id)-leg",
+            mode: .walking,
+            instruction: "Walk to \(destination.name ?? "destination")",
+            transportKind: .walking,
+            origin: origin,
+            destination: destination,
+            departureTime: departure,
+            arrivalTime: arrival,
+            distanceMeters: roadRoute.distanceMeters,
+            mapCoordinates: roadRoute.coordinates,
+            roadRoutingHint: .walking
+        )
+        let plan = RoutePlan(
+            id: id,
+            origin: origin,
+            destination: destination,
+            expectedTravelTime: duration,
+            distanceMeters: roadRoute.distanceMeters,
+            legs: [leg],
+            dataSource: .mapKit
+        )
+        return RouteOption(
+            id: id,
+            plan: plan,
+            mapOverlay: RouteMapOverlay(segments: [
+                RouteMapSegment(
+                    id: "\(id)-segment",
+                    mode: .walking,
+                    coordinates: roadRoute.coordinates
+                )
+            ])
+        )
     }
 
     /// Resolves the endpoint walks before timetable search. The candidate set is
@@ -734,8 +846,8 @@ extension PublicTransportRoutingEngine {
         }) else {
             return nil
         }
-        // GTFS shapes and stop coordinates are sufficient for the initial overlay.
-        // Exact road geometry is applied only by the background force-refresh.
+        // Candidate walks and any shape fallback have already been road-refined
+        // before this final presentation model is built.
         let routedLegs = legs
 
         let optionID = optionID(for: routedLegs, origin: origin, destination: destination)

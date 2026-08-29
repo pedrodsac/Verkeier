@@ -282,6 +282,7 @@ struct TransitMapViewModelTests {
         )
 
         #expect(routeService.calculateCallCount == 1)
+        #expect(routeService.lastRealtimeRefreshPolicy == .forceRefresh)
         #expect(viewModel.routePlan == routePlan)
         #expect(viewModel.routeOptions == [option])
         #expect(viewModel.selectedRouteOptionID == option.id)
@@ -626,54 +627,36 @@ struct TransitMapViewModelTests {
         #expect(viewModel.selectedRouteOptionID == "route-early-arrival")
     }
 
-    @Test func backgroundRefreshKeepsUnconfirmedScheduledRoutes() {
+    @Test func walkingOnlyResultDisablesPagingAndIgnoresTransitModeFilter() async {
         let destination = makeStop(id: "stop-1")
-        let scheduled = (1 ... 5).map { index in
-            makeRouteOption(
-                id: "route-\(index)",
-                plan: makeRoutePlan(destination: destination, routeName: "Scheduled \(index)")
-            )
-        }
-        let enrichedFirst = makeRouteOption(
-            id: "route-1",
-            plan: makeRoutePlan(destination: destination, routeName: "Live 1")
+        let departure = Date(timeIntervalSince1970: 1_000)
+        let walking = makeWalkingRouteOption(
+            id: "walking",
+            destination: destination,
+            departure: departure,
+            arrival: departure.addingTimeInterval(600)
+        )
+        let routeService = MockRouteService(result: .success(RouteCalculation(
+            options: [walking],
+            selectedOptionID: walking.id
+        )))
+        let viewModel = TransitMapViewModel(now: { departure })
+        viewModel.selectStop(destination)
+        viewModel.updateRouteFilters(RoutePlannerFilters(
+            modePreference: .tram,
+            avoidTightTransfers: false,
+            preferAccessible: false
+        ))
+
+        await viewModel.calculateRoute(
+            using: routeService,
+            from: CLLocation(latitude: 49.61, longitude: 6.13)
         )
 
-        let merged = TransitMapViewModel.mergingRefreshedOptions(
-            scheduled: scheduled,
-            refreshed: [enrichedFirst],
-            invalidatedOptionIDs: [],
-            limit: 5
-        )
-
-        #expect(merged.map(\.id) == scheduled.map(\.id))
-        #expect(merged.first?.routeNames == ["Live 1"])
-        #expect(merged.dropFirst().allSatisfy { $0.realtimeCoverage == .scheduleOnly })
-    }
-
-    @Test func backgroundRefreshReplacesExplicitlyInvalidatedRoute() {
-        let destination = makeStop(id: "stop-1")
-        let invalid = makeRouteOption(
-            id: "route-invalid",
-            plan: makeRoutePlan(destination: destination, routeName: "Cancelled")
-        )
-        let scheduled = makeRouteOption(
-            id: "route-scheduled",
-            plan: makeRoutePlan(destination: destination, routeName: "Scheduled")
-        )
-        let replacement = makeRouteOption(
-            id: "route-replacement",
-            plan: makeRoutePlan(destination: destination, routeName: "Replacement")
-        )
-
-        let merged = TransitMapViewModel.mergingRefreshedOptions(
-            scheduled: [invalid, scheduled],
-            refreshed: [replacement],
-            invalidatedOptionIDs: [invalid.id],
-            limit: 5
-        )
-
-        #expect(merged.map(\.id) == [scheduled.id, replacement.id])
+        #expect(viewModel.routeOptions == [walking])
+        #expect(!viewModel.canLoadEarlierRoutes)
+        #expect(!viewModel.canLoadLaterRoutes)
+        #expect(routeService.calculateCallCount == 1)
     }
 
     @Test func strictDepartureAndArrivalDominanceRemovesOnlyStrictlyWorseRoute() {
@@ -776,7 +759,54 @@ struct TransitMapViewModelTests {
         #expect(viewModel.canLoadLaterRoutes)
     }
 
-    @Test func sparseLaterPageDisablesOnlyLaterDirection() async {
+    @Test func laterPageBoundaryIgnoresAllTheWayWalkingDeparture() async {
+        let destination = makeStop(id: "stop-1")
+        let transit = makeTimedRouteOption(
+            id: "initial",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 1_000),
+            arrival: Date(timeIntervalSince1970: 1_500),
+            routeName: "Initial"
+        )
+        let walking = makeWalkingRouteOption(
+            id: "walking",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 5_000),
+            arrival: Date(timeIntervalSince1970: 5_600)
+        )
+        let later = makeTimedRouteOption(
+            id: "later",
+            destination: destination,
+            departure: Date(timeIntervalSince1970: 2_000),
+            arrival: Date(timeIntervalSince1970: 2_500),
+            routeName: "Later"
+        )
+        let routeService = MockRouteService(result: .success(RouteCalculation(
+            options: [later],
+            selectedOptionID: later.id
+        )))
+        let viewModel = TransitMapViewModel(now: { Date(timeIntervalSince1970: 0) })
+        viewModel.selectStop(destination)
+        viewModel.unfilteredRouteOptions = [walking, transit]
+        viewModel.routeOptions = [walking, transit]
+
+        await viewModel.loadLaterRoutes(
+            using: routeService,
+            from: CLLocation(latitude: 49.61, longitude: 6.13)
+        )
+
+        guard case let .later(boundary, limit) = routeService.lastPage else {
+            Issue.record("Expected a later-page request")
+            return
+        }
+        #expect(boundary == transit.departureTime)
+        #expect(limit == 3)
+        #expect(routeService.lastRealtimeRefreshPolicy == .forceRefresh)
+        #expect(viewModel.routeOptions.filter(\.isWalkingOnly).count == 1)
+        #expect(routeService.calculateCallCount == 1)
+    }
+
+    @Test func sparseLaterPageKeepsLaterDirectionAvailable() async {
         let destination = makeStop(id: "stop-1")
         let initial = makeTimedRouteOption(
             id: "initial",
@@ -808,7 +838,7 @@ struct TransitMapViewModelTests {
             from: CLLocation(latitude: 49.61, longitude: 6.13)
         )
 
-        #expect(!viewModel.canLoadLaterRoutes)
+        #expect(viewModel.canLoadLaterRoutes)
         #expect(viewModel.canLoadEarlierRoutes)
         #expect(!viewModel.isLoadingLaterRoutes)
     }
@@ -1039,6 +1069,38 @@ struct TransitMapViewModelTests {
         RouteOption(id: id, plan: plan, mapOverlay: overlay)
     }
 
+    private func makeWalkingRouteOption(
+        id: String,
+        destination: Stop,
+        departure: Date,
+        arrival: Date
+    ) -> RouteOption {
+        let origin = LocationPoint(name: "Origin", latitude: 49.61, longitude: 6.13)
+        let leg = RoutePlan.Leg(
+            id: "\(id)-leg",
+            mode: .walking,
+            transportKind: .walking,
+            origin: origin,
+            destination: destination.location,
+            departureTime: departure,
+            arrivalTime: arrival,
+            distanceMeters: 800
+        )
+        return RouteOption(
+            id: id,
+            plan: RoutePlan(
+                id: id,
+                origin: origin,
+                destination: destination.location,
+                expectedTravelTime: arrival.timeIntervalSince(departure),
+                distanceMeters: 800,
+                legs: [leg],
+                dataSource: .mapKit
+            ),
+            mapOverlay: nil
+        )
+    }
+
     private func makeOverlay(id: String) -> RouteMapOverlay {
         RouteMapOverlay(segments: [
             RouteMapSegment(
@@ -1214,6 +1276,8 @@ private enum MockRouteError: Error {
 private nonisolated final class MockRouteService: RouteService, @unchecked Sendable {
     private let result: Result<RouteCalculation, Error>
     private(set) var calculateCallCount = 0
+    private(set) var lastRealtimeRefreshPolicy: RouteRealtimeRefreshPolicy?
+    private(set) var lastPage: RouteSearchPage?
 
     init(result: Result<RouteCalculation, Error>) {
         self.result = result
@@ -1224,10 +1288,12 @@ private nonisolated final class MockRouteService: RouteService, @unchecked Senda
         to _: LocationPoint,
         time _: RoutePlanningTime,
         filters _: RoutePlannerFilters,
-        realtimeRefreshPolicy _: RouteRealtimeRefreshPolicy,
-        page _: RouteSearchPage
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy,
+        page: RouteSearchPage
     ) async throws -> RouteCalculation {
         calculateCallCount += 1
+        lastRealtimeRefreshPolicy = realtimeRefreshPolicy
+        lastPage = page
         return try result.get()
     }
 

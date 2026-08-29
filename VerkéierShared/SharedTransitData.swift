@@ -94,12 +94,21 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
     let name: String
     let locality: String?
     let platformIds: [String]
+    /// Opaque, app-owned filter payload. Older widgets can safely ignore it.
+    let boardFilterData: Data?
 
-    nonisolated init(id: String, name: String, locality: String?, platformIds: [String]? = nil) {
+    nonisolated init(
+        id: String,
+        name: String,
+        locality: String?,
+        platformIds: [String]? = nil,
+        boardFilterData: Data? = nil
+    ) {
         self.id = id
         self.name = name.stationDisplayName
         self.locality = locality
         self.platformIds = Self.normalizedPlatformIds(platformIds, fallbackId: id)
+        self.boardFilterData = boardFilterData
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -107,6 +116,7 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
         case name
         case locality
         case platformIds
+        case boardFilterData
     }
 
     nonisolated init(from decoder: Decoder) throws {
@@ -120,6 +130,7 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
             try container.decodeIfPresent([String].self, forKey: .platformIds),
             fallbackId: id
         )
+        boardFilterData = try container.decodeIfPresent(Data.self, forKey: .boardFilterData)
     }
 
     private nonisolated static func normalizedPlatformIds(_ ids: [String]?, fallbackId: String) -> [String] {

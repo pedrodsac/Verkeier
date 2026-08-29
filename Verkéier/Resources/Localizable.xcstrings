@@ -57,6 +57,16 @@
         }
       }
     },
+    "%@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
     "%lld" : {
       "localizations" : {
         "de" : {
@@ -81,35 +91,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld"
-          }
-        }
-      }
-    },
-    "%lld min" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld Min."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld min"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld Min."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld min"
           }
         }
       }
@@ -288,35 +269,6 @@
         }
       }
     },
-    "Actions for %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktionen für %1$@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actions pour %1$@"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktioune fir %1$@"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ações para %1$@"
-          }
-        }
-      }
-    },
     "Add" : {
       "localizations" : {
         "de" : {
@@ -401,64 +353,6 @@
         }
       }
     },
-    "Administration des transports publics - GTFS public transport schedules and stops" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Administration des transports publics - öffentliche GTFS-Fahrpläne und Haltestellen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Administration des transports publics - horaires et arrêts de transports publics GTFS"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Administration des transports publics - GTFS-Fuerpläng an Arrête vum ëffentlechen Transport"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Administration des transports publics - horários e paragens de transporte público GTFS"
-          }
-        }
-      }
-    },
-    "Administration des transports publics - mobiliteit.lu OpenAPI" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Administration des transports publics - mobiliteit.lu OpenAPI"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Administration des transports publics - mobiliteit.lu OpenAPI"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Administration des transports publics - mobiliteit.lu OpenAPI"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Administration des transports publics - mobiliteit.lu OpenAPI"
-          }
-        }
-      }
-    },
     "Advanced" : {
       "localizations" : {
         "de" : {
@@ -511,35 +405,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Todos"
-          }
-        }
-      }
-    },
-    "All stops" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Haltestellen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tous les arrêts"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All Arrêten"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todas as paragens"
           }
         }
       }
@@ -600,35 +465,6 @@
         }
       }
     },
-    "Apple Maps / MapKit" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Maps / MapKit"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Plans / MapKit"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Maps / MapKit"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Maps / MapKit"
-          }
-        }
-      }
-    },
     "Arrive" : {
       "localizations" : {
         "de" : {
@@ -681,35 +517,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chegar até…"
-          }
-        }
-      }
-    },
-    "Attribution" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quellenangaben"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Crédits"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quellen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Atribuição"
           }
         }
       }
@@ -1109,35 +916,6 @@
         }
       }
     },
-    "Clear search" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suche löschen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Effacer la recherche"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sich läschen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Limpar pesquisa"
-          }
-        }
-      }
-    },
     "Closest stops from mobiliteit.lu" : {
       "localizations" : {
         "de" : {
@@ -1197,6 +975,9 @@
         }
       }
     },
+    "Connectivity" : {
+
+    },
     "Continues as %@ — no change needed" : {
       "localizations" : {
         "de" : {
@@ -1221,64 +1002,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Continua como %1$@ — não é necessária qualquer alteração"
-          }
-        }
-      }
-    },
-    "Current Location" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktueller Standort"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Position actuelle"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktuell Plaz"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Localização atual"
-          }
-        }
-      }
-    },
-    "Data" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Daten"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Données"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Donnéeën"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dados"
           }
         }
       }
@@ -1335,35 +1058,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Antecedência predefinida"
-          }
-        }
-      }
-    },
-    "Delete all favourites, recent stops, trips, and commute presets?" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Favoriten, zuletzt verwendeten Haltestellen, Fahrten und Pendelprofile löschen?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Supprimer tous les favoris, arrêts récents, trajets et préréglages de trajet domicile-travail ?"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All Favoritten, rezent Arrêten, Reesen a Pendel-Presets läschen?"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eliminar todos os favoritos, paragens recentes, viagens e predefinições de deslocação?"
           }
         }
       }
@@ -1427,35 +1121,6 @@
     "Delete local data?" : {
 
     },
-    "Departure refresh failed. %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktualisierung der Abfahrten fehlgeschlagen. %1$@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L’actualisation des départs a échoué. %1$@"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "D’Aktualiséierung vun den Departuren ass net gelongen. %1$@"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A atualização das partidas falhou. %1$@"
-          }
-        }
-      }
-    },
     "Departures" : {
       "localizations" : {
         "de" : {
@@ -1480,35 +1145,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Partidas"
-          }
-        }
-      }
-    },
-    "Departures unavailable" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abfahrten nicht verfügbar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Départs indisponibles"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Departuren net verfügbar"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partidas indisponíveis"
           }
         }
       }
@@ -1737,35 +1373,6 @@
         }
       }
     },
-    "Edit Label" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bezeichnung bearbeiten"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modifier le libellé"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Label änneren"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar etiqueta"
-          }
-        }
-      }
-    },
     "Edit labels" : {
       "localizations" : {
         "de" : {
@@ -1823,6 +1430,7 @@
       }
     },
     "Edit labels for %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1909,35 +1517,6 @@
         }
       }
     },
-    "Fastest" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schnellste"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le plus rapide"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schnellsten"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mais rápido"
-          }
-        }
-      }
-    },
     "Favourite Stop" : {
       "localizations" : {
         "de" : {
@@ -1962,35 +1541,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paragem favorita"
-          }
-        }
-      }
-    },
-    "Favourite Stops" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favoriten-Haltestellen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arrêts favoris"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favoritten-Arrêten"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paragens favoritas"
           }
         }
       }
@@ -2023,35 +1573,6 @@
         }
       }
     },
-    "Favourites refreshed" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favoriten aktualisiert"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favoris actualisés"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favoritten aktualiséiert"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favoritos atualizados"
-          }
-        }
-      }
-    },
     "Find a stop" : {
       "localizations" : {
         "de" : {
@@ -2080,35 +1601,6 @@
         }
       }
     },
-    "Find Routes" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Routen suchen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechercher des itinéraires"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weeër sichen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Procurar rotas"
-          }
-        }
-      }
-    },
     "Finding nearby stops" : {
       "localizations" : {
         "de" : {
@@ -2133,36 +1625,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A procurar paragens próximas"
-          }
-        }
-      }
-    },
-    "From" : {
-      "comment" : "Route-planner origin field label.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Von"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Départ"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vun"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "De"
           }
         }
       }
@@ -2247,35 +1709,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Obter próximas partidas"
-          }
-        }
-      }
-    },
-    "Get started" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Loslegen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Commencer"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ufänken"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Começar"
           }
         }
       }
@@ -2423,35 +1856,6 @@
         }
       }
     },
-    "Label (e.g. Home, Work)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bezeichnung (z. B. Zuhause, Arbeit)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Libellé (p. ex. Maison, Travail)"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Label (z. B. Doheem, Schaffen)"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Etiqueta (por ex., Casa, Trabalho)"
-          }
-        }
-      }
-    },
     "Labels" : {
       "localizations" : {
         "de" : {
@@ -2479,9 +1883,6 @@
           }
         }
       }
-    },
-    "Labels: %@" : {
-
     },
     "Last service today" : {
       "localizations" : {
@@ -2604,153 +2005,8 @@
         }
       }
     },
-    "Live departure data is unavailable in offline mode or without an ATP connection." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Live-Abfahrtsdaten sind im Offline-Modus oder ohne ATP-Verbindung nicht verfügbar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les données de départ en direct ne sont pas disponibles hors ligne ou sans connexion ATP."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Live-Departuredonnéeën sinn am Offline-Modus oder ouni ATP-Verbindung net verfügbar."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Os dados de partidas em tempo real não estão disponíveis no modo offline ou sem ligação ATP."
-          }
-        }
-      }
-    },
-    "Live departures are unavailable in offline mode or without an ATP connection." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Live-Abfahrten sind im Offline-Modus oder ohne ATP-Verbindung nicht verfügbar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les départs en direct ne sont pas disponibles hors ligne ou sans connexion ATP."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Live-Departuren sinn am Offline-Modus oder ouni ATP-Verbindung net verfügbar."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "As partidas em tempo real não estão disponíveis no modo offline ou sem ligação ATP."
-          }
-        }
-      }
-    },
-    "Live departures could not be loaded for this stop." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Live-Abfahrten für diese Haltestelle konnten nicht geladen werden."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les départs en direct pour cet arrêt n’ont pas pu être chargés."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "D’Live-Departure fir dësen Arrêt konnten net geluede ginn."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Não foi possível carregar as partidas em tempo real desta paragem."
-          }
-        }
-      }
-    },
-    "Live departures unavailable" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Live-Abfahrten nicht verfügbar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Départs en direct indisponibles"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Live-Departuren net verfügbar"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partidas em tempo real indisponíveis"
-          }
-        }
-      }
-    },
     "Live information" : {
 
-    },
-    "Loading departures" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abfahrten werden geladen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chargement des départs"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Departure lueden"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A carregar partidas"
-          }
-        }
-      }
     },
     "Loading stops" : {
       "localizations" : {
@@ -2804,35 +2060,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Localização"
-          }
-        }
-      }
-    },
-    "Location is optional. You can search for stops without sharing your location." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Standort ist optional. Du kannst ohne Standortfreigabe nach Haltestellen suchen."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La position est facultative. Vous pouvez rechercher des arrêts sans partager votre position."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "D’Plaz ass fakultativ. Du kanns no Arrête sichen, ouni deng Plaz ze deelen."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A localização é opcional. Pode procurar paragens sem partilhar a sua localização."
           }
         }
       }
@@ -2896,35 +2123,6 @@
     "Maps" : {
 
     },
-    "Maps:" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Karten:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cartes :"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kaarten:"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mapas:"
-          }
-        }
-      }
-    },
     "Mode preference" : {
       "localizations" : {
         "de" : {
@@ -2955,35 +2153,6 @@
     },
     "More" : {
 
-    },
-    "More actions" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weitere Aktionen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autres actions"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Méi Aktiounen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mais ações"
-          }
-        }
-      }
     },
     "Name this trip so you can re-plan it in one tap. Use “Home → Work” for time-of-day commute suggestions." : {
       "localizations" : {
@@ -3125,35 +2294,6 @@
         }
       }
     },
-    "No departures" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Abfahrten"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucun départ"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keng Departuren"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sem partidas"
-          }
-        }
-      }
-    },
     "No favourites" : {
       "localizations" : {
         "de" : {
@@ -3210,35 +2350,6 @@
         }
       }
     },
-    "No live departures are currently available for this stop." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Für diese Haltestelle sind derzeit keine Live-Abfahrten verfügbar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucun départ en direct n’est actuellement disponible pour cet arrêt."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Et si momentan keng Live-Departure fir dësen Arrêt verfügbar."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Não há partidas em tempo real disponíveis para esta paragem."
-          }
-        }
-      }
-    },
     "No matches" : {
       "localizations" : {
         "de" : {
@@ -3291,35 +2402,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sem paragens próximas"
-          }
-        }
-      }
-    },
-    "No upcoming departures" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine bevorstehenden Abfahrten"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucun départ à venir"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keng nächst Departuren"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sem próximas partidas"
           }
         }
       }
@@ -3408,35 +2490,6 @@
         }
       }
     },
-    "On time" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pünktlich"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "À l’heure"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Op der Zäit"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pontual"
-          }
-        }
-      }
-    },
     "Open departures" : {
       "localizations" : {
         "de" : {
@@ -3466,6 +2519,7 @@
       }
     },
     "Open departures for %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3838,6 +2892,9 @@
         }
       }
     },
+    "Opens departures for this stop" : {
+
+    },
     "Opens route step-by-step timeline" : {
       "localizations" : {
         "de" : {
@@ -3924,6 +2981,7 @@
       }
     },
     "Plan from %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3979,6 +3037,9 @@
         }
       }
     },
+    "Plan journeys from the static schedule only, without live departures, delays, or cancellations. Adds a 15-minute minimum between transfers as a safety buffer." : {
+
+    },
     "Plan Route" : {
       "localizations" : {
         "de" : {
@@ -4008,6 +3069,7 @@
       }
     },
     "Plan to %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4290,35 +3352,6 @@
     "Public transport for Luxembourg" : {
 
     },
-    "Public transport in Luxembourg, made easy." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Öffentlicher Verkehr in Luxemburg, ganz einfach."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les transports publics au Luxembourg, en toute simplicité."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ëffentlechen Transport zu Lëtzebuerg, einfach gemaach."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transportes públicos no Luxemburgo, de forma simples."
-          }
-        }
-      }
-    },
     "Quick destinations" : {
       "localizations" : {
         "de" : {
@@ -4371,35 +3404,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recentes"
-          }
-        }
-      }
-    },
-    "Recent Places" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zuletzt verwendete Orte"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lieux récents"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rezent Plazen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Locais recentes"
           }
         }
       }
@@ -4492,6 +3496,7 @@
       }
     },
     "Refresh departures for %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4543,64 +3548,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Atualizar favoritos"
-          }
-        }
-      }
-    },
-    "Refresh Routes" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Routen aktualisieren"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actualiser les itinéraires"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weeër aktualiséieren"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Atualizar rotas"
-          }
-        }
-      }
-    },
-    "Refreshing departures" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abfahrten werden aktualisiert"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actualisation des départs"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Departure ginn aktualiséiert"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A atualizar partidas"
           }
         }
       }
@@ -4752,6 +3699,7 @@
       }
     },
     "Remove %@ from favourites" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4807,66 +3755,8 @@
         }
       }
     },
-    "Remove Label" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bezeichnung entfernen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Supprimer le libellé"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Label ewechhuelen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remover etiqueta"
-          }
-        }
-      }
-    },
     "Results" : {
 
-    },
-    "Retry departures" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abfahrten erneut laden"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Réessayer les départs"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Departuren nach eemol lueden"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tentar partidas novamente"
-          }
-        }
-      }
     },
     "Route options" : {
       "localizations" : {
@@ -4920,64 +3810,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Predefinições do planeador de rotas"
-          }
-        }
-      }
-    },
-    "Routes could not be refreshed. Showing the last available results." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Routen konnten nicht aktualisiert werden. Die letzten verfügbaren Ergebnisse werden angezeigt."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les itinéraires n’ont pas pu être actualisés. Les derniers résultats disponibles sont affichés."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "D’Routen konnten net aktualiséiert ginn. Déi lescht verfügbar Resultater gi gewisen."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Não foi possível atualizar as rotas. São apresentados os últimos resultados disponíveis."
-          }
-        }
-      }
-    },
-    "Routes may have changed. Refresh routes for the latest information." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Routen können sich geändert haben. Aktualisieren Sie sie für die neuesten Informationen."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les itinéraires ont peut-être changé. Actualisez-les pour obtenir les dernières informations."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "D’Routen hu sech vläicht geännert. Aktualiséier se fir déi lescht Informatiounen."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "As rotas podem ter mudado. Atualize-as para obter as informações mais recentes."
           }
         }
       }
@@ -5184,64 +4016,6 @@
     "Schedules, live departures, bike-share availability, and service warnings are provided by their respective data publishers and may be incomplete or delayed." : {
 
     },
-    "Search" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suchen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechercher"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sichen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pesquisar"
-          }
-        }
-      }
-    },
-    "Search settings" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sucheinstellungen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Réglages de recherche"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sichastellungen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Definições de pesquisa"
-          }
-        }
-      }
-    },
     "Search stops" : {
       "localizations" : {
         "de" : {
@@ -5270,64 +4044,6 @@
         }
       }
     },
-    "Search stops & places" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haltestellen und Orte suchen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechercher des arrêts et des lieux"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No Arrêten a Plaze sichen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pesquisar paragens e locais"
-          }
-        }
-      }
-    },
-    "Search stops…" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haltestellen suchen …"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechercher des arrêts…"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No Arrête sichen…"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pesquisar paragens…"
-          }
-        }
-      }
-    },
     "Settings" : {
       "localizations" : {
         "de" : {
@@ -5352,35 +4068,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Definições"
-          }
-        }
-      }
-    },
-    "Settings and information" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Einstellungen und Informationen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Réglages et informations"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Astellungen an Informatiounen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Definições e informações"
           }
         }
       }
@@ -5441,35 +4128,6 @@
         }
       }
     },
-    "Show more routes" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weitere Routen anzeigen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher plus d’itinéraires"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Méi Weeër weisen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar mais rotas"
-          }
-        }
-      }
-    },
     "Show Nearby Stops" : {
       "localizations" : {
         "de" : {
@@ -5494,35 +4152,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostrar paragens próximas"
-          }
-        }
-      }
-    },
-    "Show only stops labelled “Work” and your commute preset while this Focus is on." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Während dieses Fokus aktiv ist, nur Haltestellen mit der Bezeichnung „Arbeit“ und dein Pendelprofil anzeigen."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher uniquement les arrêts portant le libellé « Travail » et votre trajet domicile-travail lorsque ce mode de concentration est actif."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nëmmen Arrête mam Label „Schaffen“ an däi Pendler-Preset weisen, soulaang dëse Focus aktiv ass."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar apenas paragens com a etiqueta “Trabalho” e a sua predefinição de deslocação enquanto este modo de concentração estiver ativo."
           }
         }
       }
@@ -5555,92 +4184,8 @@
         }
       }
     },
-    "Sort by" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sortieren nach"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trier par"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sortéieren no"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ordenar por"
-          }
-        }
-      }
-    },
-    "Sort routes" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Routen sortieren"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trier les itinéraires"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weeër sortéieren"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ordenar rotas"
-          }
-        }
-      }
-    },
-    "Start typing to find a stop, address, or place." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib etwas ein, um eine Haltestelle, Adresse oder einen Ort zu finden."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Commencez à saisir un arrêt, une adresse ou un lieu."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fänkt un ze tippen, fir en Arrêt, eng Adress oder eng Plaz ze fannen."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comece a escrever para encontrar uma paragem, morada ou local."
-          }
-        }
-      }
+    "Shows %@" : {
+
     },
     "Start typing to find stops from local GTFS data." : {
       "localizations" : {
@@ -5750,35 +4295,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paragem %1$@"
-          }
-        }
-      }
-    },
-    "Stop search" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haltestellensuche"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recherche d’arrêt"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Statiounssich"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pesquisa de paragem"
           }
         }
       }
@@ -6007,35 +4523,6 @@
         }
       }
     },
-    "This app is not an official Luxembourg public transport app." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese App ist keine offizielle Luxemburger ÖPNV-App."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette app n’est pas une application officielle des transports publics luxembourgeois."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dës App ass keng offiziell App vum ëffentlechen Transport zu Lëtzebuerg."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esta app não é uma aplicação oficial dos transportes públicos luxemburgueses."
-          }
-        }
-      }
-    },
     "This removes favourites, recent stops, trips, and commute presets from this device." : {
 
     },
@@ -6063,36 +4550,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hora"
-          }
-        }
-      }
-    },
-    "To" : {
-      "comment" : "Route-planner destination field label.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nach"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arrivée"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Op"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Para"
           }
         }
       }
@@ -6261,64 +4718,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Elétrico T0"
-          }
-        }
-      }
-    },
-    "Transfers" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Umstiege"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Correspondances"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ëmsteigen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transbordos"
-          }
-        }
-      }
-    },
-    "Transport data:" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verkehrsdaten:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Données de transport :"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transportdaten:"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dados de transporte:"
           }
         }
       }
@@ -6528,93 +4927,6 @@
     "Verkéier is an independent app and is not affiliated with or endorsed by Luxembourg public transport operators." : {
 
     },
-    "Ville de Luxembourg - AVL Autobus" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ville de Luxembourg - AVL Autobus"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ville de Luxembourg - AVL Autobus"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ville de Luxembourg - AVL Autobus"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ville de Luxembourg - AVL Autobus"
-          }
-        }
-      }
-    },
-    "Walking" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zu Fuß"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "À pied"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zu Fouss"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A pé"
-          }
-        }
-      }
-    },
-    "Welcome to Verkéier" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Willkommen bei Verkéier"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bienvenue dans Verkéier"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wëllkomm bei Verkéier"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bem-vindo ao Verkéier"
-          }
-        }
-      }
-    },
     "Wheelchair accessible" : {
       "localizations" : {
         "de" : {
@@ -6639,35 +4951,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Acessível a cadeira de rodas"
-          }
-        }
-      }
-    },
-    "You can change permissions later in Settings." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du kannst die Berechtigungen später in den Einstellungen ändern."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vous pourrez modifier les autorisations plus tard dans Réglages."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du kanns d’Berechtigungen spéider an den Astellunge änneren."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pode alterar as permissões mais tarde nas Definições."
           }
         }
       }

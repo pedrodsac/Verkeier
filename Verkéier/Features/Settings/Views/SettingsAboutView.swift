@@ -55,6 +55,16 @@ struct SettingsAboutView: View {
                 )
             }
 
+            Section {
+                ForEach(PublicTransportMapLink.all) { mapLink in
+                    AboutExternalLinkRow(mapLink: mapLink)
+                }
+            } header: {
+                Text("Public transport maps")
+            } footer: {
+                Text("Official mobiliteit.lu network maps for Luxembourg, available in English, French, and German.")
+            }
+
             Section("Privacy") {
                 AboutFactRow(
                     iconName: "location.fill",
@@ -128,6 +138,34 @@ struct SettingsAboutView: View {
     }
 }
 
+/// A language-specific map published by mobiliteit.lu.
+///
+/// These are intentionally global links: they describe public transport across
+/// Luxembourg and should be available regardless of the user's current locality.
+struct PublicTransportMapLink: Identifiable, Hashable, Sendable {
+    let id: String
+    let language: String
+    let url: URL
+
+    static let all: [Self] = [
+        Self(
+            id: "english",
+            language: "English",
+            url: URL(string: "https://www.mobiliteit.lu/en/maps/")!
+        ),
+        Self(
+            id: "french",
+            language: "Français",
+            url: URL(string: "https://www.mobiliteit.lu/fr/plans-detailles/")!
+        ),
+        Self(
+            id: "german",
+            language: "Deutsch",
+            url: URL(string: "https://www.mobiliteit.lu/de/ubersichtsplane/")!
+        )
+    ]
+}
+
 private struct AboutAppHeader: View {
     private var versionText: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
@@ -182,6 +220,40 @@ private struct AboutSourceRow: View {
             }
         }
         .accessibilityElement(children: .combine)
+    }
+}
+
+private struct AboutExternalLinkRow: View {
+    let mapLink: PublicTransportMapLink
+
+    var body: some View {
+        Link(destination: mapLink.url) {
+            HStack(alignment: .center, spacing: 12) {
+                Image(systemName: "map")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.tint)
+                    .frame(width: 28, height: 28)
+                    .background(.tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(mapLink.language)
+                        .font(.subheadline)
+                    Text("mobiliteit.lu · Public transport maps")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "arrow.up.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
+            }
+        }
+        .accessibilityLabel("\(mapLink.language) public transport maps")
+        .accessibilityHint("Opens the mobiliteit.lu map in your browser")
     }
 }
 

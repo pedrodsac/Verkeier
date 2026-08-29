@@ -93,6 +93,11 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
         plan.legs.contains { $0.transportKind == .bikeShare }
     }
 
+    /// True when the complete door-to-door journey is made on foot.
+    var isWalkingOnly: Bool {
+        !plan.legs.isEmpty && plan.legs.allSatisfy { $0.transportKind == .walking }
+    }
+
     /// True for a vel'OH! journey with only the walking access/egress legs
     /// needed to reach its stations. Transit-bike combinations remain regular
     /// transit options for time-range and missed-departure presentation.

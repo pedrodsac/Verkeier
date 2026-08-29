@@ -19,15 +19,7 @@ struct SettingsView: View {
 
     var body: some View {
         @Bindable var prefs = preferences
-        List {
-			Section {
-				Toggle("Offline mode", isOn: $prefs.offlineMode)
-			} footer: {
-				Text("Plan journeys from the static schedule only, without live "
-					 + "departures, delays, or cancellations. Adds a 15-minute "
-					 + "minimum between transfers as a safety buffer.")
-			}
-			
+		List {
 			Section("Appearance") {
 				Picker("Theme", selection: $prefs.appearance) {
 					ForEach(AppearancePreference.allCases) { option in
@@ -37,6 +29,15 @@ struct SettingsView: View {
 				.pickerStyle(.segmented)
 				.listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
 			}
+			
+			Section {
+				Toggle("Offline mode", isOn: $prefs.offlineMode)
+			} header: {
+				Text("Connectivity")
+			} footer: {
+				Text("Plan journeys from the static schedule only, without live departures, delays, or cancellations. Adds a 15-minute minimum between transfers as a safety buffer.")
+			}
+			
 			Section("Units") {
 				Picker("Distance", selection: $prefs.distanceUnit) {
 					ForEach(DistanceUnitPreference.allCases) { unit in
@@ -44,6 +45,7 @@ struct SettingsView: View {
 					}
 				}
 			}
+			
 			Section("Map pins") {
 				Toggle(isOn: $prefs.showBikeShareStations) {
 					mapPinLabel("Bike share stations", mode: .bicycle)
@@ -58,6 +60,7 @@ struct SettingsView: View {
 					mapPinLabel("Train stations", mode: .train)
 				}
 			}
+			
 			Section("Route Planner Defaults") {
 				Picker("Preferred mode", selection: $prefs.defaultModePreference) {
 					ForEach(RoutePlannerModePreference.allCases) { mode in
@@ -67,6 +70,7 @@ struct SettingsView: View {
 				Toggle("Avoid tight transfers", isOn: $prefs.avoidTightTransfers)
 				Toggle("Prefer step-free routes", isOn: $prefs.preferAccessible)
 			}
+			
 			Section("Reminders") {
 				Picker(
 					"Default lead time",
@@ -77,7 +81,8 @@ struct SettingsView: View {
 					}
 				}
 			}
-			Section {
+			
+			Section("About") {
 				NavigationLink {
 					SettingsAboutView()
 				} label: {
@@ -85,7 +90,6 @@ struct SettingsView: View {
 				}
 			}
         }
-		.padding(.top, -20)
         .listStyle(.insetGrouped)
         // Give every settings glyph subtle layered depth without per-row changes.
         .symbolRenderingMode(.hierarchical)

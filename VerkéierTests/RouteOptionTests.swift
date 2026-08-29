@@ -47,6 +47,12 @@ struct RouteOptionTests {
         #expect(option(legs: [leg(from: hamilius, to: metz)]).crossesBorder == true)
     }
 
+    @Test func walkingOnlyRequiresEveryLegToBeWalking() {
+        let walking = leg(from: hamilius, to: luxexpo, kind: .walking, routeName: nil)
+        #expect(option(legs: [walking]).isWalkingOnly)
+        #expect(!option(legs: [walking, leg(from: hamilius, to: luxexpo)]).isWalkingOnly)
+    }
+
     @Test func shareTextIncludesEndpointsLineAndAttribution() {
         let text = option(legs: [leg(from: hamilius, to: luxexpo)])
             .shareText(originTitle: "Home", destinationTitle: "Work")

@@ -1,6 +1,5 @@
-import ActivityKit
 import AppIntents
-import SwiftUI
+import Foundation
 import WidgetKit
 
 struct WidgetFavouriteStopEntity: AppEntity, Identifiable {
@@ -20,20 +19,19 @@ struct WidgetFavouriteStopEntity: AppEntity, Identifiable {
 }
 
 struct WidgetFavouriteStopEntityQuery: EntityQuery {
-    func entities(for identifiers: [WidgetFavouriteStopEntity.ID]) async throws
-        -> [WidgetFavouriteStopEntity] {
-        sharedStops().filter { identifiers.contains($0.id) }
+    func entities(for identifiers: [String]) async throws -> [WidgetFavouriteStopEntity] {
+        entities.filter { identifiers.contains($0.id) }
     }
 
     func suggestedEntities() async throws -> [WidgetFavouriteStopEntity] {
-        sharedStops()
+        entities
     }
 
     func defaultResult() async -> WidgetFavouriteStopEntity? {
-        sharedStops().first
+        entities.first
     }
 
-    private func sharedStops() -> [WidgetFavouriteStopEntity] {
+    private var entities: [WidgetFavouriteStopEntity] {
         SharedTransitDataStore.favouriteStops().map {
             WidgetFavouriteStopEntity(id: $0.id, name: $0.name, locality: $0.locality)
         }
@@ -42,53 +40,107 @@ struct WidgetFavouriteStopEntityQuery: EntityQuery {
 
 struct SelectFavouriteStopIntent: WidgetConfigurationIntent {
     static let title: LocalizedStringResource = "Choose Favourite Stop"
-    static let description = IntentDescription("Pick which saved favourite stop this widget opens.")
+    static let description = IntentDescription("Choose the stop shown by Live Departures.")
 
     @Parameter(title: "Stop")
     var stop: WidgetFavouriteStopEntity?
 }
 
-struct FavouriteStopEntry: TimelineEntry {
+struct LiveDeparturesEntry: TimelineEntry {
     let date: Date
-    let selectedStop: SharedFavouriteStop?
-    let departureBoard: SharedDepartureBoard?
+    let stop: SharedFavouriteStop?
+    let board: SharedDepartureBoard?
+
+    var departures: [SharedWidgetDeparture] {
+        let cutoff = date.addingTimeInterval(-30)
+        return (board?.departures ?? [])
+            .filter { ($0.displayDepartureDate ?? .distantFuture) >= cutoff }
+            .sorted {
+                ($0.displayDepartureDate ?? .distantFuture) < ($1.displayDepartureDate ?? .distantFuture)
+            }
+    }
+
+    var isStale: Bool {
+        guard let board else { return false }
+        return date.timeIntervalSince(board.updatedAt) > 15 * 60
+    }
+
+    var updateLabel: String {
+        guard let board else { return "Waiting for live data" }
+        if isStale {
+            return "Last updated \(board.updatedAt.formatted(date: .omitted, time: .shortened))"
+        }
+        return "Updated \(board.updatedAt.formatted(date: .omitted, time: .shortened))"
+    }
+
+    var destinationURL: URL {
+        stop.map { TransitDeepLink.showDepartures(stopId: $0.id).url }
+            ?? TransitDeepLink.showNearbyStops.url
+    }
 }
 
-struct FavouriteStopTimelineProvider: AppIntentTimelineProvider {
-    func placeholder(in _: Context) -> FavouriteStopEntry {
-        let stop = SharedTransitDataStore.favouriteStops().first
-        return FavouriteStopEntry(
+struct LiveDeparturesTimelineProvider: AppIntentTimelineProvider {
+    func placeholder(in _: Context) -> LiveDeparturesEntry {
+        LiveDeparturesEntry(
             date: .now,
-            selectedStop: stop,
-            departureBoard: stop.flatMap { SharedTransitDataStore.favouriteDepartureBoards()[$0.id] }
+            stop: SharedFavouriteStop(id: "preview", name: "Hamilius", locality: "Centre"),
+            board: SharedDepartureBoard(
+                stopId: "preview",
+                departures: [
+                    SharedWidgetDeparture(
+                        id: "preview-1",
+                        lineName: "16",
+                        destination: "Findel, Airport",
+                        scheduledDeparture: .now.addingTimeInterval(4 * 60),
+                        realtimeDeparture: .now.addingTimeInterval(5 * 60),
+                        delayMinutes: 1,
+                        platform: "2",
+                        isCancelled: false
+                    ),
+                    SharedWidgetDeparture(
+                        id: "preview-2",
+                        lineName: "T1",
+                        destination: "Luxexpo",
+                        scheduledDeparture: .now.addingTimeInterval(8 * 60),
+                        realtimeDeparture: nil,
+                        delayMinutes: nil,
+                        platform: "1",
+                        isCancelled: false
+                    )
+                ],
+                updatedAt: .now
+            )
         )
     }
 
-    func snapshot(for configuration: SelectFavouriteStopIntent, in _: Context) async
-        -> FavouriteStopEntry {
-        entry(for: configuration)
+    func snapshot(
+        for configuration: SelectFavouriteStopIntent,
+        in context: Context
+    ) async -> LiveDeparturesEntry {
+        if context.isPreview { return placeholder(in: context) }
+        return entry(for: configuration, at: .now)
     }
 
-    func timeline(for configuration: SelectFavouriteStopIntent, in _: Context) async
-        -> Timeline<FavouriteStopEntry> {
-        let entry = entry(for: configuration)
-        return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(15 * 60)))
-    }
-
-    private func entry(for configuration: SelectFavouriteStopIntent) -> FavouriteStopEntry {
-        let stop = selectedStop(from: configuration)
-        return FavouriteStopEntry(
-            date: .now,
-            selectedStop: stop,
-            departureBoard: stop.flatMap { SharedTransitDataStore.favouriteDepartureBoards()[$0.id] }
-        )
-    }
-
-    private func selectedStop(from configuration: SelectFavouriteStopIntent) -> SharedFavouriteStop? {
-        let stops = SharedTransitDataStore.favouriteStops()
-        if let stopID = configuration.stop?.id {
-            return stops.first(where: { $0.id == stopID }) ?? stops.first
+    func timeline(
+        for configuration: SelectFavouriteStopIntent,
+        in _: Context
+    ) async -> Timeline<LiveDeparturesEntry> {
+        let start = Date.now
+        let entries = (0...15).map {
+            entry(for: configuration, at: start.addingTimeInterval(TimeInterval($0 * 60)))
         }
-        return stops.first
+        return Timeline(entries: entries, policy: .after(start.addingTimeInterval(15 * 60)))
+    }
+
+    private func entry(
+        for configuration: SelectFavouriteStopIntent,
+        at date: Date
+    ) -> LiveDeparturesEntry {
+        let stops = SharedTransitDataStore.favouriteStops()
+        let stop = configuration.stop.flatMap { selected in
+            stops.first { $0.id == selected.id }
+        } ?? stops.first
+        let board = stop.flatMap { SharedTransitDataStore.favouriteDepartureBoards()[$0.id] }
+        return LiveDeparturesEntry(date: date, stop: stop, board: board)
     }
 }

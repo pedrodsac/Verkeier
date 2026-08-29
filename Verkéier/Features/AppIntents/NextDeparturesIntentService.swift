@@ -12,7 +12,15 @@ enum NextDeparturesIntentService {
 
         do {
             let departures = try await LiveATPClient(configuration: configuration)
-                .departureBoards(stopIds: stop.platformIds)
+                .departureBoards(
+                    stopIds: stop.platformIds,
+                    options: {
+                        var options = stop.boardFilter.options()
+                        options.durationMinutes = min(options.durationMinutes, 90)
+                        options.maximumJourneys = 3
+                        return options
+                    }()
+                )
             return summary(for: stop, departures: departures)
         } catch ATPClientError.missingAccessId {
             return "Live ATP departures are not configured. Open Verkéier to use local favourites and search."

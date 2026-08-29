@@ -89,23 +89,6 @@ actor PublicTransportRoutingEngine {
         try Task.checkCancellation()
         guard page.resultLimit > 0 else { throw RoutingError.noPublicTransportRoute }
 
-        // Bike availability is optional enrichment. Refresh it independently so a
-        // slow JCDecaux request cannot delay a direct bus or tram result; routing
-        // uses the latest snapshot already held by the service.
-        Task { @concurrent [bikeShareService] in
-            await bikeShareService.refreshAvailability()
-        }
-        async let timetableTask = gtfsService.timetableIndex()
-        try Task.checkCancellation()
-        let bikeStations = await bikeShareService.bikeShareStations(
-            near: from
-        )
-        try Task.checkCancellation()
-        guard let timetable = await timetableTask, !timetable.trips.isEmpty else {
-            throw RoutingError.timetableUnavailable
-        }
-        try Task.checkCancellation()
-
         // Departures search forward from their requested time. Arrive-by searches
         // backward from the deadline, so later connections remain viable labels.
         let requestNow: Date
@@ -128,24 +111,56 @@ actor PublicTransportRoutingEngine {
             arriveByLimit = nil
         }
 
+        // Bike availability is optional enrichment. Refresh it independently so a
+        // slow JCDecaux request cannot delay a direct bus or tram result; routing
+        // uses the latest snapshot already held by the service.
+        Task { @concurrent [bikeShareService] in
+            await bikeShareService.refreshAvailability()
+        }
+        async let timetableTask = gtfsService.timetableIndex()
+        try Task.checkCancellation()
+        let bikeStations = await bikeShareService.bikeShareStations(
+            near: from
+        )
+        try Task.checkCancellation()
+
+        // The direct walking route is schedule-independent and is only shown on
+        // the initial page. Resolve it before timetable search so it can also be
+        // returned when no usable public-transport schedule exists.
+        let walkingOption: RouteOption? = if case .initial = page {
+            await directWalkingOption(
+                from: from,
+                to: to,
+                time: time,
+                leaveNowAnchor: requestNow
+            )
+        } else {
+            nil
+        }
+        try Task.checkCancellation()
+        guard let timetable = await timetableTask, !timetable.trips.isEmpty else {
+            if let walkingOption {
+                return walkingOnlyCalculation(walkingOption)
+            }
+            throw RoutingError.timetableUnavailable
+        }
+        try Task.checkCancellation()
+
         let staticContext = try await cachedStaticContext(for: timetable, now: requestNow)
         let baseContext = RouteSearchContext(staticContext: staticContext, now: requestNow)
         guard !baseContext.activeTrips.isEmpty else {
+            if let walkingOption {
+                return walkingOnlyCalculation(walkingOption)
+            }
             throw RoutingError.noPublicTransportRoute
         }
 
-        // Keep the first result schedule-only. A force refresh resolves exact
-        // endpoint walks before searching so live catchability can be revalidated.
-        let context = if forceRealtimeRefresh {
-            await contextWithWalkingDistances(
-                from: from,
-                to: to,
-                context: baseContext,
-                bikeStations: bikeStations
-            )
-        } else {
-            baseContext
-        }
+        let context = await contextWithWalkingDistances(
+            from: from,
+            to: to,
+            context: baseContext,
+            bikeStations: bikeStations
+        )
 
         let kernel = RouteSearchKernel(engine: self)
         let arriveBy = arriveByLimit != nil
@@ -246,6 +261,9 @@ actor PublicTransportRoutingEngine {
         }
 
         guard !scheduledCandidates.isEmpty else {
+            if let walkingOption {
+                return walkingOnlyCalculation(walkingOption)
+            }
             throw RoutingError.noPublicTransportRoute
         }
 
@@ -302,11 +320,7 @@ actor PublicTransportRoutingEngine {
                 !repairedOriginalSignatures.contains($0.signature)
             } + repairs.map(\.candidate)
         }
-        let geometryCandidates = if forceRealtimeRefresh {
-            try await self.roadRoutedCandidates(candidatesAfterRepair)
-        } else {
-            candidatesAfterRepair
-        }
+        let geometryCandidates = try await self.roadRoutedCandidates(candidatesAfterRepair)
         let sortedCandidates = try await routeCalculationConcurrent {
             try Task.checkCancellation()
             return kernel.selectEnrichedCandidates(
@@ -325,11 +339,24 @@ actor PublicTransportRoutingEngine {
         )
 
         guard !options.isEmpty else {
+            if let walkingOption {
+                return walkingOnlyCalculation(walkingOption)
+            }
             throw RoutingError.noPublicTransportRoute
         }
 
-        let primaryOptions = Array(options.filter { !$0.usesBikeShare }.prefix(page.resultLimit))
+        let transitOptions = Array(options.filter { !$0.usesBikeShare }.prefix(page.resultLimit))
         let supplementalOptions = Array(options.filter(\.usesBikeShare).prefix(1))
+        let primaryOptions: [RouteOption]
+        if case .initial = page, let walkingOption {
+            primaryOptions = resolvedPrimaryOptions(
+                walking: walkingOption,
+                transit: transitOptions,
+                limit: page.resultLimit
+            )
+        } else {
+            primaryOptions = transitOptions
+        }
         let selectedOptionID = primaryOptions.first?.id ?? supplementalOptions.first?.id
         return RouteCalculation(
             options: primaryOptions,
@@ -337,6 +364,40 @@ actor PublicTransportRoutingEngine {
             invalidatedOptionIDs: invalidatedOptionIDs,
             selectedOptionID: selectedOptionID
         )
+    }
+
+    nonisolated func walkingOnlyCalculation(_ walkingOption: RouteOption) -> RouteCalculation {
+        RouteCalculation(options: [walkingOption], selectedOptionID: walkingOption.id)
+    }
+
+    /// Applies the agreed three-way comparison against the best viable transit
+    /// option after realtime and road-distance enrichment have finished.
+    nonisolated func resolvedPrimaryOptions(
+        walking: RouteOption,
+        transit: [RouteOption],
+        limit: Int
+    ) -> [RouteOption] {
+        let viableTransit = transit.first { option in
+            !option.transitLegs.contains {
+                $0.liveStatus == .cancelled || $0.transferWarning == "Connection miss"
+            }
+        }
+        guard let bestTransit = viableTransit else { return [walking] }
+
+        let walkingDuration = walking.plan.expectedTravelTime ?? .infinity
+        let transitDuration = bestTransit.plan.expectedTravelTime ?? .infinity
+        if walkingDuration < transitDuration {
+            return [walking]
+        }
+
+        if walkingDuration > transitDuration,
+           let walkingArrival = walking.arrivalTime,
+           let transitArrival = bestTransit.arrivalTime,
+           walkingArrival < transitArrival {
+            return [walking] + Array(transit.prefix(max(0, limit - 1)))
+        }
+
+        return Array(transit.prefix(limit))
     }
 
     func cachedStaticContext(

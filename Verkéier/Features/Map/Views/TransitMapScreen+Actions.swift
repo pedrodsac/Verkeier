@@ -67,6 +67,7 @@ extension TransitMapScreen {
             refreshAlerts: refreshAlerts,
             calculateRoute: calculateRoute,
             showHome: showHome,
+            openSpecialEvent: openSpecialEvent,
             expandSheet: expandSheet,
             openRouteInAppleMaps: openRouteInAppleMaps,
             selectRouteOrigin: selectRouteOrigin,
@@ -86,6 +87,7 @@ extension TransitMapScreen {
             cancelDepartureReminder: cancelDepartureReminder,
             toggleDepartureLine: toggleDepartureLine,
             selectDeparturePlatform: selectDeparturePlatform,
+            updateDepartureBoardFilter: updateDepartureBoardFilter,
             updateSearch: updateSearch,
             selectLineDetailDirection: selectLineDetailDirection,
             checkGTFSUpdate: checkGTFSUpdate,
@@ -105,6 +107,15 @@ extension TransitMapScreen {
 
     func selectStop(_ stop: Stop) {
         navigateToSheet([.stopDetail(stop)])
+    }
+
+    func openSpecialEvent(_ event: SpecialEvent) {
+        Task { @MainActor in
+            guard let stop = await gtfsService.searchStops(query: event.stopName).first else {
+                return
+            }
+            selectStop(stop)
+        }
     }
 
     func openFavouriteStop(_ stop: Stop) {
@@ -140,7 +151,8 @@ extension TransitMapScreen {
             viewModel.markFavouriteDeparturesUnavailable(for: [stop])
             return
         }
-        await viewModel.refreshFavouriteDeparture(using: atpClient, stop: stop)
+        let filter = favouriteEntities.first(where: { $0.stopId == stop.id })?.boardFilter ?? TransitBoardFilter()
+        await viewModel.refreshFavouriteDeparture(using: atpClient, stop: stop, filter: filter)
     }
 
     func refreshFavouriteStops() async {
@@ -148,7 +160,12 @@ extension TransitMapScreen {
             viewModel.markFavouriteDeparturesUnavailable(for: favouriteStops)
             return
         }
-        await viewModel.loadFavouriteDepartures(using: atpClient, favourites: favouriteStops)
+        let filters = Dictionary(uniqueKeysWithValues: favouriteEntities.map { ($0.stopId, $0.boardFilter) })
+        await viewModel.loadFavouriteDepartures(
+            using: atpClient,
+            favourites: favouriteStops,
+            filtersByStopID: filters
+        )
     }
 
     func updateFavouriteLabels(stopID: String, labels: [String]) {
@@ -272,10 +289,17 @@ extension TransitMapScreen {
 
     func toggleDepartureLine(_ route: TransitRoute) {
         viewModel.toggleDepartureLine(route)
+        Task { await viewModel.loadDepartures(using: atpClient) }
     }
 
     func selectDeparturePlatform(_ platform: String?) {
         viewModel.selectDeparturePlatform(platform)
+        Task { await viewModel.loadDepartures(using: atpClient) }
+    }
+
+    func updateDepartureBoardFilter(_ filter: TransitBoardFilter) {
+        viewModel.updateDepartureBoardFilter(filter)
+        Task { await viewModel.loadDepartures(using: atpClient) }
     }
 
     func stopForRoutePlace(_ place: RoutePlace) -> Stop? {

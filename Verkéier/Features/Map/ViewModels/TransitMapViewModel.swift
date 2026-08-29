@@ -41,6 +41,13 @@ final class TransitMapViewModel {
         didSet { rebuildDepartureFilters() }
     }
 
+    /// Session-scoped advanced query controls for the selected stop. They are
+    /// intentionally separate from the visible line/platform chips so the UI
+    /// can keep common interactions lightweight.
+    var departureBoardFilter = TransitBoardFilter() {
+        didSet { rebuildDepartureFilters() }
+    }
+
     private(set) var availableDeparturePlatforms: [String] = []
     private(set) var filteredDepartures: [Departure] = []
     var isLoadingDepartures = false

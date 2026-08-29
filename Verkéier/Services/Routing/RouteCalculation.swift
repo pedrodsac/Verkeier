@@ -6,7 +6,8 @@ import Foundation
 /// A calculation always holds at least one option; ``plan`` traps if asked for
 /// a plan when none exist, so treat an empty `options` as an error upstream.
 struct RouteCalculation: Sendable {
-    /// The primary public-transport departure profile (at most five journeys).
+    /// The primary route profile (at most five journeys), optionally including
+    /// the direct all-the-way walking comparison.
     let options: [RouteOption]
     /// A best-effort bike-inclusive alternative that never consumes a transit slot.
     var supplementalOptions: [RouteOption] = []

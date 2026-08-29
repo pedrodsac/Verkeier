@@ -6,7 +6,7 @@ struct DepartureCountdownActivityWidget: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: DepartureActivityAttributes.self) { context in
             DepartureLockScreenView(context: context)
-                .activityBackgroundTint(Color(.secondarySystemBackground))
+                .activityBackgroundTint(.black)
                 .activitySystemActionForegroundColor(.accentColor)
                 .widgetURL(TransitDeepLink.showDepartures(stopId: context.attributes.stopId).url)
         } dynamicIsland: { context in
@@ -17,12 +17,12 @@ struct DepartureCountdownActivityWidget: Widget {
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     VStack(alignment: .trailing, spacing: 3) {
-                        ActivityDepartureClock(state: context.state)
+                        ActivityExpandedDepartureCountdown(state: context.state)
                         ActivityStatusLabel(state: context.state, prominent: true)
+							.padding(.trailing, 4)
                     }
                     .frame(maxHeight: .infinity, alignment: .center)
-                    .padding(.trailing, 4)
-					.padding(.top, 7)
+					.padding(.top, 10)
                 }
                 DynamicIslandExpandedRegion(.center) {
                     VStack(alignment: .leading, spacing: 4) {
@@ -48,7 +48,7 @@ struct DepartureCountdownActivityWidget: Widget {
             } compactLeading: {
                 ActivityLineBadge(line: context.attributes.lineName, compact: true)
             } compactTrailing: {
-                ActivityCompactDepartureClock(state: context.state)
+                ActivityCompactDepartureCountdown(state: context.state, compact: true)
             } minimal: {
                 ZStack {
                     Circle().fill(lineColor(context.attributes.lineName))
@@ -63,15 +63,21 @@ struct DepartureCountdownActivityWidget: Widget {
     }
 }
 
-private struct ActivityCompactDepartureClock: View {
+private struct ActivityCompactDepartureCountdown: View {
+	let compact: Bool
     let state: DepartureActivityAttributes.ContentState
 
+	init(state: DepartureActivityAttributes.ContentState, compact: Bool = false) {
+		self.state = state
+		self.compact = compact
+	}
+	
     var body: some View {
         Group {
             if state.isCancelled {
                 Image(systemName: "xmark")
             } else if let date = state.displayDepartureDate {
-                Text(date, style: .time)
+                Text(timerInterval: Date.now...max(date, Date.now), countsDown: true)
             } else {
                 Text("—")
             }
@@ -80,7 +86,7 @@ private struct ActivityCompactDepartureClock: View {
         .monospacedDigit()
         .foregroundStyle(statusColor)
         .lineLimit(1)
-        .frame(width: 50, alignment: .trailing)
+		.frame(width: compact ? 40 : 50, alignment: .trailing)
     }
 
     private var statusColor: Color {
@@ -96,7 +102,7 @@ private struct DepartureLockScreenView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            ActivityLineBadge(line: context.attributes.lineName, compact: false)
+            ActivityLineBadge(line: context.attributes.lineName, compact: false, roundedSquare: true)
 
 			VStack(alignment: .leading, spacing: 5) {
 				HStack(spacing: 5) {
@@ -113,7 +119,7 @@ private struct DepartureLockScreenView: View {
 
 				HStack(spacing: 5) {
 					HStack(spacing: 5) {
-						Text(context.state.displayDepartureDate?.formatted(date: .omitted, time: .shortened) ?? "Time unknown")
+                        Text(context.attributes.stopName.stationDisplayName)
 
 						if let platform = context.attributes.platform, !platform.isEmpty {
 							Text("· Platform \(platform)")
@@ -139,33 +145,44 @@ private struct DepartureLockScreenView: View {
 private struct ActivityLineBadge: View {
     let line: String
     let compact: Bool
+    var roundedSquare = false
+
+    private var size: CGSize {
+        compact ? CGSize(width: 60, height: 25) : CGSize(width: 58, height: 58)
+    }
+
+    // These radii mirror the surrounding system surfaces after their visual inset:
+    // inner radius + surrounding inset = outer radius.
+    private var cornerRadius: CGFloat {
+		compact ? .infinity : 16
+    }
 
     var body: some View {
-        VStack(spacing: 2) {
-            Text(line)
-				.font(compact ? .caption2.weight(.heavy) : .title2.weight(.heavy))
-                .lineLimit(1)
-                .minimumScaleFactor(0.65)
-        }
+        Text(line)
+			.font(compact ? .caption2.weight(.heavy) : .title2.weight(.heavy))
+            .lineLimit(1)
+            .minimumScaleFactor(0.65)
         .foregroundStyle(.white)
-        .frame(width: compact ? 50 : 58, height: compact ? 32 : 58)
+        .frame(width: size.width, height: size.height)
 		.background {
-            if compact {
-                Capsule().fill(lineColor(line).gradient)
+            if compact || roundedSquare {
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(lineColor(line).gradient)
             } else {
-                Circle().fill(lineColor(line).gradient)
+                Circle()
+                    .fill(lineColor(line).gradient)
             }
         }
     }
 }
 
-private struct ActivityDepartureClock: View {
+private struct ActivityExpandedDepartureCountdown: View {
     let state: DepartureActivityAttributes.ContentState
 
     var body: some View {
         Group {
             if let date = state.displayDepartureDate {
-                Text(date, style: .time)
+                Text(timerInterval: Date.now...max(date, Date.now), countsDown: true)
             } else {
                 Text("—")
             }
@@ -174,6 +191,7 @@ private struct ActivityDepartureClock: View {
         .monospacedDigit()
         .foregroundStyle(state.isCancelled ? .secondary : .primary)
         .lineLimit(1)
+		.frame(width: 50)
     }
 }
 

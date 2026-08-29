@@ -15,10 +15,21 @@ protocol ATPClient: Sendable {
     /// - Throws: ``ATPClientError`` on auth, transport, or decoding failure.
     nonisolated func nearbyStops(latitude: Double, longitude: Double) async throws -> [Stop]
 
+    /// Fetches nearby stops with an explicit bounded query scope. Existing
+    /// clients only need to implement the unfiltered method.
+    nonisolated func nearbyStops(
+        latitude: Double,
+        longitude: Double,
+        options: ATPNearbyStopsOptions
+    ) async throws -> [Stop]
+
     /// Fetches the departure board for a single stop or platform.
     /// - Parameter stopId: The stop/platform identifier to query.
     /// - Throws: ``ATPClientError`` on auth, transport, or decoding failure.
     nonisolated func departureBoard(stopId: String) async throws -> [Departure]
+
+    /// Fetches a departure board with server-side filters.
+    nonisolated func departureBoard(stopId: String, options: ATPDepartureBoardOptions) async throws -> [Departure]
 
     /// Fetches and merges departure boards for several stops/platforms.
     ///
@@ -28,6 +39,11 @@ protocol ATPClient: Sendable {
     /// - Throws: ``ATPClientError`` on auth, transport, or decoding failure.
     nonisolated func departureBoards(stopIds: [String]) async throws -> [Departure]
 
+    nonisolated func departureBoards(
+        stopIds: [String],
+        options: ATPDepartureBoardOptions
+    ) async throws -> [Departure]
+
     /// Fetches the arrival board for a stop (vehicles arriving, for riders
     /// waiting to meet someone). ATP exposes departures only today, so the
     /// default implementation returns an empty board.
@@ -36,11 +52,33 @@ protocol ATPClient: Sendable {
 }
 
 extension ATPClient {
+    nonisolated func nearbyStops(
+        latitude: Double,
+        longitude: Double,
+        options _: ATPNearbyStopsOptions
+    ) async throws -> [Stop] {
+        try await nearbyStops(latitude: latitude, longitude: longitude)
+    }
+
+    nonisolated func departureBoard(
+        stopId: String,
+        options _: ATPDepartureBoardOptions
+    ) async throws -> [Departure] {
+        try await departureBoard(stopId: stopId)
+    }
+
     nonisolated func departureBoards(stopIds: [String]) async throws -> [Departure] {
+        try await departureBoards(stopIds: stopIds, options: ATPDepartureBoardOptions())
+    }
+
+    nonisolated func departureBoards(
+        stopIds: [String],
+        options: ATPDepartureBoardOptions
+    ) async throws -> [Departure] {
         var departures: [Departure] = []
 
         for stopId in ATPStopIdentifier.normalized(stopIds) {
-            try await departures.append(contentsOf: departureBoard(stopId: stopId))
+            try await departures.append(contentsOf: departureBoard(stopId: stopId, options: options))
         }
 
         return ATPMapper.mergedDepartures(departures)

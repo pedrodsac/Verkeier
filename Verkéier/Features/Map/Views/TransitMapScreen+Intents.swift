@@ -45,19 +45,22 @@ extension TransitMapScreen {
         if let existing = favouriteEntities.first(where: { $0.stopId == selectedStop.id }) {
             removeFavourite(stopID: existing.stopId)
         } else {
-            modelContext.insert(PersistedFavouriteStop(stop: selectedStop))
+            modelContext.insert(PersistedFavouriteStop(
+                stop: selectedStop,
+                boardFilter: viewModel.departureBoardFilter
+            ))
             try? modelContext.save()
             mirrorFavouriteEntitiesForIntents()
         }
     }
 
     func mirrorFavouriteEntitiesForIntents() {
-        let stops = favouriteStops
-        FavouriteStopEntityStore.save(stops: stops)
-        if stops.isEmpty {
+        let favourites = favouriteEntities
+        FavouriteStopEntityStore.save(favourites: favourites)
+        if favourites.isEmpty {
             FavouriteStopSpotlightIndexer.removeAll()
         } else {
-            FavouriteStopSpotlightIndexer.index(stops)
+            FavouriteStopSpotlightIndexer.index(favourites.map(\.stop))
         }
     }
 

@@ -16,9 +16,22 @@ final class LiveATPClient: ATPClient {
     }
 
     nonisolated func nearbyStops(latitude: Double, longitude: Double) async throws -> [Stop] {
+        try await nearbyStops(
+            latitude: latitude,
+            longitude: longitude,
+            options: ATPNearbyStopsOptions()
+        )
+    }
+
+    nonisolated func nearbyStops(
+        latitude: Double,
+        longitude: Double,
+        options: ATPNearbyStopsOptions
+    ) async throws -> [Stop] {
         let request = try URLRequest(url: ATPRequestBuilder.nearbyStopsURL(
             latitude: latitude,
             longitude: longitude,
+            options: options,
             configuration: configuration
         ))
         let response: ATPNearbyStopsResponse = try await fetch(request)
@@ -26,8 +39,16 @@ final class LiveATPClient: ATPClient {
     }
 
     nonisolated func departureBoard(stopId: String) async throws -> [Departure] {
+        try await departureBoard(stopId: stopId, options: ATPDepartureBoardOptions())
+    }
+
+    nonisolated func departureBoard(
+        stopId: String,
+        options: ATPDepartureBoardOptions
+    ) async throws -> [Departure] {
         let request = try URLRequest(url: ATPRequestBuilder.departureBoardURL(
             stopId: stopId,
+            options: options,
             configuration: configuration
         ))
         let response: ATPDepartureBoardResponse = try await fetch(request)
@@ -35,6 +56,13 @@ final class LiveATPClient: ATPClient {
     }
 
     nonisolated func departureBoards(stopIds: [String]) async throws -> [Departure] {
+        try await departureBoards(stopIds: stopIds, options: ATPDepartureBoardOptions())
+    }
+
+    nonisolated func departureBoards(
+        stopIds: [String],
+        options: ATPDepartureBoardOptions
+    ) async throws -> [Departure] {
         let ids = ATPStopIdentifier.normalized(stopIds)
         guard !ids.isEmpty else { return [] }
 
@@ -46,7 +74,7 @@ final class LiveATPClient: ATPClient {
             for stopId in ids {
                 group.addTask {
                     do {
-                        return .success(try await self.departureBoard(stopId: stopId))
+                        return .success(try await self.departureBoard(stopId: stopId, options: options))
                     } catch {
                         return .failure(error)
                     }
@@ -87,34 +115,59 @@ enum ATPRequestBuilder {
     nonisolated static func nearbyStopsURL(
         latitude: Double,
         longitude: Double,
+        options: ATPNearbyStopsOptions = ATPNearbyStopsOptions(),
         configuration: AppConfiguration
     ) throws -> URL {
+        let options = options.normalized
         try url(
             path: "location.nearbystops",
             configuration: configuration,
             queryItems: [
                 URLQueryItem(name: "originCoordLat", value: String(latitude)),
                 URLQueryItem(name: "originCoordLong", value: String(longitude)),
-                URLQueryItem(name: "maxNo", value: "50"),
-                URLQueryItem(name: "r", value: "1500"),
+                URLQueryItem(name: "maxNo", value: String(options.maximumResults)),
+                URLQueryItem(name: "r", value: String(options.radiusMeters)),
                 URLQueryItem(name: "type", value: "SE"),
+                URLQueryItem(name: "products", value: options.products.map { String($0.rawValue) }),
+                URLQueryItem(name: "lang", value: options.language),
                 URLQueryItem(name: "format", value: "json")
-            ]
+            ].filter { $0.value != nil }
         )
     }
 
     nonisolated static func departureBoardURL(
         stopId: String,
+        options: ATPDepartureBoardOptions = ATPDepartureBoardOptions(),
         configuration: AppConfiguration
     ) throws -> URL {
+        let options = options.normalized
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = TimeZone(identifier: "Europe/Luxembourg")
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let timeFormatter = DateFormatter()
+        timeFormatter.locale = Locale(identifier: "en_US_POSIX")
+        timeFormatter.timeZone = TimeZone(identifier: "Europe/Luxembourg")
+        timeFormatter.dateFormat = "HH:mm"
         try url(
             path: "departureBoard",
             configuration: configuration,
             queryItems: [
-                URLQueryItem(name: "lang", value: "fr"),
+                URLQueryItem(name: "lang", value: options.language),
                 URLQueryItem(name: "id", value: stopId),
+                URLQueryItem(name: "direction", value: options.directionStopID),
+                URLQueryItem(name: "date", value: options.date.map(dateFormatter.string)),
+                URLQueryItem(name: "time", value: options.date.map(timeFormatter.string)),
+                URLQueryItem(name: "duration", value: String(options.durationMinutes)),
+                URLQueryItem(name: "maxJourneys", value: String(options.maximumJourneys)),
+                URLQueryItem(name: "products", value: options.products.map { String($0.rawValue) }),
+                URLQueryItem(name: "operators", value: options.operators.isEmpty ? nil : options.operators.joined(separator: ",")),
+                URLQueryItem(name: "lines", value: options.lines.isEmpty ? nil : options.lines.joined(separator: ",")),
+                URLQueryItem(name: "platforms", value: options.platforms.isEmpty ? nil : options.platforms.joined(separator: ",")),
+                URLQueryItem(name: "rtMode", value: options.realtimeMode.rawValue),
+                URLQueryItem(name: "passlist", value: options.includePasslist ? "1" : "0"),
                 URLQueryItem(name: "format", value: "json")
-            ]
+            ].filter { $0.value != nil }
         )
     }
 

@@ -8,6 +8,7 @@ struct BottomSheetContent: View {
     let viewModel: CommuteDashboardViewModel
     let searchViewModel: SearchPresentationModel
     let searchActions: SearchActions
+    let openSpecialEvent: (SpecialEvent) -> Void
 
     var body: some View {
         Group {
@@ -21,7 +22,11 @@ struct BottomSheetContent: View {
                 EmptyView()
             } else {
                 ScrollView {
-                    HomeSheetContent(detent: detent, viewModel: viewModel)
+                    HomeSheetContent(
+                        detent: detent,
+                        viewModel: viewModel,
+                        openSpecialEvent: openSpecialEvent
+                    )
                 }
             }
         }
@@ -33,10 +38,12 @@ struct BottomSheetContent: View {
 private struct HomeSheetContent: View {
     let detent: BottomSheetDetent
     let viewModel: CommuteDashboardViewModel
+    let openSpecialEvent: (SpecialEvent) -> Void
 
     var body: some View {
         CommuteDashboardView(
             viewModel: viewModel,
+            openSpecialEvent: openSpecialEvent,
             displayStyle: detent == .medium ? .mapsMedium : .regular
         )
     }

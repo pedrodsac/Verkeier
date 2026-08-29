@@ -37,6 +37,55 @@ struct ATPRequestBuilderTests {
         #expect(query["format"] == "json")
     }
 
+    @Test func departureBoardURLIncludesBoundedServerSideFilters() throws {
+        let date = try #require(ISO8601DateFormatter().date(from: "2026-09-01T08:30:00Z"))
+        let url = try ATPRequestBuilder.departureBoardURL(
+            stopId: "200405060",
+            options: ATPDepartureBoardOptions(
+                directionStopID: "200405061",
+                date: date,
+                durationMinutes: 9_999,
+                maximumJourneys: 500,
+                products: [.trains, .tram],
+                operators: ["CFL", "AVL"],
+                lines: ["10"],
+                platforms: ["3"],
+                realtimeMode: .off,
+                includePasslist: true
+            ),
+            configuration: configuration(accessId: "secret")
+        )
+        let query = queryItems(from: try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)))
+
+        #expect(query["direction"] == "200405061")
+        #expect(query["duration"] == "1439")
+        #expect(query["maxJourneys"] == "100")
+        #expect(query["products"] == "263")
+        #expect(query["operators"] == "CFL,AVL")
+        #expect(query["lines"] == "10")
+        #expect(query["platforms"] == "3")
+        #expect(query["rtMode"] == "OFF")
+        #expect(query["passlist"] == "1")
+    }
+
+    @Test func nearbyStopsURLIncludesProductsAndClampsScope() throws {
+        let url = try ATPRequestBuilder.nearbyStopsURL(
+            latitude: 49.6116,
+            longitude: 6.1319,
+            options: ATPNearbyStopsOptions(
+                radiusMeters: 9_000,
+                maximumResults: 0,
+                products: [.bus, .tram]
+            ),
+            configuration: configuration(accessId: "secret")
+        )
+        let query = queryItems(from: try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)))
+
+        #expect(query["r"] == "5000")
+        #expect(query["maxNo"] == "1")
+        #expect(query["products"] == "288")
+    }
+
     @Test func missingAccessIdFailsBeforeNetworkRequest() {
         #expect(throws: ATPClientError.missingAccessId) {
             _ = try ATPRequestBuilder.departureBoardURL(

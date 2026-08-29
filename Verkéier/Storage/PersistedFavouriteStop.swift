@@ -17,8 +17,11 @@ final class PersistedFavouriteStop {
     /// remains populated with the first label so existing stores and older
     /// app versions continue to render a sensible group.
     var labelsData: Data?
+    /// Optional saved board scope for this favourite. `nil` preserves the
+    /// historical unfiltered favourite behaviour.
+    var boardFilterData: Data?
 
-    init(stop: Stop, createdAt: Date = .now) {
+    init(stop: Stop, boardFilter: TransitBoardFilter? = nil, createdAt: Date = .now) {
         stopId = stop.id
         name = stop.name
         locality = stop.locality
@@ -27,6 +30,7 @@ final class PersistedFavouriteStop {
         modesRawValue = stop.modes.map(\.rawValue).joined(separator: ",")
         platformIdsRawValue = stop.platformIds.joined(separator: ",")
         self.createdAt = createdAt
+        boardFilterData = boardFilter.flatMap { try? JSONEncoder().encode($0) }
     }
 
     var stop: Stop {
@@ -58,6 +62,18 @@ final class PersistedFavouriteStop {
             return Self.normalizedLabels(decoded)
         }
         return Self.normalizedLabels(label.map { [$0] } ?? [])
+    }
+
+    var boardFilter: TransitBoardFilter {
+        guard let boardFilterData,
+              let filter = try? JSONDecoder().decode(TransitBoardFilter.self, from: boardFilterData) else {
+            return TransitBoardFilter()
+        }
+        return filter
+    }
+
+    func replaceBoardFilter(with filter: TransitBoardFilter) {
+        boardFilterData = try? JSONEncoder().encode(filter)
     }
 
     func replaceLabels(with values: [String]) {

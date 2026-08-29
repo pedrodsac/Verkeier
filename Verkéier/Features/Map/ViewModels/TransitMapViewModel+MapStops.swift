@@ -17,7 +17,8 @@ extension TransitMapViewModel {
         do {
             nearbyStops = try await atpClient.nearbyStops(
                 latitude: coordinate.latitude,
-                longitude: coordinate.longitude
+                longitude: coordinate.longitude,
+                options: nearbyStopsOptions()
             )
         } catch {
             nearbyStops = []
@@ -25,6 +26,15 @@ extension TransitMapViewModel {
         }
 
         isLoadingNearbyStops = false
+    }
+
+    private func nearbyStopsOptions() -> ATPNearbyStopsOptions {
+        var products = ATPProductFilter()
+        let preferences = AppPreferences.shared
+        if preferences.showTrainStations { products.formUnion(.trains) }
+        if preferences.showBusStops { products.formUnion(.bus) }
+        if preferences.showTramStops { products.formUnion(.tram) }
+        return ATPNearbyStopsOptions(products: products.isEmpty ? nil : products)
     }
 
     /// Loads the lines serving each nearby stop, with bounded concurrency, so
@@ -99,6 +109,7 @@ extension TransitMapViewModel {
         offlineScheduledDepartures = []
         selectedDepartureLine = nil
         selectedDeparturePlatform = nil
+        departureBoardFilter = TransitBoardFilter()
         departuresErrorMessage = nil
         departuresLastUpdated = nil
         routeErrorMessage = nil

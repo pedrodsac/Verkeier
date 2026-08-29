@@ -10,14 +10,16 @@ struct RouteTimelineSummaryCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(option.isVelohOnly ? (durationText ?? "Scheduled route") : timeRangeText)
+                Text(option.isVelohOnly || option.isWalkingOnly
+                    ? (durationText ?? "Route")
+                    : timeRangeText)
                     .font(.title3.weight(.bold))
                     .monospacedDigit()
                     .foregroundStyle(.primary)
 
                 Spacer(minLength: 8)
 
-                if !option.isVelohOnly {
+                if !option.isVelohOnly, !option.isWalkingOnly {
                     RouteOptionBadge(status: option.status(at: .now))
                 }
             }
@@ -46,15 +48,19 @@ struct RouteTimelineSummaryCard: View {
     }
 
     private var metaText: String {
+        let meters = option.plan.distanceMeters ?? 0
+        let dist = meters >= 1000
+            ? String(format: "%.1f km", meters / 1000)
+            : "\(Int(meters)) m"
+        if option.isWalkingOnly {
+            return "Walking  ·  \(dist)"
+        }
+
         let transfers = switch option.transferCount {
         case 0: "Direct"
         case 1: "1 transfer"
         default: "\(option.transferCount) transfers"
         }
-        let meters = option.plan.distanceMeters ?? 0
-        let dist = meters >= 1000
-            ? String(format: "%.1f km", meters / 1000)
-            : "\(Int(meters)) m"
         let bikeNote = option.hasBikeAvailabilityWarning ? "Bike availability uncertain" : nil
         let duration = option.isVelohOnly ? nil : durationText
         return [duration, transfers, dist, bikeNote].compactMap(\.self).joined(separator: "  ·  ")

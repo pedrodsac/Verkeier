@@ -9,6 +9,7 @@ struct CommuteDashboardView: View {
     }
 
     let viewModel: CommuteDashboardViewModel
+    let openSpecialEvent: (SpecialEvent) -> Void
     var displayStyle: DisplayStyle = .regular
 
     var body: some View {
@@ -17,12 +18,14 @@ struct CommuteDashboardView: View {
                 AlertsSummaryRow(alertCount: viewModel.activeAlertCount)
             }
 
-            if let preset = viewModel.suggestedCommutePreset {
-                CommuteSuggestionRow(preset: preset)
+            ForEach(viewModel.specialEvents) { event in
+                SpecialEventRow(event: event) {
+                    openSpecialEvent(event)
+                }
             }
 
-            if viewModel.hasFavourites {
-                favouritesContent
+            if let preset = viewModel.suggestedCommutePreset {
+                CommuteSuggestionRow(preset: preset)
             }
 
             nearbyContent
@@ -30,26 +33,13 @@ struct CommuteDashboardView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var favouritesContent: some View {
-        ForEach(viewModel.favourites) { stop in
-            StopListRow(
-                stop: stop,
-                markerColor: .blue,
-                surface: .favourite,
-                navigationValue: .stopDetail(stop)
-            )
-        }
-    }
-
     private var nearbyContent: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if viewModel.hasFavourites {
-                Text("Nearby")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .padding(.top, 6)
-                    .padding(.horizontal, 4)
-            }
+            Text("Nearby")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .padding(.top, 6)
+                .padding(.horizontal, 4)
 
             if viewModel.nearby.isLoading, viewModel.nearby.stops.isEmpty {
                 DepartureLoadingCard(title: "Finding nearby stops")
@@ -83,6 +73,6 @@ struct CommuteDashboardView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.top, viewModel.hasFavourites ? 0 : 4)
+        .padding(.top, 4)
     }
 }

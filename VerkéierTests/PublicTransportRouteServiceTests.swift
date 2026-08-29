@@ -834,7 +834,7 @@ struct PublicTransportRouteServiceTests {
         })
     }
 
-    @Test func rejectsWalkingOnlyRoutes() async throws {
+    @Test func omitsWalkingWhenMapKitCannotProduceAnExactRoute() async throws {
         let now = luxembourgDate(hour: 8, minute: 0)
         let timetable = makeTimetable()
         let routeService = PublicTransportRouteService(
@@ -850,6 +850,147 @@ struct PublicTransportRouteServiceTests {
                 to: LocationPoint(id: "S1", name: "Hill Lift", latitude: 49.6, longitude: 6.1)
             )
         }
+    }
+
+    @Test func walkingRouteFallsBackWhenTimetableIsUnavailableAndHonorsPlanningTime() async throws {
+        let anchor = luxembourgDate(hour: 9, minute: 0)
+        let origin = LocationPoint(name: "Origin", latitude: 49.6, longitude: 6.1)
+        let destination = LocationPoint(name: "Destination", latitude: 49.61, longitude: 6.11)
+        let routeCoordinates = [RouteMapCoordinate(origin), RouteMapCoordinate(destination)]
+
+        for planningTime in [
+            RoutePlanningTime.leaveNow,
+            .departAt(anchor.addingTimeInterval(600)),
+            .arriveBy(anchor.addingTimeInterval(3_600))
+        ] {
+            let service = PublicTransportRouteService(
+                gtfsService: MockGTFSService(timetable: nil),
+                atpClient: MockATPClient(),
+                roadRouteProvider: MockRoadRouteProvider(routes: [
+                    "49.6,6.1|49.61,6.11": routeCoordinates
+                ]),
+                now: { anchor },
+                concurrency: .serial
+            )
+
+            let calculation = try await service.calculateRoute(
+                from: origin,
+                to: destination,
+                time: planningTime,
+                filters: RoutePlannerFilters(),
+                realtimeRefreshPolicy: .forceRefresh
+            )
+            let walking = try #require(calculation.options.first)
+            #expect(calculation.options.count == 1)
+            #expect(walking.isWalkingOnly)
+            #expect(walking.mapOverlay?.segments.first?.mode == .walking)
+            #expect(walking.plan.distanceMeters != nil)
+
+            switch planningTime {
+            case .leaveNow:
+                #expect(walking.departureTime == anchor)
+            case let .departAt(date):
+                #expect(walking.departureTime == date)
+            case let .arriveBy(date):
+                #expect(walking.arrivalTime == date)
+            }
+        }
+    }
+
+    @Test func walkingComparisonUsesDurationThenArrivalAndCapsPrimaryCards() {
+        let anchor = Date(timeIntervalSince1970: 1_000)
+        let origin = LocationPoint(name: "Origin", latitude: 49.6, longitude: 6.1)
+        let destination = LocationPoint(name: "Destination", latitude: 49.61, longitude: 6.11)
+        let engine = PublicTransportRoutingEngine(
+            gtfsService: MockGTFSService(timetable: nil),
+            atpClient: MockATPClient(),
+            bikeShareService: UnavailableBikeShareService(),
+            roadRouteProvider: MockRoadRouteProvider(),
+            offlineMode: false,
+            now: { anchor },
+            calendar: Calendar(identifier: .gregorian),
+            concurrency: .serial
+        )
+
+        func option(
+            id: String,
+            walking: Bool,
+            departure: TimeInterval,
+            duration: TimeInterval
+        ) -> RouteOption {
+            let start = Date(timeIntervalSince1970: departure)
+            let end = start.addingTimeInterval(duration)
+            let kind: RouteLegTransportKind = walking ? .walking : .transit
+            let leg = RoutePlan.Leg(
+                id: "\(id)-leg",
+                mode: walking ? .walking : .bus,
+                transportKind: kind,
+                routeName: walking ? nil : id,
+                origin: origin,
+                destination: destination,
+                departureTime: start,
+                arrivalTime: end,
+                distanceMeters: 1_000
+            )
+            return RouteOption(
+                id: id,
+                plan: RoutePlan(
+                    id: id,
+                    origin: origin,
+                    destination: destination,
+                    expectedTravelTime: duration,
+                    distanceMeters: 1_000,
+                    legs: [leg],
+                    dataSource: .mock
+                ),
+                mapOverlay: nil
+            )
+        }
+
+        let shortWalk = option(id: "walk-short", walking: true, departure: 1_000, duration: 300)
+        let slowerTransit = option(id: "transit-slow", walking: false, departure: 1_100, duration: 600)
+        #expect(engine.resolvedPrimaryOptions(
+            walking: shortWalk,
+            transit: [slowerTransit],
+            limit: 5
+        ) == [shortWalk])
+
+        let longWalk = option(id: "walk-long", walking: true, departure: 1_000, duration: 600)
+        let waitingTransit = (0 ..< 5).map { index in
+            option(
+                id: "transit-\(index)",
+                walking: false,
+                departure: 1_700 + Double(index * 60),
+                duration: 300
+            )
+        }
+        let combined = engine.resolvedPrimaryOptions(
+            walking: longWalk,
+            transit: waitingTransit,
+            limit: 5
+        )
+        #expect(combined.first == longWalk)
+        #expect(combined.count == 5)
+        #expect(combined.dropFirst() == waitingTransit.prefix(4))
+
+        let earlyTransit = option(id: "transit-early", walking: false, departure: 1_100, duration: 300)
+        #expect(engine.resolvedPrimaryOptions(
+            walking: longWalk,
+            transit: [earlyTransit],
+            limit: 5
+        ) == [earlyTransit])
+
+        let equalDurationTransit = option(
+            id: "transit-equal",
+            walking: false,
+            departure: 1_400,
+            duration: 600
+        )
+        #expect(engine.resolvedPrimaryOptions(
+            walking: longWalk,
+            transit: [equalDurationTransit],
+            limit: 5
+        ) == [equalDurationTransit])
     }
 
     @Test func cancelledEarlierTripIsDemotedBehindLiveFeasibleTrip() async throws {

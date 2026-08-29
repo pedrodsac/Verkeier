@@ -40,6 +40,11 @@ struct Departure: Codable, Hashable, Identifiable, Sendable {
     /// `nil` when the platform is unchanged or no change signal is available.
     // ponytail: stubbed — populate from ATP when the platform-change signal is confirmed.
     let previousPlatform: String?
+    /// ATP's stable journey reference, when supplied. This survives board
+    /// reordering and should be used for tracking and reminders.
+    let journeyReference: String?
+    /// Service-status text and rider-facing notes supplied by ATP.
+    let serviceNote: String?
     /// Set when the vehicle continues past the listed terminus (through service),
     /// naming where it carries on to; `nil` when not a through service.
     // ponytail: stubbed — populate from GTFS block / ATP when continuation data is confirmed.
@@ -64,6 +69,8 @@ struct Departure: Codable, Hashable, Identifiable, Sendable {
         dataSource: DataSource,
         lastUpdated: Date? = nil,
         previousPlatform: String? = nil,
+        journeyReference: String? = nil,
+        serviceNote: String? = nil,
         continuesAs: String? = nil,
         occupancy: OccupancyLevel? = nil
     ) {
@@ -82,6 +89,8 @@ struct Departure: Codable, Hashable, Identifiable, Sendable {
         self.dataSource = dataSource
         self.lastUpdated = lastUpdated
         self.previousPlatform = previousPlatform
+        self.journeyReference = journeyReference
+        self.serviceNote = serviceNote
         self.continuesAs = continuesAs
         self.occupancy = occupancy
     }
@@ -115,6 +124,8 @@ struct Departure: Codable, Hashable, Identifiable, Sendable {
             dataSource: dataSource,
             lastUpdated: lastUpdated,
             previousPlatform: previousPlatform,
+            journeyReference: journeyReference,
+            serviceNote: serviceNote,
             continuesAs: continuesAs,
             occupancy: occupancy
         )

@@ -88,7 +88,8 @@ struct TransitBottomSheet: View {
                 contentTopPadding: shouldShowSearchBar ? searchBarContentTopPadding : 0,
                 viewModel: viewModel.commute,
                 searchViewModel: viewModel.search,
-                searchActions: SearchActions(from: actions)
+                searchActions: SearchActions(from: actions),
+                openSpecialEvent: actions.openSpecialEvent
             )
             .navigationDestination(for: TransitSheetRoute.self) { route in
                 TransitSheetDestinationView(

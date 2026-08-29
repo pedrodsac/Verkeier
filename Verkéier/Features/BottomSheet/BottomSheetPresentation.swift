@@ -20,6 +20,7 @@ struct TransitSheetActions {
     let refreshAlerts: () -> Void
     let calculateRoute: () -> Void
     let showHome: () -> Void
+    let openSpecialEvent: (SpecialEvent) -> Void
     let expandSheet: () -> Void
     let openRouteInAppleMaps: () -> Void
     let selectRouteOrigin: (RoutePlace?) -> Void
@@ -39,6 +40,7 @@ struct TransitSheetActions {
     let cancelDepartureReminder: () -> Void
     let toggleDepartureLine: (TransitRoute) -> Void
     let selectDeparturePlatform: (String?) -> Void
+    let updateDepartureBoardFilter: (TransitBoardFilter) -> Void
     let updateSearch: () -> Void
     let selectLineDetailDirection: (String) -> Void
     let checkGTFSUpdate: () -> Void

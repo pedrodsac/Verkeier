@@ -186,13 +186,12 @@ extension TransitMapViewModel {
         routeErrorMessage = nil
         routeStatusMessage = nil
         do {
-            let shouldRefreshInBackground = unfilteredRouteOptions.isEmpty
             let calculation = try await routeService.calculateRoute(
                 from: origin,
                 to: destination.location,
                 time: routePlanningTime,
                 filters: routeFilters,
-                realtimeRefreshPolicy: shouldRefreshInBackground ? .useCache : .forceRefresh
+                realtimeRefreshPolicy: .forceRefresh
             )
             guard requestGeneration == routeCalculationGeneration else { return }
             unfilteredRouteOptions = calculation.options
@@ -204,13 +203,10 @@ extension TransitMapViewModel {
                     origin: routeOrigin, destination: destination
                 )
             }
-            if shouldRefreshInBackground {
-                refreshRouteInBackground(
-                    using: routeService,
-                    origin: origin,
-                    destination: destination,
-                    requestGeneration: requestGeneration
-                )
+            if calculation.options.count == 1,
+               calculation.options.first?.isWalkingOnly == true {
+                canLoadEarlierRoutes = false
+                canLoadLaterRoutes = false
             }
         } catch {
             guard requestGeneration == routeCalculationGeneration else { return }
@@ -258,7 +254,11 @@ extension TransitMapViewModel {
             return
         }
 
-        let departures = routeOptions.compactMap(\.departureTime)
+        // The all-the-way walk is not schedule-based and must never move a
+        // transit page boundary.
+        let departures = routeOptions
+            .filter { !$0.transitLegs.isEmpty }
+            .compactMap(\.departureTime)
         guard let boundary = direction == .earlier ? departures.min() : departures.max() else {
             return
         }
@@ -276,7 +276,7 @@ extension TransitMapViewModel {
                 to: destination.location,
                 time: routePlanningTime,
                 filters: routeFilters,
-                realtimeRefreshPolicy: .useCache,
+                realtimeRefreshPolicy: .forceRefresh,
                 page: page
             )
             guard requestGeneration == routeCalculationGeneration else { return }
@@ -287,15 +287,10 @@ extension TransitMapViewModel {
                 invalidatedOptionIDs: calculation.invalidatedOptionIDs
             )
             applyRouteOptions(preferredID: preferredID, announceFallback: true)
-            setRoutePageAvailable(calculation.options.count >= 3, direction: direction)
+            // A partial page does not prove there are no more routes. Keep paging
+            // available until a search actually returns an empty page.
+            setRoutePageAvailable(!calculation.options.isEmpty, direction: direction)
             routeLastCalculatedAt = now()
-            refreshRoutePageInBackground(
-                page,
-                using: routeService,
-                origin: origin,
-                destination: destination,
-                requestGeneration: requestGeneration
-            )
         } catch is CancellationError {
             // A newer full search or page request owns the visible result set.
         } catch let error as RoutingError where error == .noPublicTransportRoute {
@@ -359,117 +354,6 @@ extension TransitMapViewModel {
     private func startRouteRequest() -> Int {
         routeCalculationGeneration += 1
         return routeCalculationGeneration
-    }
-
-    private func refreshRouteInBackground(
-        using routeService: any RouteService,
-        origin: LocationPoint,
-        destination: RoutePlace,
-        requestGeneration: Int
-    ) {
-        let planningTime = routePlanningTime
-        let filters = routeFilters
-        Task { [weak self] in
-            guard let self else { return }
-            do {
-                let calculation = try await routeService.calculateRoute(
-                    from: origin,
-                    to: destination.location,
-                    time: planningTime,
-                    filters: filters,
-                    realtimeRefreshPolicy: .forceRefresh
-                )
-                guard requestGeneration == routeCalculationGeneration else { return }
-                let preferredID = selectedRouteOptionID
-                unfilteredRouteOptions = Self.mergingRefreshedOptions(
-                    scheduled: unfilteredRouteOptions,
-                    refreshed: calculation.options,
-                    invalidatedOptionIDs: calculation.invalidatedOptionIDs,
-                    limit: 5
-                )
-                supplementalRouteOptions = Self.mergingRefreshedOptions(
-                    scheduled: supplementalRouteOptions,
-                    refreshed: calculation.supplementalOptions,
-                    invalidatedOptionIDs: calculation.invalidatedOptionIDs,
-                    limit: 1
-                )
-                applyRouteOptions(preferredID: preferredID, announceFallback: true)
-                routeLastCalculatedAt = now()
-            } catch {
-                guard requestGeneration == routeCalculationGeneration else { return }
-                routeStatusMessage = "Live updates are unavailable. Showing scheduled routes."
-            }
-        }
-    }
-
-    private func refreshRoutePageInBackground(
-        _ page: RouteSearchPage,
-        using routeService: any RouteService,
-        origin: LocationPoint,
-        destination: RoutePlace,
-        requestGeneration: Int
-    ) {
-        let planningTime = routePlanningTime
-        let filters = routeFilters
-        Task { [weak self] in
-            guard let self else { return }
-            do {
-                let calculation = try await routeService.calculateRoute(
-                    from: origin,
-                    to: destination.location,
-                    time: planningTime,
-                    filters: filters,
-                    realtimeRefreshPolicy: .forceRefresh,
-                    page: page
-                )
-                guard requestGeneration == routeCalculationGeneration else { return }
-                let preferredID = selectedRouteOptionID
-                unfilteredRouteOptions = Self.mergingAccumulatedOptions(
-                    existing: unfilteredRouteOptions,
-                    incoming: calculation.options,
-                    invalidatedOptionIDs: calculation.invalidatedOptionIDs
-                )
-                applyRouteOptions(preferredID: preferredID, announceFallback: true)
-                routeLastCalculatedAt = now()
-            } catch {
-                guard requestGeneration == routeCalculationGeneration else { return }
-                routeStatusMessage = "Live updates are unavailable. Showing scheduled routes."
-            }
-        }
-    }
-
-    /// Realtime coverage is sparse, so a refresh enriches the scheduled profile
-    /// in place instead of replacing it. Only a cancellation or broken connection
-    /// explicitly reported by the engine is allowed to remove a scheduled card.
-    static func mergingRefreshedOptions(
-        scheduled: [RouteOption],
-        refreshed: [RouteOption],
-        invalidatedOptionIDs: Set<String>,
-        limit: Int
-    ) -> [RouteOption] {
-        guard limit > 0 else { return [] }
-        var refreshedByID = Dictionary(
-            refreshed.map { ($0.id, $0) },
-            uniquingKeysWith: { first, _ in first }
-        )
-        var merged: [RouteOption] = []
-        var seenIDs: Set<String> = []
-
-        for scheduledOption in scheduled where merged.count < limit {
-            guard !invalidatedOptionIDs.contains(scheduledOption.id) else { continue }
-            let option = refreshedByID.removeValue(forKey: scheduledOption.id) ?? scheduledOption
-            if seenIDs.insert(option.id).inserted {
-                merged.append(option)
-            }
-        }
-
-        for option in refreshed where merged.count < limit {
-            guard refreshedByID[option.id] != nil else { continue }
-            if seenIDs.insert(option.id).inserted {
-                merged.append(option)
-            }
-        }
-        return merged
     }
 
     static func mergingAccumulatedOptions(
@@ -633,6 +517,8 @@ extension TransitMapViewModel {
 
     private func filteredRouteOptions(from options: [RouteOption]) -> [RouteOption] {
         options.filter { option in
+            if option.isWalkingOnly { return true }
+
             if routeFilters.avoidTightTransfers,
                [.atRisk, .connectionMayBeMissed].contains(option.status(at: now())) {
                 return false

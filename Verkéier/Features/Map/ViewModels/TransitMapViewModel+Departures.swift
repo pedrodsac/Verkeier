@@ -5,7 +5,11 @@ import SwiftUI
 import WidgetKit
 
 extension TransitMapViewModel {
-    func loadFavouriteDepartures(using atpClient: any ATPClient, favourites: [Stop]) async {
+    func loadFavouriteDepartures(
+        using atpClient: any ATPClient,
+        favourites: [Stop],
+        filtersByStopID: [String: TransitBoardFilter] = [:]
+    ) async {
         guard !favourites.isEmpty else {
             favouriteDepartureBoards = [:]
             isLoadingFavouriteDepartures = false
@@ -22,7 +26,8 @@ extension TransitMapViewModel {
 
         let results = await loadFavouriteDepartureBoards(
             using: atpClient,
-            favourites: favourites
+            favourites: favourites,
+            filtersByStopID: filtersByStopID
         )
         let refreshedAt = Date.now
         for result in results {
@@ -42,13 +47,22 @@ extension TransitMapViewModel {
         isLoadingFavouriteDepartures = false
     }
 
-    func refreshFavouriteDeparture(using atpClient: any ATPClient, stop: Stop) async {
+    func refreshFavouriteDeparture(
+        using atpClient: any ATPClient,
+        stop: Stop,
+        filter: TransitBoardFilter = TransitBoardFilter()
+    ) async {
         var snapshot = favouriteDepartureBoards[stop.id] ?? FavouriteDepartureBoardSnapshot()
         snapshot.phase = .loading
         snapshot.errorMessage = nil
         favouriteDepartureBoards[stop.id] = snapshot
 
-        let result = await Self.loadFavouriteDepartureBoard(using: atpClient, stop: stop, index: 0)
+        let result = await Self.loadFavouriteDepartureBoard(
+            using: atpClient,
+            stop: stop,
+            filter: filter,
+            index: 0
+        )
         snapshot = favouriteDepartureBoards[stop.id] ?? FavouriteDepartureBoardSnapshot()
         if result.didFail {
             snapshot.phase = .failed
@@ -82,7 +96,10 @@ extension TransitMapViewModel {
         departuresErrorMessage = nil
 
         do {
-            let refreshedDepartures = try await atpClient.departureBoards(stopIds: selectedStop.platformIds)
+            let refreshedDepartures = try await atpClient.departureBoards(
+                stopIds: selectedStop.platformIds,
+                options: currentDepartureBoardOptions()
+            )
             departures = departuresWithPlatformFallback(
                 in: refreshedDepartures,
                 from: departures
@@ -132,6 +149,32 @@ extension TransitMapViewModel {
 
     func selectDeparturePlatform(_ platform: String?) {
         selectedDeparturePlatform = platform
+    }
+
+    func updateDepartureBoardFilter(_ filter: TransitBoardFilter) {
+        departureBoardFilter = filter
+    }
+
+    func resetDepartureBoardFilter() {
+        departureBoardFilter = TransitBoardFilter()
+    }
+
+    private func currentDepartureBoardOptions() -> ATPDepartureBoardOptions {
+        let lines: [String]
+        if let selectedDepartureLine,
+           let route = selectedStopRoutes.first(where: { $0.id == selectedDepartureLine }) {
+            // ATP accepts public line labels. Including the GTFS route id as a
+            // second value would cause a strict upstream filter to miss data.
+            lines = [route.shortName]
+        } else {
+            lines = []
+        }
+
+        var filter = departureBoardFilter
+        if let selectedDeparturePlatform {
+            filter.platforms = [selectedDeparturePlatform]
+        }
+        return filter.options(lines: lines)
     }
 
     func loadOfflineScheduledDepartures(

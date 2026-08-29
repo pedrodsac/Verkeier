@@ -41,7 +41,8 @@ extension TransitMapViewModel {
 
     func loadFavouriteDepartureBoards(
         using atpClient: any ATPClient,
-        favourites: [Stop]
+        favourites: [Stop],
+        filtersByStopID: [String: TransitBoardFilter] = [:]
     ) async -> [FavouriteDepartureBoardResult] {
         await withTaskGroup(of: FavouriteDepartureBoardResult.self) { group in
             var results: [FavouriteDepartureBoardResult] = []
@@ -54,6 +55,7 @@ extension TransitMapViewModel {
                     await Self.loadFavouriteDepartureBoard(
                         using: atpClient,
                         stop: next.element,
+                        filter: filtersByStopID[next.element.id] ?? TransitBoardFilter(),
                         index: next.offset
                     )
                 }
@@ -64,8 +66,9 @@ extension TransitMapViewModel {
                 if let next = iterator.next() {
                     group.addTask {
                         await Self.loadFavouriteDepartureBoard(
-                            using: atpClient,
-                            stop: next.element,
+                        using: atpClient,
+                        stop: next.element,
+                        filter: filtersByStopID[next.element.id] ?? TransitBoardFilter(),
                             index: next.offset
                         )
                     }
@@ -79,12 +82,16 @@ extension TransitMapViewModel {
     static func loadFavouriteDepartureBoard(
         using atpClient: any ATPClient,
         stop: Stop,
+        filter: TransitBoardFilter = TransitBoardFilter(),
         index: Int
     ) async -> FavouriteDepartureBoardResult {
         do {
             return try await FavouriteDepartureBoardResult(
                 stopId: stop.id,
-                departures: atpClient.departureBoards(stopIds: stop.platformIds),
+                departures: atpClient.departureBoards(
+                    stopIds: stop.platformIds,
+                    options: filter.options()
+                ),
                 didFail: false,
                 index: index
             )

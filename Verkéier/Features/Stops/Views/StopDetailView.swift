@@ -7,6 +7,11 @@ struct StopDetailView: View {
     var body: some View {
         if let stop = viewModel.stop {
             VStack(alignment: .leading, spacing: 16) {
+                DepartureBoardAdvancedFilterMenu(
+                    filter: viewModel.departureBoardFilter,
+                    update: actions.updateDepartureBoardFilter
+                )
+
                 PlatformFilterPicker(
                     platforms: viewModel.availablePlatforms,
                     selectedPlatform: viewModel.selectedPlatform,
@@ -93,5 +98,49 @@ struct StopDetailView: View {
         }
         lines.append("via Verkéier")
         return lines.joined(separator: "\n")
+    }
+}
+
+private struct DepartureBoardAdvancedFilterMenu: View {
+    let filter: TransitBoardFilter
+    let update: (TransitBoardFilter) -> Void
+
+    var body: some View {
+        Menu {
+            Section("Time window") {
+                ForEach([30, 60, 120, 240], id: \.self) { duration in
+                    Button(duration == filter.durationMinutes ? "✓ \(duration) minutes" : "\(duration) minutes") {
+                        var copy = filter
+                        copy.durationMinutes = duration
+                        update(copy)
+                    }
+                }
+            }
+            Section("Results") {
+                ForEach([5, 10, 20, 50], id: \.self) { count in
+                    Button(count == filter.maximumJourneys ? "✓ \(count) departures" : "\(count) departures") {
+                        var copy = filter
+                        copy.maximumJourneys = count
+                        update(copy)
+                    }
+                }
+            }
+            Section("Data") {
+                Button(filter.realtimeMode == .full ? "✓ Live updates" : "Live updates") {
+                    var copy = filter
+                    copy.realtimeMode = .full
+                    update(copy)
+                }
+                Button(filter.realtimeMode == .off ? "✓ Timetable only" : "Timetable only") {
+                    var copy = filter
+                    copy.realtimeMode = .off
+                    update(copy)
+                }
+            }
+            Button("Reset filters", role: .destructive) { update(TransitBoardFilter()) }
+        } label: {
+            Label("Board filters", systemImage: "line.3.horizontal.decrease.circle")
+                .font(.callout.weight(.medium))
+        }
     }
 }

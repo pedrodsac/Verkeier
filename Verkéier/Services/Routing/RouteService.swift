@@ -29,8 +29,8 @@ protocol RouteService: Sendable {
 }
 
 extension RouteService {
-    /// Default calculation path: reuse a snapshot that is still fresh enough to be
-    /// useful. The explicit planner refresh action passes `.forceRefresh` instead.
+    /// Default calculation path: reuse a fresh realtime snapshot and fetch any
+    /// boards that are missing or stale. Explicit refresh bypasses that cache.
     nonisolated func calculateRoute(
         from: LocationPoint,
         to: LocationPoint,

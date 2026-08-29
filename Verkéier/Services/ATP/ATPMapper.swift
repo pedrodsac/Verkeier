@@ -52,7 +52,7 @@ nonisolated enum ATPMapper {
                 ?? inferredPlatforms[departureStopId]
 
             return Departure(
-                id: "\(stopId)-\(dto.name ?? lineName)-\(dto.date ?? "")-\(dto.time ?? "")-\(index)",
+                id: dto.journeyDetailReference ?? "\(stopId)-\(dto.name ?? lineName)-\(dto.date ?? "")-\(dto.time ?? "")-\(index)",
                 stopId: departureStopId,
                 routeId: dto.product?.line,
                 lineName: lineName,
@@ -61,12 +61,14 @@ nonisolated enum ATPMapper {
                 realtimeDeparture: realtime,
                 delayMinutes: delayMinutes,
                 platform: platform,
-                operatorName: dto.product?.operatorName,
-                isCancelled: dto.cancelled ?? false,
+                operatorName: dto.product?.operatorName ?? dto.product?.operatorCode,
+                isCancelled: dto.cancelled ?? dto.journeyStatus?.lowercased().contains("cancel") ?? false,
                 isStatusUnknown: scheduled == nil,
                 dataSource: .atpOpenAPI,
                 lastUpdated: .now,
-                previousPlatform: platformResolution.previous
+                previousPlatform: platformResolution.previous,
+                journeyReference: dto.journeyDetailReference,
+                serviceNote: dto.notes.isEmpty ? nil : dto.notes.joined(separator: " • ")
             )
         }
     }

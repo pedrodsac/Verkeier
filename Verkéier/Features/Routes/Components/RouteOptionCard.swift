@@ -17,7 +17,7 @@ struct RouteOptionCard: View {
             VStack(alignment: .leading, spacing: 8) {
                 // ── Header: time range / duration / status badge ──────────
                 HStack(alignment: .firstTextBaseline, spacing: 0) {
-                    if option.isVelohOnly {
+                    if option.isVelohOnly || option.isWalkingOnly {
                         Text(durationText)
                             .font(.callout.weight(.bold))
                             .monospacedDigit()
@@ -35,7 +35,7 @@ struct RouteOptionCard: View {
 
                     Spacer(minLength: -8)
 
-                    if !option.isVelohOnly {
+                    if !option.isVelohOnly, !option.isWalkingOnly {
                         RouteOptionBadge(status: option.status(at: .now))
                     }
                 }
@@ -89,13 +89,17 @@ struct RouteOptionCard: View {
     }
 
     private var secondarySummary: String {
+        let distance = preferences.formattedDistance(option.plan.distanceMeters ?? 0)
+        if option.isWalkingOnly {
+            return "Walking  ·  \(distance)"
+        }
+
         let transfers = switch option.transferCount {
         case 0: "Direct"
         case 1: "1 transfer"
         default: "\(option.transferCount) transfers"
         }
 
-        let distance = preferences.formattedDistance(option.plan.distanceMeters ?? 0)
         let dataNote = if option.usesBikeShare {
             option.hasBikeAvailabilityWarning ? "Bike availability uncertain" : "Bike availability live"
         } else {
@@ -110,7 +114,7 @@ struct RouteOptionCard: View {
     }
 
     private var accessibilityLabel: String {
-        let heading = option.isVelohOnly
+        let heading = option.isVelohOnly || option.isWalkingOnly
             ? durationText
             : "\(timeRangeText), \(durationText)"
         return "\(heading). \(secondarySummary)"

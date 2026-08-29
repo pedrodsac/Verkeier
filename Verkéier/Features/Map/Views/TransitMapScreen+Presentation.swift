@@ -38,10 +38,10 @@ extension TransitMapScreen {
                 routesByStopId: viewModel.nearbyStopRoutes
             ),
             commute: CommuteDashboardViewModel(
-                favourites: favouriteStops,
                 nearby: nearby,
                 activeAlertCount: viewModel.activeAlertCount,
-                suggestedCommutePreset: viewModel.suggestedCommutePreset
+                suggestedCommutePreset: viewModel.suggestedCommutePreset,
+                specialEvents: SpecialEventCatalog.activeEvents()
             ),
             search: SearchPresentationModel(
                 results: viewModel.searchResults,
@@ -59,6 +59,7 @@ extension TransitMapScreen {
                 availablePlatforms: viewModel.availableDeparturePlatforms,
                 selectedLine: viewModel.selectedDepartureLine,
                 selectedPlatform: viewModel.selectedDeparturePlatform,
+                departureBoardFilter: viewModel.departureBoardFilter,
                 isLoadingDepartures: viewModel.isLoadingDepartures,
                 errorMessage: viewModel.departuresErrorMessage,
                 lastUpdated: viewModel.departuresLastUpdated,

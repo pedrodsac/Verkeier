@@ -57,6 +57,9 @@ struct ATPDeparture: Decodable {
     let rtTrack: String?
     let cancelled: Bool?
     let product: ATPProduct?
+    let journeyDetailReference: String?
+    let journeyStatus: String?
+    let notes: [String]
 
     enum CodingKeys: String, CodingKey {
         case name
@@ -75,6 +78,9 @@ struct ATPDeparture: Decodable {
         case rtTrack
         case cancelled
         case product = "Product"
+        case journeyDetailReference = "JourneyDetailRef"
+        case journeyStatus = "JourneyStatus"
+        case notes = "Notes"
     }
 
     init(from decoder: Decoder) throws {
@@ -96,6 +102,9 @@ struct ATPDeparture: Decodable {
         track = Self.decodePlatform(from: container, key: .track)
         rtTrack = Self.decodePlatform(from: container, key: .rtTrack)
         product = Self.decodeProduct(from: container)
+        journeyDetailReference = Self.decodeJourneyReference(from: container)
+        journeyStatus = Self.decodeJourneyStatus(from: container)
+        notes = Self.decodeNotes(from: container)
     }
 
     private static func decodePlatform(
@@ -126,6 +135,71 @@ struct ATPDeparture: Decodable {
         }
         return nil
     }
+
+    private static func decodeJourneyReference(from container: KeyedDecodingContainer<CodingKeys>) -> String? {
+        do {
+            return try container.decodeIfPresent(ATPJourneyDetailReference.self, forKey: .journeyDetailReference)?
+                .ref?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        } catch {
+            return nil
+        }
+    }
+
+    private static func decodeJourneyStatus(from container: KeyedDecodingContainer<CodingKeys>) -> String? {
+        if let value = try? container.decodeIfPresent(String.self, forKey: .journeyStatus) {
+            return value?.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        if let value = try? container.decodeIfPresent(ATPJourneyStatus.self, forKey: .journeyStatus) {
+            return value?.value
+        }
+        return nil
+    }
+
+    private static func decodeNotes(from container: KeyedDecodingContainer<CodingKeys>) -> [String] {
+        do {
+            return try container.decodeIfPresent([ATPNote].self, forKey: .notes)?.compactMap(\.text) ?? []
+        } catch {
+            return []
+        }
+    }
+}
+
+private struct ATPJourneyDetailReference: Decodable {
+    let ref: String?
+}
+
+private struct ATPJourneyStatus: Decodable {
+    let value: String?
+
+    init(from decoder: Decoder) throws {
+        if let value = try? decoder.singleValueContainer().decode(String.self) {
+            self.value = value
+            return
+        }
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.value = try container.decodeIfPresent(String.self, forKey: .status)
+            ?? container.decodeIfPresent(String.self, forKey: .text)
+    }
+
+    private enum CodingKeys: String, CodingKey { case status, text }
+}
+
+private struct ATPNote: Decodable {
+    let text: String?
+
+    init(from decoder: Decoder) throws {
+        if let text = try? decoder.singleValueContainer().decode(String.self) {
+            self.text = text
+            return
+        }
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.text = try container.decodeIfPresent(String.self, forKey: .value)
+            ?? container.decodeIfPresent(String.self, forKey: .text)
+            ?? container.decodeIfPresent(String.self, forKey: .txt)
+    }
+
+    private enum CodingKeys: String, CodingKey { case value, text, txt }
 }
 
 struct ATPPlatform: Decodable {
@@ -138,6 +212,7 @@ struct ATPProduct: Decodable {
     let catOut: String?
     let catOutL: String?
     let operatorName: String?
+    let operatorCode: String?
 
     enum CodingKeys: String, CodingKey {
         case name
@@ -145,5 +220,6 @@ struct ATPProduct: Decodable {
         case catOut
         case catOutL
         case operatorName = "operator"
+        case operatorCode
     }
 }

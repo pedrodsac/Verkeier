@@ -3,140 +3,191 @@ import SwiftUI
 import WidgetKit
 
 struct DeparturesSummaryWidget: Widget {
-    let kind = "DeparturesSummaryWidget"
+    static let kind = "DeparturesSummaryWidget"
 
     var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: kind, intent: SelectFavouriteStopIntent.self, provider: FavouriteStopTimelineProvider()) { entry in
+        AppIntentConfiguration(
+            kind: Self.kind,
+            intent: SelectFavouriteStopIntent.self,
+            provider: LiveDeparturesTimelineProvider()
+        ) { entry in
             LiveDeparturesWidgetView(entry: entry)
-                .containerBackground(for: .widget) { WidgetBackdrop() }
-                .widgetURL(entry.selectedStop.map { TransitDeepLink.showDepartures(stopId: $0.id).url } ?? TransitDeepLink.showNearbyStops.url)
+                .containerBackground(.background, for: .widget)
+                .widgetURL(entry.destinationURL)
         }
         .configurationDisplayName("Live Departures")
-        .description("Upcoming departures for a favourite stop.")
+        .description("See the next departures from a favourite stop.")
         .supportedFamilies([.systemMedium])
+        .contentMarginsDisabled()
     }
 }
 
 private struct LiveDeparturesWidgetView: View {
-    let entry: FavouriteStopEntry
-
-    private var upcoming: [SharedWidgetDeparture] {
-        let cutoff = entry.date.addingTimeInterval(-60)
-        return Array((entry.departureBoard?.departures ?? [])
-            .filter { ($0.displayDepartureDate ?? .distantFuture) >= cutoff }
-            .prefix(3))
-    }
+    let entry: LiveDeparturesEntry
 
     var body: some View {
-        VStack(spacing: 9) {
+        VStack(alignment: .leading, spacing: 0) {
             header
-            if entry.selectedStop == nil {
-                emptyState("Choose a favourite stop", icon: "star")
-            } else if upcoming.isEmpty {
-                emptyState("Open Verkéier to refresh departures", icon: "arrow.clockwise")
-            } else {
-                VStack(spacing: 6) {
-                    ForEach(upcoming) { WidgetDepartureRow(departure: $0) }
-                }
-            }
+                .padding(.horizontal, 16)
+                .padding(.top, 14)
+                .padding(.bottom, 10)
+
+            Divider()
+                .padding(.horizontal, 16)
+
+            content
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private var header: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             Image(systemName: "tram.fill")
                 .font(.caption.weight(.bold))
-                .foregroundStyle(.tint)
-                .frame(width: 26, height: 26)
-                .background(.tint.opacity(0.13), in: Circle())
-            VStack(alignment: .leading, spacing: 0) {
-                Text(entry.selectedStop?.name.stationDisplayName ?? "Live departures")
+                .foregroundStyle(.white)
+                .frame(width: 28, height: 28)
+                .background(Color.accentColor, in: Circle())
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(entry.stop?.name.stationDisplayName ?? "Live departures")
                     .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.primary)
                     .lineLimit(1)
-                if let board = entry.departureBoard {
-                    Text(board.updatedAt, style: .relative)
-                        .font(.caption2)
-                        .foregroundStyle(entry.date.timeIntervalSince(board.updatedAt) > 900 ? .orange : .secondary)
-                } else {
-                    Text("Favourite stop").font(.caption2).foregroundStyle(.secondary)
-                }
+
+                Text(entry.updateLabel)
+                    .font(.caption2)
+                    .foregroundStyle(entry.isStale ? Color.orange : Color.secondary)
+                    .lineLimit(1)
             }
-            Spacer(minLength: 0)
-            Image(systemName: "chevron.right").font(.caption2.weight(.bold)).foregroundStyle(.tertiary)
+
+            Spacer(minLength: 8)
+
+            Image(systemName: "chevron.right")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.tertiary)
         }
     }
 
-    private func emptyState(_ title: String, icon: String) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: icon).foregroundStyle(.secondary)
-            Text(title).font(.footnote.weight(.medium)).foregroundStyle(.secondary)
-            Spacer()
+    @ViewBuilder
+    private var content: some View {
+        if entry.stop == nil {
+            WidgetMessage(
+                icon: "star",
+                title: "Choose a favourite stop",
+                detail: "Touch and hold the widget to edit it."
+            )
+        } else if entry.departures.isEmpty {
+            WidgetMessage(
+                icon: "arrow.clockwise",
+                title: "No departures available",
+                detail: "Open Verkéier to refresh live data."
+            )
+        } else {
+            VStack(spacing: 0) {
+                ForEach(Array(entry.departures.prefix(3).enumerated()), id: \.element.id) { index, departure in
+                    DepartureRow(departure: departure, referenceDate: entry.date)
+                    if index < min(entry.departures.count, 3) - 1 {
+                        Divider().padding(.leading, 46)
+                    }
+                }
+            }
         }
-        .frame(maxHeight: .infinity)
     }
 }
 
-private struct WidgetDepartureRow: View {
+private struct DepartureRow: View {
     let departure: SharedWidgetDeparture
+    let referenceDate: Date
 
     var body: some View {
-        HStack(spacing: 9) {
-            Text(departure.lineName)
-                .font(.caption.weight(.heavy))
+        HStack(spacing: 10) {
+            Text(departure.lineName.isEmpty ? "—" : departure.lineName)
+                .font(.caption.weight(.bold))
                 .foregroundStyle(.white)
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
-                .frame(width: 38, height: 27)
-                .background(lineColor.gradient, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .minimumScaleFactor(0.65)
+                .frame(width: 36, height: 26)
+                .background(routeColor, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+
             VStack(alignment: .leading, spacing: 1) {
-                Text(departure.destination.isEmpty ? "Destination unknown" : departure.destination)
-                    .font(.caption.weight(.semibold)).lineLimit(1)
-                HStack(spacing: 4) {
-                    if let date = departure.displayDepartureDate { Text(date, style: .time) }
-                    if let platform = departure.platform, !platform.isEmpty { Text("· Platform \(platform)") }
-                }
-                .font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+                Text(departure.destination.isEmpty ? "Destination unavailable" : departure.destination)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+
+                Text(departureDetail)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
+
             Spacer(minLength: 4)
-            countdown
+
+            Text(countdownLabel)
                 .font(.caption.weight(.bold))
+                .foregroundStyle(countdownColor)
+                .monospacedDigit()
                 .fixedSize()
         }
-        .padding(.horizontal, 7)
-        .padding(.vertical, 5)
-        .background(.primary.opacity(0.055), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+        .frame(height: 33)
         .accessibilityElement(children: .combine)
     }
 
-    @ViewBuilder private var countdown: some View {
-        if departure.isCancelled {
-            Text("Cancelled").foregroundStyle(.red)
-        } else if let date = departure.displayDepartureDate {
-            Text(timerInterval: Date.now...max(date, Date.now), countsDown: true)
-                .monospacedDigit()
-                .foregroundStyle((departure.delayMinutes ?? 0) > 0 ? .orange : .primary)
-        } else {
-            Text("—").foregroundStyle(.secondary)
+    private var departureDetail: String {
+        var parts: [String] = []
+        if let date = departure.displayDepartureDate {
+            parts.append(date.formatted(date: .omitted, time: .shortened))
         }
+        if let platform = departure.platform?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !platform.isEmpty {
+            parts.append("Platform \(platform)")
+        }
+        return parts.isEmpty ? "Time unavailable" : parts.joined(separator: " · ")
     }
 
-    private var lineColor: Color {
-        let name = departure.lineName.uppercased()
-        if name.hasPrefix("T") { return .blue }
-        if name.range(of: #"^\d+$"#, options: .regularExpression) != nil { return .indigo }
-        return .teal
+    private var countdownLabel: String {
+        guard !departure.isCancelled else { return "Cancelled" }
+        guard let date = departure.displayDepartureDate else { return "—" }
+        let seconds = date.timeIntervalSince(referenceDate)
+        if seconds <= 30 { return "Now" }
+        return "\(max(1, Int(ceil(seconds / 60)))) min"
+    }
+
+    private var countdownColor: Color {
+        if departure.isCancelled { return .red }
+        if (departure.delayMinutes ?? 0) > 0 { return .orange }
+        return .primary
+    }
+
+    private var routeColor: Color {
+        departure.lineName.uppercased().hasPrefix("T") ? .orange : .blue
     }
 }
 
-private struct WidgetBackdrop: View {
+private struct WidgetMessage: View {
+    let icon: String
+    let title: String
+    let detail: String
+
     var body: some View {
-        ZStack {
-            Color(.secondarySystemBackground)
-            Circle()
-                .fill(Color.accentColor.opacity(0.12))
-                .frame(width: 190, height: 190)
-                .blur(radius: 35)
-                .offset(x: 145, y: -75)
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(.secondary)
+                .frame(width: 30)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.primary)
+                Text(detail)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
 }

@@ -247,7 +247,7 @@ struct RouteView: View {
                 )
             }
 
-            if !viewModel.routeOptions.isEmpty {
+            if viewModel.routeOptions.contains(where: { !$0.transitLegs.isEmpty }) {
                 HStack(spacing: 10) {
                     routePageButton(
                         title: "Earlier",
