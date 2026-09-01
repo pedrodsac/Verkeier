@@ -5,7 +5,7 @@ import Foundation
 /// best-effort update from a `BGAppRefreshTask`. The OS schedules the work
 /// opportunistically; we just request it and re-arm after each run.
 enum GTFSBackgroundRefresh {
-    static let identifier = "dev.pedrocordeiro.LuxTransit.gtfsRefresh"
+    static let identifier = "dev.pedrocordeiro.Verkeier.gtfsRefresh"
 
     /// Request the next opportunistic refresh (no sooner than ~6h out).
     static func schedule() {

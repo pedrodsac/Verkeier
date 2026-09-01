@@ -7,7 +7,7 @@ import UniformTypeIdentifiers
 /// Items use the `stop.<id>` unique identifier and a shared domain identifier so
 /// the whole set can be cleared in one call when the last favourite is removed.
 enum FavouriteStopSpotlightIndexer {
-    static let domainIdentifier = "lu.luxtransit.favouritestop"
+    static let domainIdentifier = "lu.verkeier.favouritestop"
 
     static func index(_ stops: [Stop]) {
         let items = stops.map { stop -> CSSearchableItem in

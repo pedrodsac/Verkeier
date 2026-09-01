@@ -47,7 +47,7 @@
 
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* Verkéier.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Verkéier.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		000000000000000000000220 /* VerkéierTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "VerkéierTests.xctest"; path = "VerkéierTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000220 /* VerkéierTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "VerkéierTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		000000000000000000000320 /* VerkéierWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "VerkéierWidgets.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		627757803024D6D30012B2EF /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		62FE86412FDDDDC400081C59 /* AppConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppConfig.xcconfig; sourceTree = "<group>"; };
@@ -487,7 +487,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.pedrocordeiro.LuxTransit;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pedrocordeiro.Verkeier;
 				PRODUCT_MODULE_NAME = Verkeier;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -529,7 +529,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.pedrocordeiro.LuxTransit;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pedrocordeiro.Verkeier;
 				PRODUCT_MODULE_NAME = Verkeier;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -562,7 +562,7 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.pedrocordeiro.LuxTransitTests;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pedrocordeiro.VerkeierTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -592,7 +592,7 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.pedrocordeiro.LuxTransitTests;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pedrocordeiro.VerkeierTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -624,7 +624,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.pedrocordeiro.LuxTransit.Widgets;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pedrocordeiro.Verkeier.Widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
@@ -657,7 +657,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.pedrocordeiro.LuxTransit.Widgets;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pedrocordeiro.Verkeier.Widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;

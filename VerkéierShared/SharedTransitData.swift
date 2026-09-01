@@ -1,7 +1,7 @@
 import Foundation
 
 nonisolated enum SharedTransitDataStore {
-    static let appGroupIdentifier = "group.dev.pedrocordeiro.LuxTransit"
+    static let appGroupIdentifier = "group.dev.pedrocordeiro.Verkeier"
     static let favouriteStopsKey = "FavouriteStopEntities"
     static let trackedDepartureReminderKey = "TrackedDepartureReminder"
     static let favouriteDepartureBoardsKey = "FavouriteDepartureBoards"
@@ -245,7 +245,7 @@ nonisolated enum TransitDeepLink: Equatable, Sendable {
     case showDepartures(stopId: String)
     case planRoute(destinationName: String)
 
-    static let scheme = "luxtransit"
+    static let scheme = "verkeier"
 
     init?(url: URL) {
         guard url.scheme == Self.scheme else { return nil }

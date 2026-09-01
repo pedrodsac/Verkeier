@@ -11,16 +11,16 @@ import Testing
 /// the macOS "Designed for iPhone" host), then prints the planned route.
 ///
 /// Gated by env so it never runs (or hits the network) in the normal suite:
-///   LUXTRANSIT_VALIDATE=1   — required to run
-///   LUXTRANSIT_GTFS_URL     — optional GTFS .zip URL (defaults to the latest known feed)
-///   LUXTRANSIT_DEPART       — optional "yyyy-MM-dd HH:mm" Europe/Luxembourg depart time
+///   VERKEIER_VALIDATE=1   — required to run
+///   VERKEIER_GTFS_URL     — optional GTFS .zip URL (defaults to the latest known feed)
+///   VERKEIER_DEPART       — optional "yyyy-MM-dd HH:mm" Europe/Luxembourg depart time
 struct RouteValidationTests {
     private static let defaultFeedURL =
         "https://download.data.public.lu/resources/horaires-et-arrets-des-transport-publics-gtfs/20260625-054655/gtfs-20260624-20260823.zip"
 
     @Test func senningerbergCharlysStatiounToHamilius() async throws {
-        guard ProcessInfo.processInfo.environment["LUXTRANSIT_VALIDATE"] == "1" else {
-            print("[route-validation] LUXTRANSIT_VALIDATE != 1 — skipping.")
+        guard ProcessInfo.processInfo.environment["VERKEIER_VALIDATE"] == "1" else {
+            print("[route-validation] VERKEIER_VALIDATE != 1 — skipping.")
             return
         }
 
@@ -61,8 +61,8 @@ struct RouteValidationTests {
     }
 
     @Test func senningerbergGromscheedToMerschArriveBy() async throws {
-        guard ProcessInfo.processInfo.environment["LUXTRANSIT_VALIDATE"] == "1" else {
-            print("[route-validation] LUXTRANSIT_VALIDATE != 1 — skipping.")
+        guard ProcessInfo.processInfo.environment["VERKEIER_VALIDATE"] == "1" else {
+            print("[route-validation] VERKEIER_VALIDATE != 1 — skipping.")
             return
         }
 
@@ -150,8 +150,8 @@ struct RouteValidationTests {
     }
 
     @Test func scheduledProfileSearchP95StaysUnderFiveHundredMilliseconds() async throws {
-        guard ProcessInfo.processInfo.environment["LUXTRANSIT_VALIDATE"] == "1" else {
-            print("[route-validation] LUXTRANSIT_VALIDATE != 1 — skipping.")
+        guard ProcessInfo.processInfo.environment["VERKEIER_VALIDATE"] == "1" else {
+            print("[route-validation] VERKEIER_VALIDATE != 1 — skipping.")
             return
         }
 
@@ -236,7 +236,7 @@ struct RouteValidationTests {
 
     private func loadTimetable() async throws -> GTFSTimetableIndexPayload {
         let work = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "luxtransit-validation",
+            "verkeier-validation",
             isDirectory: true
         )
         try? FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
@@ -248,7 +248,7 @@ struct RouteValidationTests {
             return payload
         }
 
-        let feedString = ProcessInfo.processInfo.environment["LUXTRANSIT_GTFS_URL"] ?? Self.defaultFeedURL
+        let feedString = ProcessInfo.processInfo.environment["VERKEIER_GTFS_URL"] ?? Self.defaultFeedURL
         let feedURL = try #require(URL(string: feedString))
         let zipURL = work.appendingPathComponent("gtfs.zip")
         if !FileManager.default.fileExists(atPath: zipURL.path) {
@@ -273,7 +273,7 @@ struct RouteValidationTests {
     private func departTime() -> Date {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "Europe/Luxembourg")!
-        if let override = ProcessInfo.processInfo.environment["LUXTRANSIT_DEPART"] {
+        if let override = ProcessInfo.processInfo.environment["VERKEIER_DEPART"] {
             let formatter = DateFormatter()
             formatter.calendar = calendar
             formatter.timeZone = calendar.timeZone

@@ -8,7 +8,7 @@
 	<string>$(AVL_MESSAGES_URL)</string>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>dev.pedrocordeiro.LuxTransit.gtfsRefresh</string>
+		<string>dev.pedrocordeiro.Verkeier.gtfsRefresh</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
@@ -32,10 +32,10 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>dev.pedrocordeiro.LuxTransit</string>
+			<string>dev.pedrocordeiro.Verkeier</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>luxtransit</string>
+				<string>verkeier</string>
 			</array>
 		</dict>
 	</array>
