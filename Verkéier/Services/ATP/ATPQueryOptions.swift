@@ -2,7 +2,7 @@ import Foundation
 
 /// ATP product flags documented by mobiliteit.lu. The values can be combined
 /// into the `products` query parameter.
-struct ATPProductFilter: OptionSet, Codable, Hashable, Sendable {
+nonisolated struct ATPProductFilter: OptionSet, Codable, Hashable, Sendable {
     let rawValue: Int
 
     static let expressTrain = ATPProductFilter(rawValue: 1)
@@ -15,13 +15,13 @@ struct ATPProductFilter: OptionSet, Codable, Hashable, Sendable {
     static let publicTransport: ATPProductFilter = [.trains, .bus, .tram]
 }
 
-enum ATPRealtimeMode: String, Codable, CaseIterable, Sendable {
+nonisolated enum ATPRealtimeMode: String, Codable, CaseIterable, Sendable {
     case full = "FULL"
     case off = "OFF"
 }
 
 /// Explicit, bounded controls for a nearby-stop ATP request.
-struct ATPNearbyStopsOptions: Hashable, Sendable {
+nonisolated struct ATPNearbyStopsOptions: Hashable, Sendable {
     var radiusMeters: Int = 1_500
     var maximumResults: Int = 50
     var products: ATPProductFilter? = nil
@@ -37,7 +37,7 @@ struct ATPNearbyStopsOptions: Hashable, Sendable {
 }
 
 /// Explicit, bounded controls for a departure-board ATP request.
-struct ATPDepartureBoardOptions: Hashable, Sendable {
+nonisolated struct ATPDepartureBoardOptions: Hashable, Sendable {
     var directionStopID: String? = nil
     var date: Date? = nil
     var durationMinutes: Int = 120
@@ -75,7 +75,7 @@ struct ATPDepartureBoardOptions: Hashable, Sendable {
 /// Filter state shared by a stop board and a saved favourite. Technical
 /// request IDs and passlist are deliberately excluded: they are managed by
 /// the client for diagnostics and journey tracking respectively.
-struct TransitBoardFilter: Codable, Hashable, Sendable {
+nonisolated struct TransitBoardFilter: Codable, Hashable, Sendable {
     var products: ATPProductFilter? = nil
     var operators: [String] = []
     var destinationStopID: String? = nil

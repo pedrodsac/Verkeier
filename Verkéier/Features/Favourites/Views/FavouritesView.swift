@@ -74,27 +74,38 @@ struct FavouritesView: View {
                     .padding(.horizontal, 4)
             }
 
-            LazyVGrid(
-                columns: [
-                    GridItem(.flexible(), spacing: 12),
-                    GridItem(.flexible(), spacing: 12),
-                    GridItem(.flexible(), spacing: 12)
-                ],
-                spacing: 12
-            ) {
+            LazyVStack(spacing: 8) {
                 ForEach(section.stops) { favourite in
-                    FavouriteStopTile(
-                        favourite: favourite,
-                        actions: actions,
-                        editLabels: {
-                            lastEditedFavouriteID = favourite.id
-                            editingFavourite = favourite
-                        }
+                    StopListRow(
+                        stop: favourite.stop,
+                        markerColor: favourite.stop.modes.primaryMode.tint,
+                        accessorySystemName: nil,
+                        surface: .favourite,
+                        action: { actions.openStop(favourite.stop) }
                     )
                     .accessibilityFocused($focusedFavouriteID, equals: favourite.id)
+                    .accessibilityHint("Opens departures for this stop")
+                    .accessibilityAction(named: "Plan to \(favourite.stop.displayName)") {
+                        actions.planTo(favourite.stop)
+                    }
+                    .accessibilityAction(named: "Plan from \(favourite.stop.displayName)") {
+                        actions.planFrom(favourite.stop)
+                    }
+                    .accessibilityAction(named: "Refresh departures for \(favourite.stop.displayName)") {
+                        Task { await actions.refreshStop(favourite.stop) }
+                    }
+                    .accessibilityAction(named: "Remove \(favourite.stop.displayName) from favourites") {
+                        actions.removeFavourite(favourite.stop.id)
+                    }
+                    .contextMenu {
+                        favouriteContextMenu(for: favourite)
+                    }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func refreshAll() async {
@@ -108,6 +119,43 @@ struct FavouritesView: View {
         Task { @MainActor in
             focusedFavouriteID = lastEditedFavouriteID
             self.lastEditedFavouriteID = nil
+        }
+    }
+
+    @ViewBuilder
+    private func favouriteContextMenu(for favourite: FavouriteStopPresentationModel) -> some View {
+        let stop = favourite.stop
+        Button {
+            actions.openStop(stop)
+        } label: {
+            Label("Open departures", systemImage: "clock")
+        }
+        Button {
+            actions.planTo(stop)
+        } label: {
+            Label("Plan to this stop", systemImage: "arrow.right.circle")
+        }
+        Button {
+            actions.planFrom(stop)
+        } label: {
+            Label("Plan from this stop", systemImage: "arrow.left.circle")
+        }
+        Button {
+            Task { await actions.refreshStop(stop) }
+        } label: {
+            Label("Refresh departures", systemImage: "arrow.clockwise")
+        }
+        Button {
+            lastEditedFavouriteID = favourite.id
+            editingFavourite = favourite
+        } label: {
+            Label("Edit labels", systemImage: "tag")
+        }
+        Divider()
+        Button(role: .destructive) {
+            actions.removeFavourite(stop.id)
+        } label: {
+            Label("Remove favourite", systemImage: "star.slash")
         }
     }
 

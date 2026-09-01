@@ -112,7 +112,7 @@ struct RoutePlaceSearchView: View {
         }
 
         // Debounce: a new keystroke cancels this task before the sleep ends.
-        try? await Task.sleep(for: .milliseconds(250))
+        try? await Task.sleep(for: StopSearchConfiguration.debounceInterval)
         guard !Task.isCancelled else { return }
 
         async let stops = gtfsService.searchStops(query: current)

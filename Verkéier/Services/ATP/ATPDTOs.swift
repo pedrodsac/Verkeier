@@ -148,10 +148,10 @@ struct ATPDeparture: Decodable {
 
     private static func decodeJourneyStatus(from container: KeyedDecodingContainer<CodingKeys>) -> String? {
         if let value = try? container.decodeIfPresent(String.self, forKey: .journeyStatus) {
-            return value?.trimmingCharacters(in: .whitespacesAndNewlines)
+			return value.trimmingCharacters(in: .whitespacesAndNewlines)
         }
         if let value = try? container.decodeIfPresent(ATPJourneyStatus.self, forKey: .journeyStatus) {
-            return value?.value
+			return value.value
         }
         return nil
     }

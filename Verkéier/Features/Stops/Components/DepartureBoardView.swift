@@ -64,7 +64,7 @@ struct DepartureBoardView: View {
                     LazyVStack(spacing: 8) {
                         if !departed.isEmpty {
                             DisclosureGroup("Recently departed") {
-                                ForEach(Array(departed)) { departure in
+								ForEach(Array(departed), id: \.self) { departure in
                                     DepartureListRow(departure: departure, showsControls: false)
                                         .opacity(0.55)
                                 }
@@ -74,7 +74,7 @@ struct DepartureBoardView: View {
                             .tint(.secondary)
                         }
 
-                        ForEach(upcoming) { departure in
+						ForEach(upcoming, id: \.self) { departure in
                             DepartureListRow(
                                 departure: departure,
                                 isTracked: departure.id == trackedDepartureId,

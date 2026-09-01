@@ -13,6 +13,16 @@ struct FavouriteStopTile: View {
             tileContent
         }
         .buttonStyle(.pressable)
+        .frame(maxWidth: .infinity)
+        .aspectRatio(1, contentMode: .fit)
+        .background(
+            mode.tint.opacity(0.14),
+            in: RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
+                .stroke(.separator.opacity(0.3), lineWidth: 0.5)
+        }
         .accessibilityLabel(accessibilityLabel)
         .accessibilityHint("Opens departures for this stop")
         .accessibilityAction(named: planToActionLabel) {
@@ -34,27 +44,26 @@ struct FavouriteStopTile: View {
     }
 
     private var tileContent: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 10) {
             Image(systemName: mode.symbolName)
                 .font(.system(size: 36, weight: .semibold))
                 .foregroundStyle(.white)
+                .frame(width: 80, height: 80)
+                .background(
+                    mode.tint,
+                    in: RoundedRectangle(cornerRadius: Radius.row + 2, style: .continuous)
+                )
                 .accessibilityHidden(true)
 
             Text(verbatim: stop.displayName)
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.white)
+                .font(.system(size: 15, weight: .regular).width(.condensed))
+                .foregroundStyle(.primary)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
-                .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity)
         }
         .padding(16)
-        .frame(maxWidth: .infinity)
-        .aspectRatio(1, contentMode: .fit)
-        .background(
-            mode.tint.gradient,
-            in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
-        )
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func openStop() {

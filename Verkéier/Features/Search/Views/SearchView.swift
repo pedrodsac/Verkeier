@@ -146,7 +146,8 @@ struct SearchResultsContent: View {
                     )
                 }
             }
-            .padding(.bottom, 24)
+            .padding(.vertical, 75)
+			.padding(.horizontal, 16)
         }
     }
 }
@@ -156,12 +157,17 @@ private struct RecentSearchStops: View {
     let referenceLocation: CLLocation?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Recent")
-                .font(.headline.weight(.semibold))
-
+		VStack(alignment: .leading, spacing: 12) {
             ScrollView {
                 LazyVStack(spacing: 10) {
+					HStack {
+						Text("Recent")
+							.font(.headline.weight(.semibold))
+
+						Spacer()
+					}
+					.padding(.bottom, 2)
+
                     ForEach(stops.prefix(8)) { stop in
                         StopListRow(
                             stop: stop,
@@ -172,7 +178,8 @@ private struct RecentSearchStops: View {
                         )
                     }
                 }
-                .padding(.bottom, 24)
+                .padding(.vertical, 75)
+				.padding(.horizontal, 16)
             }
         }
     }
@@ -184,10 +191,7 @@ private struct NearbySearchSuggestions: View {
     let referenceLocation: CLLocation?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Nearby Suggestions")
-                .font(.headline.weight(.semibold))
-
+        VStack(spacing: 12) {
             if isLoading, stops.isEmpty {
                 ProgressView("Finding nearby stops")
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -200,6 +204,14 @@ private struct NearbySearchSuggestions: View {
             } else {
                 ScrollView {
                     LazyVStack(spacing: 10) {
+						HStack {
+							Text("Nearby Suggestions")
+								.font(.headline.weight(.semibold))
+
+							Spacer()
+						}
+						.padding(.bottom, 2)
+
                         ForEach(stops.prefix(5)) { stop in
                             StopListRow(
                                 stop: stop,
@@ -209,7 +221,8 @@ private struct NearbySearchSuggestions: View {
                             )
                         }
                     }
-                    .padding(.bottom, 24)
+					.padding(.vertical, 75)
+					.padding(.horizontal, 16)
                 }
             }
         }

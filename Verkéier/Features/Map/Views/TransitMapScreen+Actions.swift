@@ -37,7 +37,7 @@ extension TransitMapScreen {
             searchUpdateContinuation = nil
         }
 
-        for await query in stream.stream.debounce(for: .milliseconds(180)) {
+        for await query in stream.stream.debounce(for: StopSearchConfiguration.debounceInterval) {
             guard !Task.isCancelled else { return }
             guard query == viewModel.searchQuery else { continue }
             await viewModel.searchStops(using: gtfsService)

@@ -88,40 +88,42 @@ struct StopListRow: View {
                     .font(.body.weight(.semibold))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.7)
 
                 HStack(spacing: 6) {
                     Text(subtitleLocation)
 
-                    Divider()
-                        .frame(height: 10)
-
                     if servesNightBus {
+						Divider()
+							.frame(height: 10)
+
                         Image(systemName: "moon.stars.fill")
                             .foregroundStyle(.indigo)
                             .accessibilityLabel("Night bus")
                     }
 
-                    if let lineSummary {
-                        Text(lineSummary)
-                    } else if !stop.modes.isEmpty {
-                        Text(modeSummary)
-                    }
+//                    if let lineSummary {
+//                        Text(lineSummary)
+//                    } else if !stop.modes.isEmpty {
+//                        Text(modeSummary)
+//                    }
 
                     if let distanceMetadata {
-                        Divider()
-                            .frame(height: 10)
+						Divider()
+							.frame(height: 10)
 
                         Text(distanceMetadata)
                     }
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
+				.minimumScaleFactor(0.7)
                 .lineLimit(1)
             }
 
-            Spacer(minLength: 8)
+			if showsAccessory {
+                Spacer(minLength: 8)
 
-            if showsAccessory {
                 accessoryContent
             }
         }
@@ -180,7 +182,7 @@ struct StopListRow: View {
         }
 
         guard stop.name.contains("(") else {
-            return commaSeparatedLocation ?? stop.dataSource.displayName
+            return commaSeparatedLocation ?? "Luxembourg"
         }
 
         let nameWithoutQualifier = stop.name
@@ -189,13 +191,13 @@ struct StopListRow: View {
             .trimmingCharacters(in: .whitespacesAndNewlines) ?? stop.name
 
         guard let separator = nameWithoutQualifier.lastIndex(of: "-") else {
-            return commaSeparatedLocation ?? stop.dataSource.displayName
+            return commaSeparatedLocation ?? "Luxembourg"
         }
 
         let inferredLocation = nameWithoutQualifier[nameWithoutQualifier.index(after: separator)...]
             .trimmingCharacters(in: .whitespacesAndNewlines)
         return inferredLocation.isEmpty
-            ? (commaSeparatedLocation ?? stop.dataSource.displayName)
+            ? (commaSeparatedLocation ?? "Luxembourg")
             : String(inferredLocation)
     }
 

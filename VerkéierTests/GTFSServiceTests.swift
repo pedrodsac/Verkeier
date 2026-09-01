@@ -21,6 +21,78 @@ struct GTFSServiceTests {
         #expect(results.map(\.id) == ["accented"])
     }
 
+    @Test func fuzzySearchHandlesTyposPunctuationAndReorderedWords() async {
+        let station = makeStop(id: "gare", name: "Gare-Centrale", modes: [.train])
+        let service = LocalGTFSService(stops: [station], routesByStopId: [:])
+
+        #expect(await service.searchStops(query: "gaer centrale").map(\.id) == [station.id])
+        #expect(await service.searchStops(query: "gare cntrel").map(\.id) == [station.id])
+        #expect(await service.searchStops(query: "centrale gare").map(\.id) == [station.id])
+    }
+
+    @Test func fuzzySearchRanksExactPrefixAndSubstringMatchesDeterministically() async {
+        let exact = makeStop(id: "1-exact", name: "Gare")
+        let prefix = makeStop(id: "2-prefix", name: "Gare Centrale")
+        let substring = makeStop(id: "3-substring", name: "Luxembourg, Gare du Nord")
+        let fuzzy = makeStop(id: "4-fuzzy", name: "Gârre du Parc")
+        let service = LocalGTFSService(
+            stops: [fuzzy, substring, prefix, exact],
+            routesByStopId: [:]
+        )
+
+        let results = await service.searchStops(query: "gare")
+
+        #expect(results.map(\.id) == [exact.id, prefix.id, substring.id, fuzzy.id])
+    }
+
+    @Test func shortQueriesDoNotUseFuzzyMatching() async {
+        let service = LocalGTFSService(
+            stops: [
+                makeStop(id: "prefix", name: "Gare Centrale"),
+                makeStop(id: "unrelated", name: "Hollerich")
+            ],
+            routesByStopId: [:]
+        )
+
+        #expect(await service.searchStops(query: "ga").map(\.id) == ["prefix"])
+        #expect(await service.searchStops(query: "ar").isEmpty)
+        #expect(await service.searchStops(query: "xy").isEmpty)
+    }
+
+    @Test func fuzzySearchIsBoundedAndUsesSharedDebounceConfiguration() async {
+        let stops = (0..<100).map { index in
+            makeStop(id: "stop-\(index)", name: "Town Transfer \(index)")
+        }
+        let service = LocalGTFSService(stops: stops, routesByStopId: [:])
+
+        #expect(await service.searchStops(query: "town").count == StopSearchConfiguration.resultLimit)
+        #expect(StopSearchConfiguration.debounceInterval == .milliseconds(500))
+    }
+
+    @Test func feedSizedFuzzySearchIsSafeToRunConcurrently() async {
+        let target = makeStop(id: "target", name: "Luxembourg Gare Centrale", modes: [.train])
+        let stops = [target] + (0..<2_814).map { index in
+            makeStop(id: "stop-\(index)", name: "Synthetic Transit Stop \(index)", modes: [.bus])
+        }
+        let service = LocalGTFSService(stops: stops, routesByStopId: [:])
+
+        let results = await withTaskGroup(of: [Stop].self) { group in
+            for _ in 0..<8 {
+                group.addTask {
+                    await service.searchStops(query: "luxembourg garr centrle")
+                }
+            }
+
+            var searches: [[Stop]] = []
+            for await search in group {
+                searches.append(search)
+            }
+            return searches
+        }
+
+        #expect(results.allSatisfy { $0.first?.id == target.id })
+    }
+
     @Test func searchUsesFullNameWhenDisplayNameOmitsLocality() async {
         let stop = Stop(
             id: "arlon-gare",

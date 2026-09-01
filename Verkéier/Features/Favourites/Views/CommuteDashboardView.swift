@@ -28,12 +28,12 @@ struct CommuteDashboardView: View {
                 CommuteSuggestionRow(preset: preset)
             }
 
-            nearbyContent
+            stopsContent
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var nearbyContent: some View {
+    private var stopsContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Nearby")
                 .font(.subheadline.weight(.semibold))
@@ -54,15 +54,10 @@ struct CommuteDashboardView: View {
                     systemImage: "mappin.slash"
                 )
             } else {
-                ForEach(viewModel.nearby.stops.prefix(5)) { stop in
-                    StopListRow(
-                        stop: stop,
-                        markerColor: .blue,
-                        referenceLocation: viewModel.nearby.referenceLocation,
-                        routes: viewModel.nearby.routesByStopId[stop.id] ?? [],
-                        navigationValue: .stopDetail(stop)
-                    )
-                }
+                stopGrid(
+                    viewModel.nearby.stops.prefix(6),
+                    routesByStopID: viewModel.nearby.routesByStopId
+                )
 
                 Text("Tap a stop to see departures and save it to your commute.")
                     .font(.footnote)
@@ -71,8 +66,42 @@ struct CommuteDashboardView: View {
                     .padding(.top, 2)
                     .padding(.horizontal, 4)
             }
+
+            if !viewModel.recentStops.isEmpty {
+                Text("Recent Stops")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 14)
+                    .padding(.horizontal, 4)
+
+                stopGrid(viewModel.recentStops)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 4)
+    }
+
+    private func stopGrid(
+        _ stops: some Collection<Stop>,
+        routesByStopID: [String: [TransitRoute]] = [:]
+    ) -> some View {
+        LazyVGrid(
+            columns: [
+                GridItem(.flexible(minimum: 0), spacing: 8),
+                GridItem(.flexible(minimum: 0), spacing: 8)
+            ],
+            spacing: 8
+        ) {
+            ForEach(Array(stops)) { stop in
+                StopListRow(
+                    stop: stop,
+                    markerColor: .blue,
+                    accessorySystemName: nil,
+                    referenceLocation: viewModel.nearby.referenceLocation,
+                    routes: routesByStopID[stop.id] ?? [],
+                    navigationValue: .stopDetail(stop)
+                )
+            }
+        }
     }
 }

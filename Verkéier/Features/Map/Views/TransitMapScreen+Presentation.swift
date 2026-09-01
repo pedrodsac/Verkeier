@@ -39,6 +39,7 @@ extension TransitMapScreen {
             ),
             commute: CommuteDashboardViewModel(
                 nearby: nearby,
+                recentStops: viewModel.recentStops.deduplicatedByExactName(),
                 activeAlertCount: viewModel.activeAlertCount,
                 suggestedCommutePreset: viewModel.suggestedCommutePreset,
                 specialEvents: SpecialEventCatalog.activeEvents()

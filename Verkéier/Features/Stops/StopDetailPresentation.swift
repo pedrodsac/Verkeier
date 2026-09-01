@@ -21,6 +21,48 @@ struct StopDetailPresentationModel {
     let activeReminder: SharedTrackedDepartureReminder?
     let departureReminderErrorMessage: String?
 
+    init(
+        stop: Stop?,
+        routes: [TransitRoute],
+        departures: [Departure],
+        offlineScheduledDepartures: [OfflineScheduleDeparture],
+        alerts: [AlertMessage],
+        availablePlatforms: [String],
+        selectedLine: String?,
+        selectedPlatform: String?,
+        departureBoardFilter: TransitBoardFilter = TransitBoardFilter(),
+        isLoadingDepartures: Bool,
+        errorMessage: String?,
+        lastUpdated: Date?,
+        isStale: Bool,
+        isFavourite: Bool,
+        trackedDepartureId: String?,
+        liveActivityErrorMessage: String?,
+        liveActivityStaleMessage: String,
+        activeReminder: SharedTrackedDepartureReminder?,
+        departureReminderErrorMessage: String?
+    ) {
+        self.stop = stop
+        self.routes = routes
+        self.departures = departures
+        self.offlineScheduledDepartures = offlineScheduledDepartures
+        self.alerts = alerts
+        self.availablePlatforms = availablePlatforms
+        self.selectedLine = selectedLine
+        self.selectedPlatform = selectedPlatform
+        self.departureBoardFilter = departureBoardFilter
+        self.isLoadingDepartures = isLoadingDepartures
+        self.errorMessage = errorMessage
+        self.lastUpdated = lastUpdated
+        self.isStale = isStale
+        self.isFavourite = isFavourite
+        self.trackedDepartureId = trackedDepartureId
+        self.liveActivityErrorMessage = liveActivityErrorMessage
+        self.liveActivityStaleMessage = liveActivityStaleMessage
+        self.activeReminder = activeReminder
+        self.departureReminderErrorMessage = departureReminderErrorMessage
+    }
+
     var mergedDepartures: [Departure] {
         guard let stop else { return departures }
         let merged = DepartureBoardMerger.merge(

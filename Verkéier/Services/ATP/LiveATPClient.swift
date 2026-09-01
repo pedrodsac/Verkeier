@@ -119,7 +119,7 @@ enum ATPRequestBuilder {
         configuration: AppConfiguration
     ) throws -> URL {
         let options = options.normalized
-        try url(
+        return try url(
             path: "location.nearbystops",
             configuration: configuration,
             queryItems: [
@@ -149,7 +149,7 @@ enum ATPRequestBuilder {
         timeFormatter.locale = Locale(identifier: "en_US_POSIX")
         timeFormatter.timeZone = TimeZone(identifier: "Europe/Luxembourg")
         timeFormatter.dateFormat = "HH:mm"
-        try url(
+        return try url(
             path: "departureBoard",
             configuration: configuration,
             queryItems: [

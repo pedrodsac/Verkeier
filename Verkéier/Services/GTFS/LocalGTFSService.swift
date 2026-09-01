@@ -51,10 +51,19 @@ final class LocalGTFSService: GTFSService {
     }
 
     nonisolated func searchStops(query: String) async -> [Stop] {
-        let normalizedQuery = query.normalizedForSearch
+        let normalizedQuery = query.normalizedForStopSearch
         guard !normalizedQuery.isEmpty else { return [] }
 
-        return await loader.searchStops(query: normalizedQuery)
+        // Capture the immutable index from the actor, then score it on a
+        // concurrent executor. Even broad fuzzy matching therefore cannot run
+        // on the UI actor while the user is typing.
+        let stopIndex = await loader.stopIndex()
+        return await withTaskGroup(of: [Stop].self, returning: [Stop].self) { group in
+            group.addTask(priority: .userInitiated) {
+                stopIndex.search(query: normalizedQuery)
+            }
+            return await group.next() ?? []
+        }
     }
 
     nonisolated func stopsForMap(
@@ -112,8 +121,8 @@ private actor GTFSDataLoader {
         snapshot = initialSnapshot
     }
 
-    func searchStops(query: String) -> [Stop] {
-        currentSnapshot().stopIndex.search(query: query)
+    func stopIndex() -> GTFSStopIndex {
+        currentSnapshot().stopIndex
     }
 
     func stopsForMap(
@@ -331,12 +340,27 @@ private nonisolated struct GTFSStopIndex {
     }
 
     func search(query: String) -> [Stop] {
-        searchableStops.compactMap { entry in
-            guard entry.fullName.contains(query) else {
-                return nil
+        var matches: [StopSearchMatch] = []
+        matches.reserveCapacity(min(searchableStops.count, StopSearchConfiguration.resultLimit * 2))
+
+        for (index, entry) in searchableStops.enumerated() {
+            // A cancelled query should release its worker promptly instead of
+            // competing with the newer, debounced query.
+            if index.isMultiple(of: 32), Task.isCancelled {
+                return []
             }
-            return entry.stop
+
+            if let match = entry.match(for: query) {
+                matches.append(match)
+            }
         }
+
+        guard !Task.isCancelled else { return [] }
+
+        return matches
+            .sorted(by: StopSearchMatch.isOrderedBefore)
+            .prefix(StopSearchConfiguration.resultLimit)
+            .map(\.stop)
     }
 
     func stopsForMap(
@@ -396,10 +420,138 @@ private nonisolated struct GTFSStopIndex {
 private nonisolated struct SearchableStop {
     let stop: Stop
     let fullName: String
+    let tokens: [String]
 
     init(stop: Stop) {
         self.stop = stop
-        fullName = stop.fullName.normalizedForSearch
+        fullName = stop.fullName.normalizedForStopSearch
+        tokens = fullName.split(separator: " ").map(String.init)
+    }
+
+    func match(for query: String) -> StopSearchMatch? {
+        if fullName == query {
+            return StopSearchMatch(stop: stop, tier: .exact, score: 1)
+        }
+
+        let queryTokens = query.split(separator: " ").map(String.init)
+        guard !queryTokens.isEmpty else { return nil }
+
+        if allQueryTokensMatch(queryTokens, using: { token, queryToken in token.hasPrefix(queryToken) }) {
+            return StopSearchMatch(stop: stop, tier: .prefix, score: 1)
+        }
+
+        // One- and two-character searches deliberately stay prefix-only to
+        // avoid broad, low-signal result lists while typing.
+        guard query.count > 2 else { return nil }
+
+        if fullName.contains(query) || allQueryTokensMatch(queryTokens, using: { token, queryToken in
+            token.contains(queryToken)
+        }) {
+            return StopSearchMatch(stop: stop, tier: .substring, score: 1)
+        }
+
+        let phraseSimilarity = StopSearchMatch.similarity(between: query, and: fullName)
+        let tokenSimilarities = queryTokens.map { queryToken in
+            tokens.map { StopSearchMatch.similarity(between: queryToken, and: $0) }.max() ?? 0
+        }
+        let tokenThresholdsMet = zip(queryTokens, tokenSimilarities).allSatisfy { queryToken, similarity in
+            similarity >= StopSearchMatch.minimumSimilarity(forTokenLength: queryToken.count)
+        }
+
+        guard tokenThresholdsMet || phraseSimilarity >= 0.60 else { return nil }
+
+        let averageTokenSimilarity = tokenSimilarities.reduce(0, +) / Double(tokenSimilarities.count)
+        return StopSearchMatch(
+            stop: stop,
+            tier: .fuzzy,
+            score: max(phraseSimilarity, averageTokenSimilarity)
+        )
+    }
+
+    private func allQueryTokensMatch(
+        _ queryTokens: [String],
+        using predicate: (String, String) -> Bool
+    ) -> Bool {
+        queryTokens.allSatisfy { queryToken in
+            tokens.contains { predicate($0, queryToken) }
+        }
+    }
+}
+
+private nonisolated struct StopSearchMatch {
+    enum Tier: Int {
+        case exact
+        case prefix
+        case substring
+        case fuzzy
+    }
+
+    let stop: Stop
+    let tier: Tier
+    let score: Double
+
+    static func isOrderedBefore(_ lhs: StopSearchMatch, _ rhs: StopSearchMatch) -> Bool {
+        if lhs.tier != rhs.tier {
+            return lhs.tier.rawValue < rhs.tier.rawValue
+        }
+        if lhs.score != rhs.score {
+            return lhs.score > rhs.score
+        }
+
+        let nameOrder = lhs.stop.name.localizedStandardCompare(rhs.stop.name)
+        if nameOrder != .orderedSame {
+            return nameOrder == .orderedAscending
+        }
+        return lhs.stop.id < rhs.stop.id
+    }
+
+    static func minimumSimilarity(forTokenLength length: Int) -> Double {
+        switch length {
+        case 0...2: 1
+        case 3...4: 0.66
+        case 5...7: 0.60
+        default: 0.55
+        }
+    }
+
+    /// Damerau-Levenshtein similarity using optimal string alignment. It
+    /// tolerates adjacent transpositions while remaining cheap for stop names.
+    static func similarity(between lhs: String, and rhs: String) -> Double {
+        let source = Array(lhs)
+        let target = Array(rhs)
+        let maximumLength = max(source.count, target.count)
+        guard maximumLength > 0 else { return 1 }
+
+        var twoRowsBack = Array(0...target.count)
+        var previousRow = twoRowsBack
+
+        for sourceIndex in 1...source.count {
+            var currentRow = Array(repeating: 0, count: target.count + 1)
+            currentRow[0] = sourceIndex
+
+            for targetIndex in 1...target.count {
+                let substitutionCost = source[sourceIndex - 1] == target[targetIndex - 1] ? 0 : 1
+                var distance = min(
+                    previousRow[targetIndex] + 1,
+                    currentRow[targetIndex - 1] + 1,
+                    previousRow[targetIndex - 1] + substitutionCost
+                )
+
+                if sourceIndex > 1,
+                   targetIndex > 1,
+                   source[sourceIndex - 1] == target[targetIndex - 2],
+                   source[sourceIndex - 2] == target[targetIndex - 1] {
+                    distance = min(distance, twoRowsBack[targetIndex - 2] + 1)
+                }
+
+                currentRow[targetIndex] = distance
+            }
+
+            twoRowsBack = previousRow
+            previousRow = currentRow
+        }
+
+        return 1 - Double(previousRow[target.count]) / Double(maximumLength)
     }
 }
 
@@ -446,5 +598,19 @@ extension String {
     nonisolated var normalizedForSearch: String {
         folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
             .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// Normalization used only by GTFS stop matching. Punctuation acts as a
+    /// separator so "Gare-Centrale" and "Gare Centrale" produce the same
+    /// searchable tokens, while existing general-purpose normalization keeps
+    /// its current semantics.
+    nonisolated var normalizedForStopSearch: String {
+        let folded = folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+        let punctuationSeparated = folded.unicodeScalars.map { scalar in
+            CharacterSet.alphanumerics.contains(scalar) ? String(scalar) : " "
+        }.joined()
+        return punctuationSeparated
+            .split(whereSeparator: \.isWhitespace)
+            .joined(separator: " ")
     }
 }

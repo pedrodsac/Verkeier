@@ -5,7 +5,7 @@ import Foundation
 /// A departure carries both the scheduled time and, when available, the
 /// realtime estimate so the UI can show live delays. Derive the user-facing
 /// state with ``status`` rather than inspecting the raw fields.
-struct Departure: Codable, Hashable, Identifiable, Sendable {
+struct Departure: Codable, Hashable, Sendable {
     /// Stable identifier for the departure entry.
     let id: String
     /// Identifier of the stop this departure leaves from.

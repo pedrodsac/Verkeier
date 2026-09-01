@@ -34,7 +34,10 @@ extension TransitMapViewModel {
         if preferences.showTrainStations { products.formUnion(.trains) }
         if preferences.showBusStops { products.formUnion(.bus) }
         if preferences.showTramStops { products.formUnion(.tram) }
-        return ATPNearbyStopsOptions(products: products.isEmpty ? nil : products)
+        return ATPNearbyStopsOptions(
+            maximumResults: 6,
+            products: products.isEmpty ? nil : products
+        )
     }
 
     /// Loads the lines serving each nearby stop, with bounded concurrency, so

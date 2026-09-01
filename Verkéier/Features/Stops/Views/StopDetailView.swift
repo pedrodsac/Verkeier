@@ -7,10 +7,10 @@ struct StopDetailView: View {
     var body: some View {
         if let stop = viewModel.stop {
             VStack(alignment: .leading, spacing: 16) {
-                DepartureBoardAdvancedFilterMenu(
-                    filter: viewModel.departureBoardFilter,
-                    update: actions.updateDepartureBoardFilter
-                )
+//                DepartureBoardAdvancedFilterMenu(
+//                    filter: viewModel.departureBoardFilter,
+//                    update: actions.updateDepartureBoardFilter
+//                )
 
                 PlatformFilterPicker(
                     platforms: viewModel.availablePlatforms,

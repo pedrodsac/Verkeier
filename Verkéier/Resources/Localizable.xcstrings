@@ -57,6 +57,9 @@
         }
       }
     },
+    "%@ public transport maps" : {
+
+    },
     "%@, %@" : {
       "localizations" : {
         "en" : {
@@ -94,6 +97,9 @@
           }
         }
       }
+    },
+    "%lld departures" : {
+
     },
     "%lld min · %@" : {
       "localizations" : {
@@ -157,6 +163,9 @@
         }
       }
     },
+    "%lld minutes" : {
+
+    },
     "%lldm" : {
       "localizations" : {
         "de" : {
@@ -184,6 +193,18 @@
           }
         }
       }
+    },
+    "✓ %lld departures" : {
+
+    },
+    "✓ %lld minutes" : {
+
+    },
+    "✓ Live updates" : {
+
+    },
+    "✓ Timetable only" : {
+
     },
     "0 transfers  ·  0.0 km  ·  Scheduled GTFS times" : {
       "localizations" : {
@@ -240,6 +261,9 @@
           }
         }
       }
+    },
+    "About" : {
+
     },
     "About & Legal" : {
       "localizations" : {
@@ -607,6 +631,9 @@
           }
         }
       }
+    },
+    "Board filters" : {
+
     },
     "Bus 000" : {
       "localizations" : {
@@ -1005,6 +1032,9 @@
           }
         }
       }
+    },
+    "Data" : {
+
     },
     "Data Status" : {
       "localizations" : {
@@ -2008,6 +2038,9 @@
     "Live information" : {
 
     },
+    "Live updates" : {
+
+    },
     "Loading stops" : {
       "localizations" : {
         "de" : {
@@ -2121,6 +2154,9 @@
       }
     },
     "Maps" : {
+
+    },
+    "mobiliteit.lu · Public transport maps" : {
 
     },
     "Mode preference" : {
@@ -2461,6 +2497,9 @@
           }
         }
       }
+    },
+    "Official mobiliteit.lu network maps for Luxembourg, available in English, French, and German." : {
+
     },
     "Offline mode" : {
       "localizations" : {
@@ -2923,6 +2962,9 @@
         }
       }
     },
+    "Opens the mobiliteit.lu map in your browser" : {
+
+    },
     "Permissions" : {
       "localizations" : {
         "de" : {
@@ -2981,7 +3023,6 @@
       }
     },
     "Plan from %@" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3069,7 +3110,6 @@
       }
     },
     "Plan to %@" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3352,6 +3392,9 @@
     "Public transport for Luxembourg" : {
 
     },
+    "Public transport maps" : {
+
+    },
     "Quick destinations" : {
       "localizations" : {
         "de" : {
@@ -3407,6 +3450,9 @@
           }
         }
       }
+    },
+    "Recent Stops" : {
+
     },
     "Recently departed" : {
       "localizations" : {
@@ -3496,7 +3542,6 @@
       }
     },
     "Refresh departures for %@" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3699,7 +3744,6 @@
       }
     },
     "Remove %@ from favourites" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3754,6 +3798,9 @@
           }
         }
       }
+    },
+    "Reset filters" : {
+
     },
     "Results" : {
 
@@ -4553,6 +4600,12 @@
           }
         }
       }
+    },
+    "Time window" : {
+
+    },
+    "Timetable only" : {
+
     },
     "Track departure" : {
       "localizations" : {

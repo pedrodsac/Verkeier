@@ -18,8 +18,6 @@ struct BottomSheetContent: View {
                     viewModel: searchViewModel,
                     actions: searchActions
                 )
-            } else if detent == .collapsed {
-                EmptyView()
             } else {
                 ScrollView {
                     HomeSheetContent(
@@ -27,11 +25,11 @@ struct BottomSheetContent: View {
                         viewModel: viewModel,
                         openSpecialEvent: openSpecialEvent
                     )
+					.padding(.top, contentTopPadding)
+					.padding(.horizontal, 16)
                 }
             }
         }
-        .padding(.top, contentTopPadding)
-        .safeAreaPadding(.horizontal, 16)
     }
 }
 

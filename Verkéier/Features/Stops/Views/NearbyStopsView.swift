@@ -27,11 +27,12 @@ struct NearbyStopsView: View {
                 )
             } else {
                 ScrollView {
-                    LazyVStack(spacing: 8) {
+                    LazyVGrid(columns: gridColumns, spacing: 8) {
                         ForEach(viewModel.stops) { stop in
                             StopListRow(
                                 stop: stop,
                                 markerColor: .blue,
+                                accessorySystemName: nil,
                                 referenceLocation: viewModel.referenceLocation,
                                 routes: viewModel.routesByStopId[stop.id] ?? []
                             ) {
@@ -44,6 +45,13 @@ struct NearbyStopsView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var gridColumns: [GridItem] {
+        [
+            GridItem(.flexible(minimum: 0), spacing: 8),
+            GridItem(.flexible(minimum: 0), spacing: 8)
+        ]
     }
 }
 

@@ -52,28 +52,36 @@ struct TransitBottomSheet: View {
 
     private var tabView: some View {
         TabView(selection: $navigation.selectedTab) {
-            Tab("Home", systemImage: "train.side.front.car", value: TransitSheetTab.home) {
-                homeTab
+			Tab("Home", systemImage: "train.side.front.car", value: TransitSheetTab.home) {
+				if detent == .collapsed { EmptyView() } else {
+					homeTab
+				}
             }
 
             Tab("Favourites", systemImage: "star", value: TransitSheetTab.favourites) {
-                favouritesTab
+				if detent == .collapsed { EmptyView() } else {
+					favouritesTab
+				}
             }
 
             Tab("Plan", systemImage: "arrow.triangle.turn.up.right.diamond", value: TransitSheetTab.plan) {
-                planTab
+				if detent == .collapsed { EmptyView() } else {
+					planTab
+				}
             }
 
             Tab("Settings", systemImage: "gear", value: TransitSheetTab.settings) {
-                NavigationStack {
-                    SettingsView(
-                        viewModel: viewModel.settings,
-                        checkGTFSUpdate: actions.checkGTFSUpdate,
-                        setDebugDataMode: actions.setDebugDataMode
-                    )
-                    .navigationTitle("Settings")
-					.toolbarTitleDisplayMode(.inline)
-                }
+				if detent == .collapsed { EmptyView() } else {
+					NavigationStack {
+						SettingsView(
+							viewModel: viewModel.settings,
+							checkGTFSUpdate: actions.checkGTFSUpdate,
+							setDebugDataMode: actions.setDebugDataMode
+						)
+						.navigationTitle("Settings")
+						.toolbarTitleDisplayMode(.inline)
+					}
+				}
             }
         }
         .tabBarMinimizeBehavior(.never)
@@ -121,7 +129,6 @@ struct TransitBottomSheet: View {
     private var favouritesTab: some View {
         NavigationStack(path: $navigation.favouritesPath) {
             FavouritesView(viewModel: viewModel.favourites, actions: actions.favourites)
-            	.padding(.horizontal, 16)
             	.navigationTitle("Favourites")
             	.toolbarTitleDisplayMode(.inline)
             	.navigationDestination(for: TransitSheetRoute.self) { route in
