@@ -36,13 +36,6 @@ struct SpecialEventRow: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
-
-            Spacer(minLength: 8)
-
-            Image(systemName: "chevron.right")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(.tertiary)
-                .accessibilityHidden(true)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
