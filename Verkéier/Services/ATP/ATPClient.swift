@@ -7,6 +7,8 @@ import Foundation
 /// use `EmptyATPClient`/`ATPMockClient`. Inject an implementation via the
 /// environment rather than constructing one in a view.
 protocol ATPClient: Sendable {
+    nonisolated func routingBoard(stopID: String, options: ATPDepartureBoardOptions) async throws -> ATPRoutingBoard
+
     /// Fetches stops near a coordinate.
     /// - Parameters:
     ///   - latitude: Latitude of the search centre.
@@ -52,6 +54,11 @@ protocol ATPClient: Sendable {
 }
 
 extension ATPClient {
+    nonisolated func routingBoard(stopID: String, options: ATPDepartureBoardOptions) async throws -> ATPRoutingBoard {
+        let departures = try await departureBoard(stopId: stopID, options: options)
+        return ATPRoutingBoard(journeys: departures.map { ATPRoutingJourney(departure: $0) })
+    }
+
     nonisolated func nearbyStops(
         latitude: Double,
         longitude: Double,

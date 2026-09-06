@@ -1,5 +1,29 @@
 import Foundation
 
+/// Shared display rules for departure countdowns in the app and widgets.
+nonisolated enum SharedDepartureTiming {
+    /// Keep a departure visible for the full minute after its departure time.
+    static let postDepartureVisibilityInterval: TimeInterval = 60
+
+    /// Matches the widget's existing countdown behaviour: departures more
+    /// than 30 seconds away round up to the next whole minute.
+    nonisolated static func countdownMinutes(
+        until departureDate: Date,
+        from referenceDate: Date
+    ) -> Int {
+        let seconds = departureDate.timeIntervalSince(referenceDate)
+        guard seconds > 30 else { return 0 }
+        return max(1, Int(ceil(seconds / 60)))
+    }
+
+    nonisolated static func isVisible(
+        _ departureDate: Date,
+        at referenceDate: Date
+    ) -> Bool {
+        departureDate >= referenceDate.addingTimeInterval(-postDepartureVisibilityInterval)
+    }
+}
+
 nonisolated enum SharedTransitDataStore {
     static let appGroupIdentifier = "group.dev.pedrocordeiro.Verkeier"
     static let favouriteStopsKey = "FavouriteStopEntities"
@@ -96,6 +120,27 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
     let platformIds: [String]
     /// Opaque, app-owned filter payload. Older widgets can safely ignore it.
     let boardFilterData: Data?
+
+    /// The stop name without a locality prefix that is already presented as
+    /// separate context in compact surfaces such as the departures widget.
+    nonisolated var displayName: String {
+        let cleanedName = name.stationDisplayName
+        let trimmedName = cleanedName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let locality = locality?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !locality.isEmpty,
+              trimmedName.count > locality.count + 1 else {
+            return cleanedName
+        }
+
+        let prefix = "\(locality),"
+        guard trimmedName.prefix(prefix.count).caseInsensitiveCompare(prefix) == .orderedSame else {
+            return cleanedName
+        }
+
+        let strippedName = trimmedName.dropFirst(prefix.count)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return strippedName.isEmpty ? cleanedName : String(strippedName)
+    }
 
     nonisolated init(
         id: String,

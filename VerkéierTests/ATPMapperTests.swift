@@ -133,6 +133,34 @@ struct ATPMapperTests {
         #expect(departures[0].status == .delayed(minutes: 5))
     }
 
+    @Test func excludesDepartureWhenBoardStopIsFinalStopOnTrip() throws {
+        let response: ATPDepartureBoardResponse = try decode(
+            """
+            {
+              "Departure": [
+                {
+                  "name": "Bus 29",
+                  "stop": "Senningerberg, Charlys Statioun",
+                  "stopExtId": "300537003",
+                  "time": "10:00:00",
+                  "date": "2026-06-13",
+                  "direction": "Hesperange, Cité Um Schlass",
+                  "Product": [{
+                    "name": "Bus 29",
+                    "line": "29",
+                    "routeIdxFrom": 29,
+                    "routeIdxTo": 29
+                  }]
+                }
+              ]
+            }
+            """,
+            as: ATPDepartureBoardResponse.self
+        )
+
+        #expect(ATPMapper.mapDepartures(response, stopId: "300537003").isEmpty)
+    }
+
     @Test func mapsLiveDepartureBoardPayloadWithProductArrayAndPlatformObject() throws {
         let response: ATPDepartureBoardResponse = try decode(
             """

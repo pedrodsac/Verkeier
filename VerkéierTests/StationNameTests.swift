@@ -27,4 +27,20 @@ struct StationNameTests {
         #expect(stop.displayName == "Hamilius")
         #expect(stop.location.name == "Hamilius")
     }
+
+    @Test func stationNamesMatchWithoutLocalityPrefix() {
+        #expect("Luxembourg, Gare Centrale".identifiesSameStation(as: "Gare Centrale"))
+    }
+
+    @Test func stationNamesMatchIgnoringFeedQualifiersAndDiacritics() {
+        #expect("Kirchberg, Luxexpo (Tram)".identifiesSameStation(as: "LUXEXPO"))
+    }
+
+    @Test func differentStationsDoNotMatch() {
+        #expect(!"Luxembourg, Gare Centrale".identifiesSameStation(as: "Hamilius"))
+    }
+
+    @Test func blankDirectionDoesNotMatchAStop() {
+        #expect(!"".identifiesSameStation(as: "Luxembourg, Gare Centrale"))
+    }
 }

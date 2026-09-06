@@ -63,14 +63,13 @@ struct TransitMapScreen: View {
                 navigation: sheetNavigation,
                 viewModel: sheetPresentationModel,
                 actions: sheetActions,
-                activateRoute: activateSheetRoute,
-                selectedTab: showSheetTab
+                activateRoute: activateSheetRoute
             )
             .presentationDetents(
                 BottomSheetDetent.presentationDetents,
                 selection: sheetPresentationDetent
             )
-			.presentationBackground(sheetDetent == .collapsed ? .clear : Color(uiColor: .systemBackground))
+			.presentationBackground(Color(uiColor: .systemBackground))
             .presentationBackgroundInteraction(
                 .enabled(upThrough: BottomSheetDetent.mediumPresentationDetent)
             )
@@ -106,6 +105,8 @@ struct TransitMapScreen: View {
             }
         }
         .task {
+            gtfsUpdateController.loadSnapshot()
+            gtfsUpdateController.checkAutomatically()
             viewModel.loadRoutePlanner()
             locationService.startUpdatingIfAllowed()
             await bikeShareService.refreshStaticStations()
@@ -119,8 +120,6 @@ struct TransitMapScreen: View {
             )
             await viewModel.loadNearbyStopRoutes(using: gtfsService)
             await loadAlertsAndCheckDisruptions()
-            gtfsUpdateController.loadSnapshot()
-            gtfsUpdateController.checkAutomatically()
         }
         .task {
             await observeSearchUpdates()

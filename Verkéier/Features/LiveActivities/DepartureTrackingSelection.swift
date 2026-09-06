@@ -27,7 +27,7 @@ enum DepartureTrackingSelection {
                 guard let date = departure.realtimeDeparture ?? departure.scheduledDeparture else {
                     return true
                 }
-                return date >= now.addingTimeInterval(-60)
+                return SharedDepartureTiming.isVisible(date, at: now)
             }
             .sorted { lhs, rhs in
                 let lhsDate = lhs.realtimeDeparture ?? lhs.scheduledDeparture ?? .distantFuture

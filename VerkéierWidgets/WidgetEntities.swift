@@ -46,15 +46,51 @@ struct SelectFavouriteStopIntent: WidgetConfigurationIntent {
     var stop: WidgetFavouriteStopEntity?
 }
 
+struct RefreshDeparturesWidgetIntent: AppIntent {
+    static let title: LocalizedStringResource = "Refresh Departures"
+    static let description = IntentDescription("Refresh the departures shown in the widget.")
+
+    @Parameter(title: "Stop ID")
+    var stopID: String?
+
+    init() {}
+
+    init(stopID: String?) {
+        self.stopID = stopID
+    }
+
+    func perform() async throws -> some IntentResult {
+        guard let stop = WidgetDeparturesAPI.stop(withID: stopID) else {
+            WidgetCenter.shared.reloadTimelines(ofKind: DeparturesSummaryWidget.kind)
+            return .result()
+        }
+
+        let departures = try await WidgetDeparturesAPI.fetchDepartures(for: stop)
+        SharedTransitDataStore.saveFavouriteDepartureBoard(
+            stopId: stop.id,
+            departures: departures,
+            updatedAt: .now
+        )
+        WidgetCenter.shared.reloadTimelines(ofKind: DeparturesSummaryWidget.kind)
+        return .result()
+    }
+}
+
 struct LiveDeparturesEntry: TimelineEntry {
     let date: Date
     let stop: SharedFavouriteStop?
     let board: SharedDepartureBoard?
 
     var departures: [SharedWidgetDeparture] {
-        let cutoff = date.addingTimeInterval(-30)
         return (board?.departures ?? [])
-            .filter { ($0.displayDepartureDate ?? .distantFuture) >= cutoff }
+            .filter { departure in
+                guard let stop else { return true }
+                return !departure.destination.identifiesSameStation(as: stop.name)
+            }
+            .filter {
+                ($0.displayDepartureDate)
+                    .map { SharedDepartureTiming.isVisible($0, at: date) } ?? true
+            }
             .sorted {
                 ($0.displayDepartureDate ?? .distantFuture) < ($1.displayDepartureDate ?? .distantFuture)
             }

@@ -282,16 +282,24 @@ private actor GTFSDataLoader {
     }
 
     private static func loadTimetableIndex(store: GTFSLocalStore) -> GTFSTimetableIndexPayload? {
-        guard FileManager.default.fileExists(atPath: store.timetableIndexURL.path),
-              let data = try? Data(contentsOf: store.timetableIndexURL),
-              let payload = try? JSONDecoder.gtfsLocal.decode(
-                  GTFSTimetableIndexPayload.self,
-                  from: data
-              ) else {
-            return nil
+        if let data = try? Data(contentsOf: store.timetableIndexURL),
+           let payload = try? JSONDecoder.gtfsLocal.decode(
+               GTFSTimetableIndexPayload.self,
+               from: data
+           ),
+           payload.schemaVersion == GTFSTimetableIndexPayload.currentVersion {
+            return payload
         }
 
-        return payload
+        // Older installs may have no timetable index at all because the
+        // archive was considered too large. Rebuild it from the retained GTFS
+        // feed so its shapes.txt geometry becomes available without requiring
+        // the rider to wait for another download.
+        guard store.hasCurrentFeed(),
+              let directory = try? GTFSValidator().validatedFeedDirectory(in: store.currentDirectory),
+              (try? GTFSIndexBuilder().buildTimetableIndex(from: directory, to: store.timetableIndexURL)) != nil,
+              let rebuilt = try? Data(contentsOf: store.timetableIndexURL) else { return nil }
+        return try? JSONDecoder.gtfsLocal.decode(GTFSTimetableIndexPayload.self, from: rebuilt)
     }
 }
 

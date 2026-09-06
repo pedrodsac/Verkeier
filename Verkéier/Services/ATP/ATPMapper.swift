@@ -41,7 +41,12 @@ nonisolated enum ATPMapper {
         let dtos = response.departure ?? []
         let inferredPlatforms = inferredPlatforms(for: dtos, fallbackStopId: stopId)
 
-        return dtos.enumerated().map { index, dto in
+        return dtos.enumerated().compactMap { index, dto in
+            if let currentIndex = dto.product?.routeIndexFrom,
+               let finalIndex = dto.product?.routeIndexTo,
+               currentIndex >= finalIndex {
+                return nil
+            }
             let scheduled = date(dateString: dto.date, timeString: dto.time)
             let realtime = date(dateString: dto.rtDate ?? dto.date, timeString: dto.rtTime)
             let delayMinutes = delayMinutes(scheduled: scheduled, realtime: realtime)
@@ -163,7 +168,7 @@ nonisolated enum ATPMapper {
         return max(0, Int((realtime.timeIntervalSince(scheduled) / 60).rounded()))
     }
 
-    private static func date(dateString: String?, timeString: String?) -> Date? {
+    static func date(dateString: String?, timeString: String?) -> Date? {
         guard let dateString, let timeString else { return nil }
         let combined = "\(dateString) \(timeString)"
         return dateFormatters.lazy.compactMap { $0.date(from: combined) }.first

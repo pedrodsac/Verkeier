@@ -93,6 +93,8 @@ final class TransitMapViewModel {
     let favouriteDepartureConcurrencyLimit = 3
     let nearbyRouteConcurrencyLimit = 10
     var visibleMapRegion: MKCoordinateRegion?
+    var lastNearbyStopsRequestLocation: CLLocation?
+    let nearbyStopsRefreshDistance: CLLocationDistance = 100
     let now: @Sendable () -> Date
     var routeCalculationGeneration = 0
     var unfilteredRouteOptions: [RouteOption] = []

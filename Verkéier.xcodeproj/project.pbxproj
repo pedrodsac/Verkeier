@@ -14,6 +14,7 @@
 		62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000102 /* AsyncAlgorithms */; };
 		62FE86412FEE000000000004 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000104 /* ZIPFoundation */; };
 		62FE86412FEE000000000005 /* UIOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000105 /* UIOnboarding */; };
+		E8ACE883304CCD690019CAC3 /* Transit in Frameworks */ = {isa = PBXBuildFile; productRef = E8ACE882304CCD690019CAC3 /* Transit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +104,7 @@
 		000000000000000130000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				E8ACE883304CCD690019CAC3 /* Transit in Frameworks */,
 				62FE86412FEE000000000001 /* ZIPFoundation in Frameworks */,
 				62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */,
 				62FE86412FEE000000000005 /* UIOnboarding in Frameworks */,
@@ -179,6 +181,7 @@
 				62FE86412FEE000000000101 /* ZIPFoundation */,
 				62FE86412FEE000000000102 /* AsyncAlgorithms */,
 				62FE86412FEE000000000105 /* UIOnboarding */,
+				E8ACE882304CCD690019CAC3 /* Transit */,
 			);
 			productName = "Verkéier";
 			productReference = 000000000000000000000120 /* Verkéier.app */;
@@ -266,6 +269,7 @@
 				62FE86412FEE000000000201 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				62FE86412FEE000000000204 /* XCRemoteSwiftPackageReference "UIOnboarding" */,
+				E8ACE881304CCD690019CAC3 /* XCRemoteSwiftPackageReference "transit" */,
 			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
@@ -735,6 +739,14 @@
 				kind = branch;
 			};
 		};
+		E8ACE881304CCD690019CAC3 /* XCRemoteSwiftPackageReference "transit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pedrodsac/transit.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -757,6 +769,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 62FE86412FEE000000000204 /* XCRemoteSwiftPackageReference "UIOnboarding" */;
 			productName = UIOnboarding;
+		};
+		E8ACE882304CCD690019CAC3 /* Transit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E8ACE881304CCD690019CAC3 /* XCRemoteSwiftPackageReference "transit" */;
+			productName = Transit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

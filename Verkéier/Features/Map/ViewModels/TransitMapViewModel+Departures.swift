@@ -31,16 +31,19 @@ extension TransitMapViewModel {
         )
         let refreshedAt = Date.now
         for result in results {
+            guard let stop = favourites.first(where: { $0.id == result.stopId }) else { continue }
             var snapshot = favouriteDepartureBoards[result.stopId] ?? FavouriteDepartureBoardSnapshot()
             if result.didFail {
                 snapshot.phase = .failed
                 snapshot.errorMessage = "Favourite departures could not be loaded."
             } else {
                 snapshot.phase = .loaded
-                snapshot.departures = result.departures
+                snapshot.departures = result.departures.filter {
+                    !$0.destination.identifiesSameStation(as: stop.name)
+                }
                 snapshot.lastUpdated = refreshedAt
                 snapshot.errorMessage = nil
-                cacheDeparturesForWidget(result.departures, stopId: result.stopId, updatedAt: refreshedAt)
+                cacheDeparturesForWidget(snapshot.departures, stopId: result.stopId, updatedAt: refreshedAt)
             }
             favouriteDepartureBoards[result.stopId] = snapshot
         }
@@ -69,10 +72,12 @@ extension TransitMapViewModel {
             snapshot.errorMessage = "Favourite departures could not be loaded."
         } else {
             snapshot.phase = .loaded
-            snapshot.departures = result.departures
+            snapshot.departures = result.departures.filter {
+                !$0.destination.identifiesSameStation(as: stop.name)
+            }
             snapshot.lastUpdated = .now
             snapshot.errorMessage = nil
-            cacheDeparturesForWidget(result.departures, stopId: result.stopId, updatedAt: .now)
+            cacheDeparturesForWidget(snapshot.departures, stopId: result.stopId, updatedAt: .now)
         }
         favouriteDepartureBoards[stop.id] = snapshot
     }
@@ -103,7 +108,7 @@ extension TransitMapViewModel {
             departures = departuresWithPlatformFallback(
                 in: refreshedDepartures,
                 from: departures
-            )
+            ).filter { !$0.destination.identifiesSameStation(as: selectedStop.name) }
             departuresLastUpdated = .now
             cacheDeparturesForWidget(departures, stopId: selectedStop.id, updatedAt: .now)
         } catch {

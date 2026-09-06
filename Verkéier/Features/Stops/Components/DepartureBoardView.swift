@@ -55,10 +55,16 @@ struct DepartureBoardView: View {
 
                 let now = Date()
                 let departed = departures
-                    .filter { ($0.realtimeDeparture ?? $0.scheduledDeparture).map { $0 < now } ?? false }
+                    .filter {
+                        ($0.realtimeDeparture ?? $0.scheduledDeparture)
+                            .map { !SharedDepartureTiming.isVisible($0, at: now) } ?? false
+                    }
                     .suffix(3)
                 let upcoming = departures
-                    .filter { ($0.realtimeDeparture ?? $0.scheduledDeparture).map { $0 >= now } ?? true }
+                    .filter {
+                        ($0.realtimeDeparture ?? $0.scheduledDeparture)
+                            .map { SharedDepartureTiming.isVisible($0, at: now) } ?? true
+                    }
 
                 ScrollView {
                     LazyVStack(spacing: 8) {

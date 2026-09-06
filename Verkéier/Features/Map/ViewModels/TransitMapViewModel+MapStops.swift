@@ -8,11 +8,21 @@ extension TransitMapViewModel {
         locationService.requestWhenInUseAuthorization()
     }
 
-    func loadNearbyStops(using atpClient: any ATPClient, location: CLLocation?) async {
+    func loadNearbyStops(
+        using atpClient: any ATPClient,
+        location: CLLocation?,
+        force: Bool = false
+    ) async {
+        let requestLocation = location ?? CLLocation(
+            latitude: defaultRegion.center.latitude,
+            longitude: defaultRegion.center.longitude
+        )
+        guard force || shouldRefreshNearbyStops(for: requestLocation) else { return }
+        lastNearbyStopsRequestLocation = requestLocation
         isLoadingNearbyStops = true
         nearbyStopsErrorMessage = nil
 
-        let coordinate = location?.coordinate ?? defaultRegion.center
+        let coordinate = requestLocation.coordinate
 
         do {
             nearbyStops = try await atpClient.nearbyStops(
@@ -26,6 +36,11 @@ extension TransitMapViewModel {
         }
 
         isLoadingNearbyStops = false
+    }
+
+    func shouldRefreshNearbyStops(for location: CLLocation) -> Bool {
+        guard let lastNearbyStopsRequestLocation else { return true }
+        return location.distance(from: lastNearbyStopsRequestLocation) >= nearbyStopsRefreshDistance
     }
 
     private func nearbyStopsOptions() -> ATPNearbyStopsOptions {

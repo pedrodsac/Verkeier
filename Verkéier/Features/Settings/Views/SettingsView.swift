@@ -81,6 +81,20 @@ struct SettingsView: View {
 					}
 				}
 			}
+
+			Section("Transit data") {
+				LabeledContent("Last version", value: transitDataVersion)
+
+				Button(action: checkGTFSUpdate) {
+					Label(
+						viewModel.isCheckingGTFSUpdate ? "Updating…" : "Update transit data",
+						systemImage: "arrow.clockwise"
+					)
+					.frame(maxWidth: .infinity, alignment: .center)
+				}
+				.disabled(viewModel.isCheckingGTFSUpdate)
+				.accessibilityHint("Checks for and installs a newer transit-data version.")
+			}
 			
 			Section("About") {
 				NavigationLink {
@@ -93,7 +107,16 @@ struct SettingsView: View {
         .listStyle(.insetGrouped)
         // Give every settings glyph subtle layered depth without per-row changes.
         .symbolRenderingMode(.hierarchical)
-    }
+	}
+
+	private var transitDataVersion: String {
+		guard let metadata = viewModel.gtfsUpdateSnapshot.metadata else {
+			return "Included with app"
+		}
+
+		return (metadata.lastModified ?? metadata.downloadedAt)
+			.formatted(date: .abbreviated, time: .omitted)
+	}
 
 	@ViewBuilder
 	private func mapPinLabel(_ title: LocalizedStringKey, mode: TransportMode) -> some View {

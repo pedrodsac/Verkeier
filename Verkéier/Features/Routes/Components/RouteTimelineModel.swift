@@ -16,7 +16,7 @@ import Foundation
 enum RailStyle: Equatable {
     /// A transit ride — drawn solid in the mode's tint.
     case transit(TransportMode)
-    /// An on-foot stretch (walk or transfer) — drawn dotted green.
+    /// An on-foot stretch (walk or transfer) — drawn solid green.
     case walk
 }
 

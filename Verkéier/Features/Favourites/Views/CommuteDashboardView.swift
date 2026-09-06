@@ -87,7 +87,6 @@ struct CommuteDashboardView: View {
     ) -> some View {
         LazyVGrid(
             columns: [
-                GridItem(.flexible(minimum: 0), spacing: 8),
                 GridItem(.flexible(minimum: 0), spacing: 8)
             ],
             spacing: 8

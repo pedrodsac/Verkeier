@@ -50,24 +50,46 @@ private struct LiveDeparturesWidgetView: View {
                 .frame(width: 28, height: 28)
                 .background(Color.accentColor, in: Circle())
 
-            VStack(alignment: .leading, spacing: 1) {
-                Text(entry.stop?.name.stationDisplayName ?? "Live departures")
+            VStack(alignment: .leading, spacing: 0) {
+                metadata
+
+                Text(entry.stop?.displayName ?? "Live departures")
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.primary)
-                    .lineLimit(1)
-
-                Text(entry.updateLabel)
-                    .font(.caption2)
-                    .foregroundStyle(entry.isStale ? Color.orange : Color.secondary)
                     .lineLimit(1)
             }
 
             Spacer(minLength: 8)
 
-            Image(systemName: "chevron.right")
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.tertiary)
+            Button(intent: RefreshDeparturesWidgetIntent(stopID: entry.stop?.id)) {
+                Image(systemName: "arrow.clockwise")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 28, height: 28)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Refresh departures")
         }
+    }
+
+    private var metadata: some View {
+        HStack(spacing: 4) {
+            if let locality = entry.stop?.locality?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !locality.isEmpty {
+                Text(locality)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+
+                Text("·")
+                    .foregroundStyle(.secondary)
+            }
+
+            Text(entry.updateLabel)
+                .foregroundStyle(entry.isStale ? Color.orange : Color.secondary)
+                .lineLimit(1)
+        }
+        .font(.caption2)
     }
 
     @ViewBuilder
@@ -117,48 +139,89 @@ private struct DepartureRow: View {
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
-                Text(departureDetail)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                departureDetail
             }
 
             Spacer(minLength: 4)
 
-            Text(countdownLabel)
-                .font(.caption.weight(.bold))
-                .foregroundStyle(countdownColor)
-                .monospacedDigit()
-                .fixedSize()
+            VStack(alignment: .trailing, spacing: 1) {
+                Text(countdownLabel)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(countdownColor)
+
+                if let statusLabel {
+                    Text(statusLabel)
+                        .font(.caption2)
+                        .foregroundStyle(statusColor)
+                }
+            }
+            .monospacedDigit()
+            .fixedSize()
         }
         .frame(height: 33)
         .accessibilityElement(children: .combine)
     }
 
-    private var departureDetail: String {
-        var parts: [String] = []
-        if let date = departure.displayDepartureDate {
-            parts.append(date.formatted(date: .omitted, time: .shortened))
+    @ViewBuilder
+    private var departureDetail: some View {
+        HStack(spacing: 4) {
+            if isLate,
+               let scheduled = departure.scheduledDeparture,
+               let realtime = departure.realtimeDeparture {
+                Text(formattedTime(scheduled))
+                    .strikethrough()
+                    .foregroundStyle(.secondary)
+                Text(formattedTime(realtime))
+                    .foregroundStyle(.orange)
+            } else if let date = departure.displayDepartureDate {
+                Text(formattedTime(date))
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Time unavailable")
+                    .foregroundStyle(.secondary)
+            }
+
+            if let platform = departure.platform?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !platform.isEmpty {
+                Text("· Platform \(platform)")
+                    .foregroundStyle(.secondary)
+            }
         }
-        if let platform = departure.platform?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !platform.isEmpty {
-            parts.append("Platform \(platform)")
-        }
-        return parts.isEmpty ? "Time unavailable" : parts.joined(separator: " · ")
+        .font(.caption2)
+        .lineLimit(1)
     }
 
     private var countdownLabel: String {
         guard !departure.isCancelled else { return "Cancelled" }
         guard let date = departure.displayDepartureDate else { return "—" }
-        let seconds = date.timeIntervalSince(referenceDate)
-        if seconds <= 30 { return "Now" }
-        return "\(max(1, Int(ceil(seconds / 60)))) min"
+        let minutes = SharedDepartureTiming.countdownMinutes(until: date, from: referenceDate)
+        return minutes == 0 ? "Now" : "\(minutes) min"
+    }
+
+    private var statusLabel: String? {
+        guard !departure.isCancelled else { return nil }
+        if let delayMinutes = departure.delayMinutes {
+            return delayMinutes > 0 ? "+\(delayMinutes) min" : "On time"
+        }
+        return nil
+    }
+
+    private var statusColor: Color {
+        isLate ? .orange : .green
     }
 
     private var countdownColor: Color {
         if departure.isCancelled { return .red }
-        if (departure.delayMinutes ?? 0) > 0 { return .orange }
+        if isLate { return .orange }
         return .primary
+    }
+
+    private var isLate: Bool {
+        (departure.delayMinutes ?? 0) > 0
+    }
+
+    private func formattedTime(_ date: Date) -> String {
+        date.formatted(date: .omitted, time: .shortened)
     }
 
     private var routeColor: Color {

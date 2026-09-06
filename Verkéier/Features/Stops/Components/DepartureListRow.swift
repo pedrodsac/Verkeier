@@ -182,8 +182,8 @@ struct DepartureListRow: View {
 
     private var countdownText: String {
         guard let departureDate else { return "—" }
-        let minutes = Int(departureDate.timeIntervalSinceNow / 60)
-        if minutes <= 0 { return "Now" }
+        let minutes = SharedDepartureTiming.countdownMinutes(until: departureDate, from: .now)
+        if minutes == 0 { return "Now" }
         if minutes < 90 { return "\(minutes)m" }
         return departureDate.formatted(date: .omitted, time: .shortened)
     }

@@ -84,7 +84,9 @@ struct LineDetailService {
             return LineStopSequenceEntry(
                 id: stop.id,
                 name: stop.name.stationDisplayName,
-                platform: stop.platformCode,
+                platform: stop.platformCode?
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .nonEmpty,
                 location: stop.location
             )
         }

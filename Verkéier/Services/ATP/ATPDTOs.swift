@@ -60,6 +60,7 @@ struct ATPDeparture: Decodable {
     let journeyDetailReference: String?
     let journeyStatus: String?
     let notes: [String]
+    let stops: ATPPasslist?
 
     enum CodingKeys: String, CodingKey {
         case name
@@ -81,6 +82,7 @@ struct ATPDeparture: Decodable {
         case journeyDetailReference = "JourneyDetailRef"
         case journeyStatus = "JourneyStatus"
         case notes = "Notes"
+        case stops = "Stops"
     }
 
     init(from decoder: Decoder) throws {
@@ -105,6 +107,7 @@ struct ATPDeparture: Decodable {
         journeyDetailReference = Self.decodeJourneyReference(from: container)
         journeyStatus = Self.decodeJourneyStatus(from: container)
         notes = Self.decodeNotes(from: container)
+        stops = try container.decodeIfPresent(ATPPasslist.self, forKey: .stops)
     }
 
     private static func decodePlatform(
@@ -213,6 +216,8 @@ struct ATPProduct: Decodable {
     let catOutL: String?
     let operatorName: String?
     let operatorCode: String?
+    let routeIndexFrom: Int?
+    let routeIndexTo: Int?
 
     enum CodingKeys: String, CodingKey {
         case name
@@ -221,5 +226,7 @@ struct ATPProduct: Decodable {
         case catOutL
         case operatorName = "operator"
         case operatorCode
+        case routeIndexFrom = "routeIdxFrom"
+        case routeIndexTo = "routeIdxTo"
     }
 }

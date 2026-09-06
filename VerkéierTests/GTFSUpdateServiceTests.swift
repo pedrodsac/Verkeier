@@ -12,12 +12,11 @@ struct GTFSUpdateServiceTests {
             metadataClient: MockGTFSMetadataClient(resource: remoteResource(id: "resource-1")),
             downloadService: MockGTFSDownloadService(),
             archiveService: MockGTFSArchiveService(),
-            store: store,
-            calendar: Calendar(identifier: .gregorian)
+            store: store
         )
 
         let snapshot = await service.checkForUpdates(
-            force: true, now: Date(timeIntervalSince1970: 1_000))
+            now: Date(timeIntervalSince1970: 1_000))
 
         #expect(snapshot.status == .updated)
         #expect(snapshot.lastFailureMessage == nil)
@@ -55,12 +54,11 @@ struct GTFSUpdateServiceTests {
             metadataClient: MockGTFSMetadataClient(resource: remoteResource(id: "new")),
             downloadService: MockGTFSDownloadService(),
             archiveService: FailingGTFSArchiveService(),
-            store: store,
-            calendar: Calendar(identifier: .gregorian)
+            store: store
         )
 
         let snapshot = await service.checkForUpdates(
-            force: true, now: Date(timeIntervalSince1970: 2_000))
+            now: Date(timeIntervalSince1970: 2_000))
 
         #expect(snapshot.status == .failed)
         #expect(snapshot.lastFailureMessage == "The GTFS ZIP archive is invalid.")

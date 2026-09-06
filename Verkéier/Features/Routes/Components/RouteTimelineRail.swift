@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Draws one row's slice of the connecting rail: an upper half (`above`) and a
-/// lower half (`below`), each solid or dotted per ``RailStyle``, plus a marker
+/// lower half (`below`), each drawn as a continuous line, plus a marker
 /// centred on the junction. With `VStack(spacing: 0)` the per-row slices join
 /// into one continuous rail.
 struct TimelineRail: View {
@@ -38,12 +38,24 @@ struct TimelineRail: View {
         GeometryReader { proxy in
             let midX = proxy.size.width / 2
             let junctionY = junctionFromTop ?? proxy.size.height / 2
+            // Let each row's rail extend slightly into its neighbours. Strokes
+            // clipped exactly at separate row bounds can leave a hairline seam
+            // after pixel rounding, especially on non-integer display scales.
+            let edgeBleed = RouteTimelineLayout.railWidth
             ZStack {
                 if let above {
-                    railLine(above, from: CGPoint(x: midX, y: 0), to: CGPoint(x: midX, y: junctionY))
+                    railLine(
+                        above,
+                        from: CGPoint(x: midX, y: -edgeBleed),
+                        to: CGPoint(x: midX, y: junctionY)
+                    )
                 }
                 if let below {
-                    railLine(below, from: CGPoint(x: midX, y: junctionY), to: CGPoint(x: midX, y: proxy.size.height))
+                    railLine(
+                        below,
+                        from: CGPoint(x: midX, y: junctionY),
+                        to: CGPoint(x: midX, y: proxy.size.height + edgeBleed)
+                    )
                 }
                 markerView
                     .position(x: midX, y: junctionY)
@@ -90,30 +102,20 @@ struct TimelineRail: View {
     }
 
     private func railLine(_ style: RailStyle, from: CGPoint, to: CGPoint) -> some View {
-        Path { path in
-            path.move(to: from)
-            path.addLine(to: to)
-        }
-        .stroke(
-            color(for: style),
-            style: StrokeStyle(
-                lineWidth: RouteTimelineLayout.railWidth,
-                lineCap: .round,
-                dash: isDashed(style) ? [1, RouteTimelineLayout.railWidth * 2.5] : []
+        Rectangle()
+            .fill(color(for: style))
+            .frame(
+                width: RouteTimelineLayout.railWidth,
+                height: max(to.y - from.y, 0)
             )
-        )
+            .position(x: from.x, y: (from.y + to.y) / 2)
     }
 
     private func color(for style: RailStyle) -> Color {
         switch style {
         case let .transit(mode): mode.tint
-        case .walk: .green
+        case .walk: .green.opacity(0.7)
         }
-    }
-
-    private func isDashed(_ style: RailStyle) -> Bool {
-        if case .walk = style { return true }
-        return false
     }
 
     private var dotColor: Color {

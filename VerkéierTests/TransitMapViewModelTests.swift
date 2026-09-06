@@ -5,6 +5,20 @@ import Testing
 
 @MainActor
 struct TransitMapViewModelTests {
+    @Test func nearbyStopsRefreshRequiresMeaningfulMovement() async {
+        let viewModel = TransitMapViewModel()
+        let origin = CLLocation(latitude: 49.6116, longitude: 6.1319)
+        let gpsJitter = CLLocation(latitude: 49.61165, longitude: 6.13195)
+        let meaningfulMove = CLLocation(latitude: 49.6130, longitude: 6.1319)
+        let client = NearbyStopsCountingATPClient()
+
+        await viewModel.loadNearbyStops(using: client, location: origin)
+        await viewModel.loadNearbyStops(using: client, location: gpsJitter)
+        await viewModel.loadNearbyStops(using: client, location: meaningfulMove)
+
+        #expect(client.nearbyStopsRequestCount == 2)
+    }
+
     @Test func selectingStopClearsDepartureFilters() {
         let viewModel = TransitMapViewModel()
         viewModel.selectedDepartureLine = "line-15"
@@ -1204,6 +1218,24 @@ private struct FailingATPClient: ATPClient {
 
     func departureBoard(stopId _: String) async throws -> [Departure] {
         throw ATPClientError.httpStatus(503)
+    }
+}
+
+private nonisolated final class NearbyStopsCountingATPClient: ATPClient, @unchecked Sendable {
+    private let lock = NSLock()
+    private var requestCount = 0
+
+    var nearbyStopsRequestCount: Int {
+        lock.withLock { requestCount }
+    }
+
+    func nearbyStops(latitude _: Double, longitude _: Double) async throws -> [Stop] {
+        lock.withLock { requestCount += 1 }
+        return []
+    }
+
+    func departureBoard(stopId _: String) async throws -> [Departure] {
+        []
     }
 }
 

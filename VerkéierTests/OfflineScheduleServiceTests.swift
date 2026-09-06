@@ -3,6 +3,65 @@ import Testing
 @testable import Verkeier
 
 struct OfflineScheduleServiceTests {
+    @Test func upcomingDeparturesExcludesTripAtItsFinalStop() {
+        let service = OfflineScheduleService(calendar: luxCalendar)
+        let stop = Stop(
+            id: "terminal",
+            name: "Charlys Statioun",
+            location: LocationPoint(name: "Charlys Statioun", latitude: 49.65, longitude: 6.22),
+            modes: [.bus],
+            dataSource: .gtfs
+        )
+        let timetable = GTFSTimetableIndexPayload(
+            source: "test",
+            stops: [
+                GTFSTimetableStopEntry(
+                    id: "origin", name: "Origin", latitude: 49.6, longitude: 6.1,
+                    parentStation: nil, platformCode: nil
+                ),
+                GTFSTimetableStopEntry(
+                    id: "terminal", name: "Charlys Statioun", latitude: 49.65, longitude: 6.22,
+                    parentStation: nil, platformCode: nil
+                )
+            ],
+            routes: [GTFSTimetableRouteEntry(
+                id: "route-29", shortName: "29", longName: nil, mode: "bus", operatorName: nil
+            )],
+            services: [GTFSTimetableServiceEntry(
+                id: "daily", weekdays: Set(1 ... 7), startDate: nil, endDate: nil,
+                addedDates: [], removedDates: []
+            )],
+            trips: [GTFSTimetableTripEntry(
+                id: "incoming-29",
+                routeId: "route-29",
+                serviceId: "daily",
+                headsign: "Charlys Statioun",
+                directionId: nil,
+                shapeId: nil,
+                stopTimes: [
+                    GTFSTimetableStopTimeEntry(
+                        stopId: "origin", arrivalSeconds: 28_800, departureSeconds: 28_800, sequence: 1,
+                        headsign: nil, pickupType: nil, dropOffType: nil, shapeDistanceTraveled: nil
+                    ),
+                    GTFSTimetableStopTimeEntry(
+                        stopId: "terminal", arrivalSeconds: 29_400, departureSeconds: 29_400, sequence: 2,
+                        headsign: nil, pickupType: nil, dropOffType: nil, shapeDistanceTraveled: nil
+                    )
+                ]
+            )],
+            transfers: [],
+            shapes: []
+        )
+
+        let departures = service.upcomingDepartures(
+            for: stop,
+            timetable: timetable,
+            now: makeDate(year: 2026, month: 6, day: 22, hour: 8, minute: 5)
+        )
+
+        #expect(departures.isEmpty)
+    }
+
     @Test func departureBoardMergerPrefersLiveAndMarksScheduledStatusUnknown() {
         let firstDeparture = Date(timeIntervalSince1970: 1_800)
         let live = Departure(

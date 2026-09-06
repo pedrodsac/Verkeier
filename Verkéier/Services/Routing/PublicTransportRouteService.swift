@@ -21,7 +21,7 @@ struct PublicTransportRouteService: RouteService {
             return calendar
         }(),
         concurrency: RouteCalculationConcurrency = .default,
-        realtimeBoardBudgetSeconds: TimeInterval = 2,
+        realtimeBoardBudgetSeconds: TimeInterval = 8,
         roadGeometryBudgetSeconds: TimeInterval = 1
     ) {
         let engine = PublicTransportRoutingEngine(

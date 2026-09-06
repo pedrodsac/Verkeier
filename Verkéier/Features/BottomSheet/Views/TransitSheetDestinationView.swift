@@ -9,8 +9,6 @@ struct TransitSheetDestinationView: View {
     let viewModel: TransitSheetPresentationModel
     let actions: TransitSheetActions
 
-    @Environment(\.dismiss) private var dismiss
-
     var body: some View {
         switch route {
         case .search:
@@ -21,7 +19,6 @@ struct TransitSheetDestinationView: View {
             )
             .safeAreaPadding(.horizontal, 16)
             .padding(.top, searchContentTopPadding)
-
         case .stopGroup:
             ScrollView {
                 StopGroupView(viewModel: viewModel.stopGroup)
@@ -60,7 +57,7 @@ struct TransitSheetDestinationView: View {
                     viewModel: viewModel.route,
                     actions: RouteActions(from: actions)
                 )
-                .padding(.horizontal, 16)
+                .safeAreaPadding(.horizontal, 16)
             }
             .navigationTitle(route.navigationTitle)
             .toolbarTitleDisplayMode(.inline)
@@ -85,7 +82,6 @@ struct TransitSheetDestinationView: View {
                     guard let place else { return }
                     actions.selectRouteDestination(place)
                 }
-                dismiss()
             }
 
         case .routeTimeline:
@@ -94,7 +90,7 @@ struct TransitSheetDestinationView: View {
                     viewModel: viewModel.route,
                     openInAppleMaps: actions.openRouteInAppleMaps
                 )
-                .padding(.horizontal, 16)
+                .safeAreaPadding(.horizontal, 16)
             }
             .navigationTitle(route.navigationTitle)
             .toolbarTitleDisplayMode(.inline)

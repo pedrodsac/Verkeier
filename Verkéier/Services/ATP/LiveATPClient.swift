@@ -99,6 +99,16 @@ final class LiveATPClient: ATPClient {
         return ATPMapper.mergedDepartures(departures)
     }
 
+    nonisolated func routingBoard(stopID: String, options: ATPDepartureBoardOptions) async throws -> ATPRoutingBoard {
+        var options = options
+        options.includePasslist = true
+        let request = try URLRequest(url: ATPRequestBuilder.departureBoardURL(
+            stopId: stopID, options: options, configuration: configuration
+        ))
+        let response: ATPDepartureBoardResponse = try await fetch(request)
+        return ATPMapper.mapRoutingBoard(response, stopID: stopID)
+    }
+
     private nonisolated func fetch<Response: Decodable>(_ request: URLRequest) async throws -> Response {
         let (data, response) = try await session.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse else {
@@ -164,7 +174,7 @@ enum ATPRequestBuilder {
                 URLQueryItem(name: "operators", value: options.operators.isEmpty ? nil : options.operators.joined(separator: ",")),
                 URLQueryItem(name: "lines", value: options.lines.isEmpty ? nil : options.lines.joined(separator: ",")),
                 URLQueryItem(name: "platforms", value: options.platforms.isEmpty ? nil : options.platforms.joined(separator: ",")),
-                URLQueryItem(name: "rtMode", value: options.realtimeMode.rawValue),
+                URLQueryItem(name: "rtMode", value: options.realtimeMode == .off ? "OFF" : nil),
                 URLQueryItem(name: "passlist", value: options.includePasslist ? "1" : "0"),
                 URLQueryItem(name: "format", value: "json")
             ].filter { $0.value != nil }

@@ -17,16 +17,21 @@ struct TimelineSegmentRow: View {
             Color.clear
                 .frame(width: timeColumnWidth)
 
+            Color.clear
+            .frame(width: RouteTimelineLayout.railColumnWidth)
+
+            content
+                .padding(.vertical, RouteTimelineLayout.segmentRowPadding)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .overlay(alignment: .leading) {
             TimelineRail(
                 above: node.rail,
                 below: node.rail,
                 marker: railMarker
             )
             .frame(width: RouteTimelineLayout.railColumnWidth)
-
-            content
-                .padding(.vertical, RouteTimelineLayout.segmentRowPadding)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            .offset(x: timeColumnWidth + RouteTimelineLayout.columnSpacing)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
@@ -154,120 +159,70 @@ private struct TimelineLineBadge: View {
     let text: String
     let mode: TransportMode
 
+    private let horizontalInset: CGFloat = 6
+    private let verticalInset: CGFloat = 2
+
     var body: some View {
         Text(text)
             .font(.callout.weight(.bold))
             .foregroundStyle(.white)
-            .padding(.horizontal, 9)
-            .padding(.vertical, 4)
+            .padding(.horizontal, horizontalInset)
+            .padding(.vertical, verticalInset)
             .background(
                 mode.tint.gradient,
-                in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+                in: RoundedRectangle(cornerRadius: 7, style: .continuous)
             )
     }
 }
 
-/// A destination card that is intentionally separate from the line-number
-/// card. The overlap makes the number feel anchored to the destination while
-/// preserving the original number card's shape.
+/// One compact card containing the line badge and its destination.
 private struct TimelineTransitBadge: View {
     let routeText: String
     let mode: TransportMode
     let direction: String?
 
     var body: some View {
-        HStack(alignment: .center, spacing: -8) {
-            TimelineLineBadge(text: routeText, mode: mode)
-                .zIndex(1)
+        ViewThatFits(in: .horizontal) {
+            card {
+                destinationText
+                    .fixedSize(horizontal: true, vertical: false)
+            }
 
-            if let direction, !direction.isEmpty {
-                TimelineDestinationCard(text: direction)
+            card {
+                if let direction, !direction.isEmpty {
+                    OverflowMarqueeText(
+                        text: direction,
+                        font: .subheadline.weight(.semibold),
+                        initialLeadingInset: 0,
+                        forceScroll: true
+                    )
+                    .frame(maxWidth: .infinity, minHeight: 22, alignment: .leading)
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
-}
 
-/// Measures the direction against the actual space left beside the line card.
-/// This avoids relying on ``ViewThatFits``' proposal, which can be wider than
-/// the destination's final space inside the timeline HStack.
-private struct TimelineDestinationCard: View {
-    let text: String
-
-    @State private var textWidth: CGFloat = 0
-
-    private let leadingInset: CGFloat = 18
-    private let trailingInset: CGFloat = 12
-    private let destinationFont = Font.subheadline.weight(.semibold)
-
-    var body: some View {
-        GeometryReader { proxy in
-            let availableWidth = proxy.size.width
-            let intrinsicWidth = textWidth + leadingInset + trailingInset
-            let isOverflowing = textWidth > 0 && intrinsicWidth > availableWidth + 1
-            let cardWidth = isOverflowing ? availableWidth : min(intrinsicWidth, availableWidth)
-
-            ZStack(alignment: .leading) {
-                if isOverflowing {
-                    OverflowMarqueeText(
-                        text: text,
-                        font: destinationFont,
-                        initialLeadingInset: leadingInset,
-                        forceScroll: true
-                    )
-                    .frame(maxWidth: .infinity, minHeight: 28, alignment: .leading)
-                    .padding(.trailing, trailingInset)
-                } else {
-                    Text(text)
-                        .font(destinationFont)
-                        .fixedSize(horizontal: true, vertical: false)
-                        .padding(.leading, leadingInset)
-                        .padding(.trailing, trailingInset)
-                }
-            }
-            .foregroundStyle(.primary)
-            .frame(width: cardWidth, alignment: .leading)
-            .frame(minHeight: 28, alignment: .center)
-            .background(destinationBackground, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        }
-        .frame(maxWidth: .infinity, minHeight: 28, alignment: .leading)
-        .overlay(alignment: .topLeading) {
-            Text(text)
-                .font(destinationFont)
-                .lineLimit(1)
-                .fixedSize(horizontal: true, vertical: false)
-                .background {
-                    GeometryReader { proxy in
-                        Color.clear
-                            .preference(key: TimelineDestinationTextWidthKey.self, value: proxy.size.width)
-                    }
-                }
-                .hidden()
-                .allowsHitTesting(false)
-        }
-        .onPreferenceChange(TimelineDestinationTextWidthKey.self) { width in
-            guard abs(textWidth - width) > 0.5 else { return }
-            textWidth = width
-        }
+    private var destinationText: some View {
+        Text(direction ?? "")
+            .font(.subheadline.weight(.semibold))
+            .lineLimit(1)
     }
 
-    private var destinationBackground: LinearGradient {
-        LinearGradient(
-            colors: [
-                .white.opacity(0.92),
-                .gray.opacity(0.12)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
+    private func card<Destination: View>(
+        @ViewBuilder destination: () -> Destination
+    ) -> some View {
+        HStack(alignment: .center, spacing: 8) {
+            TimelineLineBadge(text: routeText, mode: mode)
+            destination()
+        }
+        .foregroundStyle(.black)
+        .padding(3)
+        .padding(.trailing, 5)
+        .background(
+            Color.white.opacity(0.94),
+            in: RoundedRectangle(cornerRadius: 9, style: .continuous)
         )
-    }
-}
-
-private struct TimelineDestinationTextWidthKey: PreferenceKey {
-    static let defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
+        .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
     }
 }

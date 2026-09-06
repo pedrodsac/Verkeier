@@ -180,6 +180,8 @@ struct OfflineScheduleService {
             .flatMap { trip in
                 trip.stopTimes.compactMap { stopTime -> OfflineScheduleDeparture? in
                     guard candidateStopIds.contains(stopTime.stopId),
+                          (trip.stopTimes.count == 1
+                              || trip.stopTimes.contains(where: { $0.sequence > stopTime.sequence })),
                           stopTime.departureSeconds >= secondsSinceMidnight,
                           let route = routesById[trip.routeId] else {
                         return nil

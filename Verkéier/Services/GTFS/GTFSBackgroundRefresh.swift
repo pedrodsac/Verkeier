@@ -16,6 +16,6 @@ enum GTFSBackgroundRefresh {
 
     /// Run a best-effort GTFS update; downloads only when the remote feed changed.
     static func run() async {
-        _ = await GTFSUpdateService().checkForUpdates(force: false)
+        _ = await GTFSUpdateService().checkForUpdates()
     }
 }

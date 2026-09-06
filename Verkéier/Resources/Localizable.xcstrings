@@ -4307,6 +4307,7 @@
       }
     },
     "Recents" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

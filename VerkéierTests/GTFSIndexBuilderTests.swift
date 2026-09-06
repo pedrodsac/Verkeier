@@ -18,6 +18,7 @@ struct GTFSIndexBuilderTests {
 
         #expect(lift.name == "Hill Lift")
         #expect(lift.locality == "Test City")
+        #expect(lift.wheelchairBoarding == "0")
         #expect(lift.modes.sorted() == ["funicular"])
         #expect(lift.routeIds.sorted() == ["F1"])
         #expect(
@@ -58,10 +59,14 @@ struct GTFSIndexBuilderTests {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
 
         let files = [
+            "agency.txt": """
+            agency_name,agency_url,agency_timezone
+            Test Transit,https://example.com,Europe/Luxembourg
+            """,
             "stops.txt": """
-            stop_id,stop_name,stop_lat,stop_lon,zone_id,location_type,parent_station,platform_code
-            S1,Hill Lift,49.6289,6.21474,Test City,,,
-            S2,Upper Station,49.61779,6.12589,Test City,0,P1,5
+            stop_id,stop_name,stop_lat,stop_lon,zone_id,location_type,parent_station,platform_code,wheelchair_boarding
+            S1,Hill Lift,49.6289,6.21474,Test City,,,,0
+            S2,Upper Station,49.61779,6.12589,Test City,0,P1,5,1
             """,
             "routes.txt": """
             route_id,agency_id,route_short_name,route_long_name,route_type

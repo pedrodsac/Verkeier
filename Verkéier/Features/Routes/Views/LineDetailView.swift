@@ -19,7 +19,7 @@ struct LineDetailView: View {
                             Text(direction.title).tag(direction.id)
                         }
                     }
-                    .pickerStyle(.segmented)
+                    .pickerStyle(.inline)
                 }
 
                     Section("Stop Sequence") {
@@ -32,7 +32,7 @@ struct LineDetailView: View {
                             dataSource: .gtfs
                         )
                         NavigationLink(value: TransitSheetRoute.stopDetail(destinationStop)) {
-                            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                            HStack(alignment: .center, spacing: 10) {
                                 Text("\(index + 1)")
                                     .font(.caption.weight(.bold))
                                     .foregroundStyle(.secondary)
@@ -48,9 +48,6 @@ struct LineDetailView: View {
                                     }
                                 }
                                 Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.caption.weight(.bold))
-                                    .foregroundStyle(.tertiary)
                             }
                         }
                         .buttonStyle(.plain)

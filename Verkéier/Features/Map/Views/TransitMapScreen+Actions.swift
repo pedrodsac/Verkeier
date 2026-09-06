@@ -140,9 +140,7 @@ extension TransitMapScreen {
         animateSheetChange {
             sheetNavigation.selectedTab = .plan
             sheetNavigation.planPath = []
-            if sheetDetent == .collapsed {
-                sheetDetent = .medium
-            }
+            sheetDetent = .medium
         }
     }
 
@@ -348,15 +346,6 @@ extension TransitMapScreen {
         navigateToSheet(routes, detent: detent)
     }
 
-    func showSheetTab(_ tab: TransitSheetTab) {
-        animateSheetChange {
-            sheetNavigation.selectedTab = tab
-            if sheetDetent == .collapsed, tab != .home {
-                sheetDetent = .medium
-            }
-        }
-    }
-
     func activateSheetRoute(
         _ route: TransitSheetRoute?,
         _ previousRoute: TransitSheetRoute?,
@@ -437,7 +426,11 @@ extension TransitMapScreen {
     func setDebugDataMode(_ mode: DebugTransitDataMode) {
         debugTransitDataModeRawValue = mode.rawValue
         Task {
-            await viewModel.loadNearbyStops(using: atpClient, location: locationService.currentLocation)
+            await viewModel.loadNearbyStops(
+                using: atpClient,
+                location: locationService.currentLocation,
+                force: true
+            )
             await viewModel.loadNearbyStopRoutes(using: gtfsService)
             await loadAlertsAndCheckDisruptions()
             await refreshFavouriteStops()

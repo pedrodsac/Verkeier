@@ -6,6 +6,9 @@ struct StopSearchBar: UIViewRepresentable {
     @Binding var text: String
     @Binding var isActive: Bool
     @Binding var focusRequested: Bool
+    var placeholder = "Search stops"
+    var accessibilityIdentifier = "stop-search"
+    var accessibilityLabel = "Stop search"
     let onActivate: () -> Void
     let onCancel: () -> Void
 
@@ -19,9 +22,9 @@ struct StopSearchBar: UIViewRepresentable {
         searchBar.backgroundImage = UIImage()
         searchBar.backgroundColor = .clear
         searchBar.barTintColor = .clear
-        searchBar.placeholder = "Search stops"
-        searchBar.accessibilityIdentifier = "stop-search"
-        searchBar.searchTextField.accessibilityLabel = "Stop search"
+        searchBar.placeholder = placeholder
+        searchBar.accessibilityIdentifier = accessibilityIdentifier
+        searchBar.searchTextField.accessibilityLabel = accessibilityLabel
         return searchBar
     }
 
@@ -59,7 +62,6 @@ struct StopSearchBar: UIViewRepresentable {
 
         func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
             parent.isActive = true
-            parent.focusRequested = false
             parent.onActivate()
         }
 

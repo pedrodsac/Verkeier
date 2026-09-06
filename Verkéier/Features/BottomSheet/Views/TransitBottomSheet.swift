@@ -10,7 +10,6 @@ struct TransitBottomSheet: View {
     let viewModel: TransitSheetPresentationModel
     let actions: TransitSheetActions
     let activateRoute: (TransitSheetRoute?, TransitSheetRoute?, Bool) -> Void
-    let selectedTab: (TransitSheetTab) -> Void
 
     @State private var isSearchActive = false
     @State private var focusSearch = false
@@ -34,16 +33,6 @@ struct TransitBottomSheet: View {
             .onChange(of: navigation.planPath) { oldPath, newPath in
                 activatePath(newPath, previous: oldPath)
             }
-            .onChange(of: navigation.selectedTab) { _, tab in
-                guard detent == .collapsed else { return }
-                selectedTab(tab)
-            }
-            .onChange(of: detent) { _, newDetent in
-                if newDetent == .collapsed {
-                    isSearchActive = false
-                    focusSearch = false
-                }
-            }
             .onAppear {
                 isSearchActive = isSearchRoute
                 focusSearch = isSearchRoute
@@ -53,34 +42,26 @@ struct TransitBottomSheet: View {
     private var tabView: some View {
         TabView(selection: $navigation.selectedTab) {
 			Tab("Home", systemImage: "train.side.front.car", value: TransitSheetTab.home) {
-				if detent == .collapsed { EmptyView() } else {
-					homeTab
-				}
+				homeTab
             }
 
             Tab("Favourites", systemImage: "star", value: TransitSheetTab.favourites) {
-				if detent == .collapsed { EmptyView() } else {
-					favouritesTab
-				}
+				favouritesTab
             }
 
             Tab("Plan", systemImage: "arrow.triangle.turn.up.right.diamond", value: TransitSheetTab.plan) {
-				if detent == .collapsed { EmptyView() } else {
-					planTab
-				}
+				planTab
             }
 
             Tab("Settings", systemImage: "gear", value: TransitSheetTab.settings) {
-				if detent == .collapsed { EmptyView() } else {
-					NavigationStack {
-						SettingsView(
-							viewModel: viewModel.settings,
-							checkGTFSUpdate: actions.checkGTFSUpdate,
-							setDebugDataMode: actions.setDebugDataMode
-						)
-						.navigationTitle("Settings")
-						.toolbarTitleDisplayMode(.inline)
-					}
+				NavigationStack {
+					SettingsView(
+						viewModel: viewModel.settings,
+						checkGTFSUpdate: actions.checkGTFSUpdate,
+						setDebugDataMode: actions.setDebugDataMode
+					)
+					.navigationTitle("Settings")
+					.toolbarTitleDisplayMode(.inline)
 				}
             }
         }
@@ -156,14 +137,7 @@ struct TransitBottomSheet: View {
         }
     }
 
-    private var isCollapsed: Bool {
-        detent == .collapsed
-    }
-
     private var tabBarBackground: AnyShapeStyle {
-        if isCollapsed {
-            return AnyShapeStyle(Color(.clear))
-        }
         return AnyShapeStyle(.regularMaterial)
     }
 
@@ -172,11 +146,11 @@ struct TransitBottomSheet: View {
     }
 
     private var shouldShowSearchBar: Bool {
-        navigation.selectedTab == .home && !isCollapsed && (navigation.homePath.isEmpty || isSearchRoute)
+        navigation.selectedTab == .home && (navigation.homePath.isEmpty || isSearchRoute)
     }
 
     private var navigationBarVisibility: Visibility {
-        if detent == .collapsed || shouldShowSearchBar {
+        if shouldShowSearchBar {
             .hidden
         } else {
             .visible

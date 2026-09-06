@@ -15,7 +15,6 @@ actor GTFSUpdateService {
     private let validator: GTFSValidator
     private let indexBuilder: GTFSIndexBuilder
     private let store: GTFSLocalStore
-    private let calendar: Calendar
     private var currentStatus: GTFSUpdateStatus = .idle
     private var lastFailureMessage: String?
 
@@ -25,8 +24,7 @@ actor GTFSUpdateService {
         archiveService: any GTFSArchiveExtracting = GTFSArchiveService(),
         validator: GTFSValidator = GTFSValidator(),
         indexBuilder: GTFSIndexBuilder = GTFSIndexBuilder(),
-        store: GTFSLocalStore = GTFSLocalStore(),
-        calendar: Calendar = .current
+        store: GTFSLocalStore = GTFSLocalStore()
     ) {
         self.metadataClient = metadataClient
         self.downloadService = downloadService
@@ -34,7 +32,6 @@ actor GTFSUpdateService {
         self.validator = validator
         self.indexBuilder = indexBuilder
         self.store = store
-        self.calendar = calendar
     }
 
     func snapshot() async -> GTFSUpdateSnapshot {
@@ -47,21 +44,13 @@ actor GTFSUpdateService {
     }
 
     @discardableResult
-    func checkForUpdates(force: Bool = false, now: Date = .now) async -> GTFSUpdateSnapshot {
+    func checkForUpdates(now: Date = .now) async -> GTFSUpdateSnapshot {
         currentStatus = .checking
         lastFailureMessage = nil
 
         do {
             try store.bootstrap()
             let localMetadata = try store.loadMetadata()
-            if !force,
-               store.hasCurrentFeed(),
-               let lastCheck = try store.loadLastMetadataCheckAt(),
-               calendar.isDate(lastCheck, inSameDayAs: now) {
-                currentStatus = .upToDate
-                return await snapshot()
-            }
-
             try store.saveLastMetadataCheckAt(now)
             let dataset = try await metadataClient.fetchDataset()
             guard let remote = GTFSResourceSelector.selectLatestGTFSResource(from: dataset) else {
@@ -135,7 +124,9 @@ final class GTFSUpdateController {
 
     func loadSnapshot() {
         Task {
-            snapshot = await service.snapshot()
+            let savedSnapshot = await service.snapshot()
+            guard !isChecking else { return }
+            snapshot = savedSnapshot
         }
     }
 
@@ -143,7 +134,7 @@ final class GTFSUpdateController {
         guard !isChecking else { return }
         isChecking = true
         Task {
-            snapshot = await service.checkForUpdates(force: false)
+            snapshot = await service.checkForUpdates()
             isChecking = false
         }
     }
@@ -152,7 +143,7 @@ final class GTFSUpdateController {
         guard !isChecking else { return }
         isChecking = true
         Task {
-            snapshot = await service.checkForUpdates(force: true)
+            snapshot = await service.checkForUpdates()
             isChecking = false
         }
     }

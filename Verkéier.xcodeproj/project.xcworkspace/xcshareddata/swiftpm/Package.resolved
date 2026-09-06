@@ -1,5 +1,5 @@
 {
-  "originHash" : "255299f91da4e0312ca5d282a305590e9d0d30717b8f34479f8877f0542969fb",
+  "originHash" : "adbc54b70c747997723aafca16db6c019bd6397171aeda18df4458e241cd01a1",
   "pins" : [
     {
       "identity" : "swift-async-algorithms",
@@ -17,6 +17,15 @@
       "state" : {
         "revision" : "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
         "version" : "1.6.0"
+      }
+    },
+    {
+      "identity" : "transit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pedrodsac/transit.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f6f2b0c5b4ef882fe80ac7f18a18eec8e4a6d06d"
       }
     },
     {

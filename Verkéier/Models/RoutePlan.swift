@@ -66,6 +66,10 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
         let transferWarning: String?
         /// Pickup/return station and availability details for a bike-share leg.
         let bikeShareDetails: BikeShareLegDetails?
+        var departureTimingSource: RouteTimingSource? = nil
+        var arrivalTimingSource: RouteTimingSource? = nil
+        /// Total time required since the preceding ride, including movement.
+        var requiredTransferSeconds: Int? = nil
 
         init(
             id: String,
@@ -206,4 +210,9 @@ enum RouteLegLiveStatus: String, Codable, Hashable, Sendable {
         case .unknown: "Status unknown"
         }
     }
+}
+
+/// Explicit predictions and extrapolations must remain distinguishable to riders.
+nonisolated enum RouteTimingSource: String, Codable, Hashable, Sendable {
+    case scheduled, observed, estimated
 }

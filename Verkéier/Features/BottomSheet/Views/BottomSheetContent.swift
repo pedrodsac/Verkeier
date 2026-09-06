@@ -26,7 +26,7 @@ struct BottomSheetContent: View {
                         openSpecialEvent: openSpecialEvent
                     )
 					.padding(.top, contentTopPadding)
-					.padding(.horizontal, 16)
+					.safeAreaPadding(.horizontal, 16)
                 }
             }
         }

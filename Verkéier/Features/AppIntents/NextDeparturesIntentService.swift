@@ -39,7 +39,7 @@ enum NextDeparturesIntentService {
                 guard let date = departure.realtimeDeparture ?? departure.scheduledDeparture else {
                     return true
                 }
-                return date >= now.addingTimeInterval(-60)
+                return SharedDepartureTiming.isVisible(date, at: now)
             }
             .sorted { lhs, rhs in
                 let lhsDate = lhs.realtimeDeparture ?? lhs.scheduledDeparture ?? .distantFuture
@@ -64,8 +64,8 @@ enum NextDeparturesIntentService {
             return "time unknown"
         }
 
-        let minutes = Int(departureDate.timeIntervalSince(now) / 60)
-        if minutes <= 0 { return "now" }
+        let minutes = SharedDepartureTiming.countdownMinutes(until: departureDate, from: now)
+        if minutes == 0 { return "now" }
         if minutes < 90 { return "in \(minutes) min" }
 
         return departureDate.formatted(date: .omitted, time: .shortened)

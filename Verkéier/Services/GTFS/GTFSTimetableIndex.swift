@@ -1,6 +1,12 @@
 import Foundation
 
 nonisolated struct GTFSTimetableIndexPayload: Codable, Sendable, Hashable {
+    /// Version 3 guarantees every installed feed includes the `shapes.txt`
+    /// geometry referenced by its trips. Bump this so indexes produced while
+    /// large shapes were skipped are rebuilt from the retained GTFS archive.
+    static let currentVersion = 3
+    var schemaVersion: Int? = currentVersion
+    var revision: String? = nil
     let source: String
     let stops: [GTFSTimetableStopEntry]
     let routes: [GTFSTimetableRouteEntry]
@@ -51,6 +57,8 @@ nonisolated struct GTFSTimetableTripEntry: Codable, Sendable, Hashable {
     let headsign: String?
     let directionId: String?
     let shapeId: String?
+    var originalTripID: String? = nil
+    var serviceDate: String? = nil
     let stopTimes: [GTFSTimetableStopTimeEntry]
 }
 
@@ -63,12 +71,22 @@ nonisolated struct GTFSTimetableStopTimeEntry: Codable, Sendable, Hashable {
     let pickupType: String?
     let dropOffType: String?
     let shapeDistanceTraveled: Double?
+    var scheduledArrivalSeconds: Int? = nil
+    var scheduledDepartureSeconds: Int? = nil
+    var arrivalSource: RouteTimingSource? = nil
+    var departureSource: RouteTimingSource? = nil
+    var livePlatform: String? = nil
 }
 
 nonisolated struct GTFSTimetableTransferEntry: Codable, Sendable, Hashable {
     let fromStopId: String
     let toStopId: String
     let minimumTransferSeconds: Int?
+    var transferType: Int? = nil
+    var fromRouteID: String? = nil
+    var toRouteID: String? = nil
+    var fromTripID: String? = nil
+    var toTripID: String? = nil
 }
 
 nonisolated struct GTFSTimetableShapeEntry: Codable, Sendable, Hashable {

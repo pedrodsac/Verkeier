@@ -26,8 +26,48 @@ struct LineDetailServiceTests {
         #expect(detail?.directions.count == 2)
         #expect(detail?.selectedDirectionID == "0|Luxexpo")
         #expect(detail?.stopSequence.map(\.id) == ["stop-a", "stop-b", "stop-c"])
+        #expect(detail?.stopSequence.map(\.platform) == ["1", "2", "3"])
         #expect(detail?.upcomingDepartures.map(\.id) == ["trip-1-stop-b", "trip-2-stop-b"])
         #expect(detail?.mapOverlay?.segments.first?.coordinates.count == 3)
+    }
+
+    @Test func detailOmitsBlankPlatformCodes() {
+        let service = LineDetailService(calendar: luxCalendar)
+        var timetable = makeTimetable()
+        timetable = GTFSTimetableIndexPayload(
+            source: timetable.source,
+            stops: timetable.stops.map { stop in
+                GTFSTimetableStopEntry(
+                    id: stop.id,
+                    name: stop.name,
+                    latitude: stop.latitude,
+                    longitude: stop.longitude,
+                    parentStation: stop.parentStation,
+                    platformCode: stop.id == "stop-b" ? "  \n" : stop.platformCode
+                )
+            },
+            routes: timetable.routes,
+            services: timetable.services,
+            trips: timetable.trips,
+            transfers: timetable.transfers,
+            shapes: timetable.shapes
+        )
+        let route = TransitRoute(
+            id: "route-t1",
+            shortName: "T1",
+            longName: "Luxembourg Gare - Luxexpo",
+            mode: .tram,
+            dataSource: .gtfs
+        )
+
+        let detail = service.detail(
+            for: route,
+            selectedStopId: "stop-b",
+            timetable: timetable,
+            now: testDate(hour: 8, minute: 2)
+        )
+
+        #expect(detail?.stopSequence.first(where: { $0.id == "stop-b" })?.platform == nil)
     }
 
     @Test func detailRespectsSelectedDirectionOverride() {

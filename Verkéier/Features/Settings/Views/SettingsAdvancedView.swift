@@ -31,7 +31,7 @@ struct SettingsAdvancedView: View {
                     label: "ATP endpoint",
                     value: configuration.apiProxyURL?.host() ?? "Unavailable"
                 )
-                AdvancedDiagnosticRow(label: "GTFS cache", value: gtfsSummary)
+                AdvancedDiagnosticRow(label: "Transit data cache", value: gtfsSummary)
                 AdvancedDiagnosticRow(
                     label: "AVL feed",
                     value: configuration.avlMessagesURL.host() ?? "Configured"
@@ -39,12 +39,12 @@ struct SettingsAdvancedView: View {
                 AdvancedDiagnosticRow(label: "Routing", value: "MapKit + Apple Maps")
             }
 
-            Section("GTFS Data") {
+            Section("Transit data details") {
                 AdvancedDiagnosticRow(
                     label: "Dataset",
-                    value: "Luxembourg public transport GTFS"
+                    value: "Luxembourg public transport data"
                 )
-                AdvancedDiagnosticRow(label: "Resource", value: currentGTFSResource)
+                AdvancedDiagnosticRow(label: "Source file", value: currentGTFSResource)
                 AdvancedDiagnosticRow(
                     label: "Downloaded",
                     value: formatted(viewModel.gtfsUpdateSnapshot.metadata?.downloadedAt)
@@ -73,13 +73,13 @@ struct SettingsAdvancedView: View {
 
                 Button(action: checkGTFSUpdate) {
                     Label(
-                        viewModel.isCheckingGTFSUpdate ? "Checking…" : "Check for GTFS update",
+                        viewModel.isCheckingGTFSUpdate ? "Checking…" : "Check for data update",
                         systemImage: "arrow.clockwise"
                     )
                     .frame(maxWidth: .infinity, alignment: .center)
                 }
                 .disabled(viewModel.isCheckingGTFSUpdate)
-                .accessibilityHint("Checks data.public.lu for a newer GTFS feed")
+                .accessibilityHint("Checks data.public.lu for a newer public-transport data version")
             }
 
             Section("Support") {

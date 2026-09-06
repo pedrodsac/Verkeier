@@ -19,6 +19,13 @@ struct TimelinePlaceRow: View {
             timeColumn
                 .padding(.vertical, RouteTimelineLayout.placeRowPadding)
 
+            Color.clear
+            .frame(width: RouteTimelineLayout.railColumnWidth)
+
+            contentColumn
+                .padding(.vertical, RouteTimelineLayout.placeRowPadding)
+        }
+        .overlay(alignment: .leading) {
             TimelineRail(
                 above: node.railAbove,
                 below: node.railBelow,
@@ -26,9 +33,7 @@ struct TimelinePlaceRow: View {
                 junctionFromTop: RouteTimelineLayout.placeRowPadding + firstLineCentre
             )
             .frame(width: RouteTimelineLayout.railColumnWidth)
-
-            contentColumn
-                .padding(.vertical, RouteTimelineLayout.placeRowPadding)
+            .offset(x: timeColumnWidth + RouteTimelineLayout.columnSpacing)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
@@ -37,27 +42,19 @@ struct TimelinePlaceRow: View {
     // MARK: - Time gutter
 
     private var timeColumn: some View {
-        VStack(alignment: .trailing, spacing: 1) {
+        VStack(alignment: .trailing, spacing: 2) {
             if node.role == .transfer {
-                timePair(
-                    effective: node.arrivalTime,
-                    scheduled: node.scheduledArrivalTime,
-                    font: .subheadline,
-                    color: .secondary
-                )
-                timePair(
-                    effective: node.departureTime,
-                    scheduled: node.scheduledDepartureTime,
-                    font: .subheadline.weight(.semibold),
-                    color: .primary
-                )
+                arrivalTimeBlock(node.arrivalTime)
+                departureTimeBlock(node.departureTime)
             } else {
-                timePair(
-                    effective: primaryTime,
-                    scheduled: scheduledPrimaryTime,
-                    font: primaryTimeFont,
-                    color: primaryTimeColor
-                )
+                switch node.role {
+                case .origin, .board:
+                    departureTimeBlock(node.departureTime)
+                case .alight, .destination:
+                    arrivalTimeBlock(node.arrivalTime)
+                case .transfer:
+                    EmptyView()
+                }
             }
         }
         .frame(width: timeColumnWidth, alignment: .trailing)
@@ -66,46 +63,69 @@ struct TimelinePlaceRow: View {
     }
 
     @ViewBuilder
-    private func timeText(_ date: Date?, font: Font, color: Color) -> some View {
+    private func primaryTimeText(_ date: Date?, isTransferArrival: Bool = false) -> some View {
         if let date {
             Text(date.formatted(date: .omitted, time: .shortened))
-                .font(font)
-                .foregroundStyle(color)
+                .font(.subheadline.weight(isTransferArrival ? .regular : .bold))
+                .foregroundStyle(isTransferArrival ? .secondary : .primary)
                 .monospacedDigit()
                 .lineLimit(1)
-                .minimumScaleFactor(0.75)
         }
     }
 
     @ViewBuilder
-    private func timePair(effective: Date?, scheduled: Date?, font: Font, color: Color) -> some View {
+    private func departureTimeBlock(_ effective: Date?) -> some View {
         if let effective {
             VStack(alignment: .trailing, spacing: 0) {
-                if shouldShowScheduledTime(scheduled, insteadOf: effective), let scheduled {
+                if shouldShowScheduledDeparture(insteadOf: effective), let scheduled = node.scheduledDepartureTime {
                     Text(scheduled.formatted(date: .omitted, time: .shortened))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .strikethrough(true, color: .secondary)
                         .monospacedDigit()
                         .lineLimit(1)
-                        .minimumScaleFactor(0.75)
                 }
-                timeText(effective, font: font, color: color)
+                primaryTimeText(effective)
+                if let departureStatusText {
+                    Text(departureStatusText)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(departureStatusColor)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
+                }
             }
         }
     }
 
-    private func shouldShowScheduledTime(_ scheduled: Date?, insteadOf effective: Date) -> Bool {
-        guard node.liveStatus != .cancelled, let scheduled else { return false }
-        return abs(effective.timeIntervalSince(scheduled)) >= 30
+    @ViewBuilder
+    private func arrivalTimeBlock(_ effective: Date?) -> some View {
+        if effective != nil {
+            primaryTimeText(effective, isTransferArrival: node.role == .transfer)
+        }
     }
 
-    private var scheduledPrimaryTime: Date? {
-        switch node.role {
-        case .origin, .board: node.scheduledDepartureTime
-        case .alight, .destination: node.scheduledArrivalTime
-        case .transfer: node.scheduledDepartureTime
+    private func shouldShowScheduledDeparture(insteadOf effective: Date) -> Bool {
+        guard node.liveStatus != .cancelled,
+              let delay = node.delayMinutes, delay > 0,
+              let scheduled = node.scheduledDepartureTime
+        else { return false }
+        return effective.timeIntervalSince(scheduled) >= 30
+    }
+
+    private var departureStatusText: String? {
+        switch node.liveStatus {
+        case .live, .delayed:
+            if let delay = node.delayMinutes, delay > 0 {
+                return "+\(delay) min"
+            }
+            return "On time"
+        case .scheduled, .cancelled, .unknown:
+            return nil
         }
+    }
+
+    private var departureStatusColor: Color {
+        (node.delayMinutes ?? 0) > 0 ? .orange : .green
     }
 
     // MARK: - Content
@@ -209,20 +229,6 @@ struct TimelinePlaceRow: View {
         case .alight, .destination: node.arrivalTime
         case .transfer: node.departureTime
         }
-    }
-
-    private var primaryTimeFont: Font {
-        switch node.role {
-        // Destination arrival is emphasised, but stays subheadline so it fits the
-        // gutter — its prominence comes from the pin, "Arrive" eyebrow, and name.
-        case .destination: .subheadline.weight(.bold)
-        case .origin: .subheadline
-        default: .subheadline.weight(.semibold)
-        }
-    }
-
-    private var primaryTimeColor: Color {
-        node.role == .origin ? .secondary : .primary
     }
 
     // MARK: - Accessibility
