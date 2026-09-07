@@ -26,12 +26,6 @@ struct SettingsAdvancedView: View {
             }
 
             Section("API") {
-                AdvancedDiagnosticRow(label: "ATP mode", value: atpMode)
-                AdvancedDiagnosticRow(
-                    label: "ATP endpoint",
-                    value: configuration.apiProxyURL?.host() ?? "Unavailable"
-                )
-                AdvancedDiagnosticRow(label: "Transit data cache", value: gtfsSummary)
                 AdvancedDiagnosticRow(
                     label: "AVL feed",
                     value: configuration.avlMessagesURL.host() ?? "Configured"
@@ -40,46 +34,8 @@ struct SettingsAdvancedView: View {
             }
 
             Section("Transit data details") {
-                AdvancedDiagnosticRow(
-                    label: "Dataset",
-                    value: "Luxembourg public transport data"
-                )
-                AdvancedDiagnosticRow(label: "Source file", value: currentGTFSResource)
-                AdvancedDiagnosticRow(
-                    label: "Downloaded",
-                    value: formatted(viewModel.gtfsUpdateSnapshot.metadata?.downloadedAt)
-                )
-                AdvancedDiagnosticRow(
-                    label: "Last checked",
-                    value: formatted(viewModel.gtfsUpdateSnapshot.lastMetadataCheckAt)
-                )
-                AdvancedDiagnosticRow(
-                    label: "Last modified",
-                    value: formatted(viewModel.gtfsUpdateSnapshot.metadata?.lastModified)
-                )
-                AdvancedDiagnosticRow(
-                    label: "Checksum",
-                    value: viewModel.gtfsUpdateSnapshot.metadata?.checksum ?? "Unavailable"
-                )
-                AdvancedDiagnosticRow(label: "Status", value: gtfsStatusText)
-
-                if let lastFailureMessage = viewModel.gtfsUpdateSnapshot.lastFailureMessage {
-                    AdvancedFactRow(
-                        iconName: "exclamationmark.triangle.fill",
-                        title: "Last update failed",
-                        message: lastFailureMessage
-                    )
-                }
-
-                Button(action: checkGTFSUpdate) {
-                    Label(
-                        viewModel.isCheckingGTFSUpdate ? "Checking…" : "Check for data update",
-                        systemImage: "arrow.clockwise"
-                    )
-                    .frame(maxWidth: .infinity, alignment: .center)
-                }
-                .disabled(viewModel.isCheckingGTFSUpdate)
-                .accessibilityHint("Checks data.public.lu for a newer public-transport data version")
+                AdvancedDiagnosticRow(label: "GTFS schedules", value: "Disconnected")
+                AdvancedDiagnosticRow(label: "ATP live data", value: "Disconnected")
             }
 
             Section("Support") {
@@ -127,33 +83,6 @@ struct SettingsAdvancedView: View {
         return "\(version) (\(build))"
     }
 
-    private var gtfsSummary: String {
-        viewModel.gtfsUpdateSnapshot.metadata == nil ? "Unavailable" : "Cached locally"
-    }
-
-    private var atpMode: String {
-        configuration.hasATPAccessId ? "Live API configured" : "Mock fallback"
-    }
-
-    private var currentGTFSResource: String {
-        viewModel.gtfsUpdateSnapshot.metadata?.title ?? "Not downloaded"
-    }
-
-    private var gtfsStatusText: String {
-        if viewModel.isCheckingGTFSUpdate { return "Checking" }
-        switch viewModel.gtfsUpdateSnapshot.status {
-        case .idle: return "Idle"
-        case .checking: return "Checking"
-        case .upToDate: return "Up to date"
-        case .updated: return "Updated"
-        case .failed: return "Update failed"
-        }
-    }
-
-    private func formatted(_ date: Date?) -> String {
-        guard let date else { return "Unavailable" }
-        return date.formatted(date: .abbreviated, time: .shortened)
-    }
 }
 
 // MARK: - Shared helper components

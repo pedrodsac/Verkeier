@@ -8,7 +8,6 @@ struct RoutePlaceSearchView: View {
     let onSelect: (RoutePlace?) -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.gtfsService) private var gtfsService
     @Environment(\.placeSearchService) private var placeSearchService
     @State private var query = ""
     @State private var results: [RoutePlace] = []
@@ -145,23 +144,18 @@ struct RoutePlaceSearchView: View {
         }
 
         // Debounce: a new keystroke cancels this task before the sleep ends.
-        try? await Task.sleep(for: StopSearchConfiguration.debounceInterval)
+        try? await Task.sleep(for: .milliseconds(250))
         guard !Task.isCancelled else { return }
 
-        async let stops = gtfsService.searchStops(query: current)
         async let places = placeSearchService.searchPlaces(
             query: current,
             near: viewModel.currentLocation?.location
         )
-        let stopResults = await stops
-        let stopPlaces = stopResults
-            .deduplicatedByExactName()
-            .map { RoutePlace(stop: $0, source: .search) }
         let placeResults = await places
         guard !Task.isCancelled else { return }
 
         var seenIDs = Set<String>()
-        results = (stopPlaces + placeResults).filter { seenIDs.insert($0.id).inserted }
+        results = placeResults.filter { seenIDs.insert($0.id).inserted }
     }
 }
 

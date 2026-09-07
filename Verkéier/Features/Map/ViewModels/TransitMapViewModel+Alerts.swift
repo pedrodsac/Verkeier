@@ -24,39 +24,22 @@ extension TransitMapViewModel {
     /// stops' route ids with bounded fan-out, then defers to
     /// ``DisruptionAlertService`` to dedupe and deliver.
     func checkDisruptionAlerts(
-        using gtfsService: any GTFSService,
         disruptionAlertService: DisruptionAlertService,
-        favouriteStops: [Stop]
+        favouriteStops _: [Stop]
     ) async {
-        guard !favouriteStops.isEmpty, !alerts.isEmpty else { return }
-
-        let favouriteRouteIds = await Set(
-            withTaskGroup(of: [TransitRoute].self) { group in
-                for stop in favouriteStops {
-                    group.addTask { await gtfsService.routesForStop(id: stop.id) }
-                }
-                return await group.reduce(into: []) { $0 += $1 }
-            }.map(\.id)
-        )
-
-        await disruptionAlertService.checkAlerts(alerts, favouriteRouteIds: favouriteRouteIds)
+        guard !alerts.isEmpty else { return }
+        await disruptionAlertService.checkAlerts(alerts, favouriteRouteIds: [])
     }
 
-    func loadLineDetail(using gtfsService: any GTFSService, now: Date = .now) async {
+    func loadLineDetail(now _: Date = .now) async {
         guard let route = selectedLineDetailRoute else {
             selectedLineDetail = nil
             selectedLineDetailErrorMessage = "Line details are not available yet."
             return
         }
 
-        selectedLineDetail = await gtfsService.lineDetail(
-            for: route,
-            selectedStopId: selectedStop?.id,
-            now: now,
-            selectedDirectionID: selectedLineDetailDirectionID
-        )
-        selectedLineDetailErrorMessage =
-            selectedLineDetail == nil ? "No GTFS timetable details are available for this line." : nil
+        selectedLineDetail = nil
+        selectedLineDetailErrorMessage = "GTFS timetable data is currently unavailable for this line."
     }
 
     var areAlertsStale: Bool {

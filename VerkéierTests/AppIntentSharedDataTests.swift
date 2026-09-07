@@ -93,53 +93,6 @@ struct AppIntentSharedDataTests {
         )
     }
 
-    @Test func nextDeparturesSummaryFormatsUpcomingDepartures() {
-        let stop = FavouriteStopEntity(id: "stop-1", name: "Hill Lift", locality: "Test City")
-        let now = Date(timeIntervalSince1970: 1_000)
-        let departures = [
-            Departure(
-                id: "later",
-                stopId: stop.id,
-                lineName: "F2",
-                destination: "Lower Station",
-                scheduledDeparture: now.addingTimeInterval(360),
-                realtimeDeparture: now.addingTimeInterval(420),
-                delayMinutes: 1,
-                dataSource: .atpOpenAPI
-            ),
-            Departure(
-                id: "first",
-                stopId: stop.id,
-                lineName: "F1",
-                destination: "Upper Station",
-                scheduledDeparture: now.addingTimeInterval(120),
-                realtimeDeparture: now.addingTimeInterval(120),
-                delayMinutes: 0,
-                dataSource: .atpOpenAPI
-            ),
-        ]
-
-        let summary = NextDeparturesIntentService.summary(
-            for: stop,
-            departures: departures,
-            now: now
-        )
-
-        #expect(
-            summary
-                == "Next departures from Hill Lift: F1 to Upper Station, in 2 min, On time; F2 to Lower Station, in 7 min, +1 min"
-        )
-    }
-
-    @Test func nextDeparturesSummaryHandlesEmptyBoard() {
-        let stop = FavouriteStopEntity(id: "stop-1", name: "Hill Lift", locality: "Test City")
-
-        #expect(
-            NextDeparturesIntentService.summary(for: stop, departures: [], now: .now)
-                == "No upcoming live departures are available for Hill Lift."
-        )
-    }
-
     @Test func trackedDepartureReminderRoundTripsSharedStorage() throws {
         clearSharedStorage()
         defer { clearSharedStorage() }

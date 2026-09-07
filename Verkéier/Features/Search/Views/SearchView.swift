@@ -201,7 +201,7 @@ private struct NearbySearchSuggestions: View {
                 ContentUnavailableView(
                     "Search stops",
                     systemImage: "tram",
-                    description: Text("Start typing to find stops from local GTFS data.")
+                    description: Text("Start typing to search places and addresses.")
                 )
             } else {
                 ScrollView {

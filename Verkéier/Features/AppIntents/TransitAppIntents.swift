@@ -62,8 +62,7 @@ struct GetNextDeparturesIntent: AppIntent {
     var stop: FavouriteStopEntity
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        let response = await NextDeparturesIntentService.response(for: stop)
-        return .result(dialog: IntentDialog(stringLiteral: response))
+        .result(dialog: IntentDialog(stringLiteral: "Transit data is currently unavailable for \(stop.name)."))
     }
 }
 

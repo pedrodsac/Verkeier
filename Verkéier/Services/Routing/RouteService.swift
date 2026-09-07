@@ -2,9 +2,8 @@ import Foundation
 
 /// Computes journeys between two places and hands off to Apple Maps.
 ///
-/// `PublicTransportRouteService` is the production implementation, combining the
-/// GTFS timetable with live ATP data; `MapKitRouteService` provides a
-/// MapKit-only fallback. Inject an implementation via the environment.
+/// `MapKitRouteService` is the current implementation and delegates route
+/// calculation to Apple Maps. Inject an implementation via the environment.
 protocol RouteService: Sendable {
     /// Computes route alternatives between two points.
     /// - Parameters:
@@ -29,9 +28,7 @@ protocol RouteService: Sendable {
 }
 
 extension RouteService {
-    /// Default calculations publish immediately from the offline timetable.
-    /// The planner asks for live enrichment explicitly after it has a result to
-    /// display, so network or directions latency never blocks the first route.
+    /// Default calculations use the initial route-search page.
     nonisolated func calculateRoute(
         from: LocationPoint,
         to: LocationPoint,
@@ -78,10 +75,10 @@ extension RouteService {
     }
 }
 
-/// Controls whether a planner calculation may reuse its short-lived ATP snapshot.
-/// The policy has no effect on offline and MapKit-only routing.
+/// Controls the freshness requested by a route calculation.
+/// MapKit-only routing may ignore this policy.
 nonisolated enum RouteRealtimeRefreshPolicy: Hashable, Sendable {
-    /// Use only static GTFS data. This is the fast initial result.
+    /// Prefer the fastest available scheduled result.
     case scheduleOnly
     case useCache
     case forceRefresh

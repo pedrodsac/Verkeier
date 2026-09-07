@@ -1,6 +1,15 @@
 {
-  "originHash" : "360039efc01feaa38910b13059b5a8e0c745cd2b7288f73f4ea2739e7e935b2b",
+  "originHash" : "9863ca39a9be483cd8ea3febddaa4d64f5bb80a97913ad2208c3a29d886d02ab",
   "pins" : [
+    {
+      "identity" : "mobiliteitkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pedrodsac/MobiliteitKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "7a75e802752e6e0fc1cf68901504bfd2d0a8264e"
+      }
+    },
     {
       "identity" : "swift-async-algorithms",
       "kind" : "remoteSourceControl",

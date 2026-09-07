@@ -2,6 +2,53 @@ import CoreLocation
 import Foundation
 import MapKit
 
+func routeSearchDistanceMeters(from origin: LocationPoint, to destination: LocationPoint) -> Double {
+    CLLocation(latitude: origin.latitude, longitude: origin.longitude)
+        .distance(from: CLLocation(latitude: destination.latitude, longitude: destination.longitude))
+}
+
+protocol RoadRouteProviding: Sendable {
+    nonisolated func roadRoute(
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        transport: RoadRouteTransport
+    ) async -> RoadRoute?
+
+    nonisolated func roadRouteCoordinates(
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        transport: RoadRouteTransport
+    ) async -> [RouteMapCoordinate]?
+}
+
+extension RoadRouteProviding {
+    nonisolated func roadRoute(
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        transport: RoadRouteTransport
+    ) async -> RoadRoute? {
+        guard let coordinates = await roadRouteCoordinates(
+            from: origin,
+            to: destination,
+            transport: transport
+        ), coordinates.count >= 2 else {
+            return nil
+        }
+
+        let distanceMeters = zip(coordinates, coordinates.dropFirst()).reduce(0) { total, pair in
+            total + CLLocation(
+                latitude: pair.0.latitude,
+                longitude: pair.0.longitude
+            ).distance(from: CLLocation(
+                latitude: pair.1.latitude,
+                longitude: pair.1.longitude
+            ))
+        }
+        guard distanceMeters.isFinite, distanceMeters >= 0 else { return nil }
+        return RoadRoute(coordinates: coordinates, distanceMeters: distanceMeters)
+    }
+}
+
 enum RoadRouteTransport: String, Sendable {
     case automobile
     case walking

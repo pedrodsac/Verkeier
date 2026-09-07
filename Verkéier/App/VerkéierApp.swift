@@ -8,20 +8,15 @@ struct VerkéierApp: App {
         DebugTransitDataMode.normal.rawValue
     @State private var preferences = AppPreferences.shared
     private let configuration: AppConfiguration
-    private let gtfsService: any GTFSService
     private let bikeShareService: any BikeShareService
     private let modelContainer: ModelContainer
     @State private var liveActivityManager = LiveActivityManager()
     @State private var departureReminderService = DepartureReminderService()
     @State private var disruptionAlertService = DisruptionAlertService()
-    @State private var gtfsUpdateController: GTFSUpdateController
 
     init() {
         let configuration = AppConfiguration.current
         self.configuration = configuration
-        let gtfsController = GTFSController()
-        gtfsService = gtfsController
-        _gtfsUpdateController = State(initialValue: GTFSUpdateController(controller: gtfsController))
         bikeShareService = JCDecauxBikeShareService(configuration: configuration)
         modelContainer = AppModelContainer.make()
     }
@@ -30,9 +25,6 @@ struct VerkéierApp: App {
         WindowGroup {
             TransitMapScreen(locationService: locationService)
                 .environment(\.appConfiguration, configuration)
-                .environment(\.atpClient, atpClient)
-                .environment(\.gtfsService, gtfsService)
-                .environment(\.gtfsUpdateController, gtfsUpdateController)
                 .environment(\.routeService, routeService)
                 .environment(\.bikeShareService, bikeShareService)
                 .environment(\.avlClient, avlClient)
@@ -42,36 +34,6 @@ struct VerkéierApp: App {
                 .environment(preferences)
                 .modelContainer(modelContainer)
                 .preferredColorScheme(preferences.appearance.colorScheme)
-                .task {
-                    GTFSBackgroundRefresh.schedule()
-                }
-        }
-        .backgroundTask(.appRefresh(GTFSBackgroundRefresh.identifier)) {
-            await GTFSBackgroundRefresh.run()
-            await GTFSBackgroundRefresh.schedule()
-        }
-    }
-
-    private var debugTransitDataMode: DebugTransitDataMode {
-        DebugTransitDataMode(rawValue: debugTransitDataModeRawValue) ?? .normal
-    }
-
-    private var atpClient: any ATPClient {
-        // Offline mode: no live transit data anywhere (departures, delays, cancellations).
-        if preferences.offlineMode {
-            return EmptyATPClient()
-        }
-        return switch debugTransitDataMode {
-        case .normal:
-            configuration.hasATPAccessId ? LiveATPClient(configuration: configuration) : EmptyATPClient()
-        case .sample:
-            FixtureATPClient(mode: .sample)
-        case .empty:
-            FixtureATPClient(mode: .empty)
-        case .failure:
-            FixtureATPClient(mode: .failure)
-        case .disruption:
-            FixtureATPClient(mode: .disruption)
         }
     }
 
@@ -88,12 +50,9 @@ struct VerkéierApp: App {
         }
     }
 
-    private var routeService: any RouteService {
-        PublicTransportRouteService(
-            gtfsService: gtfsService,
-            atpClient: atpClient,
-            bikeShareService: bikeShareService,
-            offlineMode: preferences.offlineMode
-        )
+    private var debugTransitDataMode: DebugTransitDataMode {
+        DebugTransitDataMode(rawValue: debugTransitDataModeRawValue) ?? .normal
     }
+
+    private var routeService: any RouteService { MapKitRouteService() }
 }

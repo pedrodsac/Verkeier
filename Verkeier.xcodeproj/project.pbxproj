@@ -10,11 +10,10 @@
 		000000000000000370000000 /* VerkeierWidgets.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 000000000000000000000320 /* VerkeierWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		627757813024D6D30012B2EF /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 627757803024D6D30012B2EF /* AppIcon.icon */; };
 		627757823024D6D30012B2EF /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 627757803024D6D30012B2EF /* AppIcon.icon */; };
-		62FE86412FEE000000000001 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000101 /* ZIPFoundation */; };
 		62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000102 /* AsyncAlgorithms */; };
-		62FE86412FEE000000000004 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000104 /* ZIPFoundation */; };
 		62FE86412FEE000000000005 /* UIOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000105 /* UIOnboarding */; };
 		E8ACE883304CCD690019CAC3 /* Transit in Frameworks */ = {isa = PBXBuildFile; productRef = E8ACE882304CCD690019CAC3 /* Transit */; };
+		E8D57E2E304F173F00F569AC /* MobiliteitKit in Frameworks */ = {isa = PBXBuildFile; productRef = E8D57E2D304F173F00F569AC /* MobiliteitKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,15 +104,14 @@
 			isa = PBXFrameworksBuildPhase;
 			files = (
 				E8ACE883304CCD690019CAC3 /* Transit in Frameworks */,
-				62FE86412FEE000000000001 /* ZIPFoundation in Frameworks */,
 				62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */,
+				E8D57E2E304F173F00F569AC /* MobiliteitKit in Frameworks */,
 				62FE86412FEE000000000005 /* UIOnboarding in Frameworks */,
 			);
 		};
 		000000000000000230000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
-				62FE86412FEE000000000004 /* ZIPFoundation in Frameworks */,
 			);
 		};
 		000000000000000330000000 /* Frameworks */ = {
@@ -178,10 +176,10 @@
 			);
 			name = Verkeier;
 			packageProductDependencies = (
-				62FE86412FEE000000000101 /* ZIPFoundation */,
 				62FE86412FEE000000000102 /* AsyncAlgorithms */,
 				62FE86412FEE000000000105 /* UIOnboarding */,
 				E8ACE882304CCD690019CAC3 /* Transit */,
+				E8D57E2D304F173F00F569AC /* MobiliteitKit */,
 			);
 			productName = "Verkéier";
 			productReference = 000000000000000000000120 /* Verkeier.app */;
@@ -204,9 +202,6 @@
 				62FE86412FDDDDC400081C54 /* VerkéierTests */,
 			);
 			name = VerkeierTests;
-			packageProductDependencies = (
-				62FE86412FEE000000000104 /* ZIPFoundation */,
-			);
 			productName = "VerkéierTests";
 			productReference = 000000000000000000000220 /* VerkeierTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -266,10 +261,10 @@
 			mainGroup = 000000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				62FE86412FEE000000000201 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				62FE86412FEE000000000204 /* XCRemoteSwiftPackageReference "UIOnboarding" */,
 				E8ACE881304CCD690019CAC3 /* XCRemoteSwiftPackageReference "transit" */,
+				E8D57E2C304F173F00F569AC /* XCRemoteSwiftPackageReference "MobiliteitKit" */,
 			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
@@ -719,14 +714,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		62FE86412FEE000000000201 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.9.20;
-			};
-		};
 		62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-async-algorithms.git";
@@ -751,23 +738,21 @@
 				kind = branch;
 			};
 		};
+		E8D57E2C304F173F00F569AC /* XCRemoteSwiftPackageReference "MobiliteitKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pedrodsac/MobiliteitKit";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		62FE86412FEE000000000101 /* ZIPFoundation */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 62FE86412FEE000000000201 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
-			productName = ZIPFoundation;
-		};
 		62FE86412FEE000000000102 /* AsyncAlgorithms */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
-		};
-		62FE86412FEE000000000104 /* ZIPFoundation */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 62FE86412FEE000000000201 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
-			productName = ZIPFoundation;
 		};
 		62FE86412FEE000000000105 /* UIOnboarding */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -778,6 +763,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E8ACE881304CCD690019CAC3 /* XCRemoteSwiftPackageReference "transit" */;
 			productName = Transit;
+		};
+		E8D57E2D304F173F00F569AC /* MobiliteitKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E8D57E2C304F173F00F569AC /* XCRemoteSwiftPackageReference "MobiliteitKit" */;
+			productName = MobiliteitKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

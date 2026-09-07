@@ -83,17 +83,10 @@ struct SettingsView: View {
 			}
 
 			Section("Transit data") {
-				LabeledContent("Last version", value: transitDataVersion)
-
-				Button(action: checkGTFSUpdate) {
-					Label(
-						viewModel.isCheckingGTFSUpdate ? "Updating…" : "Update transit data",
-						systemImage: "arrow.clockwise"
-					)
-					.frame(maxWidth: .infinity, alignment: .center)
-				}
-				.disabled(viewModel.isCheckingGTFSUpdate)
-				.accessibilityHint("Checks for and installs a newer transit-data version.")
+				LabeledContent("Status", value: "Disconnected")
+				Text("GTFS schedules and ATP live departures are not connected.")
+					.font(.footnote)
+					.foregroundStyle(.secondary)
 			}
 			
 			Section("About") {
@@ -107,15 +100,6 @@ struct SettingsView: View {
         .listStyle(.insetGrouped)
         // Give every settings glyph subtle layered depth without per-row changes.
         .symbolRenderingMode(.hierarchical)
-	}
-
-	private var transitDataVersion: String {
-		guard let metadata = viewModel.gtfsUpdateSnapshot.metadata else {
-			return "Included with app"
-		}
-
-		return (metadata.lastModified ?? metadata.downloadedAt)
-			.formatted(date: .abbreviated, time: .omitted)
 	}
 
 	@ViewBuilder
@@ -171,8 +155,6 @@ private struct SettingsPermissionsSection: View {
     SettingsView(
         viewModel: SettingsPresentationModel(
             configuration: .current,
-            gtfsUpdateSnapshot: .empty,
-            isCheckingGTFSUpdate: false,
             readiness: DataReadinessSnapshot(
                 summaryTitle: "Transit data is ready",
                 summaryMessage: "This screen shows whether Verkéier is using live, downloaded, bundled, or fallback data.",

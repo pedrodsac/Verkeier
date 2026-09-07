@@ -6,7 +6,7 @@ struct NearbyStopsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Closest stops from mobiliteit.lu")
+            Text("Nearby stops")
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(.secondary)
 

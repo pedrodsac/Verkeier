@@ -8,11 +8,7 @@ extension TransitMapViewModel {
         locationService.requestWhenInUseAuthorization()
     }
 
-    func loadNearbyStops(
-        using atpClient: any ATPClient,
-        location: CLLocation?,
-        force: Bool = false
-    ) async {
+    func loadNearbyStops(location: CLLocation?, force: Bool = false) async {
         let requestLocation = location ?? CLLocation(
             latitude: defaultRegion.center.latitude,
             longitude: defaultRegion.center.longitude
@@ -20,20 +16,8 @@ extension TransitMapViewModel {
         guard force || shouldRefreshNearbyStops(for: requestLocation) else { return }
         lastNearbyStopsRequestLocation = requestLocation
         isLoadingNearbyStops = true
-        nearbyStopsErrorMessage = nil
-
-        let coordinate = requestLocation.coordinate
-
-        do {
-            nearbyStops = try await atpClient.nearbyStops(
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude,
-                options: nearbyStopsOptions()
-            )
-        } catch {
-            nearbyStops = []
-            nearbyStopsErrorMessage = "Nearby stops could not be loaded."
-        }
+        nearbyStops = []
+        nearbyStopsErrorMessage = "Transit data is currently unavailable."
 
         isLoadingNearbyStops = false
     }
@@ -43,70 +27,26 @@ extension TransitMapViewModel {
         return location.distance(from: lastNearbyStopsRequestLocation) >= nearbyStopsRefreshDistance
     }
 
-    private func nearbyStopsOptions() -> ATPNearbyStopsOptions {
-        var products = ATPProductFilter()
-        let preferences = AppPreferences.shared
-        if preferences.showTrainStations { products.formUnion(.trains) }
-        if preferences.showBusStops { products.formUnion(.bus) }
-        if preferences.showTramStops { products.formUnion(.tram) }
-        return ATPNearbyStopsOptions(
-            maximumResults: 6,
-            products: products.isEmpty ? nil : products
-        )
-    }
-
     /// Loads the lines serving each nearby stop, with bounded concurrency, so
     /// the nearby list can show "12 · 14 · 25" rather than just a mode label.
-    func loadNearbyStopRoutes(using gtfsService: any GTFSService) async {
-        let stops = nearbyStops
-        guard !stops.isEmpty else {
-            nearbyStopRoutes = [:]
-            return
-        }
-
-        var result: [String: [TransitRoute]] = [:]
-        await withTaskGroup(of: (String, [TransitRoute]).self) { group in
-            var iterator = stops.makeIterator()
-            for _ in 0 ..< min(nearbyRouteConcurrencyLimit, stops.count) {
-                guard let stop = iterator.next() else { break }
-                group.addTask { await (stop.id, gtfsService.routesForStop(id: stop.id)) }
-            }
-
-            while let (id, routes) = await group.next() {
-                if !routes.isEmpty { result[id] = routes }
-                if let stop = iterator.next() {
-                    group.addTask { await (stop.id, gtfsService.routesForStop(id: stop.id)) }
-                }
-            }
-        }
-        nearbyStopRoutes = result
+    func loadNearbyStopRoutes() async {
+        nearbyStopRoutes = [:]
     }
 
-    func loadGTFSMapStops(using gtfsService: any GTFSService, location _: CLLocation?) async {
+    func loadGTFSMapStops(location _: CLLocation?) async {
         let region = visibleMapRegion ?? cameraRegion
-        await loadGTFSMapStops(using: gtfsService, region: region)
+        await loadGTFSMapStops(region: region)
     }
 
-    func updateVisibleMapRegion(_ region: MKCoordinateRegion, using gtfsService: any GTFSService) async {
+    func updateVisibleMapRegion(_ region: MKCoordinateRegion) async {
         guard let region = sanitized(region) else { return }
         visibleMapRegion = region
-        await loadGTFSMapStops(using: gtfsService, region: region)
+        await loadGTFSMapStops(region: region)
     }
 
-    private func loadGTFSMapStops(using gtfsService: any GTFSService, region: MKCoordinateRegion) async {
+    private func loadGTFSMapStops(region: MKCoordinateRegion) async {
         guard let region = sanitized(region) else { return }
-        let coordinate = region.center
-        let center = LocationPoint(
-            name: "Visible map center",
-            latitude: coordinate.latitude,
-            longitude: coordinate.longitude
-        )
-        gtfsMapStops = await gtfsService.stopsForMap(
-            center: center,
-            latitudeDelta: max(region.span.latitudeDelta, defaultRegion.span.latitudeDelta),
-            longitudeDelta: max(region.span.longitudeDelta, defaultRegion.span.longitudeDelta),
-            limit: 180
-        )
+        gtfsMapStops = []
     }
 
     func selectStop(
@@ -170,49 +110,16 @@ extension TransitMapViewModel {
         }
     }
 
-    func searchStops(using gtfsService: any GTFSService) async {
+    func searchStops() async {
         let query = searchQuery
-        async let gtfsLookup = gtfsService.searchStops(query: query)
         async let mapKitLookup = Self.mapKitStops(matching: query)
-
-        let gtfsResults = await Array(gtfsLookup.prefix(80))
-        // Drop MapKit hits that land on top of a GTFS stop we already returned.
-        let mapKitResults = await mapKitLookup.filter { place in
-            !gtfsResults.contains { Self.areWithin(100, place, $0) }
-        }
 
         // A newer keystroke may have superseded this query while MapKit ran.
         guard query == searchQuery else { return }
-        searchResults = (gtfsResults + mapKitResults).deduplicatedByExactName()
+        searchResults = await mapKitLookup.deduplicatedByExactName()
     }
 
-    func updateSelectedStopRoutes(using gtfsService: any GTFSService) async {
-        guard let selectedStop else {
-            selectedStopRoutes = []
-            return
-        }
-
-        let directRoutes = await gtfsService.routesForStop(id: selectedStop.id)
-        if !directRoutes.isEmpty {
-            selectedStopRoutes = directRoutes
-            return
-        }
-
-        let matchedStops = await gtfsService.searchStops(query: selectedStop.name)
-        let routeCandidateStops = matchedStops
-            .filter { $0.name.normalizedForSearch == selectedStop.name.normalizedForSearch }
-            .sorted {
-                squaredDistance(from: $0.location, to: selectedStop.location)
-                    < squaredDistance(from: $1.location, to: selectedStop.location)
-            }
-        for stop in routeCandidateStops {
-            let routes = await gtfsService.routesForStop(id: stop.id)
-            if !routes.isEmpty {
-                selectedStopRoutes = routes
-                return
-            }
-        }
-
+    func updateSelectedStopRoutes() async {
         selectedStopRoutes = []
     }
 

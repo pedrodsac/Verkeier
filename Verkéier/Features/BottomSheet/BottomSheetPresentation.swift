@@ -100,8 +100,6 @@ struct AlertsPresentationModel {
 
 struct SettingsPresentationModel {
     let configuration: AppConfiguration
-    let gtfsUpdateSnapshot: GTFSUpdateSnapshot
-    let isCheckingGTFSUpdate: Bool
     let readiness: DataReadinessSnapshot
     let supportBundleText: String
     let debugDataMode: DebugTransitDataMode

@@ -60,17 +60,6 @@ struct RefreshDeparturesWidgetIntent: AppIntent {
     }
 
     func perform() async throws -> some IntentResult {
-        guard let stop = WidgetDeparturesAPI.stop(withID: stopID) else {
-            WidgetCenter.shared.reloadTimelines(ofKind: DeparturesSummaryWidget.kind)
-            return .result()
-        }
-
-        let departures = try await WidgetDeparturesAPI.fetchDepartures(for: stop)
-        SharedTransitDataStore.saveFavouriteDepartureBoard(
-            stopId: stop.id,
-            departures: departures,
-            updatedAt: .now
-        )
         WidgetCenter.shared.reloadTimelines(ofKind: DeparturesSummaryWidget.kind)
         return .result()
     }

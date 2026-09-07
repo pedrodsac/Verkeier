@@ -64,22 +64,15 @@ struct StopDetailPresentationModel {
     }
 
     var mergedDepartures: [Departure] {
-        guard let stop else { return departures }
-        let merged = DepartureBoardMerger.merge(
-            live: departures,
-            scheduled: offlineScheduledDepartures,
-            stopID: stop.id
-        )
-
         let lineFiltered: [Departure]
         if let selectedLine,
            let route = routes.first(where: { $0.id == selectedLine }) {
-            lineFiltered = merged.filter { departure in
+            lineFiltered = departures.filter { departure in
                 departure.routeId?.caseInsensitiveCompare(route.id) == .orderedSame
                     || departure.lineName.caseInsensitiveCompare(route.shortName) == .orderedSame
             }
         } else {
-            lineFiltered = merged
+            lineFiltered = departures
         }
 
         guard let selectedPlatform else { return lineFiltered }

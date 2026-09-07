@@ -63,16 +63,10 @@ value types, decoded and mapped from external feeds before they reach the UI.
 Each protocol is the seam between the UI and a data source. Pick an
 implementation by injecting it into the environment.
 
-- ``ATPClient``
-- ``GTFSService``
 - ``AVLClient``
 - ``RouteService``
 
 ### Service Implementations
 
-- ``LocalGTFSService``
-- ``GTFSUpdateService``
-- ``OfflineScheduleService``
-- ``LineDetailService``
 - ``DepartureReminderService``
 - ``LocationService``

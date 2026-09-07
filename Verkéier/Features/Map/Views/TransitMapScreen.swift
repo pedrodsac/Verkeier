@@ -8,9 +8,6 @@ import SwiftUI
 struct TransitMapScreen: View {
     @AppStorage("debugTransitDataMode") var debugTransitDataModeRawValue =
         DebugTransitDataMode.normal.rawValue
-    @Environment(\.atpClient) var atpClient
-    @Environment(\.gtfsService) var gtfsService
-    @Environment(\.gtfsUpdateController) var gtfsUpdateController
     @Environment(\.routeService) var routeService
     @Environment(\.bikeShareService) private var bikeShareService
     @Environment(\.accessibilityReduceMotion) var reduceMotion
@@ -92,7 +89,6 @@ struct TransitMapScreen: View {
             OnboardingView {
                 hasCompletedOnboarding = true
                 isOnboardingPresented = false
-                gtfsUpdateController.checkAutomatically()
             }
             .ignoresSafeArea()
         }
@@ -110,20 +106,14 @@ struct TransitMapScreen: View {
             }
         }
         .task {
-            gtfsUpdateController.loadSnapshot()
-            gtfsUpdateController.checkAutomatically()
             viewModel.loadRoutePlanner()
             locationService.startUpdatingIfAllowed()
             await bikeShareService.refreshStaticStations()
             await bikeShareService.refreshAvailability()
             bikeShareStations = await bikeShareService.snapshot()?.stations ?? []
-            await viewModel.loadGTFSMapStops(
-                using: gtfsService, location: locationService.currentLocation
-            )
-            await viewModel.loadNearbyStops(
-                using: atpClient, location: locationService.currentLocation
-            )
-            await viewModel.loadNearbyStopRoutes(using: gtfsService)
+            await viewModel.loadGTFSMapStops(location: locationService.currentLocation)
+            await viewModel.loadNearbyStops(location: locationService.currentLocation)
+            await viewModel.loadNearbyStopRoutes()
             await loadAlertsAndCheckDisruptions()
         }
         .task {
@@ -137,9 +127,7 @@ struct TransitMapScreen: View {
                 shouldCenterOnNextLocation = false
             }
             Task {
-                await viewModel.loadGTFSMapStops(
-                    using: gtfsService, location: locationService.currentLocation
-                )
+                await viewModel.loadGTFSMapStops(location: locationService.currentLocation)
             }
             scheduleNearbyStopsRefresh()
             calculateWaitingRouteIfNeeded()
@@ -148,13 +136,13 @@ struct TransitMapScreen: View {
             guard viewModel.selectedStop != nil, isShowingStopDetail else {
                 return
             }
-            await viewModel.loadDepartures(using: atpClient)
+            await viewModel.loadDepartures()
             await updateTrackedDepartureIfNeeded()
 
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(45))
                 guard !Task.isCancelled else { return }
-                await viewModel.loadDepartures(using: atpClient)
+                await viewModel.loadDepartures()
                 await updateTrackedDepartureIfNeeded()
             }
         }
@@ -193,19 +181,6 @@ struct TransitMapScreen: View {
         }
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
             handleSpotlightActivity(activity)
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .gtfsDidUpdate)) { _ in
-            Task {
-                await viewModel.loadGTFSMapStops(
-                    using: gtfsService, location: locationService.currentLocation
-                )
-                await viewModel.updateSelectedStopRoutes(using: gtfsService)
-                await viewModel.loadOfflineScheduledDepartures(using: gtfsService)
-                await viewModel.searchStops(using: gtfsService)
-                if viewModel.selectedLineDetailRoute != nil {
-                    await viewModel.loadLineDetail(using: gtfsService)
-                }
-            }
         }
     }
 
@@ -297,8 +272,7 @@ struct TransitMapScreen: View {
     }
 
     var canLoadLiveFavouriteDepartures: Bool {
-        !AppPreferences.shared.offlineMode
-            && (appConfiguration.hasATPAccessId || debugTransitDataMode != .normal)
+        false
     }
 
     var departureRefreshKey: String {

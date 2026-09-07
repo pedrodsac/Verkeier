@@ -15,7 +15,7 @@ extension TransitMapScreen {
                 return
             }
             guard !Task.isCancelled else { return }
-            await viewModel.updateVisibleMapRegion(region, using: gtfsService)
+            await viewModel.updateVisibleMapRegion(region)
         }
     }
 
@@ -23,7 +23,7 @@ extension TransitMapScreen {
         let query = viewModel.searchQuery
         guard !query.isEmpty else {
             Task {
-                await viewModel.searchStops(using: gtfsService)
+                await viewModel.searchStops()
             }
             return
         }
@@ -37,10 +37,10 @@ extension TransitMapScreen {
             searchUpdateContinuation = nil
         }
 
-        for await query in stream.stream.debounce(for: StopSearchConfiguration.debounceInterval) {
+        for await query in stream.stream.debounce(for: .milliseconds(250)) {
             guard !Task.isCancelled else { return }
             guard query == viewModel.searchQuery else { continue }
-            await viewModel.searchStops(using: gtfsService)
+            await viewModel.searchStops()
         }
     }
 
@@ -53,10 +53,8 @@ extension TransitMapScreen {
                 return
             }
             guard !Task.isCancelled else { return }
-            await viewModel.loadNearbyStops(
-                using: atpClient, location: locationService.currentLocation
-            )
-            await viewModel.loadNearbyStopRoutes(using: gtfsService)
+            await viewModel.loadNearbyStops(location: locationService.currentLocation)
+            await viewModel.loadNearbyStopRoutes()
         }
     }
 
@@ -111,10 +109,7 @@ extension TransitMapScreen {
 
     func openSpecialEvent(_ event: SpecialEvent) {
         Task { @MainActor in
-            guard let stop = await gtfsService.searchStops(query: event.stopName).first else {
-                return
-            }
-            selectStop(stop)
+            _ = event
         }
     }
 
@@ -145,25 +140,11 @@ extension TransitMapScreen {
     }
 
     func refreshFavouriteStop(_ stop: Stop) async {
-        guard canLoadLiveFavouriteDepartures else {
-            viewModel.markFavouriteDeparturesUnavailable(for: [stop])
-            return
-        }
-        let filter = favouriteEntities.first(where: { $0.stopId == stop.id })?.boardFilter ?? TransitBoardFilter()
-        await viewModel.refreshFavouriteDeparture(using: atpClient, stop: stop, filter: filter)
+        viewModel.markFavouriteDeparturesUnavailable(for: [stop])
     }
 
     func refreshFavouriteStops() async {
-        guard canLoadLiveFavouriteDepartures else {
-            viewModel.markFavouriteDeparturesUnavailable(for: favouriteStops)
-            return
-        }
-        let filters = Dictionary(uniqueKeysWithValues: favouriteEntities.map { ($0.stopId, $0.boardFilter) })
-        await viewModel.loadFavouriteDepartures(
-            using: atpClient,
-            favourites: favouriteStops,
-            filtersByStopID: filters
-        )
+        await viewModel.loadFavouriteDepartures(favourites: favouriteStops)
     }
 
     func updateFavouriteLabels(stopID: String, labels: [String]) {
@@ -222,7 +203,7 @@ extension TransitMapScreen {
     func selectLineDetailDirection(_ directionID: String) {
         viewModel.selectLineDetailDirection(directionID)
         Task {
-            await viewModel.loadLineDetail(using: gtfsService)
+            await viewModel.loadLineDetail()
         }
     }
 
@@ -287,17 +268,17 @@ extension TransitMapScreen {
 
     func toggleDepartureLine(_ route: TransitRoute) {
         viewModel.toggleDepartureLine(route)
-        Task { await viewModel.loadDepartures(using: atpClient) }
+        Task { await viewModel.loadDepartures() }
     }
 
     func selectDeparturePlatform(_ platform: String?) {
         viewModel.selectDeparturePlatform(platform)
-        Task { await viewModel.loadDepartures(using: atpClient) }
+        Task { await viewModel.loadDepartures() }
     }
 
     func updateDepartureBoardFilter(_ filter: TransitBoardFilter) {
         viewModel.updateDepartureBoardFilter(filter)
-        Task { await viewModel.loadDepartures(using: atpClient) }
+        Task { await viewModel.loadDepartures() }
     }
 
     func stopForRoutePlace(_ place: RoutePlace) -> Stop? {
@@ -364,7 +345,7 @@ extension TransitMapScreen {
             prepareLineDetail: { viewModel.prepareLineDetail($0) || viewModel.selectedLineDetail == nil },
             loadLineDetail: {
                 Task {
-                    await viewModel.loadLineDetail(using: gtfsService)
+                    await viewModel.loadLineDetail()
                 }
             }
         )
@@ -377,12 +358,9 @@ extension TransitMapScreen {
 
     func loadSelectedStopData() {
         Task {
-            await viewModel.updateSelectedStopRoutes(using: gtfsService)
-            await viewModel.loadOfflineScheduledDepartures(using: gtfsService)
-            await viewModel.loadGTFSMapStops(
-                using: gtfsService,
-                location: locationService.currentLocation
-            )
+            await viewModel.updateSelectedStopRoutes()
+            await viewModel.loadOfflineScheduledDepartures()
+            await viewModel.loadGTFSMapStops(location: locationService.currentLocation)
         }
     }
 
@@ -395,9 +373,7 @@ extension TransitMapScreen {
             } else {
                 viewModel.centerOnUserLocation(locationService.currentLocation)
                 Task {
-                    await viewModel.loadGTFSMapStops(
-                        using: gtfsService, location: locationService.currentLocation
-                    )
+                    await viewModel.loadGTFSMapStops(location: locationService.currentLocation)
                 }
             }
         case .notDetermined:
@@ -409,33 +385,27 @@ extension TransitMapScreen {
     }
 
     func refreshDepartures() async {
-        await viewModel.loadDepartures(using: atpClient)
+        await viewModel.loadDepartures()
         await updateTrackedDepartureIfNeeded()
     }
 
     func updateSearch() {
         Task {
-            await viewModel.searchStops(using: gtfsService)
+            await viewModel.searchStops()
         }
     }
 
     func checkGTFSUpdate() {
-        gtfsUpdateController.checkManually()
+        // GTFS updates are intentionally disconnected.
     }
 
     func setDebugDataMode(_ mode: DebugTransitDataMode) {
         debugTransitDataModeRawValue = mode.rawValue
         Task {
-            await viewModel.loadNearbyStops(
-                using: atpClient,
-                location: locationService.currentLocation,
-                force: true
-            )
-            await viewModel.loadNearbyStopRoutes(using: gtfsService)
             await loadAlertsAndCheckDisruptions()
             await refreshFavouriteStops()
             if viewModel.selectedStop != nil {
-                await viewModel.loadDepartures(using: atpClient)
+                await viewModel.loadDepartures()
             }
         }
     }
@@ -499,7 +469,6 @@ extension TransitMapScreen {
     func loadAlertsAndCheckDisruptions() async {
         await viewModel.loadAlerts(using: avlClient)
         await viewModel.checkDisruptionAlerts(
-            using: gtfsService,
             disruptionAlertService: disruptionAlertService,
             favouriteStops: favouriteStops
         )

@@ -121,8 +121,6 @@ extension TransitMapScreen {
             ),
             settings: SettingsPresentationModel(
                 configuration: appConfiguration,
-                gtfsUpdateSnapshot: gtfsUpdateController.snapshot,
-                isCheckingGTFSUpdate: gtfsUpdateController.isChecking,
                 readiness: settingsReadinessSnapshot,
                 supportBundleText: settingsSupportBundleText,
                 debugDataMode: debugTransitDataMode
@@ -131,18 +129,13 @@ extension TransitMapScreen {
     }
 
     var settingsReadinessSnapshot: DataReadinessSnapshot {
-        SettingsSupport.readinessSnapshot(
-            configuration: appConfiguration,
-            gtfsSnapshot: gtfsUpdateController.snapshot,
-            hasBundledSeed: Bundle.main.url(forResource: "gtfs-compact", withExtension: "json") != nil
-        )
+        SettingsSupport.readinessSnapshot(configuration: appConfiguration)
     }
 
     var settingsSupportBundleText: String {
         SettingsSupport.supportBundleText(
             appVersion: appVersion,
             readiness: settingsReadinessSnapshot,
-            gtfsSnapshot: gtfsUpdateController.snapshot,
             configuration: appConfiguration
         )
     }

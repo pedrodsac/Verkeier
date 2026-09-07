@@ -406,6 +406,7 @@
       }
     },
     "0 transfers  ·  0.0 km  ·  Scheduled GTFS times" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -432,6 +433,9 @@
           }
         }
       }
+    },
+    "0 transfers  ·  0.0 km  ·  Scheduled times" : {
+
     },
     "00:00 – 00:00  ·  00 min" : {
       "localizations" : {
@@ -1077,9 +1081,6 @@
         }
       }
     },
-    "Check for data update" : {
-
-    },
     "Check for GTFS update" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1110,6 +1111,7 @@
       }
     },
     "Checking…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1165,12 +1167,6 @@
           }
         }
       }
-    },
-    "Checks data.public.lu for a newer public-transport data version" : {
-
-    },
-    "Checks for and installs a newer transit-data version." : {
-
     },
     "Choose a stop at this location" : {
       "localizations" : {
@@ -1229,6 +1225,7 @@
       }
     },
     "Closest stops from mobiliteit.lu" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2182,6 +2179,9 @@
         }
       }
     },
+    "GTFS schedules and ATP live departures are not connected." : {
+
+    },
     "Home" : {
       "localizations" : {
         "de" : {
@@ -2377,9 +2377,6 @@
           }
         }
       }
-    },
-    "Last version" : {
-
     },
     "Leave at…" : {
       "localizations" : {
@@ -2834,6 +2831,9 @@
           }
         }
       }
+    },
+    "Nearby stops" : {
+
     },
     "Nearby Stops" : {
       "localizations" : {
@@ -5225,6 +5225,7 @@
       }
     },
     "Start typing to find stops from local GTFS data." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5251,6 +5252,12 @@
           }
         }
       }
+    },
+    "Start typing to search places and addresses." : {
+
+    },
+    "Status" : {
+
     },
     "Step-free, wheelchair accessible" : {
       "localizations" : {
@@ -5985,12 +5992,6 @@
           }
         }
       }
-    },
-    "Update transit data" : {
-
-    },
-    "Updating…" : {
-
     },
     "vel’OH! %@, %@" : {
       "localizations" : {

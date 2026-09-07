@@ -10,7 +10,7 @@ struct MapKitRouteService: RouteService {
         page: RouteSearchPage
     ) async throws -> RouteCalculation {
         // MapKit transit routing has no per-mode/sort hook, so filters are advisory only
-        // here; the public-transport engine is where they take effect.
+        // here; MapKit owns the transit-mode selection.
         let request = MKDirections.Request()
         request.source = mapItem(for: from)
         request.destination = mapItem(for: to)

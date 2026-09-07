@@ -36,9 +36,8 @@ nonisolated struct LineTimetableEntry: Hashable, Identifiable, Sendable {
 
 /// Everything the line-detail screen needs about a single ``TransitRoute``.
 ///
-/// Assembled by ``LineDetailService`` from the on-device GTFS timetable for a
-/// chosen direction: the stop sequence, the next departures, a one-line service
-/// summary, and an optional map overlay.
+/// Holds the route, directions, schedule rows, and optional map overlay used by
+/// the line-detail presentation.
 nonisolated struct LineDetail: Hashable, Sendable {
     /// The route this detail describes.
     let route: TransitRoute

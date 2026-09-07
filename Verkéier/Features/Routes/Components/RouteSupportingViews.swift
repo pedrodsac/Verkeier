@@ -111,7 +111,7 @@ struct RouteOptionSkeletonRow: View {
                     .background(.secondary, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
             }
 
-            Text("0 transfers  ·  0.0 km  ·  Scheduled GTFS times")
+            Text("0 transfers  ·  0.0 km  ·  Scheduled times")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
