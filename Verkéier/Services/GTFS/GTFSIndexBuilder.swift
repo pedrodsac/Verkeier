@@ -50,6 +50,7 @@ nonisolated struct GTFSIndexBuilder: Sendable {
     }
 
     func buildTimetableIndex(from feedDirectory: URL, to destination: URL) throws {
+        let agencies = try readAgencies(from: feedDirectory)
         let routesById = try readRoutes(from: feedDirectory)
         let stopsById = try readTimetableStops(from: feedDirectory)
         let services = try readServices(from: feedDirectory)
@@ -67,7 +68,10 @@ nonisolated struct GTFSIndexBuilder: Sendable {
                     shortName: $0.shortName,
                     longName: $0.longName,
                     mode: $0.mode,
-                    operatorName: $0.operatorName
+                    operatorName: $0.operatorName,
+                    description: $0.description,
+                    color: $0.color,
+                    textColor: $0.textColor
                 )
             }
             .sorted { $0.shortName.localizedStandardCompare($1.shortName) == .orderedAscending }
@@ -80,6 +84,7 @@ nonisolated struct GTFSIndexBuilder: Sendable {
         let payload = GTFSTimetableIndexPayload(
             revision: UUID().uuidString,
             source: "data.public.lu GTFS",
+            agencies: agencies,
             stops: stops,
             routes: routes,
             services: services.sorted { $0.id < $1.id },
@@ -101,24 +106,61 @@ nonisolated struct GTFSIndexBuilder: Sendable {
     }
 
     private func readRoutes(from feedDirectory: URL) throws -> [String: GTFSRouteIndexEntry] {
-        let feed = Transit.Feed(contentsOfURL: feedDirectory)
-        guard let routes = feed.routes?.routes else {
-            throw GTFSUpdateError.validationFailed("Transit could not read routes.txt.")
-        }
-
-        return Dictionary(uniqueKeysWithValues: routes.compactMap { route in
-            guard !route.routeID.isEmpty else {
+        let table = try readCSV(feedDirectory.appendingPathComponent("routes.txt"))
+        return Dictionary(uniqueKeysWithValues: table.rows.compactMap { line -> (String, GTFSRouteIndexEntry)? in
+            let values = CSVRowParser.parse(line)
+            guard let id = values.value(for: "route_id", in: table.indexByHeader), !id.isEmpty else {
                 return nil
             }
             let route = GTFSRouteIndexEntry(
-                id: route.routeID,
-                shortName: route.shortName ?? route.name ?? route.routeID,
-                longName: route.name,
-                mode: mode(for: route.type),
-                operatorName: route.agencyID
+                id: id,
+                shortName: values.value(for: "route_short_name", in: table.indexByHeader)
+                    ?? values.value(for: "route_long_name", in: table.indexByHeader)
+                    ?? id,
+                longName: values.value(for: "route_long_name", in: table.indexByHeader),
+                mode: mode(forGTFSRouteType: values.value(for: "route_type", in: table.indexByHeader)),
+                operatorName: values.value(for: "agency_id", in: table.indexByHeader),
+                description: values.value(for: "route_desc", in: table.indexByHeader),
+                color: values.value(for: "route_color", in: table.indexByHeader),
+                textColor: values.value(for: "route_text_color", in: table.indexByHeader)
             )
-            return (route.id, route)
+            return (id, route)
         })
+    }
+
+    private func readAgencies(from feedDirectory: URL) throws -> [GTFSTimetableAgencyEntry] {
+        // `agency.txt` is required by the current GTFS reference, but older
+        // and otherwise usable archives in the wild can omit it. Do not make
+        // route, stop, timetable, or geometry indexing unavailable for that
+        // omission; callers simply receive no agency metadata.
+        guard FileManager.default.fileExists(
+            atPath: feedDirectory.appendingPathComponent("agency.txt").path
+        ) else {
+            return []
+        }
+        let table = try readCSV(feedDirectory.appendingPathComponent("agency.txt"))
+        return table.rows.compactMap { line in
+            let values = CSVRowParser.parse(line)
+            // `agency_id` is optional when a feed has one operator. Preserve
+            // that valid feed shape behind a stable local identifier instead
+            // of silently discarding its agency metadata.
+            let publishedID = values.value(for: "agency_id", in: table.indexByHeader)
+            let id = publishedID?.isEmpty == false ? publishedID : (table.rows.count == 1 ? "default" : nil)
+            guard let id,
+                  let name = values.value(for: "agency_name", in: table.indexByHeader), !name.isEmpty else {
+                return nil
+            }
+            return GTFSTimetableAgencyEntry(
+                id: id,
+                name: name,
+                url: values.value(for: "agency_url", in: table.indexByHeader),
+                timezone: values.value(for: "agency_timezone", in: table.indexByHeader),
+                language: values.value(for: "agency_lang", in: table.indexByHeader),
+                phone: values.value(for: "agency_phone", in: table.indexByHeader),
+                fareURL: values.value(for: "agency_fare_url", in: table.indexByHeader),
+                email: values.value(for: "agency_email", in: table.indexByHeader)
+            )
+        }
     }
 
     private func readStops(from feedDirectory: URL) throws -> [Transit.Stop] {
@@ -192,7 +234,11 @@ nonisolated struct GTFSIndexBuilder: Sendable {
                     latitude: latitude,
                     longitude: longitude,
                     parentStation: values.value(for: "parent_station", in: table.indexByHeader),
-                    platformCode: values.value(for: "platform_code", in: table.indexByHeader)
+                    platformCode: values.value(for: "platform_code", in: table.indexByHeader),
+                    code: values.value(for: "stop_code", in: table.indexByHeader),
+                    description: values.value(for: "stop_desc", in: table.indexByHeader),
+                    locationType: Int(values.value(for: "location_type", in: table.indexByHeader) ?? ""),
+                    wheelchairBoarding: values.value(for: "wheelchair_boarding", in: table.indexByHeader)
                 )
             )
         })
@@ -286,7 +332,10 @@ nonisolated struct GTFSIndexBuilder: Sendable {
                 serviceId: serviceId,
                 headsign: values.value(for: "trip_headsign", in: tripsTable.indexByHeader),
                 directionId: values.value(for: "direction_id", in: tripsTable.indexByHeader),
-                shapeId: values.value(for: "shape_id", in: tripsTable.indexByHeader)
+                shapeId: values.value(for: "shape_id", in: tripsTable.indexByHeader),
+                blockId: values.value(for: "block_id", in: tripsTable.indexByHeader),
+                wheelchairAccessible: values.value(for: "wheelchair_accessible", in: tripsTable.indexByHeader),
+                bikesAllowed: values.value(for: "bikes_allowed", in: tripsTable.indexByHeader)
             )
         }
 
@@ -337,6 +386,9 @@ nonisolated struct GTFSIndexBuilder: Sendable {
                 headsign: trip.headsign,
                 directionId: trip.directionId,
                 shapeId: trip.shapeId,
+                blockId: trip.blockId,
+                wheelchairAccessible: trip.wheelchairAccessible,
+                bikesAllowed: trip.bikesAllowed,
                 stopTimes: stopTimes
             )
         }
@@ -471,13 +523,25 @@ nonisolated struct GTFSIndexBuilder: Sendable {
         return components[0] * 3600 + components[1] * 60 + components[2]
     }
 
-    private func mode(for routeType: Transit.RouteType) -> String {
-        switch routeType {
-        case .tram: "tram"
-        case .rail: "train"
-        case .bus: "bus"
-        case .funicular: "funicular"
-        default: "unknown"
+    private func mode(forGTFSRouteType value: String?) -> String {
+        // Route types are stable GTFS wire identifiers. Parsing routes directly
+        // keeps an unrelated malformed or oversized shapes file from making
+        // valid route metadata unavailable.
+		guard let int = Int(value ?? "") else {
+			return "unknown"
+		}
+		
+        switch int {
+        	case 0, 900...999:
+				return "tram"
+        	case 2, 100...199, 1000...1099:
+				return "train"
+        	case 3, 700...799:
+				return "bus"
+        	case 7, 1400...1499:
+				return "funicular"
+        	default:
+				return "unknown"
         }
     }
 }
@@ -489,6 +553,9 @@ private struct PartialTrip {
     let headsign: String?
     let directionId: String?
     let shapeId: String?
+    let blockId: String?
+    let wheelchairAccessible: String?
+    let bikesAllowed: String?
 }
 
 nonisolated struct GTFSStopsIndexPayload: Codable, Sendable {
@@ -515,6 +582,9 @@ nonisolated struct GTFSRouteIndexEntry: Codable, Sendable {
     let longName: String?
     let mode: String
     let operatorName: String?
+    var description: String? = nil
+    var color: String? = nil
+    var textColor: String? = nil
 }
 
 private struct CSVTable {

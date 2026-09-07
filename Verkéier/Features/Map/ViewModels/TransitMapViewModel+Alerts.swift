@@ -43,20 +43,16 @@ extension TransitMapViewModel {
     }
 
     func loadLineDetail(using gtfsService: any GTFSService, now: Date = .now) async {
-        guard let route = selectedLineDetailRoute,
-              let timetable = await gtfsService.timetableIndex() else {
+        guard let route = selectedLineDetailRoute else {
             selectedLineDetail = nil
             selectedLineDetailErrorMessage = "Line details are not available yet."
             return
         }
 
-        let service = LineDetailService()
-        selectedLineDetail = service.detail(
+        selectedLineDetail = await gtfsService.lineDetail(
             for: route,
             selectedStopId: selectedStop?.id,
-            timetable: timetable,
             now: now,
-
             selectedDirectionID: selectedLineDetailDirectionID
         )
         selectedLineDetailErrorMessage =

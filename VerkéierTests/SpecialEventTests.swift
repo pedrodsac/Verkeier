@@ -24,7 +24,7 @@ struct SpecialEventTests {
         #expect(event.title == "Schueberfouer")
         #expect(event.subtitle == "Glacis, Limpertsberg")
         #expect(event.stopName == "Limpertsberg, Theater")
-        #expect(event.symbolName == "tent.2.fill")
+        #expect(event.symbolName == "party.popper.fill")
         #expect(event.accentColor == .pink)
         #expect(event.backgroundColor == .pink)
     }

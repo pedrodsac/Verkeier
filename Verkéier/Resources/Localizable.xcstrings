@@ -1077,7 +1077,11 @@
         }
       }
     },
+    "Check for data update" : {
+
+    },
     "Check for GTFS update" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1134,6 +1138,7 @@
       }
     },
     "Checks data.public.lu for a newer GTFS feed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1160,6 +1165,12 @@
           }
         }
       }
+    },
+    "Checks data.public.lu for a newer public-transport data version" : {
+
+    },
+    "Checks for and installs a newer transit-data version." : {
+
     },
     "Choose a stop at this location" : {
       "localizations" : {
@@ -2143,6 +2154,7 @@
       }
     },
     "GTFS Data" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2365,6 +2377,9 @@
           }
         }
       }
+    },
+    "Last version" : {
+
     },
     "Leave at…" : {
       "localizations" : {
@@ -5825,6 +5840,12 @@
         }
       }
     },
+    "Transit data" : {
+
+    },
+    "Transit data details" : {
+
+    },
     "Try again when your location is available." : {
       "localizations" : {
         "de" : {
@@ -5964,6 +5985,12 @@
           }
         }
       }
+    },
+    "Update transit data" : {
+
+    },
+    "Updating…" : {
+
     },
     "vel’OH! %@, %@" : {
       "localizations" : {

@@ -7,9 +7,9 @@ import Foundation
 /// downloaded GTFS update on disk and falling back to the bundled compact feed.
 /// The service observes the `gtfsDidUpdate` notification and reloads its
 /// snapshot when a fresh feed is installed.
-final class LocalGTFSService: GTFSService {
+nonisolated final class LocalGTFSService: GTFSService {
     private let loader: GTFSDataLoader
-    private let updateTask: Task<Void, Never>
+    private let updateTask: Task<Void, Never>?
     /// Shared by route-service values that are recreated by SwiftUI.
     let routeSearchContextCache = RouteSearchContextCache()
 
@@ -23,8 +23,7 @@ final class LocalGTFSService: GTFSService {
         let initialSnapshot: GTFSSnapshot? = if let stops, let routesByStopId {
             GTFSSnapshot(
                 stops: stops,
-                routesByStopId: routesByStopId,
-                timetable: nil
+                routesByStopId: routesByStopId
             )
         } else {
             nil
@@ -37,17 +36,23 @@ final class LocalGTFSService: GTFSService {
             initialSnapshot: initialSnapshot
         )
         self.loader = loader
-        let routeSearchContextCache = self.routeSearchContextCache
-        updateTask = Task { [loader, routeSearchContextCache] in
-            for await _ in NotificationCenter.default.notifications(named: .gtfsDidUpdate) {
-                await loader.reloadFromDisk()
-                await routeSearchContextCache.removeAll()
+        if initialSnapshot == nil {
+            let routeSearchContextCache = self.routeSearchContextCache
+            updateTask = Task { [loader, routeSearchContextCache] in
+                for await _ in NotificationCenter.default.notifications(named: .gtfsDidUpdate) {
+                    await loader.reloadFromDisk()
+                    await routeSearchContextCache.removeAll()
+                }
             }
+        } else {
+            // Fixture-backed instances are intentionally immutable. A global
+            // production-feed update must not erase an injected test fixture.
+            updateTask = nil
         }
     }
 
     deinit {
-        updateTask.cancel()
+        updateTask?.cancel()
     }
 
     nonisolated func searchStops(query: String) async -> [Stop] {
@@ -108,6 +113,11 @@ private actor GTFSDataLoader {
     private let resourceName: String
     private let store: GTFSLocalStore
     private var snapshot: GTFSSnapshot?
+    /// Timetable decoding is intentionally independent of the small stop/map
+    /// snapshot. A map pan or a stop search must never decode all trips and
+    /// shapes as an incidental side effect.
+    private var cachedTimetable: GTFSTimetableIndexPayload?
+    private var hasLoadedTimetable = false
 
     init(
         bundle: Bundle,
@@ -152,11 +162,17 @@ private actor GTFSDataLoader {
     }
 
     func timetableIndex() -> GTFSTimetableIndexPayload? {
-        currentSnapshot().timetable
+        if !hasLoadedTimetable {
+            cachedTimetable = Self.loadTimetableIndex(store: store)
+            hasLoadedTimetable = true
+        }
+        return cachedTimetable
     }
 
     func reloadFromDisk() {
         snapshot = loadSnapshotFromDisk()
+        cachedTimetable = nil
+        hasLoadedTimetable = false
     }
 
     private func currentSnapshot() -> GTFSSnapshot {
@@ -174,8 +190,7 @@ private actor GTFSDataLoader {
             ?? Self.loadCompactStore(bundle: bundle, resourceName: resourceName)
         return GTFSSnapshot(
             stops: store?.stops ?? [],
-            routesByStopId: store?.routesByStopId ?? [:],
-            timetable: Self.loadTimetableIndex(store: self.store)
+            routesByStopId: store?.routesByStopId ?? [:]
         )
     }
 
@@ -306,17 +321,14 @@ private actor GTFSDataLoader {
 private nonisolated struct GTFSSnapshot {
     let stops: [Stop]
     let routesByStopId: [String: [TransitRoute]]
-    let timetable: GTFSTimetableIndexPayload?
     let stopIndex: GTFSStopIndex
 
     init(
         stops: [Stop],
-        routesByStopId: [String: [TransitRoute]],
-        timetable: GTFSTimetableIndexPayload?
+        routesByStopId: [String: [TransitRoute]]
     ) {
         self.stops = stops
         self.routesByStopId = routesByStopId
-        self.timetable = timetable
         stopIndex = GTFSStopIndex(stops: stops)
     }
 }

@@ -110,6 +110,7 @@ private actor RouteCalculationCoordinator {
                 time: time,
                 filters: filters,
                 forceRealtimeRefresh: realtimeRefreshPolicy == .forceRefresh,
+                allowNetworkEnrichment: realtimeRefreshPolicy != .scheduleOnly,
                 page: page
             )
         }

@@ -186,7 +186,8 @@ extension PublicTransportRoutingEngine {
     func enrich(
         _ candidates: [ScheduledJourney],
         context _: RouteSearchContext,
-        forceRealtimeRefresh: Bool = false
+        forceRealtimeRefresh: Bool = false,
+        allowNetwork: Bool = true
     ) async throws -> (candidates: [RouteCandidate], boardsByStopId: [String: [Departure]]) {
         // Offline mode plans purely on the static schedule — no ATP fetch, and no
         // no-realtime penalty (which would otherwise flag every leg as unverified).
@@ -208,7 +209,7 @@ extension PublicTransportRoutingEngine {
             stopIds: stopIds,
             optionsByStopID: optionsByStopID,
             forceRefresh: forceRealtimeRefresh,
-            allowNetwork: true
+            allowNetwork: allowNetwork
         )
         return (
             try await enrichedCandidatesConcurrently(
@@ -479,11 +480,10 @@ extension PublicTransportRoutingEngine {
                     group.addTask { @concurrent in
                         try Task.checkCancellation()
                         let platformIds = await gtfsService.stop(id: stopId)?.platformIds ?? [stopId]
-                        let options = optionsByStopID[stopId] ?? ATPDepartureBoardOptions()
                         let departures = await routingValueWithin(
                             seconds: max(0.001, remainingSeconds),
                             operation: {
-                                try await atpClient.departureBoards(stopIds: platformIds, options: options)
+                                try await atpClient.departureBoards(stopIds: platformIds)
                             }
                         ) ?? []
                         return (stopId, departures)

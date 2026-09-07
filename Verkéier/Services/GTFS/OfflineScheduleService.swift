@@ -128,7 +128,7 @@ private extension String {
 ///
 /// Used as a fallback when live ATP data is unavailable. All time arithmetic is
 /// done in the `Europe/Luxembourg` time zone by default.
-struct OfflineScheduleService {
+nonisolated struct OfflineScheduleService {
     private let calendar: Calendar
 
     init(calendar: Calendar = {
@@ -159,36 +159,35 @@ struct OfflineScheduleService {
 
         let routesById = Dictionary(uniqueKeysWithValues: timetable.routes.map { ($0.id, $0) })
         let stopsById = Dictionary(uniqueKeysWithValues: timetable.stops.map { ($0.id, $0) })
-        let activeServiceIds = Set(
-            timetable.services.filter { isActive($0, on: now) }.map(\.id)
-        )
-        guard !activeServiceIds.isEmpty else { return [] }
-
         let candidateStopIds = matchingStopIDs(for: stop, in: timetable)
         guard !candidateStopIds.isEmpty else { return [] }
 
-        let startOfDay = calendar.startOfDay(for: now)
-        let currentSeconds = calendar.dateComponents([.hour, .minute, .second], from: now)
-        let secondsSinceMidnight =
-            (currentSeconds.hour ?? 0) * 3600
-                + (currentSeconds.minute ?? 0) * 60
-                + (currentSeconds.second ?? 0)
+        // GTFS permits times beyond 24:00. At 01:00, for example, a 25:15
+        // departure belongs to yesterday's service day, not today's. Query
+        // both service days and compare real dates rather than wrapping times.
+        let today = calendar.startOfDay(for: now)
+        let serviceDays = [
+            calendar.date(byAdding: .day, value: -1, to: today),
+            today
+        ].compactMap { $0 }.map { day in
+            (day, Set(timetable.services.filter { isActive($0, on: day) }.map(\.id)))
+        }
+        guard serviceDays.contains(where: { !$0.1.isEmpty }) else { return [] }
 
-        let departures = timetable.trips
-            .lazy
-            .filter { activeServiceIds.contains($0.serviceId) }
-            .flatMap { trip in
+        let departures = serviceDays.lazy.flatMap { serviceDay, activeServiceIDs in
+            timetable.trips.lazy.filter { activeServiceIDs.contains($0.serviceId) }.flatMap { trip in
                 trip.stopTimes.compactMap { stopTime -> OfflineScheduleDeparture? in
                     guard candidateStopIds.contains(stopTime.stopId),
+                          stopTime.pickupType != "1",
                           (trip.stopTimes.count == 1
                               || trip.stopTimes.contains(where: { $0.sequence > stopTime.sequence })),
-                          stopTime.departureSeconds >= secondsSinceMidnight,
                           let route = routesById[trip.routeId] else {
                         return nil
                     }
 
                     let stopEntry = stopsById[stopTime.stopId]
-                    let departureDate = startOfDay.addingTimeInterval(TimeInterval(stopTime.departureSeconds))
+                    let departureDate = serviceDay.addingTimeInterval(TimeInterval(stopTime.departureSeconds))
+                    guard departureDate >= now else { return nil }
                     let destination = [
                         stopTime.headsign,
                         trip.headsign,
@@ -211,6 +210,7 @@ struct OfflineScheduleService {
                     )
                 }
             }
+        }
             .sorted { lhs, rhs in
                 if lhs.departureDate != rhs.departureDate {
                     return lhs.departureDate < rhs.departureDate

@@ -75,6 +75,11 @@ struct TransitMapScreen: View {
             )
             .presentationCornerRadius(40)
             .interactiveDismissDisabled()
+            // Keep the observation-based preference dependency explicit at
+            // this presentation boundary. Sheets have a separate hosting
+            // hierarchy, so relying on an inherited object can crash before
+            // the sheet's first body is rendered.
+            .environment(preferences)
         }
         .fullScreenCover(
             isPresented: onboardingPresentationBinding,

@@ -186,17 +186,15 @@ extension TransitMapViewModel {
         using gtfsService: any GTFSService,
         now: Date = .now
     ) async {
-        guard let selectedStop,
-              let timetable = await gtfsService.timetableIndex() else {
+        guard let selectedStop else {
             offlineScheduledDepartures = []
             return
         }
 
-        let service = OfflineScheduleService()
-        offlineScheduledDepartures = service.upcomingDepartures(
+        offlineScheduledDepartures = await gtfsService.scheduledDepartures(
             for: selectedStop,
-            timetable: timetable,
-            now: now
+            now: now,
+            limit: 8
         )
     }
 

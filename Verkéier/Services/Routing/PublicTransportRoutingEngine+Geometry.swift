@@ -100,7 +100,10 @@ extension PublicTransportRoutingEngine {
             routeName: routeName,
             headsign: trip.headsign ?? alightTime.headsign,
             routeId: route.id,
-            tripId: trip.id,
+            // The shifted ID is an internal service-day key. Keep the GTFS
+            // trip identifier at the app boundary so callers and future
+            // realtime overlays can match the source archive directly.
+            tripId: trip.originalTripID ?? trip.id,
             originStopId: boardStop.id,
             destinationStopId: alightStop.id,
             stopCount: stopCount,

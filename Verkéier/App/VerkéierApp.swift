@@ -14,12 +14,14 @@ struct VerkéierApp: App {
     @State private var liveActivityManager = LiveActivityManager()
     @State private var departureReminderService = DepartureReminderService()
     @State private var disruptionAlertService = DisruptionAlertService()
-    @State private var gtfsUpdateController = GTFSUpdateController()
+    @State private var gtfsUpdateController: GTFSUpdateController
 
     init() {
         let configuration = AppConfiguration.current
         self.configuration = configuration
-        gtfsService = LocalGTFSService()
+        let gtfsController = GTFSController()
+        gtfsService = gtfsController
+        _gtfsUpdateController = State(initialValue: GTFSUpdateController(controller: gtfsController))
         bikeShareService = JCDecauxBikeShareService(configuration: configuration)
         modelContainer = AppModelContainer.make()
     }

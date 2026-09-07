@@ -5,7 +5,7 @@ import Foundation
 /// Groups a route's trips into directions, derives the stop sequence and the
 /// next departures for the selected direction, and assembles a map overlay. All
 /// time arithmetic uses the `Europe/Luxembourg` time zone by default.
-struct LineDetailService {
+nonisolated struct LineDetailService {
     private let calendar: Calendar
 
     init(calendar: Calendar = {
@@ -328,7 +328,7 @@ struct LineDetailService {
 }
 
 private extension String {
-    var nonEmpty: String? {
+    nonisolated var nonEmpty: String? {
         isEmpty ? nil : self
     }
 }

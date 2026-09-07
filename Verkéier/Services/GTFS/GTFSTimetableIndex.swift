@@ -4,16 +4,33 @@ nonisolated struct GTFSTimetableIndexPayload: Codable, Sendable, Hashable {
     /// Version 3 guarantees every installed feed includes the `shapes.txt`
     /// geometry referenced by its trips. Bump this so indexes produced while
     /// large shapes were skipped are rebuilt from the retained GTFS archive.
-    static let currentVersion = 3
+    /// Version 4 retains the GTFS fields which are not currently rendered by
+    /// the app. Keeping them in the archive boundary makes them available to
+    /// future features without another importer redesign.
+    static let currentVersion = 4
     var schemaVersion: Int? = currentVersion
     var revision: String? = nil
     let source: String
+    var agencies: [GTFSTimetableAgencyEntry] = []
     let stops: [GTFSTimetableStopEntry]
     let routes: [GTFSTimetableRouteEntry]
     let services: [GTFSTimetableServiceEntry]
     let trips: [GTFSTimetableTripEntry]
     let transfers: [GTFSTimetableTransferEntry]
     let shapes: [GTFSTimetableShapeEntry]
+}
+
+/// Operator facts published by `agency.txt`. These are deliberately separate
+/// from presentation so missing contact/fare data is never invented by a UI.
+nonisolated struct GTFSTimetableAgencyEntry: Codable, Sendable, Hashable, Identifiable {
+    let id: String
+    let name: String
+    let url: String?
+    let timezone: String?
+    var language: String? = nil
+    var phone: String? = nil
+    var fareURL: String? = nil
+    var email: String? = nil
 }
 
 nonisolated struct GTFSTimetableStopEntry: Codable, Sendable, Hashable {
@@ -23,6 +40,11 @@ nonisolated struct GTFSTimetableStopEntry: Codable, Sendable, Hashable {
     let longitude: Double
     let parentStation: String?
     let platformCode: String?
+    var code: String? = nil
+    var description: String? = nil
+    var locationType: Int? = nil
+    /// Raw GTFS value. `0` means unknown, never "not accessible".
+    var wheelchairBoarding: String? = nil
 
     var location: LocationPoint {
         LocationPoint(id: id, name: name, latitude: latitude, longitude: longitude)
@@ -35,6 +57,9 @@ nonisolated struct GTFSTimetableRouteEntry: Codable, Sendable, Hashable {
     let longName: String?
     let mode: String
     let operatorName: String?
+    var description: String? = nil
+    var color: String? = nil
+    var textColor: String? = nil
 
     var transportMode: TransportMode {
         TransportMode(rawValue: mode) ?? .unknown
@@ -59,6 +84,11 @@ nonisolated struct GTFSTimetableTripEntry: Codable, Sendable, Hashable {
     let shapeId: String?
     var originalTripID: String? = nil
     var serviceDate: String? = nil
+    var blockId: String? = nil
+    /// Raw GTFS value. `0` means unknown, not disallowed.
+    var wheelchairAccessible: String? = nil
+    /// Raw GTFS value. `0` means unknown, not disallowed.
+    var bikesAllowed: String? = nil
     let stopTimes: [GTFSTimetableStopTimeEntry]
 }
 

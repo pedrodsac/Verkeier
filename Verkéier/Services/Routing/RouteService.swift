@@ -29,8 +29,9 @@ protocol RouteService: Sendable {
 }
 
 extension RouteService {
-    /// Default calculation path: reuse a fresh realtime snapshot and fetch any
-    /// boards that are missing or stale. Explicit refresh bypasses that cache.
+    /// Default calculations publish immediately from the offline timetable.
+    /// The planner asks for live enrichment explicitly after it has a result to
+    /// display, so network or directions latency never blocks the first route.
     nonisolated func calculateRoute(
         from: LocationPoint,
         to: LocationPoint,
@@ -42,7 +43,7 @@ extension RouteService {
             to: to,
             time: time,
             filters: filters,
-            realtimeRefreshPolicy: .useCache,
+            realtimeRefreshPolicy: .scheduleOnly,
             page: .initial
         )
     }
@@ -80,6 +81,8 @@ extension RouteService {
 /// Controls whether a planner calculation may reuse its short-lived ATP snapshot.
 /// The policy has no effect on offline and MapKit-only routing.
 nonisolated enum RouteRealtimeRefreshPolicy: Hashable, Sendable {
+    /// Use only static GTFS data. This is the fast initial result.
+    case scheduleOnly
     case useCache
     case forceRefresh
 }

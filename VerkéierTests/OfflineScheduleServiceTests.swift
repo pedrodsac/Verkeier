@@ -3,6 +3,49 @@ import Testing
 @testable import Verkeier
 
 struct OfflineScheduleServiceTests {
+    @Test func upcomingDeparturesKeepsPreviousServiceDayAfterMidnightAndExcludesNoPickup() {
+        let service = OfflineScheduleService(calendar: luxCalendar)
+        let stop = Stop(
+            id: "origin", name: "Origin",
+            location: LocationPoint(name: "Origin", latitude: 49.6, longitude: 6.1),
+            modes: [.bus], dataSource: .gtfs
+        )
+        let allowed = GTFSTimetableTripEntry(
+            id: "allowed", routeId: "route", serviceId: "monday", headsign: "Destination",
+            directionId: nil, shapeId: nil,
+            stopTimes: [
+                GTFSTimetableStopTimeEntry(stopId: "origin", arrivalSeconds: 90_000, departureSeconds: 90_000, sequence: 1, headsign: nil, pickupType: "0", dropOffType: "0", shapeDistanceTraveled: nil),
+                GTFSTimetableStopTimeEntry(stopId: "destination", arrivalSeconds: 90_600, departureSeconds: 90_600, sequence: 2, headsign: nil, pickupType: "0", dropOffType: "0", shapeDistanceTraveled: nil),
+            ]
+        )
+        let noPickup = GTFSTimetableTripEntry(
+            id: "no-pickup", routeId: "route", serviceId: "monday", headsign: "Destination",
+            directionId: nil, shapeId: nil,
+            stopTimes: [
+                GTFSTimetableStopTimeEntry(stopId: "origin", arrivalSeconds: 90_300, departureSeconds: 90_300, sequence: 1, headsign: nil, pickupType: "1", dropOffType: "0", shapeDistanceTraveled: nil),
+                GTFSTimetableStopTimeEntry(stopId: "destination", arrivalSeconds: 90_900, departureSeconds: 90_900, sequence: 2, headsign: nil, pickupType: "0", dropOffType: "0", shapeDistanceTraveled: nil),
+            ]
+        )
+        let timetable = GTFSTimetableIndexPayload(
+            source: "test",
+            stops: [
+                GTFSTimetableStopEntry(id: "origin", name: "Origin", latitude: 49.6, longitude: 6.1, parentStation: nil, platformCode: nil),
+                GTFSTimetableStopEntry(id: "destination", name: "Destination", latitude: 49.61, longitude: 6.11, parentStation: nil, platformCode: nil),
+            ],
+            routes: [GTFSTimetableRouteEntry(id: "route", shortName: "1", longName: nil, mode: "bus", operatorName: nil)],
+            services: [GTFSTimetableServiceEntry(id: "monday", weekdays: [2], startDate: nil, endDate: nil, addedDates: [], removedDates: [])],
+            trips: [allowed, noPickup], transfers: [], shapes: []
+        )
+
+        let departures = service.upcomingDepartures(
+            for: stop, timetable: timetable,
+            now: makeDate(year: 2026, month: 6, day: 23, hour: 0, minute: 30)
+        )
+
+        #expect(departures.map(\.id) == ["allowed-origin-1"])
+        #expect(departures.first?.departureDate == makeDate(year: 2026, month: 6, day: 23, hour: 1, minute: 0))
+    }
+
     @Test func upcomingDeparturesExcludesTripAtItsFinalStop() {
         let service = OfflineScheduleService(calendar: luxCalendar)
         let stop = Stop(

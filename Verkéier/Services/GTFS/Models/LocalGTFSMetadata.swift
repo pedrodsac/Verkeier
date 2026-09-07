@@ -49,5 +49,5 @@ extension GTFSUpdateStatus {
 }
 
 extension Notification.Name {
-    static let gtfsDidUpdate = Notification.Name("gtfsDidUpdate")
+    nonisolated static let gtfsDidUpdate = Notification.Name("gtfsDidUpdate")
 }

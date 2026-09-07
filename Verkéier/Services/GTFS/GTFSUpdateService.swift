@@ -114,17 +114,17 @@ actor GTFSUpdateService {
 @MainActor
 @Observable
 final class GTFSUpdateController {
-    private let service: GTFSUpdateService
+    private let controller: GTFSController
     var snapshot: GTFSUpdateSnapshot = .empty
     var isChecking = false
 
-    init(service: GTFSUpdateService = GTFSUpdateService()) {
-        self.service = service
+    init(controller: GTFSController = GTFSController()) {
+        self.controller = controller
     }
 
     func loadSnapshot() {
         Task {
-            let savedSnapshot = await service.snapshot()
+            let savedSnapshot = await controller.updateSnapshot()
             guard !isChecking else { return }
             snapshot = savedSnapshot
         }
@@ -134,7 +134,7 @@ final class GTFSUpdateController {
         guard !isChecking else { return }
         isChecking = true
         Task {
-            snapshot = await service.checkForUpdates()
+            snapshot = await controller.checkForUpdates()
             isChecking = false
         }
     }
@@ -143,7 +143,7 @@ final class GTFSUpdateController {
         guard !isChecking else { return }
         isChecking = true
         Task {
-            snapshot = await service.checkForUpdates()
+            snapshot = await controller.checkForUpdates()
             isChecking = false
         }
     }

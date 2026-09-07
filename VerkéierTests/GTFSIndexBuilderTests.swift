@@ -40,12 +40,20 @@ struct GTFSIndexBuilderTests {
         let trip = try #require(payload.trips.first { $0.id == "T-F1" })
         let service = try #require(payload.services.first { $0.id == "WEEK" })
         let shape = try #require(payload.shapes.first { $0.id == "shape-f1" })
+        let agency = try #require(payload.agencies.first { $0.id == "Operator" })
 
         #expect(payload.stops.map(\.id).sorted() == ["S1", "S2"])
         let platformStop = try #require(payload.stops.first { $0.id == "S2" })
         #expect(platformStop.parentStation == "P1")
         #expect(platformStop.platformCode == "5")
+        #expect(platformStop.wheelchairBoarding == "1")
         #expect(payload.routes.map(\.id) == ["F1"])
+        #expect(payload.routes.first?.description == "Scenic connector")
+        #expect(payload.routes.first?.color == "124578")
+        #expect(payload.routes.first?.textColor == "FFFFFF")
+        #expect(agency.name == "Test Transit")
+        #expect(trip.blockId == "block-1")
+        #expect(trip.bikesAllowed == "1")
         #expect(trip.stopTimes.map(\.departureSeconds) == [28_800, 87_000])
         #expect(trip.stopTimes.compactMap(\.shapeDistanceTraveled) == [0, 1.4])
         #expect(service.addedDates.contains("20260614"))
@@ -60,8 +68,8 @@ struct GTFSIndexBuilderTests {
 
         let files = [
             "agency.txt": """
-            agency_name,agency_url,agency_timezone
-            Test Transit,https://example.com,Europe/Luxembourg
+            agency_id,agency_name,agency_url,agency_timezone
+            Operator,Test Transit,https://example.com,Europe/Luxembourg
             """,
             "stops.txt": """
             stop_id,stop_name,stop_lat,stop_lon,zone_id,location_type,parent_station,platform_code,wheelchair_boarding
@@ -69,12 +77,12 @@ struct GTFSIndexBuilderTests {
             S2,Upper Station,49.61779,6.12589,Test City,0,P1,5,1
             """,
             "routes.txt": """
-            route_id,agency_id,route_short_name,route_long_name,route_type
-            F1,Operator,F1,Lower Station - Upper Station,7
+            route_id,agency_id,route_short_name,route_long_name,route_type,route_desc,route_color,route_text_color
+            F1,Operator,F1,Lower Station - Upper Station,7,Scenic connector,124578,FFFFFF
             """,
             "trips.txt": """
-            route_id,service_id,trip_id,shape_id
-            F1,WEEK,T-F1,shape-f1
+            route_id,service_id,trip_id,shape_id,block_id,wheelchair_accessible,bikes_allowed
+            F1,WEEK,T-F1,shape-f1,block-1,0,1
             """,
             "stop_times.txt": """
             trip_id,arrival_time,departure_time,stop_id,stop_sequence,shape_dist_traveled

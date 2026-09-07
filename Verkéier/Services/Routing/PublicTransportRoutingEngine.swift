@@ -74,7 +74,8 @@ actor PublicTransportRoutingEngine {
         self.concurrency = concurrency
         self.realtimeBoardBudgetSeconds = realtimeBoardBudgetSeconds
         self.roadGeometryBudgetSeconds = roadGeometryBudgetSeconds
-        self.routeSearchContextCache = (gtfsService as? LocalGTFSService)?.routeSearchContextCache
+        self.routeSearchContextCache = (gtfsService as? GTFSController)?.routeSearchContextCache
+            ?? (gtfsService as? LocalGTFSService)?.routeSearchContextCache
         transferBufferSeconds = offlineMode ? 15 * 60 : 120
     }
 
@@ -84,6 +85,7 @@ actor PublicTransportRoutingEngine {
         time: RoutePlanningTime = .leaveNow,
         filters: RoutePlannerFilters = RoutePlannerFilters(),
         forceRealtimeRefresh: Bool = false,
+        allowNetworkEnrichment: Bool = true,
         page: RouteSearchPage = .initial
     ) async throws -> RouteCalculation {
         try Task.checkCancellation()
@@ -127,7 +129,7 @@ actor PublicTransportRoutingEngine {
         // The direct walking route is schedule-independent and is only shown on
         // the initial page. Resolve it before timetable search so it can also be
         // returned when no usable public-transport schedule exists.
-        let walkingOption: RouteOption? = if case .initial = page {
+        let walkingOption: RouteOption? = if case .initial = page, allowNetworkEnrichment {
             await directWalkingOption(
                 from: from,
                 to: to,
@@ -155,12 +157,16 @@ actor PublicTransportRoutingEngine {
             throw RoutingError.noPublicTransportRoute
         }
 
-        let context = await contextWithWalkingDistances(
-            from: from,
-            to: to,
-            context: baseContext,
-            bikeStations: bikeStations
-        )
+        let context = if allowNetworkEnrichment {
+            await contextWithWalkingDistances(
+                from: from,
+                to: to,
+                context: baseContext,
+                bikeStations: bikeStations
+            )
+        } else {
+            baseContext
+        }
 
         let kernel = RouteSearchKernel(engine: self)
         let arriveBy = arriveByLimit != nil
@@ -298,7 +304,8 @@ actor PublicTransportRoutingEngine {
         let enrichment = try await enrich(
             scheduledForLiveSearch,
             context: context,
-            forceRealtimeRefresh: forceRealtimeRefresh
+            forceRealtimeRefresh: forceRealtimeRefresh,
+            allowNetwork: allowNetworkEnrichment
         )
         let enrichedCandidates = enrichment.candidates
         let invalidatedOptionIDs: Set<String> = Set(enrichedCandidates.compactMap { candidate in
@@ -320,7 +327,11 @@ actor PublicTransportRoutingEngine {
                 !repairedOriginalSignatures.contains($0.signature)
             } + repairs.map(\.candidate)
         }
-        let geometryCandidates = try await self.roadRoutedCandidates(candidatesAfterRepair)
+        let geometryCandidates = if allowNetworkEnrichment {
+            try await self.roadRoutedCandidates(candidatesAfterRepair)
+        } else {
+            candidatesAfterRepair
+        }
         let sortedCandidates = try await routeCalculationConcurrent {
             try Task.checkCancellation()
             return kernel.selectEnrichedCandidates(
