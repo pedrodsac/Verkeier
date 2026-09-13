@@ -27,7 +27,7 @@ actor MobiliteitGTFSService: GTFSService {
         self.session = session
         metadata = Self.loadMetadata(at: metadataURL)
         store = try? GTFSStore(databaseAt: databaseURL)
-        if let metadata, store != nil {
+        if let metadata, store != nil, !Self.isExpired(metadata.validThrough) {
             currentStatus = GTFSFeedStatus(
                 phase: .ready,
                 resourceTitle: metadata.resourceTitle,
@@ -47,7 +47,8 @@ actor MobiliteitGTFSService: GTFSService {
         if !force,
            store != nil,
            let lastChecked = metadata?.lastCheckedAt,
-           Date.now.timeIntervalSince(lastChecked) < Self.refreshInterval {
+           Date.now.timeIntervalSince(lastChecked) < Self.refreshInterval,
+           !Self.isExpired(metadata?.validThrough) {
             return currentStatus
         }
 
@@ -63,7 +64,7 @@ actor MobiliteitGTFSService: GTFSService {
                 metadata?.lastCheckedAt = .now
                 persistMetadata()
                 currentStatus.lastCheckedAt = .now
-                currentStatus.phase = store == nil ? .unavailable : .ready
+                currentStatus.phase = hasUsableStore ? .ready : .unavailable
                 return currentStatus
             }
 
@@ -99,7 +100,7 @@ actor MobiliteitGTFSService: GTFSService {
             // or import failure. Never report a valid cached feed as empty.
             metadata?.lastCheckedAt = .now
             persistMetadata()
-            currentStatus.phase = store == nil ? .failed : .stale
+            currentStatus.phase = hasUsableStore ? .stale : .failed
             currentStatus.lastCheckedAt = .now
             currentStatus.errorMessage = Self.userMessage(for: error)
         }
@@ -300,6 +301,21 @@ private extension MobiliteitGTFSService {
         let url: URL
         let checksum: String?
         let modifiedAt: Date?
+    }
+
+    var hasUsableStore: Bool {
+        store != nil && !Self.isExpired(metadata?.validThrough)
+    }
+
+    nonisolated static func isExpired(_ value: String?, at date: Date = .now) -> Bool {
+        guard let value else { return false }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.timeZone = timeZone
+        formatter.dateFormat = "yyyy-MM-dd"
+        guard let finalServiceDay = formatter.date(from: value) else { return false }
+        return finalServiceDay < Calendar.current.startOfDay(for: date)
     }
 
     struct DatasetResponse: Decodable {

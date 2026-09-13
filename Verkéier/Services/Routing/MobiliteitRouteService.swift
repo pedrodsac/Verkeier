@@ -8,10 +8,15 @@ import MobiliteitKit
 /// model.
 struct MobiliteitRouteService: RouteService {
     let databaseURL: URL
+    private let gtfsService: (any GTFSService)?
     private let fallback = MapKitRouteService()
 
-    init(databaseURL: URL = MobiliteitGTFSService.installedDatabaseURL) {
+    init(
+        databaseURL: URL = MobiliteitGTFSService.installedDatabaseURL,
+        gtfsService: (any GTFSService)? = nil
+    ) {
         self.databaseURL = databaseURL
+        self.gtfsService = gtfsService
     }
 
     nonisolated func calculateRoute(
@@ -22,6 +27,14 @@ struct MobiliteitRouteService: RouteService {
         realtimeRefreshPolicy _: RouteRealtimeRefreshPolicy,
         page: RouteSearchPage
     ) async throws -> RouteCalculation {
+        // A route request may arrive while the launch-time GTFS refresh is
+        // still running. Await that same refresh here rather than allowing an
+        // expired or half-installed timetable to degrade into a walking-only
+        // route.
+        if let gtfsService {
+            let status = await gtfsService.refreshIfNeeded(force: false)
+            guard status.isReady else { throw RoutingError.timetableUnavailable }
+        }
         guard FileManager.default.fileExists(atPath: databaseURL.path) else {
             throw RoutingError.timetableUnavailable
         }

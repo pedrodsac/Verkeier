@@ -60,5 +60,5 @@ struct VerkéierApp: App {
         DebugTransitDataMode(rawValue: debugTransitDataModeRawValue) ?? .normal
     }
 
-    private var routeService: any RouteService { MobiliteitRouteService() }
+    private var routeService: any RouteService { MobiliteitRouteService(gtfsService: gtfsService) }
 }
