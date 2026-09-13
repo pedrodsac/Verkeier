@@ -16,6 +16,11 @@ struct SettingsAdvancedView: View {
                 )
                 .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
 
+                if viewModel.isPreparingTimetable {
+                    TimetablePreparationProgress()
+                        .listRowInsets(EdgeInsets(top: 0, leading: 26, bottom: 8, trailing: 26))
+                }
+
                 ForEach(viewModel.readiness.items) { item in
                     AdvancedFactRow(
                         iconName: item.iconName,

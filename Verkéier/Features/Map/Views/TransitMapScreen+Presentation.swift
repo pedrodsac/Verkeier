@@ -122,6 +122,7 @@ extension TransitMapScreen {
             settings: SettingsPresentationModel(
                 configuration: appConfiguration,
                 readiness: settingsReadinessSnapshot,
+                gtfsStatus: viewModel.gtfsFeedStatus,
                 supportBundleText: settingsSupportBundleText,
                 debugDataMode: debugTransitDataMode
             )

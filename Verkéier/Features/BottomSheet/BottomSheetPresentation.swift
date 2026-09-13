@@ -101,6 +101,11 @@ struct AlertsPresentationModel {
 struct SettingsPresentationModel {
     let configuration: AppConfiguration
     let readiness: DataReadinessSnapshot
+    let gtfsStatus: GTFSFeedStatus
     let supportBundleText: String
     let debugDataMode: DebugTransitDataMode
+
+    var isPreparingTimetable: Bool {
+        !gtfsStatus.isReady && gtfsStatus.phase != .failed
+    }
 }

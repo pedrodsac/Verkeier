@@ -87,6 +87,9 @@ struct SettingsView: View {
 				Text(viewModel.readiness.summaryMessage)
 					.font(.footnote)
 					.foregroundStyle(.secondary)
+				if viewModel.isPreparingTimetable {
+					TimetablePreparationProgress()
+				}
 				Button("Check for GTFS update", action: checkGTFSUpdate)
 				NavigationLink {
 					SettingsAdvancedView(
@@ -170,6 +173,7 @@ private struct SettingsPermissionsSection: View {
                 summaryMessage: "This screen shows whether Verkéier is using live, downloaded, bundled, or fallback data.",
                 items: []
             ),
+            gtfsStatus: .unavailable,
             supportBundleText: "Preview",
             debugDataMode: .normal
         ),
@@ -177,4 +181,18 @@ private struct SettingsPermissionsSection: View {
         setDebugDataMode: { _ in }
     )
     .environment(AppPreferences())
+}
+
+struct TimetablePreparationProgress: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            ProgressView()
+                .progressViewStyle(.linear)
+            Text("Downloading and preparing timetable data…")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Preparing timetable data")
+    }
 }
