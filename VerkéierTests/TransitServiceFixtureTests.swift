@@ -3,6 +3,13 @@ import Testing
 @testable import Verkeier
 
 struct TransitServiceFixtureTests {
+    @Test func parsesFractionalPublicCatalogueTimestamps() {
+        let date = MobiliteitGTFSService.parseResourceDate("2026-09-10T05:19:16.095000+00:00")
+
+        #expect(date != nil)
+        #expect(date?.formatted(.iso8601.year().month().day()) == "2026-09-10")
+    }
+
     @Test func resolvesAUniqueLiveStationOntoItsMatchingGTFSStop() async {
         let staticStop = stop(id: "gtfs-1", name: "Gare Centrale")
         let gtfs = FixtureGTFSService(stops: [staticStop])

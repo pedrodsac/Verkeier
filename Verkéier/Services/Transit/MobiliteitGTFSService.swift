@@ -45,6 +45,24 @@ actor MobiliteitGTFSService: GTFSService {
         }
     }
 
+    nonisolated static func parseResourceDate(_ value: String) -> Date? {
+        // data.public.lu emits values such as
+        // `2026-09-10T05:19:16.095000+00:00`. ISO8601DateFormatter does not
+        // accept fractional seconds unless explicitly configured.
+        let fractionalISO = ISO8601DateFormatter()
+        fractionalISO.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = fractionalISO.date(from: value) { return date }
+
+        let iso = ISO8601DateFormatter()
+        if let date = iso.date(from: value) { return date }
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        return formatter.date(from: value)
+    }
+
     func feedStatus() async -> GTFSFeedStatus { currentStatus }
 
     func refreshIfNeeded(force: Bool) async -> GTFSFeedStatus {
@@ -509,11 +527,6 @@ private extension KeyedDecodingContainer {
 
     nonisolated func decodeDate(forKey key: Key) throws -> Date? {
         guard let value = try decodeIfPresent(String.self, forKey: key) else { return nil }
-        let iso = ISO8601DateFormatter()
-        if let date = iso.date(from: value) { return date }
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        return formatter.date(from: value)
+        return MobiliteitGTFSService.parseResourceDate(value)
     }
 }

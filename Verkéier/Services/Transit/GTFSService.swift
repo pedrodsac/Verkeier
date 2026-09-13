@@ -19,7 +19,7 @@ protocol GTFSService: Sendable {
     func routeShape(for tripID: String) async -> [RouteMapCoordinate]
 }
 
-enum GTFSFeedPhase: String, Codable, Sendable {
+nonisolated enum GTFSFeedPhase: String, Codable, Sendable {
     case unavailable
     case checking
     case downloading
@@ -30,7 +30,7 @@ enum GTFSFeedPhase: String, Codable, Sendable {
     case failed
 }
 
-struct GTFSFeedStatus: Codable, Sendable, Equatable {
+nonisolated struct GTFSFeedStatus: Codable, Sendable, Equatable {
     var phase: GTFSFeedPhase
     var resourceTitle: String?
     var downloadedAt: Date?
