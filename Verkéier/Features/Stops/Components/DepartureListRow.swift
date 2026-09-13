@@ -47,9 +47,9 @@ struct DepartureListRow: View {
 
                 HStack(spacing: 6) {
                     departureTimeView
-                    Divider()
-                        .frame(height: 10)
                     if let platform = departure.platform, !platform.isEmpty {
+						Divider()
+							.frame(height: 10)
                         Text("Platform \(platform)")
                     }
 

@@ -78,6 +78,36 @@ struct StopDetailPresentationModel {
         guard let selectedPlatform else { return lineFiltered }
         return lineFiltered.filter { $0.platform == selectedPlatform }
     }
+
+    /// GTFS rows intentionally remain distinct from HAFAS rows. A matching
+    /// realtime candidate may be overlaid by the router in the future, but a
+    /// static schedule must never be silently presented as live information.
+    var scheduledDepartures: [Departure] {
+        let values = offlineScheduledDepartures.map { scheduled in
+            Departure(
+                id: scheduled.id,
+                stopId: stop?.id ?? "",
+                lineName: scheduled.lineName,
+                destination: scheduled.destination,
+                scheduledDeparture: scheduled.departureDate,
+                platform: scheduled.platform,
+                dataSource: .gtfs
+            )
+        }
+        let lineFiltered: [Departure]
+        if let selectedLine,
+           let route = routes.first(where: { $0.id == selectedLine }) {
+            lineFiltered = values.filter {
+                $0.routeId?.caseInsensitiveCompare(route.id) == .orderedSame
+                    || $0.lineName.caseInsensitiveCompare(route.shortName) == .orderedSame
+            }
+        } else {
+            lineFiltered = values
+        }
+
+        guard let selectedPlatform else { return lineFiltered }
+        return lineFiltered.filter { $0.platform == selectedPlatform }
+    }
 }
 
 /// Callbacks the stop-detail sheet needs, sliced from ``TransitSheetActions``.

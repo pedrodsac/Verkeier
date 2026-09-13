@@ -1,5 +1,5 @@
 {
-  "originHash" : "9863ca39a9be483cd8ea3febddaa4d64f5bb80a97913ad2208c3a29d886d02ab",
+  "originHash" : "89fa6924548643fe4c97e1934070ca228342f861cc76efa393a8aa5c3ceb622f",
   "pins" : [
     {
       "identity" : "mobiliteitkit",
@@ -7,7 +7,7 @@
       "location" : "https://github.com/pedrodsac/MobiliteitKit",
       "state" : {
         "branch" : "main",
-        "revision" : "7a75e802752e6e0fc1cf68901504bfd2d0a8264e"
+        "revision" : "385067502d7f7556d2a3cd5b44c431ec36a20c9e"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-async-algorithms.git",
       "state" : {
-        "revision" : "d0b4a06d0f173a2f3be27d3ea21b3c3aa18db440",
-        "version" : "1.1.4"
+        "revision" : "3da39bbc4e687d4192af7c9cf4eab805745a0b9c",
+        "version" : "1.1.5"
       }
     },
     {
@@ -26,15 +26,6 @@
       "state" : {
         "revision" : "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
         "version" : "1.6.0"
-      }
-    },
-    {
-      "identity" : "transit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pedrodsac/transit.git",
-      "state" : {
-        "branch" : "main",
-        "revision" : "f6f2b0c5b4ef882fe80ac7f18a18eec8e4a6d06d"
       }
     },
     {

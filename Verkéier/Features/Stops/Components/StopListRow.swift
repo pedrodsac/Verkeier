@@ -18,7 +18,6 @@ struct StopListRow: View {
     var action: (() -> Void)? = nil
     var navigationValue: TransitSheetRoute? = nil
 	
-    @Environment(AppPreferences.self) private var preferences
     @Environment(\.colorScheme) private var colorScheme
 	
     @ViewBuilder
@@ -108,12 +107,6 @@ struct StopListRow: View {
 //                        Text(modeSummary)
 //                    }
 
-                    if let distanceMetadata {
-						Divider()
-							.frame(height: 10)
-
-                        Text(distanceMetadata)
-                    }
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -227,29 +220,7 @@ struct StopListRow: View {
     private var accessibilityLabel: String {
         var parts: [String] = [stop.displayName]
         parts.append(subtitleLocation)
-        if let distanceMetadata {
-            parts.append(distanceMetadata)
-        }
         return parts.joined(separator: ", ")
-    }
-
-    private var distanceMetadata: String? {
-        guard let referenceLocation else { return nil }
-
-        let distance = CLLocation(
-            latitude: stop.location.latitude,
-            longitude: stop.location.longitude
-        ).distance(from: referenceLocation)
-        guard distance.isFinite else { return nil }
-
-        return "\(preferences.formattedDistance(distance)) · \(walkingETA(for: distance))"
-    }
-
-    /// Walking time at ~5 km/h (83.3 m/min), rounded up. "<1 min" under 50 m.
-    private func walkingETA(for meters: CLLocationDistance) -> String {
-        if meters < 50 { return "<1 min" }
-        let minutes = Int((meters / 83.3).rounded(.up))
-        return "~\(minutes) min"
     }
 }
 

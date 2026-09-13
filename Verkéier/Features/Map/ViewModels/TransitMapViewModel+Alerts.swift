@@ -31,15 +31,22 @@ extension TransitMapViewModel {
         await disruptionAlertService.checkAlerts(alerts, favouriteRouteIds: [])
     }
 
-    func loadLineDetail(now _: Date = .now) async {
+    func loadLineDetail(using gtfsService: any GTFSService, now: Date = .now) async {
         guard let route = selectedLineDetailRoute else {
             selectedLineDetail = nil
-            selectedLineDetailErrorMessage = "Line details are not available yet."
+            selectedLineDetailErrorMessage = "Choose a line to view its timetable."
             return
         }
 
-        selectedLineDetail = nil
-        selectedLineDetailErrorMessage = "GTFS timetable data is currently unavailable for this line."
+        selectedLineDetailErrorMessage = nil
+        selectedLineDetail = await gtfsService.lineDetail(
+            for: route,
+            directionID: selectedLineDetailDirectionID,
+            at: now
+        )
+        if selectedLineDetail == nil {
+            selectedLineDetailErrorMessage = "No active timetable data is available for this line."
+        }
     }
 
     var areAlertsStale: Bool {

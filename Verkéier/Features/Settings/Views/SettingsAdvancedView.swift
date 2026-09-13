@@ -34,8 +34,13 @@ struct SettingsAdvancedView: View {
             }
 
             Section("Transit data details") {
-                AdvancedDiagnosticRow(label: "GTFS schedules", value: "Disconnected")
-                AdvancedDiagnosticRow(label: "ATP live data", value: "Disconnected")
+                ForEach(viewModel.readiness.items.filter { $0.id == "gtfs" || $0.id == "atp" }) { item in
+                    AdvancedDiagnosticRow(label: item.title, value: item.status)
+                    Text(item.detail)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                Button("Check for GTFS update", action: checkGTFSUpdate)
             }
 
             Section("Support") {

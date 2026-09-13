@@ -8,6 +8,8 @@ private enum EnvironmentDependencyDefaults {
 
 extension EnvironmentValues {
     @Entry var placeSearchService: any PlaceSearchService = LivePlaceSearchService()
+    @Entry var gtfsService: any GTFSService = UnavailableGTFSService()
+    @Entry var liveTransitService: any LiveTransitService = UnavailableLiveTransitService()
     @Entry var routeService: any RouteService = MapKitRouteService()
     @Entry var avlClient: any AVLClient = LiveAVLClient(
         feedURL: AppConfiguration.current.avlMessagesURL

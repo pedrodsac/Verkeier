@@ -1,0 +1,483 @@
+import Foundation
+import MobiliteitKit
+
+/// Owns the installed MobilitéitKit database and the official-feed update
+/// policy. Import work stays in the package; this actor selects resources,
+/// persists provenance, and maps feed values into the app domain.
+actor MobiliteitGTFSService: GTFSService {
+    private nonisolated static let datasetURL = URL(string: "https://data.public.lu/api/1/datasets/5a2a58b9111e9b7f34fc6606/")!
+    private nonisolated static let refreshInterval: TimeInterval = 24 * 60 * 60
+    private nonisolated static let timeZone = TimeZone(identifier: "Europe/Luxembourg")!
+
+    private let databaseURL: URL
+    private let metadataURL: URL
+    private let session: URLSession
+    private var store: GTFSStore?
+    private var metadata: GTFSLocalMetadata?
+    private var currentStatus: GTFSFeedStatus
+
+    nonisolated static var installedDatabaseURL: URL {
+        defaultDirectory().appendingPathComponent("gtfs.sqlite")
+    }
+
+    init(session: URLSession = .shared, directory: URL? = nil) {
+        let base = directory ?? Self.defaultDirectory()
+        databaseURL = base.appendingPathComponent("gtfs.sqlite")
+        metadataURL = base.appendingPathComponent("metadata.json")
+        self.session = session
+        metadata = Self.loadMetadata(at: metadataURL)
+        store = try? GTFSStore(databaseAt: databaseURL)
+        if let metadata, store != nil {
+            currentStatus = GTFSFeedStatus(
+                phase: .ready,
+                resourceTitle: metadata.resourceTitle,
+                downloadedAt: metadata.downloadedAt,
+                lastCheckedAt: metadata.lastCheckedAt,
+                validThrough: metadata.validThrough,
+                errorMessage: nil
+            )
+        } else {
+            currentStatus = .unavailable
+        }
+    }
+
+    func feedStatus() async -> GTFSFeedStatus { currentStatus }
+
+    func refreshIfNeeded(force: Bool) async -> GTFSFeedStatus {
+        if !force,
+           store != nil,
+           let lastChecked = metadata?.lastCheckedAt,
+           Date.now.timeIntervalSince(lastChecked) < Self.refreshInterval {
+            return currentStatus
+        }
+
+        currentStatus.phase = .checking
+        currentStatus.errorMessage = nil
+        do {
+            let remote = try await latestResource()
+            // `force` bypasses only the once-per-day metadata check. A manual
+            // check must not redownload an identical archive.
+            let unchanged = metadata?.resourceID == remote.id
+                && (remote.checksum == nil || remote.checksum == metadata?.checksum)
+            guard !unchanged else {
+                metadata?.lastCheckedAt = .now
+                persistMetadata()
+                currentStatus.lastCheckedAt = .now
+                currentStatus.phase = store == nil ? .unavailable : .ready
+                return currentStatus
+            }
+
+            currentStatus.phase = .downloading
+            let generation = (metadata?.generation ?? 0) + 1
+            let info = try await GTFSArchiveInstaller.downloadAndInstall(
+                from: remote.url,
+                databaseAt: databaseURL,
+                generation: generation,
+                session: session
+            )
+            store = try GTFSStore(databaseAt: databaseURL)
+            metadata = GTFSLocalMetadata(
+                resourceID: remote.id,
+                resourceTitle: remote.title,
+                checksum: remote.checksum,
+                downloadedAt: .now,
+                lastCheckedAt: .now,
+                generation: info.generation,
+                validThrough: info.lastServiceDate.description
+            )
+            persistMetadata()
+            currentStatus = GTFSFeedStatus(
+                phase: .ready,
+                resourceTitle: remote.title,
+                downloadedAt: metadata?.downloadedAt,
+                lastCheckedAt: metadata?.lastCheckedAt,
+                validThrough: info.lastServiceDate.description,
+                errorMessage: nil
+            )
+        } catch {
+            // Keep any already-open store readable after a metadata, download,
+            // or import failure. Never report a valid cached feed as empty.
+            metadata?.lastCheckedAt = .now
+            persistMetadata()
+            currentStatus.phase = store == nil ? .failed : .stale
+            currentStatus.lastCheckedAt = .now
+            currentStatus.errorMessage = Self.userMessage(for: error)
+        }
+        return currentStatus
+    }
+
+    func searchStops(query: String) async -> [Stop] {
+        guard let store else { return [] }
+        return (try? await store.searchStops(matching: query, limit: 40).map { Self.stop($0) }) ?? []
+    }
+
+    func nearbyStops(to location: LocationPoint, radiusMeters: Double, limit: Int) async -> [Stop] {
+        guard let store else { return [] }
+        return (try? await store.nearbyStops(
+            to: Coordinate(latitude: location.latitude, longitude: location.longitude),
+            withinMeters: radiusMeters,
+            limit: limit
+        ).map { Self.stop($0) }) ?? []
+    }
+
+    func matchLiveStop(_ liveStop: LiveTransitStop) async -> Stop? {
+        guard let store else { return nil }
+        guard let candidates = try? await store.nearbyStops(
+            to: Coordinate(latitude: liveStop.location.latitude, longitude: liveStop.location.longitude),
+            withinMeters: 75,
+            limit: 12
+        ) else { return nil }
+        let matching = candidates.filter {
+            $0.name.normalizedForSearch == liveStop.name.normalizedForSearch
+        }
+        guard matching.count == 1, let staticStop = matching.first else { return nil }
+        return Self.stop(staticStop, hafasStationIDs: [liveStop.stationID], liveModes: liveStop.modes)
+    }
+
+    func routes(for stop: Stop) async -> [TransitRoute] {
+        guard let store, let stopID = stop.gtfsStopID else { return [] }
+        guard let departures = try? await store.nextScheduledDepartures(
+            fromStopID: stopID,
+            at: .now,
+            horizon: 24 * 60 * 60,
+            limit: 1_000
+        ) else { return [] }
+        var seen: Set<String> = []
+        return departures.compactMap { departure in
+            let route = Self.route(departure.route, agency: departure.agency)
+            return seen.insert(route.id).inserted ? route : nil
+        }
+    }
+
+    func scheduledDepartures(for stop: Stop, at date: Date, limit: Int) async -> [OfflineScheduleDeparture] {
+        guard let store, let stopID = stop.gtfsStopID else { return [] }
+        let feed = await store.feedInfo()
+        guard let departures = try? await store.nextScheduledDepartures(
+            fromStopID: stopID,
+            at: date,
+            horizon: 4 * 60 * 60,
+            limit: limit
+        ) else { return [] }
+        return departures.compactMap { departure in
+            guard let time = Self.date(for: departure.departure, serviceDay: departure.serviceDay, feed: feed) else { return nil }
+            return OfflineScheduleDeparture(
+                id: "gtfs:\(departure.tripID):\(departure.stopID):\(departure.departure?.rawValue ?? -1)",
+                lineName: departure.route.shortName ?? departure.route.longName ?? "Service",
+                destination: departure.headsign ?? departure.route.longName ?? "Unknown destination",
+                departureDate: time,
+                platform: nil,
+                mode: Self.mode(routeType: departure.route.type)
+            )
+        }
+    }
+
+    func lineDetail(for route: TransitRoute, directionID: String?, at date: Date) async -> LineDetail? {
+        guard let store else { return nil }
+        let today = Self.gtfsDate(from: date)
+        let feed = await store.feedInfo()
+        let todayServiceDay = await store.serviceDay(for: today)
+        guard let trips = try? await store.trips(forRouteID: route.id, activeOn: today, limit: 500), !trips.isEmpty else {
+            return nil
+        }
+        let directions = Self.directions(from: trips)
+        let selected = directionID ?? directions.first?.id ?? "unknown"
+        let selectedDirection = Int(selected)
+        guard let representative = trips.first(where: { $0.directionID == selectedDirection }) ?? trips.first,
+              let stopTimes = try? await store.stopTimes(forTripID: representative.id) else { return nil }
+        let stops = stopTimes.map { time in
+            LineStopSequenceEntry(
+                id: time.stop.id,
+                name: time.stop.name,
+                platform: time.stop.platformCode,
+                location: LocationPoint(id: time.stop.id, name: time.stop.name, latitude: time.stop.coordinate.latitude, longitude: time.stop.coordinate.longitude)
+            )
+        }
+        var upcoming: [LineTimetableEntry] = []
+        if let todayServiceDay {
+            for trip in trips where trip.directionID == representative.directionID {
+                guard let times = try? await store.stopTimes(forTripID: trip.id),
+                      let first = times.first,
+                      let departure = Self.date(for: first.departure, serviceDay: todayServiceDay, feed: feed),
+                      departure >= date else { continue }
+                upcoming.append(LineTimetableEntry(
+                    id: trip.id,
+                    departureTime: departure,
+                    originName: first.stop.name,
+                    destinationName: trip.headsign ?? route.longName ?? route.shortName
+                ))
+            }
+        }
+        upcoming.sort { $0.departureTime < $1.departureTime }
+        let geometry = await routeShape(for: representative.id)
+        let overlay = geometry.count >= 2 ? RouteMapOverlay(segments: [
+            RouteMapSegment(id: "line:\(route.id):\(selected)", mode: route.mode, routeName: route.shortName, routeId: route.id, coordinates: geometry)
+        ]) : nil
+        return LineDetail(
+            route: route,
+            directions: directions,
+            selectedDirectionID: selected,
+            stopSequence: stops,
+            upcomingDepartures: Array(upcoming.prefix(12)),
+            serviceSummary: "Static GTFS timetable",
+            mapOverlay: overlay
+        )
+    }
+
+    func routingStops(near location: LocationPoint, radiusMeters: Double, limit: Int) async -> [Stop] {
+        await nearbyStops(to: location, radiusMeters: radiusMeters, limit: limit)
+    }
+
+    func journeyDepartures(from stop: Stop, after date: Date, horizon: TimeInterval, limit: Int) async -> [GTFSJourneyDeparture] {
+        guard let store, let stopID = stop.gtfsStopID,
+              let departures = try? await store.nextScheduledDepartures(
+                fromStopID: stopID,
+                at: date,
+                horizon: horizon,
+                limit: limit
+              ) else { return [] }
+        let feed = await store.feedInfo()
+        var result: [GTFSJourneyDeparture] = []
+        for departure in departures {
+            guard let departureDate = Self.date(for: departure.departure, serviceDay: departure.serviceDay, feed: feed) else { continue }
+            let trip = try? await store.trip(id: departure.tripID)
+            result.append(GTFSJourneyDeparture(
+                tripID: departure.tripID,
+                stopID: departure.stopID,
+                route: Self.route(departure.route, agency: departure.agency),
+                headsign: departure.headsign ?? departure.route.longName ?? departure.route.shortName ?? "Service",
+                directionID: departure.directionID,
+                departureDate: departureDate,
+                arrivalDate: Self.date(for: departure.arrival, serviceDay: departure.serviceDay, feed: feed),
+                wheelchairAccessible: Self.wheelchairAccess(trip?.wheelchairAccessible)
+            ))
+        }
+        return result
+    }
+
+    func journeyStops(for tripID: String) async -> [GTFSJourneyStopTime] {
+        guard let store, let raw = try? await store.stopTimes(forTripID: tripID),
+              let serviceDay = await store.serviceDay(for: Self.gtfsDate(from: .now)) else { return [] }
+        let feed = await store.feedInfo()
+        return raw.map { value in
+            GTFSJourneyStopTime(
+                stop: Self.stop(value.stop),
+                sequence: value.sequence,
+                arrivalDate: Self.date(for: value.arrival, serviceDay: serviceDay, feed: feed),
+                departureDate: Self.date(for: value.departure, serviceDay: serviceDay, feed: feed),
+                pickupAllowed: value.pickupType != 1,
+                dropOffAllowed: value.dropOffType != 1
+            )
+        }
+    }
+
+    func transferRules(from stop: Stop) async -> [GTFSTransferRule] {
+        guard let store, let stopID = stop.gtfsStopID,
+              let raw = try? await store.transferRules(fromStopID: stopID) else { return [] }
+        return raw.map { GTFSTransferRule(destinationStopID: $0.toStopID, minimumTransferSeconds: $0.minimumTransferSeconds) }
+    }
+
+    func routeShape(for tripID: String) async -> [RouteMapCoordinate] {
+        guard let store, let trip = try? await store.trip(id: tripID), let shapeID = trip.shapeID,
+              let shape = try? await store.shape(id: shapeID) else { return [] }
+        return shape.coordinates.map { RouteMapCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
+    }
+}
+
+private extension MobiliteitGTFSService {
+    struct GTFSLocalMetadata: Codable, Sendable {
+        let resourceID: String
+        let resourceTitle: String
+        let checksum: String?
+        let downloadedAt: Date
+        var lastCheckedAt: Date
+        let generation: Int
+        let validThrough: String?
+    }
+
+    struct RemoteResource: Sendable {
+        let id: String
+        let title: String
+        let url: URL
+        let checksum: String?
+        let modifiedAt: Date?
+    }
+
+    struct DatasetResponse: Decodable {
+        let resources: [DatasetResource]
+    }
+
+    struct DatasetResource: Decodable {
+        let id: String?
+        let title: String?
+        let url: URL?
+        let latest: URL?
+        let format: String?
+        let mime: String?
+        let filetype: String?
+        let checksum: Checksum?
+        let lastModified: Date?
+
+        enum CodingKeys: String, CodingKey {
+            case id, title, url, latest, format, mime, filetype, checksum
+            case lastModified = "last_modified"
+        }
+
+        init(from decoder: Decoder) throws {
+            let values = try decoder.container(keyedBy: CodingKeys.self)
+            id = try values.decodeIfPresent(String.self, forKey: .id)
+            title = try values.decodeIfPresent(String.self, forKey: .title)
+            url = try values.decodeURL(forKey: .url)
+            latest = try values.decodeURL(forKey: .latest)
+            format = try values.decodeIfPresent(String.self, forKey: .format)
+            mime = try values.decodeIfPresent(String.self, forKey: .mime)
+            filetype = try values.decodeIfPresent(String.self, forKey: .filetype)
+            checksum = try values.decodeIfPresent(Checksum.self, forKey: .checksum)
+            lastModified = try values.decodeDate(forKey: .lastModified)
+        }
+    }
+
+    struct Checksum: Decodable { let value: String? }
+
+    func latestResource() async throws -> RemoteResource {
+        let (data, response) = try await session.data(from: Self.datasetURL)
+        guard let response = response as? HTTPURLResponse, (200 ..< 300).contains(response.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+        let dataset = try JSONDecoder().decode(DatasetResponse.self, from: data)
+        let values = dataset.resources.compactMap { resource -> RemoteResource? in
+            let title = resource.title ?? "GTFS archive"
+            let candidate = resource.latest ?? resource.url
+            guard let id = resource.id, let url = candidate else { return nil }
+            let type = [title, resource.format, resource.filetype, resource.mime].compactMap { $0 }.joined(separator: " ").lowercased()
+            guard type.contains("gtfs"), type.contains("zip") else { return nil }
+            return RemoteResource(id: id, title: title, url: url, checksum: resource.checksum?.value, modifiedAt: resource.lastModified)
+        }
+        guard let latest = values.max(by: { ($0.modifiedAt ?? .distantPast) < ($1.modifiedAt ?? .distantPast) }) else {
+            throw URLError(.fileDoesNotExist)
+        }
+        return latest
+    }
+
+    nonisolated static func defaultDirectory() -> URL {
+        let manager = FileManager.default
+        let root = (try? manager.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )) ?? manager.temporaryDirectory
+        let directory = root.appendingPathComponent("Mobiliteit", isDirectory: true)
+        try? manager.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory
+    }
+
+
+    nonisolated static func loadMetadata(at url: URL) -> GTFSLocalMetadata? {
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        return try? JSONDecoder().decode(GTFSLocalMetadata.self, from: data)
+    }
+
+    func persistMetadata() {
+        guard let metadata, let data = try? JSONEncoder().encode(metadata) else { return }
+        try? data.write(to: metadataURL, options: .atomic)
+    }
+
+    nonisolated static func userMessage(for error: Error) -> String {
+        if error is URLError { return "The GTFS update could not be downloaded." }
+        if error is GTFSArchiveError { return "The downloaded GTFS feed could not be installed." }
+        return "The GTFS update could not be completed."
+    }
+
+    nonisolated static func stop(_ source: MobiliteitKit.TransitStop, hafasStationIDs: [String] = [], liveModes: [TransportMode] = []) -> Stop {
+        Stop(
+            id: source.id,
+            name: source.name,
+            location: LocationPoint(id: source.id, name: source.name, latitude: source.coordinate.latitude, longitude: source.coordinate.longitude),
+            modes: liveModes,
+            dataSource: .gtfs,
+            platformIds: source.platformCode.map { [$0] },
+            wheelchairBoarding: wheelchairAccess(source.wheelchairBoarding),
+            gtfsStopID: source.id,
+            hafasStationIDs: hafasStationIDs
+        )
+    }
+
+    nonisolated static func route(_ source: MobiliteitKit.TransitRoute, agency: Agency?) -> TransitRoute {
+        TransitRoute(
+            id: source.id,
+            shortName: source.shortName ?? source.longName ?? "Service",
+            longName: source.longName,
+            mode: mode(routeType: source.type),
+            operatorName: agency?.name,
+            dataSource: .gtfs
+        )
+    }
+
+    nonisolated static func mode(routeType: Int) -> TransportMode {
+        switch routeType {
+        case 0, 1, 2: .train
+        case 900...999: .tram
+        case 3, 700...799: .bus
+        case 7: .funicular
+        default: .unknown
+        }
+    }
+
+    nonisolated static func wheelchairAccess(_ value: Int?) -> WheelchairAccess {
+        switch value {
+        case 1: .accessible
+        case 2: .notAccessible
+        default: .unknown
+        }
+    }
+
+    nonisolated static func gtfsDate(from date: Date) -> GTFSDate {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
+        let values = calendar.dateComponents([.year, .month, .day], from: date)
+        return try! GTFSDate(year: values.year!, month: values.month!, day: values.day!)
+    }
+
+    nonisolated static func date(for time: ServiceTime?, serviceDay: ServiceDay, feed: FeedInfo) -> Date? {
+        guard let time else { return nil }
+        // GTFSStore already returns service-day values. Luxembourg's GTFS feed
+        // uses Europe/Luxembourg, so deliberately preserve 24:00+ service time.
+        let day = feed.firstServiceDate.adding(days: Int(serviceDay.index))
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
+        var components = DateComponents()
+        components.calendar = calendar
+        components.timeZone = timeZone
+        components.year = day.year
+        components.month = day.month
+        components.day = day.day
+        guard let midnight = calendar.date(from: components) else { return nil }
+        return midnight.addingTimeInterval(TimeInterval(time.rawValue))
+    }
+
+    nonisolated static func directions(from trips: [MobiliteitKit.TransitTrip]) -> [LineDetailDirection] {
+        var seen: Set<String> = []
+        return trips.compactMap { trip in
+            let id = String(trip.directionID ?? 0)
+            guard seen.insert(id).inserted else { return nil }
+            return LineDetailDirection(id: id, title: trip.headsign ?? "Direction \(Int(id) ?? 0)", subtitle: nil)
+        }
+    }
+}
+
+private extension KeyedDecodingContainer {
+    nonisolated func decodeURL(forKey key: Key) throws -> URL? {
+        if let url = try? decode(URL.self, forKey: key) { return url }
+        return try decodeIfPresent(String.self, forKey: key).flatMap(URL.init(string:))
+    }
+
+    nonisolated func decodeDate(forKey key: Key) throws -> Date? {
+        guard let value = try decodeIfPresent(String.self, forKey: key) else { return nil }
+        let iso = ISO8601DateFormatter()
+        if let date = iso.date(from: value) { return date }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        return formatter.date(from: value)
+    }
+}

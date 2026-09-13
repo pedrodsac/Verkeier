@@ -8,6 +8,10 @@ struct DepartureBoardView: View {
         viewModel.mergedDepartures
     }
 
+    private var scheduledDepartures: [Departure] {
+        viewModel.scheduledDepartures
+    }
+
     private var isLoading: Bool {
         viewModel.isLoadingDepartures
     }
@@ -25,9 +29,9 @@ struct DepartureBoardView: View {
     }
 
     var body: some View {
-        if isLoading, departures.isEmpty {
+        if isLoading, departures.isEmpty, scheduledDepartures.isEmpty {
             DepartureLoadingCard(title: "Loading departures")
-        } else if departures.isEmpty {
+        } else if departures.isEmpty, scheduledDepartures.isEmpty {
             if let errorMessage {
                 CompactUnavailableCard(
                     title: "Departures unavailable",
@@ -68,31 +72,45 @@ struct DepartureBoardView: View {
 
                 ScrollView {
                     LazyVStack(spacing: 8) {
-                        if !departed.isEmpty {
-                            DisclosureGroup("Recently departed") {
-								ForEach(Array(departed), id: \.self) { departure in
-                                    DepartureListRow(departure: departure, showsControls: false)
-                                        .opacity(0.55)
+                        if !departures.isEmpty {
+                            if !departed.isEmpty {
+                                DisclosureGroup("Recently departed") {
+									ForEach(Array(departed), id: \.self) { departure in
+                                        DepartureListRow(departure: departure, showsControls: false)
+                                            .opacity(0.55)
+                                    }
                                 }
+                                .disclosureGroupStyle(ChevronDisclosureGroupStyle())
+                                .font(.subheadline.weight(.semibold))
+                                .tint(.secondary)
                             }
-                            .disclosureGroupStyle(ChevronDisclosureGroupStyle())
-                            .font(.subheadline.weight(.semibold))
-                            .tint(.secondary)
+
+							ForEach(upcoming, id: \.self) { departure in
+                                DepartureListRow(
+                                    departure: departure,
+                                    isTracked: departure.id == trackedDepartureId,
+                                    isLastOfDay: lastOfDayIDs.contains(departure.id),
+                                    activeReminder: activeReminder,
+                                    startTrackingDeparture: { actions.startTrackingDeparture(departure) },
+                                    stopTrackingDeparture: actions.stopTrackingDeparture,
+                                    scheduleReminder: { minutes in
+                                        actions.scheduleDepartureReminder(departure, minutes)
+                                    },
+                                    cancelReminder: actions.cancelDepartureReminder
+                                )
+                            }
                         }
 
-						ForEach(upcoming, id: \.self) { departure in
-                            DepartureListRow(
-                                departure: departure,
-                                isTracked: departure.id == trackedDepartureId,
-                                isLastOfDay: lastOfDayIDs.contains(departure.id),
-                                activeReminder: activeReminder,
-                                startTrackingDeparture: { actions.startTrackingDeparture(departure) },
-                                stopTrackingDeparture: actions.stopTrackingDeparture,
-                                scheduleReminder: { minutes in
-                                    actions.scheduleDepartureReminder(departure, minutes)
-                                },
-                                cancelReminder: actions.cancelDepartureReminder
-                            )
+                        if !scheduledDepartures.isEmpty {
+                            Label("Scheduled timetable", systemImage: "calendar")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.top, departures.isEmpty ? 0 : 12)
+
+                            ForEach(scheduledDepartures, id: \.self) { departure in
+                                DepartureListRow(departure: departure, showsControls: false)
+                            }
                         }
                     }
 					.safeAreaPadding(.top, 5)

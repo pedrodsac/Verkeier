@@ -1082,7 +1082,6 @@
       }
     },
     "Check for GTFS update" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2178,9 +2177,6 @@
           }
         }
       }
-    },
-    "GTFS schedules and ATP live departures are not connected." : {
-
     },
     "Home" : {
       "localizations" : {
@@ -4971,6 +4967,9 @@
           }
         }
       }
+    },
+    "Scheduled timetable" : {
+
     },
     "Schedules" : {
       "localizations" : {

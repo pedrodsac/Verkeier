@@ -60,7 +60,7 @@ struct RefreshDeparturesWidgetIntent: AppIntent {
     }
 
     func perform() async throws -> some IntentResult {
-        WidgetCenter.shared.reloadTimelines(ofKind: DeparturesSummaryWidget.kind)
+        WidgetCenter.shared.reloadTimelines(ofKind: "DeparturesSummaryWidget")
         return .result()
     }
 }
@@ -92,10 +92,11 @@ struct LiveDeparturesEntry: TimelineEntry {
 
     var updateLabel: String {
         guard let board else { return "Waiting for live data" }
+        let source = board.sourceSummary ?? "Transit data"
         if isStale {
-            return "Last updated \(board.updatedAt.formatted(date: .omitted, time: .shortened))"
+            return "\(source) · last updated \(board.updatedAt.formatted(date: .omitted, time: .shortened))"
         }
-        return "Updated \(board.updatedAt.formatted(date: .omitted, time: .shortened))"
+        return "\(source) · updated \(board.updatedAt.formatted(date: .omitted, time: .shortened))"
     }
 
     var destinationURL: URL {
@@ -120,7 +121,8 @@ struct LiveDeparturesTimelineProvider: AppIntentTimelineProvider {
                         realtimeDeparture: .now.addingTimeInterval(5 * 60),
                         delayMinutes: 1,
                         platform: "2",
-                        isCancelled: false
+                        isCancelled: false,
+                        sourceLabel: "mobiliteit.lu OpenAPI"
                     ),
                     SharedWidgetDeparture(
                         id: "preview-2",
@@ -130,10 +132,12 @@ struct LiveDeparturesTimelineProvider: AppIntentTimelineProvider {
                         realtimeDeparture: nil,
                         delayMinutes: nil,
                         platform: "1",
-                        isCancelled: false
+                        isCancelled: false,
+                        sourceLabel: "mobiliteit.lu OpenAPI"
                     )
                 ],
-                updatedAt: .now
+                updatedAt: .now,
+                sourceSummary: "mobiliteit.lu OpenAPI"
             )
         )
     }

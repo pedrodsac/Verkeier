@@ -77,5 +77,49 @@ struct StopDetailPresentationTests {
 
         #expect(model.mergedDepartures.map(\.id) == ["live-2"])
         #expect(model.mergedDepartures.first?.platform == "2")
+        #expect(model.scheduledDepartures.isEmpty)
+    }
+
+    @Test func keepsScheduledRowsSeparateAndLabelsThemAsGTFS() {
+        let stop = Stop(
+            id: "stop-1",
+            name: "Central",
+            location: LocationPoint(name: "Central", latitude: 49.6, longitude: 6.1),
+            modes: [.bus],
+            dataSource: .gtfs,
+            gtfsStopID: "stop-1"
+        )
+        let scheduled = OfflineScheduleDeparture(
+            id: "scheduled-1",
+            lineName: "16",
+            destination: "Airport",
+            departureDate: Date(timeIntervalSince1970: 1_800),
+            platform: nil,
+            mode: .bus
+        )
+        let model = StopDetailPresentationModel(
+            stop: stop,
+            routes: [],
+            departures: [],
+            offlineScheduledDepartures: [scheduled],
+            alerts: [],
+            availablePlatforms: [],
+            selectedLine: nil,
+            selectedPlatform: nil,
+            isLoadingDepartures: false,
+            errorMessage: nil,
+            lastUpdated: nil,
+            isStale: false,
+            isFavourite: false,
+            trackedDepartureId: nil,
+            liveActivityErrorMessage: nil,
+            liveActivityStaleMessage: "",
+            activeReminder: nil,
+            departureReminderErrorMessage: nil
+        )
+
+        #expect(model.mergedDepartures.isEmpty)
+        #expect(model.scheduledDepartures.map(\.id) == ["scheduled-1"])
+        #expect(model.scheduledDepartures.first?.dataSource == .gtfs)
     }
 }

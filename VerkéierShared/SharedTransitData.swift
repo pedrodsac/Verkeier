@@ -53,10 +53,16 @@ nonisolated enum SharedTransitDataStore {
     nonisolated static func saveFavouriteDepartureBoard(
         stopId: String,
         departures: [SharedWidgetDeparture],
-        updatedAt: Date
+        updatedAt: Date,
+        sourceSummary: String? = nil
     ) {
         var boards = favouriteDepartureBoards()
-        boards[stopId] = SharedDepartureBoard(stopId: stopId, departures: departures, updatedAt: updatedAt)
+        boards[stopId] = SharedDepartureBoard(
+            stopId: stopId,
+            departures: departures,
+            updatedAt: updatedAt,
+            sourceSummary: sourceSummary
+        )
         guard let data = try? JSONEncoder().encode(boards) else { return }
         userDefaults.set(data, forKey: favouriteDepartureBoardsKey)
         UserDefaults.standard.set(data, forKey: favouriteDepartureBoardsKey)
@@ -69,6 +75,14 @@ nonisolated enum SharedTransitDataStore {
             return [:]
         }
         return boards
+    }
+
+    nonisolated static func removeFavouriteDepartureBoard(stopId: String) {
+        var boards = favouriteDepartureBoards()
+        boards.removeValue(forKey: stopId)
+        guard let data = try? JSONEncoder().encode(boards) else { return }
+        userDefaults.set(data, forKey: favouriteDepartureBoardsKey)
+        UserDefaults.standard.set(data, forKey: favouriteDepartureBoardsKey)
     }
 
     nonisolated static func saveTrackedReminder(_ reminder: SharedTrackedDepartureReminder?) {
@@ -98,6 +112,9 @@ struct SharedDepartureBoard: Codable, Hashable, Sendable {
     let stopId: String
     let departures: [SharedWidgetDeparture]
     let updatedAt: Date
+    /// Human-readable provenance such as "mobiliteit.lu OpenAPI" or "GTFS".
+    /// Optional to preserve boards written by older app releases.
+    let sourceSummary: String?
 }
 
 struct SharedWidgetDeparture: Codable, Hashable, Identifiable, Sendable {
@@ -109,8 +126,11 @@ struct SharedWidgetDeparture: Codable, Hashable, Identifiable, Sendable {
     let delayMinutes: Int?
     let platform: String?
     let isCancelled: Bool
+    /// The source for this individual row. A board can contain a scheduled
+    /// fallback after a failed live refresh, so provenance lives on the row too.
+    let sourceLabel: String?
 
-    var displayDepartureDate: Date? { realtimeDeparture ?? scheduledDeparture }
+    nonisolated var displayDepartureDate: Date? { realtimeDeparture ?? scheduledDeparture }
 }
 
 struct SharedFavouriteStop: Codable, Hashable, Identifiable {

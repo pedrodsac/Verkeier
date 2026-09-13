@@ -129,7 +129,12 @@ extension TransitMapScreen {
     }
 
     var settingsReadinessSnapshot: DataReadinessSnapshot {
-        SettingsSupport.readinessSnapshot(configuration: appConfiguration)
+        SettingsSupport.readinessSnapshot(
+            configuration: appConfiguration,
+            gtfsStatus: viewModel.gtfsFeedStatus,
+            liveTransitLastUpdated: viewModel.liveTransitLastUpdated,
+            liveTransitErrorMessage: viewModel.liveTransitErrorMessage
+        )
     }
 
     var settingsSupportBundleText: String {

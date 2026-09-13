@@ -28,6 +28,9 @@ final class TransitMapViewModel {
 
     var isLoadingNearbyStops = false
     var nearbyStopsErrorMessage: String?
+    var gtfsFeedStatus: GTFSFeedStatus = .unavailable
+    var liveTransitLastUpdated: Date?
+    var liveTransitErrorMessage: String?
     var departures: [Departure] = [] {
         didSet { rebuildDepartureFilters() }
     }
@@ -245,10 +248,11 @@ final class TransitMapViewModel {
         }
     }
 
-    struct FavouriteDepartureBoardResult {
+    struct FavouriteDepartureBoardResult: Sendable {
         let stopId: String
         let departures: [Departure]
         let didFail: Bool
+        let usedLiveData: Bool
         let index: Int
     }
 }

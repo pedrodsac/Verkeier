@@ -10,6 +10,12 @@ final class PersistedFavouriteStop {
     var longitude: Double
     var modesRawValue: String
     var platformIdsRawValue: String?
+    /// Feed identifiers are persisted separately because GTFS and HAFAS use
+    /// unrelated identifier spaces. These additive optional fields preserve
+    /// existing favourites while allowing newly saved stops to refresh both
+    /// scheduled and live boards after an app relaunch.
+    var gtfsStopID: String?
+    var hafasStationIDsRawValue: String?
     var createdAt: Date
     /// Optional rider-set grouping label, e.g. "Home", "Work". `nil` = unlabelled.
     var label: String?
@@ -29,6 +35,8 @@ final class PersistedFavouriteStop {
         longitude = stop.location.longitude
         modesRawValue = stop.modes.map(\.rawValue).joined(separator: ",")
         platformIdsRawValue = stop.platformIds.joined(separator: ",")
+        gtfsStopID = stop.gtfsStopID
+        hafasStationIDsRawValue = stop.hafasStationIDs.joined(separator: ",")
         self.createdAt = createdAt
         boardFilterData = boardFilter.flatMap { try? JSONEncoder().encode($0) }
     }
@@ -42,8 +50,10 @@ final class PersistedFavouriteStop {
             modes: modesRawValue
                 .split(separator: ",")
                 .compactMap { TransportMode(rawValue: String($0)) },
-            dataSource: .local,
-            platformIds: platformIds
+            dataSource: gtfsStopID == nil ? (hafasStationIDs.isEmpty ? .local : .atpOpenAPI) : .gtfs,
+            platformIds: platformIds,
+            gtfsStopID: gtfsStopID,
+            hafasStationIDs: hafasStationIDs
         )
     }
 
@@ -54,6 +64,14 @@ final class PersistedFavouriteStop {
             .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
         return ids.isEmpty ? [stopId] : ids
+    }
+
+    private var hafasStationIDs: [String] {
+        guard let hafasStationIDsRawValue else { return [] }
+        return hafasStationIDsRawValue
+            .split(separator: ",")
+            .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
     }
 
     var labels: [String] {

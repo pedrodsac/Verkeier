@@ -12,7 +12,6 @@
 		627757823024D6D30012B2EF /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 627757803024D6D30012B2EF /* AppIcon.icon */; };
 		62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000102 /* AsyncAlgorithms */; };
 		62FE86412FEE000000000005 /* UIOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000105 /* UIOnboarding */; };
-		E8ACE883304CCD690019CAC3 /* Transit in Frameworks */ = {isa = PBXBuildFile; productRef = E8ACE882304CCD690019CAC3 /* Transit */; };
 		E8D57E2E304F173F00F569AC /* MobiliteitKit in Frameworks */ = {isa = PBXBuildFile; productRef = E8D57E2D304F173F00F569AC /* MobiliteitKit */; };
 /* End PBXBuildFile section */
 
@@ -103,7 +102,6 @@
 		000000000000000130000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
-				E8ACE883304CCD690019CAC3 /* Transit in Frameworks */,
 				62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */,
 				E8D57E2E304F173F00F569AC /* MobiliteitKit in Frameworks */,
 				62FE86412FEE000000000005 /* UIOnboarding in Frameworks */,
@@ -178,7 +176,6 @@
 			packageProductDependencies = (
 				62FE86412FEE000000000102 /* AsyncAlgorithms */,
 				62FE86412FEE000000000105 /* UIOnboarding */,
-				E8ACE882304CCD690019CAC3 /* Transit */,
 				E8D57E2D304F173F00F569AC /* MobiliteitKit */,
 			);
 			productName = "Verkéier";
@@ -263,7 +260,6 @@
 			packageReferences = (
 				62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				62FE86412FEE000000000204 /* XCRemoteSwiftPackageReference "UIOnboarding" */,
-				E8ACE881304CCD690019CAC3 /* XCRemoteSwiftPackageReference "transit" */,
 				E8D57E2C304F173F00F569AC /* XCRemoteSwiftPackageReference "MobiliteitKit" */,
 			);
 			preferredProjectObjectVersion = 90;
@@ -730,14 +726,6 @@
 				kind = branch;
 			};
 		};
-		E8ACE881304CCD690019CAC3 /* XCRemoteSwiftPackageReference "transit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pedrodsac/transit.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 		E8D57E2C304F173F00F569AC /* XCRemoteSwiftPackageReference "MobiliteitKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pedrodsac/MobiliteitKit";
@@ -758,11 +746,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 62FE86412FEE000000000204 /* XCRemoteSwiftPackageReference "UIOnboarding" */;
 			productName = UIOnboarding;
-		};
-		E8ACE882304CCD690019CAC3 /* Transit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E8ACE881304CCD690019CAC3 /* XCRemoteSwiftPackageReference "transit" */;
-			productName = Transit;
 		};
 		E8D57E2D304F173F00F569AC /* MobiliteitKit */ = {
 			isa = XCSwiftPackageProductDependency;

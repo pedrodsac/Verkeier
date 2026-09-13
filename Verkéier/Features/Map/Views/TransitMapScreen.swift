@@ -9,6 +9,8 @@ struct TransitMapScreen: View {
     @AppStorage("debugTransitDataMode") var debugTransitDataModeRawValue =
         DebugTransitDataMode.normal.rawValue
     @Environment(\.routeService) var routeService
+    @Environment(\.gtfsService) var gtfsService
+    @Environment(\.liveTransitService) var liveTransitService
     @Environment(\.bikeShareService) private var bikeShareService
     @Environment(\.accessibilityReduceMotion) var reduceMotion
     @Environment(\.avlClient) var avlClient
@@ -108,12 +110,17 @@ struct TransitMapScreen: View {
         .task {
             viewModel.loadRoutePlanner()
             locationService.startUpdatingIfAllowed()
+            viewModel.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: false)
             await bikeShareService.refreshStaticStations()
             await bikeShareService.refreshAvailability()
             bikeShareStations = await bikeShareService.snapshot()?.stations ?? []
-            await viewModel.loadGTFSMapStops(location: locationService.currentLocation)
-            await viewModel.loadNearbyStops(location: locationService.currentLocation)
-            await viewModel.loadNearbyStopRoutes()
+            await viewModel.loadGTFSMapStops(location: locationService.currentLocation, using: gtfsService)
+            await viewModel.loadNearbyStops(
+                location: locationService.currentLocation,
+                using: liveTransitService,
+                gtfsService: gtfsService
+            )
+            await viewModel.loadNearbyStopRoutes(using: gtfsService)
             await loadAlertsAndCheckDisruptions()
         }
         .task {
@@ -127,7 +134,7 @@ struct TransitMapScreen: View {
                 shouldCenterOnNextLocation = false
             }
             Task {
-                await viewModel.loadGTFSMapStops(location: locationService.currentLocation)
+                await viewModel.loadGTFSMapStops(location: locationService.currentLocation, using: gtfsService)
             }
             scheduleNearbyStopsRefresh()
             calculateWaitingRouteIfNeeded()
@@ -136,13 +143,13 @@ struct TransitMapScreen: View {
             guard viewModel.selectedStop != nil, isShowingStopDetail else {
                 return
             }
-            await viewModel.loadDepartures()
+            await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
             await updateTrackedDepartureIfNeeded()
 
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(45))
                 guard !Task.isCancelled else { return }
-                await viewModel.loadDepartures()
+                await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
                 await updateTrackedDepartureIfNeeded()
             }
         }
@@ -272,7 +279,9 @@ struct TransitMapScreen: View {
     }
 
     var canLoadLiveFavouriteDepartures: Bool {
-        false
+        // Favourites can always refresh a GTFS-only board; the live relay is
+        // additive rather than a prerequisite for a useful widget snapshot.
+        liveTransitService.isConfigured || viewModel.gtfsFeedStatus.isReady
     }
 
     var departureRefreshKey: String {

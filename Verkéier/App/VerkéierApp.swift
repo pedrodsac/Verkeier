@@ -9,6 +9,8 @@ struct VerkéierApp: App {
     @State private var preferences = AppPreferences.shared
     private let configuration: AppConfiguration
     private let bikeShareService: any BikeShareService
+    private let gtfsService: any GTFSService
+    private let liveTransitService: any LiveTransitService
     private let modelContainer: ModelContainer
     @State private var liveActivityManager = LiveActivityManager()
     @State private var departureReminderService = DepartureReminderService()
@@ -18,6 +20,8 @@ struct VerkéierApp: App {
         let configuration = AppConfiguration.current
         self.configuration = configuration
         bikeShareService = JCDecauxBikeShareService(configuration: configuration)
+        gtfsService = MobiliteitGTFSService()
+        liveTransitService = MobiliteitLiveTransitService(proxyURL: configuration.apiProxyURL)
         modelContainer = AppModelContainer.make()
     }
 
@@ -26,6 +30,8 @@ struct VerkéierApp: App {
             TransitMapScreen(locationService: locationService)
                 .environment(\.appConfiguration, configuration)
                 .environment(\.routeService, routeService)
+                .environment(\.gtfsService, gtfsService)
+                .environment(\.liveTransitService, liveTransitService)
                 .environment(\.bikeShareService, bikeShareService)
                 .environment(\.avlClient, avlClient)
                 .environment(\.liveActivityManager, liveActivityManager)
@@ -54,5 +60,5 @@ struct VerkéierApp: App {
         DebugTransitDataMode(rawValue: debugTransitDataModeRawValue) ?? .normal
     }
 
-    private var routeService: any RouteService { MapKitRouteService() }
+    private var routeService: any RouteService { MobiliteitRouteService() }
 }

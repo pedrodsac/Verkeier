@@ -25,7 +25,10 @@ extension TransitMapScreen {
 
     func trackNextDeparture(for stop: Stop) {
         Task {
-            await viewModel.loadDepartures()
+            await viewModel.loadDepartures(
+                using: liveTransitService,
+                gtfsService: gtfsService
+            )
             guard let departure = DepartureTrackingSelection.nextTrackableDeparture(
                 from: viewModel.departures
             ) else {
@@ -117,7 +120,7 @@ extension TransitMapScreen {
         case let .planRoute(destinationName):
             viewModel.searchQuery = destinationName
             Task {
-                await viewModel.searchStops()
+                await viewModel.searchStops(using: gtfsService)
                 if let stop = confidentRouteDestinationMatch(for: destinationName) {
                     viewModel.selectStop(stop)
                     loadSelectedStopData()

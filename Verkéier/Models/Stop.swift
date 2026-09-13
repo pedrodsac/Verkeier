@@ -70,6 +70,15 @@ struct Stop: Codable, Hashable, Identifiable {
     /// has its own ATP departure board. Defaults to `[id]` when no distinct
     /// platforms are known.
     let platformIds: [String]
+    /// Identifier from the static GTFS feed. This intentionally remains
+    /// separate from the HAFAS identifiers used for live departure boards.
+    /// MobilitéitKit documents that the two identifier spaces are opaque and
+    /// must never be treated as interchangeable.
+    let gtfsStopID: String?
+    /// One or more opaque HAFAS station identifiers confidently associated
+    /// with this canonical stop. A stop can retain no live identifier when the
+    /// feeds cannot be matched safely.
+    let hafasStationIDs: [String]
     /// Wheelchair boarding accessibility, from GTFS `wheelchair_boarding`.
     let wheelchairBoarding: WheelchairAccess
 
@@ -86,7 +95,9 @@ struct Stop: Codable, Hashable, Identifiable {
         modes: [TransportMode] = [],
         dataSource: DataSource,
         platformIds: [String]? = nil,
-        wheelchairBoarding: WheelchairAccess = .unknown
+        wheelchairBoarding: WheelchairAccess = .unknown,
+        gtfsStopID: String? = nil,
+        hafasStationIDs: [String] = []
     ) {
         self.id = id
         let displayName = name.stationDisplayName
@@ -97,6 +108,8 @@ struct Stop: Codable, Hashable, Identifiable {
         self.dataSource = dataSource
         self.platformIds = Self.normalizedPlatformIds(platformIds, fallbackId: id)
         self.wheelchairBoarding = wheelchairBoarding
+        self.gtfsStopID = gtfsStopID
+        self.hafasStationIDs = Self.normalizedIdentifiers(hafasStationIDs)
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -108,6 +121,8 @@ struct Stop: Codable, Hashable, Identifiable {
         case dataSource
         case platformIds
         case wheelchairBoarding
+        case gtfsStopID
+        case hafasStationIDs
     }
 
     /// Decodes a stop, applying the same platform normalization as the
@@ -135,6 +150,10 @@ struct Stop: Codable, Hashable, Identifiable {
         wheelchairBoarding = try container.decodeIfPresent(
             WheelchairAccess.self, forKey: .wheelchairBoarding
         ) ?? .unknown
+        gtfsStopID = try container.decodeIfPresent(String.self, forKey: .gtfsStopID)
+        hafasStationIDs = Self.normalizedIdentifiers(
+            try container.decodeIfPresent([String].self, forKey: .hafasStationIDs) ?? []
+        )
     }
 
     private nonisolated static func normalizedPlatformIds(_ ids: [String]?, fallbackId: String) -> [String] {
@@ -142,6 +161,13 @@ struct Stop: Codable, Hashable, Identifiable {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
         return normalized.isEmpty ? [fallbackId] : Array(dictOrderedSet: normalized)
+    }
+
+    private nonisolated static func normalizedIdentifiers(_ ids: [String]) -> [String] {
+        var seen: Set<String> = []
+        return ids
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && seen.insert($0).inserted }
     }
 
     /// The rider-facing name without a locality prefix that is already shown

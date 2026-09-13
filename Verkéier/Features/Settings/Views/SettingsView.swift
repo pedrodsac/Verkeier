@@ -83,10 +83,20 @@ struct SettingsView: View {
 			}
 
 			Section("Transit data") {
-				LabeledContent("Status", value: "Disconnected")
-				Text("GTFS schedules and ATP live departures are not connected.")
+				LabeledContent("Status", value: viewModel.readiness.summaryTitle)
+				Text(viewModel.readiness.summaryMessage)
 					.font(.footnote)
 					.foregroundStyle(.secondary)
+				Button("Check for GTFS update", action: checkGTFSUpdate)
+				NavigationLink {
+					SettingsAdvancedView(
+						viewModel: viewModel,
+						checkGTFSUpdate: checkGTFSUpdate,
+						setDebugDataMode: setDebugDataMode
+					)
+				} label: {
+					Label("Transit data details", systemImage: "info.circle")
+				}
 			}
 			
 			Section("About") {

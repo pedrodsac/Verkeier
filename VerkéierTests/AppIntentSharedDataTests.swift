@@ -68,7 +68,9 @@ struct AppIntentSharedDataTests {
             location: LocationPoint(name: "Badanstalt", latitude: 49.6135, longitude: 6.1292),
             modes: [.bus],
             dataSource: .atpOpenAPI,
-            platformIds: ["300362001", "300362002"]
+            platformIds: ["300362001", "300362002"],
+            gtfsStopID: "gtfs-badanstalt",
+            hafasStationIDs: ["hafas-badanstalt"]
         )
 
         let persisted = PersistedFavouriteStop(stop: stop)
@@ -77,6 +79,8 @@ struct AppIntentSharedDataTests {
 
         #expect(restored.id == "grouped-stop")
         #expect(restored.platformIds == ["300362001", "300362002"])
+        #expect(restored.gtfsStopID == "gtfs-badanstalt")
+        #expect(restored.hafasStationIDs == ["hafas-badanstalt"])
         #expect(restored.name == stop.name)
     }
 
@@ -123,6 +127,35 @@ struct AppIntentSharedDataTests {
         #expect(restored.didNotifyCancellation == false)
     }
 
+    @Test func favouriteBoardPersistsSourceStampedScheduleFallback() throws {
+        clearSharedStorage()
+        defer { clearSharedStorage() }
+
+        let updatedAt = Date(timeIntervalSince1970: 1_800)
+        SharedTransitDataStore.saveFavouriteDepartureBoard(
+            stopId: "stop-1",
+            departures: [
+                SharedWidgetDeparture(
+                    id: "departure-1",
+                    lineName: "16",
+                    destination: "Airport",
+                    scheduledDeparture: updatedAt.addingTimeInterval(300),
+                    realtimeDeparture: nil,
+                    delayMinutes: nil,
+                    platform: nil,
+                    isCancelled: false,
+                    sourceLabel: "GTFS"
+                )
+            ],
+            updatedAt: updatedAt,
+            sourceSummary: "GTFS"
+        )
+
+        let board = try #require(SharedTransitDataStore.favouriteDepartureBoards()["stop-1"])
+        #expect(board.sourceSummary == "GTFS")
+        #expect(board.departures.first?.sourceLabel == "GTFS")
+    }
+
     private func clearSharedStorage() {
         SharedTransitDataStore.userDefaults.removeObject(
             forKey: SharedTransitDataStore.favouriteStopsKey)
@@ -130,6 +163,9 @@ struct AppIntentSharedDataTests {
         SharedTransitDataStore.userDefaults.removeObject(
             forKey: SharedTransitDataStore.trackedDepartureReminderKey)
         UserDefaults.standard.removeObject(forKey: SharedTransitDataStore.trackedDepartureReminderKey)
+        SharedTransitDataStore.userDefaults.removeObject(
+            forKey: SharedTransitDataStore.favouriteDepartureBoardsKey)
+        UserDefaults.standard.removeObject(forKey: SharedTransitDataStore.favouriteDepartureBoardsKey)
     }
 
     private func makeHandoffStore() -> TransitIntentHandoffStore {
