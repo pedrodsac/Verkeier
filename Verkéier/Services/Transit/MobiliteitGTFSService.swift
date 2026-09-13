@@ -27,6 +27,7 @@ actor MobiliteitGTFSService: GTFSService {
         self.session = session
         metadata = Self.loadMetadata(at: metadataURL)
         store = try? GTFSStore(databaseAt: databaseURL)
+        Self.debugLog("Initialized. Database present: \(store != nil); metadata: \(metadata?.resourceTitle ?? "none"); valid through: \(metadata?.validThrough ?? "unknown")")
         if let metadata, store != nil, !Self.isExpired(metadata.validThrough) {
             currentStatus = GTFSFeedStatus(
                 phase: .ready,
@@ -38,29 +39,37 @@ actor MobiliteitGTFSService: GTFSService {
             )
         } else {
             currentStatus = .unavailable
+            if let validThrough = metadata?.validThrough, Self.isExpired(validThrough) {
+                Self.debugLog("Installed timetable expired on \(validThrough); a current archive is required.")
+            }
         }
     }
 
     func feedStatus() async -> GTFSFeedStatus { currentStatus }
 
     func refreshIfNeeded(force: Bool) async -> GTFSFeedStatus {
+        Self.debugLog("Refresh requested (force: \(force)). Current phase: \(currentStatus.phase.rawValue).")
         if !force,
            store != nil,
            let lastChecked = metadata?.lastCheckedAt,
            Date.now.timeIntervalSince(lastChecked) < Self.refreshInterval,
            !Self.isExpired(metadata?.validThrough) {
+            Self.debugLog("Using cached timetable; last checked \(lastChecked.formatted(date: .abbreviated, time: .standard)).")
             return currentStatus
         }
 
         currentStatus.phase = .checking
         currentStatus.errorMessage = nil
         do {
+            Self.debugLog("Fetching the official GTFS catalogue.")
             let remote = try await latestResource()
+            Self.debugLog("Selected archive \(remote.title) (resource \(remote.id)); host: \(remote.url.host() ?? "unknown").")
             // `force` bypasses only the once-per-day metadata check. A manual
             // check must not redownload an identical archive.
             let unchanged = metadata?.resourceID == remote.id
                 && (remote.checksum == nil || remote.checksum == metadata?.checksum)
             guard !unchanged else {
+                Self.debugLog("Catalogue matches the installed archive; no download required.")
                 metadata?.lastCheckedAt = .now
                 persistMetadata()
                 currentStatus.lastCheckedAt = .now
@@ -70,6 +79,7 @@ actor MobiliteitGTFSService: GTFSService {
 
             currentStatus.phase = .downloading
             let generation = (metadata?.generation ?? 0) + 1
+            Self.debugLog("Downloading and importing generation \(generation).")
             let info = try await GTFSArchiveInstaller.downloadAndInstall(
                 from: remote.url,
                 databaseAt: databaseURL,
@@ -95,6 +105,7 @@ actor MobiliteitGTFSService: GTFSService {
                 validThrough: info.lastServiceDate.description,
                 errorMessage: nil
             )
+            Self.debugLog("Timetable ready. Service dates: \(info.firstServiceDate) through \(info.lastServiceDate).")
         } catch {
             // Keep any already-open store readable after a metadata, download,
             // or import failure. Never report a valid cached feed as empty.
@@ -103,6 +114,7 @@ actor MobiliteitGTFSService: GTFSService {
             currentStatus.phase = hasUsableStore ? .stale : .failed
             currentStatus.lastCheckedAt = .now
             currentStatus.errorMessage = Self.userMessage(for: error)
+            Self.debugLog("Refresh failed: \(String(describing: error)). Status: \(currentStatus.phase.rawValue).")
         }
         return currentStatus
     }
@@ -402,6 +414,14 @@ private extension MobiliteitGTFSService {
         if error is URLError { return "The GTFS update could not be downloaded." }
         if error is GTFSArchiveError { return "The downloaded GTFS feed could not be installed." }
         return "The GTFS update could not be completed."
+    }
+
+    nonisolated static func debugLog(_ message: String) {
+        #if DEBUG
+        print("[Verkéier GTFS] \(Date.now.formatted(date: .omitted, time: .standard)): \(message)")
+        #else
+        _ = message
+        #endif
     }
 
     nonisolated static func stop(_ source: MobiliteitKit.TransitStop, hafasStationIDs: [String] = [], liveModes: [TransportMode] = []) -> Stop {
