@@ -83,6 +83,36 @@ struct OfflineWalkingRoutingTests {
         #expect(abs(coordinates[1].longitude - 1) < 0.000001)
     }
 
+    @Test("A bundled graph installs once and is reused")
+    func bundledGraphInstallsOnce() async throws {
+        let folder = FileManager.default.temporaryDirectory
+            .appendingPathComponent("BundledRoutingDatasetInstallerTests-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+
+        let archive = folder.appendingPathComponent("luxembourg-walking-tiles.tar")
+        let archiveData = Data("bundled graph fixture".utf8)
+        try archiveData.write(to: archive)
+        let manifestURL = folder.appendingPathComponent("luxembourg-walking-manifest.json")
+        let bundledManifest = manifest(version: "bundled-v1", archive: archiveData, url: archive)
+        try JSONEncoder.routing.encode(bundledManifest).write(to: manifestURL)
+
+        let manager = RoutingDatasetManager(rootURL: folder, appBuild: 10)
+        let installer = BundledRoutingDatasetInstaller(
+            manifestURL: manifestURL,
+            archiveURL: archive,
+            datasetManager: manager,
+            validator: AcceptingDatasetValidator()
+        )
+
+        let firstInstall = await installer.installIfNeeded()
+        #expect(firstInstall == .ready(version: "bundled-v1"))
+        let secondInstall = await installer.installIfNeeded()
+        #expect(secondInstall == .ready(version: "bundled-v1"))
+        let activeDataset = try await manager.activeDataset()
+        #expect(activeDataset?.version == "bundled-v1")
+    }
+
     @Test("Transit search receives the local walk distance and duration")
     func transitWalkingProviderUsesLocalRoute() async throws {
         let provider = LocalFirstWalkingRoutingProvider(

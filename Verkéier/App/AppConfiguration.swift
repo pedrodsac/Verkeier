@@ -7,33 +7,26 @@ nonisolated struct AppConfiguration: Sendable {
     let bikeShareStaticStationsURL: URL
     let bikeShareAPIURL: URL
     let bikeShareAPIKey: String?
-    /// Optional stable endpoint for the versioned Luxembourg Valhalla manifest.
-    /// Leaving this unset keeps the local-first router fully functional for an
-    /// already-installed graph while disabling automatic graph downloads.
-    let routingDataManifestURL: URL?
 
     init(
         apiProxyURL: URL? = nil,
         avlMessagesURL: URL,
         bikeShareStaticStationsURL: URL = URL(string: "https://developer.jcdecaux.com/rest/vls/stations/luxembourg.csv")!,
         bikeShareAPIURL: URL = URL(string: "https://api.jcdecaux.com/vls/v1/stations")!,
-        bikeShareAPIKey: String? = nil,
-        routingDataManifestURL: URL? = nil
+        bikeShareAPIKey: String? = nil
     ) {
         self.apiProxyURL = apiProxyURL
         self.avlMessagesURL = avlMessagesURL
         self.bikeShareStaticStationsURL = bikeShareStaticStationsURL
         self.bikeShareAPIURL = bikeShareAPIURL
         self.bikeShareAPIKey = bikeShareAPIKey
-        self.routingDataManifestURL = routingDataManifestURL
     }
 
     static let current = AppConfiguration(
         apiProxyURL: resolvedAPIProxyURL(),
         avlMessagesURL: resolvedAVLMessagesURL(),
         bikeShareStaticStationsURL: URL(string: "https://developer.jcdecaux.com/rest/vls/stations/luxembourg.csv")!,
-        bikeShareAPIURL: URL(string: "https://api.jcdecaux.com/vls/v1/stations")!,
-        routingDataManifestURL: resolvedRoutingDataManifestURL()
+        bikeShareAPIURL: URL(string: "https://api.jcdecaux.com/vls/v1/stations")!
     )
 
     var hasAPIProxyURL: Bool {
@@ -66,15 +59,6 @@ nonisolated struct AppConfiguration: Sendable {
             return fallback
         }
 
-        return url
-    }
-
-    private static func resolvedRoutingDataManifestURL() -> URL? {
-        guard let value = Bundle.main.object(forInfoDictionaryKey: "ROUTING_DATA_MANIFEST_URL") as? String else {
-            return nil
-        }
-        let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let url = URL(string: trimmedValue), url.scheme == "https" else { return nil }
         return url
     }
 

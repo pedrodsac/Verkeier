@@ -43,8 +43,6 @@
 	<string>Verkéier uses your location to show nearby public transport stops on the map.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
-	<key>ROUTING_DATA_MANIFEST_URL</key>
-	<string>$(ROUTING_DATA_MANIFEST_URL)</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchScreen</key>

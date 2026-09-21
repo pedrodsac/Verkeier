@@ -3,7 +3,6 @@ import SwiftUI
 
 @main
 struct VerkéierApp: App {
-    @Environment(\.scenePhase) private var scenePhase
     @State private var locationService = LocationService()
     @AppStorage("debugTransitDataMode") private var debugTransitDataModeRawValue =
         DebugTransitDataMode.normal.rawValue
@@ -14,7 +13,7 @@ struct VerkéierApp: App {
     private let liveTransitService: any LiveTransitService
     private let routeService: any RouteService
     private let walkingRouter: any WalkingRouting
-    private let routingDataUpdateService: RoutingDatasetUpdateService
+    private let bundledRoutingDatasetInstaller: BundledRoutingDatasetInstaller
     private let modelContainer: ModelContainer
     @State private var liveActivityManager = LiveActivityManager()
     @State private var departureReminderService = DepartureReminderService()
@@ -31,13 +30,12 @@ struct VerkéierApp: App {
         let routingDatasetManager = RoutingDatasetManager()
         let walkingRouter = LocalFirstWalkingRouter(datasetManager: routingDatasetManager)
         self.walkingRouter = walkingRouter
-        let routingDataUpdateService = RoutingDatasetUpdateService(
-            manifestURL: configuration.routingDataManifestURL,
+        let bundledRoutingDatasetInstaller = BundledRoutingDatasetInstaller(
             datasetManager: routingDatasetManager
         )
-        self.routingDataUpdateService = routingDataUpdateService
+        self.bundledRoutingDatasetInstaller = bundledRoutingDatasetInstaller
         Task(priority: .utility) {
-            _ = await routingDataUpdateService.checkForUpdateIfDue()
+            _ = await bundledRoutingDatasetInstaller.installIfNeeded()
         }
         let routeService = MobiliteitRouteService(
             gtfsService: gtfsService,
@@ -66,12 +64,6 @@ struct VerkéierApp: App {
                 .environment(preferences)
                 .modelContainer(modelContainer)
                 .preferredColorScheme(preferences.appearance.colorScheme)
-                .onChange(of: scenePhase) { _, phase in
-                    guard phase == .active else { return }
-                    Task(priority: .utility) {
-                        _ = await routingDataUpdateService.checkForUpdateIfDue()
-                    }
-                }
         }
     }
 

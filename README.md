@@ -37,7 +37,6 @@ Required later:
 
 - `API_PROXY_URL`: deployed Cloudflare Worker URL for keyed ATP and JCDecaux requests
 - `AVL_MESSAGES_URL`: optional override for the Ville de Luxembourg AVL messages XML feed
-- `ROUTING_DATA_MANIFEST_URL`: HTTPS manifest for immutable Luxembourg Valhalla graph releases
 
 The upstream ATP and JCDecaux credentials belong in the Worker’s Cloudflare
 secrets, not in the iOS build settings or app bundle. The app handles a
@@ -45,6 +44,22 @@ missing proxy URL during early phases.
 
 See the [verkeier-relay repository](https://github.com/pedrodsac/verkeier-relay)
 for local development and deploy instructions.
+
+## Bundled offline walking graph
+
+Before making a release with offline walking routes, generate the Luxembourg
+Valhalla archive and its checked manifest locally:
+
+```sh
+Scripts/build_luxembourg_routing_dataset.sh
+```
+
+The script downloads the public Geofabrik Luxembourg OpenStreetMap extract and
+uses Valhalla 3.6.3 in Docker. It writes `luxembourg-walking-tiles.tar` and
+`luxembourg-walking-manifest.json` to `Verkéier/Resources/`; Xcode bundles
+those resources automatically. The archive is installed into Application
+Support and validated on the first app launch. Regenerate it for each release
+when map data should be refreshed.
 
 ## Build
 

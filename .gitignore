@@ -4,6 +4,8 @@ Config/LocalConfig.xcconfig
 worker/.dev.vars
 worker/.env*
 worker/node_modules/
+Verkéier/Resources/luxembourg-walking-tiles.tar
+Verkéier/Resources/luxembourg-walking-manifest.json
 *.xcuserstate
 .superpowers/
 
