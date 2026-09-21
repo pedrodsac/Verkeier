@@ -81,6 +81,17 @@ nonisolated enum WalkingRoutingError: Error, Equatable {
     case noRoute
 }
 
+/// Real-world walking includes crossings, wayfinding, and brief pauses that
+/// graph engines usually do not model. Apply one product-wide buffer so route
+/// cards, transfer planning, and nearby-stop estimates agree.
+nonisolated enum WalkingDurationCalibration {
+    static let multiplier = 1.25
+
+    static func adjusted(_ duration: TimeInterval) -> TimeInterval {
+        max(1, duration * multiplier)
+    }
+}
+
 /// Configures the inexpensive geographic prefilter before one matrix request.
 nonisolated struct NearbyStopPrefilter: Sendable {
     let candidateLimit: Int

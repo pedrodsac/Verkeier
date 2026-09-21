@@ -128,6 +128,29 @@ struct OfflineWalkingRoutingTests {
         #expect(route.polyline.count == 3)
     }
 
+    @Test("Walking estimates and routes include the 25 percent real-world buffer")
+    func walkingDurationIncludesCalibration() async throws {
+        let router = LocalFirstWalkingRouter(
+            datasetManager: RoutingDatasetManager(
+                rootURL: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString),
+                appBuild: 10
+            ),
+            mapKitFallback: FixedOfflineWalkingRouter(),
+            straightLineFallback: FixedOfflineWalkingRouter()
+        )
+        let origin = LocationPoint(latitude: 49.61, longitude: 6.12)
+        let destination = LocationPoint(latitude: 49.62, longitude: 6.13)
+
+        let estimates = try await router.estimates(
+            from: origin,
+            to: [.init(id: "destination", location: destination)]
+        )
+        let route = try await router.route(from: origin, to: destination)
+
+        #expect(estimates[0].duration == 971.25)
+        #expect(route.duration == 971.25)
+    }
+
     private func stop(id: String, latitude: Double, longitude: Double) -> Stop {
         Stop(
             id: id,

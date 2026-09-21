@@ -30,7 +30,7 @@ actor LocalFirstWalkingRouter: WalkingRouting {
             do {
                 let estimates = try await router.estimates(from: origin, to: destinations)
                 debugLog("Walking estimates: using local OSM graph for \(destinations.count) destination(s).")
-                return estimates
+                return calibrated(estimates)
             } catch {
                 debugLog("Walking estimates: local OSM graph failed (\(error)); falling back to MapKit.")
             }
@@ -40,12 +40,12 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         do {
             let estimates = try await mapKitFallback.estimates(from: origin, to: destinations)
             debugLog("Walking estimates: using MapKit fallback for \(destinations.count) destination(s).")
-            return estimates
+            return calibrated(estimates)
         } catch {
             debugLog("Walking estimates: MapKit fallback failed (\(error)); using straight-line estimate.")
         }
         debugLog("Walking estimates: using straight-line fallback for \(destinations.count) destination(s).")
-        return try await straightLineFallback.estimates(from: origin, to: destinations)
+        return calibrated(try await straightLineFallback.estimates(from: origin, to: destinations))
     }
 
     func route(from origin: LocationPoint, to destination: LocationPoint) async throws -> OfflineWalkingRoute {
@@ -54,7 +54,7 @@ actor LocalFirstWalkingRouter: WalkingRouting {
             do {
                 let route = try await router.route(from: origin, to: destination)
                 debugLog("Walking route: using local OSM graph.")
-                return route
+                return calibrated(route)
             } catch {
                 debugLog("Walking route: local OSM graph failed (\(error)); falling back to MapKit.")
             }
@@ -64,12 +64,12 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         do {
             let route = try await mapKitFallback.route(from: origin, to: destination)
             debugLog("Walking route: using MapKit fallback.")
-            return route
+            return calibrated(route)
         } catch {
             debugLog("Walking route: MapKit fallback failed (\(error)); using straight-line estimate.")
         }
         debugLog("Walking route: using straight-line fallback.")
-        return try await straightLineFallback.route(from: origin, to: destination)
+        return calibrated(try await straightLineFallback.route(from: origin, to: destination))
     }
 
     private func localRouter() async throws -> ValhallaWalkingRouter {
@@ -85,6 +85,26 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         )
         cachedRouter = (dataset.version, router)
         return router
+    }
+
+    private func calibrated(_ estimates: [OfflineWalkingEstimate]) -> [OfflineWalkingEstimate] {
+        estimates.map {
+            OfflineWalkingEstimate(
+                destinationID: $0.destinationID,
+                distanceMeters: $0.distanceMeters,
+                duration: WalkingDurationCalibration.adjusted($0.duration),
+                source: $0.source
+            )
+        }
+    }
+
+    private func calibrated(_ route: OfflineWalkingRoute) -> OfflineWalkingRoute {
+        OfflineWalkingRoute(
+            distanceMeters: route.distanceMeters,
+            duration: WalkingDurationCalibration.adjusted(route.duration),
+            coordinates: route.coordinates,
+            source: route.source
+        )
     }
 
     private func debugLog(_ message: @autoclosure () -> String) {
