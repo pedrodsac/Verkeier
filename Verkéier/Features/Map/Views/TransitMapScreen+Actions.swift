@@ -56,7 +56,8 @@ extension TransitMapScreen {
             await viewModel.loadNearbyStops(
                 location: locationService.currentLocation,
                 using: liveTransitService,
-                gtfsService: gtfsService
+                gtfsService: gtfsService,
+                walkingRouter: walkingRouter
             )
             await viewModel.loadNearbyStopRoutes(using: gtfsService)
         }
@@ -68,6 +69,7 @@ extension TransitMapScreen {
             refreshDepartures: refreshDepartures,
             refreshAlerts: refreshAlerts,
             calculateRoute: calculateRoute,
+            showDirections: showDirections,
             showHome: showHome,
             openSpecialEvent: openSpecialEvent,
             expandSheet: expandSheet,
@@ -92,6 +94,7 @@ extension TransitMapScreen {
             updateDepartureBoardFilter: updateDepartureBoardFilter,
             updateSearch: updateSearch,
             selectLineDetailDirection: selectLineDetailDirection,
+            refreshLineDetail: refreshLineDetail,
             checkGTFSUpdate: checkGTFSUpdate,
             setDebugDataMode: setDebugDataMode,
             favourites: FavouritesActions(
@@ -118,11 +121,7 @@ extension TransitMapScreen {
     }
 
     func openFavouriteStop(_ stop: Stop) {
-        animateSheetChange {
-            sheetNavigation.selectedTab = .favourites
-            sheetNavigation.favouritesPath.append(.stopDetail(stop))
-            sheetDetent = .medium
-        }
+        navigateToSheet([.stopDetail(stop)], detent: .medium)
     }
 
     func planToFavouriteStop(_ stop: Stop) {
@@ -141,6 +140,11 @@ extension TransitMapScreen {
             sheetNavigation.planPath = []
             sheetDetent = .medium
         }
+    }
+
+    func showDirections() {
+        showPlanTab()
+        calculateRoute()
     }
 
     func refreshFavouriteStop(_ stop: Stop) async {
@@ -371,11 +375,6 @@ extension TransitMapScreen {
 
     func loadSelectedStopData() {
         Task {
-            await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
-            // Nearby API stops start with an opaque HAFAS id. loadDepartures
-            // resolves those onto their GTFS stop first; route chips must be
-            // loaded afterward so GTFS receives the resolved stop id.
-            await viewModel.updateSelectedStopRoutes(using: gtfsService)
             await viewModel.loadGTFSMapStops(location: locationService.currentLocation, using: gtfsService)
         }
     }
@@ -411,6 +410,11 @@ extension TransitMapScreen {
         }
     }
 
+    func refreshLineDetail() async {
+        viewModel.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: true)
+        await viewModel.loadLineDetail(using: gtfsService)
+    }
+
     func checkGTFSUpdate() {
         Task {
             viewModel.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: true)
@@ -419,6 +423,7 @@ extension TransitMapScreen {
                 location: locationService.currentLocation,
                 using: liveTransitService,
                 gtfsService: gtfsService,
+                walkingRouter: walkingRouter,
                 force: true
             )
             await viewModel.loadNearbyStopRoutes(using: gtfsService)

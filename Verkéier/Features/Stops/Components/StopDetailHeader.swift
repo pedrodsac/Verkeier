@@ -4,6 +4,7 @@ struct StopDetailHeader: View {
     let stop: Stop
     let routes: [TransitRoute]
     let selectedLine: String?
+    let showDirections: () -> Void
     let toggleDepartureLine: (TransitRoute) -> Void
 
     var body: some View {
@@ -29,7 +30,7 @@ struct StopDetailHeader: View {
                 )
             }
 
-            DirectionsButton()
+            DirectionsButton(action: showDirections)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -200,8 +201,10 @@ struct RouteChip: View {
 }
 
 private struct DirectionsButton: View {
+    let action: () -> Void
+
     var body: some View {
-        NavigationLink(value: TransitSheetRoute.directions) {
+        Button(action: action) {
             Label("Directions", systemImage: "arrow.triangle.turn.up.right.diamond.fill")
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(.white)

@@ -112,34 +112,65 @@ extension TransitMapViewModel {
         gtfsService: any GTFSService
     ) async {
         guard let selectedStop else { return }
+        let selectedStopID = selectedStop.id
+        departureLoadGeneration &+= 1
+        let requestGeneration = departureLoadGeneration
+        isLoadingDepartures = true
+        departuresErrorMessage = nil
+
         let boardStop = await liveTransitService.resolvedStop(
             for: selectedStop,
             gtfsService: gtfsService
         )
+        guard !Task.isCancelled else {
+            if isCurrentDepartureRequest(requestGeneration, for: selectedStopID) {
+                isLoadingDepartures = false
+            }
+            return
+        }
+        guard isCurrentDepartureRequest(requestGeneration, for: selectedStopID) else { return }
         if boardStop != selectedStop {
             self.selectedStop = boardStop
         }
-        isLoadingDepartures = true
-        departures = []
-        offlineScheduledDepartures = await gtfsService.scheduledDepartures(
+
+        async let scheduledRequest = gtfsService.scheduledDepartures(
             for: boardStop,
-            at: .now,
+            at: now(),
             limit: departureBoardFilter.maximumJourneys
         )
-        departuresLastUpdated = nil
-        departuresErrorMessage = nil
+
+        async let liveRequest = liveTransitService.departureBoard(
+            for: boardStop,
+            filter: departureBoardFilter
+        )
+
+        let liveDepartures: [Departure]
+        let liveError: Error?
         do {
-            departures = try await liveTransitService.departureBoard(for: boardStop, filter: departureBoardFilter)
-            departuresLastUpdated = .now
-            liveTransitLastUpdated = .now
-            liveTransitErrorMessage = nil
+            liveDepartures = try await liveRequest
+            liveError = nil
         } catch {
-            liveTransitErrorMessage = error.localizedDescription
-            if offlineScheduledDepartures.isEmpty {
-                departuresErrorMessage = "No live or scheduled departures are available for this stop."
-            }
+            liveDepartures = []
+            liveError = error
         }
-        rebuildDepartureFilters()
+
+        let scheduledDepartures = await scheduledRequest
+        guard !Task.isCancelled else {
+            if isCurrentDepartureRequest(requestGeneration, for: boardStop.id) {
+                isLoadingDepartures = false
+            }
+            return
+        }
+        guard isCurrentDepartureRequest(requestGeneration, for: boardStop.id) else { return }
+
+        departures = liveDepartures
+        offlineScheduledDepartures = scheduledDepartures
+        departuresLastUpdated = liveError == nil ? now() : nil
+        liveTransitLastUpdated = liveError == nil ? now() : liveTransitLastUpdated
+        liveTransitErrorMessage = liveError?.localizedDescription
+        departuresErrorMessage = liveDepartures.isEmpty && scheduledDepartures.isEmpty
+            ? "No live or scheduled departures are available for this stop."
+            : nil
         isLoadingDepartures = false
     }
 
@@ -150,7 +181,7 @@ extension TransitMapViewModel {
             selectedDepartureLine = route.id
         }
 
-        clearSelectedPlatformIfUnavailable()
+        selectedDeparturePlatform = nil
     }
 
     func selectDeparturePlatform(_ platform: String?) {
@@ -173,11 +204,13 @@ extension TransitMapViewModel {
             offlineScheduledDepartures = []
             return
         }
-        offlineScheduledDepartures = await gtfsService.scheduledDepartures(
+        let scheduledDepartures = await gtfsService.scheduledDepartures(
             for: selectedStop,
             at: now,
             limit: departureBoardFilter.maximumJourneys
         )
+        guard self.selectedStop?.id == selectedStop.id else { return }
+        offlineScheduledDepartures = scheduledDepartures
     }
 
     var areDeparturesStale: Bool {
@@ -187,6 +220,10 @@ extension TransitMapViewModel {
 
     var areFavouriteDeparturesStale: Bool {
         favouriteDepartureBoards.values.contains { $0.isStale() }
+    }
+
+    private func isCurrentDepartureRequest(_ generation: Int, for stopID: String) -> Bool {
+        departureLoadGeneration == generation && selectedStop?.id == stopID
     }
 
 }

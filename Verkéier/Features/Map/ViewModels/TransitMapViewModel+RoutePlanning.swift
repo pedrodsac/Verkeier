@@ -185,37 +185,80 @@ extension TransitMapViewModel {
         routeLoadingPhase = .calculating
         routeErrorMessage = nil
         routeStatusMessage = nil
+        var receivedRouteUpdate = false
+        var receivedFinalRouteUpdate = false
+        var didScheduleFinalWalkingRefinement = false
         do {
-            let calculation = try await routeService.calculateRoute(
+            let updates = routeCalculationUpdatesWithDeadline(
+                using: routeService,
                 from: origin,
                 to: destination.location,
                 time: routePlanningTime,
                 filters: routeFilters,
                 realtimeRefreshPolicy: .forceRefresh
             )
-            guard requestGeneration == routeCalculationGeneration else { return }
-            unfilteredRouteOptions = calculation.options
-            supplementalRouteOptions = calculation.supplementalOptions
-            applyRouteOptions(preferredID: calculation.selectedOptionID, announceFallback: false)
-            if !calculation.allOptions.isEmpty {
-                routeLastCalculatedAt = now()
-                recentTrips = RoutePlannerStore.shared.recordRecentTrip(
-                    origin: routeOrigin, destination: destination
-                )
+            for try await calculation in updates {
+                guard requestGeneration == routeCalculationGeneration else { return }
+                let preferredID = receivedRouteUpdate
+                    ? selectedRouteOptionID
+                    : calculation.selectedOptionID
+                if calculation.stage == .final, !receivedFinalRouteUpdate {
+                    unfilteredRouteOptions = calculation.options
+                    supplementalRouteOptions = calculation.supplementalOptions
+                    receivedFinalRouteUpdate = true
+                } else if receivedRouteUpdate {
+                    unfilteredRouteOptions = Self.mergingAccumulatedOptions(
+                        existing: unfilteredRouteOptions,
+                        incoming: calculation.options,
+                        invalidatedOptionIDs: calculation.invalidatedOptionIDs
+                    )
+                    supplementalRouteOptions = Self.mergingAccumulatedOptions(
+                        existing: supplementalRouteOptions,
+                        incoming: calculation.supplementalOptions,
+                        invalidatedOptionIDs: calculation.invalidatedOptionIDs
+                    )
+                } else {
+                    unfilteredRouteOptions = calculation.options
+                    supplementalRouteOptions = calculation.supplementalOptions
+                }
+                applyRouteOptions(preferredID: preferredID, announceFallback: false)
+                if calculation.stage == .final, !didScheduleFinalWalkingRefinement {
+                    didScheduleFinalWalkingRefinement = true
+                    scheduleWalkingRouteRefinement(
+                        calculation,
+                        using: routeService,
+                        requestGeneration: requestGeneration
+                    )
+                }
+
+                if !receivedRouteUpdate, !calculation.allOptions.isEmpty {
+                    routeLastCalculatedAt = now()
+                    recentTrips = RoutePlannerStore.shared.recordRecentTrip(
+                        origin: routeOrigin, destination: destination
+                    )
+                }
+                if calculation.options.count == 1,
+                   calculation.options.first?.isWalkingOnly == true {
+                    canLoadEarlierRoutes = false
+                    canLoadLaterRoutes = false
+                }
+                receivedRouteUpdate = true
+                routeLoadingPhase = .idle
             }
-            if calculation.options.count == 1,
-               calculation.options.first?.isWalkingOnly == true {
-                canLoadEarlierRoutes = false
-                canLoadLaterRoutes = false
-            }
+            guard receivedRouteUpdate else { throw RoutingError.noRouteFound }
         } catch {
             guard requestGeneration == routeCalculationGeneration else { return }
-            if routeOptions.isEmpty, supplementalRouteOptions.isEmpty {
+            if receivedRouteUpdate {
+                routeStatusMessage = nil
+                routeErrorMessage = nil
+            } else if routeOptions.isEmpty, supplementalRouteOptions.isEmpty {
                 clearRouteResult()
             } else {
                 routeStatusMessage = "Routes could not be refreshed. Showing the last available results."
             }
-            routeErrorMessage = routeErrorMessage(for: error)
+            if !receivedRouteUpdate {
+                routeErrorMessage = routeErrorMessage(for: error)
+            }
         }
 
         if requestGeneration == routeCalculationGeneration {
@@ -356,6 +399,109 @@ extension TransitMapViewModel {
         return routeCalculationGeneration
     }
 
+    private func routeCalculationUpdatesWithDeadline(
+        using routeService: any RouteService,
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        time: RoutePlanningTime,
+        filters: RoutePlannerFilters,
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy
+    ) -> AsyncThrowingStream<RouteCalculation, Error> {
+        let timeout = routeCalculationTimeout
+        return AsyncThrowingStream<RouteCalculation, Error> { continuation in
+            let timeoutTask = Task.detached {
+                do {
+                    try await Task.sleep(for: timeout)
+                    continuation.finish(throwing: RoutingError.requestTimedOut)
+                } catch {
+                    // The first usable result arrived and cancelled the timer.
+                }
+            }
+            let calculationTask = Task.detached(priority: .userInitiated) {
+                do {
+                    let updates = routeService.routeCalculationUpdates(
+                        from: origin,
+                        to: destination,
+                        time: time,
+                        filters: filters,
+                        realtimeRefreshPolicy: realtimeRefreshPolicy,
+                        page: .initial
+                    )
+                    var receivedUpdate = false
+                    for try await calculation in updates {
+                        if !receivedUpdate {
+                            timeoutTask.cancel()
+                            receivedUpdate = true
+                        }
+                        continuation.yield(calculation)
+                    }
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+            continuation.onTermination = { @Sendable _ in
+                calculationTask.cancel()
+                timeoutTask.cancel()
+            }
+        }
+    }
+
+    /// The initial result deliberately uses local walking estimates so the
+    /// timetable search is responsive. Start road-network refinement as soon
+    /// as each update is visible; do not wait for progressive/live updates to
+    /// finish before asking MapKit for walking geometry and travel time.
+    private func scheduleWalkingRouteRefinement(
+        _ calculation: RouteCalculation,
+        using routeService: any RouteService,
+        requestGeneration: Int
+    ) {
+        guard let routeService = routeService as? any WalkingRouteRefining else { return }
+        scheduleWalkingRouteRefinementUpdates(
+            from: routeService.refineWalkingRouteUpdates(in: calculation.options),
+            supplemental: false,
+            requestGeneration: requestGeneration
+        )
+        scheduleWalkingRouteRefinementUpdates(
+            from: routeService.refineWalkingRouteUpdates(in: calculation.supplementalOptions),
+            supplemental: true,
+            requestGeneration: requestGeneration
+        )
+    }
+
+    private func scheduleWalkingRouteRefinementUpdates(
+        from updates: AsyncStream<RouteOption>,
+        supplemental: Bool,
+        requestGeneration: Int
+    ) {
+        Task { [weak self] in
+            for await option in updates {
+                guard !Task.isCancelled,
+                      let self,
+                      requestGeneration == self.routeCalculationGeneration
+                else {
+                    return
+                }
+
+                let selectedID = self.selectedRouteOptionID
+                if supplemental {
+                    self.supplementalRouteOptions = Self.mergingAccumulatedOptions(
+                        existing: self.supplementalRouteOptions,
+                        incoming: [option],
+                        invalidatedOptionIDs: []
+                    )
+                } else {
+                    self.unfilteredRouteOptions = Self.mergingAccumulatedOptions(
+                        existing: self.unfilteredRouteOptions,
+                        incoming: [option],
+                        invalidatedOptionIDs: []
+                    )
+                }
+                self.applyRouteOptions(preferredID: selectedID, announceFallback: false)
+            }
+        }
+    }
+
     static func mergingAccumulatedOptions(
         existing: [RouteOption],
         incoming: [RouteOption],
@@ -390,7 +536,9 @@ extension TransitMapViewModel {
             return
         }
 
-        let viableStatuses: Set<RouteOptionStatus> = [.viable, .partiallyLive, .scheduledOnly, .atRisk]
+        let viableStatuses: Set<RouteOptionStatus> = [
+            .viable, .delayed, .partiallyLive, .scheduledOnly, .atRisk,
+        ]
         // Route calculations normally deduplicate options before publication, but
         // keep selection resilient to equivalent options arriving from a fallback
         // or an older route-service implementation.
@@ -418,10 +566,8 @@ extension TransitMapViewModel {
     private func applyRouteOptions(preferredID: String?, announceFallback: Bool) {
         let filtered = filteredRouteOptions(from: unfilteredRouteOptions)
         let didRelaxFilters = filtered.isEmpty && !unfilteredRouteOptions.isEmpty
-        routeOptions = Self.removingStrictlyDominatedOptions(
-            Self.uniqueRouteOptionsByDeparture(
-                uniqueRouteOptions(didRelaxFilters ? unfilteredRouteOptions : filtered)
-            )
+        routeOptions = Self.deduplicatingEquivalentRouteOptions(
+            uniqueRouteOptions(didRelaxFilters ? unfilteredRouteOptions : filtered)
         )
         selectBestRouteOption(preferredID: preferredID, announceFallback: announceFallback)
 
@@ -430,50 +576,6 @@ extension TransitMapViewModel {
         } else if routeOptions.isEmpty {
             routeStatusMessage = nil
         }
-    }
-
-    static func removingStrictlyDominatedOptions(_ options: [RouteOption]) -> [RouteOption] {
-        options.filter { candidate in
-            guard let candidateDeparture = candidate.departureTime,
-                  let candidateArrival = candidate.arrivalTime else {
-                return true
-            }
-            return !options.contains { other in
-                guard other.id != candidate.id,
-                      let otherDeparture = other.departureTime,
-                      let otherArrival = other.arrivalTime else {
-                    return false
-                }
-                return otherDeparture > candidateDeparture && otherArrival < candidateArrival
-            }
-        }
-    }
-
-    static func uniqueRouteOptionsByDeparture(_ options: [RouteOption]) -> [RouteOption] {
-        var bestByDeparture: [Int: RouteOption] = [:]
-        var withoutDeparture: [RouteOption] = []
-        for option in options {
-            guard let departure = option.departureTime else {
-                withoutDeparture.append(option)
-                continue
-            }
-            let key = Int(departure.timeIntervalSince1970.rounded())
-            if let existing = bestByDeparture[key] {
-                if routeOptionRanksBefore(option, existing) {
-                    bestByDeparture[key] = option
-                }
-            } else {
-                bestByDeparture[key] = option
-            }
-        }
-        let deduplicated = options.compactMap { option -> RouteOption? in
-            guard let departure = option.departureTime else { return nil }
-            let key = Int(departure.timeIntervalSince1970.rounded())
-            guard bestByDeparture[key]?.id == option.id else { return nil }
-            bestByDeparture[key] = nil
-            return option
-        }
-        return deduplicated + withoutDeparture
     }
 
     static func chronologicallyOrderedOptions(_ options: [RouteOption]) -> [RouteOption] {
@@ -494,6 +596,52 @@ extension TransitMapViewModel {
             return lhs.walkingDistanceMeters < rhs.walkingDistanceMeters
         }
         return lhs.id < rhs.id
+    }
+
+    /// Collapses alternatives that render with the same departure, arrival,
+    /// and duration while preserving the first-seen position of each group.
+    static func deduplicatingEquivalentRouteOptions(_ options: [RouteOption]) -> [RouteOption] {
+        var result: [RouteOption] = []
+        var indexByKey: [DisplayedRouteTimingKey: Int] = [:]
+
+        for option in options {
+            guard let key = DisplayedRouteTimingKey(option: option) else {
+                result.append(option)
+                continue
+            }
+
+            if let index = indexByKey[key] {
+                if transferTimingRanksBefore(option, result[index]) {
+                    result[index] = option
+                }
+            } else {
+                indexByKey[key] = result.count
+                result.append(option)
+            }
+        }
+        return result
+    }
+
+    private static func transferTimingRanksBefore(_ lhs: RouteOption, _ rhs: RouteOption) -> Bool {
+        let lhsIsDirect = lhs.transferCount == 0
+        let rhsIsDirect = rhs.transferCount == 0
+        if lhsIsDirect != rhsIsDirect { return lhsIsDirect }
+
+        let lhsGaps = lhs.transferGapDurations
+        let rhsGaps = rhs.transferGapDurations
+        if (lhsGaps != nil) != (rhsGaps != nil) { return lhsGaps != nil }
+
+        if let lhsMinimum = lhsGaps?.min(), let rhsMinimum = rhsGaps?.min(),
+           lhsMinimum != rhsMinimum {
+            return lhsMinimum > rhsMinimum
+        }
+
+        if let lhsTotal = lhsGaps?.reduce(0, +), let rhsTotal = rhsGaps?.reduce(0, +),
+           lhsTotal != rhsTotal {
+            return lhsTotal > rhsTotal
+        }
+
+        return routeOptionRanksBefore(lhs, rhs)
     }
 
     private func setRoutePageLoading(_ loading: Bool, direction: RoutePagingDirection) {
@@ -594,6 +742,8 @@ extension TransitMapViewModel {
             return "Public transport schedules are not available yet."
         case .noPublicTransportRoute, .noRouteFound:
             return "No public transport route was found."
+        case .requestTimedOut:
+            return "Route calculation is taking too long. Please try again."
         }
     }
 }
@@ -601,4 +751,31 @@ extension TransitMapViewModel {
 private enum RoutePagingDirection {
     case earlier
     case later
+}
+
+private struct DisplayedRouteTimingKey: Hashable {
+    let departureMinute: Int64
+    let arrivalMinute: Int64
+    let durationMinutes: Int
+
+    init?(option: RouteOption) {
+        guard !option.transitLegs.isEmpty,
+              let lastLeg = option.plan.legs.last,
+              (lastLeg.realtimeArrivalTime ?? lastLeg.scheduledArrivalTime ?? lastLeg.arrivalTime) != nil,
+              let departure = option.departureTime,
+              let arrival = option.arrivalTime,
+              let duration = option.plan.expectedTravelTime,
+              duration.isFinite
+        else {
+            return nil
+        }
+
+        departureMinute = Self.minute(containing: departure)
+        arrivalMinute = Self.minute(containing: arrival)
+        durationMinutes = max(1, Int((duration / 60).rounded()))
+    }
+
+    private static func minute(containing date: Date) -> Int64 {
+        Int64(floor(date.timeIntervalSince1970 / 60))
+    }
 }

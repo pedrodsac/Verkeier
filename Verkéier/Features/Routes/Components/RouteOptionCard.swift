@@ -102,6 +102,8 @@ struct RouteOptionCard: View {
 
         let dataNote = if option.usesBikeShare {
             option.hasBikeAvailabilityWarning ? "Bike availability uncertain" : "Bike availability live"
+        } else if let delay = option.transitLegs.compactMap(\.delayMinutes).max(), delay > 0 {
+            "+\(delay) min delay"
         } else {
             option.realtimeCoverage.displayText
         }

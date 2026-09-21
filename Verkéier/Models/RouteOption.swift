@@ -54,6 +54,40 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
         max(0, transitLegs.count - 1)
     }
 
+    /// Effective time available between each pair of consecutive transit legs.
+    ///
+    /// A walking leg between rides is intentionally not inspected directly: the
+    /// gap from the preceding ride's arrival to the following ride's departure
+    /// already includes the time spent making that transfer. `nil` means at
+    /// least one transfer is missing timing data; a direct route returns `[]`.
+    var transferGapDurations: [TimeInterval]? {
+        let legs = transitLegs
+        guard legs.count > 1 else { return [] }
+
+        var gaps: [TimeInterval] = []
+        gaps.reserveCapacity(legs.count - 1)
+        for (arrivingLeg, departingLeg) in zip(legs, legs.dropFirst()) {
+            guard let arrival = Self.effectiveArrivalTime(for: arrivingLeg),
+                  let departure = Self.effectiveDepartureTime(for: departingLeg)
+            else {
+                return nil
+            }
+            gaps.append(departure.timeIntervalSince(arrival))
+        }
+        return gaps
+    }
+
+    /// The tightest connection in the route. Negative values represent a
+    /// connection that is already missed according to the effective times.
+    var minimumTransferGapDuration: TimeInterval? {
+        transferGapDurations?.min()
+    }
+
+    /// Total effective time spent between transit legs.
+    var totalTransferGapDuration: TimeInterval? {
+        transferGapDurations?.reduce(0, +)
+    }
+
     /// Distinct line labels used by the option, in order.
     var routeNames: [String] {
         var seen: Set<String> = []
@@ -129,12 +163,20 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
         return plan.legs.contains { !insideLuxembourg($0.origin) || !insideLuxembourg($0.destination) }
     }
 
+    private static func effectiveDepartureTime(for leg: RoutePlan.Leg) -> Date? {
+        leg.realtimeDepartureTime ?? leg.scheduledDepartureTime ?? leg.departureTime
+    }
+
+    private static func effectiveArrivalTime(for leg: RoutePlan.Leg) -> Date? {
+        leg.realtimeArrivalTime ?? leg.scheduledArrivalTime ?? leg.arrivalTime
+    }
+
     /// Resolves the option's status relative to a reference time.
     ///
     /// Resolution order: cancelled → missed (transit first departure already
     /// gone, with a 30s grace) → Connection miss → at-risk (any tight
-    /// transfer) → live / partly-live / schedule-only. Vel'OH!-only plans never
-    /// become missed.
+    /// transfer) → delayed → live / partly-live / schedule-only. Vel'OH!-only
+    /// plans never become missed.
     ///
     /// - Parameter now: The reference time, usually the current date.
     func status(at now: Date) -> RouteOptionStatus {
@@ -154,6 +196,10 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
 
         if transitLegs.contains(where: { $0.transferWarning != nil }) {
             return .atRisk
+        }
+
+        if transitLegs.contains(where: { ($0.delayMinutes ?? 0) > 0 }) {
+            return .delayed
         }
 
         switch realtimeCoverage {
@@ -187,6 +233,8 @@ nonisolated enum RouteRealtimeCoverage: String, Codable, Hashable {
 nonisolated enum RouteOptionStatus: String, Codable, Hashable {
     /// Backed by live data and currently catchable.
     case viable
+    /// One or more legs currently have a positive live delay.
+    case delayed
     /// Catchable, but one or more legs have timetable-only data.
     case partiallyLive
     /// Timetable-only; no realtime confirmation.
@@ -204,6 +252,7 @@ nonisolated enum RouteOptionStatus: String, Codable, Hashable {
     var displayText: String {
         switch self {
         case .viable: "Live"
+        case .delayed: "Delayed"
         case .partiallyLive: "Partly live"
         case .scheduledOnly: "Schedule only"
         case .atRisk: "Tight transfer"

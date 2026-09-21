@@ -1,10 +1,11 @@
 import Foundation
 import MapKit
 
-/// Searches for addresses and points of interest (not GTFS stops) so a rider can
+/// Searches for addresses and map locations (not GTFS stops) so a rider can
 /// plan a trip to/from any place, and the map search can jump to a location.
 protocol PlaceSearchService: Sendable {
-    /// Address/POI matches for `query`, biased toward `region` when provided.
+    /// Address, POI, and physical-location matches for `query`, biased toward
+    /// `region` when provided.
     /// Returns an empty array for short or unmatched queries.
     func searchPlaces(query: String, near region: LocationPoint?) async -> [RoutePlace]
 }
@@ -16,11 +17,11 @@ struct LivePlaceSearchService: PlaceSearchService {
 
     func searchPlaces(query: String, near region: LocationPoint?) async -> [RoutePlace] {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard trimmed.count >= 3 else { return [] }
+        guard trimmed.count >= 2 else { return [] }
 
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = trimmed
-        request.resultTypes = [.address, .pointOfInterest]
+        request.resultTypes = [.address, .pointOfInterest, .physicalFeature]
         request.region = MKCoordinateRegion(
             center: region?.coordinate ?? Self.defaultCenter,
             latitudinalMeters: 60000,

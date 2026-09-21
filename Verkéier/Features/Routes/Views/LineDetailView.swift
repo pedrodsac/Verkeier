@@ -5,8 +5,9 @@ struct LineDetailView: View {
     let actions: LineDetailActions
 
     var body: some View {
-        if let detail = viewModel.detail {
-            List {
+        Group {
+            if let detail = viewModel.detail {
+                List {
                 if detail.directions.count > 1 {
                     Picker(
                         "Direction",
@@ -81,20 +82,22 @@ struct LineDetailView: View {
                     }
                 }
             }
-            .listStyle(.insetGrouped)
-        } else if let route = viewModel.route {
-            CompactUnavailableCard(
-                title: "Line details unavailable",
-                message: viewModel.errorMessage ?? "No GTFS timetable details are available for \(route.shortName).",
-                systemImage: "tram.fill"
-            )
-        } else {
-            CompactUnavailableCard(
-                title: "No line selected",
-                message: "Choose a line from stop detail to open its timetable and stop sequence.",
-                systemImage: "tram.fill"
-            )
+                .listStyle(.insetGrouped)
+            } else if let route = viewModel.route {
+                CompactUnavailableCard(
+                    title: "Line details unavailable",
+                    message: viewModel.errorMessage ?? "No GTFS timetable details are available for \(route.shortName).",
+                    systemImage: "tram.fill"
+                )
+            } else {
+                CompactUnavailableCard(
+                    title: "No line selected",
+                    message: "Choose a line from stop detail to open its timetable and stop sequence.",
+                    systemImage: "tram.fill"
+                )
+            }
         }
+        .refreshable { await actions.refresh() }
     }
 }
 

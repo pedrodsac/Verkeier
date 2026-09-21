@@ -29,15 +29,18 @@ struct NearbyStopsView: View {
                 ScrollView {
                     LazyVGrid(columns: gridColumns, spacing: 8) {
                         ForEach(viewModel.stops) { stop in
-                            StopListRow(
-                                stop: stop,
-                                markerColor: .blue,
-                                accessorySystemName: nil,
-                                referenceLocation: viewModel.referenceLocation,
-                                routes: viewModel.routesByStopId[stop.id] ?? []
-                            ) {
+                            Button {
                                 selectStop(stop)
+                            } label: {
+                                StopRow(
+                                    stop: stop,
+                                    routes: viewModel.routesByStopId[stop.id] ?? [],
+                                    walkingEstimate: viewModel.walkingEstimatesByStopID[stop.id]
+                                )
+                                .padding(8)
+                                .cardSurface(radius: Radius.row)
                             }
+                            .buttonStyle(.pressable)
                         }
                     }
                     .padding(.bottom, 24)

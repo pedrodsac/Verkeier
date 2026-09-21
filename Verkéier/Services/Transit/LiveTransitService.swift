@@ -9,7 +9,9 @@ protocol LiveTransitService: Sendable {
 
 extension LiveTransitService {
     func resolvedStop(for stop: Stop, gtfsService: any GTFSService) async -> Stop {
-        guard stop.hafasStationIDs.isEmpty else { return stop }
+        // ATP accepts the numeric identifiers published by Luxembourg's GTFS
+        // feed. Do not require a unique nearby-platform match for those stops.
+        guard stop.hafasStationIDs.isEmpty, stop.gtfsStopID == nil else { return stop }
         do {
             let candidates = try await nearbyStops(to: stop.location, radiusMeters: 100, limit: 12)
             let named = candidates.filter {
@@ -17,8 +19,7 @@ extension LiveTransitService {
                     && Self.distanceMeters(from: stop.location, to: $0.location) <= 75
             }
             guard named.count == 1,
-                  let resolved = await gtfsService.matchLiveStop(named[0]),
-                  resolved.gtfsStopID == stop.gtfsStopID else { return stop }
+                  let resolved = await gtfsService.matchLiveStop(named[0]) else { return stop }
             return resolved
         } catch {
             return stop
@@ -80,6 +81,12 @@ struct UnavailableLiveTransitService: LiveTransitService {
 /// same handling for ATP's response variants.
 struct MobiliteitLiveTransitService: LiveTransitService {
     let proxyURL: URL?
+    let session: URLSession
+
+    init(proxyURL: URL?, session: URLSession = .shared) {
+        self.proxyURL = proxyURL
+        self.session = session
+    }
 
     var isConfigured: Bool { proxyURL != nil }
 
@@ -113,7 +120,7 @@ struct MobiliteitLiveTransitService: LiveTransitService {
 
     func departureBoard(for stop: Stop, filter: TransitBoardFilter) async throws -> [Departure] {
         guard proxyURL != nil else { throw LiveTransitError.notConfigured }
-        guard let stationID = stop.hafasStationIDs.first else {
+        guard let stationID = Self.stationIdentifier(for: stop) else {
             throw LiveTransitError.noLiveIdentifier
         }
 
@@ -144,14 +151,30 @@ struct MobiliteitLiveTransitService: LiveTransitService {
 
     private var client: MobiliteitAPIClient {
         guard let proxyURL else {
-            return MobiliteitAPIClient(apiKey: "", baseURL: MobiliteitAPIClient.defaultBaseURL)
+            return MobiliteitAPIClient(
+                apiKey: "",
+                baseURL: MobiliteitAPIClient.defaultBaseURL,
+                session: session
+            )
         }
-        return MobiliteitAPIClient(apiKey: "", baseURL: proxyURL.appendingPathComponent("atp"))
+        return MobiliteitAPIClient(
+            apiKey: "",
+            baseURL: proxyURL.appendingPathComponent("atp"),
+            session: session
+        )
     }
 
     private var language: String { Locale.current.language.languageCode?.identifier ?? "en" }
 
-    private func map(_ source: HafasDeparture, stop: Stop, updatedAt: Date) -> Departure? {
+    func map(_ source: HafasDeparture, stop: Stop, updatedAt: Date) -> Departure? {
+        // HAFAS can return an arrival at the selected stop as a departure-board
+        // row when that stop is the journey's terminus. There is nowhere for a
+        // rider to board and travel from here, so omit it from every consumer
+        // of the live board (including favourites and widgets).
+        if Self.isTerminalArrival(source, at: stop) {
+            return nil
+        }
+
         let scheduled = Self.date(date: source.plannedDate, time: source.plannedTime)
         let realtime = Self.date(
             date: source.realtimeDate ?? source.plannedDate,
@@ -182,7 +205,10 @@ struct MobiliteitLiveTransitService: LiveTransitService {
             scheduledDeparture: scheduled,
             realtimeDeparture: realtime,
             delayMinutes: delay,
-            platform: source.realtimePlatform?.text ?? source.platform?.text,
+            platform: Self.firstNonempty(
+                source.realtimePlatform?.text,
+                source.platform?.text
+            ),
             operatorName: product?.operatorName,
             isCancelled: source.cancelled ?? false,
             isStatusUnknown: source.prognosisType?.uppercased() == "UNKNOWN",
@@ -215,5 +241,40 @@ struct MobiliteitLiveTransitService: LiveTransitService {
         if let value = formatter.date(from: "\(date) \(time)") { return value }
         formatter.dateFormat = "yyyy-MM-dd HH:mm"
         return formatter.date(from: "\(date) \(time)")
+    }
+
+    static func stationIdentifier(for stop: Stop) -> String? {
+        stop.hafasStationIDs.first ?? stop.gtfsStopID
+    }
+
+    static func isTerminalArrival(_ departure: HafasDeparture, at stop: Stop) -> Bool {
+        if let lastStop = departure.passlist.values.last {
+            let stopIdentifiers = Set(
+                ([stop.id, stop.gtfsStopID].compactMap { $0 } + stop.hafasStationIDs)
+                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty }
+            )
+            let lastStopIdentifiers = [lastStop.id, lastStop.externalID]
+                .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+
+            if lastStopIdentifiers.contains(where: stopIdentifiers.contains) {
+                return true
+            }
+            if let name = lastStop.name, name.identifiesSameStation(as: stop.name) {
+                return true
+            }
+        }
+
+        // Direction is the terminus label and remains the fallback for HAFAS
+        // responses whose pass list is absent or uses unrelated identifiers.
+        return departure.direction?.identifiesSameStation(as: stop.name) == true
+    }
+
+    static func firstNonempty(_ values: String?...) -> String? {
+        values.lazy.compactMap { value in
+            let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed?.isEmpty == false ? trimmed : nil
+        }.first
     }
 }

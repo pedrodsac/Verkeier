@@ -9,15 +9,12 @@ import Observation
 final class TransitSheetNavigationState {
     var selectedTab: TransitSheetTab = .home
     var homePath: [TransitSheetRoute] = []
-    var favouritesPath: [TransitSheetRoute] = []
     var planPath: [TransitSheetRoute] = []
 
     var activePath: [TransitSheetRoute] {
         switch selectedTab {
         case .home:
             homePath
-        case .favourites:
-            favouritesPath
         case .plan:
             planPath
         case .settings:
@@ -28,7 +25,6 @@ final class TransitSheetNavigationState {
 
 enum TransitSheetTab: Hashable, CaseIterable {
     case home
-    case favourites
     case plan
     case settings
 }

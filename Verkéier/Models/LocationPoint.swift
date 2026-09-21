@@ -13,6 +13,9 @@ nonisolated struct LocationPoint: Codable, Hashable, Identifiable, Sendable {
     let name: String?
     let latitude: Double
     let longitude: Double
+    /// Exact GTFS stop identifier when this point represents a transit stop.
+    /// Free-form addresses and device locations leave this `nil`.
+    let transitStopID: String?
 
     /// Creates a location point.
     ///
@@ -22,12 +25,14 @@ nonisolated struct LocationPoint: Codable, Hashable, Identifiable, Sendable {
         id: String? = nil,
         name: String? = nil,
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        transitStopID: String? = nil
     ) {
         self.id = id ?? "\(latitude),\(longitude)"
         self.name = name?.stationDisplayName
         self.latitude = latitude
         self.longitude = longitude
+        self.transitStopID = transitStopID
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -35,6 +40,7 @@ nonisolated struct LocationPoint: Codable, Hashable, Identifiable, Sendable {
         case name
         case latitude
         case longitude
+        case transitStopID
     }
 
     nonisolated init(from decoder: Decoder) throws {
@@ -43,6 +49,7 @@ nonisolated struct LocationPoint: Codable, Hashable, Identifiable, Sendable {
         name = try container.decodeIfPresent(String.self, forKey: .name)?.stationDisplayName
         latitude = try container.decode(Double.self, forKey: .latitude)
         longitude = try container.decode(Double.self, forKey: .longitude)
+        transitStopID = try container.decodeIfPresent(String.self, forKey: .transitStopID)
     }
 
     /// The point as a MapKit / CoreLocation coordinate.

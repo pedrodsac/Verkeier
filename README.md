@@ -37,6 +37,7 @@ Required later:
 
 - `API_PROXY_URL`: deployed Cloudflare Worker URL for keyed ATP and JCDecaux requests
 - `AVL_MESSAGES_URL`: optional override for the Ville de Luxembourg AVL messages XML feed
+- `ROUTING_DATA_MANIFEST_URL`: HTTPS manifest for immutable Luxembourg Valhalla graph releases
 
 The upstream ATP and JCDecaux credentials belong in the Worker’s Cloudflare
 secrets, not in the iOS build settings or app bundle. The app handles a

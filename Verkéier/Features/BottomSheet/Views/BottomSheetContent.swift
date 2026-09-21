@@ -6,6 +6,8 @@ struct BottomSheetContent: View {
     let detent: BottomSheetDetent
     let contentTopPadding: CGFloat
     let viewModel: CommuteDashboardViewModel
+    let favouritesViewModel: FavouritesPresentationModel
+    let favouritesActions: FavouritesActions
     let searchViewModel: SearchPresentationModel
     let searchActions: SearchActions
     let openSpecialEvent: (SpecialEvent) -> Void
@@ -19,30 +21,15 @@ struct BottomSheetContent: View {
                     actions: searchActions
                 )
             } else {
-                ScrollView {
-                    HomeSheetContent(
-                        detent: detent,
-                        viewModel: viewModel,
-                        openSpecialEvent: openSpecialEvent
-                    )
-					.padding(.top, contentTopPadding)
-					.safeAreaPadding(.horizontal, 16)
-                }
+				CommuteDashboardView(
+					viewModel: viewModel,
+					favouritesViewModel: favouritesViewModel,
+					favouritesActions: favouritesActions,
+					openSpecialEvent: openSpecialEvent,
+					displayStyle: detent == .medium ? .mapsMedium : .regular
+				)
+                .contentMargins(.top, contentTopPadding, for: .scrollContent)
             }
         }
-    }
-}
-
-private struct HomeSheetContent: View {
-    let detent: BottomSheetDetent
-    let viewModel: CommuteDashboardViewModel
-    let openSpecialEvent: (SpecialEvent) -> Void
-
-    var body: some View {
-        CommuteDashboardView(
-            viewModel: viewModel,
-            openSpecialEvent: openSpecialEvent,
-            displayStyle: detent == .medium ? .mapsMedium : .regular
-        )
     }
 }

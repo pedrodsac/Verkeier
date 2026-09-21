@@ -50,9 +50,16 @@ struct SettingsAboutView: View {
             Section("Maps") {
                 AboutSourceRow(
                     iconName: "map.fill",
-                    title: "Maps and walking routes",
+                    title: "Visible map",
                     source: "Apple Maps / MapKit"
                 )
+                Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
+                    AboutSourceRow(
+                        iconName: "figure.walk",
+                        title: "Walking routes",
+                        source: "© OpenStreetMap contributors · ODbL"
+                    )
+                }
             }
 
             Section {

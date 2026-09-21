@@ -22,12 +22,13 @@ struct StopDetailView: View {
                     stop: stop,
                     routes: viewModel.routes,
                     selectedLine: viewModel.selectedLine,
+                    showDirections: actions.showDirections,
                     toggleDepartureLine: actions.toggleDepartureLine
                 )
 
-                if !viewModel.mergedDepartures.isEmpty {
+                if !viewModel.displayedDepartures.isEmpty {
                     ShareLink(
-                        item: stopDeparturesShareText(stop: stop, departures: viewModel.mergedDepartures)
+                        item: stopDeparturesShareText(stop: stop, departures: viewModel.displayedDepartures)
                     ) {
                         Label("Share next departures", systemImage: "square.and.arrow.up")
                             .font(.callout.weight(.medium))

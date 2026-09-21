@@ -1168,6 +1168,7 @@
       }
     },
     "Choose a stop at this location" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1783,6 +1784,9 @@
           }
         }
       }
+    },
+    "Downloading and preparing timetable data…" : {
+
     },
     "Edit labels" : {
       "localizations" : {
@@ -2547,6 +2551,9 @@
           }
         }
       }
+    },
+    "Live updates unavailable · showing timetable" : {
+
     },
     "Loading stops" : {
       "localizations" : {
@@ -4121,6 +4128,9 @@
         }
       }
     },
+    "Preparing timetable data" : {
+
+    },
     "Privacy" : {
       "localizations" : {
         "de" : {
@@ -4290,6 +4300,7 @@
       }
     },
     "Recently departed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4318,7 +4329,6 @@
       }
     },
     "Recents" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4968,9 +4978,6 @@
         }
       }
     },
-    "Scheduled timetable" : {
-
-    },
     "Schedules" : {
       "localizations" : {
         "de" : {
@@ -5054,6 +5061,9 @@
           }
         }
       }
+    },
+    "Searching" : {
+
     },
     "Settings" : {
       "localizations" : {
@@ -5483,6 +5493,7 @@
       }
     },
     "Tap a stop to see departures and save it to your commute." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

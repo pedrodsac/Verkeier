@@ -8,9 +8,11 @@ struct RoutePlaceSearchView: View {
     let onSelect: (RoutePlace?) -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.gtfsService) private var gtfsService
     @Environment(\.placeSearchService) private var placeSearchService
     @State private var query = ""
     @State private var results: [RoutePlace] = []
+    @State private var isSearching = false
     @State private var isSearchActive = true
     @State private var focusSearch = true
 
@@ -57,31 +59,29 @@ struct RoutePlaceSearchView: View {
     @ViewBuilder
     private var searchContent: some View {
         if trimmedQuery.isEmpty {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 10) {
+            List {
+                Section {
                     currentLocationButton
 
                     if let selectedPlace,
                        selectedPlace.id != viewModel.currentLocation?.id {
                         placeButton(selectedPlace)
                     }
+                }
 
-                    let recents = viewModel.recentPlacesExcludingPinned(for: endpoint)
-                    if !recents.isEmpty {
-                        Text("Recent")
-                            .font(.headline.weight(.semibold))
-                            .padding(.top, 10)
-                            .padding(.bottom, 2)
-
+                let recents = viewModel.recentPlacesExcludingPinned(for: endpoint)
+                if !recents.isEmpty {
+                    Section("Recent") {
                         ForEach(recents) { place in
                             placeButton(place)
                         }
                     }
                 }
-                .padding(.top, 16)
-                .padding(.bottom, 75)
-                .padding(.horizontal, 16)
             }
+            .listStyle(.insetGrouped)
+        } else if isSearching && results.isEmpty {
+            ProgressView("Searching")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if results.isEmpty {
             ContentUnavailableView(
                 "No matches",
@@ -89,29 +89,27 @@ struct RoutePlaceSearchView: View {
                 description: Text("Try another stop, address, or place name.")
             )
         } else {
-            ScrollView {
-                LazyVStack(spacing: 10) {
+            List {
+                Section {
                     ForEach(results) { place in
                         placeButton(place)
                     }
                 }
-                .padding(.top, 16)
-                .padding(.bottom, 75)
-                .padding(.horizontal, 16)
             }
+            .listStyle(.insetGrouped)
         }
     }
 
     private var currentLocationButton: some View {
         Button(action: selectCurrentLocation) {
-            RoutePlaceSearchRow(
+            RoutePlaceRow(
                 title: "Current Location",
                 subtitle: viewModel.currentLocation?.subtitle ?? "Live device location",
                 systemImage: "location.fill",
                 tint: .blue
             )
         }
-        .buttonStyle(.pressable)
+        .buttonStyle(.plain)
         .disabled(endpoint == .destination && viewModel.currentLocation == nil)
     }
 
@@ -120,14 +118,14 @@ struct RoutePlaceSearchView: View {
             onSelect(place)
             dismiss()
         } label: {
-            RoutePlaceSearchRow(
+            RoutePlaceRow(
                 title: place.title,
                 subtitle: place.subtitle,
                 systemImage: place.searchSystemImage,
                 tint: place.searchIconTint
             )
         }
-        .buttonStyle(.pressable)
+        .buttonStyle(.plain)
     }
 
     private func selectCurrentLocation() {
@@ -140,22 +138,44 @@ struct RoutePlaceSearchView: View {
         let current = trimmedQuery
         guard !current.isEmpty else {
             results = []
+            isSearching = false
             return
         }
 
-        // Debounce: a new keystroke cancels this task before the sleep ends.
-        try? await Task.sleep(for: .milliseconds(250))
+        // Clear stale results immediately so a previous query is never shown
+        // as if it matched the current text. The short debounce keeps the
+        // search services from being hit for every keystroke.
+        results = []
+        isSearching = true
+        try? await Task.sleep(for: .milliseconds(180))
         guard !Task.isCancelled else { return }
 
-        async let places = placeSearchService.searchPlaces(
+        async let stopMatches = gtfsService.searchStops(query: current)
+        async let placeMatches = placeSearchService.searchPlaces(
             query: current,
             near: viewModel.currentLocation?.location
         )
-        let placeResults = await places
+        let stops = await stopMatches
         guard !Task.isCancelled else { return }
+        results = mergedResults(stops: stops, places: [])
 
+        let places = await placeMatches
+        guard !Task.isCancelled else { return }
+        results = mergedResults(stops: stops, places: places)
+        isSearching = false
+    }
+
+    private func mergedResults(stops: [Stop], places: [RoutePlace]) -> [RoutePlace] {
         var seenIDs = Set<String>()
-        results = placeResults.filter { seenIDs.insert($0.id).inserted }
+        let stopResults = stops
+            .deduplicatedByExactName()
+            .prefix(30)
+            .map { RoutePlace(stop: $0, source: .search) }
+        let placeResults = Array(places.prefix(10))
+        return (stopResults + placeResults)
+            .filter { seenIDs.insert($0.id).inserted }
+            .prefix(40)
+            .map { $0 }
     }
 }
 
@@ -177,47 +197,44 @@ private extension RoutePlace {
     }
 }
 
-private struct RoutePlaceSearchRow: View {
+private struct RoutePlaceRow: View {
     let title: String
     let subtitle: String?
     let systemImage: String
     let tint: Color
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             Image(systemName: systemImage)
-                .font(.headline.weight(.semibold))
+                .font(.subheadline)
                 .foregroundStyle(.white)
-                .frame(width: 38, height: 38)
-                .background(tint.gradient, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .frame(width: 32, height: 32)
+                .background(tint.gradient, in: Circle())
+                .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 1) {
                 Text(title)
-                    .font(.body.weight(.semibold))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                 if let subtitle {
                     Text(subtitle)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
             }
             Spacer(minLength: 8)
-            Image(systemName: "chevron.right")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(.tertiary)
         }
-        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
-        .background {
-            RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
-                .fill(.thinMaterial)
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
-                .stroke(.separator.opacity(0.3), lineWidth: 0.5)
-        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    private var accessibilityLabel: String {
+        guard let subtitle, !subtitle.isEmpty else { return title }
+        return "\(title), \(subtitle)"
     }
 }

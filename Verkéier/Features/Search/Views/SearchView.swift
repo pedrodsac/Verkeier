@@ -75,20 +75,6 @@ struct StopSearchBar: UIViewRepresentable {
     }
 }
 
-struct SearchView: View {
-    @Binding var query: String
-    let viewModel: SearchPresentationModel
-    let actions: SearchActions
-
-    var body: some View {
-        SearchResultsContent(
-            query: $query,
-            viewModel: viewModel,
-            actions: actions
-        )
-    }
-}
-
 struct SearchResultsContent: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Binding var query: String
@@ -137,20 +123,25 @@ struct SearchResultsContent: View {
     }
 
     private var resultsList: some View {
-        ScrollView {
-            LazyVStack(spacing: 10) {
+        nativeStopList {
+            Section {
                 ForEach(viewModel.results) { stop in
-                    StopListRow(
-                        stop: stop,
-                        markerColor: .blue,
-                        accessorySystemName: "chevron.right",
-                        navigationValue: .stopDetail(stop)
-                    )
+                    NavigationLink(value: TransitSheetRoute.stopDetail(stop)) {
+                        StopRow(stop: stop)
+                    }
                 }
             }
-            .padding(.vertical, 75)
-			.padding(.horizontal, 16)
         }
+    }
+
+    private func nativeStopList<Content: View>(
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        List {
+            content()
+        }
+        .listStyle(.insetGrouped)
+        .contentMargins(.top, 75, for: .scrollContent)
     }
 }
 
@@ -159,31 +150,17 @@ private struct RecentSearchStops: View {
     let referenceLocation: CLLocation?
 
     var body: some View {
-		VStack(alignment: .leading, spacing: 12) {
-            ScrollView {
-                LazyVStack(spacing: 10) {
-					HStack {
-						Text("Recent")
-							.font(.headline.weight(.semibold))
-
-						Spacer()
-					}
-					.padding(.bottom, 2)
-
-                    ForEach(stops.prefix(8)) { stop in
-                        StopListRow(
-                            stop: stop,
-                            markerColor: .blue,
-                            accessorySystemName: "chevron.right",
-                            referenceLocation: referenceLocation,
-                            navigationValue: .stopDetail(stop)
-                        )
+        List {
+            Section("Recent Stops") {
+                ForEach(stops.prefix(8)) { stop in
+                    NavigationLink(value: TransitSheetRoute.stopDetail(stop)) {
+                        StopRow(stop: stop)
                     }
                 }
-                .padding(.vertical, 75)
-				.padding(.horizontal, 16)
             }
         }
+        .listStyle(.insetGrouped)
+        .contentMargins(.top, 75, for: .scrollContent)
     }
 }
 
@@ -204,42 +181,18 @@ private struct NearbySearchSuggestions: View {
                     description: Text("Start typing to search places and addresses.")
                 )
             } else {
-                ScrollView {
-                    LazyVStack(spacing: 10) {
-						HStack {
-							Text("Nearby Suggestions")
-								.font(.headline.weight(.semibold))
-
-							Spacer()
-						}
-						.padding(.bottom, 2)
-
-                        ForEach(stops.prefix(5)) { stop in
-                            StopListRow(
-                                stop: stop,
-                                markerColor: .teal,
-                                referenceLocation: referenceLocation,
-                                navigationValue: .stopDetail(stop)
-                            )
+                List {
+                    Section("Nearby Suggestions") {
+                        ForEach(stops.prefix(6)) { stop in
+                            NavigationLink(value: TransitSheetRoute.stopDetail(stop)) {
+                                StopRow(stop: stop, markerColor: .teal)
+                            }
                         }
                     }
-					.padding(.vertical, 75)
-					.padding(.horizontal, 16)
                 }
+                .listStyle(.insetGrouped)
+                .contentMargins(.top, 75, for: .scrollContent)
             }
         }
     }
-}
-
-#Preview {
-    SearchView(
-        query: .constant(""),
-        viewModel: SearchPresentationModel(
-            results: [],
-            nearbySuggestions: [],
-            isLoadingNearbySuggestions: false,
-            referenceLocation: nil
-        ),
-        actions: SearchActions()
-    )
 }

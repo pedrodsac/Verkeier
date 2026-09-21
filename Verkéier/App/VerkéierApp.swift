@@ -3,6 +3,7 @@ import SwiftUI
 
 @main
 struct VerkéierApp: App {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var locationService = LocationService()
     @AppStorage("debugTransitDataMode") private var debugTransitDataModeRawValue =
         DebugTransitDataMode.normal.rawValue
@@ -11,6 +12,9 @@ struct VerkéierApp: App {
     private let bikeShareService: any BikeShareService
     private let gtfsService: any GTFSService
     private let liveTransitService: any LiveTransitService
+    private let routeService: any RouteService
+    private let walkingRouter: any WalkingRouting
+    private let routingDataUpdateService: RoutingDatasetUpdateService
     private let modelContainer: ModelContainer
     @State private var liveActivityManager = LiveActivityManager()
     @State private var departureReminderService = DepartureReminderService()
@@ -20,8 +24,29 @@ struct VerkéierApp: App {
         let configuration = AppConfiguration.current
         self.configuration = configuration
         bikeShareService = JCDecauxBikeShareService(configuration: configuration)
-        gtfsService = MobiliteitGTFSService()
-        liveTransitService = MobiliteitLiveTransitService(proxyURL: configuration.apiProxyURL)
+        let gtfsService = MobiliteitGTFSService()
+        self.gtfsService = gtfsService
+        let liveTransitService = MobiliteitLiveTransitService(proxyURL: configuration.apiProxyURL)
+        self.liveTransitService = liveTransitService
+        let routingDatasetManager = RoutingDatasetManager()
+        let walkingRouter = LocalFirstWalkingRouter(datasetManager: routingDatasetManager)
+        self.walkingRouter = walkingRouter
+        let routingDataUpdateService = RoutingDatasetUpdateService(
+            manifestURL: configuration.routingDataManifestURL,
+            datasetManager: routingDatasetManager
+        )
+        self.routingDataUpdateService = routingDataUpdateService
+        Task(priority: .utility) {
+            _ = await routingDataUpdateService.checkForUpdateIfDue()
+        }
+        let routeService = MobiliteitRouteService(
+            gtfsService: gtfsService,
+            liveTransitService: liveTransitService,
+            walkingRouter: walkingRouter,
+            roadRouteProvider: LocalFirstRoadRouteProvider(walkingRouter: walkingRouter)
+        )
+        routeService.prepareForRouting()
+        self.routeService = routeService
         modelContainer = AppModelContainer.make()
     }
 
@@ -30,6 +55,7 @@ struct VerkéierApp: App {
             TransitMapScreen(locationService: locationService)
                 .environment(\.appConfiguration, configuration)
                 .environment(\.routeService, routeService)
+                .environment(\.walkingRouter, walkingRouter)
                 .environment(\.gtfsService, gtfsService)
                 .environment(\.liveTransitService, liveTransitService)
                 .environment(\.bikeShareService, bikeShareService)
@@ -40,6 +66,12 @@ struct VerkéierApp: App {
                 .environment(preferences)
                 .modelContainer(modelContainer)
                 .preferredColorScheme(preferences.appearance.colorScheme)
+                .onChange(of: scenePhase) { _, phase in
+                    guard phase == .active else { return }
+                    Task(priority: .utility) {
+                        _ = await routingDataUpdateService.checkForUpdateIfDue()
+                    }
+                }
         }
     }
 
@@ -59,6 +91,4 @@ struct VerkéierApp: App {
     private var debugTransitDataMode: DebugTransitDataMode {
         DebugTransitDataMode(rawValue: debugTransitDataModeRawValue) ?? .normal
     }
-
-    private var routeService: any RouteService { MobiliteitRouteService(gtfsService: gtfsService) }
 }

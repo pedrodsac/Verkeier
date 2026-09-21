@@ -24,6 +24,7 @@ struct RouteOptionBadge: View {
     private var symbolName: String {
         switch status {
         case .viable: "checkmark.circle.fill"
+        case .delayed: "clock.badge.exclamationmark"
         case .partiallyLive, .scheduledOnly: "clock.badge.exclamationmark"
         case .atRisk: "exclamationmark.triangle.fill"
         case .connectionMayBeMissed: "xmark.circle.fill"
@@ -34,7 +35,9 @@ struct RouteOptionBadge: View {
     private var foregroundColor: Color {
         switch status {
         case .viable: .green
-        case .partiallyLive, .scheduledOnly: .orange
+        case .delayed: .orange
+        case .partiallyLive: .yellow
+        case .scheduledOnly: .orange
         case .atRisk: .orange
         case .connectionMayBeMissed: .red
         case .missed, .cancelled: .red
@@ -44,7 +47,9 @@ struct RouteOptionBadge: View {
     private var backgroundColor: Color {
         switch status {
         case .viable: .green.opacity(0.14)
-        case .partiallyLive, .scheduledOnly: .orange.opacity(0.14)
+        case .delayed: .orange.opacity(0.14)
+        case .partiallyLive: .yellow.opacity(0.14)
+        case .scheduledOnly: .orange.opacity(0.14)
         case .atRisk: .orange.opacity(0.14)
         case .connectionMayBeMissed: .red.opacity(0.14)
         case .missed, .cancelled: .red.opacity(0.14)
@@ -56,6 +61,7 @@ struct RouteOptionBadge: View {
     #Preview(traits: .sizeThatFitsLayout) {
         HStack {
             RouteOptionBadge(status: .viable)
+            RouteOptionBadge(status: .delayed)
             RouteOptionBadge(status: .partiallyLive)
             RouteOptionBadge(status: .scheduledOnly)
             RouteOptionBadge(status: .atRisk)

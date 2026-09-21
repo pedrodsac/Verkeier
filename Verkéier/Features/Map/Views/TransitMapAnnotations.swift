@@ -115,9 +115,7 @@ struct StopMapMarker: View {
 
     private var markerColor: Color {
         if isFavourite { return .yellow }
-        if stop.modes.contains(.train) { return .red }
-        if stop.modes.contains(.tram) { return .orange }
-        return .blue
+        return stop.modes.primaryMode.tint
     }
 
     private var markerSize: CGFloat {
@@ -129,9 +127,7 @@ struct StopMapMarker: View {
     }
 
     private var iconName: String {
-        if stop.modes.contains(.train) { return "train.side.front.car" }
-        if stop.modes.contains(.tram) { return "tram.fill" }
-        return "bus.fill"
+        stop.modes.primaryMode.symbolName
     }
 }
 

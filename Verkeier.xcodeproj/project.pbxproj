@@ -13,6 +13,7 @@
 		62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000102 /* AsyncAlgorithms */; };
 		62FE86412FEE000000000005 /* UIOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000105 /* UIOnboarding */; };
 		E8D57E2E304F173F00F569AC /* MobiliteitKit in Frameworks */ = {isa = PBXBuildFile; productRef = E8D57E2D304F173F00F569AC /* MobiliteitKit */; };
+		E8D57E2F304F173F00F569AC /* Valhalla in Frameworks */ = {isa = PBXBuildFile; productRef = E8D57E31304F173F00F569AC /* Valhalla */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,6 +106,7 @@
 				62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */,
 				E8D57E2E304F173F00F569AC /* MobiliteitKit in Frameworks */,
 				62FE86412FEE000000000005 /* UIOnboarding in Frameworks */,
+				E8D57E2F304F173F00F569AC /* Valhalla in Frameworks */,
 			);
 		};
 		000000000000000230000000 /* Frameworks */ = {
@@ -177,6 +179,7 @@
 				62FE86412FEE000000000102 /* AsyncAlgorithms */,
 				62FE86412FEE000000000105 /* UIOnboarding */,
 				E8D57E2D304F173F00F569AC /* MobiliteitKit */,
+				E8D57E31304F173F00F569AC /* Valhalla */,
 			);
 			productName = "Verkéier";
 			productReference = 000000000000000000000120 /* Verkeier.app */;
@@ -260,7 +263,8 @@
 			packageReferences = (
 				62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				62FE86412FEE000000000204 /* XCRemoteSwiftPackageReference "UIOnboarding" */,
-				E8D57E2C304F173F00F569AC /* XCRemoteSwiftPackageReference "MobiliteitKit" */,
+				E8D57E2C304F173F00F569AC /* XCLocalSwiftPackageReference "Packages/MobiliteitKit" */,
+				E8D57E30304F173F00F569AC /* XCRemoteSwiftPackageReference "valhalla-mobile" */,
 			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
@@ -511,6 +515,7 @@
 				DEVELOPMENT_TEAM = 9TMMFKS9DW;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Verkéier/Info.plist";
@@ -709,6 +714,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		E8D57E2C304F173F00F569AC /* XCLocalSwiftPackageReference "Packages/MobiliteitKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/MobiliteitKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -726,12 +738,12 @@
 				kind = branch;
 			};
 		};
-		E8D57E2C304F173F00F569AC /* XCRemoteSwiftPackageReference "MobiliteitKit" */ = {
+		E8D57E30304F173F00F569AC /* XCRemoteSwiftPackageReference "valhalla-mobile" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pedrodsac/MobiliteitKit";
+			repositoryURL = "https://github.com/Rallista/valhalla-mobile.git";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = exactVersion;
+				version = 0.6.3;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -749,8 +761,13 @@
 		};
 		E8D57E2D304F173F00F569AC /* MobiliteitKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E8D57E2C304F173F00F569AC /* XCRemoteSwiftPackageReference "MobiliteitKit" */;
+			package = E8D57E2C304F173F00F569AC /* XCLocalSwiftPackageReference "Packages/MobiliteitKit" */;
 			productName = MobiliteitKit;
+		};
+		E8D57E31304F173F00F569AC /* Valhalla */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E8D57E30304F173F00F569AC /* XCRemoteSwiftPackageReference "valhalla-mobile" */;
+			productName = Valhalla;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

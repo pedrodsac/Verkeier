@@ -19,6 +19,7 @@ struct TransitSheetActions {
     let refreshDepartures: () async -> Void
     let refreshAlerts: () -> Void
     let calculateRoute: () -> Void
+    let showDirections: () -> Void
     let showHome: () -> Void
     let openSpecialEvent: (SpecialEvent) -> Void
     let expandSheet: () -> Void
@@ -43,6 +44,7 @@ struct TransitSheetActions {
     let updateDepartureBoardFilter: (TransitBoardFilter) -> Void
     let updateSearch: () -> Void
     let selectLineDetailDirection: (String) -> Void
+    let refreshLineDetail: () async -> Void
     let checkGTFSUpdate: () -> Void
     let setDebugDataMode: (DebugTransitDataMode) -> Void
     let favourites: FavouritesActions
@@ -55,6 +57,7 @@ struct NearbyStopsPresentationModel {
     let referenceLocation: CLLocation?
     /// Lines serving each stop, keyed by stop id, shown on the nearby rows.
     var routesByStopId: [String: [TransitRoute]] = [:]
+    var walkingEstimatesByStopID: [String: OfflineWalkingEstimate] = [:]
 }
 
 struct StopGroupPresentationModel {

@@ -27,9 +27,6 @@ struct TransitBottomSheet: View {
                 focusSearch = newPath.last == .search
                 activatePath(newPath, previous: oldPath)
             }
-            .onChange(of: navigation.favouritesPath) { oldPath, newPath in
-                activatePath(newPath, previous: oldPath)
-            }
             .onChange(of: navigation.planPath) { oldPath, newPath in
                 activatePath(newPath, previous: oldPath)
             }
@@ -43,10 +40,6 @@ struct TransitBottomSheet: View {
         TabView(selection: $navigation.selectedTab) {
 			Tab("Home", systemImage: "train.side.front.car", value: TransitSheetTab.home) {
 				homeTab
-            }
-
-            Tab("Favourites", systemImage: "star", value: TransitSheetTab.favourites) {
-				favouritesTab
             }
 
             Tab("Plan", systemImage: "arrow.triangle.turn.up.right.diamond", value: TransitSheetTab.plan) {
@@ -76,6 +69,8 @@ struct TransitBottomSheet: View {
                 detent: detent,
                 contentTopPadding: shouldShowSearchBar ? searchBarContentTopPadding : 0,
                 viewModel: viewModel.commute,
+                favouritesViewModel: viewModel.favourites,
+                favouritesActions: actions.favourites,
                 searchViewModel: viewModel.search,
                 searchActions: SearchActions(from: actions),
                 openSpecialEvent: actions.openSpecialEvent
@@ -104,22 +99,6 @@ struct TransitBottomSheet: View {
                 .padding(.vertical, 6)
                 .padding(.horizontal, 8)
             }
-        }
-    }
-
-    private var favouritesTab: some View {
-        NavigationStack(path: $navigation.favouritesPath) {
-            FavouritesView(viewModel: viewModel.favourites, actions: actions.favourites)
-            	.navigationTitle("Favourites")
-            	.toolbarTitleDisplayMode(.inline)
-            	.navigationDestination(for: TransitSheetRoute.self) { route in
-            	    TransitSheetDestinationView(
-            	        route: route,
-            	        searchQuery: $searchQuery,
-            	        viewModel: viewModel,
-            	        actions: actions
-            	    )
-            	}
         }
     }
 

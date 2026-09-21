@@ -14,7 +14,8 @@ extension TransitMapScreen {
             isLoading: viewModel.isLoadingNearbyStops,
             errorMessage: viewModel.nearbyStopsErrorMessage,
             referenceLocation: locationService.currentLocation,
-            routesByStopId: viewModel.nearbyStopRoutes
+            routesByStopId: viewModel.nearbyStopRoutes,
+            walkingEstimatesByStopID: viewModel.nearbyWalkingEstimates
         )
 
         return TransitSheetPresentationModel(
@@ -57,12 +58,12 @@ extension TransitMapScreen {
                 departures: viewModel.departures,
                 offlineScheduledDepartures: viewModel.offlineScheduledDepartures,
                 alerts: viewModel.stopDetailAlerts,
-                availablePlatforms: viewModel.availableDeparturePlatforms,
                 selectedLine: viewModel.selectedDepartureLine,
                 selectedPlatform: viewModel.selectedDeparturePlatform,
                 departureBoardFilter: viewModel.departureBoardFilter,
                 isLoadingDepartures: viewModel.isLoadingDepartures,
                 errorMessage: viewModel.departuresErrorMessage,
+                liveErrorMessage: viewModel.liveTransitErrorMessage,
                 lastUpdated: viewModel.departuresLastUpdated,
                 isStale: viewModel.areDeparturesStale,
                 isFavourite: viewModel.selectedStop.map(isFavourite) ?? false,

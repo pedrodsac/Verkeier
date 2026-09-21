@@ -49,7 +49,7 @@ extension RoadRouteProviding {
     }
 }
 
-enum RoadRouteTransport: String, Sendable {
+nonisolated enum RoadRouteTransport: String, Sendable {
     case automobile
     case walking
     case bicycle
@@ -61,12 +61,24 @@ enum RoadRouteTransport: String, Sendable {
 /// straight-line distance between its endpoints. Keeping it alongside the
 /// polyline prevents callers from having to infer travel distance from map
 /// presentation data.
-struct RoadRoute: Sendable {
+nonisolated struct RoadRoute: Sendable {
     let coordinates: [RouteMapCoordinate]
     let distanceMeters: Double
+    /// Provider-supplied travel time. Coordinate-only providers may omit it.
+    let expectedTravelTime: TimeInterval?
+
+    init(
+        coordinates: [RouteMapCoordinate],
+        distanceMeters: Double,
+        expectedTravelTime: TimeInterval? = nil
+    ) {
+        self.coordinates = coordinates
+        self.distanceMeters = distanceMeters
+        self.expectedTravelTime = expectedTravelTime
+    }
 }
 
-struct MapKitRoadRouteProvider: RoadRouteProviding {
+nonisolated struct MapKitRoadRouteProvider: RoadRouteProviding {
     nonisolated func roadRouteCoordinates(
         from origin: LocationPoint,
         to destination: LocationPoint,
@@ -104,7 +116,8 @@ struct MapKitRoadRouteProvider: RoadRouteProviding {
             coordinates: coordinates.map {
                 RouteMapCoordinate(latitude: $0.latitude, longitude: $0.longitude)
             },
-            distanceMeters: route.distance
+            distanceMeters: route.distance,
+            expectedTravelTime: route.expectedTravelTime
         )
     }
 

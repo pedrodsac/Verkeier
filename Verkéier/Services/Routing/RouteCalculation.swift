@@ -1,5 +1,10 @@
 import Foundation
 
+enum RouteCalculationStage: Sendable {
+    case preview
+    case final
+}
+
 /// The result of a ``RouteService`` calculation: a set of route alternatives
 /// plus the currently selected one.
 ///
@@ -14,6 +19,10 @@ struct RouteCalculation: Sendable {
     /// Scheduled option identifiers that realtime explicitly proved unusable.
     /// Presentation may retain any other scheduled option when live coverage is incomplete.
     var invalidatedOptionIDs: Set<String> = []
+    /// Whether this is a lightweight early result or the complete profile.
+    /// Existing services default to final so only progressive implementations
+    /// need to opt into preview behavior.
+    var stage: RouteCalculationStage = .final
     /// Identifier of the selected option; falls back to the first option.
     let selectedOptionID: String?
 

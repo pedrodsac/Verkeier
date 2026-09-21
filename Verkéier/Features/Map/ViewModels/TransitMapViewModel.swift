@@ -21,41 +21,32 @@ final class TransitMapViewModel {
     private(set) var gtfsOnlyMapStops: [Stop] = []
     /// Routes serving each nearby stop, keyed by stop id, for the nearby list.
     var nearbyStopRoutes: [String: [TransitRoute]] = [:]
+    var nearbyWalkingEstimates: [String: OfflineWalkingEstimate] = [:]
     var selectedStop: Stop?
-    var selectedStopRoutes: [TransitRoute] = [] {
-        didSet { rebuildDepartureFilters() }
-    }
+    var selectedStopRoutes: [TransitRoute] = []
 
     var isLoadingNearbyStops = false
     var nearbyStopsErrorMessage: String?
     var gtfsFeedStatus: GTFSFeedStatus = .unavailable
     var liveTransitLastUpdated: Date?
     var liveTransitErrorMessage: String?
-    var departures: [Departure] = [] {
-        didSet { rebuildDepartureFilters() }
-    }
+    var departures: [Departure] = []
 
     var offlineScheduledDepartures: [OfflineScheduleDeparture] = []
-    var selectedDepartureLine: String? {
-        didSet { rebuildDepartureFilters() }
-    }
+    var selectedDepartureLine: String?
 
-    var selectedDeparturePlatform: String? {
-        didSet { rebuildDepartureFilters() }
-    }
+    var selectedDeparturePlatform: String?
 
     /// Session-scoped advanced query controls for the selected stop. They are
     /// intentionally separate from the visible line/platform chips so the UI
     /// can keep common interactions lightweight.
-    var departureBoardFilter = TransitBoardFilter() {
-        didSet { rebuildDepartureFilters() }
-    }
-
-    private(set) var availableDeparturePlatforms: [String] = []
-    private(set) var filteredDepartures: [Departure] = []
+    var departureBoardFilter = TransitBoardFilter()
     var isLoadingDepartures = false
     var departuresErrorMessage: String?
     var departuresLastUpdated: Date?
+    /// Every departure request receives a generation. A response may publish
+    /// only while it remains the most recent request for the selected stop.
+    var departureLoadGeneration = 0
     var favouriteDepartureBoards: [String: FavouriteDepartureBoardSnapshot] = [:]
     var isLoadingFavouriteDepartures = false
     var searchQuery = ""
@@ -95,6 +86,7 @@ final class TransitMapViewModel {
     let minimumMapSpan = 0.001
     let favouriteDepartureConcurrencyLimit = 3
     let nearbyRouteConcurrencyLimit = 10
+    let routeCalculationTimeout: Duration
     var visibleMapRegion: MKCoordinateRegion?
     var lastNearbyStopsRequestLocation: CLLocation?
     let nearbyStopsRefreshDistance: CLLocationDistance = 100
@@ -102,8 +94,12 @@ final class TransitMapViewModel {
     var routeCalculationGeneration = 0
     var unfilteredRouteOptions: [RouteOption] = []
 
-    init(now: @escaping @Sendable () -> Date = { .now }) {
+    init(
+        now: @escaping @Sendable () -> Date = { .now },
+        routeCalculationTimeout: Duration = .seconds(15)
+    ) {
         self.now = now
+        self.routeCalculationTimeout = routeCalculationTimeout
         cameraRegion = defaultRegion
     }
     func sanitized(_ region: MKCoordinateRegion) -> MKCoordinateRegion? {
@@ -210,70 +206,11 @@ final class TransitMapViewModel {
         return squaredDistance(from: lhs.location, to: rhs.location) < 0.000002
     }
 
-    func rebuildDepartureFilters() {
-        let departuresMatchingLine = departuresMatchingSelectedLine()
-        availableDeparturePlatforms = Array(dictOrderedSet: departuresMatchingLine.compactMap { departure in
-            let platform = departure.platform?.trimmingCharacters(in: .whitespacesAndNewlines)
-            return platform?.isEmpty == false ? platform : nil
-        })
-        .sorted { $0.localizedStandardCompare($1) == .orderedAscending }
-
-        if let selectedDeparturePlatform,
-           !availableDeparturePlatforms.contains(selectedDeparturePlatform) {
-            self.selectedDeparturePlatform = nil
-            return
-        }
-
-        filteredDepartures = departuresMatchingLine.filter { departure in
-            guard let selectedDeparturePlatform else { return true }
-            return departure.platform == selectedDeparturePlatform
-        }
-    }
-
-    private func departuresMatchingSelectedLine() -> [Departure] {
-        guard let selectedDepartureLine else { return departures }
-        guard let route = selectedStopRoutes.first(where: { $0.id == selectedDepartureLine }) else {
-            return departures
-        }
-
-        return departures.filter { departure in
-            departure.matches(route: route)
-        }
-    }
-
-    func clearSelectedPlatformIfUnavailable() {
-        guard let selectedDeparturePlatform else { return }
-        if !availableDeparturePlatforms.contains(selectedDeparturePlatform) {
-            self.selectedDeparturePlatform = nil
-        }
-    }
-
     struct FavouriteDepartureBoardResult: Sendable {
         let stopId: String
         let departures: [Departure]
         let didFail: Bool
         let usedLiveData: Bool
         let index: Int
-    }
-}
-
-private extension Departure {
-    func matches(route: TransitRoute) -> Bool {
-        if routeId?.caseInsensitiveCompare(route.id) == .orderedSame {
-            return true
-        }
-
-        if lineName.caseInsensitiveCompare(route.shortName) == .orderedSame {
-            return true
-        }
-
-        return false
-    }
-}
-
-private extension [String] {
-    init(dictOrderedSet values: [String]) {
-        var seen: Set<String> = []
-        self = values.filter { seen.insert($0).inserted }
     }
 }

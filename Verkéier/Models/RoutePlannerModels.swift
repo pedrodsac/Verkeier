@@ -120,12 +120,20 @@ nonisolated struct RoutePlace: Codable, Hashable, Identifiable {
 
     /// Creates a place from an existing ``Stop``.
     init(stop: Stop, source: RoutePlaceSource) {
+        let gtfsStopID = stop.gtfsStopID ?? (stop.dataSource == .gtfs ? stop.id : nil)
+        let location = LocationPoint(
+            id: stop.location.id,
+            name: stop.location.name,
+            latitude: stop.location.latitude,
+            longitude: stop.location.longitude,
+            transitStopID: gtfsStopID
+        )
         self.init(
             id: stop.id,
             title: stop.displayName,
             subtitle: stop.locality,
-            location: stop.location,
-            stopId: stop.id,
+            location: location,
+            stopId: gtfsStopID,
             modes: stop.modes,
             source: source
         )

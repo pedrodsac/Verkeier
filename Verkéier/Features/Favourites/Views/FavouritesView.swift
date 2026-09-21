@@ -76,13 +76,17 @@ struct FavouritesView: View {
 
             LazyVStack(spacing: 8) {
                 ForEach(section.stops) { favourite in
-                    StopListRow(
-                        stop: favourite.stop,
-                        markerColor: favourite.stop.modes.primaryMode.tint,
-                        accessorySystemName: nil,
-                        surface: .favourite,
-                        action: { actions.openStop(favourite.stop) }
-                    )
+                    Button {
+                        actions.openStop(favourite.stop)
+                    } label: {
+                        StopRow(
+                            stop: favourite.stop,
+                            markerColor: favourite.stop.modes.primaryMode.tint
+                        )
+                        .padding(8)
+                        .cardSurface(radius: Radius.row)
+                    }
+                    .buttonStyle(.pressable)
                     .accessibilityFocused($focusedFavouriteID, equals: favourite.id)
                     .accessibilityHint("Opens departures for this stop")
                     .accessibilityAction(named: "Plan to \(favourite.stop.displayName)") {
@@ -161,7 +165,7 @@ struct FavouritesView: View {
 
 }
 
-private struct FavouriteLabelsEditor: View {
+struct FavouriteLabelsEditor: View {
     let favourite: FavouriteStopPresentationModel
     let availableLabels: [String]
     let save: ([String]) -> Void

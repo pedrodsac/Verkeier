@@ -10,11 +10,13 @@ struct LineDetailPresentationModel {
 /// Callbacks the line-detail sheet needs, sliced from ``TransitSheetActions``.
 struct LineDetailActions {
     var selectDirection: (String) -> Void = { _ in }
+    var refresh: () async -> Void = {}
 }
 
 extension LineDetailActions {
     init(from actions: TransitSheetActions) {
         self.init()
         selectDirection = actions.selectLineDetailDirection
+        refresh = actions.refreshLineDetail
     }
 }

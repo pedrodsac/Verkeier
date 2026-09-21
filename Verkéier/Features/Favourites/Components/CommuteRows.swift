@@ -45,37 +45,19 @@ struct AlertsSummaryRow: View {
 
     var body: some View {
         NavigationLink(value: TransitSheetRoute.alerts) {
-            HStack(spacing: 10) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.subheadline.weight(.semibold))
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(.orange)
-                    .accessibilityHidden(true)
-                Text(alertText)
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(.primary)
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.tertiary)
-                    .accessibilityHidden(true)
-            }
-            .padding(.horizontal, 12)
-            .frame(minHeight: 44)
-            .background(
-                .orange.opacity(0.12), in: RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
-            )
+			Label {
+				Text(alertText)
+			} icon: {
+				Image(systemName: "exclamationmark.triangle.fill")
+					.symbolRenderingMode(.hierarchical)
+					.foregroundStyle(.orange)
+					.accessibilityHidden(true)
+			}
         }
-        .buttonStyle(.pressable)
-        .accessibilityLabel(alertText)
+		.accessibilityLabel(alertText)
     }
 
     private var alertText: String {
         alertCount == 1 ? "1 active disruption" : "\(alertCount) active disruptions"
     }
-}
-
-#Preview(traits: .sizeThatFitsLayout) {
-    AlertsSummaryRow(alertCount: 3)
-        .padding(.horizontal, 16)
 }

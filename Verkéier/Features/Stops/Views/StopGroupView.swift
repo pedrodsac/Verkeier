@@ -4,28 +4,15 @@ struct StopGroupView: View {
     let viewModel: StopGroupPresentationModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Choose a stop at this location")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(.secondary)
-
-            LazyVStack(spacing: 8) {
-                ForEach(viewModel.stops) { stop in
-                    StopListRow(
-                        stop: stop,
-                        markerColor: .blue,
-                        referenceLocation: viewModel.referenceLocation,
-                        routes: viewModel.routesByStopId[stop.id] ?? [],
-                        navigationValue: .stopDetail(stop)
-                    )
-                }
-
-                ForEach(viewModel.bikeShareStations) { station in
-                    BikeShareStationListRow(station: station)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
+		List(viewModel.stops) { stop in
+			NavigationLink(value: TransitSheetRoute.stopDetail(stop)) {
+				StopRow(
+					stop: stop,
+					routes: viewModel.routesByStopId[stop.id] ?? []
+				)
+			}
+		}
+		.listStyle(.plain)
     }
 }
 

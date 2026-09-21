@@ -9,6 +9,7 @@ struct TransitMapScreen: View {
     @AppStorage("debugTransitDataMode") var debugTransitDataModeRawValue =
         DebugTransitDataMode.normal.rawValue
     @Environment(\.routeService) var routeService
+    @Environment(\.walkingRouter) var walkingRouter
     @Environment(\.gtfsService) var gtfsService
     @Environment(\.liveTransitService) var liveTransitService
     @Environment(\.bikeShareService) private var bikeShareService
@@ -111,6 +112,7 @@ struct TransitMapScreen: View {
             viewModel.loadRoutePlanner()
             locationService.startUpdatingIfAllowed()
             viewModel.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: false)
+            (routeService as? MobiliteitRouteService)?.prepareForRouting()
             await bikeShareService.refreshStaticStations()
             await bikeShareService.refreshAvailability()
             bikeShareStations = await bikeShareService.snapshot()?.stations ?? []
@@ -118,7 +120,8 @@ struct TransitMapScreen: View {
             await viewModel.loadNearbyStops(
                 location: locationService.currentLocation,
                 using: liveTransitService,
-                gtfsService: gtfsService
+                gtfsService: gtfsService,
+                walkingRouter: walkingRouter
             )
             await viewModel.loadNearbyStopRoutes(using: gtfsService)
             await loadAlertsAndCheckDisruptions()
@@ -144,21 +147,23 @@ struct TransitMapScreen: View {
                 return
             }
             await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
+            await viewModel.updateSelectedStopRoutes(using: gtfsService)
             await updateTrackedDepartureIfNeeded()
 
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(45))
                 guard !Task.isCancelled else { return }
                 await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
+                await viewModel.updateSelectedStopRoutes(using: gtfsService)
                 await updateTrackedDepartureIfNeeded()
             }
         }
         .task(id: favouriteRefreshTaskKey) {
-            guard sheetNavigation.selectedTab == .favourites else { return }
+            guard sheetNavigation.selectedTab == .home else { return }
             await refreshFavouriteStops()
-            while !Task.isCancelled, sheetNavigation.selectedTab == .favourites {
+            while !Task.isCancelled, sheetNavigation.selectedTab == .home {
                 try? await Task.sleep(for: .seconds(45))
-                guard !Task.isCancelled, sheetNavigation.selectedTab == .favourites else { return }
+                guard !Task.isCancelled, sheetNavigation.selectedTab == .home else { return }
                 await refreshFavouriteStops()
             }
         }
@@ -275,7 +280,7 @@ struct TransitMapScreen: View {
     }
 
     var favouriteRefreshTaskKey: String {
-        "\(favouriteRefreshKey)|\(sheetNavigation.selectedTab == .favourites)|\(canLoadLiveFavouriteDepartures)"
+        "\(favouriteRefreshKey)|\(sheetNavigation.selectedTab == .home)|\(canLoadLiveFavouriteDepartures)"
     }
 
     var canLoadLiveFavouriteDepartures: Bool {

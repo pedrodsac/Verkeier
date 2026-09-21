@@ -6,12 +6,12 @@ struct StopDetailPresentationModel {
     let departures: [Departure]
     let offlineScheduledDepartures: [OfflineScheduleDeparture]
     let alerts: [AlertMessage]
-    let availablePlatforms: [String]
     let selectedLine: String?
     let selectedPlatform: String?
     let departureBoardFilter: TransitBoardFilter
     let isLoadingDepartures: Bool
     let errorMessage: String?
+    let liveErrorMessage: String?
     let lastUpdated: Date?
     let isStale: Bool
     let isFavourite: Bool
@@ -27,12 +27,12 @@ struct StopDetailPresentationModel {
         departures: [Departure],
         offlineScheduledDepartures: [OfflineScheduleDeparture],
         alerts: [AlertMessage],
-        availablePlatforms: [String],
         selectedLine: String?,
         selectedPlatform: String?,
         departureBoardFilter: TransitBoardFilter = TransitBoardFilter(),
         isLoadingDepartures: Bool,
         errorMessage: String?,
+        liveErrorMessage: String? = nil,
         lastUpdated: Date?,
         isStale: Bool,
         isFavourite: Bool,
@@ -47,12 +47,12 @@ struct StopDetailPresentationModel {
         self.departures = departures
         self.offlineScheduledDepartures = offlineScheduledDepartures
         self.alerts = alerts
-        self.availablePlatforms = availablePlatforms
         self.selectedLine = selectedLine
         self.selectedPlatform = selectedPlatform
         self.departureBoardFilter = departureBoardFilter
         self.isLoadingDepartures = isLoadingDepartures
         self.errorMessage = errorMessage
+        self.liveErrorMessage = liveErrorMessage
         self.lastUpdated = lastUpdated
         self.isStale = isStale
         self.isFavourite = isFavourite
@@ -63,55 +63,162 @@ struct StopDetailPresentationModel {
         self.departureReminderErrorMessage = departureReminderErrorMessage
     }
 
-    var mergedDepartures: [Departure] {
-        let lineFiltered: [Departure]
-        if let selectedLine,
-           let route = routes.first(where: { $0.id == selectedLine }) {
-            lineFiltered = departures.filter { departure in
-                departure.routeId?.caseInsensitiveCompare(route.id) == .orderedSame
-                    || departure.lineName.caseInsensitiveCompare(route.shortName) == .orderedSame
-            }
-        } else {
-            lineFiltered = departures
-        }
-
-        guard let selectedPlatform else { return lineFiltered }
-        return lineFiltered.filter { $0.platform == selectedPlatform }
+    private var board: DepartureBoardPresentation {
+        DepartureBoardPresentation(
+            stopID: stop?.id ?? "",
+            routes: routes,
+            liveDepartures: departures,
+            scheduledDepartures: offlineScheduledDepartures,
+            selectedLine: selectedLine,
+            selectedPlatform: selectedPlatform
+        )
     }
 
-    /// GTFS rows intentionally remain distinct from HAFAS rows. A matching
-    /// realtime candidate may be overlaid by the router in the future, but a
-    /// static schedule must never be silently presented as live information.
+    var availablePlatforms: [String] { board.availablePlatforms }
+
+    var mergedDepartures: [Departure] {
+        board.visibleLiveDepartures
+    }
+
+    /// Timetable rows which are not already represented by the live board.
+    ///
+    /// HAFAS and GTFS use different IDs for the same journey, so an ID check
+    /// alone is not enough. A scheduled time, line, and destination form the
+    /// stable rider-facing identity shared by both feeds. The API row always
+    /// wins: it carries the live status and is the row users can track.
     var scheduledDepartures: [Departure] {
-        let values = offlineScheduledDepartures.map { scheduled in
+        board.visibleScheduledDepartures
+    }
+
+    /// The one list shown on a stop board: live rows first when a live and
+    /// scheduled row describe the same trip, followed by timetable-only rows
+    /// in departure-time order.
+    var displayedDepartures: [Departure] {
+        board.visibleDepartures
+    }
+
+    var isShowingScheduledFallback: Bool {
+        liveErrorMessage != nil && departures.isEmpty && !displayedDepartures.isEmpty
+    }
+}
+
+/// Pure source-merging and filtering for a stop departure board.
+private struct DepartureBoardPresentation {
+    let routes: [TransitRoute]
+    let selectedLine: String?
+    let selectedPlatform: String?
+    let liveDepartures: [Departure]
+    let scheduledDepartures: [Departure]
+
+    init(
+        stopID: String,
+        routes: [TransitRoute],
+        liveDepartures: [Departure],
+        scheduledDepartures: [OfflineScheduleDeparture],
+        selectedLine: String?,
+        selectedPlatform: String?
+    ) {
+        self.routes = routes
+        self.selectedLine = selectedLine
+        self.selectedPlatform = selectedPlatform
+        let uniqueLiveDepartures = Self.unique(liveDepartures)
+        self.liveDepartures = uniqueLiveDepartures
+
+        let scheduled = scheduledDepartures.map { departure in
             Departure(
-                id: scheduled.id,
-                stopId: stop?.id ?? "",
-                lineName: scheduled.lineName,
-                destination: scheduled.destination,
-                scheduledDeparture: scheduled.departureDate,
-                platform: scheduled.platform,
+                id: departure.id,
+                stopId: stopID,
+                lineName: departure.lineName,
+                destination: departure.destination,
+                scheduledDeparture: departure.departureDate,
+                platform: departure.platform,
                 dataSource: .gtfs
             )
         }
-        let lineFiltered: [Departure]
-        if let selectedLine,
-           let route = routes.first(where: { $0.id == selectedLine }) {
-            lineFiltered = values.filter {
-                $0.routeId?.caseInsensitiveCompare(route.id) == .orderedSame
-                    || $0.lineName.caseInsensitiveCompare(route.shortName) == .orderedSame
+        self.scheduledDepartures = Self.unique(scheduled).filter { scheduled in
+            !uniqueLiveDepartures.contains { live in
+                live.representsSameScheduledJourney(as: scheduled)
             }
-        } else {
-            lineFiltered = values
+        }
+    }
+
+    var availablePlatforms: [String] {
+        var seen: Set<String> = []
+        return lineFiltered(liveDepartures + scheduledDepartures)
+            .compactMap { departure in
+                guard let platform = departure.platform?.trimmingCharacters(in: .whitespacesAndNewlines),
+                      !platform.isEmpty,
+                      seen.insert(platform).inserted else { return nil }
+                return platform
+            }
+            .sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+    }
+
+    var visibleLiveDepartures: [Departure] { visible(liveDepartures) }
+    var visibleScheduledDepartures: [Departure] { visible(scheduledDepartures) }
+
+    var visibleDepartures: [Departure] {
+        (visibleLiveDepartures + visibleScheduledDepartures)
+            .enumerated()
+            .sorted { lhs, rhs in
+                let lhsTime = lhs.element.realtimeDeparture ?? lhs.element.scheduledDeparture ?? .distantFuture
+                let rhsTime = rhs.element.realtimeDeparture ?? rhs.element.scheduledDeparture ?? .distantFuture
+                return lhsTime == rhsTime ? lhs.offset < rhs.offset : lhsTime < rhsTime
+            }
+            .map(\.element)
+    }
+
+    private func visible(_ departures: [Departure]) -> [Departure] {
+        lineFiltered(departures).filter { departure in
+            guard let selectedPlatform else { return true }
+            return departure.platform == selectedPlatform
+        }
+    }
+
+    private func lineFiltered(_ departures: [Departure]) -> [Departure] {
+        guard let selectedLine,
+              let route = routes.first(where: { $0.id == selectedLine }) else {
+            return departures
+        }
+        return departures.filter { departure in
+            departure.routeId?.caseInsensitiveCompare(route.id) == .orderedSame
+                || departure.lineName.caseInsensitiveCompare(route.shortName) == .orderedSame
+        }
+    }
+
+    private static func unique(_ departures: [Departure]) -> [Departure] {
+        var result: [Departure] = []
+        for departure in departures where !result.contains(where: {
+            $0.representsSameScheduledJourney(as: departure)
+        }) {
+            result.append(departure)
+        }
+        return result
+    }
+}
+
+private extension Departure {
+    /// Live predictions can move, but their planned time identifies the
+    /// scheduled service. Accept a one-minute tolerance because the feeds can
+    /// disagree on seconds while still describing the same departure.
+    func representsSameScheduledJourney(as other: Departure) -> Bool {
+        if id == other.id { return true }
+
+        guard lineName.normalizedForSearch == other.lineName.normalizedForSearch,
+              destination.normalizedForSearch == other.destination.normalizedForSearch,
+              let scheduledDeparture,
+              let otherScheduledDeparture = other.scheduledDeparture
+        else {
+            return false
         }
 
-        guard let selectedPlatform else { return lineFiltered }
-        return lineFiltered.filter { $0.platform == selectedPlatform }
+        return abs(scheduledDeparture.timeIntervalSince(otherScheduledDeparture)) <= 60
     }
 }
 
 /// Callbacks the stop-detail sheet needs, sliced from ``TransitSheetActions``.
 struct StopDetailActions {
+    var showDirections: () -> Void = {}
     var startTrackingDeparture: (Departure) -> Void = { _ in }
     var stopTrackingDeparture: () -> Void = {}
     var scheduleDepartureReminder: (Departure, Int) -> Void = { _, _ in }
@@ -124,6 +231,7 @@ struct StopDetailActions {
 extension StopDetailActions {
     init(from actions: TransitSheetActions) {
         self.init()
+        showDirections = actions.showDirections
         startTrackingDeparture = actions.startTrackingDeparture
         stopTrackingDeparture = actions.stopTrackingDeparture
         scheduleDepartureReminder = actions.scheduleDepartureReminder

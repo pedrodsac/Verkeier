@@ -5,11 +5,7 @@ struct DepartureBoardView: View {
     let actions: StopDetailActions
 
     private var departures: [Departure] {
-        viewModel.mergedDepartures
-    }
-
-    private var scheduledDepartures: [Departure] {
-        viewModel.scheduledDepartures
+        viewModel.displayedDepartures
     }
 
     private var isLoading: Bool {
@@ -29,9 +25,9 @@ struct DepartureBoardView: View {
     }
 
     var body: some View {
-        if isLoading, departures.isEmpty, scheduledDepartures.isEmpty {
+        if isLoading, departures.isEmpty {
             DepartureLoadingCard(title: "Loading departures")
-        } else if departures.isEmpty, scheduledDepartures.isEmpty {
+        } else if departures.isEmpty {
             if let errorMessage {
                 CompactUnavailableCard(
                     title: "Departures unavailable",
@@ -50,6 +46,21 @@ struct DepartureBoardView: View {
             let lastOfDayIDs = lastServiceDepartureIDs(in: departures)
 
             VStack(alignment: .leading, spacing: 8) {
+                if viewModel.isShowingScheduledFallback {
+                    Label(
+                        "Live updates unavailable · showing timetable",
+                        systemImage: "wifi.exclamationmark"
+                    )
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(.orange)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .background(
+                        .orange.opacity(0.12),
+                        in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    )
+                }
+
                 DepartureTrackingStatusCard(
                     trackedDeparture: trackedDeparture,
                     activeReminder: activeReminder,
@@ -70,52 +81,30 @@ struct DepartureBoardView: View {
                             .map { SharedDepartureTiming.isVisible($0, at: now) } ?? true
                     }
 
-                ScrollView {
-                    LazyVStack(spacing: 8) {
-                        if !departures.isEmpty {
-                            if !departed.isEmpty {
-                                DisclosureGroup("Recently departed") {
-									ForEach(Array(departed), id: \.self) { departure in
-                                        DepartureListRow(departure: departure, showsControls: false)
-                                            .opacity(0.55)
-                                    }
-                                }
-                                .disclosureGroupStyle(ChevronDisclosureGroupStyle())
-                                .font(.subheadline.weight(.semibold))
-                                .tint(.secondary)
-                            }
-
-							ForEach(upcoming, id: \.self) { departure in
-                                DepartureListRow(
-                                    departure: departure,
-                                    isTracked: departure.id == trackedDepartureId,
-                                    isLastOfDay: lastOfDayIDs.contains(departure.id),
-                                    activeReminder: activeReminder,
-                                    startTrackingDeparture: { actions.startTrackingDeparture(departure) },
-                                    stopTrackingDeparture: actions.stopTrackingDeparture,
-                                    scheduleReminder: { minutes in
-                                        actions.scheduleDepartureReminder(departure, minutes)
-                                    },
-                                    cancelReminder: actions.cancelDepartureReminder
-                                )
-                            }
-                        }
-
-                        if !scheduledDepartures.isEmpty {
-                            Label("Scheduled timetable", systemImage: "calendar")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.top, departures.isEmpty ? 0 : 12)
-
-                            ForEach(scheduledDepartures, id: \.self) { departure in
-                                DepartureListRow(departure: departure, showsControls: false)
-                            }
-                        }
+                LazyVStack(spacing: 8) {
+                    ForEach(Array(departed), id: \.id) { departure in
+                        DepartureListRow(departure: departure, showsControls: false)
+                            .opacity(0.55)
                     }
-					.safeAreaPadding(.top, 5)
-                    .padding(.bottom, 28)
+
+                    ForEach(upcoming, id: \.id) { departure in
+                        DepartureListRow(
+                            departure: departure,
+                            isTracked: departure.id == trackedDepartureId,
+                            isLastOfDay: lastOfDayIDs.contains(departure.id),
+                            showsControls: departure.dataSource != .gtfs,
+                            activeReminder: activeReminder,
+                            startTrackingDeparture: { actions.startTrackingDeparture(departure) },
+                            stopTrackingDeparture: actions.stopTrackingDeparture,
+                            scheduleReminder: { minutes in
+                                actions.scheduleDepartureReminder(departure, minutes)
+                            },
+                            cancelReminder: actions.cancelDepartureReminder
+                        )
+                    }
                 }
+                .safeAreaPadding(.top, 5)
+                .padding(.bottom, 28)
             }
         }
     }

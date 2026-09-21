@@ -114,7 +114,7 @@ actor FixtureLiveTransitService: LiveTransitService {
 
     func departureBoard(for stop: Stop, filter _: TransitBoardFilter) async throws -> [Departure] {
         if let error { throw error }
-        guard let stationID = stop.hafasStationIDs.first else {
+        guard let stationID = stop.hafasStationIDs.first ?? stop.gtfsStopID else {
             throw LiveTransitError.noLiveIdentifier
         }
         return boardsByStationID[stationID] ?? []

@@ -70,10 +70,9 @@ struct Stop: Codable, Hashable, Identifiable {
     /// has its own ATP departure board. Defaults to `[id]` when no distinct
     /// platforms are known.
     let platformIds: [String]
-    /// Identifier from the static GTFS feed. This intentionally remains
-    /// separate from the HAFAS identifiers used for live departure boards.
-    /// MobilitéitKit documents that the two identifier spaces are opaque and
-    /// must never be treated as interchangeable.
+    /// Identifier from the static GTFS feed. It remains distinct from an
+    /// opaque HAFAS identifier, although ATP currently accepts Luxembourg's
+    /// numeric GTFS stop IDs directly when no HAFAS identifier is available.
     let gtfsStopID: String?
     /// One or more opaque HAFAS station identifiers confidently associated
     /// with this canonical stop. A stop can retain no live identifier when the
@@ -219,13 +218,25 @@ struct Stop: Codable, Hashable, Identifiable {
 }
 
 extension Sequence where Element == Stop {
-    /// Keeps the first stop for each exact canonical name while preserving
-    /// the source order. This is for compact stop-choice surfaces; callers
-    /// should retain the original stops when their IDs or platforms matter.
+    /// Keeps the first stop for each exact canonical name and set of transport
+    /// modes while preserving the source order.
+    ///
+    /// Feed qualifiers such as "(Bus)" and "(Tram)" are intentionally removed
+    /// from ``Stop/name`` for presentation. Including the modes in the key keeps
+    /// those otherwise-identically-named stops distinct on the map.
     nonisolated func deduplicatedByExactName() -> [Stop] {
-        var seenNames = Set<String>()
-        return filter { seenNames.insert($0.name).inserted }
+        var seenStops = Set<StopNameDeduplicationKey>()
+        return filter {
+            seenStops.insert(
+                StopNameDeduplicationKey(name: $0.name, modes: Set($0.modes))
+            ).inserted
+        }
     }
+}
+
+private nonisolated struct StopNameDeduplicationKey: Hashable {
+    let name: String
+    let modes: Set<TransportMode>
 }
 
 private extension [String] {

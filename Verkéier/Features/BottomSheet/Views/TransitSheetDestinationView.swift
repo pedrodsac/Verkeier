@@ -12,21 +12,17 @@ struct TransitSheetDestinationView: View {
     var body: some View {
         switch route {
         case .search:
-            SearchView(
-                query: $searchQuery,
-                viewModel: viewModel.search,
-                actions: SearchActions(from: actions)
-            )
+			SearchResultsContent(
+				query: $searchQuery,
+				viewModel: viewModel.search,
+				actions: SearchActions(from: actions)
+			)
             .safeAreaPadding(.horizontal, 16)
             .padding(.top, searchContentTopPadding)
         case .stopGroup:
-            ScrollView {
-                StopGroupView(viewModel: viewModel.stopGroup)
-                    .padding(.horizontal, 16)
-            }
+			StopGroupView(viewModel: viewModel.stopGroup)
             .navigationTitle(route.navigationTitle)
             .toolbarTitleDisplayMode(.inline)
-
         case .stopDetail:
             ScrollView {
                 StopDetailView(
