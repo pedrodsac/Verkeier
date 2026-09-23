@@ -90,6 +90,17 @@ struct MobiliteitLiveTransitService: LiveTransitService {
 
     var isConfigured: Bool { proxyURL != nil }
 
+    /// The same configured client is shared with realtime journey routing so
+    /// departure boards and RAPTOR patches use one relay contract.
+    var realtimeRoutingClient: MobiliteitAPIClient? {
+        guard let proxyURL else { return nil }
+        return MobiliteitAPIClient(
+            apiKey: "",
+            baseURL: proxyURL.appendingPathComponent("atp"),
+            session: session
+        )
+    }
+
     func nearbyStops(to location: LocationPoint, radiusMeters: Int, limit: Int) async throws -> [LiveTransitStop] {
         guard proxyURL != nil else { throw LiveTransitError.notConfigured }
         let stops = try await client.nearbyStops(
@@ -150,18 +161,14 @@ struct MobiliteitLiveTransitService: LiveTransitService {
     }
 
     private var client: MobiliteitAPIClient {
-        guard let proxyURL else {
+        guard let realtimeRoutingClient else {
             return MobiliteitAPIClient(
                 apiKey: "",
                 baseURL: MobiliteitAPIClient.defaultBaseURL,
                 session: session
             )
         }
-        return MobiliteitAPIClient(
-            apiKey: "",
-            baseURL: proxyURL.appendingPathComponent("atp"),
-            session: session
-        )
+        return realtimeRoutingClient
     }
 
     private var language: String { Locale.current.language.languageCode?.identifier ?? "en" }

@@ -39,7 +39,7 @@ struct VerkéierApp: App {
         }
         let routeService = MobiliteitRouteService(
             gtfsService: gtfsService,
-            liveTransitService: liveTransitService,
+            realtimeClient: liveTransitService.realtimeRoutingClient,
             walkingRouter: walkingRouter,
             roadRouteProvider: LocalFirstRoadRouteProvider(walkingRouter: walkingRouter)
         )

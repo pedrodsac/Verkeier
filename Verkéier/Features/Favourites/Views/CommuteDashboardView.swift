@@ -1,9 +1,6 @@
 import SwiftUI
-import UIKit
 
 struct CommuteDashboardView: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
     enum DisplayStyle {
         case regular
         case mapsMedium
@@ -56,6 +53,7 @@ struct CommuteDashboardView: View {
             }
         }
         .listStyle(.insetGrouped)
+		.listSectionSpacing(16)
 		.scrollIndicators(.hidden)
         .sheet(item: $editingFavourite, onDismiss: restoreEditedFavouriteFocus) { favourite in
             FavouriteLabelsEditor(
@@ -70,7 +68,7 @@ struct CommuteDashboardView: View {
 
     private var favouritesSection: some View {
         carouselSection("Favourites") {
-			stopCarousel(favouriteColumns, favorite: true) { favourite in
+			pagedListSection(favouritesViewModel.stops, favorite: true) { favourite in
                 favouriteStopRow(favourite)
             }
         }
@@ -92,7 +90,7 @@ struct CommuteDashboardView: View {
                     systemImage: "mappin.slash"
                 )
             } else {
-                stopCarousel(nearbyStopColumns) { stop in
+                pagedListSection(Array(viewModel.nearby.stops.prefix(6))) { stop in
                     stopNavigationRow(
                         stop,
                         routes: viewModel.nearby.routesByStopId[stop.id] ?? []
@@ -109,7 +107,7 @@ struct CommuteDashboardView: View {
 
     private var recentsSection: some View {
         carouselSection("Recents") {
-            stopCarousel(recentStopColumns) { stop in
+            pagedListSection(viewModel.recentStops) { stop in
                 stopNavigationRow(stop)
             }
         }
@@ -128,58 +126,30 @@ struct CommuteDashboardView: View {
         .listSectionMargins(.horizontal, 0)
     }
 
-    private func stopCarousel<Item, Row: View>(
-        _ columns: [[Item]],
+    private func pagedListSection<Item, Row: View>(
+        _ items: [Item],
 		favorite: Bool = false,
         @ViewBuilder row: @escaping (Item) -> Row
     ) -> some View {
-        ScrollView(.horizontal) {
-            LazyHStack(alignment: .top, spacing: 12) {
-                ForEach(Array(columns.enumerated()), id: \.offset) { _, items in
-                    VStack(spacing: 0) {
-                        ForEach(items.indices, id: \.self) { index in
-                            row(items[index])
-
-                            if index < items.index(before: items.endIndex) {
-                                Divider()
-                                    .padding(.leading, 58)
-                            }
-                        }
-                    }
-                    .containerRelativeFrame(.horizontal) { width, _ in
-                        width - 24
-                    }
-                    .background(
-                        Color(uiColor: .secondarySystemGroupedBackground),
-                        in: .rect(cornerRadius: 24, style: .continuous)
-                    )
-                }
-            }
-            .scrollTargetLayout()
-            .background(FastScrollDecelerationConfigurator())
-        }
-        .safeAreaPadding(.horizontal, 16)
-        .scrollIndicators(.hidden)
-        .scrollTargetBehavior(CarouselColumnScrollTargetBehavior())
-        .listRowInsets(EdgeInsets())
-        .listRowBackground(Color.clear)
-        .listRowSeparator(.hidden)
+		PagedListSection(items: items, row: row, favorite: favorite)
+            .listRowInsets(EdgeInsets())
+			.listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
     }
 
     private func stopNavigationRow(_ stop: Stop, routes: [TransitRoute] = []) -> some View {
         NavigationLink(value: TransitSheetRoute.stopDetail(stop)) {
-            carouselRowLabel(stop: stop, routes: routes)
+            StopRow(stop: stop, routes: routes)
         }
-        .buttonStyle(.plain)
     }
 
     private func favouriteStopRow(_ favourite: FavouriteStopPresentationModel) -> some View {
         Button {
             favouritesActions.openStop(favourite.stop)
         } label: {
-            carouselRowLabel(stop: favourite.stop)
+            StopRow(stop: favourite.stop)
         }
-        .buttonStyle(.plain)
+		.foregroundStyle(.primary)
         .accessibilityFocused($focusedFavouriteID, equals: favourite.id)
         .accessibilityHint("Opens departures for this stop")
         .accessibilityAction(named: "Plan to \(favourite.stop.displayName)") {
@@ -190,41 +160,6 @@ struct CommuteDashboardView: View {
         }
         .contextMenu {
             favouriteContextMenu(for: favourite)
-        }
-    }
-
-    private func carouselRowLabel(
-        stop: Stop,
-        routes: [TransitRoute] = []
-    ) -> some View {
-        HStack(spacing: 8) {
-            StopRow(stop: stop, routes: routes)
-
-            Image(systemName: "chevron.forward")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.tertiary)
-                .accessibilityHidden(true)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .contentShape(Rectangle())
-    }
-
-    private var nearbyStopColumns: [[Stop]] {
-        chunked(Array(viewModel.nearby.stops.prefix(6)))
-    }
-
-    private var favouriteColumns: [[FavouriteStopPresentationModel]] {
-        chunked(favouritesViewModel.stops)
-    }
-
-    private var recentStopColumns: [[Stop]] {
-        chunked(viewModel.recentStops)
-    }
-
-    private func chunked<Item>(_ items: [Item]) -> [[Item]] {
-        stride(from: 0, to: items.count, by: 3).map { startIndex in
-            Array(items[startIndex..<min(startIndex + 3, items.count)])
         }
     }
 
@@ -280,54 +215,84 @@ struct CommuteDashboardView: View {
     }
 }
 
-private struct CarouselColumnScrollTargetBehavior: ScrollTargetBehavior {
-    private let viewAligned = ViewAlignedScrollTargetBehavior()
+/// A horizontally paged sequence of native inset-grouped list sections.
+///
+/// A `Section` gets its grouped styling only when hosted by a `List`, so each
+/// page owns a small, non-scrolling list rather than recreating rows manually.
+private struct PagedListSection<Item, Row: View>: View {
+    private let items: [Item]
+    private let row: (Item) -> Row
+    /// Leaves 16pt of the next inset-grouped section visible after accounting
+    /// for that list's own 16pt leading margin.
+    private let pagePeekWidth: CGFloat = 16
 
-    func updateTarget(_ target: inout ScrollTarget, context: TargetContext) {
-        viewAligned.updateTarget(&target, context: context)
+	@ScaledMetric(relativeTo: .body) private var standardRowHeight: CGFloat = 50
+	@ScaledMetric(relativeTo: .body) private var sectionVerticalMargins: CGFloat = 50
+	
+	let favorite: Bool
 
-        let edgeTolerance: CGFloat = 1
-        let columnRect = target.rect
-        let maximumOffset = max(0, context.contentSize.width - context.containerSize.width)
-        let proposedOffset: CGFloat
+	init(items: [Item], @ViewBuilder row: @escaping (Item) -> Row, favorite: Bool = false) {
+        self.items = items
+        self.row = row
+		self.favorite = favorite
+    }
 
-        if columnRect.minX <= edgeTolerance {
-            proposedOffset = 0
-        } else if columnRect.maxX >= context.contentSize.width - edgeTolerance {
-            proposedOffset = maximumOffset
-        } else {
-            proposedOffset = columnRect.midX - (context.containerSize.width / 2)
+    private var pages: [[Item]] {
+        stride(from: 0, to: items.count, by: 3).map { startIndex in
+            Array(items[startIndex..<min(startIndex + 3, items.count)])
         }
-
-        target.rect.origin.x = min(max(0, proposedOffset), maximumOffset)
-        target.anchor = .topLeading
-    }
-}
-
-private struct FastScrollDecelerationConfigurator: UIViewRepresentable {
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView(frame: .zero)
-        view.isUserInteractionEnabled = false
-        configureScrollView(containing: view)
-        return view
     }
 
-    func updateUIView(_ uiView: UIView, context: Context) {
-        configureScrollView(containing: uiView)
+    private var hasMultiplePages: Bool {
+        pages.count > 1
     }
 
-    private func configureScrollView(containing view: UIView) {
-        DispatchQueue.main.async {
-            var ancestor = view.superview
+    private var pageSpacing: CGFloat {
+        hasMultiplePages ? -16 : 0
+    }
 
-            while let currentView = ancestor {
-                if let scrollView = currentView as? UIScrollView {
-                    scrollView.decelerationRate = .fast
-                    return
+    private var pageWidthReduction: CGFloat {
+        hasMultiplePages ? pagePeekWidth : 0
+    }
+
+    /// Three standard dashboard rows plus the native grouped-section margins.
+    /// `@ScaledMetric` lets this grow alongside Dynamic Type.
+    private var pageHeight: CGFloat {
+        (standardRowHeight * 3) + sectionVerticalMargins
+    }
+
+    var body: some View {
+        ScrollView(.horizontal) {
+            // The overlap reclaims the inner lists' adjoining 16pt margins:
+            // cards gain 16pt without losing the next-card preview. A lone
+            // page uses the full width because there is nothing to preview.
+            LazyHStack(spacing: pageSpacing) {
+                ForEach(pages.indices, id: \.self) { index in
+                    List {
+                        Section {
+                            ForEach(pages[index].indices, id: \.self) { itemIndex in
+                                row(pages[index][itemIndex])
+                            }
+                        }
+						.listRowBackground(favorite ? Color.yellow.opacity(0.12) : nil)
+                    }
+                    .listStyle(.insetGrouped)
+                    .scrollDisabled(true)
+                    .scrollContentBackground(.hidden)
+                    // The nested list otherwise adds a scroll-content inset
+                    // above its section, leaving a gap below the outer header
+                    // and consuming the space reserved for the third row.
+                    .contentMargins(.top, 0, for: .scrollContent)
+                    .frame(height: pageHeight)
+                    .containerRelativeFrame(.horizontal) { width, _ in
+                        max(0, width - pageWidthReduction)
+                    }
                 }
-
-                ancestor = currentView.superview
             }
+            .scrollTargetLayout()
         }
+        .frame(height: pageHeight)
+        .scrollTargetBehavior(ViewAlignedScrollTargetBehavior(limitBehavior: .alwaysByOne))
+        .scrollIndicators(.hidden)
     }
 }

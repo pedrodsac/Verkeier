@@ -46,7 +46,7 @@ extension EnvironmentValues {
 | `ATPClient` | `LiveATPClient` | `ATPMockClient`, `EmptyATPClient` |
 | `GTFSService` | `LocalGTFSService` | `LocalGTFSService` with fixture data |
 | `AVLClient` | `LiveAVLClient` | `MockAVLClient`, `EmptyAVLClient` |
-| `RouteService` | `PublicTransportRouteService` | `MapKitRouteService` (MapKit-only fallback) |
+| `RouteService` | `MobiliteitRouteService` | `MapKitRouteService` (MapKit-only fallback) |
 
 `GTFSUpdateController`, `LiveActivityManager`, and `DepartureReminderService`
 are concrete `@Observable` classes with no protocol; test them via their
@@ -124,7 +124,8 @@ protocol RouteService: Sendable {
     nonisolated func calculateRoute(
         from: LocationPoint, to: LocationPoint,
         time: RoutePlanningTime, filters: RoutePlannerFilters,
-        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy,
+        page: RouteSearchPage
     ) async throws -> RouteCalculation
 
     @MainActor func openInAppleMaps(from: LocationPoint, to: LocationPoint)
@@ -135,6 +136,7 @@ protocol RouteService: Sendable {
 //   calculateRoute(from:to:time:)     → default filters
 
 enum RouteRealtimeRefreshPolicy {
+    case scheduleOnly
     case useCache
     case forceRefresh
 }
@@ -150,11 +152,19 @@ enum RoutingError: Error, Equatable {
 `RouteOption` wraps a `RoutePlan` and computed properties: `transferCount`,
 `walkingDistanceMeters`, `usesLiveData`, `realtimeCoverage`, `status(at:)`.
 
-`PublicTransportRouteService` coordinates one active calculation at a time;
-starting a newer request cancels the previous one. Internally, the actor-owned
-routing engine uses bounded structured concurrency (four CPU/search workers,
-four realtime-board requests, and four road-geometry requests by default).
-Tests can inject `RouteCalculationConcurrency.serial` or custom limits.
+`MobiliteitRouteService` keeps a MobiliteitKit `TransitRouter` and
+`HafasRealtimeRoutingProvider` paired to the active GTFS database generation.
+When that generation changes, both are rebuilt. A new calculation or explicit
+refresh bypasses the 60-second HAFAS board cache; earlier/later paging reuses
+covered snapshots. Live acquisition is capped at four concurrent board
+requests and a four-second deadline within the route calculation's overall
+15-second UI deadline. Failure, timeout, missing proxy configuration, and
+ambiguous HAFAS-to-GTFS matches all preserve valid schedule-only results.
+
+Realtime data is applied before RAPTOR selects a journey. Walking access,
+boardability, transfers, dominance, arrival times, and route ordering therefore
+use effective times. Reported boarding predictions remain observed, while a
+known delay propagated to later vehicle stops is marked estimated.
 
 `BikeShareService` provides vel’OH! static station data and on-demand dynamic
 availability. The public-transport routing engine merges direct bike journeys

@@ -10,7 +10,6 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
     private nonisolated static let previewSearchHorizon: TimeInterval = 30 * 60
     let databaseURL: URL
     private let gtfsService: (any GTFSService)?
-    private let liveTransitService: (any LiveTransitService)?
     private let engine: MobiliteitRouteEngine
     private let roadRouteProvider: any RoadRouteProviding
     private let appleMaps = MapKitRouteService()
@@ -18,16 +17,16 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
     init(
         databaseURL: URL = MobiliteitGTFSService.installedDatabaseURL,
         gtfsService: (any GTFSService)? = nil,
-        liveTransitService: (any LiveTransitService)? = nil,
+        realtimeClient: MobiliteitAPIClient? = nil,
         engine: MobiliteitRouteEngine? = nil,
         walkingRouter: any WalkingRouting = StraightLineWalkingRouter(),
         roadRouteProvider: any RoadRouteProviding = MapKitRoadRouteProvider()
     ) {
         self.databaseURL = databaseURL
         self.gtfsService = gtfsService
-        self.liveTransitService = liveTransitService
         self.engine = engine ?? MobiliteitRouteEngine(
-            walkingProvider: LocalFirstWalkingRoutingProvider(walkingRouter: walkingRouter)
+            walkingProvider: LocalFirstWalkingRoutingProvider(walkingRouter: walkingRouter),
+            realtimeClient: realtimeClient
         )
         self.roadRouteProvider = roadRouteProvider
     }
@@ -60,9 +59,10 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             to: to,
             searchAnchor: searchAnchor,
             filters: filters,
-            page: page
+            page: page,
+            realtimeRefreshPolicy: realtimeRefreshPolicy
         )
-        return await fullyEnrichedCalculation(to: calculation, policy: realtimeRefreshPolicy)
+        return await addingTransitGeometry(to: calculation)
     }
 
     nonisolated func routeCalculationUpdates(
@@ -108,7 +108,8 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                         origin: Self.journeyEndpoint(for: from),
                         destination: Self.journeyEndpoint(for: to),
                         departureTime: anchor,
-                        preferences: preferences(filters)
+                        preferences: preferences(filters),
+                        realtimePolicy: realtimePolicy(for: realtimeRefreshPolicy)
                     ))
 
                     var published = false
@@ -137,23 +138,12 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                         stage: .final
                     ) {
                         published = true
-                        // Publish the complete scheduled profile immediately.
-                        // Geometry and live boards are independent and run in
-                        // parallel from this point.
+                        // Realtime was already applied during the RAPTOR scan.
+                        // Geometry remains independent and can arrive later.
                         continuation.yield(finalCalculation)
-                        async let shapes = transitShapes(for: finalCalculation)
-                        var latest = finalCalculation
-
-                        for await enriched in realtimeDisplayUpdates(
-                            to: finalCalculation,
-                            policy: realtimeRefreshPolicy
-                        ) {
-                            latest = enriched
-                            continuation.yield(enriched)
-                        }
-                        let resolvedShapes = await shapes
+                        let resolvedShapes = await transitShapes(for: finalCalculation)
                         if !resolvedShapes.isEmpty {
-                            continuation.yield(applyingTransitGeometry(resolvedShapes, to: latest))
+                            continuation.yield(applyingTransitGeometry(resolvedShapes, to: finalCalculation))
                         }
                     }
                     if published {
@@ -303,61 +293,6 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         return activeDatabaseURL
     }
 
-    /// Route choice is always produced by the static GTFS/RAPTOR search above.
-    /// Live boards are joined afterwards and only annotate the chosen timetable
-    /// legs for presentation (updated time, delay, cancellation and platform).
-    private nonisolated func addingRealtimeDisplayData(
-        to calculation: RouteCalculation,
-        policy: RouteRealtimeRefreshPolicy
-    ) async -> RouteCalculation {
-        guard policy != .scheduleOnly,
-              let liveTransitService
-        else { return calculation }
-
-        let enricher = RouteRealtimeEnricher(liveTransitService: liveTransitService)
-        let optionCount = calculation.options.count
-        let enriched = await enricher.enrich(calculation.options + calculation.supplementalOptions)
-        return RouteCalculation(
-            options: Array(enriched.prefix(optionCount)),
-            supplementalOptions: Array(enriched.dropFirst(optionCount)),
-            invalidatedOptionIDs: calculation.invalidatedOptionIDs,
-            stage: calculation.stage,
-            selectedOptionID: calculation.selectedOptionID
-        )
-    }
-
-    /// Streams partial live overlays so one slow departure board cannot delay
-    /// every route card. Static route choice and ordering remain untouched.
-    private nonisolated func realtimeDisplayUpdates(
-        to calculation: RouteCalculation,
-        policy: RouteRealtimeRefreshPolicy
-    ) -> AsyncStream<RouteCalculation> {
-        guard policy != .scheduleOnly,
-              let liveTransitService
-        else {
-            return AsyncStream { continuation in continuation.finish() }
-        }
-
-        let optionCount = calculation.options.count
-        let allOptions = calculation.options + calculation.supplementalOptions
-        let enricher = RouteRealtimeEnricher(liveTransitService: liveTransitService)
-        return AsyncStream { continuation in
-            let task = Task {
-                for await enriched in enricher.updates(for: allOptions) {
-                    continuation.yield(RouteCalculation(
-                        options: Array(enriched.prefix(optionCount)),
-                        supplementalOptions: Array(enriched.dropFirst(optionCount)),
-                        invalidatedOptionIDs: calculation.invalidatedOptionIDs,
-                        stage: calculation.stage,
-                        selectedOptionID: calculation.selectedOptionID
-                    ))
-                }
-                continuation.finish()
-            }
-            continuation.onTermination = { @Sendable _ in task.cancel() }
-        }
-    }
-
     /// Adds the GTFS trip shape to transit legs. The routing engine deliberately
     /// keeps shape data out of its in-memory search snapshot, so presentation
     /// geometry is loaded only for the handful of journeys that are displayed.
@@ -365,16 +300,6 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         to calculation: RouteCalculation
     ) async -> RouteCalculation {
         applyingTransitGeometry(await transitShapes(for: calculation), to: calculation)
-    }
-
-    private nonisolated func fullyEnrichedCalculation(
-        to calculation: RouteCalculation,
-        policy: RouteRealtimeRefreshPolicy
-    ) async -> RouteCalculation {
-        async let shapesTask = transitShapes(for: calculation)
-        async let realtimeTask = addingRealtimeDisplayData(to: calculation, policy: policy)
-        let (shapes, realtime) = await (shapesTask, realtimeTask)
-        return applyingTransitGeometry(shapes, to: realtime)
     }
 
     private nonisolated func transitShapes(
@@ -434,14 +359,16 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         to: LocationPoint,
         searchAnchor: Date,
         filters: RoutePlannerFilters,
-        page: RouteSearchPage
+        page: RouteSearchPage,
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy
     ) async throws -> RouteCalculation {
         do {
             let session = try await router.makeSession(for: RouteQuery(
                 origin: Self.journeyEndpoint(for: from),
                 destination: Self.journeyEndpoint(for: to),
                 departureTime: searchAnchor,
-                preferences: preferences(filters)
+                preferences: preferences(filters),
+                realtimePolicy: realtimePolicy(for: realtimeRefreshPolicy)
             ))
             let journeyPage = try await session.initial(count: max(page.resultLimit, 5))
             guard let calculation = calculation(
@@ -500,6 +427,19 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         )
     }
 
+    private nonisolated func realtimePolicy(
+        for policy: RouteRealtimeRefreshPolicy
+    ) -> MobiliteitKit.RealtimePolicy {
+        switch policy {
+        case .scheduleOnly:
+            .disabled
+        case .useCache:
+            .bestEffort(refresh: .useCache)
+        case .forceRefresh:
+            .bestEffort(refresh: .forceRefresh)
+        }
+    }
+
     private nonisolated func option(
         from journey: MobiliteitKit.Journey,
         origin: LocationPoint,
@@ -517,10 +457,16 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                     roadRoutingHint: walk.source == .provider ? .walking : .none
                 )
             case let .transit(transit):
-                let delayed = transit.effectiveDeparture > transit.scheduledDeparture || transit.effectiveArrival > transit.scheduledArrival
-                return RoutePlan.Leg(
+                let departureIsRealtime = transit.board.timingSource != .scheduled
+                let arrivalIsRealtime = transit.alight.timingSource != .scheduled
+                let usesRealtime = departureIsRealtime || arrivalIsRealtime
+                let delaySeconds = transit.effectiveDeparture.timeIntervalSince(
+                    transit.scheduledDeparture
+                )
+                let delayed = usesRealtime && delaySeconds > 0
+                var result = RoutePlan.Leg(
                     id: "transit-\(transit.tripID)-\(transit.board.stop.id)-\(transit.alight.stop.id)",
-                    mode: mode(transit.route.type), transportKind: .transit,
+                    mode: Self.mode(forGTFSRouteType: transit.route.type), transportKind: .transit,
                     routeName: transit.route.shortName ?? transit.route.longName,
                     headsign: transit.headsign, routeId: transit.route.id, tripId: transit.tripID,
                     originStopId: transit.board.stop.id, destinationStopId: transit.alight.stop.id,
@@ -528,12 +474,15 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                     origin: point(transit.board.stop), destination: point(transit.alight.stop),
                     departureTime: transit.effectiveDeparture, arrivalTime: transit.effectiveArrival,
                     scheduledDepartureTime: transit.scheduledDeparture, scheduledArrivalTime: transit.scheduledArrival,
-                    realtimeDepartureTime: delayed ? transit.effectiveDeparture : nil,
-                    realtimeArrivalTime: delayed ? transit.effectiveArrival : nil,
+                    realtimeDepartureTime: departureIsRealtime ? transit.effectiveDeparture : nil,
+                    realtimeArrivalTime: arrivalIsRealtime ? transit.effectiveArrival : nil,
                     platform: transit.board.platform,
-                    delayMinutes: delayed ? Int(transit.effectiveDeparture.timeIntervalSince(transit.scheduledDeparture) / 60) : nil,
-                    liveStatus: delayed ? .delayed : .scheduled
+                    delayMinutes: departureIsRealtime ? Int((delaySeconds / 60).rounded()) : nil,
+                    liveStatus: usesRealtime ? (delayed ? .delayed : .live) : .scheduled
                 )
+                result.departureTimingSource = Self.timingSource(transit.board.timingSource)
+                result.arrivalTimingSource = Self.timingSource(transit.alight.timingSource)
+                return result
             case .inSeatContinuation:
                 return nil
             }
@@ -569,13 +518,35 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             transitStopID: source.stop?.id
         )
     }
-    private nonisolated func mode(_ value: Int) -> TransportMode { switch value { case 0...2: .train; case 3, 700...799: .bus; case 900...999: .tram; case 7: .funicular; default: .unknown } }
+    /// Maps GTFS route types into the app's smaller presentation taxonomy.
+    /// Type `0` is the standard GTFS tram value; Luxembourg's feed can also
+    /// use the extended tram range (`900...999`).
+    nonisolated static func mode(forGTFSRouteType value: Int) -> TransportMode {
+        switch value {
+        case 0, 900...999: .tram
+        case 1, 2: .train
+        case 3, 700...799: .bus
+        case 7: .funicular
+        default: .unknown
+        }
+    }
+
+    private nonisolated static func timingSource(
+        _ source: RealtimeTimingSource
+    ) -> RouteTimingSource {
+        switch source {
+        case .scheduled: .scheduled
+        case .reported: .observed
+        case .estimated: .estimated
+        }
+    }
 }
 
 /// Owns the expensive immutable MobiliteitKit routing snapshot. A fingerprint
 /// switches the cache when the GTFS service publishes a new generation file.
 actor MobiliteitRouteEngine {
     private let walkingProvider: any WalkingRoutingProvider
+    private let realtimeClient: MobiliteitAPIClient?
 
     private struct DatabaseFingerprint: Equatable {
         let path: String
@@ -593,8 +564,12 @@ actor MobiliteitRouteEngine {
     private var routerFingerprint: DatabaseFingerprint?
     private var preparation: Preparation?
 
-    init(walkingProvider: any WalkingRoutingProvider = MapKitWalkingProvider()) {
+    init(
+        walkingProvider: any WalkingRoutingProvider = MapKitWalkingProvider(),
+        realtimeClient: MobiliteitAPIClient? = nil
+    ) {
         self.walkingProvider = walkingProvider
+        self.realtimeClient = realtimeClient
     }
 
     func router(for databaseURL: URL) async throws -> TransitRouter {
@@ -611,9 +586,19 @@ actor MobiliteitRouteEngine {
                 id: UUID(),
                 fingerprint: fingerprint,
                 task: Task(priority: .utility) {
-                    try await TransitRouter(
+                    let realtimeProvider = try realtimeClient.map {
+                        try HafasRealtimeRoutingProvider(
+                            databaseURL: databaseURL,
+                            client: $0,
+                            maximumConcurrentBoardRequests: 4,
+                            cacheLifetime: 60,
+                            requestTimeout: .seconds(4)
+                        )
+                    }
+                    return try await TransitRouter(
                         databaseURL: databaseURL,
-                        walkingProvider: walkingProvider
+                        walkingProvider: walkingProvider,
+                        realtimeProvider: realtimeProvider
                     )
                 }
             )

@@ -119,9 +119,20 @@ struct TimelineRail: View {
     }
 
     private var dotColor: Color {
-        if let above { return color(for: above) }
-        if let below { return color(for: below) }
+        if let rail = Self.preferredDotRail(above: above, below: below) {
+            return color(for: rail)
+        }
         return .secondary
+    }
+
+    /// A walking link describes the transfer itself, rather than the vehicle
+    /// being boarded or alighted from. At either end of one, use the adjacent
+    /// transit rail for the place marker so walking never takes visual
+    /// precedence over a ride.
+    static func preferredDotRail(above: RailStyle?, below: RailStyle?) -> RailStyle? {
+        if let above, above != .walk { return above }
+        if let below, below != .walk { return below }
+        return above ?? below
     }
 }
 

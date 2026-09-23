@@ -9,6 +9,7 @@ Purpose:
 - nearby stops
 - real-time departures
 - delay calculation
+- query-time route feasibility, including delayed boardings and transfers
 
 Main endpoints:
 
@@ -100,9 +101,12 @@ Purpose:
 
 Important:
 
-MapKit is the visual/routing layer. ATP is the live departure layer.
+MapKit provides map presentation, search, Apple Maps handoff, and road geometry.
+MobiliteitKit performs on-device public-transport routing from immutable GTFS,
+with ATP HAFAS data applied as a query-time realtime overlay. HAFAS does not
+replace or mutate the installed GTFS timetable; missing, failed, or ambiguous
+live data falls back to scheduled routing.
 
-Do not claim ATP provides full route planning.
 Do not claim Apple Maps exposes all live transit data as raw API data.
 
 ## JCDecaux vel’OH! bike sharing

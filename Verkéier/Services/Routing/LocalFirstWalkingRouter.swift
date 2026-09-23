@@ -79,7 +79,7 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         if let cachedRouter, cachedRouter.version == dataset.version {
             return cachedRouter.router
         }
-        let router = try ValhallaWalkingRouter(
+		let router = try await ValhallaWalkingRouter(
             tileArchiveURL: dataset.tileArchiveURL,
             datasetVersion: dataset.version
         )

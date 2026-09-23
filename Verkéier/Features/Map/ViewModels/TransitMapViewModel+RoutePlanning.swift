@@ -319,7 +319,7 @@ extension TransitMapViewModel {
                 to: destination.location,
                 time: routePlanningTime,
                 filters: routeFilters,
-                realtimeRefreshPolicy: .forceRefresh,
+                realtimeRefreshPolicy: .useCache,
                 page: page
             )
             guard requestGeneration == routeCalculationGeneration else { return }

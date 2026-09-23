@@ -95,7 +95,8 @@ extension RouteService {
         }
     }
 
-    /// Default calculations use the initial route-search page.
+    /// Default calculations use the initial route-search page and a recent
+    /// realtime snapshot when the service has a live provider.
     nonisolated func calculateRoute(
         from: LocationPoint,
         to: LocationPoint,
@@ -107,7 +108,7 @@ extension RouteService {
             to: to,
             time: time,
             filters: filters,
-            realtimeRefreshPolicy: .scheduleOnly,
+            realtimeRefreshPolicy: .useCache,
             page: .initial
         )
     }
