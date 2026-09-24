@@ -23,9 +23,8 @@ protocol RouteService: Sendable {
         page: RouteSearchPage
     ) async throws -> RouteCalculation
 
-    /// Publishes a usable initial route set and may subsequently refine it.
-    /// Implementations without progressive routing use the single-result
-    /// default supplied by ``RouteService``.
+    /// Publishes the completed route calculation. The default implementation
+    /// emits one result after ``calculateRoute`` finishes.
     nonisolated func routeCalculationUpdates(
         from: LocationPoint,
         to: LocationPoint,
@@ -48,9 +47,43 @@ protocol WalkingRouteRefining: Sendable {
     /// been resolved by the road-routing provider. Implementations that only
     /// support all-at-once refinement get a compatibility default below.
     nonisolated func refineWalkingRouteUpdates(in options: [RouteOption]) -> AsyncStream<RouteOption>
+    nonisolated func refinementEvents(
+        in options: [RouteOption], context: RouteValidationContext?
+    ) -> AsyncStream<WalkingRefinementEvent>
+}
+
+nonisolated enum WalkingRefinementEvent: Sendable {
+    case option(RouteOption)
+    case invalidated(String)
 }
 
 extension WalkingRouteRefining {
+    nonisolated func refinementEvents(
+        in options: [RouteOption], context: RouteValidationContext?
+    ) -> AsyncStream<WalkingRefinementEvent> {
+        AsyncStream { continuation in
+            let task = Task {
+                for await option in refineWalkingRouteUpdates(in: options) {
+                    guard !Task.isCancelled else { break }
+                    if let context {
+                        let feasibility = RouteItineraryValidator.assess(option, context: context)
+                        if feasibility.isInvalid {
+                            continuation.yield(.invalidated(option.id))
+                            continue
+                        }
+                        var valid = option
+                        valid.feasibility = feasibility
+                        continuation.yield(.option(valid))
+                    } else {
+                        continuation.yield(.option(option))
+                    }
+                }
+                continuation.finish()
+            }
+            continuation.onTermination = { @Sendable _ in task.cancel() }
+        }
+    }
+
     nonisolated func refineWalkingRouteUpdates(in options: [RouteOption]) -> AsyncStream<RouteOption> {
         AsyncStream { continuation in
             let task = Task {
@@ -165,17 +198,20 @@ enum RoutingError: Error, Equatable {
 }
 
 /// Selects the portion of the departure profile returned by a route search.
-/// Page boundaries are exclusive door-to-door departure timestamps.
+/// Page boundaries use door-to-door departure and, when available, stable ID.
 nonisolated enum RouteSearchPage: Hashable, Sendable {
     case initial
     case earlier(than: Date, limit: Int)
     case later(than: Date, limit: Int)
+    case earlierFrom(than: Date, id: String, limit: Int)
+    case laterFrom(than: Date, id: String, limit: Int)
 
     var resultLimit: Int {
         switch self {
         case .initial:
             5
-        case let .earlier(_, limit), let .later(_, limit):
+        case let .earlier(_, limit), let .later(_, limit),
+             let .earlierFrom(_, _, limit), let .laterFrom(_, _, limit):
             max(0, limit)
         }
     }
@@ -184,7 +220,8 @@ nonisolated enum RouteSearchPage: Hashable, Sendable {
         switch self {
         case .initial:
             nil
-        case let .earlier(boundary, _), let .later(boundary, _):
+        case let .earlier(boundary, _), let .later(boundary, _),
+             let .earlierFrom(boundary, _, _), let .laterFrom(boundary, _, _):
             boundary
         }
     }

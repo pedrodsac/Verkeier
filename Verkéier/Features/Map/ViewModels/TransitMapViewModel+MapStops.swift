@@ -169,6 +169,7 @@ extension TransitMapViewModel {
         selectedStopRoutes = []
         departures = []
         offlineScheduledDepartures = []
+        isUsingOfflineDepartures = false
         isLoadingDepartures = false
         departureLoadGeneration &+= 1
         selectedDepartureLine = nil

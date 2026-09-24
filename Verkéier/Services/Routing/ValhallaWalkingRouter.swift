@@ -40,16 +40,48 @@ actor ValhallaWalkingRouter: WalkingRouting {
             row.map { ($0.toIndex, $0) },
             uniquingKeysWith: { first, _ in first }
         )
-        return try destinations.enumerated().map { index, destination in
+        return destinations.enumerated().compactMap { index, destination in
             guard let result = distancesByTarget[index],
                   result.distance.isFinite,
                   result.distance >= 0,
                   result.time >= 0
             else {
-                throw WalkingRoutingError.invalidResponse
+                return nil
             }
             return OfflineWalkingEstimate(
                 destinationID: destination.id,
+                distanceMeters: Self.meters(from: result.distance, units: response.units),
+                duration: TimeInterval(result.time),
+                source: .localOSM
+            )
+        }
+    }
+
+    func estimates(
+        from origins: [WalkingOrigin],
+        to destination: LocationPoint
+    ) async throws -> [OfflineWalkingEstimate] {
+        guard !origins.isEmpty else { return [] }
+        let request = MatrixRequest(
+            sources: origins.map { Coordinate(lat: $0.location.latitude, lon: $0.location.longitude) },
+            targets: [Coordinate(lat: destination.latitude, lon: destination.longitude)],
+            costing: .pedestrian,
+            directionsOptions: DirectionsOptions(units: .km)
+        )
+        let response = try engine.matrix(request: request)
+        guard response.sourcesToTargets.count == origins.count else {
+            throw WalkingRoutingError.invalidResponse
+        }
+        return origins.enumerated().compactMap { index, origin in
+            guard let result = response.sourcesToTargets[index].first(where: { $0.fromIndex == index && $0.toIndex == 0 }),
+                  result.distance.isFinite,
+                  result.distance >= 0,
+                  result.time >= 0
+            else {
+                return nil
+            }
+            return OfflineWalkingEstimate(
+                destinationID: origin.id,
                 distanceMeters: Self.meters(from: result.distance, units: response.units),
                 duration: TimeInterval(result.time),
                 source: .localOSM

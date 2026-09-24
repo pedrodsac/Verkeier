@@ -61,8 +61,7 @@ import SwiftUI
     #Preview("Route Timeline") {
         ScrollView {
             RouteTimelineView(
-                viewModel: .previewWithRoutes,
-                openInAppleMaps: {}
+                viewModel: .previewWithRoutes
             )
             .padding()
         }

@@ -117,6 +117,7 @@ extension TransitMapViewModel {
         let requestGeneration = departureLoadGeneration
         isLoadingDepartures = true
         departuresErrorMessage = nil
+        isUsingOfflineDepartures = false
 
         let boardStop = await liveTransitService.resolvedStop(
             for: selectedStop,
@@ -133,28 +134,26 @@ extension TransitMapViewModel {
             self.selectedStop = boardStop
         }
 
-        async let scheduledRequest = gtfsService.scheduledDepartures(
-            for: boardStop,
-            at: now(),
-            limit: departureBoardFilter.maximumJourneys
-        )
-
-        async let liveRequest = liveTransitService.departureBoard(
-            for: boardStop,
-            filter: departureBoardFilter
-        )
-
         let liveDepartures: [Departure]
+        let scheduledDepartures: [OfflineScheduleDeparture]
         let liveError: Error?
         do {
-            liveDepartures = try await liveRequest
+            liveDepartures = try await liveTransitService.departureBoard(
+                for: boardStop,
+                filter: departureBoardFilter
+            )
+            scheduledDepartures = []
             liveError = nil
         } catch {
             liveDepartures = []
+            scheduledDepartures = await gtfsService.scheduledDepartures(
+                for: boardStop,
+                at: now(),
+                limit: departureBoardFilter.maximumJourneys
+            )
             liveError = error
         }
 
-        let scheduledDepartures = await scheduledRequest
         guard !Task.isCancelled else {
             if isCurrentDepartureRequest(requestGeneration, for: boardStop.id) {
                 isLoadingDepartures = false
@@ -165,11 +164,12 @@ extension TransitMapViewModel {
 
         departures = liveDepartures
         offlineScheduledDepartures = scheduledDepartures
+        isUsingOfflineDepartures = liveError != nil
         departuresLastUpdated = liveError == nil ? now() : nil
         liveTransitLastUpdated = liveError == nil ? now() : liveTransitLastUpdated
         liveTransitErrorMessage = liveError?.localizedDescription
-        departuresErrorMessage = liveDepartures.isEmpty && scheduledDepartures.isEmpty
-            ? "No live or scheduled departures are available for this stop."
+        departuresErrorMessage = liveError != nil && scheduledDepartures.isEmpty
+            ? "No live or offline departures are available for this stop."
             : nil
         isLoadingDepartures = false
     }

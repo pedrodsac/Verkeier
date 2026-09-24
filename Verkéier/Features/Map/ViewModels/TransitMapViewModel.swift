@@ -33,6 +33,7 @@ final class TransitMapViewModel {
     var departures: [Departure] = []
 
     var offlineScheduledDepartures: [OfflineScheduleDeparture] = []
+    var isUsingOfflineDepartures = false
     var selectedDepartureLine: String?
 
     var selectedDeparturePlatform: String?
@@ -93,6 +94,9 @@ final class TransitMapViewModel {
     let now: @Sendable () -> Date
     var routeCalculationGeneration = 0
     var unfilteredRouteOptions: [RouteOption] = []
+    var walkingRefinedOptionIDs: Set<String> = []
+    var invalidatedRouteOptionIDs: Set<String> = []
+    var walkingReplanGeneration: Int? = nil
 
     init(
         now: @escaping @Sendable () -> Date = { .now },
@@ -144,6 +148,9 @@ final class TransitMapViewModel {
     }
 
     func clearRouteResult() {
+        walkingRefinedOptionIDs = []
+        invalidatedRouteOptionIDs = []
+        walkingReplanGeneration = nil
         unfilteredRouteOptions = []
         routeOptions = []
         supplementalRouteOptions = []

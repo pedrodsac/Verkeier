@@ -80,36 +80,35 @@ private struct RouteLineCard: View {
     let toggleDepartureLine: () -> Void
 
     var body: some View {
-        HStack(spacing: 6) {
-            Button(action: toggleDepartureLine) {
-                HStack(spacing: 5) {
-                    Image(systemName: iconName)
-                        .accessibilityHidden(true)
-                    Text(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
-                        .lineLimit(1)
-                }
-                .font(.callout.weight(.bold))
-                .foregroundStyle(.primary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 7)
-                .background(cardColor.opacity(isSelected ? 0.20 : 0.14), in: Capsule())
-                .overlay {
-                    Capsule().stroke(
-                        cardColor.opacity(isSelected ? 0.55 : 0.25),
-                        lineWidth: isSelected ? 1.1 : 0.7
-                    )
-                }
-                .contentShape(Capsule())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
-            .accessibilityAddTraits(isSelected ? [.isSelected] : [])
-        }
-        .contextMenu {
+        Menu {
             NavigationLink(value: TransitSheetRoute.lineDetail(route)) {
                 Label("Information", systemImage: "info.circle")
             }
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: iconName)
+                    .accessibilityHidden(true)
+                Text(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
+                    .lineLimit(1)
+            }
+            .font(.callout.weight(.bold))
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(cardColor.opacity(isSelected ? 0.20 : 0.14), in: Capsule())
+            .overlay {
+                Capsule().stroke(
+                    cardColor.opacity(isSelected ? 0.55 : 0.25),
+                    lineWidth: isSelected ? 1.1 : 0.7
+                )
+            }
+            .contentShape(Capsule())
+        } primaryAction: {
+            toggleDepartureLine()
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel(route.shortName.isEmpty ? route.mode.displayName : route.shortName)
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 
     init(

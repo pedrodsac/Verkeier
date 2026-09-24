@@ -68,8 +68,10 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
         let bikeShareDetails: BikeShareLegDetails?
         var departureTimingSource: RouteTimingSource? = nil
         var arrivalTimingSource: RouteTimingSource? = nil
-        /// Total time required since the preceding ride, including movement.
+        /// Additional allowance required after the preceding transfer walk.
         var requiredTransferSeconds: Int? = nil
+        /// Whether walking time came from an actual pedestrian route or an estimate.
+        var walkingEvidence: RouteWalkingEvidence? = nil
 
         init(
             id: String,
@@ -186,6 +188,11 @@ enum RouteLegRoadRoutingHint: String, Codable, Hashable, Sendable {
     case walking
     /// MapKit walking geometry used as a bicycle-path approximation.
     case bicycle
+}
+
+enum RouteWalkingEvidence: String, Codable, Hashable, Sendable {
+    case routedPedestrian
+    case estimate
 }
 
 /// Live-status classification for a transit ``RoutePlan/Leg``.

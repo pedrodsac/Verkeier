@@ -5265,9 +5265,6 @@
     "Start typing to search places and addresses." : {
 
     },
-    "Status" : {
-
-    },
     "Step-free, wheelchair accessible" : {
       "localizations" : {
         "de" : {
@@ -5379,6 +5376,9 @@
           }
         }
       }
+    },
+    "Stop Tracking" : {
+
     },
     "Stop tracking departure" : {
       "localizations" : {
@@ -5856,9 +5856,6 @@
           }
         }
       }
-    },
-    "Transit data" : {
-
     },
     "Transit data details" : {
 

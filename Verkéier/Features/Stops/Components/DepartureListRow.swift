@@ -93,17 +93,7 @@ struct DepartureListRow: View {
             .layoutPriority(1)
 
         }
-        .padding(.vertical, 10)
-        .padding(.horizontal, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background {
-            RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
-                .fill(.thinMaterial)
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
-				.stroke(.separator.opacity(0.3), lineWidth: 0.5)
-        }
         .contextMenu {
             if showsControls {
                 Button(action: isTracked ? stopTrackingDeparture : startTrackingDeparture) {
@@ -116,18 +106,13 @@ struct DepartureListRow: View {
                 reminderContextMenu
             }
         }
-        // Swipe a tracked row left to stop tracking it.
-        .gesture(
-            isTracked
-                ? DragGesture(minimumDistance: 30)
-                .onEnded { value in
-                    if value.translation.width < -50,
-                       abs(value.translation.height) < 40 {
-                        stopTrackingDeparture()
-                    }
-                }
-                : nil
-        )
+		.swipeActions(edge: .trailing) {
+			if isTracked {
+				Button("Stop Tracking") {
+					stopTrackingDeparture()
+				}
+			}
+		}
         .accessibilityElement(children: .combine)
     }
 

@@ -5,6 +5,7 @@ struct StopDetailPresentationModel {
     let routes: [TransitRoute]
     let departures: [Departure]
     let offlineScheduledDepartures: [OfflineScheduleDeparture]
+    let isUsingOfflineDepartures: Bool
     let alerts: [AlertMessage]
     let selectedLine: String?
     let selectedPlatform: String?
@@ -26,6 +27,7 @@ struct StopDetailPresentationModel {
         routes: [TransitRoute],
         departures: [Departure],
         offlineScheduledDepartures: [OfflineScheduleDeparture],
+        isUsingOfflineDepartures: Bool,
         alerts: [AlertMessage],
         selectedLine: String?,
         selectedPlatform: String?,
@@ -46,6 +48,7 @@ struct StopDetailPresentationModel {
         self.routes = routes
         self.departures = departures
         self.offlineScheduledDepartures = offlineScheduledDepartures
+        self.isUsingOfflineDepartures = isUsingOfflineDepartures
         self.alerts = alerts
         self.selectedLine = selectedLine
         self.selectedPlatform = selectedPlatform
@@ -69,6 +72,7 @@ struct StopDetailPresentationModel {
             routes: routes,
             liveDepartures: departures,
             scheduledDepartures: offlineScheduledDepartures,
+            useScheduledFallback: isUsingOfflineDepartures,
             selectedLine: selectedLine,
             selectedPlatform: selectedPlatform
         )
@@ -80,49 +84,44 @@ struct StopDetailPresentationModel {
         board.visibleLiveDepartures
     }
 
-    /// Timetable rows which are not already represented by the live board.
-    ///
-    /// HAFAS and GTFS use different IDs for the same journey, so an ID check
-    /// alone is not enough. A scheduled time, line, and destination form the
-    /// stable rider-facing identity shared by both feeds. The API row always
-    /// wins: it carries the live status and is the row users can track.
+    /// Timetable rows are available only when the live request failed.
     var scheduledDepartures: [Departure] {
         board.visibleScheduledDepartures
     }
 
-    /// The one list shown on a stop board: live rows first when a live and
-    /// scheduled row describe the same trip, followed by timetable-only rows
-    /// in departure-time order.
+    /// A successful live response owns the board, even when it contains no rows.
     var displayedDepartures: [Departure] {
         board.visibleDepartures
     }
 
     var isShowingScheduledFallback: Bool {
-        liveErrorMessage != nil && departures.isEmpty && !displayedDepartures.isEmpty
+        isUsingOfflineDepartures && !displayedDepartures.isEmpty
     }
 }
 
-/// Pure source-merging and filtering for a stop departure board.
+/// Source selection and filtering for a stop departure board.
 private struct DepartureBoardPresentation {
     let routes: [TransitRoute]
     let selectedLine: String?
     let selectedPlatform: String?
     let liveDepartures: [Departure]
     let scheduledDepartures: [Departure]
+    let useScheduledFallback: Bool
 
     init(
         stopID: String,
         routes: [TransitRoute],
         liveDepartures: [Departure],
         scheduledDepartures: [OfflineScheduleDeparture],
+        useScheduledFallback: Bool,
         selectedLine: String?,
         selectedPlatform: String?
     ) {
         self.routes = routes
         self.selectedLine = selectedLine
         self.selectedPlatform = selectedPlatform
-        let uniqueLiveDepartures = Self.unique(liveDepartures)
-        self.liveDepartures = uniqueLiveDepartures
+        self.useScheduledFallback = useScheduledFallback
+        self.liveDepartures = Self.unique(liveDepartures)
 
         let scheduled = scheduledDepartures.map { departure in
             Departure(
@@ -135,16 +134,12 @@ private struct DepartureBoardPresentation {
                 dataSource: .gtfs
             )
         }
-        self.scheduledDepartures = Self.unique(scheduled).filter { scheduled in
-            !uniqueLiveDepartures.contains { live in
-                live.representsSameScheduledJourney(as: scheduled)
-            }
-        }
+        self.scheduledDepartures = Self.unique(scheduled)
     }
 
     var availablePlatforms: [String] {
         var seen: Set<String> = []
-        return lineFiltered(liveDepartures + scheduledDepartures)
+        return lineFiltered(useScheduledFallback ? scheduledDepartures : liveDepartures)
             .compactMap { departure in
                 guard let platform = departure.platform?.trimmingCharacters(in: .whitespacesAndNewlines),
                       !platform.isEmpty,
@@ -155,10 +150,12 @@ private struct DepartureBoardPresentation {
     }
 
     var visibleLiveDepartures: [Departure] { visible(liveDepartures) }
-    var visibleScheduledDepartures: [Departure] { visible(scheduledDepartures) }
+    var visibleScheduledDepartures: [Departure] {
+        useScheduledFallback ? visible(scheduledDepartures) : []
+    }
 
     var visibleDepartures: [Departure] {
-        (visibleLiveDepartures + visibleScheduledDepartures)
+        (useScheduledFallback ? visibleScheduledDepartures : visibleLiveDepartures)
             .enumerated()
             .sorted { lhs, rhs in
                 let lhsTime = lhs.element.realtimeDeparture ?? lhs.element.scheduledDeparture ?? .distantFuture

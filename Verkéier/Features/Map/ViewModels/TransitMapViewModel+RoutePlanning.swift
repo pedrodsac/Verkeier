@@ -181,13 +181,15 @@ extension TransitMapViewModel {
         }
 
         resetRoutePagingState()
+        walkingRefinedOptionIDs = []
+        invalidatedRouteOptionIDs = []
+        walkingReplanGeneration = nil
         let requestGeneration = startRouteRequest()
         routeLoadingPhase = .calculating
         routeErrorMessage = nil
         routeStatusMessage = nil
         var receivedRouteUpdate = false
-        var receivedFinalRouteUpdate = false
-        var didScheduleFinalWalkingRefinement = false
+        var didScheduleWalkingRefinement = false
         do {
             let updates = routeCalculationUpdatesWithDeadline(
                 using: routeService,
@@ -199,34 +201,41 @@ extension TransitMapViewModel {
             )
             for try await calculation in updates {
                 guard requestGeneration == routeCalculationGeneration else { return }
+                invalidatedRouteOptionIDs.formUnion(calculation.invalidatedOptionIDs)
+                let incomingOptions = preservingWalkingRefinements(
+                    in: calculation.options,
+                    existing: unfilteredRouteOptions
+                ).filter { !invalidatedRouteOptionIDs.contains($0.id) }
+                let incomingSupplementalOptions = preservingWalkingRefinements(
+                    in: calculation.supplementalOptions,
+                    existing: supplementalRouteOptions
+                ).filter { !invalidatedRouteOptionIDs.contains($0.id) }
                 let preferredID = receivedRouteUpdate
                     ? selectedRouteOptionID
                     : calculation.selectedOptionID
-                if calculation.stage == .final, !receivedFinalRouteUpdate {
-                    unfilteredRouteOptions = calculation.options
-                    supplementalRouteOptions = calculation.supplementalOptions
-                    receivedFinalRouteUpdate = true
-                } else if receivedRouteUpdate {
+                if !receivedRouteUpdate {
+                    unfilteredRouteOptions = incomingOptions
+                    supplementalRouteOptions = incomingSupplementalOptions
+                } else {
                     unfilteredRouteOptions = Self.mergingAccumulatedOptions(
                         existing: unfilteredRouteOptions,
-                        incoming: calculation.options,
-                        invalidatedOptionIDs: calculation.invalidatedOptionIDs
+                        incoming: incomingOptions,
+                        invalidatedOptionIDs: invalidatedRouteOptionIDs
                     )
                     supplementalRouteOptions = Self.mergingAccumulatedOptions(
                         existing: supplementalRouteOptions,
-                        incoming: calculation.supplementalOptions,
-                        invalidatedOptionIDs: calculation.invalidatedOptionIDs
+                        incoming: incomingSupplementalOptions,
+                        invalidatedOptionIDs: invalidatedRouteOptionIDs
                     )
-                } else {
-                    unfilteredRouteOptions = calculation.options
-                    supplementalRouteOptions = calculation.supplementalOptions
                 }
                 applyRouteOptions(preferredID: preferredID, announceFallback: false)
-                if calculation.stage == .final, !didScheduleFinalWalkingRefinement {
-                    didScheduleFinalWalkingRefinement = true
+                if !didScheduleWalkingRefinement {
+                    didScheduleWalkingRefinement = true
                     scheduleWalkingRouteRefinement(
                         calculation,
                         using: routeService,
+                        from: origin,
+                        to: destination.location,
                         requestGeneration: requestGeneration
                     )
                 }
@@ -301,13 +310,19 @@ extension TransitMapViewModel {
         // transit page boundary.
         let departures = routeOptions
             .filter { !$0.transitLegs.isEmpty }
-            .compactMap(\.departureTime)
-        guard let boundary = direction == .earlier ? departures.min() : departures.max() else {
+            .compactMap { option -> (Date, String)? in
+                option.departureTime.map { ($0, option.id) }
+            }
+        let cursor = departures.sorted {
+            if $0.0 != $1.0 { return $0.0 < $1.0 }
+            return $0.1 < $1.1
+        }
+        guard let boundary = direction == .earlier ? cursor.first : cursor.last else {
             return
         }
         let page: RouteSearchPage = switch direction {
-        case .earlier: .earlier(than: boundary, limit: 3)
-        case .later: .later(than: boundary, limit: 3)
+        case .earlier: .earlierFrom(than: boundary.0, id: boundary.1, limit: 3)
+        case .later: .laterFrom(than: boundary.0, id: boundary.1, limit: 3)
         }
         let requestGeneration = startRouteRequest()
         setRoutePageLoading(true, direction: direction)
@@ -323,11 +338,12 @@ extension TransitMapViewModel {
                 page: page
             )
             guard requestGeneration == routeCalculationGeneration else { return }
+            invalidatedRouteOptionIDs.formUnion(calculation.invalidatedOptionIDs)
             let preferredID = selectedRouteOptionID
             unfilteredRouteOptions = Self.mergingAccumulatedOptions(
                 existing: unfilteredRouteOptions,
-                incoming: calculation.options,
-                invalidatedOptionIDs: calculation.invalidatedOptionIDs
+                incoming: calculation.options.filter { !invalidatedRouteOptionIDs.contains($0.id) },
+                invalidatedOptionIDs: invalidatedRouteOptionIDs
             )
             applyRouteOptions(preferredID: preferredID, announceFallback: true)
             // A partial page does not prove there are no more routes. Keep paging
@@ -399,6 +415,19 @@ extension TransitMapViewModel {
         return routeCalculationGeneration
     }
 
+    private func preservingWalkingRefinements(
+        in incoming: [RouteOption],
+        existing: [RouteOption]
+    ) -> [RouteOption] {
+        let existingByID = Dictionary(existing.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        return incoming.map { option in
+            guard walkingRefinedOptionIDs.contains(option.id),
+                  let previous = existingByID[option.id]
+            else { return option }
+            return option.replacingLegs(of: .walking, from: previous, preserveUpdatedTotals: true)
+        }
+    }
+
     private func routeCalculationUpdatesWithDeadline(
         using routeService: any RouteService,
         from origin: LocationPoint,
@@ -447,35 +476,44 @@ extension TransitMapViewModel {
         }
     }
 
-    /// The initial result deliberately uses local walking estimates so the
-    /// timetable search is responsive. Start road-network refinement as soon
-    /// as each update is visible; do not wait for progressive/live updates to
-    /// finish before asking MapKit for walking geometry and travel time.
+    /// Refine walking geometry and timing after the full timetable and live
+    /// calculation is available.
     private func scheduleWalkingRouteRefinement(
         _ calculation: RouteCalculation,
         using routeService: any RouteService,
+        from origin: LocationPoint,
+        to destination: LocationPoint,
         requestGeneration: Int
     ) {
-        guard let routeService = routeService as? any WalkingRouteRefining else { return }
+        guard let refiner = routeService as? any WalkingRouteRefining else { return }
         scheduleWalkingRouteRefinementUpdates(
-            from: routeService.refineWalkingRouteUpdates(in: calculation.options),
+            from: refiner.refinementEvents(in: calculation.options,
+                                           context: calculation.validationContext),
             supplemental: false,
+            routeService: routeService,
+            origin: origin, destination: destination,
             requestGeneration: requestGeneration
         )
         scheduleWalkingRouteRefinementUpdates(
-            from: routeService.refineWalkingRouteUpdates(in: calculation.supplementalOptions),
+            from: refiner.refinementEvents(in: calculation.supplementalOptions,
+                                           context: calculation.validationContext),
             supplemental: true,
+            routeService: routeService,
+            origin: origin, destination: destination,
             requestGeneration: requestGeneration
         )
     }
 
     private func scheduleWalkingRouteRefinementUpdates(
-        from updates: AsyncStream<RouteOption>,
+        from updates: AsyncStream<WalkingRefinementEvent>,
         supplemental: Bool,
+        routeService: any RouteService,
+        origin: LocationPoint,
+        destination: LocationPoint,
         requestGeneration: Int
     ) {
         Task { [weak self] in
-            for await option in updates {
+            for await event in updates {
                 guard !Task.isCancelled,
                       let self,
                       requestGeneration == self.routeCalculationGeneration
@@ -484,22 +522,68 @@ extension TransitMapViewModel {
                 }
 
                 let selectedID = self.selectedRouteOptionID
+                if case let .invalidated(id) = event {
+                    self.invalidatedRouteOptionIDs.insert(id)
+                    self.unfilteredRouteOptions.removeAll { $0.id == id }
+                    self.supplementalRouteOptions.removeAll { $0.id == id }
+                    self.walkingRefinedOptionIDs.remove(id)
+                    self.applyRouteOptions(preferredID: selectedID, announceFallback: true)
+                    if !supplemental, self.walkingReplanGeneration != requestGeneration {
+                        self.walkingReplanGeneration = requestGeneration
+                        await self.replanAfterWalkingInvalidation(
+                            using: routeService, from: origin, to: destination,
+                            requestGeneration: requestGeneration
+                        )
+                    }
+                    continue
+                }
+                guard case let .option(option) = event,
+                      !self.invalidatedRouteOptionIDs.contains(option.id) else { continue }
                 if supplemental {
+                    let current = self.supplementalRouteOptions.first { $0.id == option.id }
+                    let refined = current.map { option.replacingLegs(of: .transit, from: $0) } ?? option
                     self.supplementalRouteOptions = Self.mergingAccumulatedOptions(
                         existing: self.supplementalRouteOptions,
-                        incoming: [option],
+                        incoming: [refined],
                         invalidatedOptionIDs: []
                     )
                 } else {
+                    let current = self.unfilteredRouteOptions.first { $0.id == option.id }
+                    let refined = current.map { option.replacingLegs(of: .transit, from: $0) } ?? option
                     self.unfilteredRouteOptions = Self.mergingAccumulatedOptions(
                         existing: self.unfilteredRouteOptions,
-                        incoming: [option],
+                        incoming: [refined],
                         invalidatedOptionIDs: []
                     )
                 }
+                self.walkingRefinedOptionIDs.insert(option.id)
                 self.applyRouteOptions(preferredID: selectedID, announceFallback: false)
             }
         }
+    }
+
+    private func replanAfterWalkingInvalidation(
+        using routeService: any RouteService,
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        requestGeneration: Int
+    ) async {
+        let time = routePlanningTime
+        let filters = routeFilters
+        guard let calculation = try? await routeService.calculateRoute(
+            from: origin, to: destination, time: time, filters: filters,
+            realtimeRefreshPolicy: .useCache, page: .initial
+        ), requestGeneration == routeCalculationGeneration else { return }
+        let incoming = calculation.options.filter { !invalidatedRouteOptionIDs.contains($0.id) }
+        unfilteredRouteOptions = Self.mergingAccumulatedOptions(
+            existing: unfilteredRouteOptions, incoming: incoming,
+            invalidatedOptionIDs: invalidatedRouteOptionIDs
+        )
+        applyRouteOptions(preferredID: selectedRouteOptionID, announceFallback: true)
+        // One corrected-cache replan is the limit for this request generation.
+        scheduleWalkingRouteRefinement(calculation, using: routeService,
+                                       from: origin, to: destination,
+                                       requestGeneration: requestGeneration)
     }
 
     static func mergingAccumulatedOptions(
@@ -522,7 +606,7 @@ extension TransitMapViewModel {
             }
         }
         for option in incoming where incomingByID[option.id] != nil {
-            if seenIDs.insert(option.id).inserted {
+            if !invalidatedOptionIDs.contains(option.id), seenIDs.insert(option.id).inserted {
                 merged.append(option)
             }
         }
@@ -551,7 +635,8 @@ extension TransitMapViewModel {
             return
         }
 
-        if let replacement = allOptions.first(where: { viableStatuses.contains($0.status(at: now())) }) {
+        if let replacement = allOptions.filter({ viableStatuses.contains($0.status(at: now())) })
+            .min(by: compareRouteOptions) {
             let changed = replacement.id != preferredID
             selectedRouteOptionID = replacement.id
             if announceFallback, changed, preferredID != nil {
@@ -574,6 +659,14 @@ extension TransitMapViewModel {
         if didRelaxFilters {
             routeStatusMessage = "No routes matched all filters. Showing the closest alternatives."
         } else if routeOptions.isEmpty {
+            routeStatusMessage = nil
+        } else if let preferred = routeFilters.modePreference.transportMode,
+                  !routeOptions.contains(where: { $0.transitLegs.contains { $0.mode == preferred } }) {
+            routeStatusMessage = "No routes using the preferred mode were found. Showing other routes."
+        } else if routeFilters.preferAccessible,
+                  !routeOptions.contains(where: { $0.accessibility == .verified }) {
+            routeStatusMessage = "No step-free route could be verified. Showing routes with accessibility information where available."
+        } else {
             routeStatusMessage = nil
         }
     }
@@ -598,24 +691,19 @@ extension TransitMapViewModel {
         return lhs.id < rhs.id
     }
 
-    /// Collapses alternatives that render with the same departure, arrival,
-    /// and duration while preserving the first-seen position of each group.
+    /// Only stable itinerary identity proves an option is a duplicate. Display
+    /// minutes can coincide for routes with different walks or interchanges.
     static func deduplicatingEquivalentRouteOptions(_ options: [RouteOption]) -> [RouteOption] {
         var result: [RouteOption] = []
-        var indexByKey: [DisplayedRouteTimingKey: Int] = [:]
+        var indexByID: [String: Int] = [:]
 
         for option in options {
-            guard let key = DisplayedRouteTimingKey(option: option) else {
-                result.append(option)
-                continue
-            }
-
-            if let index = indexByKey[key] {
+            if let index = indexByID[option.id] {
                 if transferTimingRanksBefore(option, result[index]) {
                     result[index] = option
                 }
             } else {
-                indexByKey[key] = result.count
+                indexByID[option.id] = result.count
                 result.append(option)
             }
         }
@@ -672,17 +760,7 @@ extension TransitMapViewModel {
                 return false
             }
 
-            if routeFilters.preferAccessible {
-                let walkingDistance = option.walkingDistanceMeters
-                if walkingDistance > 700 || option.transferCount > 1 {
-                    return false
-                }
-            }
-
-            guard let mode = routeFilters.modePreference.transportMode else {
-                return true
-            }
-            return option.transitLegs.contains(where: { $0.mode == mode })
+            return true
         }
     }
 
@@ -719,6 +797,32 @@ extension TransitMapViewModel {
             return lhsModeRank < rhsModeRank
         }
 
+        if routeFilters.preferAccessible {
+            func rank(_ assessment: RouteAccessibilityAssessment?) -> Int {
+                switch assessment {
+                case .some(.verified): 0
+                case .some(.unknown), .none: 1
+                case .some(.inaccessible): 2
+                }
+            }
+            let lhsAccess = rank(lhs.accessibility)
+            let rhsAccess = rank(rhs.accessibility)
+            if lhsAccess != rhsAccess { return lhsAccess < rhsAccess }
+        }
+
+        let anchor = routePlanningTime.date ?? now()
+        let lhsTime = max(0, (lhs.arrivalTime ?? .distantFuture).timeIntervalSince(anchor))
+        let rhsTime = max(0, (rhs.arrivalTime ?? .distantFuture).timeIntervalSince(anchor))
+        let lhsScore = lhsTime + Double(lhs.transferCount) * 300
+            + lhs.plan.legs.filter { $0.transportKind == .walking }.reduce(0) {
+                $0 + max(0, ($1.arrivalTime ?? .distantPast).timeIntervalSince($1.departureTime ?? .distantPast))
+            }
+        let rhsScore = rhsTime + Double(rhs.transferCount) * 300
+            + rhs.plan.legs.filter { $0.transportKind == .walking }.reduce(0) {
+                $0 + max(0, ($1.arrivalTime ?? .distantPast).timeIntervalSince($1.departureTime ?? .distantPast))
+            }
+        if lhsScore != rhsScore { return lhsScore < rhsScore }
+
         let lhsArrival = lhs.arrivalTime ?? .distantFuture
         let rhsArrival = rhs.arrivalTime ?? .distantFuture
         if lhsArrival != rhsArrival { return lhsArrival < rhsArrival }
@@ -751,31 +855,4 @@ extension TransitMapViewModel {
 private enum RoutePagingDirection {
     case earlier
     case later
-}
-
-private struct DisplayedRouteTimingKey: Hashable {
-    let departureMinute: Int64
-    let arrivalMinute: Int64
-    let durationMinutes: Int
-
-    init?(option: RouteOption) {
-        guard !option.transitLegs.isEmpty,
-              let lastLeg = option.plan.legs.last,
-              (lastLeg.realtimeArrivalTime ?? lastLeg.scheduledArrivalTime ?? lastLeg.arrivalTime) != nil,
-              let departure = option.departureTime,
-              let arrival = option.arrivalTime,
-              let duration = option.plan.expectedTravelTime,
-              duration.isFinite
-        else {
-            return nil
-        }
-
-        departureMinute = Self.minute(containing: departure)
-        arrivalMinute = Self.minute(containing: arrival)
-        durationMinutes = max(1, Int((duration / 60).rounded()))
-    }
-
-    private static func minute(containing date: Date) -> Int64 {
-        Int64(floor(date.timeIntervalSince1970 / 60))
-    }
 }

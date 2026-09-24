@@ -7,7 +7,6 @@ import SwiftUI
 /// is selected.
 struct RouteTimelineView: View {
     let viewModel: RoutePresentationModel
-    let openInAppleMaps: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -22,6 +21,19 @@ struct RouteTimelineView: View {
                 if !viewModel.alerts.isEmpty {
                     RouteAlertsSection(alerts: viewModel.alerts)
                 }
+
+                ShareLink(
+                    item: selectedOption.shareText(
+                        originTitle: viewModel.originTitle,
+                        destinationTitle: viewModel.destinationTitle
+                    )
+                ) {
+                    Label("Share route", systemImage: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+                .tint(.primary)
             } else {
                 CompactUnavailableCard(
                     title: "No route selected",
@@ -29,16 +41,6 @@ struct RouteTimelineView: View {
                     systemImage: "point.topleft.down.curvedto.point.bottomright.up"
                 )
             }
-
-            // Apple Maps handoff
-            Button(action: openInAppleMaps) {
-                Label("Open in Apple Maps", systemImage: "map")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-            .tint(.primary)
-            .disabled(viewModel.selectedStop == nil && viewModel.destination == nil)
 
             Spacer(minLength: 0)
         }

@@ -6,6 +6,29 @@ import Testing
 @Suite("Route calculations through the app UI flow", .serialized)
 @MainActor
 struct RouteCalculationFlowTests {
+    @Test("Later pages prioritise departures near their page boundary for realtime")
+    func laterPageRealtimeWindow() {
+        let boundary = Date(timeIntervalSince1970: 1_800_000_000)
+        let later = MobiliteitRouteService.realtimePolicy(
+            for: .useCache,
+            page: .later(than: boundary, limit: 3)
+        )
+        let initial = MobiliteitRouteService.realtimePolicy(for: .forceRefresh, page: .initial)
+
+        guard case let .bestEffort(laterConfiguration, laterRefresh) = later,
+              case let .bestEffort(initialConfiguration, initialRefresh) = initial else {
+            Issue.record("Expected realtime routing for both page types")
+            return
+        }
+
+        #expect(laterRefresh == .useCache)
+        #expect(initialRefresh == .forceRefresh)
+        #expect(laterConfiguration.scheduledLookbackSeconds <= 10 * 60)
+        #expect(laterConfiguration.minimumForwardHorizonSeconds >= 90 * 60)
+        #expect(initialConfiguration.scheduledLookbackSeconds == 20 * 60)
+        #expect(initialConfiguration.minimumForwardHorizonSeconds >= 90 * 60)
+    }
+
     @Test("An address remains a coordinate endpoint for nearby-stop routing")
     func addressUsesCoordinateEndpoint() {
         let point = LocationPoint(
@@ -91,7 +114,7 @@ struct RouteCalculationFlowTests {
         }
         let firstResultElapsed = started.duration(to: .now)
         #expect(!viewModel.routeOptions.isEmpty)
-        #expect(firstResultElapsed < .seconds(5))
+        #expect(firstResultElapsed < .seconds(15))
 
         await routeTask.value
         let elapsed = started.duration(to: .now)
@@ -127,9 +150,37 @@ struct RouteCalculationFlowTests {
                       let otherArrival = other.arrivalTime else {
                     return false
                 }
-                return otherDeparture > candidateDeparture && otherArrival < candidateArrival
+                // Time-only pruning is intentionally superseded: a slightly
+                // slower direct or lower-walk journey remains a useful choice.
+                return otherDeparture >= candidateDeparture
+                    && otherArrival <= candidateArrival
+                    && other.transferCount <= candidate.transferCount
+                    && other.walkingDistanceMeters <= candidate.walkingDistanceMeters
+                    && other.accessibility == candidate.accessibility
+                    && (otherDeparture > candidateDeparture
+                        || otherArrival < candidateArrival
+                        || other.transferCount < candidate.transferCount
+                        || other.walkingDistanceMeters < candidate.walkingDistanceMeters)
             })
         }
+
+        var calculationCount = 0
+        for try await update in routeService.routeCalculationUpdates(
+            from: LocationPoint(
+                name: "18A Gromscheed, Senningerberg",
+                latitude: 49.6541071,
+                longitude: 6.2296443
+            ),
+            to: RoutePlace(stop: destinationStop, source: .search).location,
+            time: .departAt(anchor),
+            filters: RoutePlannerFilters(),
+            realtimeRefreshPolicy: .forceRefresh,
+            page: .initial
+        ) {
+            calculationCount += 1
+            #expect(!update.options.isEmpty)
+        }
+        #expect(calculationCount == 1)
 
         printRouteResults(
             label: "18A Gromscheed → Kirchberg, Konrad Adenauer",

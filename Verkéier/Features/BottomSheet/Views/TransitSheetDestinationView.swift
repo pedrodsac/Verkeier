@@ -24,13 +24,10 @@ struct TransitSheetDestinationView: View {
             .navigationTitle(route.navigationTitle)
             .toolbarTitleDisplayMode(.inline)
         case .stopDetail:
-            ScrollView {
-                StopDetailView(
-                    viewModel: viewModel.stopDetail,
-                    actions: StopDetailActions(from: actions)
-                )
-                .safeAreaPadding(.horizontal, 16)
-            }
+            StopDetailView(
+                viewModel: viewModel.stopDetail,
+                actions: StopDetailActions(from: actions)
+            )
             .refreshable { await actions.refreshDepartures() }
             .navigationTitle(route.navigationTitle)
             .toolbarTitleDisplayMode(.inline)
@@ -83,8 +80,7 @@ struct TransitSheetDestinationView: View {
         case .routeTimeline:
             ScrollView {
                 RouteTimelineView(
-                    viewModel: viewModel.route,
-                    openInAppleMaps: actions.openRouteInAppleMaps
+                    viewModel: viewModel.route
                 )
                 .safeAreaPadding(.horizontal, 16)
             }

@@ -57,6 +57,7 @@ extension TransitMapScreen {
                 routes: viewModel.selectedStopRoutes,
                 departures: viewModel.departures,
                 offlineScheduledDepartures: viewModel.offlineScheduledDepartures,
+                isUsingOfflineDepartures: viewModel.isUsingOfflineDepartures,
                 alerts: viewModel.stopDetailAlerts,
                 selectedLine: viewModel.selectedDepartureLine,
                 selectedPlatform: viewModel.selectedDeparturePlatform,

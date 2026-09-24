@@ -108,7 +108,8 @@ struct RouteOptionCard: View {
             option.realtimeCoverage.displayText
         }
 
-        return "\(transfers)  ·  \(distance)  ·  \(dataNote)"
+        let accessibilityNote = option.accessibility.map { "  ·  \($0.displayText)" } ?? ""
+        return "\(transfers)  ·  \(distance)  ·  \(dataNote)\(accessibilityNote)"
     }
 
     private var cardBackground: AnyShapeStyle {

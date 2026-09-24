@@ -19,9 +19,9 @@ struct MapKitRouteService: RouteService {
         let effectiveTime: RoutePlanningTime = switch page {
         case .initial:
             time
-        case let .earlier(boundary, _):
+        case let .earlier(boundary, _), let .earlierFrom(boundary, _, _):
             .arriveBy(boundary.addingTimeInterval(-1))
-        case let .later(boundary, _):
+        case let .later(boundary, _), let .laterFrom(boundary, _, _):
             .departAt(boundary.addingTimeInterval(1))
         }
         switch effectiveTime {

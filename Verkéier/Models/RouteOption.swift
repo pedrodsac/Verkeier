@@ -13,6 +13,9 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     let plan: RoutePlan
     /// Pre-built map geometry for drawing the option, if available.
     let mapOverlay: RouteMapOverlay?
+    /// Nil for route providers without accessibility evidence.
+    var accessibility: RouteAccessibilityAssessment? = nil
+    var feasibility: RouteFeasibility? = nil
 
     /// The plan's transit legs (excludes walking/driving).
     var transitLegs: [RoutePlan.Leg] {
@@ -180,6 +183,7 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     ///
     /// - Parameter now: The reference time, usually the current date.
     func status(at now: Date) -> RouteOptionStatus {
+        if feasibility?.isInvalid == true { return .connectionMayBeMissed }
         if transitLegs.contains(where: { $0.liveStatus == .cancelled }) {
             return .cancelled
         }
@@ -209,6 +213,20 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
             return .partiallyLive
         case .scheduleOnly:
             return .scheduledOnly
+        }
+    }
+}
+
+nonisolated enum RouteAccessibilityAssessment: String, Codable, Hashable, Sendable {
+    case verified
+    case unknown
+    case inaccessible
+
+    var displayText: String {
+        switch self {
+        case .verified: "Step-free verified"
+        case .unknown: "Step-free unverified"
+        case .inaccessible: "Not step-free"
         }
     }
 }

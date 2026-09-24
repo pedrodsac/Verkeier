@@ -11,36 +11,38 @@ struct RouteOptionDeduplicationTests {
     private let destination = LocationPoint(name: "Destination", latitude: 49.64, longitude: 6.16)
     private let start = Date(timeIntervalSince1970: 1_800_000_000)
 
-    @Test("Equivalent cards retain the option with the largest minimum transfer gap")
-    func retainsSafestMinimumTransferGap() {
+    // Route quality now retains distinct itineraries even when card minutes
+    // match. The previous safest-transfer-only collapse hid useful choices.
+    @Test("Distinct transfers survive the same displayed time")
+    func retainsDistinctTransferChoices() {
         let tight = option(id: "tight", transferGaps: [3 * 60, 12 * 60])
         let safe = option(id: "safe", transferGaps: [7 * 60, 8 * 60])
 
         let result = TransitMapViewModel.deduplicatingEquivalentRouteOptions([tight, safe])
 
-        #expect(result.map(\.id) == ["safe"])
-        #expect(safe.minimumTransferGapDuration == 7 * 60)
-        #expect(safe.totalTransferGapDuration == 15 * 60)
+        #expect(result.map(\.id) == ["tight", "safe"])
+        #expect(safe.minimumTransferGapDuration == 420.0)
+        #expect(safe.totalTransferGapDuration == 900.0)
     }
 
-    @Test("Total transfer time breaks an equal minimum-gap tie")
-    func totalTransferTimeBreaksTie() {
+    @Test("Equal minimum gaps can represent distinct itineraries")
+    func equalMinimumGapsRemainDistinct() {
         let shorterTotal = option(id: "shorter", transferGaps: [5 * 60, 6 * 60])
         let longerTotal = option(id: "longer", transferGaps: [5 * 60, 10 * 60])
 
         let result = TransitMapViewModel.deduplicatingEquivalentRouteOptions([shorterTotal, longerTotal])
 
-        #expect(result.map(\.id) == ["longer"])
+        #expect(result.map(\.id) == ["shorter", "longer"])
     }
 
-    @Test("A direct route wins an equivalent group")
-    func directRouteWins() {
+    @Test("A direct route survives beside a transfer")
+    func directRouteSurvives() {
         let transfer = option(id: "transfer", transferGaps: [10 * 60])
         let direct = option(id: "direct", transferGaps: [])
 
         let result = TransitMapViewModel.deduplicatingEquivalentRouteOptions([transfer, direct])
 
-        #expect(result.map(\.id) == ["direct"])
+        #expect(result.map(\.id) == ["transfer", "direct"])
     }
 
     @Test("Different displayed timing values remain separate")
@@ -57,8 +59,8 @@ struct RouteOptionDeduplicationTests {
         #expect(result.map(\.id) == ["baseline", "departure", "arrival", "duration"])
     }
 
-    @Test("Second-level differences that display in the same minute collapse")
-    func sameDisplayedMinuteCollapses() {
+    @Test("Second-level differences within a display minute survive")
+    func sameDisplayedMinuteSurvives() {
         let first = option(id: "first", transferGaps: [4 * 60])
         let safer = option(
             id: "safer",
@@ -70,17 +72,17 @@ struct RouteOptionDeduplicationTests {
 
         let result = TransitMapViewModel.deduplicatingEquivalentRouteOptions([first, safer])
 
-        #expect(result.map(\.id) == ["safer"])
+        #expect(result.map(\.id) == ["first", "safer"])
     }
 
-    @Test("Known transfer timing wins over unknown timing")
-    func knownTimingWins() {
+    @Test("Unknown and known transfer timings remain distinct")
+    func knownAndUnknownTimingRemainDistinct() {
         let unknown = option(id: "unknown", transferGaps: [nil])
         let known = option(id: "known", transferGaps: [-60])
 
         let result = TransitMapViewModel.deduplicatingEquivalentRouteOptions([unknown, known])
 
-        #expect(result.map(\.id) == ["known"])
+        #expect(result.map(\.id) == ["unknown", "known"])
         #expect(known.minimumTransferGapDuration == -60)
     }
 
@@ -145,7 +147,7 @@ struct RouteOptionDeduplicationTests {
         #expect(result.map(\.id) == ["walk-a", "walk-b"])
     }
 
-    @Test("Exact ties use existing deterministic ranking and preserve group position")
+    @Test("Distinct identities preserve input order through deduplication")
     func exactTieIsDeterministicAndStable() {
         let laterGroup = option(
             id: "later-group",
@@ -160,7 +162,17 @@ struct RouteOptionDeduplicationTests {
             higherID, laterGroup, lowerID,
         ])
 
-        #expect(result.map(\.id) == ["a-route", "later-group"])
+        #expect(result.map(\.id) == ["z-route", "later-group", "a-route"])
+    }
+
+    @Test("Repeated stable identity keeps the safer update in its original position")
+    func duplicateIdentityUsesSaferUpdate() {
+        let tight = option(id: "same", transferGaps: [3 * 60])
+        let safe = option(id: "same", transferGaps: [9 * 60])
+        let other = option(id: "other", transferGaps: [])
+        let result = TransitMapViewModel.deduplicatingEquivalentRouteOptions([tight, other, safe])
+        #expect(result.map(\.id) == ["same", "other"])
+        #expect(result[0].minimumTransferGapDuration == 540.0)
     }
 
     private func option(

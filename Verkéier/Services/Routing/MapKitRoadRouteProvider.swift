@@ -66,15 +66,19 @@ nonisolated struct RoadRoute: Sendable {
     let distanceMeters: Double
     /// Provider-supplied travel time. Coordinate-only providers may omit it.
     let expectedTravelTime: TimeInterval?
+    /// Whether walking geometry follows a pedestrian route or is an estimate.
+    let walkingEvidence: RouteWalkingEvidence
 
     init(
         coordinates: [RouteMapCoordinate],
         distanceMeters: Double,
-        expectedTravelTime: TimeInterval? = nil
+        expectedTravelTime: TimeInterval? = nil,
+        walkingEvidence: RouteWalkingEvidence = .routedPedestrian
     ) {
         self.coordinates = coordinates
         self.distanceMeters = distanceMeters
         self.expectedTravelTime = expectedTravelTime
+        self.walkingEvidence = walkingEvidence
     }
 }
 

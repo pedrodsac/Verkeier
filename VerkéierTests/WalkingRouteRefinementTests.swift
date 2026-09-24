@@ -5,6 +5,121 @@ import Testing
 @Suite("Walking route refinement")
 @MainActor
 struct WalkingRouteRefinementTests {
+    @Test("Adjacent walks are replaced by one new pedestrian route")
+    func adjacentWalksUseDirectPedestrianRoute() async throws {
+        let start = Date(timeIntervalSince1970: 10_000)
+        let origin = LocationPoint(name: "Héienhaff", latitude: 49.60, longitude: 6.20)
+        let alight = LocationPoint(name: "Charlys Statioun", latitude: 49.61, longitude: 6.21)
+        let intermediate = LocationPoint(name: "Kapell", latitude: 49.62, longitude: 6.22)
+        let destination = LocationPoint(name: "Piste Cyclable", latitude: 49.63, longitude: 6.23)
+        let ride = RoutePlan.Leg(
+            id: "ride", mode: .bus, transportKind: .transit,
+            origin: origin, destination: alight,
+            departureTime: start, arrivalTime: start.addingTimeInterval(120),
+            mapCoordinates: [RouteMapCoordinate(origin), RouteMapCoordinate(alight)]
+        )
+        let firstWalk = RoutePlan.Leg(
+            id: "first-walk", mode: .walking, transportKind: .walking,
+            origin: alight, destination: intermediate,
+            departureTime: start.addingTimeInterval(120),
+            arrivalTime: start.addingTimeInterval(180), distanceMeters: 65,
+            roadRoutingHint: .walking
+        )
+        let secondWalk = RoutePlan.Leg(
+            id: "second-walk", mode: .walking, transportKind: .walking,
+            origin: intermediate, destination: destination,
+            departureTime: start.addingTimeInterval(180),
+            arrivalTime: start.addingTimeInterval(720), distanceMeters: 636,
+            roadRoutingHint: .walking
+        )
+        let option = RouteOption(id: "route", plan: RoutePlan(
+            id: "route", origin: origin, destination: destination,
+            expectedTravelTime: 720, distanceMeters: 701,
+            legs: [ride, firstWalk, secondWalk], dataSource: .local
+        ), mapOverlay: nil)
+        let directShape = [
+            RouteMapCoordinate(alight),
+            RouteMapCoordinate(latitude: 49.615, longitude: 6.225),
+            RouteMapCoordinate(destination),
+        ]
+        let probe = RoadRouteRequestProbe()
+        let service = MobiliteitRouteService(roadRouteProvider: RecordingRoadRouteProvider(
+            probe: probe,
+            route: RoadRoute(coordinates: directShape, distanceMeters: 500, expectedTravelTime: 420)
+        ))
+
+        let refined = try #require(await service.refineWalkingRoutes(in: [option]).first)
+        let calls = await probe.requests
+        #expect(calls.count == 1)
+        #expect(calls.first?.origin == alight)
+        #expect(calls.first?.destination == destination)
+        #expect(refined.plan.legs.count == 2)
+        let walk = refined.plan.legs[1]
+        #expect(walk.id == firstWalk.id)
+        #expect(walk.origin == alight)
+        #expect(walk.destination == destination)
+        #expect(walk.distanceMeters == 500)
+        #expect(walk.mapCoordinates == directShape)
+        #expect(walk.arrivalTime == start.addingTimeInterval(540))
+        #expect(refined.plan.expectedTravelTime == 540)
+        #expect(refined.plan.distanceMeters == 500)
+        #expect(refined.mapOverlay?.segments.last?.coordinates == directShape)
+        #expect(RouteTimelineBuilder.items(from: refined.plan.legs).count == 5)
+
+        let laterTransitShape = [RouteMapCoordinate(origin),
+                                 RouteMapCoordinate(latitude: 49.605, longitude: 6.205),
+                                 RouteMapCoordinate(alight)]
+        let laterTransit = option.replacingLegs([
+            RoutePlan.Leg(
+                id: "ride", mode: .bus, transportKind: .transit,
+                origin: origin, destination: alight,
+                departureTime: start, arrivalTime: start.addingTimeInterval(120),
+                mapCoordinates: laterTransitShape
+            ),
+            firstWalk, secondWalk,
+        ])
+        let preserved = laterTransit.replacingLegs(
+            of: .walking, from: refined, preserveUpdatedTotals: true
+        )
+        #expect(preserved.plan.legs.count == 2)
+        #expect(preserved.plan.legs[0].mapCoordinates == laterTransitShape)
+        #expect(preserved.plan.legs[1].mapCoordinates == directShape)
+    }
+
+    @Test("An estimated straight line does not replace two walks")
+    func estimatedDirectWalkDoesNotCollapseLegs() async throws {
+        let start = Date(timeIntervalSince1970: 10_000)
+        let origin = LocationPoint(latitude: 49.60, longitude: 6.20)
+        let middle = LocationPoint(latitude: 49.61, longitude: 6.21)
+        let destination = LocationPoint(latitude: 49.62, longitude: 6.22)
+        let first = RoutePlan.Leg(
+            id: "first", mode: .walking, transportKind: .walking,
+            origin: origin, destination: middle,
+            departureTime: start, arrivalTime: start.addingTimeInterval(60)
+        )
+        let second = RoutePlan.Leg(
+            id: "second", mode: .walking, transportKind: .walking,
+            origin: middle, destination: destination,
+            departureTime: start.addingTimeInterval(60),
+            arrivalTime: start.addingTimeInterval(600)
+        )
+        let option = RouteOption(id: "walk", plan: RoutePlan(
+            id: "walk", origin: origin, destination: destination,
+            expectedTravelTime: 600, distanceMeters: 701,
+            legs: [first, second], dataSource: .local
+        ), mapOverlay: nil)
+        let service = MobiliteitRouteService(roadRouteProvider: FixedRoadRouteProvider(
+            route: RoadRoute(
+                coordinates: [RouteMapCoordinate(origin), RouteMapCoordinate(destination)],
+                distanceMeters: 500, expectedTravelTime: 420, walkingEvidence: .estimate
+            )
+        ))
+
+        let refined = try #require(await service.refineWalkingRoutes(in: [option]).first)
+        #expect(refined.plan.legs.count == 2)
+        #expect(refined.plan.legs.map(\.id) == ["first", "second"])
+    }
+
     @Test("MapKit route data replaces the walking estimate and keeps boarding fixed")
     func mapKitRouteReplacesWalkingEstimate() async throws {
         let boarding = Date(timeIntervalSince1970: 10_000)
@@ -112,6 +227,71 @@ struct WalkingRouteRefinementTests {
         #expect(updates.count == 2)
     }
 
+    @Test("Transit shapes and walking refinements survive either update order")
+    func independentGeometryUpdatesCombine() throws {
+        let origin = LocationPoint(name: "Origin", latitude: 49.61, longitude: 6.12)
+        let stop = LocationPoint(name: "Stop", latitude: 49.615, longitude: 6.125)
+        let destination = LocationPoint(name: "Destination", latitude: 49.63, longitude: 6.14)
+        let walk = RoutePlan.Leg(
+            id: "walk", mode: .walking, transportKind: .walking,
+            origin: origin, destination: stop, distanceMeters: 500,
+            mapCoordinates: [RouteMapCoordinate(origin), RouteMapCoordinate(stop)],
+            roadRoutingHint: .walking
+        )
+        let ride = RoutePlan.Leg(
+            id: "ride", mode: .bus, transportKind: .transit,
+            origin: stop, destination: destination
+        )
+        let initial = RouteOption(
+            id: "route",
+            plan: RoutePlan(
+                id: "route", origin: origin, destination: destination,
+                expectedTravelTime: 1_500, distanceMeters: 500,
+                legs: [walk, ride], dataSource: .local
+            ),
+            mapOverlay: nil
+        )
+        let walkingShape = [
+            RouteMapCoordinate(origin),
+            RouteMapCoordinate(latitude: 49.612, longitude: 6.123),
+            RouteMapCoordinate(stop),
+        ]
+        let busShape = [
+            RouteMapCoordinate(stop),
+            RouteMapCoordinate(latitude: 49.62, longitude: 6.13),
+            RouteMapCoordinate(destination),
+        ]
+        let walkingUpdate = initial.replacingLegs(
+            [RoutePlan.Leg(
+                id: "walk", mode: .walking, transportKind: .walking,
+                origin: origin, destination: stop, distanceMeters: 700,
+                mapCoordinates: walkingShape, roadRoutingHint: .walking
+            ), ride],
+            expectedTravelTime: 1_650,
+            distanceMeters: 700
+        )
+        let transitUpdate = initial.replacingLegs([
+            walk,
+            RoutePlan.Leg(
+                id: "ride", mode: .bus, transportKind: .transit,
+                origin: stop, destination: destination,
+                mapCoordinates: busShape
+            ),
+        ])
+
+        let walkingLast = walkingUpdate.replacingLegs(of: .transit, from: transitUpdate)
+        let transitLast = transitUpdate.replacingLegs(
+            of: .walking, from: walkingUpdate, preserveUpdatedTotals: true
+        )
+        for result in [walkingLast, transitLast] {
+            #expect(result.plan.legs[0].mapCoordinates == walkingShape)
+            #expect(result.plan.legs[1].mapCoordinates == busShape)
+            #expect(result.mapOverlay?.segments.count == 2)
+            #expect(result.plan.expectedTravelTime == 1_650)
+            #expect(result.plan.distanceMeters == 700)
+        }
+    }
+
     @Test("Walking refinement starts before progressive route updates finish")
     func refinementStartsWithFirstVisibleUpdate() async throws {
         let probe = RefinementProbe()
@@ -142,6 +322,134 @@ struct WalkingRouteRefinementTests {
 
         routeTask.cancel()
         await routeTask.value
+    }
+
+    @Test("Longer transfer walk uses waiting without changing door-to-door time")
+    func transferWalkUsesWaitingTime() async throws {
+        let start = Date(timeIntervalSince1970: 100_000)
+        let option = transferOption(start: start, outgoingOffset: 1_200)
+        let refined = try #require(await refinementService(duration: 360)
+            .refineWalkingRoutes(in: [option]).first)
+        let walk = refined.plan.legs[1]
+        #expect(walk.departureTime == start.addingTimeInterval(600))
+        #expect(walk.arrivalTime == start.addingTimeInterval(960))
+        #expect(refined.plan.expectedTravelTime == 2_400)
+        #expect(RouteItineraryValidator.assess(refined, context: .init(
+            anchor: start, arriveBy: false, minimumTransferSeconds: 120
+        )) == .feasible(minimumTransferSlack: 120))
+    }
+
+    @Test("Estimated transfer walking cannot prove a connection feasible")
+    func estimatedTransferWalkIsInvalid() {
+        let start = Date(timeIntervalSince1970: 100_000)
+        let option = transferOption(start: start, outgoingOffset: 1_200,
+                                    walkingEvidence: .estimate)
+        #expect(RouteItineraryValidator.assess(option, context: .init(
+            anchor: start, arriveBy: false, minimumTransferSeconds: 120
+        )) == .invalid(.unverifiedTransferWalk))
+    }
+
+    @Test("A transfer walk that overlaps the outgoing ride is invalidated")
+    func missedTransferIsInvalid() async throws {
+        let start = Date(timeIntervalSince1970: 100_000)
+        let option = transferOption(start: start, outgoingOffset: 900)
+        let service = refinementService(duration: 360)
+        let context = RouteValidationContext(anchor: start, arriveBy: false,
+                                             minimumTransferSeconds: 120)
+        var events: [WalkingRefinementEvent] = []
+        for await event in service.refinementEvents(in: [option], context: context) {
+            events.append(event)
+        }
+        #expect(events.count == 1)
+        if case let .invalidated(id)? = events.first { #expect(id == option.id) }
+        else { Issue.record("Expected an invalidation") }
+    }
+
+    @Test("Refined access cannot precede the original departure request")
+    func accessBeforeAnchorIsInvalid() async throws {
+        let boarding = Date(timeIntervalSince1970: 100_600)
+        let origin = LocationPoint(latitude: 49.60, longitude: 6.10)
+        let stop = LocationPoint(latitude: 49.61, longitude: 6.11)
+        let destination = LocationPoint(latitude: 49.62, longitude: 6.12)
+        let walk = RoutePlan.Leg(id: "access", mode: .walking, transportKind: .walking,
+                                 origin: origin, destination: stop,
+                                 departureTime: boarding.addingTimeInterval(-600),
+                                 arrivalTime: boarding, roadRoutingHint: .walking)
+        let ride = RoutePlan.Leg(id: "ride", mode: .bus, transportKind: .transit,
+                                 origin: stop, destination: destination,
+                                 departureTime: boarding,
+                                 arrivalTime: boarding.addingTimeInterval(1_200))
+        let option = RouteOption(id: "access-option", plan: RoutePlan(
+            id: "access-option", origin: origin, destination: destination,
+            expectedTravelTime: 1_800, distanceMeters: 600,
+            legs: [walk, ride], dataSource: .local
+        ), mapOverlay: nil)
+        let refined = try #require(await refinementService(duration: 900)
+            .refineWalkingRoutes(in: [option]).first)
+        #expect(RouteItineraryValidator.assess(refined, context: .init(
+            anchor: boarding.addingTimeInterval(-600), arriveBy: false,
+            minimumTransferSeconds: 120
+        )) == .invalid(.departureBeforeAnchor))
+    }
+
+    @Test("Refined egress cannot cross an arrival deadline")
+    func egressAfterDeadlineIsInvalid() async throws {
+        let start = Date(timeIntervalSince1970: 100_000)
+        let origin = LocationPoint(latitude: 49.60, longitude: 6.10)
+        let stop = LocationPoint(latitude: 49.61, longitude: 6.11)
+        let destination = LocationPoint(latitude: 49.62, longitude: 6.12)
+        let ride = RoutePlan.Leg(id: "ride", mode: .bus, transportKind: .transit,
+                                 origin: origin, destination: stop,
+                                 departureTime: start, arrivalTime: start.addingTimeInterval(600))
+        let walk = RoutePlan.Leg(id: "egress", mode: .walking, transportKind: .walking,
+                                 origin: stop, destination: destination,
+                                 departureTime: start.addingTimeInterval(600),
+                                 arrivalTime: start.addingTimeInterval(900),
+                                 roadRoutingHint: .walking)
+        let option = RouteOption(id: "egress-option", plan: RoutePlan(
+            id: "egress-option", origin: origin, destination: destination,
+            expectedTravelTime: 900, distanceMeters: 300,
+            legs: [ride, walk], dataSource: .local
+        ), mapOverlay: nil)
+        let refined = try #require(await refinementService(duration: 900)
+            .refineWalkingRoutes(in: [option]).first)
+        #expect(RouteItineraryValidator.assess(refined, context: .init(
+            anchor: start.addingTimeInterval(1_200), arriveBy: true,
+            minimumTransferSeconds: 120
+        )) == .invalid(.arrivalAfterDeadline))
+    }
+
+    private func refinementService(duration: TimeInterval) -> MobiliteitRouteService {
+        MobiliteitRouteService(roadRouteProvider: FixedRoadRouteProvider(route: RoadRoute(
+            coordinates: [], distanceMeters: 500, expectedTravelTime: duration
+        )))
+    }
+
+    private func transferOption(start: Date, outgoingOffset: TimeInterval,
+                                walkingEvidence: RouteWalkingEvidence? = nil) -> RouteOption {
+        let origin = LocationPoint(latitude: 49.60, longitude: 6.10)
+        let first = LocationPoint(latitude: 49.61, longitude: 6.11)
+        let second = LocationPoint(latitude: 49.615, longitude: 6.115)
+        let destination = LocationPoint(latitude: 49.62, longitude: 6.12)
+        let incoming = RoutePlan.Leg(id: "incoming", mode: .bus, transportKind: .transit,
+                                     origin: origin, destination: first,
+                                     departureTime: start, arrivalTime: start.addingTimeInterval(600))
+        var walk = RoutePlan.Leg(id: "transfer", mode: .walking, transportKind: .walking,
+                                 origin: first, destination: second,
+                                 departureTime: start.addingTimeInterval(600),
+                                 arrivalTime: start.addingTimeInterval(720),
+                                 roadRoutingHint: .walking)
+        walk.walkingEvidence = walkingEvidence
+        var outgoing = RoutePlan.Leg(id: "outgoing", mode: .train, transportKind: .transit,
+                                     origin: second, destination: destination,
+                                     departureTime: start.addingTimeInterval(outgoingOffset),
+                                     arrivalTime: start.addingTimeInterval(2_400))
+        outgoing.requiredTransferSeconds = 120
+        return RouteOption(id: "transfer-option", plan: RoutePlan(
+            id: "transfer-option", origin: origin, destination: destination,
+            expectedTravelTime: 2_400, distanceMeters: 120,
+            legs: [incoming, walk, outgoing], dataSource: .local
+        ), mapOverlay: nil)
     }
 
     private func walkingOption(
@@ -176,6 +484,41 @@ struct WalkingRouteRefinementTests {
             ),
             mapOverlay: nil
         )
+    }
+}
+
+private actor RoadRouteRequestProbe {
+    struct Request: Sendable {
+        let origin: LocationPoint
+        let destination: LocationPoint
+    }
+
+    private(set) var requests: [Request] = []
+
+    func record(from origin: LocationPoint, to destination: LocationPoint) {
+        requests.append(Request(origin: origin, destination: destination))
+    }
+}
+
+private struct RecordingRoadRouteProvider: RoadRouteProviding {
+    let probe: RoadRouteRequestProbe
+    let route: RoadRoute
+
+    nonisolated func roadRoute(
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        transport _: RoadRouteTransport
+    ) async -> RoadRoute? {
+        await probe.record(from: origin, to: destination)
+        return route
+    }
+
+    nonisolated func roadRouteCoordinates(
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        transport: RoadRouteTransport
+    ) async -> [RouteMapCoordinate]? {
+        await roadRoute(from: origin, to: destination, transport: transport)?.coordinates
     }
 }
 

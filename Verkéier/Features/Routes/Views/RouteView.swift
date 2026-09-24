@@ -37,22 +37,7 @@ struct RouteView: View {
             // ── State-driven body ─────────────────────────────────────────
             stateBody
 
-            // ── Share + Apple Maps handoff ────────────────────────────────
-            if let option = viewModel.selectedRouteOption {
-                ShareLink(
-                    item: option.shareText(
-                        originTitle: viewModel.originTitle,
-                        destinationTitle: viewModel.destinationTitle
-                    )
-                ) {
-                    Label("Share route", systemImage: "square.and.arrow.up")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-                .tint(.primary)
-            }
-
+            // ── Apple Maps handoff ────────────────────────────────────────
             if viewModel.hasDestination {
                 Button(action: actions.openInAppleMaps) {
                     Label("Open in Apple Maps", systemImage: "map")

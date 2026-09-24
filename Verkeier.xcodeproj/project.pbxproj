@@ -264,7 +264,7 @@
 				62FE86412FEE000000000202 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				62FE86412FEE000000000204 /* XCRemoteSwiftPackageReference "UIOnboarding" */,
 				E8D57E30304F173F00F569AC /* XCRemoteSwiftPackageReference "valhalla-mobile" */,
-				E8E6376C3061989F00A5CED1 /* XCRemoteSwiftPackageReference "MobiliteitKit" */,
+				E8038DF630644A8500813642 /* XCRemoteSwiftPackageReference "MobiliteitKit" */,
 			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
@@ -719,7 +719,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-async-algorithms.git";
 			requirement = {
-				kind = upToNextMajorVersion;
+				kind = upToNextMinorVersion;
 				minimumVersion = 1.1.4;
 			};
 		};
@@ -731,20 +731,20 @@
 				minimumVersion = 2.0.4;
 			};
 		};
+		E8038DF630644A8500813642 /* XCRemoteSwiftPackageReference "MobiliteitKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pedrodsac/MobiliteitKit";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		E8D57E30304F173F00F569AC /* XCRemoteSwiftPackageReference "valhalla-mobile" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Rallista/valhalla-mobile.git";
 			requirement = {
 				kind = upToNextMinorVersion;
 				minimumVersion = 0.6.3;
-			};
-		};
-		E8E6376C3061989F00A5CED1 /* XCRemoteSwiftPackageReference "MobiliteitKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pedrodsac/MobiliteitKit";
-			requirement = {
-				branch = main;
-				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -767,7 +767,7 @@
 		};
 		E8E6376D3061989F00A5CED1 /* MobiliteitKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E8E6376C3061989F00A5CED1 /* XCRemoteSwiftPackageReference "MobiliteitKit" */;
+			package = E8038DF630644A8500813642 /* XCRemoteSwiftPackageReference "MobiliteitKit" */;
 			productName = MobiliteitKit;
 		};
 /* End XCSwiftPackageProductDependency section */

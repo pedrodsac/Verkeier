@@ -21,6 +21,12 @@ nonisolated struct WalkingDestination: Hashable, Sendable {
     }
 }
 
+/// A source in a many-to-one walking query.
+nonisolated struct WalkingOrigin: Hashable, Sendable {
+    let id: String
+    let location: LocationPoint
+}
+
 /// The distance and duration to one destination.
 nonisolated struct OfflineWalkingEstimate: Hashable, Sendable {
     let destinationID: String
@@ -63,16 +69,53 @@ nonisolated struct OfflineWalkingRoute: Hashable, Sendable {
 
 /// A walking-routing engine. Implementations are deliberately independent of
 /// the UI and may be backed by an offline graph or a fallback service.
-protocol WalkingRouting: Sendable {
+nonisolated protocol WalkingRouting: Sendable {
     func estimates(
         from origin: LocationPoint,
         to destinations: [WalkingDestination]
+    ) async throws -> [OfflineWalkingEstimate]
+
+    func estimates(
+        from origins: [WalkingOrigin],
+        to destination: LocationPoint
     ) async throws -> [OfflineWalkingEstimate]
 
     func route(
         from origin: LocationPoint,
         to destination: LocationPoint
     ) async throws -> OfflineWalkingRoute
+}
+
+nonisolated extension WalkingRouting {
+    func estimates(
+        from origins: [WalkingOrigin],
+        to destination: LocationPoint
+    ) async throws -> [OfflineWalkingEstimate] {
+        guard !origins.isEmpty else { return [] }
+        return try await withThrowingTaskGroup(of: OfflineWalkingEstimate.self) { group in
+            let limit = min(4, origins.count)
+            var next = 0
+            var results: [OfflineWalkingEstimate] = []
+            func add(_ index: Int) {
+                let origin = origins[index]
+                group.addTask {
+                    let route = try await route(from: origin.location, to: destination)
+                    return .init(
+                        destinationID: origin.id,
+                        distanceMeters: route.distanceMeters,
+                        duration: route.duration,
+                        source: route.source
+                    )
+                }
+            }
+            for _ in 0..<limit { add(next); next += 1 }
+            for try await result in group {
+                results.append(result)
+                if next < origins.count { add(next); next += 1 }
+            }
+            return results
+        }
+    }
 }
 
 nonisolated enum WalkingRoutingError: Error, Equatable {

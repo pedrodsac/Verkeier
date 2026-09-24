@@ -7,7 +7,7 @@ import MobiliteitKit
 /// map overlays, accessibility, and paging UI need no parallel presentation
 /// model.
 struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
-    private nonisolated static let previewSearchHorizon: TimeInterval = 30 * 60
+    private nonisolated static let initialSearchHorizon: TimeInterval = 3 * 60 * 60
     let databaseURL: URL
     private let gtfsService: (any GTFSService)?
     private let engine: MobiliteitRouteEngine
@@ -39,124 +39,18 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         realtimeRefreshPolicy: RouteRealtimeRefreshPolicy,
         page: RouteSearchPage
     ) async throws -> RouteCalculation {
-        let anchor: Date = switch time {
-        case .leaveNow: .now
-        case let .departAt(value): value
-        // The on-device engine is leave-after. For arrive-by the app starts an
-        // earlier profile window; users can refine with Earlier from there.
-        case let .arriveBy(value): value.addingTimeInterval(-2 * 60 * 60)
-        }
-        let searchAnchor: Date = switch page {
-        case .initial: anchor
-        case let .later(boundary, _): boundary.addingTimeInterval(1)
-        case let .earlier(boundary, _): boundary.addingTimeInterval(-2 * 60 * 60)
-        }
+        let query = makeQuery(from: from, to: to, time: time, filters: filters,
+                              page: page, realtimeRefreshPolicy: realtimeRefreshPolicy)
         let databaseURL = try await readyDatabaseURL()
         let router = try await engine.router(for: databaseURL)
         let calculation = try await localCalculation(
             using: router,
             from: from,
             to: to,
-            searchAnchor: searchAnchor,
-            filters: filters,
-            page: page,
-            realtimeRefreshPolicy: realtimeRefreshPolicy
+            query: query,
+            page: page
         )
         return await addingTransitGeometry(to: calculation)
-    }
-
-    nonisolated func routeCalculationUpdates(
-        from: LocationPoint,
-        to: LocationPoint,
-        time: RoutePlanningTime,
-        filters: RoutePlannerFilters,
-        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy,
-        page: RouteSearchPage
-    ) -> AsyncThrowingStream<RouteCalculation, Error> {
-        guard case .initial = page else {
-            return AsyncThrowingStream { continuation in
-                let task = Task {
-                    do {
-                        continuation.yield(try await calculateRoute(
-                            from: from,
-                            to: to,
-                            time: time,
-                            filters: filters,
-                            realtimeRefreshPolicy: realtimeRefreshPolicy,
-                            page: page
-                        ))
-                        continuation.finish()
-                    } catch {
-                        continuation.finish(throwing: error)
-                    }
-                }
-                continuation.onTermination = { @Sendable _ in task.cancel() }
-            }
-        }
-
-        return AsyncThrowingStream { continuation in
-            let task = Task(priority: .userInitiated) {
-                do {
-                    let anchor: Date = switch time {
-                    case .leaveNow: .now
-                    case let .departAt(value): value
-                    case let .arriveBy(value): value.addingTimeInterval(-2 * 60 * 60)
-                    }
-                    let databaseURL = try await readyDatabaseURL()
-                    let router = try await engine.router(for: databaseURL)
-                    let session = try await router.makeSession(for: RouteQuery(
-                        origin: Self.journeyEndpoint(for: from),
-                        destination: Self.journeyEndpoint(for: to),
-                        departureTime: anchor,
-                        preferences: preferences(filters),
-                        realtimePolicy: realtimePolicy(for: realtimeRefreshPolicy)
-                    ))
-
-                    var published = false
-                    let preview = try await session.initial(
-                        count: max(page.resultLimit, 5),
-                        searchHorizon: Self.previewSearchHorizon
-                    )
-                    if let previewCalculation = calculation(
-                        from: preview,
-                        origin: from,
-                        destination: to,
-                        page: page,
-                        stage: .preview
-                    ) {
-                        published = true
-                        continuation.yield(previewCalculation)
-                    }
-
-                    try Task.checkCancellation()
-                    let expanded = try await session.expanded(count: max(page.resultLimit, 5))
-                    if let finalCalculation = calculation(
-                        from: expanded,
-                        origin: from,
-                        destination: to,
-                        page: page,
-                        stage: .final
-                    ) {
-                        published = true
-                        // Realtime was already applied during the RAPTOR scan.
-                        // Geometry remains independent and can arrive later.
-                        continuation.yield(finalCalculation)
-                        let resolvedShapes = await transitShapes(for: finalCalculation)
-                        if !resolvedShapes.isEmpty {
-                            continuation.yield(applyingTransitGeometry(resolvedShapes, to: finalCalculation))
-                        }
-                    }
-                    if published {
-                        continuation.finish()
-                    } else {
-                        continuation.finish(throwing: RoutingError.noPublicTransportRoute)
-                    }
-                } catch {
-                    continuation.finish(throwing: error)
-                }
-            }
-            continuation.onTermination = { @Sendable _ in task.cancel() }
-        }
     }
 
     /// Starts loading MobiliteitKit's full-feed snapshot without blocking UI
@@ -192,9 +86,9 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         appleMaps.openInAppleMaps(from: from, to: to)
     }
 
-    /// Replace the initially approximate walking segments after a route has
-    /// already been shown. MapKit supplies both pedestrian geometry and time.
-    /// Failures leave the quick local estimate in place.
+    /// Replace initially approximate walking segments after a route has been
+    /// shown. Consecutive walks are routed once between their outer endpoints.
+    /// Failures leave the original legs in place.
     nonisolated func refineWalkingRoutes(in options: [RouteOption]) async -> [RouteOption] {
         var refinedByID = Dictionary(
             options.map { ($0.id, $0) },
@@ -206,18 +100,16 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         return options.map { refinedByID[$0.id] ?? $0 }
     }
 
-    /// Streams walking refinements as soon as each MapKit request completes.
+    /// Streams walking refinements as soon as each pedestrian request completes.
     /// A single walking request can be shared by multiple alternatives, so all
     /// affected options are emitted with the completed geometry applied.
     nonisolated func refineWalkingRouteUpdates(
         in options: [RouteOption]
     ) -> AsyncStream<RouteOption> {
         let requests = options.flatMap { option in
-            option.plan.legs.compactMap { leg -> WalkingGeometryRequest? in
-                guard leg.transportKind == .walking,
-                      leg.roadRoutingHint == .walking else { return nil }
-                return .init(origin: leg.origin, destination: leg.destination)
-            }
+            WalkingLegSpan.spans(in: option.plan.legs)
+                .filter(\.needsRouting)
+                .map(\.request)
         }
         let uniqueRequests = Dictionary(
             requests.map { ($0.key, $0) },
@@ -232,6 +124,10 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         let requestsToRun = Array(uniqueRequests.values)
         return AsyncStream { continuation in
             let task = Task {
+                let activeURL = try? await readyDatabaseURL()
+                let activeRouter: TransitRouter? = if let activeURL {
+                    try? await engine.router(for: activeURL)
+                } else { nil }
                 var routesByLeg: [String: RoadRoute] = [:]
                 var startIndex = 0
 
@@ -254,18 +150,32 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                                   let route
                             else { continue }
 
-                            routesByLeg[key] = route
-                            for option in options where option.plan.legs.contains(where: { leg in
-                                leg.transportKind == .walking
-                                    && leg.roadRoutingHint == .walking
-                                    && WalkingGeometryRequest(
-                                        origin: leg.origin,
-                                        destination: leg.destination
-                                    ).key == key
-                            }) {
-                                continuation.yield(
-                                    option.replacingWalkingRoutes(routesByLeg: routesByLeg)
+                            if let request = uniqueRequests[key],
+                               let seconds = route.expectedTravelTime,
+                               seconds.isFinite, seconds >= 0,
+                               route.distanceMeters.isFinite, route.distanceMeters >= 0 {
+                                let walkingRequest = WalkingRequest(
+                                    source: Coordinate(latitude: request.origin.latitude,
+                                                       longitude: request.origin.longitude),
+                                    destination: Coordinate(latitude: request.destination.latitude,
+                                                            longitude: request.destination.longitude)
                                 )
+                                let corrected = MobiliteitKit.WalkingRoute(
+                                    durationSeconds: Int(seconds.rounded()),
+                                    distanceMeters: route.distanceMeters,
+                                    polyline: route.coordinates.map {
+                                        Coordinate(latitude: $0.latitude, longitude: $0.longitude)
+                                    },
+                                    evidence: route.walkingEvidence == .estimate ? .estimate : .routedPedestrian
+                                )
+                                await activeRouter?.correctWalkingRoute(corrected, for: walkingRequest)
+                            }
+                            routesByLeg[key] = route
+                            for option in options where WalkingLegSpan.spans(in: option.plan.legs).contains(where: { span in
+                                span.needsRouting && span.request.key == key
+                            }) {
+                                let refined = option.replacingWalkingRoutes(routesByLeg: routesByLeg)
+                                if refined != option { continuation.yield(refined) }
                             }
                         }
                     }
@@ -348,7 +258,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                 $0.replacingTransitGeometry(shapesByTripID: shapesByTripID)
             },
             invalidatedOptionIDs: calculation.invalidatedOptionIDs,
-            stage: calculation.stage,
+            validationContext: calculation.validationContext,
             selectedOptionID: calculation.selectedOptionID
         )
     }
@@ -357,25 +267,19 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         using router: TransitRouter,
         from: LocationPoint,
         to: LocationPoint,
-        searchAnchor: Date,
-        filters: RoutePlannerFilters,
-        page: RouteSearchPage,
-        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy
+        query: RouteQuery,
+        page: RouteSearchPage
     ) async throws -> RouteCalculation {
         do {
-            let session = try await router.makeSession(for: RouteQuery(
-                origin: Self.journeyEndpoint(for: from),
-                destination: Self.journeyEndpoint(for: to),
-                departureTime: searchAnchor,
-                preferences: preferences(filters),
-                realtimePolicy: realtimePolicy(for: realtimeRefreshPolicy)
-            ))
-            let journeyPage = try await session.initial(count: max(page.resultLimit, 5))
+            let session = try await router.makeSession(for: query)
+            let journeyPage = try await initialJourneys(using: session, page: page,
+                                                        direction: query.direction)
             guard let calculation = calculation(
                 from: journeyPage,
                 origin: from,
                 destination: to,
-                page: page
+                page: page,
+                query: query
             ) else { throw RoutingError.noPublicTransportRoute }
             return calculation
         } catch let error as RoutingError {
@@ -385,23 +289,79 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         }
     }
 
+    private nonisolated func initialJourneys(
+        using session: JourneyPlanningSession,
+        page: RouteSearchPage,
+        direction: RouteQueryDirection
+    ) async throws -> JourneyPage {
+        let count = page.resultLimit
+        switch page {
+        case let .earlier(boundary, _):
+            return try await session.boundedPage(before: boundary, count: count)
+        case let .later(boundary, _):
+            return try await session.boundedPage(after: boundary, count: count)
+        case let .earlierFrom(boundary, id, _):
+            return try await session.boundedPage(before: boundary, beforeID: .init(id), count: count)
+        case let .laterFrom(boundary, id, _):
+            return try await session.boundedPage(after: boundary, afterID: .init(id), count: count)
+        case .initial:
+            break
+        }
+        if direction == .arriveBy { return try await session.expanded(count: count) }
+        return try await session.initial(
+            count: count,
+            searchHorizon: Self.initialSearchHorizon
+        )
+    }
+
     private nonisolated func calculation(
         from journeyPage: JourneyPage,
         origin: LocationPoint,
         destination: LocationPoint,
         page: RouteSearchPage,
-        stage: RouteCalculationStage = .final
+        query: RouteQuery
     ) -> RouteCalculation? {
-        var journeys = journeyPage.journeys
-        if case let .earlier(boundary, limit) = page {
-            journeys = journeys.filter { $0.effectiveDeparture < boundary }
-            journeys = Array(journeys.suffix(limit))
-        } else if case let .later(boundary, limit) = page {
-            journeys = Array(journeys.filter { $0.effectiveDeparture > boundary }.prefix(limit))
-        }
-        let options = journeys.map { option(from: $0, origin: origin, destination: destination) }
+        let options = journeyPage.journeys.map { option(from: $0, origin: origin, destination: destination) }
         guard !options.isEmpty else { return nil }
-        return RouteCalculation(options: options, stage: stage, selectedOptionID: options.first?.id)
+        return RouteCalculation(
+            options: options,
+            validationContext: .init(anchor: query.departureTime,
+                                     arriveBy: query.direction == .arriveBy,
+                                     minimumTransferSeconds: query.preferences.minimumTransferSeconds),
+            selectedOptionID: journeyPage.recommendedJourneyID?.value ?? options.first?.id
+        )
+    }
+
+    private nonisolated func makeQuery(
+        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime,
+        filters: RoutePlannerFilters, page: RouteSearchPage,
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy
+    ) -> RouteQuery {
+        let anchor: Date
+        let direction: RouteQueryDirection
+        switch time {
+        case .leaveNow:
+            anchor = .now; direction = .departAfter
+        case let .departAt(value):
+            anchor = value; direction = .departAfter
+        case let .arriveBy(value):
+            anchor = value; direction = .arriveBy
+        }
+        let searchAnchor: Date
+        if direction == .arriveBy {
+            searchAnchor = anchor
+        } else {
+            switch page {
+            case .initial: searchAnchor = anchor
+            case let .later(boundary, _), let .laterFrom(boundary, _, _): searchAnchor = boundary
+            case let .earlier(boundary, _), let .earlierFrom(boundary, _, _): searchAnchor = boundary.addingTimeInterval(-86_400)
+            }
+        }
+        return RouteQuery(origin: Self.journeyEndpoint(for: from),
+                          destination: Self.journeyEndpoint(for: to),
+                          departureTime: searchAnchor, direction: direction,
+                          preferences: preferences(filters),
+                          realtimePolicy: Self.realtimePolicy(for: realtimeRefreshPolicy, page: page))
     }
 
     nonisolated static func journeyEndpoint(for point: LocationPoint) -> JourneyEndpoint {
@@ -415,28 +375,44 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
     }
 
     private nonisolated func preferences(_ filters: RoutePlannerFilters) -> RoutingPreferences {
-        // MobiliteitKit preserves every GTFS mode. The app's preference remains
-        // a presentation preference until the package's route-type mask has a
-        // lossless representation for extended GTFS route types (e.g. 900).
-        let modes: TransitModeMask = .all
+        let preferred: TransitModeMask? = switch filters.modePreference {
+        case .any: nil
+        case .bus: TransitModeMask(rawValue: 1 << 3)
+        case .tram: TransitModeMask(rawValue: 1 << 0)
+        case .train: TransitModeMask(rawValue: (1 << 1) | (1 << 2))
+        }
         return RoutingPreferences(
-            maxTransfers: 1,
+            maxTransfers: 3,
             minimumTransferSeconds: filters.avoidTightTransfers ? 180 : 120,
-            allowedModes: modes,
-            wheelchair: filters.preferAccessible ? .required : .noPreference
+            allowedModes: .all,
+            preferredMode: preferred,
+            wheelchair: .noPreference,
+            preferWheelchairAccessible: filters.preferAccessible
         )
     }
 
-    private nonisolated func realtimePolicy(
-        for policy: RouteRealtimeRefreshPolicy
+    nonisolated static func realtimePolicy(
+        for policy: RouteRealtimeRefreshPolicy,
+        page: RouteSearchPage
     ) -> MobiliteitKit.RealtimePolicy {
-        switch policy {
+        // The HAFAS board request is capped at 100 departures per stop. Looking back
+        // two hours from a later-page boundary can consume that cap before the
+        // departures the rider has asked to see. Keep a short delay lookback
+        // while prioritising the later page's forward prediction window.
+        let isLaterPage: Bool = switch page {
+        case .later, .laterFrom: true
+        default: false
+        }
+        let configuration = RealtimeConfiguration(
+            scheduledLookbackSeconds: isLaterPage ? 10 * 60 : 20 * 60
+        )
+        return switch policy {
         case .scheduleOnly:
             .disabled
         case .useCache:
-            .bestEffort(refresh: .useCache)
+            .bestEffort(configuration: configuration, refresh: .useCache)
         case .forceRefresh:
-            .bestEffort(refresh: .forceRefresh)
+            .bestEffort(configuration: configuration, refresh: .forceRefresh)
         }
     }
 
@@ -448,7 +424,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         let legs = journey.legs.compactMap { leg -> RoutePlan.Leg? in
             switch leg {
             case let .walk(walk):
-                return RoutePlan.Leg(
+                var result = RoutePlan.Leg(
                     id: "walk-\(walk.departure.timeIntervalSince1970)", mode: .walking,
                     transportKind: .walking, origin: point(walk.from), destination: point(walk.to),
                     departureTime: walk.departure, arrivalTime: walk.arrival,
@@ -456,6 +432,9 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                     mapCoordinates: walk.polyline.map { .init(latitude: $0.latitude, longitude: $0.longitude) },
                     roadRoutingHint: walk.source == .provider ? .walking : .none
                 )
+                result.walkingEvidence = walk.evidence == .routedPedestrian
+                    ? .routedPedestrian : .estimate
+                return result
             case let .transit(transit):
                 let departureIsRealtime = transit.board.timingSource != .scheduled
                 let arrivalIsRealtime = transit.alight.timingSource != .scheduled
@@ -476,12 +455,19 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                     scheduledDepartureTime: transit.scheduledDeparture, scheduledArrivalTime: transit.scheduledArrival,
                     realtimeDepartureTime: departureIsRealtime ? transit.effectiveDeparture : nil,
                     realtimeArrivalTime: arrivalIsRealtime ? transit.effectiveArrival : nil,
+                    mapCoordinates: [
+                        .init(latitude: transit.board.stop.coordinate.latitude,
+                              longitude: transit.board.stop.coordinate.longitude),
+                        .init(latitude: transit.alight.stop.coordinate.latitude,
+                              longitude: transit.alight.stop.coordinate.longitude),
+                    ],
                     platform: transit.board.platform,
                     delayMinutes: departureIsRealtime ? Int((delaySeconds / 60).rounded()) : nil,
                     liveStatus: usesRealtime ? (delayed ? .delayed : .live) : .scheduled
                 )
                 result.departureTimingSource = Self.timingSource(transit.board.timingSource)
                 result.arrivalTimingSource = Self.timingSource(transit.alight.timingSource)
+                result.requiredTransferSeconds = transit.requiredTransferSecondsAfterWalking
                 return result
             case .inSeatContinuation:
                 return nil
@@ -496,7 +482,11 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             guard leg.mapCoordinates.count >= 2 else { return nil }
             return RouteMapSegment(id: leg.id, mode: leg.mode, routeName: leg.routeName, routeId: leg.routeId, coordinates: leg.mapCoordinates)
         })
-        return RouteOption(id: journey.id.value, plan: plan, mapOverlay: overlay.segments.isEmpty ? nil : overlay)
+        return RouteOption(
+            id: journey.id.value, plan: plan,
+            mapOverlay: overlay.segments.isEmpty ? nil : overlay,
+            accessibility: RouteAccessibilityAssessment(rawValue: journey.accessibility.rawValue)
+        )
     }
 
     private nonisolated func point(_ source: MobiliteitKit.TransitStop) -> LocationPoint {
@@ -650,7 +640,72 @@ private nonisolated struct WalkingGeometryRequest: Sendable {
     }
 }
 
-private extension RouteOption {
+private nonisolated struct WalkingLegSpan: Sendable {
+    let range: Range<Int>
+    let request: WalkingGeometryRequest
+    let needsRouting: Bool
+
+    static func spans(in legs: [RoutePlan.Leg]) -> [Self] {
+        var spans: [Self] = []
+        var index = 0
+        while index < legs.count {
+            guard legs[index].transportKind == .walking else { index += 1; continue }
+            let start = index
+            while index < legs.count, legs[index].transportKind == .walking { index += 1 }
+            let last = legs[index - 1]
+            spans.append(Self(
+                range: start..<index,
+                request: WalkingGeometryRequest(origin: legs[start].origin, destination: last.destination),
+                needsRouting: index - start > 1 || legs[start].roadRoutingHint == .walking
+            ))
+        }
+        return spans
+    }
+}
+
+extension RouteOption {
+    /// Combines independently delivered transit shapes and walking refinements
+    /// without letting either update erase the other one's legs.
+    nonisolated func replacingLegs(
+        of kind: RouteLegTransportKind,
+        from updated: RouteOption,
+        preserveUpdatedTotals: Bool = false
+    ) -> RouteOption {
+        guard id == updated.id else { return self }
+        if kind == .walking {
+            // A direct pedestrian route can replace several walking legs with
+            // one. Use its leg sequence, retaining any newer transit shapes.
+            let currentTransitByID = Dictionary(
+                plan.legs.filter { $0.transportKind == .transit }.map { ($0.id, $0) },
+                uniquingKeysWith: { first, _ in first }
+            )
+            let legs = updated.plan.legs.map { leg in
+                leg.transportKind == .transit ? currentTransitByID[leg.id] ?? leg : leg
+            }
+            return replacingLegs(
+                legs,
+                expectedTravelTime: preserveUpdatedTotals ? updated.plan.expectedTravelTime : nil,
+                distanceMeters: preserveUpdatedTotals ? updated.plan.distanceMeters : nil
+            )
+        }
+        let updatedByID = Dictionary(
+            updated.plan.legs.map { ($0.id, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        let legs = plan.legs.map { leg in
+            guard leg.transportKind == kind,
+                  let replacement = updatedByID[leg.id],
+                  replacement.transportKind == kind
+            else { return leg }
+            return replacement
+        }
+        return replacingLegs(
+            legs,
+            expectedTravelTime: preserveUpdatedTotals ? updated.plan.expectedTravelTime : nil,
+            distanceMeters: preserveUpdatedTotals ? updated.plan.distanceMeters : nil
+        )
+    }
+
     nonisolated func replacingTransitGeometry(
         shapesByTripID: [String: [RouteMapCoordinate]]
     ) -> RouteOption {
@@ -671,84 +726,120 @@ private extension RouteOption {
     }
 
     nonisolated func replacingWalkingRoutes(routesByLeg: [String: RoadRoute]) -> RouteOption {
-        var walkingDurationDelta: TimeInterval = 0
-        var walkingDistanceDelta: Double = 0
-        let legs = plan.legs.enumerated().map { index, leg -> RoutePlan.Leg in
-            let request = WalkingGeometryRequest(origin: leg.origin, destination: leg.destination)
-            guard leg.transportKind == .walking,
-                  leg.roadRoutingHint == .walking,
-                  let route = routesByLeg[request.key]
-            else { return leg }
+        var legs: [RoutePlan.Leg] = []
+        let original = plan.legs
+        let spans = WalkingLegSpan.spans(in: original)
+        func usableDirectRoute(for span: WalkingLegSpan) -> RoadRoute? {
+            guard span.range.count > 1,
+                  let route = routesByLeg[span.request.key],
+                  let seconds = route.expectedTravelTime,
+                  seconds.isFinite, seconds >= 0,
+                  route.distanceMeters.isFinite, route.distanceMeters >= 0,
+                  route.walkingEvidence == .routedPedestrian,
+                  route.coordinates.count >= 2 else { return nil }
+            return route
+        }
+        guard spans.contains(where: { span in
+            usableDirectRoute(for: span) != nil
+                || (span.range.count == 1 && span.needsRouting
+                    && routesByLeg[span.request.key] != nil)
+        }) else { return self }
 
-            let oldDuration = leg.departureTime.flatMap { departure in
-                leg.arrivalTime.map { $0.timeIntervalSince(departure) }
+        var cursor = 0
+        for span in spans {
+            legs.append(contentsOf: original[cursor..<span.range.lowerBound])
+            let source = original[span.range.lowerBound]
+            let end = original[span.range.upperBound - 1]
+            if let directRoute = usableDirectRoute(for: span) {
+                var merged = RoutePlan.Leg(
+                    id: source.id, mode: .walking, instruction: source.instruction,
+                    transportKind: .walking, origin: source.origin, destination: end.destination,
+                    departureTime: source.departureTime, arrivalTime: end.arrivalTime,
+                    distanceMeters: directRoute.distanceMeters,
+                    mapCoordinates: directRoute.coordinates, roadRoutingHint: .walking
+                )
+                merged.departureTimingSource = source.departureTimingSource
+                merged.arrivalTimingSource = end.arrivalTimingSource
+                merged.walkingEvidence = .routedPedestrian
+                legs.append(merged)
+            } else {
+                legs.append(contentsOf: original[span.range])
             }
-            let mapKitDuration = route.expectedTravelTime.flatMap { duration in
-                duration.isFinite && duration >= 0 ? duration : nil
-            }
-            if let oldDuration, let mapKitDuration {
-                walkingDurationDelta += mapKitDuration - oldDuration
-            }
-            if let oldDistance = leg.distanceMeters {
-                walkingDistanceDelta += route.distanceMeters - oldDistance
-            }
+            cursor = span.range.upperBound
+        }
+        legs.append(contentsOf: original[cursor...])
 
-            var departureTime = leg.departureTime
-            var arrivalTime = leg.arrivalTime
-            if let mapKitDuration {
-                if plan.legs.indices.contains(index + 1),
-                   plan.legs[index + 1].transportKind == .transit,
-                   let fixedArrival = arrivalTime {
-                    departureTime = fixedArrival.addingTimeInterval(-mapKitDuration)
-                } else if let fixedDeparture = departureTime {
-                    arrivalTime = fixedDeparture.addingTimeInterval(mapKitDuration)
-                } else if let fixedArrival = arrivalTime {
-                    departureTime = fixedArrival.addingTimeInterval(-mapKitDuration)
-                }
+        func route(for leg: RoutePlan.Leg) -> RoadRoute? {
+            guard leg.roadRoutingHint == .walking else { return nil }
+            return routesByLeg[WalkingGeometryRequest(origin: leg.origin, destination: leg.destination).key]
+        }
+        func duration(_ leg: RoutePlan.Leg) -> TimeInterval {
+            if let value = route(for: leg)?.expectedTravelTime, value.isFinite, value >= 0 {
+                return value
             }
-            var replacement = RoutePlan.Leg(
-                id: leg.id,
-                mode: leg.mode,
-                instruction: leg.instruction,
-                transportKind: leg.transportKind,
-                routeName: leg.routeName,
-                headsign: leg.headsign,
-                routeId: leg.routeId,
-                tripId: leg.tripId,
-                originStopId: leg.originStopId,
-                destinationStopId: leg.destinationStopId,
-                stopCount: leg.stopCount,
-                origin: leg.origin,
-                destination: leg.destination,
-                departureTime: departureTime,
-                arrivalTime: arrivalTime,
-                scheduledDepartureTime: departureTime,
-                scheduledArrivalTime: arrivalTime,
+            return max(0, (leg.arrivalTime ?? .distantPast)
+                .timeIntervalSince(leg.departureTime ?? .distantPast))
+        }
+        func replace(_ leg: RoutePlan.Leg, from departure: Date, through arrival: Date) -> RoutePlan.Leg {
+            let geometry = route(for: leg)
+            var updated = RoutePlan.Leg(
+                id: leg.id, mode: leg.mode, instruction: leg.instruction,
+                transportKind: leg.transportKind, routeName: leg.routeName,
+                headsign: leg.headsign, routeId: leg.routeId, tripId: leg.tripId,
+                originStopId: leg.originStopId, destinationStopId: leg.destinationStopId,
+                stopCount: leg.stopCount, origin: leg.origin, destination: leg.destination,
+                departureTime: departure, arrivalTime: arrival,
+                scheduledDepartureTime: departure, scheduledArrivalTime: arrival,
                 realtimeDepartureTime: leg.realtimeDepartureTime,
                 realtimeArrivalTime: leg.realtimeArrivalTime,
-                distanceMeters: route.distanceMeters,
-                mapCoordinates: route.coordinates,
-                roadRoutingHint: leg.roadRoutingHint,
-                platform: leg.platform,
-                delayMinutes: leg.delayMinutes,
-                liveStatus: leg.liveStatus,
+                distanceMeters: geometry?.distanceMeters ?? leg.distanceMeters,
+                mapCoordinates: geometry?.coordinates ?? leg.mapCoordinates,
+                roadRoutingHint: leg.roadRoutingHint, platform: leg.platform,
+                delayMinutes: leg.delayMinutes, liveStatus: leg.liveStatus,
                 transferWarning: leg.transferWarning,
                 bikeShareDetails: leg.bikeShareDetails
             )
-            replacement.departureTimingSource = leg.departureTimingSource
-            replacement.arrivalTimingSource = leg.arrivalTimingSource
-            replacement.requiredTransferSeconds = leg.requiredTransferSeconds
-            return replacement
+            updated.departureTimingSource = leg.departureTimingSource
+            updated.arrivalTimingSource = leg.arrivalTimingSource
+            updated.requiredTransferSeconds = leg.requiredTransferSeconds
+            updated.walkingEvidence = geometry?.walkingEvidence ?? leg.walkingEvidence
+            return updated
         }
-        return replacingLegs(
-            legs,
-            expectedTravelTime: plan.expectedTravelTime.map {
-                max(0, $0 + walkingDurationDelta)
-            },
-            distanceMeters: plan.distanceMeters.map {
-                max(0, $0 + walkingDistanceDelta)
+
+        var index = 0
+        while index < legs.count {
+            guard legs[index].transportKind == .walking else { index += 1; continue }
+            let start = index
+            while index < legs.count && legs[index].transportKind == .walking { index += 1 }
+            let end = index
+            guard (start..<end).contains(where: { route(for: legs[$0]) != nil }) else { continue }
+
+            if start == 0 && end < legs.count && legs[end].transportKind == .transit,
+               let boarding = legs[end].realtimeDepartureTime ?? legs[end].departureTime {
+                var cursor = boarding
+                for position in (start..<end).reversed() {
+                    let departure = cursor.addingTimeInterval(-duration(legs[position]))
+                    legs[position] = replace(legs[position], from: departure, through: cursor)
+                    cursor = departure
+                }
+            } else if let firstDeparture = start == 0
+                ? legs[start].departureTime
+                : (legs[start - 1].realtimeArrivalTime ?? legs[start - 1].arrivalTime) {
+                var cursor = firstDeparture
+                for position in start..<end {
+                    let arrival = cursor.addingTimeInterval(duration(legs[position]))
+                    legs[position] = replace(legs[position], from: cursor, through: arrival)
+                    cursor = arrival
+                }
             }
-        )
+        }
+        let first = legs.first?.realtimeDepartureTime ?? legs.first?.departureTime
+        let last = legs.last?.realtimeArrivalTime ?? legs.last?.arrivalTime
+        let elapsed = first.flatMap { departure in last.map { max(0, $0.timeIntervalSince(departure)) } }
+        let distance = legs.filter { $0.transportKind == .walking }
+            .compactMap(\.distanceMeters).reduce(0, +)
+        return replacingLegs(legs, expectedTravelTime: elapsed,
+                             distanceMeters: distance)
     }
 
     nonisolated func replacingLegs(
@@ -775,7 +866,8 @@ private extension RouteOption {
                 coordinates: leg.mapCoordinates
             )
         })
-        return RouteOption(id: id, plan: updatedPlan, mapOverlay: overlay.isEmpty ? nil : overlay)
+        return RouteOption(id: id, plan: updatedPlan, mapOverlay: overlay.isEmpty ? nil : overlay,
+                           accessibility: accessibility, feasibility: feasibility)
     }
 
     /// Keeps only the ridden portion of a full-trip GTFS shape. Searching from
@@ -830,6 +922,7 @@ private extension RoutePlan.Leg {
         replacement.departureTimingSource = departureTimingSource
         replacement.arrivalTimingSource = arrivalTimingSource
         replacement.requiredTransferSeconds = requiredTransferSeconds
+        replacement.walkingEvidence = walkingEvidence
         return replacement
     }
 }
@@ -868,7 +961,8 @@ private struct MapKitWalkingProvider: WalkingRoutingProvider {
         return .init(
             durationSeconds: estimate.durationSeconds,
             distanceMeters: estimate.distanceMeters,
-            polyline: [request.source, request.destination]
+            polyline: [request.source, request.destination],
+            evidence: .estimate
         )
     }
 

@@ -83,6 +83,25 @@ struct OfflineWalkingRoutingTests {
         #expect(abs(coordinates[1].longitude - 1) < 0.000001)
     }
 
+    @Test("Separate Valhalla instances can resolve walking matrices concurrently")
+    func concurrentValhallaMatrices() async throws {
+        let archive = try #require(Bundle.main.url(
+            forResource: "luxembourg-walking-tiles", withExtension: "tar"
+        ))
+        let version = "concurrency-test-\(UUID().uuidString)"
+        let first = try ValhallaWalkingRouter(tileArchiveURL: archive, datasetVersion: "\(version)-0")
+        let second = try ValhallaWalkingRouter(tileArchiveURL: archive, datasetVersion: "\(version)-1")
+        let origin = LocationPoint(latitude: 49.6116, longitude: 6.1319)
+        let destination = LocationPoint(latitude: 49.6120, longitude: 6.1325)
+        let targets = [WalkingDestination(id: "destination", location: destination)]
+
+        async let firstResult = first.estimates(from: origin, to: targets)
+        async let secondResult = second.estimates(from: origin, to: targets)
+        let (a, b) = try await (firstResult, secondResult)
+        #expect(a.first?.source == .localOSM)
+        #expect(b.first?.source == .localOSM)
+    }
+
     @Test("A bundled graph installs once and is reused")
     func bundledGraphInstallsOnce() async throws {
         let folder = FileManager.default.temporaryDirectory
@@ -126,6 +145,26 @@ struct OfflineWalkingRoutingTests {
         #expect(route.durationSeconds == 777)
         #expect(route.distanceMeters == 1_234)
         #expect(route.polyline.count == 3)
+    }
+
+    @Test("Destination walking candidates use one directed matrix request")
+    func destinationWalkingUsesReverseMatrix() async {
+        let router = RecordingReverseWalkingRouter()
+        let provider = LocalFirstWalkingRoutingProvider(walkingRouter: router)
+        let destination = Coordinate(latitude: 49.62, longitude: 6.13)
+        let first = Coordinate(latitude: 49.61, longitude: 6.12)
+        let second = Coordinate(latitude: 49.615, longitude: 6.125)
+
+        let routes = await provider.routes([
+            .init(source: first, destination: destination),
+            .init(source: second, destination: destination),
+        ], maximumConcurrency: 4)
+
+        #expect(await router.reverseBatchCount == 1)
+        #expect(await router.singleRouteCount == 0)
+        #expect(routes.map { $0?.durationSeconds } == [60, 61])
+        #expect(routes[0]?.polyline == [first, destination])
+        #expect(routes[1]?.polyline == [second, destination])
     }
 
     @Test("Walking estimates and routes include the 25 percent real-world buffer")
@@ -177,6 +216,33 @@ struct OfflineWalkingRoutingTests {
             ),
             minimumAppBuild: 10
         )
+    }
+}
+
+private actor RecordingReverseWalkingRouter: WalkingRouting {
+    private(set) var reverseBatchCount = 0
+    private(set) var singleRouteCount = 0
+
+    func estimates(
+        from _: LocationPoint,
+        to _: [WalkingDestination]
+    ) async throws -> [OfflineWalkingEstimate] {
+        []
+    }
+
+    func estimates(
+        from origins: [WalkingOrigin],
+        to _: LocationPoint
+    ) async throws -> [OfflineWalkingEstimate] {
+        reverseBatchCount += 1
+        return origins.enumerated().map { index, origin in
+            .init(destinationID: origin.id, distanceMeters: Double(75 + index), duration: Double(60 + index), source: .localOSM)
+        }
+    }
+
+    func route(from _: LocationPoint, to _: LocationPoint) async throws -> OfflineWalkingRoute {
+        singleRouteCount += 1
+        throw WalkingRoutingError.noRoute
     }
 }
 

@@ -152,6 +152,29 @@ enum RoutingError: Error, Equatable {
 `RouteOption` wraps a `RoutePlan` and computed properties: `transferCount`,
 `walkingDistanceMeters`, `usesLiveData`, `realtimeCoverage`, `status(at:)`.
 
+Route generation accepts a departure instant or an arrival deadline. A result
+must include its access walk after the departure instant or finish its egress
+walk by the deadline. The router searches up to three transfers by default,
+retains time, walking, and transfer tradeoffs, and returns up to five transit
+alternatives plus a separate direct walking comparison. The first visible
+option is chronological; `selectedOptionID` carries the recommended choice.
+Paging uses a departure-time and stable-journey-ID cursor so equal-time options
+are not skipped. The supported arrival profile covers the previous 24 hours;
+the forward profile is bounded and does not imply exhaustive network coverage.
+
+The planner's mode control is a soft preference; package `allowedModes` is a
+separate hard filter. Accessibility has verified, unknown, and inaccessible
+states. The app preference favors verified routes and explains when none can
+be verified. Package wheelchair `.required` rejects routes with unknown or
+inaccessible segments. Generic pedestrian directions and straight-line
+estimates cannot prove step-free access. Walking legs retain routed-versus-
+estimated evidence through the app model; an estimated interchange cannot
+prove a transfer catchable. A local graph's explicit `noRoute` result is kept
+as unreachable; a missing graph can still use MapKit or an explicitly marked
+estimate. Walking refinement validates the
+original time constraint and transfer allowances; infeasible options are
+invalidated and one corrected-cost replan is attempted.
+
 `MobiliteitRouteService` keeps a MobiliteitKit `TransitRouter` and
 `HafasRealtimeRoutingProvider` paired to the active GTFS database generation.
 When that generation changes, both are rebuilt. A new calculation or explicit
