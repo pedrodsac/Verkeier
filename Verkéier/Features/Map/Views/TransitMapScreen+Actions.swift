@@ -66,6 +66,14 @@ extension TransitMapScreen {
     var sheetActions: TransitSheetActions {
         TransitSheetActions(
             toggleFavourite: toggleSelectedFavourite,
+            saveFavouriteCustomization: { stop, label, colorHex, iconName in
+                saveFavouriteCustomization(
+                    stop: stop,
+                    label: label,
+                    colorHex: colorHex,
+                    iconName: iconName
+                )
+            },
             refreshDepartures: refreshDepartures,
             refreshAlerts: refreshAlerts,
             calculateRoute: calculateRoute,
@@ -104,6 +112,7 @@ extension TransitMapScreen {
                 refreshStop: refreshFavouriteStop,
                 refreshAll: refreshFavouriteStops,
                 updateLabels: updateFavouriteLabels,
+                updateAppearance: updateFavouriteAppearance,
                 removeFavourite: removeFavourite,
                 findStop: showSearch
             )
@@ -166,6 +175,15 @@ extension TransitMapScreen {
     func updateFavouriteLabels(stopID: String, labels: [String]) {
         guard let favourite = favouriteEntities.first(where: { $0.stopId == stopID }) else { return }
         favourite.replaceLabels(with: labels)
+        try? modelContext.save()
+        mirrorFavouriteEntitiesForIntents()
+    }
+
+    func updateFavouriteAppearance(stopID: String, label: String, colorHex: String, iconName: String) {
+        guard let favourite = favouriteEntities.first(where: { $0.stopId == stopID }) else { return }
+        favourite.displayLabel = label
+        favourite.colorHex = colorHex
+        favourite.iconName = iconName
         try? modelContext.save()
         mirrorFavouriteEntitiesForIntents()
     }

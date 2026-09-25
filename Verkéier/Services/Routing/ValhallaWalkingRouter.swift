@@ -22,39 +22,22 @@ actor ValhallaWalkingRouter: WalkingRouting {
         to destinations: [WalkingDestination]
     ) async throws -> [OfflineWalkingEstimate] {
         guard !destinations.isEmpty else { return [] }
-
-        let request = MatrixRequest(
-            sources: [Coordinate(lat: origin.latitude, lon: origin.longitude)],
-            targets: destinations.map {
-                Coordinate(lat: $0.location.latitude, lon: $0.location.longitude)
-            },
-            costing: .pedestrian,
-            directionsOptions: DirectionsOptions(units: .km)
-        )
-        let response = try engine.matrix(request: request)
-        guard let row = response.sourcesToTargets.first else {
-            throw WalkingRoutingError.invalidResponse
-        }
-
-        let distancesByTarget = Dictionary(
-            row.map { ($0.toIndex, $0) },
-            uniquingKeysWith: { first, _ in first }
-        )
-        return destinations.enumerated().compactMap { index, destination in
-            guard let result = distancesByTarget[index],
-                  result.distance.isFinite,
-                  result.distance >= 0,
-                  result.time >= 0
-            else {
-                return nil
+        var estimates: [OfflineWalkingEstimate] = []
+        for destination in destinations {
+            try Task.checkCancellation()
+            do {
+                let path = try await route(from: origin, to: destination.location)
+                estimates.append(.init(
+                    destinationID: destination.id,
+                    distanceMeters: path.distanceMeters,
+                    duration: path.duration,
+                    source: .localOSM
+                ))
+            } catch WalkingRoutingError.noRoute {
+                continue
             }
-            return OfflineWalkingEstimate(
-                destinationID: destination.id,
-                distanceMeters: Self.meters(from: result.distance, units: response.units),
-                duration: TimeInterval(result.time),
-                source: .localOSM
-            )
         }
+        return estimates
     }
 
     func estimates(
@@ -62,31 +45,22 @@ actor ValhallaWalkingRouter: WalkingRouting {
         to destination: LocationPoint
     ) async throws -> [OfflineWalkingEstimate] {
         guard !origins.isEmpty else { return [] }
-        let request = MatrixRequest(
-            sources: origins.map { Coordinate(lat: $0.location.latitude, lon: $0.location.longitude) },
-            targets: [Coordinate(lat: destination.latitude, lon: destination.longitude)],
-            costing: .pedestrian,
-            directionsOptions: DirectionsOptions(units: .km)
-        )
-        let response = try engine.matrix(request: request)
-        guard response.sourcesToTargets.count == origins.count else {
-            throw WalkingRoutingError.invalidResponse
-        }
-        return origins.enumerated().compactMap { index, origin in
-            guard let result = response.sourcesToTargets[index].first(where: { $0.fromIndex == index && $0.toIndex == 0 }),
-                  result.distance.isFinite,
-                  result.distance >= 0,
-                  result.time >= 0
-            else {
-                return nil
+        var estimates: [OfflineWalkingEstimate] = []
+        for origin in origins {
+            try Task.checkCancellation()
+            do {
+                let path = try await route(from: origin.location, to: destination)
+                estimates.append(.init(
+                    destinationID: origin.id,
+                    distanceMeters: path.distanceMeters,
+                    duration: path.duration,
+                    source: .localOSM
+                ))
+            } catch WalkingRoutingError.noRoute {
+                continue
             }
-            return OfflineWalkingEstimate(
-                destinationID: origin.id,
-                distanceMeters: Self.meters(from: result.distance, units: response.units),
-                duration: TimeInterval(result.time),
-                source: .localOSM
-            )
         }
+        return estimates
     }
 
     func route(

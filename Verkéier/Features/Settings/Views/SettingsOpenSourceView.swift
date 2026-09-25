@@ -22,24 +22,21 @@ struct SettingsOpenSourceView: View {
 
     var body: some View {
         List {
-            Section {
+            Section("Libraries") {
                 ForEach(libraries) { library in
                     Link(destination: library.url) {
                         HStack {
                             Text(library.name)
                             Spacer()
                             Image(systemName: "arrow.up.right")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
                         }
                     }
                     .foregroundStyle(.primary)
                 }
-            } footer: {
-                Text("Open-source libraries used by Verkéier.")
             }
         }
-        .listStyle(.insetGrouped)
         .navigationTitle("Open-source")
         .toolbarTitleDisplayMode(.inline)
     }

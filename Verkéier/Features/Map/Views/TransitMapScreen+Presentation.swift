@@ -26,7 +26,10 @@ extension TransitMapScreen {
                         stop: favourite.stop,
                         labels: favourite.labels,
                         departures: viewModel.favouriteDepartureBoards[favourite.stopId]
-                            ?? FavouriteDepartureBoardSnapshot()
+                            ?? FavouriteDepartureBoardSnapshot(),
+                        displayLabel: favourite.displayLabel,
+                        iconName: favourite.iconName,
+                        colorHex: favourite.colorHex
                     )
                 },
                 isRefreshing: viewModel.isLoadingFavouriteDepartures,

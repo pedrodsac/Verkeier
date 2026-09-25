@@ -198,6 +198,8 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
             return .connectionMayBeMissed
         }
 
+        if case .some(.atRisk) = feasibility { return .atRisk }
+
         if transitLegs.contains(where: { $0.transferWarning != nil }) {
             return .atRisk
         }

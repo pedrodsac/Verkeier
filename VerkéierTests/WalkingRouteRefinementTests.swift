@@ -349,6 +349,49 @@ struct WalkingRouteRefinementTests {
         )) == .invalid(.unverifiedTransferWalk))
     }
 
+    @Test("A short same-stop connection stays visible with its published transfer risk")
+    func sameStopTransferShortfallIsAtRisk() {
+        let start = Date(timeIntervalSince1970: 100_000)
+        let origin = LocationPoint(id: "origin", name: "Origin", latitude: 49.60,
+                                   longitude: 6.10, transitStopID: "origin")
+        let transfer = LocationPoint(id: "transfer", name: "Transfer", latitude: 49.61,
+                                     longitude: 6.11, transitStopID: "transfer")
+        let destination = LocationPoint(id: "destination", name: "Destination", latitude: 49.62,
+                                        longitude: 6.12, transitStopID: "destination")
+        let incoming = RoutePlan.Leg(id: "321", mode: .bus, transportKind: .transit,
+                                     originStopId: "origin", destinationStopId: "transfer",
+                                     origin: origin, destination: transfer,
+                                     departureTime: start, arrivalTime: start.addingTimeInterval(600))
+        var outgoing = RoutePlan.Leg(id: "25", mode: .bus, transportKind: .transit,
+                                     originStopId: "transfer", destinationStopId: "destination",
+                                     origin: transfer, destination: destination,
+                                     departureTime: start.addingTimeInterval(1_005),
+                                     arrivalTime: start.addingTimeInterval(1_400),
+                                     transferWarning: "Transfer below published minimum by 45 sec")
+        outgoing.requiredTransferSeconds = 450
+        var option = RouteOption(id: "321-25", plan: RoutePlan(
+            id: "321-25", origin: origin, destination: destination,
+            expectedTravelTime: 1_400, distanceMeters: nil,
+            legs: [incoming, outgoing], dataSource: .local
+        ), mapOverlay: nil)
+        let strict = RouteValidationContext(anchor: start, arriveBy: false,
+                                            minimumTransferSeconds: 120)
+        #expect(RouteItineraryValidator.assess(option, context: strict) == .invalid(.missedTransfer))
+        let tolerant = RouteValidationContext(anchor: start, arriveBy: false,
+                                              minimumTransferSeconds: 120,
+                                              sameStopTransferShortfallSeconds: 60)
+        let assessment = RouteItineraryValidator.assess(option, context: tolerant)
+        #expect(assessment == .atRisk(minimumTransferSlack: -45))
+        option.feasibility = assessment
+        #expect(option.status(at: start) == .atRisk)
+        #expect(RouteTimelineBuilder.items(from: option.plan.legs).contains { item in
+            if case let .place(node) = item {
+                return node.transferWarning == "Transfer below published minimum by 45 sec"
+            }
+            return false
+        })
+    }
+
     @Test("A transfer walk that overlaps the outgoing ride is invalidated")
     func missedTransferIsInvalid() async throws {
         let start = Date(timeIntervalSince1970: 100_000)

@@ -27,6 +27,9 @@ struct FavouriteStopPresentationModel: Identifiable {
     let stop: Stop
     let labels: [String]
     let departures: FavouriteDepartureBoardSnapshot
+    let displayLabel: String?
+    let iconName: String?
+    let colorHex: String?
 
     var id: String { stop.id }
 }
@@ -77,6 +80,7 @@ struct FavouritesActions {
     var refreshStop: (Stop) async -> Void = { _ in }
     var refreshAll: () async -> Void = {}
     var updateLabels: (String, [String]) -> Void = { _, _ in }
+    var updateAppearance: (String, String, String, String) -> Void = { _, _, _, _ in }
     var removeFavourite: (String) -> Void = { _ in }
     var findStop: () -> Void = {}
 }

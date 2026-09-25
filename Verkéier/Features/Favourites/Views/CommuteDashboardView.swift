@@ -56,13 +56,14 @@ struct CommuteDashboardView: View {
 		.listSectionSpacing(16)
 		.scrollIndicators(.hidden)
         .sheet(item: $editingFavourite, onDismiss: restoreEditedFavouriteFocus) { favourite in
-            FavouriteLabelsEditor(
-                favourite: favourite,
-                availableLabels: favouritesViewModel.availableLabels,
-                save: { labels in
-                    favouritesActions.updateLabels(favourite.stop.id, labels)
-                }
-            )
+            FavouriteCustomizerView(
+                stop: favourite.stop,
+                initialLabel: favourite.displayLabel,
+                initialColorHex: favourite.colorHex,
+                initialIconName: favourite.iconName
+            ) { label, colorHex, iconName in
+                favouritesActions.updateAppearance(favourite.stop.id, label, colorHex, iconName)
+            }
         }
     }
 
@@ -147,7 +148,13 @@ struct CommuteDashboardView: View {
         Button {
             favouritesActions.openStop(favourite.stop)
         } label: {
-            StopRow(stop: favourite.stop)
+            StopRow(
+                stop: favourite.stop,
+                markerColor: favourite.colorHex.map { Color(hex: $0) } ?? favourite.stop.modes.primaryMode.tint,
+                title: favourite.displayLabel ?? favourite.stop.displayName,
+                subtitle: favourite.stop.fullName,
+                iconName: favourite.iconName
+            )
         }
 		.foregroundStyle(.primary)
         .accessibilityFocused($focusedFavouriteID, equals: favourite.id)
@@ -198,7 +205,7 @@ struct CommuteDashboardView: View {
             lastEditedFavouriteID = favourite.id
             editingFavourite = favourite
         } label: {
-            Label("Edit labels", systemImage: "tag")
+            Label("Customize favourite", systemImage: "paintpalette")
         }
         Divider()
         Button(role: .destructive) {

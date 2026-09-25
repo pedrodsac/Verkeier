@@ -63,7 +63,7 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
         /// Live-status classification for transit legs.
         let liveStatus: RouteLegLiveStatus
         /// Non-`nil` when the transfer onto this leg is tight or at risk.
-        let transferWarning: String?
+        var transferWarning: String?
         /// Pickup/return station and availability details for a bike-share leg.
         let bikeShareDetails: BikeShareLegDetails?
         var departureTimingSource: RouteTimingSource? = nil

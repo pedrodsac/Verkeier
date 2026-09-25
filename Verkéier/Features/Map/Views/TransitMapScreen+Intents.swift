@@ -47,14 +47,25 @@ extension TransitMapScreen {
 
         if let existing = favouriteEntities.first(where: { $0.stopId == selectedStop.id }) {
             removeFavourite(stopID: existing.stopId)
-        } else {
-            modelContext.insert(PersistedFavouriteStop(
-                stop: selectedStop,
-                boardFilter: viewModel.departureBoardFilter
-            ))
-            try? modelContext.save()
-            mirrorFavouriteEntitiesForIntents()
         }
+    }
+
+    func saveFavouriteCustomization(
+        stop: Stop,
+        label: String,
+        colorHex: String,
+        iconName: String
+    ) {
+        let favourite = favouriteEntities.first(where: { $0.stopId == stop.id })
+            ?? PersistedFavouriteStop(stop: stop, boardFilter: viewModel.departureBoardFilter)
+        if !favouriteEntities.contains(where: { $0.stopId == stop.id }) {
+            modelContext.insert(favourite)
+        }
+        favourite.displayLabel = label
+        favourite.colorHex = colorHex
+        favourite.iconName = iconName
+        try? modelContext.save()
+        mirrorFavouriteEntitiesForIntents()
     }
 
     func mirrorFavouriteEntitiesForIntents() {

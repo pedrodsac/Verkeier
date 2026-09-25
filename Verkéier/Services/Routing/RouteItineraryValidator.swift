@@ -5,6 +5,15 @@ nonisolated struct RouteValidationContext: Hashable, Sendable {
     let anchor: Date
     let arriveBy: Bool
     let minimumTransferSeconds: Int
+    let sameStopTransferShortfallSeconds: Int
+
+    init(anchor: Date, arriveBy: Bool, minimumTransferSeconds: Int,
+         sameStopTransferShortfallSeconds: Int = 0) {
+        self.anchor = anchor
+        self.arriveBy = arriveBy
+        self.minimumTransferSeconds = minimumTransferSeconds
+        self.sameStopTransferShortfallSeconds = sameStopTransferShortfallSeconds
+    }
 }
 
 nonisolated enum RouteInfeasibility: String, Codable, Hashable, Sendable {
@@ -14,6 +23,7 @@ nonisolated enum RouteInfeasibility: String, Codable, Hashable, Sendable {
 
 nonisolated enum RouteFeasibility: Codable, Hashable, Sendable {
     case feasible(minimumTransferSlack: TimeInterval?)
+    case atRisk(minimumTransferSlack: TimeInterval)
     case invalid(RouteInfeasibility)
 
     var isInvalid: Bool {
@@ -43,6 +53,7 @@ nonisolated enum RouteItineraryValidator {
 
         let rides = legs.enumerated().filter { $0.element.transportKind == .transit }
         var minimumSlack: TimeInterval?
+        var shortfall: TimeInterval?
         for (incoming, outgoing) in zip(rides, rides.dropFirst()) {
             guard let incomingArrival = effectiveArrival(incoming.element),
                   let outgoingDeparture = effectiveDeparture(outgoing.element) else {
@@ -61,9 +72,18 @@ nonisolated enum RouteItineraryValidator {
             let required = TimeInterval(outgoing.element.requiredTransferSeconds
                 ?? context.minimumTransferSeconds)
             let slack = outgoingDeparture.timeIntervalSince(incomingArrival) - movement - required
-            if slack < 0 { return .invalid(.missedTransfer) }
+            if slack < 0 {
+                let sameStop = incoming.element.destinationStopId != nil
+                    && incoming.element.destinationStopId == outgoing.element.originStopId
+                guard sameStop, transferWalks.isEmpty,
+                      slack >= -TimeInterval(context.sameStopTransferShortfallSeconds) else {
+                    return .invalid(.missedTransfer)
+                }
+                shortfall = min(shortfall ?? slack, slack)
+            }
             minimumSlack = min(minimumSlack ?? slack, slack)
         }
+        if let shortfall { return .atRisk(minimumTransferSlack: shortfall) }
         return .feasible(minimumTransferSlack: minimumSlack)
     }
 

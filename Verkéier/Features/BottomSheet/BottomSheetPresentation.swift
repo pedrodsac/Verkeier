@@ -16,6 +16,7 @@ struct TransitSheetPresentationModel {
 
 struct TransitSheetActions {
     let toggleFavourite: () -> Void
+    let saveFavouriteCustomization: (Stop, String, String, String) -> Void
     let refreshDepartures: () async -> Void
     let refreshAlerts: () -> Void
     let calculateRoute: () -> Void

@@ -39,10 +39,15 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         realtimeRefreshPolicy: RouteRealtimeRefreshPolicy,
         page: RouteSearchPage
     ) async throws -> RouteCalculation {
+        let started = Date()
         let query = makeQuery(from: from, to: to, time: time, filters: filters,
                               page: page, realtimeRefreshPolicy: realtimeRefreshPolicy)
         let databaseURL = try await readyDatabaseURL()
+        let feedReady = Date()
+        try Task.checkCancellation()
         let router = try await engine.router(for: databaseURL)
+        let snapshotReady = Date()
+        try Task.checkCancellation()
         let calculation = try await localCalculation(
             using: router,
             from: from,
@@ -50,7 +55,14 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             query: query,
             page: page
         )
-        return await addingTransitGeometry(to: calculation)
+        let searchReady = Date()
+        try Task.checkCancellation()
+        let complete = await addingTransitGeometry(to: calculation)
+        try Task.checkCancellation()
+        if ProcessInfo.processInfo.environment["ROUTING_BENCHMARK"] == "1" {
+            print("[Routing] feed=\(Int(feedReady.timeIntervalSince(started) * 1_000))ms snapshot=\(Int(snapshotReady.timeIntervalSince(feedReady) * 1_000))ms search=\(Int(searchReady.timeIntervalSince(snapshotReady) * 1_000))ms geometry=\(Int(Date().timeIntervalSince(searchReady) * 1_000))ms total=\(Int(Date().timeIntervalSince(started) * 1_000))ms")
+        }
+        return complete
     }
 
     /// Starts loading MobiliteitKit's full-feed snapshot without blocking UI
@@ -220,31 +232,18 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         let tripIDs = Set(allOptions.flatMap { option in
             option.transitLegs.compactMap(\.tripId)
         })
-        guard !tripIDs.isEmpty else { return [:] }
+        guard !tripIDs.isEmpty, !Task.isCancelled else { return [:] }
 
-        let shapesByTripID = await withTaskGroup(
-            of: (String, [RouteMapCoordinate]).self,
-            returning: [String: [RouteMapCoordinate]].self
-        ) { group in
-            for tripID in tripIDs {
-                group.addTask {
-                    var shape = await gtfsService.routeShape(for: tripID)
-                    if shape.isEmpty,
-                       let frequencySuffix = tripID.range(of: "#frequency-") {
-                        shape = await gtfsService.routeShape(
-                            for: String(tripID[..<frequencySuffix.lowerBound])
-                        )
-                    }
-                    return (tripID, shape)
-                }
+        let baseIDs = Dictionary(uniqueKeysWithValues: tripIDs.map { tripID in
+            let base = tripID.range(of: "#frequency-").map { String(tripID[..<$0.lowerBound]) } ?? tripID
+            return (tripID, base)
+        })
+        let shapesByID = await gtfsService.routeShapes(for: Array(tripIDs.union(baseIDs.values)))
+        return baseIDs.reduce(into: [:]) { result, item in
+            if let shape = shapesByID[item.key] ?? shapesByID[item.value], shape.count >= 2 {
+                result[item.key] = shape
             }
-            var shapes: [String: [RouteMapCoordinate]] = [:]
-            for await (tripID, shape) in group where shape.count >= 2 {
-                shapes[tripID] = shape
-            }
-            return shapes
         }
-        return shapesByTripID
     }
 
     private nonisolated func applyingTransitGeometry(
@@ -274,6 +273,10 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             let session = try await router.makeSession(for: query)
             let journeyPage = try await initialJourneys(using: session, page: page,
                                                         direction: query.direction)
+            if ProcessInfo.processInfo.environment["ROUTING_BENCHMARK"] == "1" {
+                let metrics = journeyPage.metrics
+                print("[Routing] endpoints=\(metrics.endpointPreparationMilliseconds)ms live=\(metrics.realtimePreparationMilliseconds)ms RAPTOR=\(metrics.raptorSearchMilliseconds)ms transfers=\(metrics.walkingTransferMilliseconds)ms candidate=\(metrics.candidateBuildingMilliseconds)ms patterns=\(metrics.scannedPatterns) trips=\(metrics.scannedTripInstances) walkPairs=\(metrics.walkingTransferPairs) walkRequests=\(metrics.walkingRequests) walkHits=\(metrics.walkingCacheHits) journeys=\(metrics.alternativesRetained)")
+            }
             guard let calculation = calculation(
                 from: journeyPage,
                 origin: from,
@@ -282,6 +285,8 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                 query: query
             ) else { throw RoutingError.noPublicTransportRoute }
             return calculation
+        } catch is CancellationError {
+            throw CancellationError()
         } catch let error as RoutingError {
             throw error
         } catch {
@@ -327,7 +332,8 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             options: options,
             validationContext: .init(anchor: query.departureTime,
                                      arriveBy: query.direction == .arriveBy,
-                                     minimumTransferSeconds: query.preferences.minimumTransferSeconds),
+                                     minimumTransferSeconds: query.preferences.minimumTransferSeconds,
+                                     sameStopTransferShortfallSeconds: query.preferences.sameStopTransferShortfallSeconds),
             selectedOptionID: journeyPage.recommendedJourneyID?.value ?? options.first?.id
         )
     }
@@ -384,6 +390,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         return RoutingPreferences(
             maxTransfers: 3,
             minimumTransferSeconds: filters.avoidTightTransfers ? 180 : 120,
+            sameStopTransferShortfallSeconds: filters.avoidTightTransfers ? 0 : 60,
             allowedModes: .all,
             preferredMode: preferred,
             wheelchair: .noPreference,
@@ -421,7 +428,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         origin: LocationPoint,
         destination: LocationPoint
     ) -> RouteOption {
-        let legs = journey.legs.compactMap { leg -> RoutePlan.Leg? in
+        var legs = journey.legs.compactMap { leg -> RoutePlan.Leg? in
             switch leg {
             case let .walk(walk):
                 var result = RoutePlan.Leg(
@@ -471,6 +478,18 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                 return result
             case .inSeatContinuation:
                 return nil
+            }
+        }
+
+        let transitIndices = legs.indices.filter { legs[$0].transportKind == .transit }
+        for (incomingIndex, outgoingIndex) in zip(transitIndices, transitIndices.dropFirst()) {
+            guard legs[incomingIndex].destinationStopId == legs[outgoingIndex].originStopId,
+                  let arrival = legs[incomingIndex].realtimeArrivalTime ?? legs[incomingIndex].arrivalTime,
+                  let departure = legs[outgoingIndex].realtimeDepartureTime ?? legs[outgoingIndex].departureTime,
+                  let required = legs[outgoingIndex].requiredTransferSeconds else { continue }
+            let shortfall = TimeInterval(required) - departure.timeIntervalSince(arrival)
+            if shortfall > 0 {
+                legs[outgoingIndex].transferWarning = "Transfer below published minimum by \(Int(shortfall.rounded(.up))) sec"
             }
         }
 
@@ -537,6 +556,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
 actor MobiliteitRouteEngine {
     private let walkingProvider: any WalkingRoutingProvider
     private let realtimeClient: MobiliteitAPIClient?
+    private let suppliedRealtimeProvider: (any RealtimeRoutingProvider)?
 
     private struct DatabaseFingerprint: Equatable {
         let path: String
@@ -556,10 +576,12 @@ actor MobiliteitRouteEngine {
 
     init(
         walkingProvider: any WalkingRoutingProvider = MapKitWalkingProvider(),
-        realtimeClient: MobiliteitAPIClient? = nil
+        realtimeClient: MobiliteitAPIClient? = nil,
+        realtimeProvider: (any RealtimeRoutingProvider)? = nil
     ) {
         self.walkingProvider = walkingProvider
         self.realtimeClient = realtimeClient
+        self.suppliedRealtimeProvider = realtimeProvider
     }
 
     func router(for databaseURL: URL) async throws -> TransitRouter {
@@ -576,7 +598,7 @@ actor MobiliteitRouteEngine {
                 id: UUID(),
                 fingerprint: fingerprint,
                 task: Task(priority: .utility) {
-                    let realtimeProvider = try realtimeClient.map {
+                    let realtimeProvider = try suppliedRealtimeProvider ?? realtimeClient.map {
                         try HafasRealtimeRoutingProvider(
                             databaseURL: databaseURL,
                             client: $0,

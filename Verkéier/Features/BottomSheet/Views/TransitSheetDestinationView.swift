@@ -8,6 +8,7 @@ struct TransitSheetDestinationView: View {
     var searchContentTopPadding: CGFloat = 0
     let viewModel: TransitSheetPresentationModel
     let actions: TransitSheetActions
+    @State private var favouriteCustomization: FavouriteCustomizationDraft?
 
     var body: some View {
         switch route {
@@ -34,7 +35,13 @@ struct TransitSheetDestinationView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     let isFavourite = viewModel.stopDetail.isFavourite
-                    Button(action: actions.toggleFavourite) {
+                    Button {
+                        if isFavourite {
+                            actions.toggleFavourite()
+                        } else if let stop = viewModel.stopDetail.stop {
+                            favouriteCustomization = FavouriteCustomizationDraft(stop: stop)
+                        }
+                    } label: {
                         Label(
                             isFavourite ? "Remove favourite" : "Save favourite",
                             systemImage: isFavourite ? "star.fill" : "star"
@@ -42,6 +49,18 @@ struct TransitSheetDestinationView: View {
                     }
                     .tint(isFavourite ? .yellow : nil)
                 }
+            }
+            .sheet(item: $favouriteCustomization) { draft in
+                FavouriteCustomizerView(
+                    stop: draft.stop,
+                    initialLabel: draft.label,
+                    initialColorHex: draft.colorHex,
+                    initialIconName: draft.iconName
+                ) { label, colorHex, iconName in
+                    actions.saveFavouriteCustomization(draft.stop, label, colorHex, iconName)
+                }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
             }
 
         case .directions, .directionsForPreset:
@@ -108,8 +127,8 @@ struct TransitSheetDestinationView: View {
                         Label("Refresh alerts", systemImage: "arrow.clockwise")
                     }
                     .disabled(viewModel.alerts.isLoading)
+                    }
                 }
             }
-        }
     }
 }

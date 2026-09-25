@@ -4,13 +4,16 @@ import SwiftUI
 /// Containers own navigation, selection, separators, and surface styling.
 struct StopRow: View {
     let stop: Stop
-    var markerColor: Color = .blue
+    var markerColor: Color? = nil
+    var title: String? = nil
+    var subtitle: String? = nil
+    var iconName: String? = nil
     var routes: [TransitRoute] = []
     var walkingEstimate: OfflineWalkingEstimate?
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: stop.modes.primaryMode.symbolName)
+            Image(systemName: iconName ?? stop.modes.primaryMode.symbolName)
 				.font(.subheadline)
                 .foregroundStyle(.white)
                 .frame(width: 32, height: 32)
@@ -18,13 +21,13 @@ struct StopRow: View {
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 1) {
-                Text(stop.displayName)
+                Text(title ?? stop.displayName)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
 
                 HStack(spacing: 6) {
-                    Text(detailText)
+                    Text(subtitle ?? detailText)
 
                     if servesNightBus {
                         Divider()
@@ -45,12 +48,12 @@ struct StopRow: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(stop.displayName), \(detailText)")
+        .accessibilityLabel("\(title ?? stop.displayName), \(subtitle ?? detailText)")
     }
 
     private var transitColor: Color {
         let mode = stop.modes.primaryMode
-        return mode == .unknown ? markerColor : mode.tint
+        return markerColor ?? (mode == .unknown ? .blue : mode.tint)
     }
 
     private var subtitleLocation: String {

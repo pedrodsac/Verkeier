@@ -350,6 +350,13 @@ actor MobiliteitGTFSService: GTFSService {
         return shape.coordinates.map { RouteMapCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
     }
 
+    func routeShapes(for tripIDs: [String]) async -> [String: [RouteMapCoordinate]] {
+        guard let store, let shapes = try? await store.shapes(forTripIDs: tripIDs) else { return [:] }
+        return shapes.mapValues { coordinates in
+            coordinates.map { RouteMapCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
+        }
+    }
+
     nonisolated static func transportMode(forGTFSRouteType routeType: Int) -> TransportMode {
         switch routeType {
         case 0, 5, 900 ... 999:

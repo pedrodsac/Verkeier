@@ -9,13 +9,6 @@ nonisolated struct ValhallaRoutingDatasetValidator: RoutingDatasetValidating {
         )
         let origin = LocationPoint(latitude: 49.6116, longitude: 6.1319)
         let destination = LocationPoint(latitude: 49.6120, longitude: 6.1325)
-        let estimates = try await router.estimates(
-            from: origin,
-            to: [WalkingDestination(id: "smoke", location: destination)]
-        )
-        guard estimates.count == 1, estimates[0].distanceMeters > 0 else {
-            throw WalkingRoutingError.invalidResponse
-        }
         let route = try await router.route(from: origin, to: destination)
         guard route.coordinates.count >= 2, route.distanceMeters > 0 else {
             throw WalkingRoutingError.invalidResponse

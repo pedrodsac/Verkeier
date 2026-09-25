@@ -58,6 +58,7 @@
       }
     },
     "%@ public transport maps" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -293,6 +294,9 @@
         }
       }
     },
+    "© OpenStreetMap contributors · ODbL" : {
+
+    },
     "✓ %lld departures" : {
       "localizations" : {
         "de" : {
@@ -522,6 +526,7 @@
       }
     },
     "Add" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -578,6 +583,7 @@
       }
     },
     "Add label" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -688,6 +694,9 @@
           }
         }
       }
+    },
+    "App" : {
+
     },
     "Appearance" : {
       "localizations" : {
@@ -857,7 +866,11 @@
         }
       }
     },
+    "Bike share" : {
+
+    },
     "Bike share stations" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1281,6 +1294,12 @@
         }
       }
     },
+    "Color %@" : {
+
+    },
+    "Colour" : {
+
+    },
     "Commute suggestion, %@, leave now" : {
       "localizations" : {
         "de" : {
@@ -1310,6 +1329,7 @@
       }
     },
     "Connectivity" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1365,6 +1385,9 @@
         }
       }
     },
+    "Customize favourite" : {
+
+    },
     "Data" : {
       "localizations" : {
         "de" : {
@@ -1392,6 +1415,9 @@
           }
         }
       }
+    },
+    "Data sources" : {
+
     },
     "Data Status" : {
       "localizations" : {
@@ -1422,6 +1448,7 @@
       }
     },
     "Default lead time" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1450,6 +1477,7 @@
       }
     },
     "Delete all local data" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1504,6 +1532,9 @@
           }
         }
       }
+    },
+    "Delete local data" : {
+
     },
     "Delete local data?" : {
       "localizations" : {
@@ -1785,7 +1816,7 @@
         }
       }
     },
-    "Downloading and preparing timetable data…" : {
+    "Downloading timetable…" : {
 
     },
     "Edit labels" : {
@@ -1817,6 +1848,7 @@
       }
     },
     "Edit Labels" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1874,6 +1906,7 @@
       }
     },
     "Existing labels" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1957,6 +1990,9 @@
         }
       }
     },
+    "Favourite Name" : {
+
+    },
     "Favourite Stop" : {
       "localizations" : {
         "de" : {
@@ -2014,6 +2050,7 @@
       }
     },
     "Find a stop" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2210,6 +2247,9 @@
         }
       }
     },
+    "Icon" : {
+
+    },
     "Information" : {
       "localizations" : {
         "de" : {
@@ -2237,6 +2277,9 @@
           }
         }
       }
+    },
+    "Information may be incomplete or delayed." : {
+
     },
     "Journey Alerts" : {
       "localizations" : {
@@ -2267,6 +2310,7 @@
       }
     },
     "Label" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2323,6 +2367,7 @@
       }
     },
     "Labels" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2462,6 +2507,9 @@
         }
       }
     },
+    "Libraries" : {
+
+    },
     "Live Activity tracking %@ to %@" : {
       "localizations" : {
         "de" : {
@@ -2496,7 +2544,11 @@
         }
       }
     },
+    "Live departures" : {
+
+    },
     "Live information" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2584,6 +2636,7 @@
       }
     },
     "Location" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2610,6 +2663,9 @@
           }
         }
       }
+    },
+    "Location is used on device. Saved places and trips stay on this device. No account or ads." : {
+
     },
     "Luxembourg transit map" : {
       "localizations" : {
@@ -2639,7 +2695,11 @@
         }
       }
     },
+    "Map" : {
+
+    },
     "Map pins" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2696,6 +2756,7 @@
       }
     },
     "mobiliteit.lu · Public transport maps" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2752,6 +2813,7 @@
       }
     },
     "More" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2894,6 +2956,12 @@
         }
       }
     },
+    "Network maps" : {
+
+    },
+    "New Favourite" : {
+
+    },
     "Night bus" : {
       "localizations" : {
         "de" : {
@@ -2923,6 +2991,7 @@
       }
     },
     "No favourites" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2951,6 +3020,7 @@
       }
     },
     "No labels assigned" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3063,6 +3133,7 @@
       }
     },
     "Notifications" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3091,6 +3162,7 @@
       }
     },
     "Official mobiliteit.lu network maps for Luxembourg, available in English, French, and German." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3119,6 +3191,7 @@
       }
     },
     "Offline mode" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3145,6 +3218,9 @@
           }
         }
       }
+    },
+    "Offline schedules" : {
+
     },
     "Open departures" : {
       "localizations" : {
@@ -3260,6 +3336,7 @@
       }
     },
     "Open iOS Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3484,6 +3561,7 @@
       }
     },
     "Open-source libraries used by Verkéier." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3680,6 +3758,7 @@
       }
     },
     "Opens the mobiliteit.lu map in your browser" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3708,6 +3787,7 @@
       }
     },
     "Permissions" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3821,6 +3901,7 @@
       }
     },
     "Plan journeys from the static schedule only, without live departures, delays, or cancellations. Adds a 15-minute minimum between transfers as a safety buffer." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4073,6 +4154,7 @@
       }
     },
     "Prefer step-free routes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4101,6 +4183,7 @@
       }
     },
     "Preferred mode" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4127,6 +4210,9 @@
           }
         }
       }
+    },
+    "Preferred transport" : {
+
     },
     "Preparing timetable data" : {
 
@@ -4160,6 +4246,7 @@
       }
     },
     "Public transport for Luxembourg" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4188,6 +4275,7 @@
       }
     },
     "Public transport maps" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4413,6 +4501,7 @@
       }
     },
     "Refresh departures for %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4441,6 +4530,7 @@
       }
     },
     "Refresh favourites" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4524,6 +4614,9 @@
         }
       }
     },
+    "Reminder" : {
+
+    },
     "Reminder set for %lld min before %@ to %@" : {
       "localizations" : {
         "de" : {
@@ -4587,6 +4680,7 @@
       }
     },
     "Remove" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4615,6 +4709,7 @@
       }
     },
     "Remove %@ from favourites" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4669,6 +4764,9 @@
           }
         }
       }
+    },
+    "Removes favourites, recent stops, trips, and commute presets from this device." : {
+
     },
     "Reset filters" : {
       "localizations" : {
@@ -4755,6 +4853,7 @@
       }
     },
     "Route Planner Defaults" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4811,6 +4910,7 @@
       }
     },
     "Save a stop from its detail view." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5007,6 +5107,7 @@
       }
     },
     "Schedules, live departures, bike-share availability, and service warnings are provided by their respective data publishers and may be incomplete or delayed." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5063,6 +5164,9 @@
       }
     },
     "Searching" : {
+
+    },
+    "Service alerts" : {
 
     },
     "Settings" : {
@@ -5263,6 +5367,9 @@
       }
     },
     "Start typing to search places and addresses." : {
+
+    },
+    "Step-free routes" : {
 
     },
     "Step-free, wheelchair accessible" : {
@@ -5578,6 +5685,7 @@
       }
     },
     "This removes favourites, recent stops, trips, and commute presets from this device." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5860,6 +5968,9 @@
     "Transit data details" : {
 
     },
+    "Travel" : {
+
+    },
     "Try again when your location is available." : {
       "localizations" : {
         "de" : {
@@ -5945,6 +6056,7 @@
       }
     },
     "Units" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6035,6 +6147,7 @@
       }
     },
     "Verkéier" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6063,6 +6176,7 @@
       }
     },
     "Verkéier is an independent app and is not affiliated with or endorsed by Luxembourg public transport operators." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6089,6 +6203,15 @@
           }
         }
       }
+    },
+    "Verkéier is independent and not affiliated with Luxembourg public transport operators." : {
+
+    },
+    "Version" : {
+
+    },
+    "Walking routes" : {
+
     },
     "Wheelchair accessible" : {
       "localizations" : {

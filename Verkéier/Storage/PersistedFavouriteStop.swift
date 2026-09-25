@@ -26,6 +26,10 @@ final class PersistedFavouriteStop {
     /// Optional saved board scope for this favourite. `nil` preserves the
     /// historical unfiltered favourite behaviour.
     var boardFilterData: Data?
+    /// Optional presentation customizations added without disturbing older stores.
+    var displayLabel: String?
+    var iconName: String?
+    var colorHex: String?
 
     init(stop: Stop, boardFilter: TransitBoardFilter? = nil, createdAt: Date = .now) {
         stopId = stop.id

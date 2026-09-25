@@ -17,6 +17,18 @@ protocol GTFSService: Sendable {
     func journeyStops(for tripID: String) async -> [GTFSJourneyStopTime]
     func transferRules(from stop: Stop) async -> [GTFSTransferRule]
     func routeShape(for tripID: String) async -> [RouteMapCoordinate]
+    func routeShapes(for tripIDs: [String]) async -> [String: [RouteMapCoordinate]]
+}
+
+extension GTFSService {
+    func routeShapes(for tripIDs: [String]) async -> [String: [RouteMapCoordinate]] {
+        var shapes: [String: [RouteMapCoordinate]] = [:]
+        for tripID in Set(tripIDs) {
+            let shape = await routeShape(for: tripID)
+            if shape.count >= 2 { shapes[tripID] = shape }
+        }
+        return shapes
+    }
 }
 
 nonisolated enum GTFSFeedPhase: String, Codable, Sendable {

@@ -33,6 +33,7 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         to destinations: [WalkingDestination]
     ) async throws -> [OfflineWalkingEstimate] {
         guard !destinations.isEmpty else { return [] }
+        try Task.checkCancellation()
         do {
             let estimates = try await withLocalRouter {
                 try await $0.estimates(from: origin, to: destinations)
@@ -40,6 +41,7 @@ actor LocalFirstWalkingRouter: WalkingRouting {
             debugLog("Walking estimates: using local OSM graph for \(destinations.count) destination(s).")
             return calibrated(estimates)
         } catch {
+            try Task.checkCancellation()
             debugLog("Walking estimates: local OSM graph failed (\(error)); falling back to MapKit.")
         }
         do {
@@ -47,6 +49,7 @@ actor LocalFirstWalkingRouter: WalkingRouting {
             debugLog("Walking estimates: using MapKit fallback for \(destinations.count) destination(s).")
             return calibrated(estimates)
         } catch {
+            try Task.checkCancellation()
             debugLog("Walking estimates: MapKit fallback failed (\(error)); using straight-line estimate.")
         }
         debugLog("Walking estimates: using straight-line fallback for \(destinations.count) destination(s).")
@@ -58,18 +61,22 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         to destination: LocationPoint
     ) async throws -> [OfflineWalkingEstimate] {
         guard !origins.isEmpty else { return [] }
+        try Task.checkCancellation()
         if let estimates = try? await withLocalRouter({
             try await $0.estimates(from: origins, to: destination)
         }) {
             return calibrated(estimates)
         }
+        try Task.checkCancellation()
         if let estimates = try? await mapKitFallback.estimates(from: origins, to: destination) {
             return calibrated(estimates)
         }
+        try Task.checkCancellation()
         return calibrated(try await straightLineFallback.estimates(from: origins, to: destination))
     }
 
     func route(from origin: LocationPoint, to destination: LocationPoint) async throws -> OfflineWalkingRoute {
+        try Task.checkCancellation()
         do {
             let route = try await withLocalRouter {
                 try await $0.route(from: origin, to: destination)
@@ -81,6 +88,7 @@ actor LocalFirstWalkingRouter: WalkingRouting {
             // walkable; a fallback estimate must not invent a connection.
             throw WalkingRoutingError.noRoute
         } catch {
+            try Task.checkCancellation()
             debugLog("Walking route: local OSM graph failed (\(error)); falling back to MapKit.")
         }
         do {
@@ -88,6 +96,7 @@ actor LocalFirstWalkingRouter: WalkingRouting {
             debugLog("Walking route: using MapKit fallback.")
             return calibrated(route)
         } catch {
+            try Task.checkCancellation()
             debugLog("Walking route: MapKit fallback failed (\(error)); using straight-line estimate.")
         }
         debugLog("Walking route: using straight-line fallback.")
@@ -97,6 +106,7 @@ actor LocalFirstWalkingRouter: WalkingRouting {
     private func withLocalRouter<Value: Sendable>(
         _ operation: @Sendable (ValhallaWalkingRouter) async throws -> Value
     ) async throws -> Value {
+        try Task.checkCancellation()
         guard let dataset = try await datasetManager.activeDataset() else {
             throw WalkingRoutingError.datasetUnavailable
         }
@@ -135,6 +145,7 @@ actor LocalFirstWalkingRouter: WalkingRouting {
                 routerPool?.activeCounts[index] -= 1
             }
         }
+        try Task.checkCancellation()
         return try await operation(router)
     }
 
@@ -252,87 +263,49 @@ nonisolated struct LocalFirstWalkingRoutingProvider: WalkingRoutingProvider {
         maximumConcurrency: Int
     ) async -> [MobiliteitKit.WalkingRoute?] {
         guard !requests.isEmpty else { return [] }
-        if let destination = requests.first?.destination,
-           requests.allSatisfy({ $0.destination == destination }) {
-            let origins = requests.indices.map { index in
-                WalkingOrigin(
-                    id: String(index),
-                    location: locationPoint(from: requests[index].source)
-                )
-            }
-            guard let estimates = try? await walkingRouter.estimates(
-                from: origins,
-                to: locationPoint(from: destination)
-            ) else {
-                return Array(repeating: nil, count: requests.count)
-            }
-            let byID = Dictionary(uniqueKeysWithValues: estimates.map { ($0.destinationID, $0) })
-            return requests.indices.map { index in
-                guard let estimate = byID[String(index)] else { return nil }
-                let request = requests[index]
-                return MobiliteitKit.WalkingRoute(
-                    durationSeconds: max(1, Int(estimate.duration.rounded())),
-                    distanceMeters: estimate.distanceMeters,
-                    polyline: [request.source, request.destination],
-                    evidence: estimate.source == .straightLineEstimate ? .estimate : .routedPedestrian
-                )
-            }
-        }
-        let grouped = Dictionary(grouping: requests.indices) { requests[$0].source }
-        let groups = grouped.keys.sorted {
-            if $0.latitude != $1.latitude { return $0.latitude < $1.latitude }
-            return $0.longitude < $1.longitude
-        }.map { source in (source: source, indices: grouped[source] ?? []) }
-        let router = walkingRouter
-        let limit = min(max(1, maximumConcurrency), groups.count)
+        guard !Task.isCancelled else { return Array(repeating: nil, count: requests.count) }
+        // Resolve every pair on the same pedestrian graph with bounded A* calls.
+        // A Valhalla matrix can spend tens of seconds expanding one distant target.
+        return await pairwiseRoutes(requests, maximumConcurrency: maximumConcurrency)
+    }
 
-        return await withTaskGroup(of: [(Int, MobiliteitKit.WalkingRoute?)].self) { group in
-            var nextGroup = 0
+    private func pairwiseRoutes(
+        _ requests: [WalkingRequest],
+        maximumConcurrency: Int
+    ) async -> [MobiliteitKit.WalkingRoute?] {
+        let router = walkingRouter
+        let limit = min(max(1, maximumConcurrency), requests.count)
+        return await withTaskGroup(of: (Int, MobiliteitKit.WalkingRoute?).self) { group in
+            var nextIndex = 0
             var results = Array<MobiliteitKit.WalkingRoute?>(repeating: nil, count: requests.count)
 
-            func add(_ groupIndex: Int) {
-                let item = groups[groupIndex]
-                group.addTask {
-                    let origin = LocationPoint(
-                        latitude: item.source.latitude,
-                        longitude: item.source.longitude
-                    )
-                    let destinations = item.indices.map { index in
-                        let request = requests[index]
-                        return WalkingDestination(
-                            id: String(index),
-                            location: LocationPoint(
-                                latitude: request.destination.latitude,
-                                longitude: request.destination.longitude
-                            )
-                        )
-                    }
-                    guard let estimates = try? await router.estimates(from: origin, to: destinations) else {
-                        return item.indices.map { ($0, nil) }
-                    }
-                    let byID = Dictionary(uniqueKeysWithValues: estimates.map { ($0.destinationID, $0) })
-                    return item.indices.map { index in
-                        guard let estimate = byID[String(index)] else { return (index, nil) }
-                        let request = requests[index]
-                        return (index, MobiliteitKit.WalkingRoute(
-                            durationSeconds: max(1, Int(estimate.duration.rounded())),
-                            distanceMeters: estimate.distanceMeters,
-                            polyline: [request.source, request.destination],
-                            evidence: estimate.source == .straightLineEstimate ? .estimate : .routedPedestrian
-                        ))
-                    }
+            func add(_ index: Int) -> Bool {
+                let request = requests[index]
+                return group.addTaskUnlessCancelled {
+                    guard let route = try? await router.route(
+                        from: locationPoint(from: request.source),
+                        to: locationPoint(from: request.destination)
+                    ) else { return (index, nil) }
+                    return (index, MobiliteitKit.WalkingRoute(
+                        durationSeconds: max(1, Int(route.duration.rounded())),
+                        distanceMeters: route.distanceMeters,
+                        polyline: route.coordinates.map {
+                            Coordinate(latitude: $0.latitude, longitude: $0.longitude)
+                        },
+                        evidence: route.source == .straightLineEstimate ? .estimate : .routedPedestrian
+                    ))
                 }
             }
 
             for _ in 0..<limit {
-                add(nextGroup)
-                nextGroup += 1
+                guard add(nextIndex) else { break }
+                nextIndex += 1
             }
-            while let values = await group.next() {
-                for (index, route) in values { results[index] = route }
-                if nextGroup < groups.count {
-                    add(nextGroup)
-                    nextGroup += 1
+            while let (index, route) = await group.next() {
+                results[index] = route
+                if nextIndex < requests.count, !Task.isCancelled {
+                    guard add(nextIndex) else { break }
+                    nextIndex += 1
                 }
             }
             return results
