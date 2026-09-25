@@ -602,7 +602,7 @@ actor MobiliteitRouteEngine {
                         try HafasRealtimeRoutingProvider(
                             databaseURL: databaseURL,
                             client: $0,
-                            maximumConcurrentBoardRequests: 4,
+                            maximumConcurrentBoardRequests: 12,
                             cacheLifetime: 60,
                             requestTimeout: .seconds(4)
                         )

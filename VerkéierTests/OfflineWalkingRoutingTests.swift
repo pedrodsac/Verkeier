@@ -147,8 +147,8 @@ struct OfflineWalkingRoutingTests {
         #expect(route.polyline.count == 3)
     }
 
-    @Test("Destination walking candidates use one directed matrix request")
-    func destinationWalkingUsesReverseMatrix() async {
+    @Test("Destination walking candidates keep directed route geometry")
+    func destinationWalkingUsesDirectedRoutes() async {
         let router = RecordingReverseWalkingRouter()
         let provider = LocalFirstWalkingRoutingProvider(walkingRouter: router)
         let destination = Coordinate(latitude: 49.62, longitude: 6.13)
@@ -160,8 +160,8 @@ struct OfflineWalkingRoutingTests {
             .init(source: second, destination: destination),
         ], maximumConcurrency: 4)
 
-        #expect(await router.reverseBatchCount == 1)
-        #expect(await router.singleRouteCount == 0)
+        #expect(await router.reverseBatchCount == 0)
+        #expect(await router.singleRouteCount == 2)
         #expect(routes.map { $0?.durationSeconds } == [60, 61])
         #expect(routes[0]?.polyline == [first, destination])
         #expect(routes[1]?.polyline == [second, destination])
@@ -240,9 +240,18 @@ private actor RecordingReverseWalkingRouter: WalkingRouting {
         }
     }
 
-    func route(from _: LocationPoint, to _: LocationPoint) async throws -> OfflineWalkingRoute {
+    func route(from origin: LocationPoint, to destination: LocationPoint) async throws -> OfflineWalkingRoute {
         singleRouteCount += 1
-        throw WalkingRoutingError.noRoute
+        let isFirst = origin.latitude == 49.61
+        return OfflineWalkingRoute(
+            distanceMeters: isFirst ? 75 : 76,
+            duration: isFirst ? 60 : 61,
+            coordinates: [
+                .init(latitude: origin.latitude, longitude: origin.longitude),
+                .init(latitude: destination.latitude, longitude: destination.longitude)
+            ],
+            source: .localOSM
+        )
     }
 }
 

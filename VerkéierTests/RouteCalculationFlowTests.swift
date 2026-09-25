@@ -225,6 +225,28 @@ struct RouteCalculationFlowTests {
         let selected = try #require(breedewues.selectedOption)
         #expect(selected.routeNames == ["321", "25"])
         #expect(selected.transitLegs.last?.transferWarning?.contains("45 sec") == true)
+
+        let gromscheedStop = try #require(await gtfsService.searchStops(query: "Gromscheed")
+            .first { $0.id == "000200508004" })
+        let hamiliusStop = try #require(await gtfsService.searchStops(query: "Hamilius")
+            .first { $0.id == "000200405020" })
+        let gromscheedTime = try #require(calendar.date(from: DateComponents(
+            year: 2026, month: 9, day: 25, hour: 13, minute: 47
+        )))
+        let gromscheed = try await routeService.calculateRoute(
+            from: RoutePlace(stop: gromscheedStop, source: .search).location,
+            to: RoutePlace(stop: hamiliusStop, source: .search).location,
+            time: .departAt(gromscheedTime),
+            filters: RoutePlannerFilters(),
+            realtimeRefreshPolicy: .scheduleOnly,
+            page: .initial
+        )
+        let walkingOption = try #require(gromscheed.options.first { option in
+            option.routeNames.first == "29"
+                && option.transitLegs.first?.originStopId == "000200508003"
+                && option.transitLegs.count == 2
+        })
+        #expect(walkingOption.plan.legs.first?.transportKind == .walking)
     }
 
     private func benchmarkBundledGraph(
@@ -254,6 +276,21 @@ struct RouteCalculationFlowTests {
             ),
             walkingRouter: walkingRouter
         )
+        let reverseStarted = ContinuousClock.now
+        let reverseCalculation = try await graphRouteService.calculateRoute(
+            from: RoutePlace(stop: destinationStop, source: .search).location,
+            to: LocationPoint(
+                name: "18A Gromscheed, Senningerberg",
+                latitude: 49.6541071,
+                longitude: 6.2296443
+            ),
+            time: .departAt(anchor),
+            filters: RoutePlannerFilters(),
+            realtimeRefreshPolicy: .forceRefresh,
+            page: .initial
+        )
+        print("Bundled graph cold reverse address route: \(reverseStarted.duration(to: .now)); IDs: \(reverseCalculation.options.map(\.id))")
+        #expect(!reverseCalculation.options.isEmpty)
         for run in 1...2 {
             let graphStarted = ContinuousClock.now
             let graphCalculation = try await graphRouteService.calculateRoute(
@@ -271,7 +308,32 @@ struct RouteCalculationFlowTests {
             print("Bundled graph route run \(run): \(graphStarted.duration(to: .now)); IDs: \(graphCalculation.options.map(\.id))")
             #expect(!graphCalculation.options.isEmpty)
         }
-        #expect(await fixedRealtime.requestCount == 2)
+        #expect(await fixedRealtime.requestCount == 3)
+        if ProcessInfo.processInfo.environment["ROUTING_TEST_REAL_LIVE"] == "1",
+           let proxyURL = AppConfiguration.current.apiProxyURL {
+            let liveService = MobiliteitRouteService(
+                databaseURL: databaseURL,
+                gtfsService: gtfsService,
+                realtimeClient: MobiliteitLiveTransitService(proxyURL: proxyURL).realtimeRoutingClient,
+                walkingRouter: walkingRouter
+            )
+            let liveStarted = ContinuousClock.now
+            let liveCalculation = try await liveService.calculateRoute(
+                from: RoutePlace(stop: destinationStop, source: .search).location,
+                to: LocationPoint(
+                    name: "18A Gromscheed, Senningerberg",
+                    latitude: 49.6541071,
+                    longitude: 6.2296443
+                ),
+                time: .leaveNow,
+                filters: RoutePlannerFilters(),
+                realtimeRefreshPolicy: .forceRefresh,
+                page: .initial
+            )
+            print("Live reverse address route: \(liveStarted.duration(to: .now)); IDs: \(liveCalculation.options.map(\.id))")
+            print("Live reverse coverage: \(liveCalculation.options.map(\.realtimeCoverage))")
+            #expect(!liveCalculation.options.isEmpty)
+        }
     }
 
     @Test("A stalled provider cannot leave the route sheet loading forever")
