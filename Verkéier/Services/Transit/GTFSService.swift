@@ -47,6 +47,7 @@ nonisolated struct GTFSFeedStatus: Codable, Sendable, Equatable {
     var resourceTitle: String?
     var downloadedAt: Date?
     var lastCheckedAt: Date?
+    var releasedAt: Date?
     var validThrough: String?
     var errorMessage: String?
 
@@ -73,7 +74,6 @@ struct GTFSJourneyDeparture: Sendable, Hashable {
     let directionID: Int?
     let departureDate: Date
     let arrivalDate: Date?
-    let wheelchairAccessible: WheelchairAccess
 }
 
 struct GTFSJourneyStopTime: Sendable, Hashable {

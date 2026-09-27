@@ -16,8 +16,8 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 - [x] **P0** Door-to-door journey planner: origin and destination both editable (not just current location → selected stop)
 - [x] **P0** Address and POI search as trip origin or destination (not only GTFS stops)
 - [x] **P0** "Depart at" and "Arrive by" time pickers with a clear now/later toggle
-- [x] **P0** Route filter controls: fastest · fewest transfers · least walking · accessible · prefer train/tram/bus · avoid tight transfers
-- [x] **P0** Transfer reliability indicator: flag connections with <5 min window as "tight", suggest alternatives when live delay makes a transfer unlikely
+- [x] **P0** Route filter controls: fastest · fewest transfers · least walking · prefer train/tram/bus · avoid tight transfers
+- [x] **P0** Transfer reliability indicator: flag connections with <2 min window as "tight", suggest alternatives when live delay makes a transfer unlikely
 - [x] **P1** "Last service" warning: show when the selected departure is the last one of the day on that line, and the last connection from a transfer stop
 - [x] **P1** Recent trips and destinations: remember last 10 A→B pairs for one-tap re-use
 - [x] **P1** Saved commute presets: "Home → Work", "Work → Home" and custom labels; accessible from the home sheet and commute dashboard
@@ -57,7 +57,6 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 - [x] **P1** Distance and walking ETA on every nearby stop row and map callout
 - [x] **P1** Lines served displayed on each nearby stop row (the top 3–5 routes)
 - [x] **P1** Night bus stops visible as a distinct layer (relevant for Friday/Saturday evenings) <!-- ponytail: night-service indicator on rows; per-stop map flags is the upgrade -->
-- [x] **P1** Stop accessibility info: wheelchair boarding, step-free access, elevator presence — sourced from GTFS `wheelchair_boarding` field
 - [x] **P2** Park+Ride locations as a separate map layer <!-- ponytail: stubbed — no P+R dataset -->
 - [x] **P2** Real-time vehicle positions on the map (trains/trams as moving dots) if ATP provides location streams <!-- ponytail: stubbed — no ATP vehicle stream -->
 - [x] **P2** Disruption-affected stops highlighted on the map when an active AVL alert is linked to them
@@ -120,8 +119,6 @@ The biggest gap. The app can show departures from a single stop, but cannot answ
 
 ## 8. Accessibility
 
-- [x] **P1** Wheelchair-accessible route filter in the journey planner (GTFS `wheelchair_accessible` and `wheelchair_boarding` fields) <!-- preferAccessible filter -->
-- [x] **P1** Step-free journey option: avoid stops with stairs when no elevator is confirmed <!-- preferAccessible heuristic -->
 - [x] **P1** Larger departure board mode: single-column full-screen view with 200% text, high contrast, and audio-ready labels <!-- ponytail: board uses Dynamic Type up to Accessibility sizes -->
 - [x] **P1** All interactive elements have VoiceOver labels and accessibility hints
 - [x] **P1** Dynamic Type support at all sizes including Accessibility sizes (xxLarge and above)

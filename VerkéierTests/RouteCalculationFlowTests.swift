@@ -168,7 +168,6 @@ struct RouteCalculationFlowTests {
                     && otherArrival <= candidateArrival
                     && other.transferCount <= candidate.transferCount
                     && other.walkingDistanceMeters <= candidate.walkingDistanceMeters
-                    && other.accessibility == candidate.accessibility
                     && (otherDeparture > candidateDeparture
                         || otherArrival < candidateArrival
                         || other.transferCount < candidate.transferCount
@@ -337,7 +336,7 @@ struct RouteCalculationFlowTests {
     }
 
     @Test("A stalled provider cannot leave the route sheet loading forever")
-    func stalledProviderEndsInAnActionableError() async {
+    func stalledProviderEndsInAnActionableError() async throws {
         let anchor = Date.now
         let viewModel = TransitMapViewModel(
             now: { anchor },
@@ -374,9 +373,26 @@ struct RouteCalculationFlowTests {
         #expect(viewModel.routeOptions.isEmpty)
         #expect(viewModel.routeErrorMessage == "Route calculation is taking too long. Please try again.")
 
+        let origin = try #require(viewModel.routeOrigin?.location)
+        let destination = try #require(viewModel.routeDestination?.location)
+        let oldRoute = RouteOption(id: "old-route", plan: RoutePlan(
+            id: "old-route", origin: origin, destination: destination,
+            expectedTravelTime: 600, distanceMeters: nil,
+            legs: [RoutePlan.Leg(
+                id: "old-bus", mode: .bus, transportKind: .transit,
+                origin: origin, destination: destination,
+                departureTime: anchor.addingTimeInterval(60),
+                arrivalTime: anchor.addingTimeInterval(660)
+            )], dataSource: .local
+        ), mapOverlay: nil)
+        viewModel.unfilteredRouteOptions = [oldRoute]
+        viewModel.routeOptions = [oldRoute]
+        viewModel.selectedRouteOptionID = oldRoute.id
         await viewModel.calculateRoute(using: ImmediateNoRouteService(), from: nil)
         #expect(viewModel.routeLoadingPhase == .idle)
         #expect(viewModel.routeErrorMessage == "No public transport route was found.")
+        #expect(viewModel.routeOptions.isEmpty)
+        #expect(viewModel.selectedRouteOptionID == nil)
     }
 
     private func printRouteResults(label: String, options: [RouteOption]) {
@@ -443,7 +459,7 @@ private struct ImmediateNoRouteService: RouteService {
         realtimeRefreshPolicy _: RouteRealtimeRefreshPolicy,
         page _: RouteSearchPage
     ) async throws -> RouteCalculation {
-        throw RoutingError.noRouteFound
+        throw RoutingError.noPublicTransportRoute
     }
 
     @MainActor func openInAppleMaps(from _: LocationPoint, to _: LocationPoint) {}

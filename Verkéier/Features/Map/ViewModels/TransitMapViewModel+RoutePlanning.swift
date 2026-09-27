@@ -260,6 +260,11 @@ extension TransitMapViewModel {
             if receivedRouteUpdate {
                 routeStatusMessage = nil
                 routeErrorMessage = nil
+            } else if let routingError = error as? RoutingError,
+                      routingError == .noPublicTransportRoute {
+                // A completed search found no boardable service. Keeping an
+                // older itinerary can keep suggesting a newly cancelled trip.
+                clearRouteResult()
             } else if routeOptions.isEmpty, supplementalRouteOptions.isEmpty {
                 clearRouteResult()
             } else {
@@ -663,9 +668,6 @@ extension TransitMapViewModel {
         } else if let preferred = routeFilters.modePreference.transportMode,
                   !routeOptions.contains(where: { $0.transitLegs.contains { $0.mode == preferred } }) {
             routeStatusMessage = "No routes using the preferred mode were found. Showing other routes."
-        } else if routeFilters.preferAccessible,
-                  !routeOptions.contains(where: { $0.accessibility == .verified }) {
-            routeStatusMessage = "No step-free route could be verified. Showing routes with accessibility information where available."
         } else {
             routeStatusMessage = nil
         }
@@ -691,8 +693,10 @@ extension TransitMapViewModel {
         return lhs.id < rhs.id
     }
 
-    /// Only stable itinerary identity proves an option is a duplicate. Display
-    /// minutes can coincide for routes with different walks or interchanges.
+    /// Keep distinct itineraries with equal or competing times, but hide a
+    /// transit journey when another usable one leaves no earlier and arrives
+    /// no later, or takes the same first and last trips with an unnecessary
+    /// intermediate ride. Compare actual times rather than rounded card minutes.
     static func deduplicatingEquivalentRouteOptions(_ options: [RouteOption]) -> [RouteOption] {
         var result: [RouteOption] = []
         var indexByID: [String: Int] = [:]
@@ -707,7 +711,55 @@ extension TransitMapViewModel {
                 result.append(option)
             }
         }
-        return result
+        return result.filter { candidate in
+            guard !candidate.transitLegs.isEmpty,
+                  !candidate.transitLegs.contains(where: { $0.liveStatus == .cancelled }),
+                  let departure = candidate.departureTime,
+                  let arrival = candidate.arrivalTime else { return true }
+
+            return !result.contains { other in
+                guard other.id != candidate.id,
+                      !other.transitLegs.isEmpty,
+                      other.feasibility?.isInvalid != true,
+                      !other.transitLegs.contains(where: {
+                          $0.liveStatus == .cancelled || $0.transferWarning == "Connection miss"
+                      }),
+                      let otherDeparture = other.departureTime,
+                      let otherArrival = other.arrivalTime else { return false }
+                let improvesTime = otherDeparture >= departure && otherArrival <= arrival
+                    && (otherDeparture > departure || otherArrival < arrival)
+                return improvesTime || isRedundantIntermediateRide(candidate, comparedTo: other)
+            }
+        }
+    }
+
+    private static func isRedundantIntermediateRide(
+        _ candidate: RouteOption,
+        comparedTo other: RouteOption
+    ) -> Bool {
+        let rides = candidate.transitLegs
+        let simplerRides = other.transitLegs
+        let calendar = Calendar.current
+        // Small differences in walking geometry should not preserve an extra transfer.
+        let maximumAdditionalWalkMeters = 50.0
+        guard rides.count > 2, simplerRides.count == 2,
+              let departure = candidate.departureTime,
+              let simplerDeparture = other.departureTime,
+              calendar.isDate(departure, equalTo: simplerDeparture, toGranularity: .minute),
+              let arrival = candidate.arrivalTime,
+              let simplerArrival = other.arrivalTime,
+              calendar.isDate(arrival, equalTo: simplerArrival, toGranularity: .minute),
+              candidate.walkingDistanceMeters + maximumAdditionalWalkMeters >= other.walkingDistanceMeters,
+              let firstTrip = rides.first?.tripId,
+              let lastTrip = rides.last?.tripId,
+              firstTrip == simplerRides.first?.tripId,
+              lastTrip == simplerRides.last?.tripId,
+              let boardingStop = rides.first?.originStopId,
+              let alightingStop = rides.last?.destinationStopId,
+              boardingStop == simplerRides.first?.originStopId,
+              alightingStop == simplerRides.last?.destinationStopId
+        else { return false }
+        return true
     }
 
     private static func transferTimingRanksBefore(_ lhs: RouteOption, _ rhs: RouteOption) -> Bool {
@@ -795,19 +847,6 @@ extension TransitMapViewModel {
         } ?? 0
         if lhsModeRank != rhsModeRank {
             return lhsModeRank < rhsModeRank
-        }
-
-        if routeFilters.preferAccessible {
-            func rank(_ assessment: RouteAccessibilityAssessment?) -> Int {
-                switch assessment {
-                case .some(.verified): 0
-                case .some(.unknown), .none: 1
-                case .some(.inaccessible): 2
-                }
-            }
-            let lhsAccess = rank(lhs.accessibility)
-            let rhsAccess = rank(rhs.accessibility)
-            if lhsAccess != rhsAccess { return lhsAccess < rhsAccess }
         }
 
         let anchor = routePlanningTime.date ?? now()

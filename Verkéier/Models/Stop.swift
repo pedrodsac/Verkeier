@@ -1,21 +1,5 @@
 import Foundation
 
-/// Wheelchair boarding accessibility for a stop, from GTFS `wheelchair_boarding`.
-nonisolated enum WheelchairAccess: String, Codable, Hashable {
-    case unknown
-    case accessible
-    case notAccessible
-
-    /// Maps a raw GTFS `wheelchair_boarding` value ("0"/"1"/"2") to a case.
-    nonisolated init(gtfsValue: String?) {
-        switch gtfsValue?.trimmingCharacters(in: .whitespaces) {
-        case "1": self = .accessible
-        case "2": self = .notAccessible
-        default: self = .unknown
-        }
-    }
-}
-
 /// A public-transport stop or station.
 ///
 /// `Stop` is the canonical place model used across search, the map, departure
@@ -78,8 +62,6 @@ struct Stop: Codable, Hashable, Identifiable {
     /// with this canonical stop. A stop can retain no live identifier when the
     /// feeds cannot be matched safely.
     let hafasStationIDs: [String]
-    /// Wheelchair boarding accessibility, from GTFS `wheelchair_boarding`.
-    let wheelchairBoarding: WheelchairAccess
 
     /// Creates a stop.
     ///
@@ -94,7 +76,6 @@ struct Stop: Codable, Hashable, Identifiable {
         modes: [TransportMode] = [],
         dataSource: DataSource,
         platformIds: [String]? = nil,
-        wheelchairBoarding: WheelchairAccess = .unknown,
         gtfsStopID: String? = nil,
         hafasStationIDs: [String] = []
     ) {
@@ -106,7 +87,6 @@ struct Stop: Codable, Hashable, Identifiable {
         self.modes = modes
         self.dataSource = dataSource
         self.platformIds = Self.normalizedPlatformIds(platformIds, fallbackId: id)
-        self.wheelchairBoarding = wheelchairBoarding
         self.gtfsStopID = gtfsStopID
         self.hafasStationIDs = Self.normalizedIdentifiers(hafasStationIDs)
     }
@@ -119,7 +99,6 @@ struct Stop: Codable, Hashable, Identifiable {
         case modes
         case dataSource
         case platformIds
-        case wheelchairBoarding
         case gtfsStopID
         case hafasStationIDs
     }
@@ -146,9 +125,6 @@ struct Stop: Codable, Hashable, Identifiable {
             container.decodeIfPresent([String].self, forKey: .platformIds),
             fallbackId: id
         )
-        wheelchairBoarding = try container.decodeIfPresent(
-            WheelchairAccess.self, forKey: .wheelchairBoarding
-        ) ?? .unknown
         gtfsStopID = try container.decodeIfPresent(String.self, forKey: .gtfsStopID)
         hafasStationIDs = Self.normalizedIdentifiers(
             try container.decodeIfPresent([String].self, forKey: .hafasStationIDs) ?? []

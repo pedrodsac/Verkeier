@@ -10,7 +10,7 @@ protocol RouteService: Sendable {
     ///   - from: Journey origin.
     ///   - to: Journey destination.
     ///   - time: When the rider wants to travel (now / depart at / arrive by).
-    ///   - filters: Rider constraints (sort / mode / accessibility) applied while
+    ///   - filters: Rider constraints (sort / mode) applied while
     ///     planning so preferred-mode journeys survive truncation.
     /// - Returns: A ``RouteCalculation`` holding one or more options.
     /// - Throws: ``RoutingError`` when no usable route can be produced.

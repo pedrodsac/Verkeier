@@ -63,10 +63,6 @@ final class AppPreferences {
         didSet { defaults.set(avoidTightTransfers, forKey: Keys.avoidTightTransfers) }
     }
 
-    var preferAccessible: Bool {
-        didSet { defaults.set(preferAccessible, forKey: Keys.preferAccessible) }
-    }
-
     /// Plan on static GTFS only: no live departures/delays/cancellations, and a
     /// 15-minute minimum transfer buffer.
     var offlineMode: Bool {
@@ -102,7 +98,6 @@ final class AppPreferences {
         defaultModePreference = RoutePlannerModePreference(rawValue: defaults
             .string(forKey: Keys.defaultModePreference) ?? "") ?? .any
         avoidTightTransfers = defaults.bool(forKey: Keys.avoidTightTransfers)
-        preferAccessible = defaults.bool(forKey: Keys.preferAccessible)
         offlineMode = defaults.bool(forKey: Keys.offlineMode)
         showBikeShareStations = Self.savedBool(
             forKey: Keys.showBikeShareStations,
@@ -118,8 +113,7 @@ final class AppPreferences {
     var defaultRouteFilters: RoutePlannerFilters {
         RoutePlannerFilters(
             modePreference: defaultModePreference,
-            avoidTightTransfers: avoidTightTransfers,
-            preferAccessible: preferAccessible
+            avoidTightTransfers: avoidTightTransfers
         )
     }
 
@@ -153,7 +147,6 @@ final class AppPreferences {
         static let distanceUnit = "AppPreferences.distanceUnit"
         static let defaultModePreference = "AppPreferences.defaultModePreference"
         static let avoidTightTransfers = "AppPreferences.avoidTightTransfers"
-        static let preferAccessible = "AppPreferences.preferAccessible"
         static let offlineMode = "AppPreferences.offlineMode"
         static let showBikeShareStations = "AppPreferences.showBikeShareStations"
         static let showBusStops = "AppPreferences.showBusStops"

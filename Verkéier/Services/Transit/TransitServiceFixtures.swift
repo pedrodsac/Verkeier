@@ -60,7 +60,6 @@ actor FixtureGTFSService: GTFSService {
             modes: liveStop.modes.isEmpty ? stop.modes : liveStop.modes,
             dataSource: .gtfs,
             platformIds: stop.platformIds,
-            wheelchairBoarding: stop.wheelchairBoarding,
             gtfsStopID: stop.gtfsStopID,
             hafasStationIDs: [liveStop.stationID]
         )

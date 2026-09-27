@@ -79,7 +79,7 @@ python3 Scripts/preprocess_gtfs.py ~/Downloads/gtfs.zip Verkéier/Resources/gtfs
 
 Use `--max-stops` when producing a small fixture. Do not commit oversized generated feeds without checking app size and update cadence.
 
-## Data Attribution Placeholder
+## Data Attribution
 
 Transport data:
 
@@ -90,5 +90,3 @@ Transport data:
 Maps:
 
 - Apple Maps / MapKit
-
-Replace this placeholder with exact wording after ATP confirmation.

@@ -43,8 +43,6 @@ nonisolated struct RoutePlannerFilters: Codable, Hashable, Sendable {
     var modePreference: RoutePlannerModePreference = .any
     /// When `true`, avoid options with tight transfers.
     var avoidTightTransfers = false
-    /// When `true`, prefer step-free / accessible options.
-    var preferAccessible = false
 }
 
 /// When the rider wants to travel: right now, departing at a chosen time, or

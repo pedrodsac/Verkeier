@@ -33,7 +33,27 @@ struct SettingsView: View {
                     }
                 }
                 Toggle("Avoid tight transfers", isOn: $prefs.avoidTightTransfers)
-                Toggle("Step-free routes", isOn: $prefs.preferAccessible)
+            }
+
+            Section("Timetable") {
+                LabeledContent("Status", value: viewModel.gtfsStatus.statusText)
+                LabeledContent("Released") {
+                    timetableDate(viewModel.gtfsStatus.releasedAt)
+                }
+                LabeledContent("Last checked") {
+                    timetableDate(viewModel.gtfsStatus.lastCheckedAt, includesTime: true)
+                }
+
+                Button(action: checkGTFSUpdate) {
+                    Label("Refresh", systemImage: "arrow.clockwise")
+                }
+                .disabled(viewModel.isRefreshingTimetable)
+
+                if viewModel.isRefreshingTimetable {
+                    ProgressView()
+                        .progressViewStyle(.linear)
+                        .accessibilityLabel("Refreshing timetable")
+                }
             }
 
             Section("Map") {
@@ -78,6 +98,17 @@ struct SettingsView: View {
         } icon: {
             Image(systemName: mode.symbolName)
                 .foregroundStyle(mode.tint)
+        }
+    }
+
+    @ViewBuilder
+    private func timetableDate(_ date: Date?, includesTime: Bool = false) -> some View {
+        if let date {
+            Text(date.formatted(date: .abbreviated, time: includesTime ? .shortened : .omitted))
+                .foregroundStyle(.secondary)
+        } else {
+            Text("—")
+                .foregroundStyle(.secondary)
         }
     }
 }

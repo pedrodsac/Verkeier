@@ -59,14 +59,6 @@ struct RouteOptionsBar: View {
                 )
             )
 
-            Toggle(
-                "Prefer accessible options",
-                isOn: Binding(
-                    get: { filters.preferAccessible },
-                    set: { updated in apply(\.preferAccessible, value: updated) }
-                )
-            )
-
             if hasDestination {
                 Divider()
                 Button("Save Commute…") { showingSaveAlert = true }

@@ -13,8 +13,6 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     let plan: RoutePlan
     /// Pre-built map geometry for drawing the option, if available.
     let mapOverlay: RouteMapOverlay?
-    /// Nil for route providers without accessibility evidence.
-    var accessibility: RouteAccessibilityAssessment? = nil
     var feasibility: RouteFeasibility? = nil
 
     /// The plan's transit legs (excludes walking/driving).
@@ -198,7 +196,11 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
             return .connectionMayBeMissed
         }
 
-        if case .some(.atRisk) = feasibility { return .atRisk }
+        if case .some(.atRisk) = feasibility,
+           let minimumTransferGapDuration,
+           minimumTransferGapDuration < 2 * 60 {
+            return .atRisk
+        }
 
         if transitLegs.contains(where: { $0.transferWarning != nil }) {
             return .atRisk
@@ -215,20 +217,6 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
             return .partiallyLive
         case .scheduleOnly:
             return .scheduledOnly
-        }
-    }
-}
-
-nonisolated enum RouteAccessibilityAssessment: String, Codable, Hashable, Sendable {
-    case verified
-    case unknown
-    case inaccessible
-
-    var displayText: String {
-        switch self {
-        case .verified: "Step-free verified"
-        case .unknown: "Step-free unverified"
-        case .inaccessible: "Not step-free"
         }
     }
 }

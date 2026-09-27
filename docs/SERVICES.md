@@ -163,12 +163,8 @@ are not skipped. The supported arrival profile covers the previous 24 hours;
 the forward profile is bounded and does not imply exhaustive network coverage.
 
 The planner's mode control is a soft preference; package `allowedModes` is a
-separate hard filter. Accessibility has verified, unknown, and inaccessible
-states. The app preference favors verified routes and explains when none can
-be verified. Package wheelchair `.required` rejects routes with unknown or
-inaccessible segments. Generic pedestrian directions and straight-line
-estimates cannot prove step-free access. Walking legs retain routed-versus-
-estimated evidence through the app model; an estimated interchange cannot
+separate hard filter. Walking legs retain routed-versus-estimated evidence
+through the app model; an estimated interchange cannot
 prove a transfer catchable. A local graph's explicit `noRoute` result is kept
 as unreachable; a missing graph can still use MapKit or an explicitly marked
 estimate. Walking refinement validates the

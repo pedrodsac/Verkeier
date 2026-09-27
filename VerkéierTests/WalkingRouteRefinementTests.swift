@@ -365,10 +365,10 @@ struct WalkingRouteRefinementTests {
         var outgoing = RoutePlan.Leg(id: "25", mode: .bus, transportKind: .transit,
                                      originStopId: "transfer", destinationStopId: "destination",
                                      origin: transfer, destination: destination,
-                                     departureTime: start.addingTimeInterval(1_005),
+                                     departureTime: start.addingTimeInterval(705),
                                      arrivalTime: start.addingTimeInterval(1_400),
-                                     transferWarning: "Transfer below published minimum by 45 sec")
-        outgoing.requiredTransferSeconds = 450
+                                     transferWarning: "Tight transfer")
+        outgoing.requiredTransferSeconds = 270
         var option = RouteOption(id: "321-25", plan: RoutePlan(
             id: "321-25", origin: origin, destination: destination,
             expectedTravelTime: 1_400, distanceMeters: nil,
@@ -379,14 +379,14 @@ struct WalkingRouteRefinementTests {
         #expect(RouteItineraryValidator.assess(option, context: strict) == .invalid(.missedTransfer))
         let tolerant = RouteValidationContext(anchor: start, arriveBy: false,
                                               minimumTransferSeconds: 120,
-                                              sameStopTransferShortfallSeconds: 60)
+                                              sameStopTransferShortfallSeconds: 180)
         let assessment = RouteItineraryValidator.assess(option, context: tolerant)
-        #expect(assessment == .atRisk(minimumTransferSlack: -45))
+        #expect(assessment == .atRisk(minimumTransferSlack: -165))
         option.feasibility = assessment
         #expect(option.status(at: start) == .atRisk)
         #expect(RouteTimelineBuilder.items(from: option.plan.legs).contains { item in
             if case let .place(node) = item {
-                return node.transferWarning == "Transfer below published minimum by 45 sec"
+                return node.transferWarning == "Tight transfer"
             }
             return false
         })

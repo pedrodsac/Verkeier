@@ -15,21 +15,6 @@ struct StopDetailHeader: View {
                 toggleDepartureLine: toggleDepartureLine
             )
 
-            if stop.wheelchairBoarding != .unknown {
-                Label(
-                    stop.wheelchairBoarding == .accessible
-                        ? "Wheelchair accessible" : "Not wheelchair accessible",
-                    systemImage: stop.wheelchairBoarding == .accessible
-                        ? "figure.roll" : "exclamationmark.triangle.fill"
-                )
-                .font(.footnote.weight(.medium))
-                .foregroundStyle(stop.wheelchairBoarding == .accessible ? .green : .orange)
-                .accessibilityLabel(
-                    stop.wheelchairBoarding == .accessible
-                        ? "Step-free, wheelchair accessible" : "Not wheelchair accessible"
-                )
-            }
-
             DirectionsButton(action: showDirections)
         }
         .frame(maxWidth: .infinity, alignment: .leading)

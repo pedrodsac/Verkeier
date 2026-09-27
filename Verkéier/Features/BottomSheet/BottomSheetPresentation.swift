@@ -109,6 +109,10 @@ struct SettingsPresentationModel {
     let supportBundleText: String
     let debugDataMode: DebugTransitDataMode
 
+    var isRefreshingTimetable: Bool {
+        gtfsStatus.phase == .checking || gtfsStatus.phase == .downloading
+    }
+
     var isPreparingTimetable: Bool {
         !gtfsStatus.isReady && gtfsStatus.phase != .failed
     }

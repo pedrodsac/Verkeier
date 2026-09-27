@@ -434,6 +434,9 @@ extension TransitMapScreen {
     }
 
     func checkGTFSUpdate() {
+        guard viewModel.gtfsFeedStatus.phase != .checking,
+              viewModel.gtfsFeedStatus.phase != .downloading else { return }
+        viewModel.gtfsFeedStatus.phase = .checking
         Task {
             viewModel.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: true)
             await viewModel.loadGTFSMapStops(location: locationService.currentLocation, using: gtfsService)

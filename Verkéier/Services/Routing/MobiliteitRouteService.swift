@@ -4,8 +4,7 @@ import MobiliteitKit
 
 /// App adapter for MobiliteitKit's on-device GTFS/RAPTOR journey engine.
 /// It deliberately maps into the existing RoutePlan surface so route sheets,
-/// map overlays, accessibility, and paging UI need no parallel presentation
-/// model.
+/// map overlays and paging UI need no parallel presentation model.
 struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
     private nonisolated static let initialSearchHorizon: TimeInterval = 3 * 60 * 60
     let databaseURL: URL
@@ -68,20 +67,9 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
     /// Starts loading MobiliteitKit's full-feed snapshot without blocking UI
     /// work. Every request through this service joins the same engine actor.
     nonisolated func prepareForRouting() {
-        let fallbackDatabaseURL = databaseURL
         let engine = engine
-        let gtfsService = gtfsService
         Task(priority: .utility) {
-            var databaseURL = fallbackDatabaseURL
-            if let gtfsService {
-                let refreshed = await gtfsService.refreshIfNeeded(force: false)
-                guard refreshed.isReady else { return }
-                if let service = gtfsService as? MobiliteitGTFSService,
-                   let activeDatabaseURL = await service.routingDatabaseURL() {
-                    databaseURL = activeDatabaseURL
-                }
-            }
-            guard FileManager.default.fileExists(atPath: databaseURL.path) else { return }
+            guard let databaseURL = try? await readyDatabaseURL() else { return }
             _ = try? await engine.router(for: databaseURL)
         }
     }
@@ -201,13 +189,19 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
 
     private nonisolated func readyDatabaseURL() async throws -> URL {
         var activeDatabaseURL = databaseURL
-        if let gtfsService {
-            let status = await gtfsService.refreshIfNeeded(force: false)
-            guard status.isReady else { throw RoutingError.timetableUnavailable }
-            if let service = gtfsService as? MobiliteitGTFSService,
-               let installedDatabaseURL = await service.routingDatabaseURL() {
+        if let service = gtfsService as? MobiliteitGTFSService {
+            if let installedDatabaseURL = await service.routingDatabaseURL() {
+                activeDatabaseURL = installedDatabaseURL
+            } else {
+                let status = await service.refreshIfNeeded(force: false)
+                guard status.isReady,
+                      let installedDatabaseURL = await service.routingDatabaseURL()
+                else { throw RoutingError.timetableUnavailable }
                 activeDatabaseURL = installedDatabaseURL
             }
+        } else if let gtfsService {
+            let status = await gtfsService.refreshIfNeeded(force: false)
+            guard status.isReady else { throw RoutingError.timetableUnavailable }
         }
         guard FileManager.default.fileExists(atPath: activeDatabaseURL.path) else {
             throw RoutingError.timetableUnavailable
@@ -326,7 +320,16 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         page: RouteSearchPage,
         query: RouteQuery
     ) -> RouteCalculation? {
-        let options = journeyPage.journeys.map { option(from: $0, origin: origin, destination: destination) }
+        // A cancelled vehicle cannot become a usable alternative by boarding
+        // it at a different stop. Filter older package results here as well.
+        let options = journeyPage.journeys
+            .filter { journey in
+                !journey.legs.contains { leg in
+                    if case let .transit(ride) = leg { return ride.status == .cancelled }
+                    return false
+                }
+            }
+            .map { option(from: $0, origin: origin, destination: destination) }
         guard !options.isEmpty else { return nil }
         return RouteCalculation(
             options: options,
@@ -334,7 +337,8 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                                      arriveBy: query.direction == .arriveBy,
                                      minimumTransferSeconds: query.preferences.minimumTransferSeconds,
                                      sameStopTransferShortfallSeconds: query.preferences.sameStopTransferShortfallSeconds),
-            selectedOptionID: journeyPage.recommendedJourneyID?.value ?? options.first?.id
+            selectedOptionID: options.first(where: { $0.id == journeyPage.recommendedJourneyID?.value })?.id
+                ?? options.first?.id
         )
     }
 
@@ -390,11 +394,9 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         return RoutingPreferences(
             maxTransfers: 3,
             minimumTransferSeconds: filters.avoidTightTransfers ? 180 : 120,
-            sameStopTransferShortfallSeconds: filters.avoidTightTransfers ? 0 : 60,
+            sameStopTransferShortfallSeconds: filters.avoidTightTransfers ? 0 : 180,
             allowedModes: .all,
-            preferredMode: preferred,
-            wheelchair: .noPreference,
-            preferWheelchairAccessible: filters.preferAccessible
+            preferredMode: preferred
         )
     }
 
@@ -470,7 +472,8 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                     ],
                     platform: transit.board.platform,
                     delayMinutes: departureIsRealtime ? Int((delaySeconds / 60).rounded()) : nil,
-                    liveStatus: usesRealtime ? (delayed ? .delayed : .live) : .scheduled
+                    liveStatus: transit.status == .cancelled
+                        ? .cancelled : (usesRealtime ? (delayed ? .delayed : .live) : .scheduled)
                 )
                 result.departureTimingSource = Self.timingSource(transit.board.timingSource)
                 result.arrivalTimingSource = Self.timingSource(transit.alight.timingSource)
@@ -485,11 +488,10 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         for (incomingIndex, outgoingIndex) in zip(transitIndices, transitIndices.dropFirst()) {
             guard legs[incomingIndex].destinationStopId == legs[outgoingIndex].originStopId,
                   let arrival = legs[incomingIndex].realtimeArrivalTime ?? legs[incomingIndex].arrivalTime,
-                  let departure = legs[outgoingIndex].realtimeDepartureTime ?? legs[outgoingIndex].departureTime,
-                  let required = legs[outgoingIndex].requiredTransferSeconds else { continue }
-            let shortfall = TimeInterval(required) - departure.timeIntervalSince(arrival)
-            if shortfall > 0 {
-                legs[outgoingIndex].transferWarning = "Transfer below published minimum by \(Int(shortfall.rounded(.up))) sec"
+                  let departure = legs[outgoingIndex].realtimeDepartureTime ?? legs[outgoingIndex].departureTime else { continue }
+            let transferGap = departure.timeIntervalSince(arrival)
+            if transferGap < 2 * 60 {
+                legs[outgoingIndex].transferWarning = "Tight transfer"
             }
         }
 
@@ -503,8 +505,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         })
         return RouteOption(
             id: journey.id.value, plan: plan,
-            mapOverlay: overlay.segments.isEmpty ? nil : overlay,
-            accessibility: RouteAccessibilityAssessment(rawValue: journey.accessibility.rawValue)
+            mapOverlay: overlay.segments.isEmpty ? nil : overlay
         )
     }
 
@@ -889,7 +890,7 @@ extension RouteOption {
             )
         })
         return RouteOption(id: id, plan: updatedPlan, mapOverlay: overlay.isEmpty ? nil : overlay,
-                           accessibility: accessibility, feasibility: feasibility)
+                           feasibility: feasibility)
     }
 
     /// Keeps only the ridden portion of a full-trip GTFS shape. Searching from

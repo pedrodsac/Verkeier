@@ -42,6 +42,7 @@ actor MobiliteitGTFSService: GTFSService {
                 resourceTitle: metadata.resourceTitle,
                 downloadedAt: metadata.downloadedAt,
                 lastCheckedAt: metadata.lastCheckedAt,
+                releasedAt: metadata.releasedAt,
                 validThrough: metadata.validThrough,
                 errorMessage: nil
             )
@@ -73,10 +74,11 @@ actor MobiliteitGTFSService: GTFSService {
 
     func feedStatus() async -> GTFSFeedStatus { currentStatus }
 
-    /// Returns the immutable database file for the currently active feed
-    /// generation. Callers must resolve this after a refresh has completed.
+    /// Returns the current usable generation even while a newer feed is being
+    /// checked or downloaded. The existing timetable remains valid for routing
+    /// until its last service day has passed.
     func routingDatabaseURL() async -> URL? {
-        store == nil ? nil : databaseURL
+        hasUsableStore ? databaseURL : nil
     }
 
     func refreshIfNeeded(force: Bool) async -> GTFSFeedStatus {
@@ -114,8 +116,10 @@ actor MobiliteitGTFSService: GTFSService {
             guard !unchanged else {
                 Self.debugLog("Catalogue matches the installed archive; no download required.")
                 metadata?.lastCheckedAt = .now
+                metadata?.releasedAt = remote.createdAt ?? remote.modifiedAt
                 persistMetadata()
                 currentStatus.lastCheckedAt = .now
+                currentStatus.releasedAt = metadata?.releasedAt
                 currentStatus.phase = hasUsableStore ? .ready : .unavailable
                 return currentStatus
             }
@@ -139,6 +143,7 @@ actor MobiliteitGTFSService: GTFSService {
                 checksum: remote.checksum,
                 downloadedAt: .now,
                 lastCheckedAt: .now,
+                releasedAt: remote.createdAt ?? remote.modifiedAt,
                 generation: info.generation,
                 validThrough: info.lastServiceDate.description,
                 databaseFilename: installedDatabaseURL.lastPathComponent
@@ -149,6 +154,7 @@ actor MobiliteitGTFSService: GTFSService {
                 resourceTitle: remote.title,
                 downloadedAt: metadata?.downloadedAt,
                 lastCheckedAt: metadata?.lastCheckedAt,
+                releasedAt: metadata?.releasedAt,
                 validThrough: info.lastServiceDate.description,
                 errorMessage: nil
             )
@@ -307,7 +313,6 @@ actor MobiliteitGTFSService: GTFSService {
         var result: [GTFSJourneyDeparture] = []
         for departure in departures {
             guard let departureDate = Self.date(for: departure.departure, serviceDay: departure.serviceDay, feed: feed) else { continue }
-            let trip = try? await store.trip(id: departure.tripID)
             result.append(GTFSJourneyDeparture(
                 tripID: departure.tripID,
                 stopID: departure.stopID,
@@ -315,8 +320,7 @@ actor MobiliteitGTFSService: GTFSService {
                 headsign: departure.headsign ?? departure.route.longName ?? departure.route.shortName ?? "Service",
                 directionID: departure.directionID,
                 departureDate: departureDate,
-                arrivalDate: Self.date(for: departure.arrival, serviceDay: departure.serviceDay, feed: feed),
-                wheelchairAccessible: Self.wheelchairAccess(trip?.wheelchairAccessible)
+                arrivalDate: Self.date(for: departure.arrival, serviceDay: departure.serviceDay, feed: feed)
             ))
         }
         return result
@@ -380,6 +384,7 @@ private extension MobiliteitGTFSService {
         let checksum: String?
         let downloadedAt: Date
         var lastCheckedAt: Date
+        var releasedAt: Date?
         let generation: Int
         let validThrough: String?
         let databaseFilename: String?
@@ -390,6 +395,7 @@ private extension MobiliteitGTFSService {
         let title: String
         let url: URL
         let checksum: String?
+        let createdAt: Date?
         let modifiedAt: Date?
     }
 
@@ -449,10 +455,12 @@ private extension MobiliteitGTFSService {
         let mime: String?
         let filetype: String?
         let checksum: Checksum?
+        let createdAt: Date?
         let lastModified: Date?
 
         enum CodingKeys: String, CodingKey {
             case id, title, url, latest, format, mime, filetype, checksum
+            case createdAt = "created_at"
             case lastModified = "last_modified"
         }
 
@@ -466,6 +474,7 @@ private extension MobiliteitGTFSService {
             mime = try values.decodeIfPresent(String.self, forKey: .mime)
             filetype = try values.decodeIfPresent(String.self, forKey: .filetype)
             checksum = try values.decodeIfPresent(Checksum.self, forKey: .checksum)
+            createdAt = try values.decodeDate(forKey: .createdAt)
             lastModified = try values.decodeDate(forKey: .lastModified)
         }
     }
@@ -484,7 +493,7 @@ private extension MobiliteitGTFSService {
             guard let id = resource.id, let url = candidate else { return nil }
             let type = [title, resource.format, resource.filetype, resource.mime].compactMap { $0 }.joined(separator: " ").lowercased()
             guard type.contains("gtfs"), type.contains("zip") else { return nil }
-            return RemoteResource(id: id, title: title, url: url, checksum: resource.checksum?.value, modifiedAt: resource.lastModified)
+            return RemoteResource(id: id, title: title, url: url, checksum: resource.checksum?.value, createdAt: resource.createdAt, modifiedAt: resource.lastModified)
         }
         guard let latest = values.max(by: { ($0.modifiedAt ?? .distantPast) < ($1.modifiedAt ?? .distantPast) }) else {
             throw URLError(.fileDoesNotExist)
@@ -563,7 +572,6 @@ private extension MobiliteitGTFSService {
             modes: liveModes.isEmpty ? scheduledModes : liveModes,
             dataSource: .gtfs,
             platformIds: source.platformCode.map { [$0] },
-            wheelchairBoarding: wheelchairAccess(source.wheelchairBoarding),
             gtfsStopID: source.id,
             hafasStationIDs: hafasStationIDs
         )
@@ -582,14 +590,6 @@ private extension MobiliteitGTFSService {
 
     nonisolated static func mode(routeType: Int) -> TransportMode {
         transportMode(forGTFSRouteType: routeType)
-    }
-
-    nonisolated static func wheelchairAccess(_ value: Int?) -> WheelchairAccess {
-        switch value {
-        case 1: .accessible
-        case 2: .notAccessible
-        default: .unknown
-        }
     }
 
     nonisolated static func gtfsDate(from date: Date) -> GTFSDate {

@@ -92,11 +92,10 @@ struct LiveDeparturesEntry: TimelineEntry {
 
     var updateLabel: String {
         guard let board else { return "Waiting for live data" }
-        let source = board.sourceSummary ?? "Transit data"
         if isStale {
-            return "\(source) · last updated \(board.updatedAt.formatted(date: .omitted, time: .shortened))"
+            return "last updated at \(board.updatedAt.formatted(date: .omitted, time: .shortened))"
         }
-        return "\(source) · updated \(board.updatedAt.formatted(date: .omitted, time: .shortened))"
+        return "updated at \(board.updatedAt.formatted(date: .omitted, time: .shortened))"
     }
 
     var destinationURL: URL {

@@ -45,8 +45,71 @@ struct RouteOptionDeduplicationTests {
         #expect(result.map(\.id) == ["transfer", "direct"])
     }
 
-    @Test("Different displayed timing values remain separate")
-    func differentDisplayedValuesRemainSeparate() {
+    @Test("Same 326 and T1 trips show only the option without an intermediate 850 ride")
+    func redundantIntermediateRideIsHidden() {
+        let firstDeparture = start.addingTimeInterval(6 * 60)
+        let arrival = start.addingTimeInterval(28 * 60)
+        let detour = routeOption(id: "326-850-T1", legs: [
+            walkingLeg(id: "access-detour", departure: start, duration: 6 * 60, distance: 556),
+            transitLeg(id: "326", from: origin, to: transferA,
+                       departure: firstDeparture, arrival: start.addingTimeInterval(12 * 60),
+                       tripId: "326-trip", originStopId: "board-326", destinationStopId: "early-stop"),
+            transitLeg(id: "850", from: transferA, to: transferB,
+                       departure: start.addingTimeInterval(13 * 60),
+                       arrival: start.addingTimeInterval(18 * 60), tripId: "850-trip"),
+            transitLeg(id: "T1", from: transferB, to: destination,
+                       departure: start.addingTimeInterval(21 * 60), arrival: arrival,
+                       tripId: "T1-trip", originStopId: "tram-stop", destinationStopId: "final-stop"),
+        ], duration: 28 * 60)
+        let simpler = routeOption(id: "326-T1", legs: [
+            walkingLeg(id: "access-simple", departure: start.addingTimeInterval(20),
+                       duration: 5 * 60 + 40, distance: 569),
+            transitLeg(id: "326", from: origin, to: transferB,
+                       departure: firstDeparture, arrival: start.addingTimeInterval(19 * 60),
+                       tripId: "326-trip", originStopId: "board-326", destinationStopId: "later-stop"),
+            transitLeg(id: "T1", from: transferB, to: destination,
+                       departure: start.addingTimeInterval(21 * 60), arrival: arrival,
+                       tripId: "T1-trip", originStopId: "tram-stop", destinationStopId: "final-stop"),
+        ], duration: 28 * 60)
+
+        #expect(detour.transferCount == 2)
+        #expect(simpler.transferCount == 1)
+        #expect(TransitMapViewModel.deduplicatingEquivalentRouteOptions([detour, simpler]).map(\.id)
+                == [simpler.id])
+        #expect(TransitMapViewModel.deduplicatingEquivalentRouteOptions([simpler, detour]).map(\.id)
+                == [simpler.id])
+    }
+
+    @Test("Different first or last trips remain separate despite matching line labels and times")
+    func differentTripIdentityRemainsDistinct() {
+        let first = routeOption(id: "first", legs: [
+            transitLeg(id: "326", from: origin, to: transferA,
+                       departure: start, arrival: start.addingTimeInterval(10 * 60),
+                       tripId: "326-trip-a", originStopId: "board-326"),
+            transitLeg(id: "850", from: transferA, to: transferB,
+                       departure: start.addingTimeInterval(12 * 60),
+                       arrival: start.addingTimeInterval(20 * 60)),
+            transitLeg(id: "T1", from: transferB, to: destination,
+                       departure: start.addingTimeInterval(22 * 60),
+                       arrival: start.addingTimeInterval(28 * 60),
+                       tripId: "T1-trip", destinationStopId: "final-stop"),
+        ])
+        let second = routeOption(id: "second", legs: [
+            transitLeg(id: "326", from: origin, to: transferB,
+                       departure: start, arrival: start.addingTimeInterval(20 * 60),
+                       tripId: "326-trip-b", originStopId: "board-326"),
+            transitLeg(id: "T1", from: transferB, to: destination,
+                       departure: start.addingTimeInterval(22 * 60),
+                       arrival: start.addingTimeInterval(28 * 60),
+                       tripId: "T1-trip", destinationStopId: "final-stop"),
+        ])
+
+        #expect(TransitMapViewModel.deduplicatingEquivalentRouteOptions([first, second]).map(\.id)
+                == [first.id, second.id])
+    }
+
+    @Test("A later departure with the same arrival removes slower alternatives")
+    func laterDepartureDominates() {
         let baseline = option(id: "baseline", transferGaps: [5 * 60])
         let departure = option(id: "departure", transferGaps: [5 * 60], departureOffset: 60)
         let arrival = option(id: "arrival", transferGaps: [5 * 60], arrivalOffset: 60)
@@ -56,7 +119,80 @@ struct RouteOptionDeduplicationTests {
             baseline, departure, arrival, duration,
         ])
 
-        #expect(result.map(\.id) == ["baseline", "departure", "arrival", "duration"])
+        #expect(result.map(\.id) == ["departure"])
+    }
+
+    @Test("A later, earlier-arriving route hides the enclosing route despite more walking")
+    func enclosedRouteIsHidden() {
+        let slower = routeOption(id: "10:57-11:52", legs: [
+            walkingLeg(id: "slow-access", departure: start, duration: 9 * 60, distance: 755),
+            transitLeg(id: "850", from: transferA, to: transferB,
+                       departure: start.addingTimeInterval(9 * 60),
+                       arrival: start.addingTimeInterval(20 * 60)),
+            transitLeg(id: "3", from: transferB, to: transferA,
+                       departure: start.addingTimeInterval(22 * 60),
+                       arrival: start.addingTimeInterval(35 * 60)),
+            transitLeg(id: "12", from: transferA, to: destination,
+                       departure: start.addingTimeInterval(37 * 60),
+                       arrival: start.addingTimeInterval(55 * 60)),
+        ])
+        let faster = routeOption(id: "10:58-11:29", legs: [
+            walkingLeg(id: "fast-access", departure: start.addingTimeInterval(60),
+                       duration: 10 * 60, distance: 829),
+            transitLeg(id: "29", from: transferA, to: transferB,
+                       departure: start.addingTimeInterval(11 * 60),
+                       arrival: start.addingTimeInterval(20 * 60)),
+            transitLeg(id: "6", from: transferB, to: destination,
+                       departure: start.addingTimeInterval(22 * 60),
+                       arrival: start.addingTimeInterval(32 * 60)),
+        ])
+
+        #expect(slower.walkingDistanceMeters < faster.walkingDistanceMeters)
+        #expect(slower.transferCount > faster.transferCount)
+        #expect(TransitMapViewModel.deduplicatingEquivalentRouteOptions([slower, faster]).map(\.id)
+                == [faster.id])
+        #expect(TransitMapViewModel.deduplicatingEquivalentRouteOptions([faster, slower]).map(\.id)
+                == [faster.id])
+    }
+
+    @Test("A cancelled itinerary remains visible beside a usable route")
+    func cancelledRouteIsRetained() {
+        let cancelled = routeOption(id: "cancelled", legs: [
+            transitLeg(id: "cancelled-line", from: origin, to: destination,
+                       departure: start, arrival: start.addingTimeInterval(45 * 60),
+                       liveStatus: .cancelled),
+        ])
+        let usable = routeOption(id: "usable", legs: [
+            transitLeg(id: "usable-line", from: origin, to: destination,
+                       departure: start.addingTimeInterval(60),
+                       arrival: start.addingTimeInterval(40 * 60)),
+        ])
+
+        #expect(cancelled.status(at: start) == .cancelled)
+        #expect(TransitMapViewModel.deduplicatingEquivalentRouteOptions([cancelled, usable]).map(\.id)
+                == ["cancelled", "usable"])
+    }
+
+    @Test("A replacement route shares the first bus and keeps the cancelled route visible")
+    func sharedFirstBusReplacementIsRetained() {
+        let firstBus = transitLeg(id: "first-bus", from: origin, to: transferA,
+                                  departure: start, arrival: start.addingTimeInterval(10 * 60))
+        let cancelled = routeOption(id: "cancelled-transfer", legs: [
+            firstBus,
+            transitLeg(id: "cancelled-second", from: transferA, to: destination,
+                       departure: start.addingTimeInterval(15 * 60),
+                       arrival: start.addingTimeInterval(25 * 60), liveStatus: .cancelled),
+        ])
+        let replacement = routeOption(id: "replacement-transfer", legs: [
+            firstBus,
+            transitLeg(id: "replacement-second", from: transferA, to: destination,
+                       departure: start.addingTimeInterval(20 * 60),
+                       arrival: start.addingTimeInterval(35 * 60)),
+        ])
+        let result = TransitMapViewModel.deduplicatingEquivalentRouteOptions([
+            cancelled, replacement,
+        ])
+        #expect(result.map(\.id) == ["cancelled-transfer", "replacement-transfer"])
     }
 
     @Test("Second-level differences within a display minute survive")
@@ -259,17 +395,43 @@ struct RouteOptionDeduplicationTests {
         from origin: LocationPoint,
         to destination: LocationPoint,
         departure: Date?,
-        arrival: Date?
+        arrival: Date?,
+        liveStatus: RouteLegLiveStatus = .scheduled,
+        tripId: String? = nil,
+        originStopId: String? = nil,
+        destinationStopId: String? = nil
     ) -> RoutePlan.Leg {
         RoutePlan.Leg(
             id: id,
             mode: .bus,
             transportKind: .transit,
             routeName: id,
+            tripId: tripId,
+            originStopId: originStopId,
+            destinationStopId: destinationStopId,
             origin: origin,
             destination: destination,
             departureTime: departure,
-            arrivalTime: arrival
+            arrivalTime: arrival,
+            liveStatus: liveStatus
+        )
+    }
+
+    private func walkingLeg(
+        id: String,
+        departure: Date,
+        duration: TimeInterval,
+        distance: Double
+    ) -> RoutePlan.Leg {
+        RoutePlan.Leg(
+            id: id,
+            mode: .walking,
+            transportKind: .walking,
+            origin: origin,
+            destination: transferA,
+            departureTime: departure,
+            arrivalTime: departure.addingTimeInterval(duration),
+            distanceMeters: distance
         )
     }
 }

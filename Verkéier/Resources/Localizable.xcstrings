@@ -29,6 +29,9 @@
         }
       }
     },
+    "—" : {
+
+    },
     "%@" : {
       "localizations" : {
         "de" : {
@@ -2395,6 +2398,9 @@
         }
       }
     },
+    "Last checked" : {
+
+    },
     "Last service today" : {
       "localizations" : {
         "de" : {
@@ -3100,34 +3106,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sem paragens próximas"
-          }
-        }
-      }
-    },
-    "Not wheelchair accessible" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nicht rollstuhlgerecht"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Non accessible en fauteuil roulant"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Net rollstullgerecht"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Não acessível a cadeiras de rodas"
           }
         }
       }
@@ -4125,63 +4103,6 @@
         }
       }
     },
-    "Prefer accessible options" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Barrierefreie Optionen bevorzugen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privilégier les options accessibles"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Accessibel Optioune bevorzugen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preferir opções acessíveis"
-          }
-        }
-      }
-    },
-    "Prefer step-free routes" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stufenlose Routen bevorzugen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privilégier les itinéraires sans marches"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Route ouni Träppleke bevorzugen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preferir rotas sem degraus"
-          }
-        }
-      }
-    },
     "Preferred mode" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4444,6 +4365,9 @@
         }
       }
     },
+    "Refresh" : {
+
+    },
     "Refresh alerts" : {
       "localizations" : {
         "de" : {
@@ -4557,6 +4481,12 @@
           }
         }
       }
+    },
+    "Refreshing timetable" : {
+
+    },
+    "Released" : {
+
     },
     "Remind %lld min before" : {
       "localizations" : {
@@ -5369,36 +5299,8 @@
     "Start typing to search places and addresses." : {
 
     },
-    "Step-free routes" : {
+    "Status" : {
 
-    },
-    "Step-free, wheelchair accessible" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stufenlos, rollstuhlgerecht"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sans marches, accessible en fauteuil roulant"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouni Träppleker, rollstullgerecht"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sem degraus, acessível a cadeiras de rodas"
-          }
-        }
-      }
     },
     "Stop" : {
       "localizations" : {
@@ -5768,6 +5670,9 @@
           }
         }
       }
+    },
+    "Timetable" : {
+
     },
     "Timetable only" : {
       "localizations" : {
@@ -6212,34 +6117,6 @@
     },
     "Walking routes" : {
 
-    },
-    "Wheelchair accessible" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rollstuhlgerecht"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Accessible en fauteuil roulant"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rollstullzougänglech"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Acessível a cadeira de rodas"
-          }
-        }
-      }
     },
     "Your data" : {
       "localizations" : {
