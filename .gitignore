@@ -1,5 +1,14 @@
 .DS_Store
 DerivedData/
+build/
+**/-Xcc/
+**/xcuserdata/
+*.xcarchive/
+*.ipa
+*.dSYM/
+*.mobileprovision
+*.p12
+*.p8
 Config/LocalConfig.xcconfig
 worker/.dev.vars
 worker/.env*
