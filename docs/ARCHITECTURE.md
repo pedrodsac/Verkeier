@@ -1,159 +1,63 @@
 # Architecture
 
-## Goal
-
-Create a serious native iOS codebase for a Luxembourg public transport app.
-
-The app should feel like Apple Maps:
-
-- full-screen MapKit map
-- persistent draggable bottom sheet
-- controls, search, stops, departures, route planning, favourites, and alerts inside the sheet
-- smooth native interactions
-- light/dark mode
-- accessibility support
-
-## Stack
-
-Use:
-
-- SwiftUI
-- MapKit
-- Core Location
-- SwiftData
-- ActivityKit
-- App Intents
-- WidgetKit
-- async/await
-- URLSession
-- local fixtures/mocks for development
-
-## High-Level Pattern
+Verkéier is a native SwiftUI iOS app with a full-screen MapKit map and a
+persistent bottom sheet. Features use observable state and injected services;
+networking and feed parsing stay out of view bodies.
 
 ```text
-SwiftUI View
-→ ViewModel / Observable State
-→ Service Protocol
-→ API Client / Storage Layer
-→ Decoder / Mapper
-→ Domain Model
+SwiftUI View → Observable State → Service Protocol → API Client or Storage
+             → Decoder / Mapper → Domain Model
 ```
 
-Rules:
+## Targets and folders
 
-- no networking in views
-- no business logic in view bodies
-- no massive `ContentView.swift`
-- no hardcoded fake production data
-- no god view models
-- UI must be previewable with mock data
-- API/parsing code must be testable without UI
+- `Verkeier.xcodeproj` contains the `Verkeier` app, `VerkeierWidgets` extension,
+  and `VerkeierTests` target. The source folders retain the product name's
+  accent (`Verkéier/`, `VerkéierWidgets/`, `VerkéierShared/`).
+- `Verkéier/App/` wires runtime configuration, service defaults, persistence,
+  and the app entry point.
+- `Verkéier/Features/` groups SwiftUI views, view models, and components by
+  feature.
+- `Verkéier/Services/Transit/` owns GTFS installation and offline queries,
+  plus the app adapter around MobiliteitKit's typed HAFAS client.
+- `Verkéier/Services/Routing/` plans transit journeys and walking routes.
+- `Verkéier/Services/AVL/` reads Ville de Luxembourg disruption messages.
+- `Verkéier/Services/Location/` and `Verkéier/Services/Notifications/` isolate
+  platform APIs.
+- `Verkéier/Models/` and `Verkéier/Storage/` hold domain types and local data.
 
-## Main Modules
+## Data flow
 
-```text
-Verkéier/
-├── App/
-├── Features/
-│   ├── Map/
-│   ├── BottomSheet/
-│   ├── Stops/
-│   ├── Departures/
-│   ├── Search/
-│   ├── Routes/
-│   ├── Favourites/
-│   ├── Alerts/
-│   ├── Settings/
-│   ├── LiveActivities/
-│   ├── AppIntents/
-│   └── Widgets/
-├── Services/
-│   ├── ATP/
-│   ├── GTFS/
-│   ├── AVL/
-│   ├── Location/
-│   ├── Routing/
-│   └── Cache/
-├── Models/
-├── Storage/
-├── Networking/
-├── Utilities/
-├── Resources/
-├── Tests/
-└── docs/
-```
+The app reads `API_PROXY_URL` from its Info.plist build setting. When set,
+`MobiliteitLiveTransitService` sends nearby-stop and departure-board requests
+to the allowlisted `verkeier-relay` Worker. That Worker owns the ATP credential.
+The same client supplies optional realtime observations for journey planning.
+Without a relay URL, live transit is unavailable and scheduled routing can
+still use an installed GTFS database.
 
-## Core Services
+`MobiliteitGTFSService` discovers the current official feed on data.public.lu,
+downloads and validates it, then installs an on-device database. The app does
+not bundle a production GTFS archive. The last usable feed remains available
+when an update fails. `MobiliteitRouteService` routes over that local feed and
+applies verified realtime observations at query time. Walking geometry uses a
+local graph when installed and MapKit where needed.
 
-### ATPClient
+The app calls the public AVL XML feed and JCDecaux static station feed
+directly. Dynamic bike-share availability goes through the relay when
+configured. MapKit provides map display, place search, and Apple Maps handoff.
 
-```swift
-nonisolated func nearbyStops(latitude: Double, longitude: Double) async throws -> [Stop]
-nonisolated func departureBoard(stopId: String) async throws -> [Departure]
-nonisolated func departureBoards(stopIds: [String]) async throws -> [Departure]
-```
+## Dependency injection
 
-### GTFSService
+`Verkéier/App/AppDependencies.swift` declares `EnvironmentValues` entries.
+`Verkéier/App/VerkéierApp.swift` injects live implementations into the app
+scene. Previews and tests supply fixture or unavailable implementations.
+Current protocol signatures and implementations are summarized in
+`docs/SERVICES.md`; the Swift source is authoritative.
 
-```swift
-nonisolated func searchStops(query: String) async -> [Stop]
-nonisolated func stopsForMap(center: LocationPoint, latitudeDelta: Double, longitudeDelta: Double, limit: Int) async -> [Stop]
-nonisolated func stop(id: String) async -> Stop?
-nonisolated func allStops() async -> [Stop]
-nonisolated func routesForStop(id: String) async -> [TransitRoute]
-nonisolated func timetableIndex() async -> GTFSTimetableIndexPayload?
-```
+## Rules
 
-### AVLClient
-
-```swift
-nonisolated func fetchMessages() async throws -> [AlertMessage]
-```
-
-### RouteService
-
-```swift
-nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint, time: RoutePlanningTime, filters: RoutePlannerFilters, realtimeRefreshPolicy: RouteRealtimeRefreshPolicy) async throws -> RouteCalculation
-@MainActor func openInAppleMaps(from: LocationPoint, to: LocationPoint)
-```
-
-### LiveActivityManager
-
-```swift
-func startTracking(departure: Departure, stop: Stop) async throws
-func updateTracking(departure: Departure) async
-func endTracking()
-```
-
-## Dependency Injection
-
-Services are injected via SwiftUI `EnvironmentValues` using `@Entry`
-(Swift 5.10+). All entries are declared in `Verkéier/App/AppDependencies.swift`.
-
-```swift
-// Read in any view:
-@Environment(\.atpClient) private var atpClient
-
-// Override in a preview:
-#Preview {
-    MyView().environment(\.atpClient, ATPMockClient())
-}
-```
-
-The app entry point (`VerkéierApp`) wires live implementations at launch.
-Default values in `AppDependencies.swift` are the safe no-op stubs
-(`EmptyATPClient`, `LocalGTFSService`). See `docs/SERVICES.md` for all
-protocol signatures and mock implementations.
-
-## Domain Model Inventory
-
-15 model files in `Verkéier/Models/`. Key ones:
-
-- **Stop** — canonical place: id, name, locality, location, modes, platformIds
-- **Departure** — one departure row; scheduled/realtime times, delayMinutes, isCancelled
-- **TransitRoute** — a transit line: shortName, mode, operatorName
-- **RoutePlan** / **RouteOption** — journey result with legs, overlays, and live-status
-- **LocationPoint** — Codable lat/lon coordinate; convert with `.coordinate`
-- **DataSource** — provenance enum on all models: `.atpOpenAPI .gtfs .avl .mock …`
-
-Full signatures and all 15 models: `docs/SERVICES.md`.
+- Keep business logic and networking in injected services or view models.
+- Use typed domain models and async/await.
+- Make loading, empty, error, stale, and offline states visible to users.
+- Never ship provider credentials or fake production data in the app bundle.
+- Keep attribution and the independent-app notice visible.

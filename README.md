@@ -17,30 +17,29 @@ Implemented:
 - WidgetKit extension with favourite, departures, and Live Activity widgets
 - settings, attribution, privacy, and diagnostics screen
 
-Not implemented yet:
-
-- production ATP access-id confirmation, proxy quotas, and exact attribution wording
-- full production GTFS preprocessing pipeline
-- broad manual QA across all simulator/device surfaces
+Release work remains for data-provider approval, relay quotas, privacy disclosures,
+and device QA. See `docs/DATA_SOURCES.md` for the current data contracts.
 
 ## Local Configuration
 
-Copy the example config and provide local values when data-source phases need them:
+Copy the example config and set the URL of a relay you operate:
 
 ```sh
 cp Config/LocalConfig.xcconfig.example Config/LocalConfig.xcconfig
 ```
 
-`Config/LocalConfig.xcconfig` is ignored by git and must not contain committed secrets.
+`Config/LocalConfig.xcconfig` is ignored by Git and is optionally included by
+`Config/AppConfig.xcconfig`. A fresh checkout has no relay URL, so live ATP
+departures and dynamic bike availability are unavailable until one is set.
 
-Required later:
+- `API_PROXY_URL`: HTTPS URL of your deployed Cloudflare Worker for keyed ATP
+  and JCDecaux requests
+- `AVL_MESSAGES_URL`: optional override for the public AVL messages XML feed
 
-- `API_PROXY_URL`: deployed Cloudflare Worker URL for keyed ATP and JCDecaux requests
-- `AVL_MESSAGES_URL`: optional override for the Ville de Luxembourg AVL messages XML feed
-
-The upstream ATP and JCDecaux credentials belong in the Worker’s Cloudflare
-secrets, not in the iOS build settings or app bundle. The app handles a
-missing proxy URL during early phases.
+The upstream ATP and JCDecaux credentials belong in the Worker's Cloudflare
+secrets, never in iOS build settings or the app bundle. The relay URL itself
+is visible to anyone using the app. Protect its quota before distributing a
+build that points at it.
 
 See the [verkeier-relay repository](https://github.com/pedrodsac/verkeier-relay)
 for local development and deploy instructions.
@@ -63,30 +62,31 @@ when map data should be refreshed.
 
 ## Build
 
-Open `Verkéier.xcodeproj` in Xcode or build from the command line:
+Open `Verkeier.xcodeproj` in Xcode or build from the command line:
 
 ```sh
-xcodebuild -project Verkéier.xcodeproj -scheme Verkéier -destination 'platform=iOS Simulator,name=iPhone 17' build
+xcodebuild -project Verkeier.xcodeproj -scheme Verkeier -destination 'platform=iOS Simulator,name=iPhone 17' build
 ```
 
 ## GTFS Preprocessing
 
-Download the current Luxembourg GTFS ZIP from data.public.lu, then generate a compact app resource:
-
-```sh
-python3 Scripts/preprocess_gtfs.py ~/Downloads/gtfs.zip Verkéier/Resources/gtfs-compact.json
-```
-
-Use `--max-stops` when producing a small fixture. Do not commit oversized generated feeds without checking app size and update cadence.
+The app downloads the current Luxembourg GTFS archive from data.public.lu and
+builds its on-device database. No GTFS archive is bundled with this repository.
 
 ## Data Attribution
 
 Transport data:
 
-- Administration des transports publics - mobiliteit.lu OpenAPI
-- Administration des transports publics - GTFS public transport schedules and stops
-- Ville de Luxembourg - AVL Autobus
+- [ATP mobiliteit.lu OpenAPI](https://data.public.lu/en/datasets/api-mobiliteit-lu/)
+  and [ATP GTFS schedules](https://data.public.lu/en/datasets/horaires-et-arrets-des-transport-publics-gtfs/): CC BY 4.0; credit Administration des transports publics and link to the source and license when redistributing derived data.
+- [Ville de Luxembourg AVL Autobus](https://data.public.lu/en/datasets/mobilite-avl-autobus/): CC0.
+- JCDecaux vel'OH! station data: subject to the provider's API terms.
 
 Maps:
 
 - Apple Maps / MapKit
+- [OpenStreetMap](https://www.openstreetmap.org/copyright) walking graph data: ODbL; credit OpenStreetMap contributors.
+
+The app is independent and is not affiliated with Luxembourg's transport
+operators. Data-provider licenses and terms are separate from this project's
+source-code license.

@@ -15,7 +15,7 @@
             </BuildableReference>
          </TestableReference>
       </Testables>
-   <EnvironmentVariables><EnvironmentVariable key="ROUTING_TEST_FEED_DIR" value="/Users/REDACTED/Library/Developer/CoreSimulator/Devices/1A7B6E9C-F80B-4283-B475-B2918D62272A/data/Containers/Data/Application/11C7FBDD-709C-418C-9332-F956D040C283/Library/Application Support/Mobiliteit" isEnabled="YES" /><EnvironmentVariable key="ROUTING_BENCHMARK" value="1" isEnabled="YES" /></EnvironmentVariables></TestAction>
+   <EnvironmentVariables><EnvironmentVariable key="ROUTING_BENCHMARK" value="1" isEnabled="YES" /></EnvironmentVariables></TestAction>
    <LaunchAction buildConfiguration="Debug" selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier="Xcode.DebuggerFoundation.Launcher.LLDB" launchStyle="0" useCustomWorkingDirectory="NO" ignoresPersistentStateOnLaunch="NO" debugDocumentVersioning="YES" debugServiceExtension="internal" allowLocationSimulation="YES" queueDebuggingEnabled="No">
       <BuildableProductRunnable runnableDebuggingMode="0">
          <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="000000000000000100000000" BuildableName="Verkeier.app" BlueprintName="Verkeier" ReferencedContainer="container:Verkeier.xcodeproj">

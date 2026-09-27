@@ -1,152 +1,51 @@
 # Services
 
-All service protocols live in `Verkéier/Services/`. Every protocol has a
-production implementation, at least one mock, and an empty stub. Inject via
-SwiftUI `@Environment` — never construct services inside views.
-
-## Dependency Injection
-
-Entries are declared in `Verkéier/App/AppDependencies.swift`:
+Service protocols live in `Verkéier/Services/`. The current Swift declarations
+are the contract; this document explains how they fit together. Views receive
+services through `@Environment`, with entries in
+`Verkéier/App/AppDependencies.swift`. `VerkéierApp` supplies the live
+implementations. Previews and tests can inject fixture or unavailable services.
 
 ```swift
-extension EnvironmentValues {
-    @Entry var atpClient: any ATPClient = EmptyATPClient()
-    @Entry var gtfsService: any GTFSService = LocalGTFSService()
-    @Entry var gtfsUpdateController: GTFSUpdateController = GTFSUpdateController()
-    @Entry var routeService: any RouteService = PublicTransportRouteService(
-        gtfsService: LocalGTFSService(), atpClient: EmptyATPClient())
-    @Entry var avlClient: any AVLClient = LiveAVLClient(feedURL: …)
-    @Entry var liveActivityManager: LiveActivityManager = LiveActivityManager()
-    @Entry var departureReminderService: DepartureReminderService = DepartureReminderService()
-}
-```
-
-**Reading in a view:**
-```swift
-@Environment(\.atpClient) private var atpClient
+@Environment(\.liveTransitService) private var liveTransitService
 @Environment(\.gtfsService) private var gtfsService
 ```
 
-**Overriding in a preview:**
-```swift
-#Preview {
-    MyView()
-        .environment(\.atpClient, ATPMockClient())
-        .environment(\.avlClient, MockAVLClient())
-}
-```
-
-**In tests:** pass mock implementations directly to view model constructors
-(view models take services as init parameters, not via `@Environment`).
-
-### Implementations by service
-
-| Protocol | Production | Test / Preview |
+| Protocol | Production implementation | Fixture or fallback |
 |---|---|---|
-| `ATPClient` | `LiveATPClient` | `ATPMockClient`, `EmptyATPClient` |
-| `GTFSService` | `LocalGTFSService` | `LocalGTFSService` with fixture data |
+| `LiveTransitService` | `MobiliteitLiveTransitService` | `FixtureLiveTransitService`, `UnavailableLiveTransitService` |
+| `GTFSService` | `MobiliteitGTFSService` | `FixtureGTFSService`, `UnavailableGTFSService` |
 | `AVLClient` | `LiveAVLClient` | `MockAVLClient`, `EmptyAVLClient` |
-| `RouteService` | `MobiliteitRouteService` | `MapKitRouteService` (MapKit-only fallback) |
+| `RouteService` | `MobiliteitRouteService` | `MapKitRouteService` |
+| `BikeShareService` | `JCDecauxBikeShareService` | `UnavailableBikeShareService` |
 
-`GTFSUpdateController`, `LiveActivityManager`, and `DepartureReminderService`
-are concrete `@Observable` classes with no protocol; test them via their
-public interface.
+## Live transit
 
----
+`Verkéier/Services/Transit/LiveTransitService.swift` provides nearby stops and
+filtered departure boards. `MobiliteitLiveTransitService` uses MobiliteitKit
+for typed HAFAS requests through `API_PROXY_URL/atp`; it sends no ATP key in
+the app. Without a relay URL, live transit reports `notConfigured`. The
+routing service shares its realtime client.
 
-## ATPClient — `Verkéier/Services/ATP/ATPClient.swift`
+## GTFS
 
-Live transit data from the mobiliteit.lu OpenAPI. Production requests go
-through the allowlisted Cloudflare Worker configured by `API_PROXY_URL`;
-`EmptyATPClient` is used when the proxy is absent.
+`Verkéier/Services/Transit/GTFSService.swift` provides stop search, schedules,
+route shapes, and routing data. `MobiliteitGTFSService` discovers and downloads
+the current official GTFS archive, validates and installs it, and keeps the
+last usable timetable if a refresh fails. Calls return app domain models and
+work offline once a valid database has been installed.
 
-```swift
-protocol ATPClient: Sendable {
-    nonisolated func nearbyStops(latitude: Double, longitude: Double) async throws -> [Stop]
-    nonisolated func departureBoard(stopId: String) async throws -> [Departure]
-    nonisolated func departureBoards(stopIds: [String]) async throws -> [Departure]
-    // default impl: normalises ids, queries each, merges via ATPMapper
-}
+## AVL
 
-enum ATPClientError: Error, Equatable {
-    case missingAccessId
-    case invalidResponse
-    case httpStatus(Int)
-    case allPlatformRequestsFailed
-}
-```
+`Verkéier/Services/AVL/AVLClient.swift` fetches Ville de Luxembourg disruption
+messages from the configured public XML feed.
 
----
+## Route planning
 
-## GTFSService — `Verkéier/Services/GTFS/GTFSService.swift`
-
-On-device GTFS lookups. All methods are non-throwing and work fully offline.
-Production implementation: `LocalGTFSService`.
-
-```swift
-protocol GTFSService: Sendable {
-    nonisolated func searchStops(query: String) async -> [Stop]
-    nonisolated func stopsForMap(center: LocationPoint, latitudeDelta: Double,
-                                 longitudeDelta: Double, limit: Int) async -> [Stop]
-    nonisolated func stop(id: String) async -> Stop?
-    nonisolated func allStops() async -> [Stop]
-    nonisolated func routesForStop(id: String) async -> [TransitRoute]
-    nonisolated func timetableIndex() async -> GTFSTimetableIndexPayload?
-}
-```
-
----
-
-## AVLClient — `Verkéier/Services/AVL/AVLClient.swift`
-
-Ville de Luxembourg disruption XML feed.
-
-```swift
-protocol AVLClient: Sendable {
-    nonisolated func fetchMessages() async throws -> [AlertMessage]
-}
-
-enum AVLClientError: Error {
-    case invalidURL
-    case invalidResponse
-    case httpStatus(Int)
-}
-```
-
----
-
-## RouteService — `Verkéier/Services/Routing/RouteService.swift`
-
-Journey planning and Apple Maps handoff.
-
-```swift
-protocol RouteService: Sendable {
-    nonisolated func calculateRoute(
-        from: LocationPoint, to: LocationPoint,
-        time: RoutePlanningTime, filters: RoutePlannerFilters,
-        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy,
-        page: RouteSearchPage
-    ) async throws -> RouteCalculation
-
-    @MainActor func openInAppleMaps(from: LocationPoint, to: LocationPoint)
-}
-
-// Convenience default implementations (no refresh policy / no filters / no time):
-//   calculateRoute(from:to:)          → .leaveNow, default filters
-//   calculateRoute(from:to:time:)     → default filters
-
-enum RouteRealtimeRefreshPolicy {
-    case scheduleOnly
-    case useCache
-    case forceRefresh
-}
-
-enum RoutingError: Error, Equatable {
-    case noRouteFound
-    case timetableUnavailable
-    case noPublicTransportRoute
-}
-```
+`Verkéier/Services/Routing/RouteService.swift` defines journey calculation,
+streamed updates, and Apple Maps handoff. `MobiliteitRouteService` uses the
+local GTFS database with optional HAFAS realtime overlays. Walking routes use
+the local graph when installed and MapKit where needed.
 
 `RouteCalculation` holds `options: [RouteOption]` and `selectedOptionID`.
 `RouteOption` wraps a `RoutePlan` and computed properties: `transferCount`,

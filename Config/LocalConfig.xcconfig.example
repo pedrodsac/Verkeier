@@ -1,0 +1,6 @@
+// Copy to LocalConfig.xcconfig and set your own relay URL.
+// The relay URL is public in every built app. Keep upstream keys in Worker secrets.
+API_PROXY_URL =
+
+// Optional: override the public AVL alerts feed.
+// AVL_MESSAGES_URL = https:/$()/web.vdl.lu/autobus/data/messages/messages.xml

@@ -23,6 +23,8 @@ Implementation rules:
 - keep upstream credentials in Cloudflare Worker secrets
 - app must handle a missing proxy URL gracefully
 - see the `verkeier-relay` repository README for setup instructions
+- the public dataset lists CC BY 4.0 and directs developers to request a
+  personal key from ATP; agree usage, quota, caching, and attribution with ATP
 - add mock fixtures for development and tests
 - mark uncertain response fields with TODOs
 - do not invent live status
@@ -45,27 +47,19 @@ Purpose:
 - local stop search
 - scheduled fallback where practical
 
-MVP approach:
+Current implementation:
 
-- use preprocessed local JSON or SQLite
-- sample/mock data is acceptable until real feed processing is added
-- do not build full GTFS journey planning in MVP unless simple and reliable
+- discover the latest official archive from the data.public.lu dataset API
+- download, validate, and install an on-device SQLite database
+- retain the last usable feed when an update fails
+- use the timetable for offline search, departures, and journey planning
 
 Source:
 
 - `https://data.public.lu/en/datasets/horaires-et-arrets-des-transport-publics-gtfs/`
 
-The current dataset page exposes dated ZIP resources such as:
-
-- `https://download.data.public.lu/resources/horaires-et-arrets-des-transport-publics-gtfs/20260610-065644/gtfs-20260609-20260823.zip`
-
-Preprocessing:
-
-```sh
-python3 Scripts/preprocess_gtfs.py /path/to/gtfs.zip Verkéier/Resources/gtfs-compact.json
-```
-
-The app loads cached/generated GTFS data when available. It does not fall back to bundled sample stops; if no GTFS data has been fetched or bundled, GTFS stop results remain empty.
+The dataset is published under CC BY 4.0. The app does not bundle a GTFS
+archive; until the first valid download finishes, timetable results are empty.
 
 ## AVL Autobus
 
@@ -87,6 +81,7 @@ Default MVP feed:
 - `https://web.vdl.lu/autobus/data/messages/messages.xml`
 
 The dataset is published by Ville de Luxembourg as "Mobilité - AVL Autobus" on data.public.lu. The XML contains `Message` records with start/end dates, urgency/category, titles/text, and affected line/stop elements.
+The dataset page lists CC0.
 
 ## MapKit / Apple Maps
 

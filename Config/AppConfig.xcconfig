@@ -1,5 +1,7 @@
-// Shared build settings for app-provided runtime configuration.
-// Local secrets belong in Config/LocalConfig.xcconfig, which is ignored.
+// Shared defaults. Override the relay URL in the ignored LocalConfig.xcconfig.
+// Never put upstream API credentials in iOS build settings.
 
-API_PROXY_URL = https:/$()/verkeier-api.pedrocordeiroo2.workers.dev
+API_PROXY_URL =
 AVL_MESSAGES_URL = https:/$()/web.vdl.lu/autobus/data/messages/messages.xml
+
+#include? "LocalConfig.xcconfig"

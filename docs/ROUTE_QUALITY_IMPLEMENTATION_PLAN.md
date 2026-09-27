@@ -23,14 +23,14 @@ Do not expand this into a UI redesign, a replacement routing backend, or an unre
 
 | Repository | Local root | Responsibility |
 |---|---|---|
-| Verkéier | `/Users/REDACTED/Developer/Verkeier` | App adapter, walking providers, route selection, presentation, integration tests |
-| MobiliteitKit | `/Users/REDACTED/Developer/MobilitéitKit` | GTFS snapshot, journey search, preferences, candidate pruning, package tests |
+| Verkéier | `/path/to/Verkeier` | App adapter, walking providers, route selection, presentation, integration tests |
+| MobiliteitKit | `/path/to/MobiliteitKit` | GTFS snapshot, journey search, preferences, candidate pruning, package tests |
 
 At review time, the package checkout was clean at `106146f423ace2c05cfc6c2cbdb7a3af01735ea6`. The app's [resolved package file][resolved] pins that same revision through a remote package reference in [project.pbxproj][project]. The old `Packages/MobiliteitKit` files are deleted in the current app working tree. **Do not restore or edit that old package copy.**
 
 The app already contains substantial uncommitted work, including routing and walking changes. Record both repositories' status and diff before implementation. Preserve unrelated edits and do not reset either working tree. Re-read source before editing: line numbers in this plan are orientation aids, while symbol names are the durable references.
 
-Read [CLAUDE.md][claude], [codebase rules][rules], and [service documentation][services]. Some documentation is stale: actual source and project settings take precedence. Verified Xcode project, scheme, and test target names are `Verkeier.xcodeproj`, `Verkeier`, and `VerkeierTests`, despite accented names in some command examples.
+Read [AGENTS.md][claude], [codebase rules][rules], and [service documentation][services]. Some documentation is stale: actual source and project settings take precedence. Verified Xcode project, scheme, and test target names are `Verkeier.xcodeproj`, `Verkeier`, and `VerkeierTests`, despite accented names in some command examples.
 
 The actual production dependency chain is wired in [VerkéierApp.swift][app]:
 
@@ -306,7 +306,7 @@ Do not assert fragile wall-clock thresholds in unit tests. Set explicit request/
 Verify available tooling and destinations first:
 
 ```sh
-cd /Users/REDACTED/Developer/Verkeier
+cd /path/to/Verkeier
 xcodebuild -list -project Verkeier.xcodeproj -disableAutomaticPackageResolution
 xcodebuild -showdestinations -project Verkeier.xcodeproj -scheme Verkeier -disableAutomaticPackageResolution
 ```
@@ -314,7 +314,7 @@ xcodebuild -showdestinations -project Verkeier.xcodeproj -scheme Verkeier -disab
 Run deterministic package regressions while excluding the existing network-dependent archive test:
 
 ```sh
-cd /Users/REDACTED/Developer/MobilitéitKit
+cd /path/to/MobiliteitKit
 swift test --skip gromscheedToHamiliusAppRoutePrintsRealGTFSResults
 ```
 
@@ -323,7 +323,7 @@ Confirm the installed SwiftPM runner's filtering support. Keep the network-depen
 Build and test the app using an actual installed simulator UUID from `-showdestinations`:
 
 ```sh
-cd /Users/REDACTED/Developer/Verkeier
+cd /path/to/Verkeier
 xcodebuild -project Verkeier.xcodeproj -scheme Verkeier \
   -destination 'platform=iOS Simulator,id=<SIMULATOR_UUID>' \
   -disableAutomaticPackageResolution build
@@ -358,30 +358,30 @@ The final implementation report must identify behavior changes, key design decis
 
 ## Source references
 
-These links point to the checked-out files used for this plan. Locate symbols again if source moves.
+These links identify the files used for this plan. Locate symbols again if source moves.
 
-[claude]: /Users/REDACTED/Developer/Verkeier/CLAUDE.md
-[rules]: /Users/REDACTED/Developer/Verkeier/docs/CODEBASE_RULES.md
-[services]: /Users/REDACTED/Developer/Verkeier/docs/SERVICES.md
-[project]: /Users/REDACTED/Developer/Verkeier/Verkeier.xcodeproj/project.pbxproj
-[resolved]: /Users/REDACTED/Developer/Verkeier/Verkeier.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
-[app]: /Users/REDACTED/Developer/Verkeier/Verkéier/App/VerkéierApp.swift:29
-[router]: /Users/REDACTED/Developer/MobilitéitKit/Sources/MobilitéitKit/Routing/TransitRouter.swift
-[walk-cache]: /Users/REDACTED/Developer/MobilitéitKit/Sources/MobilitéitKit/Routing/WalkingRouteCache.swift
-[importer]: /Users/REDACTED/Developer/MobilitéitKit/Sources/MobilitéitKit/GTFSArchiveInstaller.swift
-[adapter]: /Users/REDACTED/Developer/Verkeier/Verkéier/Services/Routing/MobiliteitRouteService.swift
-[route-service]: /Users/REDACTED/Developer/Verkeier/Verkéier/Services/Routing/RouteService.swift
-[local-walking]: /Users/REDACTED/Developer/Verkeier/Verkéier/Services/Routing/LocalFirstWalkingRouter.swift
-[walking]: /Users/REDACTED/Developer/Verkeier/Verkéier/Services/Routing/WalkingRouting.swift
-[valhalla]: /Users/REDACTED/Developer/Verkeier/Verkéier/Services/Routing/ValhallaWalkingRouter.swift
-[view-model]: /Users/REDACTED/Developer/Verkeier/Verkéier/Features/Map/ViewModels/TransitMapViewModel+RoutePlanning.swift
-[option]: /Users/REDACTED/Developer/Verkeier/Verkéier/Models/RouteOption.swift
-[plan]: /Users/REDACTED/Developer/Verkeier/Verkéier/Models/RoutePlan.swift
-[calculation]: /Users/REDACTED/Developer/Verkeier/Verkéier/Services/Routing/RouteCalculation.swift
-[planner-models]: /Users/REDACTED/Developer/Verkeier/Verkéier/Models/RoutePlannerModels.swift
-[kit-tests]: /Users/REDACTED/Developer/MobilitéitKit/Tests/MobilitéitKitTests/MobilitéitKitTests.swift
-[nearby-tests]: /Users/REDACTED/Developer/MobilitéitKit/Tests/MobilitéitKitTests/NearbyStopRoutingTests.swift
-[dedup-tests]: /Users/REDACTED/Developer/Verkeier/VerkéierTests/RouteOptionDeduplicationTests.swift
-[refine-tests]: /Users/REDACTED/Developer/Verkeier/VerkéierTests/WalkingRouteRefinementTests.swift
-[flow-tests]: /Users/REDACTED/Developer/Verkeier/VerkéierTests/RouteCalculationFlowTests.swift
-[offline-tests]: /Users/REDACTED/Developer/Verkeier/VerkéierTests/OfflineWalkingRoutingTests.swift
+[claude]: ../AGENTS.md
+[rules]: CODEBASE_RULES.md
+[services]: SERVICES.md
+[project]: ../Verkeier.xcodeproj/project.pbxproj
+[resolved]: ../Verkeier.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+[app]: ../Verkéier/App/VerkéierApp.swift
+[router]: https://github.com/pedrodsac/MobiliteitKit/blob/main/Sources/MobilitéitKit/Routing/TransitRouter.swift
+[walk-cache]: https://github.com/pedrodsac/MobiliteitKit/blob/main/Sources/MobilitéitKit/Routing/WalkingRouteCache.swift
+[importer]: https://github.com/pedrodsac/MobiliteitKit/blob/main/Sources/MobilitéitKit/GTFSArchiveInstaller.swift
+[adapter]: ../Verkéier/Services/Routing/MobiliteitRouteService.swift
+[route-service]: ../Verkéier/Services/Routing/RouteService.swift
+[local-walking]: ../Verkéier/Services/Routing/LocalFirstWalkingRouter.swift
+[walking]: ../Verkéier/Services/Routing/WalkingRouting.swift
+[valhalla]: ../Verkéier/Services/Routing/ValhallaWalkingRouter.swift
+[view-model]: ../Verkéier/Features/Map/ViewModels/TransitMapViewModel+RoutePlanning.swift
+[option]: ../Verkéier/Models/RouteOption.swift
+[plan]: ../Verkéier/Models/RoutePlan.swift
+[calculation]: ../Verkéier/Services/Routing/RouteCalculation.swift
+[planner-models]: ../Verkéier/Models/RoutePlannerModels.swift
+[kit-tests]: https://github.com/pedrodsac/MobiliteitKit/blob/main/Tests/MobilitéitKitTests/MobilitéitKitTests.swift
+[nearby-tests]: https://github.com/pedrodsac/MobiliteitKit/blob/main/Tests/MobilitéitKitTests/NearbyStopRoutingTests.swift
+[dedup-tests]: ../VerkéierTests/RouteOptionDeduplicationTests.swift
+[refine-tests]: ../VerkéierTests/WalkingRouteRefinementTests.swift
+[flow-tests]: ../VerkéierTests/RouteCalculationFlowTests.swift
+[offline-tests]: ../VerkéierTests/OfflineWalkingRoutingTests.swift

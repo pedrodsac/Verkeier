@@ -9,26 +9,23 @@ Verkéier is a native SwiftUI iOS app for Luxembourg public transport, built to 
 Build for simulator:
 
 ```sh
-xcodebuild -project Verkéier.xcodeproj -scheme Verkéier -destination 'platform=iOS Simulator,name=iPhone 17' build
+xcodebuild -project Verkeier.xcodeproj -scheme Verkeier -destination 'platform=iOS Simulator,name=iPhone 17' build
 ```
 
 Run the full test suite:
 
 ```sh
-xcodebuild -project Verkéier.xcodeproj -scheme Verkéier -destination 'platform=iOS Simulator,name=iPhone 17' test
+xcodebuild -project Verkeier.xcodeproj -scheme Verkeier -destination 'platform=iOS Simulator,name=iPhone 17' test
 ```
 
 Run a single test class or method (Swift Testing):
 
 ```sh
-xcodebuild -project Verkéier.xcodeproj -scheme Verkéier -destination 'platform=iOS Simulator,name=iPhone 17' test -only-testing:VerkéierTests/GTFSValidatorTests
+xcodebuild -project Verkeier.xcodeproj -scheme Verkeier -destination 'platform=iOS Simulator,name=iPhone 17' test -only-testing:VerkeierTests/StopDeduplicationTests
 ```
 
-Regenerate the bundled GTFS resource from a downloaded feed (use `--max-stops` for small fixtures):
-
-```sh
-python3 Scripts/preprocess_gtfs.py ~/Downloads/gtfs.zip Verkéier/Resources/gtfs-compact.json
-```
+The app downloads and installs the current GTFS feed at runtime. No GTFS
+archive is bundled with the repository.
 
 Local config (git-ignored; holds the non-secret `API_PROXY_URL` and an optional `AVL_MESSAGES_URL` override):
 
@@ -45,7 +42,7 @@ SwiftUI View → ViewModel/Observable State → Service Protocol → API Client/
 ```
 
 - **No networking or business logic in views or view bodies.** Route everything through view models and injected services.
-- **Every service is a protocol** with multiple implementations: `Live*` (production), `*Mock`/`Empty*` (previews/tests), and often `Local*` (on-device data). E.g. `ATPClient` has `LiveATPClient`, `ATPMockClient`, `EmptyATPClient`.
+- **Services use protocols** with production and unavailable or fixture implementations. For example, `LiveTransitService` has `MobiliteitLiveTransitService`, `UnavailableLiveTransitService`, and `FixtureLiveTransitService`.
 - **Dependency injection is via SwiftUI `EnvironmentValues`** using `@Entry` (see `Verkéier/App/AppDependencies.swift`). Each service has a default value there; views read it with `@Environment(\.serviceName)`. Override the environment to inject mocks in previews/tests.
 - UI must be previewable with mock data; API/parsing code must be testable without UI.
 
@@ -53,15 +50,15 @@ SwiftUI View → ViewModel/Observable State → Service Protocol → API Client/
 
 - `Verkéier/App/` — entry point (`VerkéierApp`), config (`AppConfiguration`), DI (`AppDependencies`), SwiftData container, debug data fixtures/modes.
 - `Verkéier/Features/<Domain>/` — feature UI grouped as `Views/`, `ViewModels/`, `Components/`. Domains: `Map`, `BottomSheet`, `Stops`, `Departures`, `Search`, `Routes`, `Favourites`, `Alerts`, `Settings`, `LiveActivities`, `AppIntents`.
-- `Verkéier/Services/` — `ATP/` (mobiliteit.lu OpenAPI departures/nearby stops), `GTFS/` (local stop search, timetable index, download/update/validation pipeline, offline schedules), `AVL/` (Ville de Luxembourg alerts XML), `Location/`, `Routing/` (MapKit route + Apple Maps handoff, public-transport route service), `Notifications/`.
+- `Verkéier/Services/` — `Transit/` (mobiliteit.lu live data and GTFS download, validation, and offline schedules), `AVL/` (Ville de Luxembourg alerts XML), `Location/`, `Routing/` (MapKit and on-device public-transport routing), `Notifications/`.
 - `Verkéier/Models/` — typed domain models (`Stop`, `Departure`, `RoutePlan`, `AlertMessage`, etc.).
 - `Verkéier/Storage/` — SwiftData persistence (e.g. favourites).
-- `VerkéierShared/` + `VerkéierWidgets/` — shared widget/Live Activity types and the WidgetKit extension (separate `VerkéierWidgets` scheme/target).
-- `VerkéierTests/` — Swift Testing suites, named after the unit under test (`ATPMapperTests`, `GTFSValidatorTests`).
+- `VerkéierShared/` + `VerkéierWidgets/` — shared widget/Live Activity types and the WidgetKit extension (separate `VerkeierWidgets` scheme/target).
+- `VerkéierTests/` — Swift Testing suites, named after the unit under test (for example, `StopDeduplicationTests`).
 
 ### Data sources & external assumptions
 
-ATP (mobiliteit.lu) access is routed through the Cloudflare Worker in the `verkeier-relay` repository; the app tolerates a missing proxy URL during early phases (`EmptyATPClient`). When an external API contract is uncertain, add a `TODO` rather than guessing. See `docs/DATA_SOURCES.md` and `docs/ARCHITECTURE.md` for the source of truth on contracts.
+ATP (mobiliteit.lu) access is routed through the Cloudflare Worker in the `verkeier-relay` repository; without a proxy URL, `MobiliteitLiveTransitService` reports live data as unavailable. When an external API contract is uncertain, add a `TODO` rather than guessing. See `docs/DATA_SOURCES.md` and `docs/ARCHITECTURE.md` for background; the current source defines implemented contracts.
 
 ## Conventions
 
@@ -81,7 +78,7 @@ ATP (mobiliteit.lu) access is routed through the Cloudflare Worker in the `verke
 ## Working notes
 
 - Make occasional small, focused commits after a coherent buildable change or passing-test milestone; don't mix unrelated work. Use concise imperative messages (`Add GTFS update validation`).
-- `docs/` holds the phased plan (`PRD.md`, `ARCHITECTURE.md`, `MVP_CHECKLIST.md`, `CODEBASE_RULES.md`, feature/audit specs). Start with `docs/README.md` for navigation and `docs/SERVICES.md` for protocol signatures. Consult both before large changes — they define intended scope and contracts.
+- `docs/` holds product, architecture, data-source, and feature plans. Start with `docs/README.md` for navigation; check current source signatures before large changes.
 
 ## Skills & tooling
 
