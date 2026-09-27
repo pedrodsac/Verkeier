@@ -88,5 +88,6 @@ Maps:
 - [OpenStreetMap](https://www.openstreetmap.org/copyright) walking graph data: ODbL; credit OpenStreetMap contributors.
 
 The app is independent and is not affiliated with Luxembourg's transport
-operators. Data-provider licenses and terms are separate from this project's
-source-code license.
+operators. Original source code, documentation, and app icon artwork in this
+repository are available under the [MIT license](LICENSE). Third-party
+packages and transport or map data retain their own licenses and terms.
