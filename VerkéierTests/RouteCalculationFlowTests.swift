@@ -55,6 +55,56 @@ struct RouteCalculationFlowTests {
         #expect(MobiliteitRouteService.journeyEndpoint(for: point) == .stop(id: "hamilius-stop"))
     }
 
+    @Test("A live-only connection is added and recommended after the timetable result")
+    func liveConnectionSupersedesScheduledRecommendation() async {
+        let anchor = Date.now
+        let origin = LocationPoint(name: "Origin", latitude: 49.61, longitude: 6.12)
+        let destination = LocationPoint(name: "Destination", latitude: 49.62, longitude: 6.13)
+        let scheduled = testOption(
+            id: "scheduled", origin: origin, destination: destination,
+            departure: anchor.addingTimeInterval(300),
+            arrival: anchor.addingTimeInterval(1_800)
+        )
+        // The live trip was scheduled too early to catch, but its delay makes
+        // it boardable and gets the rider to the destination sooner.
+        let delayed = testOption(
+            id: "delayed", origin: origin, destination: destination,
+            departure: anchor.addingTimeInterval(600),
+            arrival: anchor.addingTimeInterval(1_500),
+            scheduledDeparture: anchor.addingTimeInterval(-300)
+        )
+        let viewModel = TransitMapViewModel(now: { anchor })
+        viewModel.routeOrigin = RoutePlace(title: "Origin", location: origin, source: .search)
+        viewModel.routeDestination = RoutePlace(title: "Destination", location: destination, source: .search)
+
+        await viewModel.calculateRoute(
+            using: TwoStageRouteService(scheduled: scheduled, live: delayed), from: nil
+        )
+
+        #expect(viewModel.routeOptions.map(\.id).contains(delayed.id))
+        #expect(viewModel.selectedRouteOptionID == delayed.id)
+        #expect(viewModel.routeErrorMessage == nil)
+    }
+
+    private func testOption(
+        id: String, origin: LocationPoint, destination: LocationPoint,
+        departure: Date, arrival: Date, scheduledDeparture: Date? = nil
+    ) -> RouteOption {
+        RouteOption(id: id, plan: RoutePlan(
+            id: id, origin: origin, destination: destination,
+            expectedTravelTime: arrival.timeIntervalSince(departure), distanceMeters: nil,
+            legs: [RoutePlan.Leg(
+                id: "\(id)-bus", mode: .bus, transportKind: .transit,
+                origin: origin, destination: destination,
+                departureTime: departure, arrivalTime: arrival,
+                scheduledDepartureTime: scheduledDeparture,
+                realtimeDepartureTime: scheduledDeparture == nil ? nil : departure,
+                realtimeArrivalTime: scheduledDeparture == nil ? nil : arrival,
+                liveStatus: scheduledDeparture == nil ? .scheduled : .delayed
+            )], dataSource: .local
+        ), mapOverlay: nil)
+    }
+
     @Test("The real app flow returns five routes from 18A Gromscheed to Konrad Adenauer")
     func realFeedRouteTapPublishesFiveJourneys() async throws {
         guard let installedFeedDirectory = ProcessInfo.processInfo.environment["ROUTING_TEST_FEED_DIR"] else {
@@ -191,7 +241,9 @@ struct RouteCalculationFlowTests {
             calculationCount += 1
             #expect(!update.options.isEmpty)
         }
-        #expect(calculationCount == 1)
+        // The downloaded timetable is emitted before the live overlay so a
+        // slow connection cannot hold the first result hostage.
+        #expect(calculationCount == 2)
 
         printRouteResults(
             label: "18A Gromscheed → Kirchberg, Konrad Adenauer",
@@ -460,6 +512,33 @@ private struct ImmediateNoRouteService: RouteService {
         page _: RouteSearchPage
     ) async throws -> RouteCalculation {
         throw RoutingError.noPublicTransportRoute
+    }
+
+    @MainActor func openInAppleMaps(from _: LocationPoint, to _: LocationPoint) {}
+}
+
+private struct TwoStageRouteService: RouteService {
+    let scheduled: RouteOption
+    let live: RouteOption
+
+    func calculateRoute(
+        from _: LocationPoint, to _: LocationPoint, time _: RoutePlanningTime,
+        filters _: RoutePlannerFilters, realtimeRefreshPolicy _: RouteRealtimeRefreshPolicy,
+        page _: RouteSearchPage
+    ) async throws -> RouteCalculation {
+        RouteCalculation(options: [scheduled], selectedOptionID: scheduled.id)
+    }
+
+    func routeCalculationUpdates(
+        from _: LocationPoint, to _: LocationPoint, time _: RoutePlanningTime,
+        filters _: RoutePlannerFilters, realtimeRefreshPolicy _: RouteRealtimeRefreshPolicy,
+        page _: RouteSearchPage
+    ) -> AsyncThrowingStream<RouteCalculation, Error> {
+        AsyncThrowingStream { continuation in
+            continuation.yield(RouteCalculation(options: [scheduled], selectedOptionID: scheduled.id))
+            continuation.yield(RouteCalculation(options: [live], selectedOptionID: live.id))
+            continuation.finish()
+        }
     }
 
     @MainActor func openInAppleMaps(from _: LocationPoint, to _: LocationPoint) {}
