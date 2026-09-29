@@ -67,6 +67,7 @@ final class TransitMapViewModel {
     var canLoadEarlierRoutes = true
     var canLoadLaterRoutes = true
     var selectedRouteOptionID: String?
+    var routeSelectionWasManual = false
     var routeLoadingPhase: RouteLoadingPhase = .idle
     var routeErrorMessage: String?
     var routeStatusMessage: String?
@@ -155,6 +156,7 @@ final class TransitMapViewModel {
         routeOptions = []
         supplementalRouteOptions = []
         selectedRouteOptionID = nil
+        routeSelectionWasManual = false
         routeStatusMessage = nil
         routeLastCalculatedAt = nil
         resetRoutePagingState()
