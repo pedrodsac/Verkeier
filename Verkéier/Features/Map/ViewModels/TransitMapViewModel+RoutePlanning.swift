@@ -184,6 +184,7 @@ extension TransitMapViewModel {
         walkingRefinedOptionIDs = []
         invalidatedRouteOptionIDs = []
         walkingReplanGeneration = nil
+        routeSelectionWasManual = false
         let requestGeneration = startRouteRequest()
         routeLoadingPhase = .calculating
         routeErrorMessage = nil
@@ -210,7 +211,7 @@ extension TransitMapViewModel {
                     in: calculation.supplementalOptions,
                     existing: supplementalRouteOptions
                 ).filter { !invalidatedRouteOptionIDs.contains($0.id) }
-                let preferredID = receivedRouteUpdate
+                let preferredID = routeSelectionWasManual
                     ? selectedRouteOptionID
                     : calculation.selectedOptionID
                 if !receivedRouteUpdate {
@@ -246,11 +247,10 @@ extension TransitMapViewModel {
                         origin: routeOrigin, destination: destination
                     )
                 }
-                if calculation.options.count == 1,
-                   calculation.options.first?.isWalkingOnly == true {
-                    canLoadEarlierRoutes = false
-                    canLoadLaterRoutes = false
-                }
+                let walkingOnly = calculation.options.count == 1
+                    && calculation.options.first?.isWalkingOnly == true
+                canLoadEarlierRoutes = !walkingOnly
+                canLoadLaterRoutes = !walkingOnly
                 receivedRouteUpdate = true
                 routeLoadingPhase = .idle
             }
@@ -387,6 +387,7 @@ extension TransitMapViewModel {
             return false
         }
         selectedRouteOptionID = id
+        routeSelectionWasManual = true
         routeStatusMessage = nil
         return true
     }
