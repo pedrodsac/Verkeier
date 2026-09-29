@@ -22,15 +22,16 @@ and device QA. See `docs/DATA_SOURCES.md` for the current data contracts.
 
 ## Local Configuration
 
-Copy the example config and set the URL of a relay you operate:
+The app uses the deployed Verkéier relay by default for ATP live data and
+vel’OH! availability. To use a different relay, copy the example config and
+set its `API_PROXY_URL`:
 
 ```sh
 cp Config/LocalConfig.xcconfig.example Config/LocalConfig.xcconfig
 ```
 
 `Config/LocalConfig.xcconfig` is ignored by Git and is optionally included by
-`Config/AppConfig.xcconfig`. A fresh checkout has no relay URL, so live ATP
-departures and dynamic bike availability are unavailable until one is set.
+`Config/AppConfig.xcconfig`. Leave the override commented to use the default.
 
 - `API_PROXY_URL`: HTTPS URL of your deployed Cloudflare Worker for keyed ATP
   and JCDecaux requests
