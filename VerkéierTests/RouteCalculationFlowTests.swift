@@ -191,7 +191,9 @@ struct RouteCalculationFlowTests {
             calculationCount += 1
             #expect(!update.options.isEmpty)
         }
-        #expect(calculationCount == 1)
+        // The downloaded timetable is emitted before the live overlay so a
+        // slow connection cannot hold the first result hostage.
+        #expect(calculationCount == 2)
 
         printRouteResults(
             label: "18A Gromscheed → Kirchberg, Konrad Adenauer",

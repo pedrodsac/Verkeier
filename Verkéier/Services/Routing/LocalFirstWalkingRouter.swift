@@ -28,6 +28,12 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         self.straightLineFallback = straightLineFallback
     }
 
+    /// Opens the installed graph before the first route tap. Graph startup is
+    /// local work, but doing it on the request path can exhaust the UI deadline.
+    func prepareLocalGraph() async {
+        _ = try? await withLocalRouter { _ in true }
+    }
+
     func estimates(
         from origin: LocationPoint,
         to destinations: [WalkingDestination]

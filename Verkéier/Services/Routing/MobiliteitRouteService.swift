@@ -11,6 +11,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
     private let gtfsService: (any GTFSService)?
     private let engine: MobiliteitRouteEngine
     private let roadRouteProvider: any RoadRouteProviding
+    private let graphPreparation: Task<Void, Never>?
     private let appleMaps = MapKitRouteService()
 
     init(
@@ -19,7 +20,8 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         realtimeClient: MobiliteitAPIClient? = nil,
         engine: MobiliteitRouteEngine? = nil,
         walkingRouter: any WalkingRouting = StraightLineWalkingRouter(),
-        roadRouteProvider: any RoadRouteProviding = MapKitRoadRouteProvider()
+        roadRouteProvider: any RoadRouteProviding = MapKitRoadRouteProvider(),
+        graphPreparation: Task<Void, Never>? = nil
     ) {
         self.databaseURL = databaseURL
         self.gtfsService = gtfsService
@@ -28,6 +30,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             realtimeClient: realtimeClient
         )
         self.roadRouteProvider = roadRouteProvider
+        self.graphPreparation = graphPreparation
     }
 
     nonisolated func calculateRoute(
@@ -43,6 +46,10 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                               page: page, realtimeRefreshPolicy: realtimeRefreshPolicy)
         let databaseURL = try await readyDatabaseURL()
         let feedReady = Date()
+        // The bundled pedestrian graph is installed in parallel at launch.
+        // Join that work before endpoint/transfer routing can fall back to a
+        // network-backed walking service on a cold start.
+        await graphPreparation?.value
         try Task.checkCancellation()
         let router = try await engine.router(for: databaseURL)
         let snapshotReady = Date()
@@ -62,6 +69,56 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             print("[Routing] feed=\(Int(feedReady.timeIntervalSince(started) * 1_000))ms snapshot=\(Int(snapshotReady.timeIntervalSince(feedReady) * 1_000))ms search=\(Int(searchReady.timeIntervalSince(snapshotReady) * 1_000))ms geometry=\(Int(Date().timeIntervalSince(searchReady) * 1_000))ms total=\(Int(Date().timeIntervalSince(started) * 1_000))ms")
         }
         return complete
+    }
+
+    /// Show a timetable route before attempting network-backed realtime boards.
+    /// A slow or unavailable connection must not consume the UI's first-result
+    /// deadline when the downloaded GTFS feed can already answer the query.
+    nonisolated func routeCalculationUpdates(
+        from: LocationPoint,
+        to: LocationPoint,
+        time: RoutePlanningTime,
+        filters: RoutePlannerFilters,
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy,
+        page: RouteSearchPage
+    ) -> AsyncThrowingStream<RouteCalculation, Error> {
+        let service = self
+        return AsyncThrowingStream { continuation in
+            let task = Task(priority: .userInitiated) {
+                do {
+                    guard realtimeRefreshPolicy == .forceRefresh,
+                          engine.hasRealtimeProvider else {
+                        continuation.yield(try await service.calculateRoute(
+                            from: from, to: to, time: time, filters: filters,
+                            realtimeRefreshPolicy: realtimeRefreshPolicy, page: page
+                        ))
+                        continuation.finish()
+                        return
+                    }
+
+                    // A live delay can make a scheduled connection possible,
+                    // so still try live search if the timetable has no route.
+                    do {
+                        let scheduled = try await service.calculateRoute(
+                            from: from, to: to, time: time, filters: filters,
+                            realtimeRefreshPolicy: .scheduleOnly, page: page
+                        )
+                        continuation.yield(scheduled)
+                    } catch RoutingError.noPublicTransportRoute {
+                        // Realtime may recover a connection missed by GTFS.
+                    }
+                    try Task.checkCancellation()
+                    continuation.yield(try await service.calculateRoute(
+                        from: from, to: to, time: time, filters: filters,
+                        realtimeRefreshPolicy: realtimeRefreshPolicy, page: page
+                    ))
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+            continuation.onTermination = { @Sendable _ in task.cancel() }
+        }
     }
 
     /// Starts loading MobiliteitKit's full-feed snapshot without blocking UI
@@ -555,6 +612,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
 /// Owns the expensive immutable MobiliteitKit routing snapshot. A fingerprint
 /// switches the cache when the GTFS service publishes a new generation file.
 actor MobiliteitRouteEngine {
+    nonisolated let hasRealtimeProvider: Bool
     private let walkingProvider: any WalkingRoutingProvider
     private let realtimeClient: MobiliteitAPIClient?
     private let suppliedRealtimeProvider: (any RealtimeRoutingProvider)?
@@ -580,6 +638,7 @@ actor MobiliteitRouteEngine {
         realtimeClient: MobiliteitAPIClient? = nil,
         realtimeProvider: (any RealtimeRoutingProvider)? = nil
     ) {
+        self.hasRealtimeProvider = realtimeClient != nil || realtimeProvider != nil
         self.walkingProvider = walkingProvider
         self.realtimeClient = realtimeClient
         self.suppliedRealtimeProvider = realtimeProvider

@@ -34,14 +34,16 @@ struct VerkéierApp: App {
             datasetManager: routingDatasetManager
         )
         self.bundledRoutingDatasetInstaller = bundledRoutingDatasetInstaller
-        Task(priority: .utility) {
+        let graphPreparation = Task(priority: .utility) {
             _ = await bundledRoutingDatasetInstaller.installIfNeeded()
+            await walkingRouter.prepareLocalGraph()
         }
         let routeService = MobiliteitRouteService(
             gtfsService: gtfsService,
             realtimeClient: liveTransitService.realtimeRoutingClient,
             walkingRouter: walkingRouter,
-            roadRouteProvider: LocalFirstRoadRouteProvider(walkingRouter: walkingRouter)
+            roadRouteProvider: LocalFirstRoadRouteProvider(walkingRouter: walkingRouter),
+            graphPreparation: graphPreparation
         )
         routeService.prepareForRouting()
         self.routeService = routeService
