@@ -16,7 +16,7 @@ implementations. Previews and tests can inject fixture or unavailable services.
 | `LiveTransitService` | `MobiliteitLiveTransitService` | `FixtureLiveTransitService`, `UnavailableLiveTransitService` |
 | `GTFSService` | `MobiliteitGTFSService` | `FixtureGTFSService`, `UnavailableGTFSService` |
 | `AVLClient` | `LiveAVLClient` | `MockAVLClient`, `EmptyAVLClient` |
-| `RouteService` | `MobiliteitRouteService` | `MapKitRouteService` |
+| `RouteService` | `MobiliteitRouteService` | `MapKitRouteService` (unavailable calculation; Apple Maps handoff only) |
 | `BikeShareService` | `JCDecauxBikeShareService` | `UnavailableBikeShareService` |
 
 ## Live transit
@@ -45,7 +45,7 @@ messages from the configured public XML feed.
 `Verkéier/Services/Routing/RouteService.swift` defines journey calculation,
 streamed updates, and Apple Maps handoff. `MobiliteitRouteService` uses the
 local GTFS database with optional HAFAS realtime overlays. Walking routes use
-the local graph when installed and MapKit where needed.
+the local pedestrian graph exclusively. Missing graphs report walking as unavailable.
 
 `RouteCalculation` holds `options: [RouteOption]` and `selectedOptionID`.
 `RouteOption` wraps a `RoutePlan` and computed properties: `transferCount`,
@@ -65,16 +65,15 @@ The planner's mode control is a soft preference; package `allowedModes` is a
 separate hard filter. Walking legs retain routed-versus-estimated evidence
 through the app model; an estimated interchange cannot
 prove a transfer catchable. A local graph's explicit `noRoute` result is kept
-as unreachable; a missing graph can still use MapKit or an explicitly marked
-estimate. Walking refinement validates the
+as unreachable; missing or unusable graphs report walking as unavailable. Walking refinement validates the
 original time constraint and transfer allowances; infeasible options are
 invalidated and one corrected-cost replan is attempted.
 
-`MobiliteitRouteService` keeps a MobiliteitKit `TransitRouter` and
+MobiliteitKit’s `JourneyPlanner` keeps a `TransitRouter` and
 `HafasRealtimeRoutingProvider` paired to the active GTFS database generation.
 When that generation changes, both are rebuilt. A new calculation or explicit
 refresh bypasses the 60-second HAFAS board cache; earlier/later paging reuses
-covered snapshots. Live acquisition is capped at four concurrent board
+covered snapshots. Live acquisition is capped at 32 concurrent board
 requests and a four-second deadline within the route calculation's overall
 15-second UI deadline. Failure, timeout, missing proxy configuration, and
 ambiguous HAFAS-to-GTFS matches all preserve valid schedule-only results.
@@ -127,3 +126,31 @@ enum GTFSUpdateError: Error {
 | `RouteLoadingPhase` | `.idle .waitingForLocation .calculating` — drives progress UI |
 | `DataReadinessSnapshot` | Per-source readiness summary for settings/debug UI |
 | `RoutePlannerModels` | `RoutePlannerFilters`, `RoutePlanningTime`, `RoutePlace`, `RouteCommutePreset` |
+
+## Route calculation ownership
+
+MobiliteitKit owns transit search, prepared-router caching, request/page policy,
+accumulated journey results, ranking and deduplication, transit polylines, feasibility,
+route status and replacement planning after walking corrections. Verkéier renders
+`JourneyPlanningResult` snapshots through `MobiliteitRouteService`; it preserves a
+selectable manual choice or uses the package recommendation.
+
+Verkéier retains GTFS installation, pedestrian routing exclusively with the local Valhalla graph, walking calibration, refinement requests and walking timing adjustments.
+`AppJourneySessionStore` bridges refined native walking spans back to the package
+session. UI loading deadlines, reveal timing, labels, overlays and Apple Maps handoff
+remain in the app. Package refinement tokens prevent old queries from changing newer
+results, and the package limits corrected-cache replacement searches to one per
+planning generation.
+
+## Ownership migration verification
+
+The migration passes 71 MobiliteitKit tests and the full iPhone 17 simulator
+suite, including app-to-package refinement feedback, snapshot mapping, manual
+selection, cancellation, loading deadlines and local graph availability.
+
+The existing Release route benchmark was compared using the same cached GTFS
+feed, bundled pedestrian graph, simulator and fixed realtime provider. Cold
+reverse address routing measured 14.00s before and 13.52s after; two warm
+forward runs averaged 9.96s before and 9.81s after. This sample shows no material
+latency regression. The earlier app's additional filtering changed its visible
+result count; the new app passes the package alternatives through unchanged.
