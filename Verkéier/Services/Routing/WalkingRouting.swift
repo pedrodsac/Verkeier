@@ -2,8 +2,8 @@ import CoreLocation
 import Foundation
 
 /// The provenance of an on-foot calculation. This remains in the domain model
-/// so callers can distinguish a routed distance from the final approximation
-/// fallback without exposing implementation details in SwiftUI.
+/// so persisted routes retain provenance. Legacy cases remain decodable;
+/// production walking calculations use only the local pedestrian graph.
 nonisolated enum WalkingEstimateSource: String, Codable, Sendable {
     case localOSM
     case mapKit
@@ -68,8 +68,9 @@ nonisolated struct OfflineWalkingRoute: Hashable, Sendable {
 }
 
 /// A walking-routing engine. Implementations are deliberately independent of
-/// the UI and may be backed by an offline graph or a fallback service.
+/// the UI and backed by the installed pedestrian graph in production.
 nonisolated protocol WalkingRouting: Sendable {
+    func checkAvailability() async throws
     func estimates(
         from origin: LocationPoint,
         to destinations: [WalkingDestination]
@@ -87,6 +88,8 @@ nonisolated protocol WalkingRouting: Sendable {
 }
 
 nonisolated extension WalkingRouting {
+    func checkAvailability() async throws {}
+
     func estimates(
         from origins: [WalkingOrigin],
         to destination: LocationPoint

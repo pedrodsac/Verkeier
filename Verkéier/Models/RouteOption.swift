@@ -1,11 +1,12 @@
 import Foundation
+import MobiliteitKit
 
 /// A presentable route alternative: a ``RoutePlan`` plus map overlay and a set
 /// of derived, UI-friendly properties.
 ///
 /// The route planner returns several options; the computed properties here
 /// (transfer count, walking distance, live-data usage, and ``status(at:)``)
-/// drive both sorting and the badges shown for each alternative.
+/// supply display values and badges from package journey evidence.
 nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     /// Stable identifier for the option.
     let id: String
@@ -14,6 +15,9 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     /// Pre-built map geometry for drawing the option, if available.
     let mapOverlay: RouteMapOverlay?
     var feasibility: RouteFeasibility? = nil
+    var journeySummary: JourneySummary? = nil
+    var statusEvidence: JourneyStatusEvidence? = nil
+    var refinementToken: JourneyRefinementToken? = nil
 
     /// The plan's transit legs (excludes walking/driving).
     var transitLegs: [RoutePlan.Leg] {
@@ -24,6 +28,7 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     /// scheduled times. Bike-only plans fall back to their first leg so the
     /// value remains useful to callers that need a transit departure time.
     var firstTransitDepartureTime: Date? {
+        if let journeySummary { return journeySummary.firstBoarding ?? journeySummary.departure }
         let transitDeparture = transitLegs.compactMap {
             $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime
         }.min()
@@ -38,21 +43,23 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     /// minute. (``firstTransitDepartureTime`` remains the "when does my bus leave"
     /// figure used for status and transit-specific presentation.)
     var departureTime: Date? {
-        plan.legs.first.flatMap {
+        if let journeySummary { return journeySummary.departure }
+        return plan.legs.first.flatMap {
             $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime
         }
     }
 
     /// Arrival time at the destination, preferring realtime over scheduled.
     var arrivalTime: Date? {
-        plan.legs.compactMap {
+        if let journeySummary { return journeySummary.arrival }
+        return plan.legs.compactMap {
             $0.realtimeArrivalTime ?? $0.scheduledArrivalTime ?? $0.arrivalTime
         }.last
     }
 
     /// Number of transfers between transit legs (always `>= 0`).
     var transferCount: Int {
-        max(0, transitLegs.count - 1)
+        journeySummary?.transferCount ?? max(0, transitLegs.count - 1)
     }
 
     /// Effective time available between each pair of consecutive transit legs.
@@ -62,6 +69,7 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     /// already includes the time spent making that transfer. `nil` means at
     /// least one transfer is missing timing data; a direct route returns `[]`.
     var transferGapDurations: [TimeInterval]? {
+        if let journeySummary { return journeySummary.transferGaps }
         let legs = transitLegs
         guard legs.count > 1 else { return [] }
 
@@ -97,7 +105,8 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
 
     /// `true` when any transit leg carries realtime information.
     var usesLiveData: Bool {
-        transitLegs.contains { leg in
+        if let statusEvidence { return statusEvidence.coverage != .scheduleOnly }
+        return transitLegs.contains { leg in
             leg.realtimeDepartureTime != nil
                 || leg.realtimeArrivalTime != nil
                 || leg.delayMinutes != nil
@@ -111,6 +120,9 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     /// provide predictions for every line. Those schedule-only legs remain useful,
     /// but the option must not imply that every connection is live-confirmed.
     var realtimeCoverage: RouteRealtimeCoverage {
+        if let statusEvidence {
+            return RouteRealtimeCoverage(rawValue: statusEvidence.coverage.rawValue) ?? .scheduleOnly
+        }
         let legs = transitLegs
         guard !legs.isEmpty else { return .scheduleOnly }
 
@@ -148,7 +160,8 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
 
     /// Total walking distance across all walking legs, in metres.
     var walkingDistanceMeters: Double {
-        plan.legs
+        if let journeySummary { return journeySummary.walkingDistance }
+        return plan.legs
             .filter { $0.transportKind == .walking }
             .compactMap(\.distanceMeters)
             .reduce(0, +)
@@ -158,6 +171,7 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     /// journey likely crosses into France, Germany, or Belgium, where ATP
     /// real-time coverage of CFL/SNCF/DB connections may be incomplete.
     var crossesBorder: Bool {
+        if let journeySummary { return journeySummary.crossesBorder }
         func insideLuxembourg(_ point: LocationPoint) -> Bool {
             (49.44 ... 50.19).contains(point.latitude) && (5.73 ... 6.54).contains(point.longitude)
         }
@@ -181,43 +195,15 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     ///
     /// - Parameter now: The reference time, usually the current date.
     func status(at now: Date) -> RouteOptionStatus {
-        if feasibility?.isInvalid == true { return .connectionMayBeMissed }
-        if transitLegs.contains(where: { $0.liveStatus == .cancelled }) {
-            return .cancelled
-        }
-
-        if !isVelohOnly,
-           let firstTransitDepartureTime,
-           firstTransitDepartureTime.addingTimeInterval(30) < now {
-            return .missed
-        }
-
-        if transitLegs.contains(where: { $0.transferWarning == "Connection miss" }) {
-            return .connectionMayBeMissed
-        }
-
-        if case .some(.atRisk) = feasibility,
-           let minimumTransferGapDuration,
-           minimumTransferGapDuration < 2 * 60 {
-            return .atRisk
-        }
-
-        if transitLegs.contains(where: { $0.transferWarning != nil }) {
-            return .atRisk
-        }
-
-        if transitLegs.contains(where: { ($0.delayMinutes ?? 0) > 0 }) {
-            return .delayed
-        }
-
-        switch realtimeCoverage {
-        case .live:
-            return .viable
-        case .partial:
-            return .partiallyLive
-        case .scheduleOnly:
-            return .scheduledOnly
-        }
+        let evidence = statusEvidence ?? JourneyStatusEvidence(
+            firstBoarding: isVelohOnly ? nil : firstTransitDepartureTime,
+            cancelled: transitLegs.contains { $0.liveStatus == .cancelled },
+            delayed: transitLegs.contains { ($0.delayMinutes ?? 0) > 0 },
+            tightTransfer: transitLegs.contains { $0.transferWarning != nil },
+            connectionMiss: transitLegs.contains { $0.transferWarning == "Connection miss" },
+            coverage: JourneyRealtimeCoverage(rawValue: realtimeCoverage.rawValue) ?? .scheduleOnly)
+        return RouteOptionStatus(rawValue: evidence.status(at: now, feasibility: feasibility).rawValue)
+            ?? .scheduledOnly
     }
 }
 
@@ -255,6 +241,11 @@ nonisolated enum RouteOptionStatus: String, Codable, Hashable {
     case missed
     /// A leg has been cancelled.
     case cancelled
+
+    /// Whether the package considers the option usable for selection.
+    var isSelectable: Bool {
+        JourneyStatus(rawValue: rawValue)?.isSelectable ?? false
+    }
 
     /// Short label suitable for a badge.
     var displayText: String {

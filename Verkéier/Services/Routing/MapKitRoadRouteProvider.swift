@@ -96,10 +96,11 @@ nonisolated struct MapKitRoadRouteProvider: RoadRouteProviding {
         to destination: LocationPoint,
         transport: RoadRouteTransport
     ) async -> RoadRoute? {
+        guard let transportType = transport.mapKitTransportType else { return nil }
         let request = MKDirections.Request()
         request.source = mapItem(for: origin)
         request.destination = mapItem(for: destination)
-        request.transportType = transport.mapKitTransportType
+        request.transportType = transportType
         request.requestsAlternateRoutes = false
 
         guard let route = try? await MKDirections(request: request).calculate().routes.first,
@@ -149,11 +150,11 @@ extension RoadRouteTransport {
         }
     }
 
-    nonisolated var mapKitTransportType: MKDirectionsTransportType {
+    nonisolated var mapKitTransportType: MKDirectionsTransportType? {
         switch self {
         case .automobile: .automobile
-        case .walking: .walking
-        case .bicycle: .walking
+        case .walking: nil
+        case .bicycle: nil
         }
     }
 }

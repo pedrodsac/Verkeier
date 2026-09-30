@@ -169,25 +169,50 @@ struct OfflineWalkingRoutingTests {
 
     @Test("Walking estimates and routes include the 25 percent real-world buffer")
     func walkingDurationIncludesCalibration() async throws {
-        let router = LocalFirstWalkingRouter(
-            datasetManager: RoutingDatasetManager(
-                rootURL: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString),
-                appBuild: 10
-            ),
-            mapKitFallback: FixedOfflineWalkingRouter(),
-            straightLineFallback: FixedOfflineWalkingRouter()
-        )
-        let origin = LocationPoint(latitude: 49.61, longitude: 6.12)
-        let destination = LocationPoint(latitude: 49.62, longitude: 6.13)
-
-        let estimates = try await router.estimates(
-            from: origin,
-            to: [.init(id: "destination", location: destination)]
-        )
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let manager = RoutingDatasetManager(rootURL: folder, appBuild: 10)
+        let state = await BundledRoutingDatasetInstaller(datasetManager: manager).installIfNeeded()
+        guard case .ready = state else { Issue.record("Bundled graph unavailable"); return }
+        let dataset = try #require(await manager.activeDataset())
+        let rawRouter = try ValhallaWalkingRouter(tileArchiveURL: dataset.tileArchiveURL,
+            datasetVersion: "calibration-\(UUID().uuidString)")
+        let router = LocalFirstWalkingRouter(datasetManager: manager)
+        let origin = LocationPoint(latitude: 49.6116, longitude: 6.1319)
+        let destination = LocationPoint(latitude: 49.6120, longitude: 6.1325)
+        let targets = [WalkingDestination(id: "destination", location: destination)]
+        let rawEstimates = try await rawRouter.estimates(from: origin, to: targets)
+        let rawRoute = try await rawRouter.route(from: origin, to: destination)
+        let estimates = try await router.estimates(from: origin, to: targets)
         let route = try await router.route(from: origin, to: destination)
 
-        #expect(estimates[0].duration == 971.25)
-        #expect(route.duration == 971.25)
+        #expect(estimates[0].duration == WalkingDurationCalibration.adjusted(rawEstimates[0].duration))
+        #expect(route.duration == WalkingDurationCalibration.adjusted(rawRoute.duration))
+        #expect(route.source == .localOSM)
+    }
+
+    @Test("Missing pedestrian graphs never fall back to an external or approximate walk")
+    func missingGraphIsUnavailable() async throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let router = LocalFirstWalkingRouter(datasetManager: RoutingDatasetManager(rootURL: folder, appBuild: 10))
+        let origin = LocationPoint(latitude: 49.6116, longitude: 6.1319)
+        let destination = LocationPoint(latitude: 49.6120, longitude: 6.1325)
+        await #expect(throws: WalkingRoutingError.datasetUnavailable) {
+            try await router.checkAvailability()
+        }
+        await #expect(throws: WalkingRoutingError.datasetUnavailable) {
+            try await router.route(from: origin, to: destination)
+        }
+        await #expect(throws: WalkingRoutingError.datasetUnavailable) {
+            try await router.estimates(from: origin, to: [.init(id: "destination", location: destination)])
+        }
+        await #expect(throws: WalkingRoutingError.datasetUnavailable) {
+            try await router.estimates(from: [.init(id: "origin", location: origin)], to: destination)
+        }
+        let roadProvider = MapKitRoadRouteProvider()
+        #expect(await roadProvider.roadRoute(from: origin, to: destination, transport: .walking) == nil)
+        #expect(await roadProvider.roadRoute(from: origin, to: destination, transport: .bicycle) == nil)
     }
 
     private func stop(id: String, latitude: Double, longitude: Double) -> Stop {

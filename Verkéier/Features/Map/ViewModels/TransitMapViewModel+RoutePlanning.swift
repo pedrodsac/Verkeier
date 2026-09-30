@@ -1,5 +1,6 @@
 import CoreLocation
 import MapKit
+import MobiliteitKit
 import Observation
 import SwiftUI
 
@@ -139,7 +140,6 @@ extension TransitMapViewModel {
 
     func updateRouteFilters(_ filters: RoutePlannerFilters) {
         routeFilters = filters
-        applyRouteOptions(preferredID: selectedRouteOptionID, announceFallback: true)
     }
 
     func setRoutePlanningTime(_ time: RoutePlanningTime) {
@@ -182,13 +182,13 @@ extension TransitMapViewModel {
 
         resetRoutePagingState()
         walkingRefinedOptionIDs = []
+        walkingRefinementScheduledIDs = []
         invalidatedRouteOptionIDs = []
-        walkingReplanGeneration = nil
-        routeSelectionWasManual = false
         let requestGeneration = startRouteRequest()
         routeLoadingPhase = .calculating
         routeErrorMessage = nil
         routeStatusMessage = nil
+        let manualSelectionID = routeSelectionWasManual ? selectedRouteOptionID : nil
         var receivedRouteUpdate = false
         var didScheduleWalkingRefinement = false
         do {
@@ -203,18 +203,17 @@ extension TransitMapViewModel {
             for try await calculation in updates {
                 guard requestGeneration == routeCalculationGeneration else { return }
                 invalidatedRouteOptionIDs.formUnion(calculation.invalidatedOptionIDs)
-                let incomingOptions = preservingWalkingRefinements(
+                let incomingOptions = calculation.isAuthoritativeSnapshot ? calculation.options : preservingWalkingRefinements(
                     in: calculation.options,
                     existing: unfilteredRouteOptions
                 ).filter { !invalidatedRouteOptionIDs.contains($0.id) }
-                let incomingSupplementalOptions = preservingWalkingRefinements(
+                let incomingSupplementalOptions = calculation.isAuthoritativeSnapshot ? calculation.supplementalOptions : preservingWalkingRefinements(
                     in: calculation.supplementalOptions,
                     existing: supplementalRouteOptions
                 ).filter { !invalidatedRouteOptionIDs.contains($0.id) }
-                let preferredID = routeSelectionWasManual
-                    ? selectedRouteOptionID
-                    : calculation.selectedOptionID
-                if !receivedRouteUpdate {
+                routeRecommendedOptionID = calculation.selectedOptionID
+                let preferredID = manualSelectionID ?? calculation.selectedOptionID
+                if !receivedRouteUpdate || calculation.isAuthoritativeSnapshot {
                     unfilteredRouteOptions = incomingOptions
                     supplementalRouteOptions = incomingSupplementalOptions
                 } else {
@@ -249,8 +248,8 @@ extension TransitMapViewModel {
                 }
                 let walkingOnly = calculation.options.count == 1
                     && calculation.options.first?.isWalkingOnly == true
-                canLoadEarlierRoutes = !walkingOnly
-                canLoadLaterRoutes = !walkingOnly
+                canLoadEarlierRoutes = calculation.canLoadEarlier ?? !walkingOnly
+                canLoadLaterRoutes = calculation.canLoadLater ?? !walkingOnly
                 receivedRouteUpdate = true
                 routeLoadingPhase = calculation.hasMoreOptions ? .calculating : .idle
             }
@@ -311,24 +310,7 @@ extension TransitMapViewModel {
             return
         }
 
-        // The all-the-way walk is not schedule-based and must never move a
-        // transit page boundary.
-        let departures = routeOptions
-            .filter { !$0.transitLegs.isEmpty }
-            .compactMap { option -> (Date, String)? in
-                option.departureTime.map { ($0, option.id) }
-            }
-        let cursor = departures.sorted {
-            if $0.0 != $1.0 { return $0.0 < $1.0 }
-            return $0.1 < $1.1
-        }
-        guard let boundary = direction == .earlier ? cursor.first : cursor.last else {
-            return
-        }
-        let page: RouteSearchPage = switch direction {
-        case .earlier: .earlierFrom(than: boundary.0, id: boundary.1, limit: 3)
-        case .later: .laterFrom(than: boundary.0, id: boundary.1, limit: 3)
-        }
+        let page: RouteSearchPage = direction == .earlier ? .earlierAdjacent : .laterAdjacent
         let requestGeneration = startRouteRequest()
         setRoutePageLoading(true, direction: direction)
         routeStatusMessage = nil
@@ -344,16 +326,22 @@ extension TransitMapViewModel {
             )
             guard requestGeneration == routeCalculationGeneration else { return }
             invalidatedRouteOptionIDs.formUnion(calculation.invalidatedOptionIDs)
-            let preferredID = selectedRouteOptionID
-            unfilteredRouteOptions = Self.mergingAccumulatedOptions(
-                existing: unfilteredRouteOptions,
-                incoming: calculation.options.filter { !invalidatedRouteOptionIDs.contains($0.id) },
-                invalidatedOptionIDs: invalidatedRouteOptionIDs
-            )
+            routeRecommendedOptionID = calculation.selectedOptionID
+            let preferredID = routeSelectionWasManual ? selectedRouteOptionID : calculation.selectedOptionID
+            if calculation.isAuthoritativeSnapshot {
+                unfilteredRouteOptions = calculation.options
+            } else {
+                unfilteredRouteOptions = Self.mergingAccumulatedOptions(
+                    existing: unfilteredRouteOptions, incoming: calculation.options,
+                    invalidatedOptionIDs: calculation.invalidatedOptionIDs)
+            }
             applyRouteOptions(preferredID: preferredID, announceFallback: true)
             // A partial page does not prove there are no more routes. Keep paging
             // available until a search actually returns an empty page.
-            setRoutePageAvailable(!calculation.options.isEmpty, direction: direction)
+            setRoutePageAvailable((direction == .earlier ? calculation.canLoadEarlier : calculation.canLoadLater)
+                ?? !calculation.options.isEmpty, direction: direction)
+            scheduleWalkingRouteRefinement(calculation, using: routeService, from: origin,
+                to: destination.location, requestGeneration: requestGeneration)
             routeLastCalculatedAt = now()
         } catch is CancellationError {
             // A newer full search or page request owns the visible result set.
@@ -361,8 +349,8 @@ extension TransitMapViewModel {
             guard requestGeneration == routeCalculationGeneration else { return }
             setRoutePageAvailable(false, direction: direction)
             routeStatusMessage = direction == .earlier
-                ? "No earlier routes were found within six hours."
-                : "No later routes were found within six hours."
+                ? "No earlier routes were found."
+                : "No later routes were found."
         } catch {
             guard requestGeneration == routeCalculationGeneration else { return }
             routeStatusMessage = direction == .earlier
@@ -492,8 +480,11 @@ extension TransitMapViewModel {
         requestGeneration: Int
     ) {
         guard let refiner = routeService as? any WalkingRouteRefining else { return }
+        let primary = calculation.options.filter { !walkingRefinementScheduledIDs.contains($0.id) }
+        let supplemental = calculation.supplementalOptions.filter { !walkingRefinementScheduledIDs.contains($0.id) }
+        walkingRefinementScheduledIDs.formUnion((primary + supplemental).map(\.id))
         scheduleWalkingRouteRefinementUpdates(
-            from: refiner.refinementEvents(in: calculation.options,
+            from: refiner.refinementEvents(in: primary,
                                            context: calculation.validationContext),
             supplemental: false,
             routeService: routeService,
@@ -501,7 +492,7 @@ extension TransitMapViewModel {
             requestGeneration: requestGeneration
         )
         scheduleWalkingRouteRefinementUpdates(
-            from: refiner.refinementEvents(in: calculation.supplementalOptions,
+            from: refiner.refinementEvents(in: supplemental,
                                            context: calculation.validationContext),
             supplemental: true,
             routeService: routeService,
@@ -528,19 +519,25 @@ extension TransitMapViewModel {
                 }
 
                 let selectedID = self.selectedRouteOptionID
+                if case let .calculation(calculation) = event {
+                    self.routeRecommendedOptionID = calculation.selectedOptionID
+                    self.unfilteredRouteOptions = calculation.options
+                    self.supplementalRouteOptions = calculation.supplementalOptions
+                    self.invalidatedRouteOptionIDs.formUnion(calculation.invalidatedOptionIDs)
+                    self.canLoadEarlierRoutes = calculation.canLoadEarlier ?? self.canLoadEarlierRoutes
+                    self.canLoadLaterRoutes = calculation.canLoadLater ?? self.canLoadLaterRoutes
+                    self.applyRouteOptions(preferredID: self.routeSelectionWasManual
+                        ? selectedID : calculation.selectedOptionID, announceFallback: true)
+                    self.scheduleWalkingRouteRefinement(calculation, using: routeService,
+                        from: origin, to: destination, requestGeneration: requestGeneration)
+                    continue
+                }
                 if case let .invalidated(id) = event {
                     self.invalidatedRouteOptionIDs.insert(id)
                     self.unfilteredRouteOptions.removeAll { $0.id == id }
                     self.supplementalRouteOptions.removeAll { $0.id == id }
                     self.walkingRefinedOptionIDs.remove(id)
                     self.applyRouteOptions(preferredID: selectedID, announceFallback: true)
-                    if !supplemental, self.walkingReplanGeneration != requestGeneration {
-                        self.walkingReplanGeneration = requestGeneration
-                        await self.replanAfterWalkingInvalidation(
-                            using: routeService, from: origin, to: destination,
-                            requestGeneration: requestGeneration
-                        )
-                    }
                     continue
                 }
                 guard case let .option(option) = event,
@@ -566,30 +563,6 @@ extension TransitMapViewModel {
                 self.applyRouteOptions(preferredID: selectedID, announceFallback: false)
             }
         }
-    }
-
-    private func replanAfterWalkingInvalidation(
-        using routeService: any RouteService,
-        from origin: LocationPoint,
-        to destination: LocationPoint,
-        requestGeneration: Int
-    ) async {
-        let time = routePlanningTime
-        let filters = routeFilters
-        guard let calculation = try? await routeService.calculateRoute(
-            from: origin, to: destination, time: time, filters: filters,
-            realtimeRefreshPolicy: .useCache, page: .initial
-        ), requestGeneration == routeCalculationGeneration else { return }
-        let incoming = calculation.options.filter { !invalidatedRouteOptionIDs.contains($0.id) }
-        unfilteredRouteOptions = Self.mergingAccumulatedOptions(
-            existing: unfilteredRouteOptions, incoming: incoming,
-            invalidatedOptionIDs: invalidatedRouteOptionIDs
-        )
-        applyRouteOptions(preferredID: selectedRouteOptionID, announceFallback: true)
-        // One corrected-cache replan is the limit for this request generation.
-        scheduleWalkingRouteRefinement(calculation, using: routeService,
-                                       from: origin, to: destination,
-                                       requestGeneration: requestGeneration)
     }
 
     static func mergingAccumulatedOptions(
@@ -620,169 +593,22 @@ extension TransitMapViewModel {
     }
 
     private func selectBestRouteOption(preferredID: String?, announceFallback: Bool) {
-        let allOptions = Self.chronologicallyOrderedOptions(routeOptions) + supplementalRouteOptions
-        guard !allOptions.isEmpty else {
-            selectedRouteOptionID = nil
-            return
+        let allOptions = routeOptions + supplementalRouteOptions
+        let previous = selectedRouteOptionID
+        selectedRouteOptionID = JourneySelectionPolicy.select(
+            preferred: preferredID.map(JourneySignature.init),
+            recommended: routeRecommendedOptionID.map(JourneySignature.init),
+            candidates: allOptions.map { option in
+                (.init(option.id), JourneyStatus(rawValue: option.status(at: now()).rawValue) ?? .scheduledOnly)
+            })?.value
+        if announceFallback, previous != nil, previous != selectedRouteOptionID {
+            routeStatusMessage = "Showing the next available route."
         }
-
-        let viableStatuses: Set<RouteOptionStatus> = [
-            .viable, .delayed, .partiallyLive, .scheduledOnly, .atRisk,
-        ]
-        // Route calculations normally deduplicate options before publication, but
-        // keep selection resilient to equivalent options arriving from a fallback
-        // or an older route-service implementation.
-        let optionsByID = Dictionary(allOptions.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
-
-        if let preferredID,
-           let preferred = optionsByID[preferredID],
-           viableStatuses.contains(preferred.status(at: now())) {
-            selectedRouteOptionID = preferredID
-            return
-        }
-
-        if let replacement = allOptions.filter({ viableStatuses.contains($0.status(at: now())) })
-            .min(by: compareRouteOptions) {
-            let changed = replacement.id != preferredID
-            selectedRouteOptionID = replacement.id
-            if announceFallback, changed, preferredID != nil {
-                routeStatusMessage = "Showing the next available route."
-            }
-            return
-        }
-
-        selectedRouteOptionID = allOptions.first?.id
     }
 
     private func applyRouteOptions(preferredID: String?, announceFallback: Bool) {
-        let filtered = filteredRouteOptions(from: unfilteredRouteOptions)
-        let didRelaxFilters = filtered.isEmpty && !unfilteredRouteOptions.isEmpty
-        routeOptions = Self.deduplicatingEquivalentRouteOptions(
-            uniqueRouteOptions(didRelaxFilters ? unfilteredRouteOptions : filtered)
-        )
+        routeOptions = unfilteredRouteOptions
         selectBestRouteOption(preferredID: preferredID, announceFallback: announceFallback)
-
-        if didRelaxFilters {
-            routeStatusMessage = "No routes matched all filters. Showing the closest alternatives."
-        } else if routeOptions.isEmpty {
-            routeStatusMessage = nil
-        } else if let preferred = routeFilters.modePreference.transportMode,
-                  !routeOptions.contains(where: { $0.transitLegs.contains { $0.mode == preferred } }) {
-            routeStatusMessage = "No routes using the preferred mode were found. Showing other routes."
-        } else {
-            routeStatusMessage = nil
-        }
-    }
-
-    static func chronologicallyOrderedOptions(_ options: [RouteOption]) -> [RouteOption] {
-        options.sorted { lhs, rhs in
-            let lhsDeparture = lhs.departureTime ?? .distantFuture
-            let rhsDeparture = rhs.departureTime ?? .distantFuture
-            if lhsDeparture != rhsDeparture { return lhsDeparture < rhsDeparture }
-            return routeOptionRanksBefore(lhs, rhs)
-        }
-    }
-
-    private static func routeOptionRanksBefore(_ lhs: RouteOption, _ rhs: RouteOption) -> Bool {
-        let lhsArrival = lhs.arrivalTime ?? .distantFuture
-        let rhsArrival = rhs.arrivalTime ?? .distantFuture
-        if lhsArrival != rhsArrival { return lhsArrival < rhsArrival }
-        if lhs.transferCount != rhs.transferCount { return lhs.transferCount < rhs.transferCount }
-        if lhs.walkingDistanceMeters != rhs.walkingDistanceMeters {
-            return lhs.walkingDistanceMeters < rhs.walkingDistanceMeters
-        }
-        return lhs.id < rhs.id
-    }
-
-    /// Keep distinct itineraries with equal or competing times, but hide a
-    /// transit journey when another usable one leaves no earlier and arrives
-    /// no later, or takes the same first and last trips with an unnecessary
-    /// intermediate ride. Compare actual times rather than rounded card minutes.
-    static func deduplicatingEquivalentRouteOptions(_ options: [RouteOption]) -> [RouteOption] {
-        var result: [RouteOption] = []
-        var indexByID: [String: Int] = [:]
-
-        for option in options {
-            if let index = indexByID[option.id] {
-                if transferTimingRanksBefore(option, result[index]) {
-                    result[index] = option
-                }
-            } else {
-                indexByID[option.id] = result.count
-                result.append(option)
-            }
-        }
-        return result.filter { candidate in
-            guard !candidate.transitLegs.isEmpty,
-                  !candidate.transitLegs.contains(where: { $0.liveStatus == .cancelled }),
-                  let departure = candidate.departureTime,
-                  let arrival = candidate.arrivalTime else { return true }
-
-            return !result.contains { other in
-                guard other.id != candidate.id,
-                      !other.transitLegs.isEmpty,
-                      other.feasibility?.isInvalid != true,
-                      !other.transitLegs.contains(where: {
-                          $0.liveStatus == .cancelled || $0.transferWarning == "Connection miss"
-                      }),
-                      let otherDeparture = other.departureTime,
-                      let otherArrival = other.arrivalTime else { return false }
-                let improvesTime = otherDeparture >= departure && otherArrival <= arrival
-                    && (otherDeparture > departure || otherArrival < arrival)
-                return improvesTime || isRedundantIntermediateRide(candidate, comparedTo: other)
-            }
-        }
-    }
-
-    private static func isRedundantIntermediateRide(
-        _ candidate: RouteOption,
-        comparedTo other: RouteOption
-    ) -> Bool {
-        let rides = candidate.transitLegs
-        let simplerRides = other.transitLegs
-        let calendar = Calendar.current
-        // Small differences in walking geometry should not preserve an extra transfer.
-        let maximumAdditionalWalkMeters = 50.0
-        guard rides.count > 2, simplerRides.count == 2,
-              let departure = candidate.departureTime,
-              let simplerDeparture = other.departureTime,
-              calendar.isDate(departure, equalTo: simplerDeparture, toGranularity: .minute),
-              let arrival = candidate.arrivalTime,
-              let simplerArrival = other.arrivalTime,
-              calendar.isDate(arrival, equalTo: simplerArrival, toGranularity: .minute),
-              candidate.walkingDistanceMeters + maximumAdditionalWalkMeters >= other.walkingDistanceMeters,
-              let firstTrip = rides.first?.tripId,
-              let lastTrip = rides.last?.tripId,
-              firstTrip == simplerRides.first?.tripId,
-              lastTrip == simplerRides.last?.tripId,
-              let boardingStop = rides.first?.originStopId,
-              let alightingStop = rides.last?.destinationStopId,
-              boardingStop == simplerRides.first?.originStopId,
-              alightingStop == simplerRides.last?.destinationStopId
-        else { return false }
-        return true
-    }
-
-    private static func transferTimingRanksBefore(_ lhs: RouteOption, _ rhs: RouteOption) -> Bool {
-        let lhsIsDirect = lhs.transferCount == 0
-        let rhsIsDirect = rhs.transferCount == 0
-        if lhsIsDirect != rhsIsDirect { return lhsIsDirect }
-
-        let lhsGaps = lhs.transferGapDurations
-        let rhsGaps = rhs.transferGapDurations
-        if (lhsGaps != nil) != (rhsGaps != nil) { return lhsGaps != nil }
-
-        if let lhsMinimum = lhsGaps?.min(), let rhsMinimum = rhsGaps?.min(),
-           lhsMinimum != rhsMinimum {
-            return lhsMinimum > rhsMinimum
-        }
-
-        if let lhsTotal = lhsGaps?.reduce(0, +), let rhsTotal = rhsGaps?.reduce(0, +),
-           lhsTotal != rhsTotal {
-            return lhsTotal > rhsTotal
-        }
-
-        return routeOptionRanksBefore(lhs, rhs)
     }
 
     private func setRoutePageLoading(_ loading: Bool, direction: RoutePagingDirection) {
@@ -799,89 +625,14 @@ extension TransitMapViewModel {
         }
     }
 
-    private func uniqueRouteOptions(_ options: [RouteOption]) -> [RouteOption] {
-        var seenIDs: Set<String> = []
-        return options.filter { seenIDs.insert($0.id).inserted }
-    }
-
-    private func filteredRouteOptions(from options: [RouteOption]) -> [RouteOption] {
-        options.filter { option in
-            if option.isWalkingOnly { return true }
-
-            if routeFilters.avoidTightTransfers,
-               [.atRisk, .connectionMayBeMissed].contains(option.status(at: now())) {
-                return false
-            }
-
-            return true
-        }
-    }
-
-    private func compareRouteOptions(_ lhs: RouteOption, _ rhs: RouteOption) -> Bool {
-        if case let .arriveBy(deadline) = routePlanningTime {
-            let lhsSevere = isSeverelyUnusable(lhs)
-            let rhsSevere = isSeverelyUnusable(rhs)
-            if lhsSevere != rhsSevere { return rhsSevere }
-
-            let lhsArrival = lhs.arrivalTime ?? .distantFuture
-            let rhsArrival = rhs.arrivalTime ?? .distantFuture
-            let lhsOnTime = lhsArrival <= deadline
-            let rhsOnTime = rhsArrival <= deadline
-            if lhsOnTime != rhsOnTime { return lhsOnTime }
-            if !lhsOnTime {
-                let lhsLateness = lhsArrival.timeIntervalSince(deadline)
-                let rhsLateness = rhsArrival.timeIntervalSince(deadline)
-                if lhsLateness != rhsLateness { return lhsLateness < rhsLateness }
-            }
-
-            let lhsDeparture = lhs.departureTime ?? .distantPast
-            let rhsDeparture = rhs.departureTime ?? .distantPast
-            if lhsDeparture != rhsDeparture { return lhsDeparture > rhsDeparture }
-        }
-
-        let preferredMode = routeFilters.modePreference.transportMode
-        let lhsModeRank = preferredMode.map { mode in
-            lhs.transitLegs.contains(where: { $0.mode == mode }) ? 0 : 1
-        } ?? 0
-        let rhsModeRank = preferredMode.map { mode in
-            rhs.transitLegs.contains(where: { $0.mode == mode }) ? 0 : 1
-        } ?? 0
-        if lhsModeRank != rhsModeRank {
-            return lhsModeRank < rhsModeRank
-        }
-
-        let anchor = routePlanningTime.date ?? now()
-        let lhsTime = max(0, (lhs.arrivalTime ?? .distantFuture).timeIntervalSince(anchor))
-        let rhsTime = max(0, (rhs.arrivalTime ?? .distantFuture).timeIntervalSince(anchor))
-        let lhsScore = lhsTime + Double(lhs.transferCount) * 300
-            + lhs.plan.legs.filter { $0.transportKind == .walking }.reduce(0) {
-                $0 + max(0, ($1.arrivalTime ?? .distantPast).timeIntervalSince($1.departureTime ?? .distantPast))
-            }
-        let rhsScore = rhsTime + Double(rhs.transferCount) * 300
-            + rhs.plan.legs.filter { $0.transportKind == .walking }.reduce(0) {
-                $0 + max(0, ($1.arrivalTime ?? .distantPast).timeIntervalSince($1.departureTime ?? .distantPast))
-            }
-        if lhsScore != rhsScore { return lhsScore < rhsScore }
-
-        let lhsArrival = lhs.arrivalTime ?? .distantFuture
-        let rhsArrival = rhs.arrivalTime ?? .distantFuture
-        if lhsArrival != rhsArrival { return lhsArrival < rhsArrival }
-
-        return lhs.id < rhs.id
-    }
-
-    private func isSeverelyUnusable(_ option: RouteOption) -> Bool {
-        option.transitLegs.contains {
-            $0.liveStatus == .cancelled || $0.transferWarning == "Connection miss"
-        }
-    }
-
     private func routeErrorMessage(for error: Error) -> String {
         guard let routingError = error as? RoutingError else {
             return "A public transport route could not be calculated."
         }
 
         switch routingError {
+        case .walkingUnavailable:
+            return "Walking routes are unavailable. Install the local pedestrian graph to plan a journey."
         case .timetableUnavailable:
             return "Public transport schedules are not available yet."
         case .noPublicTransportRoute, .noRouteFound:

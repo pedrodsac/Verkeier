@@ -1,13 +1,10 @@
 import Foundation
 import MobiliteitKit
 
-/// Chooses the active immutable OSM graph first, then MapKit, then a clearly
-/// identified straight-line approximation. A replacement graph is picked up on
+/// Uses only the active immutable OSM pedestrian graph. A replacement is picked up on
 /// the next request without ever modifying an engine's open tile archive.
 actor LocalFirstWalkingRouter: WalkingRouting {
     private let datasetManager: RoutingDatasetManager
-    private let mapKitFallback: any WalkingRouting
-    private let straightLineFallback: any WalkingRouting
     private struct RouterPool {
         let version: String
         var routers: [ValhallaWalkingRouter]
@@ -18,14 +15,12 @@ actor LocalFirstWalkingRouter: WalkingRouting {
     // instance only when another request is already using the first.
     private let maximumLocalRouters = 2
 
-    init(
-        datasetManager: RoutingDatasetManager,
-        mapKitFallback: any WalkingRouting = MapKitWalkingRouter(),
-        straightLineFallback: any WalkingRouting = StraightLineWalkingRouter()
-    ) {
+    init(datasetManager: RoutingDatasetManager) {
         self.datasetManager = datasetManager
-        self.mapKitFallback = mapKitFallback
-        self.straightLineFallback = straightLineFallback
+    }
+
+    func checkAvailability() async throws {
+        _ = try await withLocalRouter { _ in true }
     }
 
     /// Opens the installed graph before the first route tap. Graph startup is
@@ -39,27 +34,9 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         to destinations: [WalkingDestination]
     ) async throws -> [OfflineWalkingEstimate] {
         guard !destinations.isEmpty else { return [] }
-        try Task.checkCancellation()
-        do {
-            let estimates = try await withLocalRouter {
-                try await $0.estimates(from: origin, to: destinations)
-            }
-            debugLog("Walking estimates: using local OSM graph for \(destinations.count) destination(s).")
-            return calibrated(estimates)
-        } catch {
-            try Task.checkCancellation()
-            debugLog("Walking estimates: local OSM graph failed (\(error)); falling back to MapKit.")
-        }
-        do {
-            let estimates = try await mapKitFallback.estimates(from: origin, to: destinations)
-            debugLog("Walking estimates: using MapKit fallback for \(destinations.count) destination(s).")
-            return calibrated(estimates)
-        } catch {
-            try Task.checkCancellation()
-            debugLog("Walking estimates: MapKit fallback failed (\(error)); using straight-line estimate.")
-        }
-        debugLog("Walking estimates: using straight-line fallback for \(destinations.count) destination(s).")
-        return calibrated(try await straightLineFallback.estimates(from: origin, to: destinations))
+        return calibrated(try await withLocalRouter {
+            try await $0.estimates(from: origin, to: destinations)
+        })
     }
 
     func estimates(
@@ -67,46 +44,15 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         to destination: LocationPoint
     ) async throws -> [OfflineWalkingEstimate] {
         guard !origins.isEmpty else { return [] }
-        try Task.checkCancellation()
-        if let estimates = try? await withLocalRouter({
+        return calibrated(try await withLocalRouter {
             try await $0.estimates(from: origins, to: destination)
-        }) {
-            return calibrated(estimates)
-        }
-        try Task.checkCancellation()
-        if let estimates = try? await mapKitFallback.estimates(from: origins, to: destination) {
-            return calibrated(estimates)
-        }
-        try Task.checkCancellation()
-        return calibrated(try await straightLineFallback.estimates(from: origins, to: destination))
+        })
     }
 
     func route(from origin: LocationPoint, to destination: LocationPoint) async throws -> OfflineWalkingRoute {
-        try Task.checkCancellation()
-        do {
-            let route = try await withLocalRouter {
-                try await $0.route(from: origin, to: destination)
-            }
-            debugLog("Walking route: using local OSM graph.")
-            return calibrated(route)
-        } catch WalkingRoutingError.noRoute {
-            // A healthy local graph has established that this pair is not
-            // walkable; a fallback estimate must not invent a connection.
-            throw WalkingRoutingError.noRoute
-        } catch {
-            try Task.checkCancellation()
-            debugLog("Walking route: local OSM graph failed (\(error)); falling back to MapKit.")
-        }
-        do {
-            let route = try await mapKitFallback.route(from: origin, to: destination)
-            debugLog("Walking route: using MapKit fallback.")
-            return calibrated(route)
-        } catch {
-            try Task.checkCancellation()
-            debugLog("Walking route: MapKit fallback failed (\(error)); using straight-line estimate.")
-        }
-        debugLog("Walking route: using straight-line fallback.")
-        return calibrated(try await straightLineFallback.route(from: origin, to: destination))
+        calibrated(try await withLocalRouter {
+            try await $0.route(from: origin, to: destination)
+        })
     }
 
     private func withLocalRouter<Value: Sendable>(
@@ -175,15 +121,11 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         )
     }
 
-    private func debugLog(_ message: @autoclosure () -> String) {
-        #if DEBUG
-        print("[Routing] \(message())")
-        #endif
-    }
+
 }
 
 /// Bridges the walking abstraction back into the existing route-plan geometry
-/// refinement seam. Automobile and bicycle requests remain MapKit-backed.
+/// refinement seam. Automobile requests remain MapKit-backed.
 nonisolated struct LocalFirstRoadRouteProvider: RoadRouteProviding {
     private let walkingRouter: any WalkingRouting
     private let mapKitProvider: MapKitRoadRouteProvider
@@ -224,7 +166,7 @@ nonisolated struct LocalFirstRoadRouteProvider: RoadRouteProviding {
     }
 }
 
-/// Adapts the app's local-first router to MobiliteitKit's transit-search
+/// Adapts the app's local pedestrian router to MobiliteitKit's transit-search
 /// protocol. MobiliteitKit chooses its bounded set of endpoint stop candidates
 /// using geographic distance first; every candidate it evaluates here is then
 /// measured with the actual pedestrian router.

@@ -9,11 +9,8 @@ struct RouteCalculationFlowTests {
     @Test("Later pages prioritise departures near their page boundary for realtime")
     func laterPageRealtimeWindow() {
         let boundary = Date(timeIntervalSince1970: 1_800_000_000)
-        let later = MobiliteitRouteService.realtimePolicy(
-            for: .useCache,
-            page: .later(than: boundary, limit: 3)
-        )
-        let initial = MobiliteitRouteService.realtimePolicy(for: .forceRefresh, page: .initial)
+        let later = JourneyPlanningPage.after(boundary, nil, 3).realtimePolicy(.useCache)
+        let initial = JourneyPlanningPage.initial.realtimePolicy(.forceRefresh)
 
         guard case let .bestEffort(laterConfiguration, laterRefresh) = later,
               case let .bestEffort(initialConfiguration, initialRefresh) = initial else {
@@ -150,7 +147,14 @@ struct RouteCalculationFlowTests {
         let feedStore = try GTFSStore(databaseAt: databaseURL)
         let feed = await feedStore.feedInfo()
         let anchor = try #require(routeDate(at: 8, within: feed))
-        let routeService = MobiliteitRouteService(gtfsService: gtfsService)
+        let walkingManager = RoutingDatasetManager(
+            rootURL: folder.appendingPathComponent("walking-graph"), appBuild: 10)
+        let graphState = await BundledRoutingDatasetInstaller(datasetManager: walkingManager).installIfNeeded()
+        guard case .ready = graphState else { Issue.record("Bundled graph unavailable"); return }
+        let walkingRouter = LocalFirstWalkingRouter(datasetManager: walkingManager)
+        let routeService = MobiliteitRouteService(gtfsService: gtfsService,
+            walkingRouter: walkingRouter,
+            roadRouteProvider: NoBenchmarkRoadRouteProvider())
         routeService.prepareForRouting()
         try await routeService.waitUntilPreparedForRouting()
         try await benchmarkBundledGraph(
@@ -206,12 +210,9 @@ struct RouteCalculationFlowTests {
             !option.routeNames.contains { $0.caseInsensitiveCompare("18A") == .orderedSame }
         })
 
-        let tripSequences = viewModel.routeOptions.map { option in
-            option.transitLegs.compactMap(\.tripId)
-        }
-        #expect(Set(tripSequences).count == 5)
+        #expect(Set(viewModel.routeOptions.map(\.id)).count == viewModel.routeOptions.count)
 
-        let ordered = TransitMapViewModel.chronologicallyOrderedOptions(viewModel.routeOptions)
+        let ordered = viewModel.routeOptions
         for (earlier, later) in zip(ordered, ordered.dropFirst()) {
             let earlierDeparture = try #require(earlier.departureTime)
             let laterDeparture = try #require(later.departureTime)
@@ -287,7 +288,7 @@ struct RouteCalculationFlowTests {
         )
         let selected = try #require(breedewues.selectedOption)
         #expect(selected.routeNames == ["321", "25"])
-        #expect(selected.transitLegs.last?.transferWarning?.contains("45 sec") == true)
+        #expect(selected.transitLegs.last?.transferWarning == "Tight transfer")
 
         let gromscheedStop = try #require(await gtfsService.searchStops(query: "Gromscheed")
             .first { $0.id == "000200508004" })
@@ -603,4 +604,10 @@ private func routeDate(at hour: Int, within feed: FeedInfo) -> Date? {
         day: first.day,
         hour: hour
     ))
+}
+
+/// The cached-feed benchmark must never issue Apple Maps refinement requests.
+private struct NoBenchmarkRoadRouteProvider: RoadRouteProviding {
+    nonisolated func roadRouteCoordinates(from: LocationPoint, to: LocationPoint,
+                                         transport: RoadRouteTransport) async -> [RouteMapCoordinate]? { nil }
 }

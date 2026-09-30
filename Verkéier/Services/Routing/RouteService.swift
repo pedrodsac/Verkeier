@@ -1,9 +1,10 @@
 import Foundation
+import MobiliteitKit
 
 /// Computes journeys between two places and hands off to Apple Maps.
 ///
-/// `MapKitRouteService` is the current implementation and delegates route
-/// calculation to Apple Maps. Inject an implementation via the environment.
+/// Production transit calculation delegates to MobiliteitKit. Inject services
+/// through the environment to supply fixtures or unavailable implementations.
 protocol RouteService: Sendable {
     /// Computes route alternatives between two points.
     /// - Parameters:
@@ -55,6 +56,7 @@ protocol WalkingRouteRefining: Sendable {
 nonisolated enum WalkingRefinementEvent: Sendable {
     case option(RouteOption)
     case invalidated(String)
+    case calculation(RouteCalculation)
 }
 
 extension WalkingRouteRefining {
@@ -132,6 +134,9 @@ extension RouteService {
                         )
                         update.invalidatedOptionIDs = calculation.invalidatedOptionIDs
                         update.validationContext = calculation.validationContext
+                        update.isAuthoritativeSnapshot = calculation.isAuthoritativeSnapshot
+                        update.canLoadEarlier = calculation.canLoadEarlier
+                        update.canLoadLater = calculation.canLoadLater
                         update.hasMoreOptions = count < calculation.options.count
                         if count == calculation.options.count {
                             update.supplementalOptions = calculation.supplementalOptions
@@ -199,7 +204,6 @@ extension RouteService {
 }
 
 /// Controls the freshness requested by a route calculation.
-/// MapKit-only routing may ignore this policy.
 nonisolated enum RouteRealtimeRefreshPolicy: Hashable, Sendable {
     /// Prefer the fastest available scheduled result.
     case scheduleOnly
@@ -213,6 +217,8 @@ enum RoutingError: Error, Equatable {
     case noRouteFound
     /// The offline timetable needed for planning was unavailable.
     case timetableUnavailable
+    /// The local pedestrian graph needed for walking was unavailable.
+    case walkingUnavailable
     /// A route exists but none of it uses public transport.
     case noPublicTransportRoute
     /// The route provider did not resolve within the UI's bounded wait.
@@ -223,28 +229,10 @@ enum RoutingError: Error, Equatable {
 /// Page boundaries use door-to-door departure and, when available, stable ID.
 nonisolated enum RouteSearchPage: Hashable, Sendable {
     case initial
+    case earlierAdjacent, laterAdjacent
     case earlier(than: Date, limit: Int)
     case later(than: Date, limit: Int)
     case earlierFrom(than: Date, id: String, limit: Int)
     case laterFrom(than: Date, id: String, limit: Int)
 
-    var resultLimit: Int {
-        switch self {
-        case .initial:
-            5
-        case let .earlier(_, limit), let .later(_, limit),
-             let .earlierFrom(_, _, limit), let .laterFrom(_, _, limit):
-            max(0, limit)
-        }
-    }
-
-    var boundary: Date? {
-        switch self {
-        case .initial:
-            nil
-        case let .earlier(boundary, _), let .later(boundary, _),
-             let .earlierFrom(boundary, _, _), let .laterFrom(boundary, _, _):
-            boundary
-        }
-    }
 }

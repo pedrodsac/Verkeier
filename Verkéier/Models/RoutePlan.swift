@@ -72,6 +72,7 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
         var requiredTransferSeconds: Int? = nil
         /// Whether walking time came from an actual pedestrian route or an estimate.
         var walkingEvidence: RouteWalkingEvidence? = nil
+        var nativeWalkingRange: Range<Int>? = nil
 
         init(
             id: String,
