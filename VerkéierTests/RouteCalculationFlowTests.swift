@@ -55,29 +55,48 @@ struct RouteCalculationFlowTests {
         #expect(MobiliteitRouteService.journeyEndpoint(for: point) == .stop(id: "hamilius-stop"))
     }
 
-    @Test("The route sheet requests and displays one live calculation")
-    func routeSheetUsesOneLiveCalculation() async {
+    @Test("Five route options are revealed from one live calculation")
+    func routeSheetRevealsFiveOptionsFromOneCalculation() async throws {
         let anchor = Date.now
         let origin = LocationPoint(name: "Origin", latitude: 49.61, longitude: 6.12)
         let destination = LocationPoint(name: "Destination", latitude: 49.62, longitude: 6.13)
-        let delayed = testOption(
-            id: "delayed", origin: origin, destination: destination,
-            departure: anchor.addingTimeInterval(600),
-            arrival: anchor.addingTimeInterval(1_500),
-            scheduledDeparture: anchor.addingTimeInterval(-300)
-        )
+        let options = (0..<5).map { index in
+            let departure = anchor.addingTimeInterval(Double(300 + index * 600))
+            return testOption(
+                id: "live-\(index)", origin: origin, destination: destination,
+                departure: departure,
+                arrival: departure.addingTimeInterval(900),
+                scheduledDeparture: departure.addingTimeInterval(-60)
+            )
+        }
+        let streamRecorder = RouteRequestRecorder()
+        let streamService = RecordingLiveRouteService(options: options, recorder: streamRecorder)
+        var publishedCounts: [Int] = []
+        var moreOptionsFlags: [Bool] = []
+        for try await update in streamService.routeCalculationUpdates(
+            from: origin, to: destination, time: .leaveNow,
+            filters: RoutePlannerFilters(), realtimeRefreshPolicy: .forceRefresh,
+            page: .initial
+        ) {
+            publishedCounts.append(update.options.count)
+            moreOptionsFlags.append(update.hasMoreOptions)
+        }
+        #expect(publishedCounts == [1, 2, 3, 4, 5])
+        #expect(moreOptionsFlags == [true, true, true, true, false])
+        #expect(await streamRecorder.policies == [.forceRefresh])
+
         let viewModel = TransitMapViewModel(now: { anchor })
         viewModel.routeOrigin = RoutePlace(title: "Origin", location: origin, source: .search)
         viewModel.routeDestination = RoutePlace(title: "Destination", location: destination, source: .search)
         let recorder = RouteRequestRecorder()
 
         await viewModel.calculateRoute(
-            using: RecordingLiveRouteService(option: delayed, recorder: recorder), from: nil
+            using: RecordingLiveRouteService(options: options, recorder: recorder), from: nil
         )
 
         #expect(await recorder.policies == [.forceRefresh])
-        #expect(viewModel.routeOptions.map(\.id) == [delayed.id])
-        #expect(viewModel.selectedRouteOptionID == delayed.id)
+        #expect(viewModel.routeOptions.map(\.id) == options.map(\.id))
+        #expect(viewModel.selectedRouteOptionID == options.first?.id)
         #expect(viewModel.routeErrorMessage == nil)
     }
 
@@ -236,7 +255,7 @@ struct RouteCalculationFlowTests {
             calculationCount += 1
             #expect(!update.options.isEmpty)
         }
-        #expect(calculationCount == 1)
+        #expect(calculationCount == 5)
 
         printRouteResults(
             label: "18A Gromscheed → Kirchberg, Konrad Adenauer",
@@ -519,7 +538,7 @@ private actor RouteRequestRecorder {
 }
 
 private struct RecordingLiveRouteService: RouteService {
-    let option: RouteOption
+    let options: [RouteOption]
     let recorder: RouteRequestRecorder
 
     func calculateRoute(
@@ -528,7 +547,7 @@ private struct RecordingLiveRouteService: RouteService {
         page _: RouteSearchPage
     ) async throws -> RouteCalculation {
         await recorder.record(realtimeRefreshPolicy)
-        return RouteCalculation(options: [option], selectedOptionID: option.id)
+        return RouteCalculation(options: options, selectedOptionID: options.first?.id)
     }
 
     @MainActor func openInAppleMaps(from _: LocationPoint, to _: LocationPoint) {}

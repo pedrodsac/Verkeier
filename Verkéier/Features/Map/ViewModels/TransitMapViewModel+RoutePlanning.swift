@@ -230,7 +230,7 @@ extension TransitMapViewModel {
                     )
                 }
                 applyRouteOptions(preferredID: preferredID, announceFallback: false)
-                if !didScheduleWalkingRefinement {
+                if !didScheduleWalkingRefinement, !calculation.hasMoreOptions {
                     didScheduleWalkingRefinement = true
                     scheduleWalkingRouteRefinement(
                         calculation,
@@ -252,7 +252,7 @@ extension TransitMapViewModel {
                 canLoadEarlierRoutes = !walkingOnly
                 canLoadLaterRoutes = !walkingOnly
                 receivedRouteUpdate = true
-                routeLoadingPhase = .idle
+                routeLoadingPhase = calculation.hasMoreOptions ? .calculating : .idle
             }
             guard receivedRouteUpdate else { throw RoutingError.noRouteFound }
         } catch {
