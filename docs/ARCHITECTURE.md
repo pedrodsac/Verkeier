@@ -40,7 +40,7 @@ downloads and validates it, then installs an on-device database. The app does
 not bundle a production GTFS archive. The last usable feed remains available
 when an update fails. `MobiliteitRouteService` routes over that local feed and
 applies verified realtime observations at query time. Walking geometry uses a
-local graph when installed and MapKit where needed.
+local pedestrian graph exclusively. Missing graphs report walking as unavailable.
 
 The app calls the public AVL XML feed and JCDecaux static station feed
 directly. Dynamic bike-share availability goes through the relay when
@@ -61,3 +61,18 @@ Current protocol signatures and implementations are summarized in
 - Make loading, empty, error, stale, and offline states visible to users.
 - Never ship provider credentials or fake production data in the app bundle.
 - Keep attribution and the independent-app notice visible.
+
+## Route calculation ownership
+
+MobiliteitKit owns transit search, prepared-router caching, request/page policy,
+accumulated journey results, ranking and deduplication, transit polylines, feasibility,
+route status and replacement planning after walking corrections. Verkéier renders
+`JourneyPlanningResult` snapshots through `MobiliteitRouteService`; it preserves a
+selectable manual choice or uses the package recommendation.
+
+Verkéier retains GTFS installation, pedestrian routing exclusively with the local Valhalla graph, walking calibration, refinement requests and walking timing adjustments.
+`AppJourneySessionStore` bridges refined native walking spans back to the package
+session. UI loading deadlines, reveal timing, labels, overlays and Apple Maps handoff
+remain in the app. Package refinement tokens prevent old queries from changing newer
+results, and the package limits corrected-cache replacement searches to one per
+planning generation.
