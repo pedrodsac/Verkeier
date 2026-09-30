@@ -25,7 +25,7 @@ protocol RouteService: Sendable {
     ) async throws -> RouteCalculation
 
     /// Publishes route options after one calculation. The default implementation
-    /// reveals the completed result one option at a time.
+    /// publishes the complete result immediately.
     nonisolated func routeCalculationUpdates(
         from: LocationPoint,
         to: LocationPoint,
@@ -121,31 +121,8 @@ extension RouteService {
                         realtimeRefreshPolicy: realtimeRefreshPolicy,
                         page: page
                     )
-                    guard calculation.options.count > 1 else {
-                        continuation.yield(calculation)
-                        continuation.finish()
-                        return
-                    }
-                    for count in 1...calculation.options.count {
-                        try Task.checkCancellation()
-                        var update = RouteCalculation(
-                            options: Array(calculation.options.prefix(count)),
-                            selectedOptionID: calculation.selectedOptionID
-                        )
-                        update.invalidatedOptionIDs = calculation.invalidatedOptionIDs
-                        update.validationContext = calculation.validationContext
-                        update.isAuthoritativeSnapshot = calculation.isAuthoritativeSnapshot
-                        update.canLoadEarlier = calculation.canLoadEarlier
-                        update.canLoadLater = calculation.canLoadLater
-                        update.hasMoreOptions = count < calculation.options.count
-                        if count == calculation.options.count {
-                            update.supplementalOptions = calculation.supplementalOptions
-                        }
-                        continuation.yield(update)
-                        if count < calculation.options.count {
-                            try await Task.sleep(for: .milliseconds(100))
-                        }
-                    }
+                    try Task.checkCancellation()
+                    continuation.yield(calculation)
                     continuation.finish()
                 } catch {
                     continuation.finish(throwing: error)

@@ -52,7 +52,7 @@ struct RouteCalculationFlowTests {
         #expect(MobiliteitRouteService.journeyEndpoint(for: point) == .stop(id: "hamilius-stop"))
     }
 
-    @Test("Five route options are revealed from one live calculation")
+    @Test("Five route options publish together from one live calculation")
     func routeSheetRevealsFiveOptionsFromOneCalculation() async throws {
         let anchor = Date.now
         let origin = LocationPoint(name: "Origin", latitude: 49.61, longitude: 6.12)
@@ -78,8 +78,8 @@ struct RouteCalculationFlowTests {
             publishedCounts.append(update.options.count)
             moreOptionsFlags.append(update.hasMoreOptions)
         }
-        #expect(publishedCounts == [1, 2, 3, 4, 5])
-        #expect(moreOptionsFlags == [true, true, true, true, false])
+        #expect(publishedCounts == [5])
+        #expect(moreOptionsFlags == [false])
         #expect(await streamRecorder.policies == [.forceRefresh])
 
         let viewModel = TransitMapViewModel(now: { anchor })

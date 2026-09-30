@@ -33,17 +33,25 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         time: RoutePlanningTime, filters: RoutePlannerFilters,
         realtimeRefreshPolicy: RouteRealtimeRefreshPolicy, page: RouteSearchPage
     ) async throws -> RouteCalculation {
+        let started = ContinuousClock.now
         let databaseURL = try await readyDatabaseURL()
+        let readiness = RoutingDiagnostics.elapsed(since: started)
+        let graphStarted = ContinuousClock.now
         await graphPreparation?.value
         try Task.checkCancellation()
         do {
             try await walkingRouter.checkAvailability()
+            let graphMilliseconds = RoutingDiagnostics.elapsed(since: graphStarted)
             let result = try await sessions.calculate(databaseURL: databaseURL,
                 request: .init(origin: Self.journeyEndpoint(for: from),
                     destination: Self.journeyEndpoint(for: to), time: time.packageTime,
-                    preferences: filters.packagePreferences),
+                    preferences: filters.packagePreferences, realtimeAcquisitionBudgetMilliseconds: 2_000),
                 page: page.packagePage, refresh: realtimeRefreshPolicy.packagePolicy)
-            return calculation(from: result, origin: from, destination: to)
+            var calculation = calculation(from: result, origin: from, destination: to)
+            calculation.diagnostics?.milliseconds[.timetableReadiness] = readiness
+            calculation.diagnostics?.milliseconds[.graphPreparation] = graphMilliseconds
+            calculation.diagnostics?.totalMilliseconds = RoutingDiagnostics.elapsed(since: started)
+            return calculation
         } catch is CancellationError { throw CancellationError() }
         catch JourneyPlanningError.supersededRequest { throw CancellationError() }
         catch WalkingRoutingError.datasetUnavailable { throw RoutingError.walkingUnavailable }
@@ -68,6 +76,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
 
     nonisolated func calculation(from result: JourneyPlanningResult,
         origin: LocationPoint, destination: LocationPoint) -> RouteCalculation {
+        let started = ContinuousClock.now
         var calculation = RouteCalculation(options: result.journeys.map {
             option(from: $0, origin: origin, destination: destination, result: result)
         }, selectedOptionID: result.recommendedJourneyID?.value)
@@ -76,6 +85,8 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         calculation.isAuthoritativeSnapshot = true
         calculation.canLoadEarlier = result.hasEarlier
         calculation.canLoadLater = result.hasLater
+        calculation.diagnostics = result.diagnostics
+        calculation.diagnostics?.record(.adapterMapping, since: started)
         return calculation
     }
 

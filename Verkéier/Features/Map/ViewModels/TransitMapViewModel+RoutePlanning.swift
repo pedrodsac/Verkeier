@@ -185,6 +185,9 @@ extension TransitMapViewModel {
         walkingRefinementScheduledIDs = []
         invalidatedRouteOptionIDs = []
         let requestGeneration = startRouteRequest()
+        routeOperationStarted = ContinuousClock.now
+        routeDiagnostics = nil
+        routePublishedAt = nil
         routeLoadingPhase = .calculating
         routeErrorMessage = nil
         routeStatusMessage = nil
@@ -252,6 +255,9 @@ extension TransitMapViewModel {
                 canLoadLaterRoutes = calculation.canLoadLater ?? !walkingOnly
                 receivedRouteUpdate = true
                 routeLoadingPhase = calculation.hasMoreOptions ? .calculating : .idle
+                if !calculation.hasMoreOptions {
+                    recordRoutePublication(calculation)
+                }
             }
             guard receivedRouteUpdate else { throw RoutingError.noRouteFound }
         } catch {
@@ -312,6 +318,9 @@ extension TransitMapViewModel {
 
         let page: RouteSearchPage = direction == .earlier ? .earlierAdjacent : .laterAdjacent
         let requestGeneration = startRouteRequest()
+        routeOperationStarted = ContinuousClock.now
+        routeDiagnostics = nil
+        routePublishedAt = nil
         setRoutePageLoading(true, direction: direction)
         routeStatusMessage = nil
 
@@ -343,6 +352,7 @@ extension TransitMapViewModel {
             scheduleWalkingRouteRefinement(calculation, using: routeService, from: origin,
                 to: destination.location, requestGeneration: requestGeneration)
             routeLastCalculatedAt = now()
+            recordRoutePublication(calculation)
         } catch is CancellationError {
             // A newer full search or page request owns the visible result set.
         } catch let error as RoutingError where error == .noPublicTransportRoute {

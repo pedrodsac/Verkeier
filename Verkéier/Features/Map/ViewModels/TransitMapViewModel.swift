@@ -1,6 +1,7 @@
 import CoreLocation
 import MapKit
 import Observation
+import MobiliteitKit
 import SwiftUI
 
 @Observable
@@ -61,6 +62,9 @@ final class TransitMapViewModel {
     var recentTrips: [RouteCommutePreset] = []
     var commutePresets: [RouteCommutePreset] = []
     var routeOptions: [RouteOption] = []
+    var routeDiagnostics: RoutingDiagnostics?
+    @ObservationIgnored var routeOperationStarted: ContinuousClock.Instant?
+    @ObservationIgnored var routePublishedAt: ContinuousClock.Instant?
     var supplementalRouteOptions: [RouteOption] = []
     var isLoadingEarlierRoutes = false
     var isLoadingLaterRoutes = false

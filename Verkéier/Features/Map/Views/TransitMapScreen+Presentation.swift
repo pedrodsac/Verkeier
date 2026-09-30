@@ -1,3 +1,4 @@
+import MobiliteitKit
 import AsyncAlgorithms
 import CoreLocation
 import CoreSpotlight
@@ -109,7 +110,9 @@ extension TransitMapScreen {
                 loadingPhase: viewModel.routeLoadingPhase,
                 errorMessage: viewModel.routeErrorMessage,
                 statusMessage: viewModel.routeStatusMessage,
-                lastCalculatedAt: viewModel.routeLastCalculatedAt
+                lastCalculatedAt: viewModel.routeLastCalculatedAt,
+                diagnosticRequestID: viewModel.routeDiagnostics?.requestID,
+                resultsRendered: viewModel.recordRouteResultsRendered
             ),
             lineDetail: LineDetailPresentationModel(
                 route: viewModel.selectedLineDetailRoute,

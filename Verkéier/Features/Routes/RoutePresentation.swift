@@ -49,6 +49,8 @@ struct RoutePresentationModel {
     let errorMessage: String?
     let statusMessage: String?
     var lastCalculatedAt: Date? = nil
+    var diagnosticRequestID: UUID? = nil
+    var resultsRendered: (UUID) -> Void = { _ in }
 
     var selectedRouteOption: RouteOption? {
         let allOptions = routeOptions + supplementalRouteOptions
