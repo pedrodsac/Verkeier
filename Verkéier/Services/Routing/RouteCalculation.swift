@@ -14,6 +14,8 @@ struct RouteCalculation: Sendable {
     /// Scheduled option identifiers that realtime explicitly proved unusable.
     /// Presentation may retain any other scheduled option when live coverage is incomplete.
     var invalidatedOptionIDs: Set<String> = []
+    /// More alternatives from this same calculation will be published shortly.
+    var hasMoreOptions = false
     /// Immutable request constraint used by walking refinement and validation.
     var validationContext: RouteValidationContext? = nil
     /// Identifier of the selected option; falls back to the first option.

@@ -23,8 +23,8 @@ protocol RouteService: Sendable {
         page: RouteSearchPage
     ) async throws -> RouteCalculation
 
-    /// Publishes the completed route calculation. The default implementation
-    /// emits one result after ``calculateRoute`` finishes.
+    /// Publishes route options after one calculation. The default implementation
+    /// reveals the completed result one option at a time.
     nonisolated func routeCalculationUpdates(
         from: LocationPoint,
         to: LocationPoint,
@@ -111,14 +111,36 @@ extension RouteService {
         AsyncThrowingStream { continuation in
             let task = Task {
                 do {
-                    continuation.yield(try await calculateRoute(
+                    let calculation = try await calculateRoute(
                         from: from,
                         to: to,
                         time: time,
                         filters: filters,
                         realtimeRefreshPolicy: realtimeRefreshPolicy,
                         page: page
-                    ))
+                    )
+                    guard calculation.options.count > 1 else {
+                        continuation.yield(calculation)
+                        continuation.finish()
+                        return
+                    }
+                    for count in 1...calculation.options.count {
+                        try Task.checkCancellation()
+                        var update = RouteCalculation(
+                            options: Array(calculation.options.prefix(count)),
+                            selectedOptionID: calculation.selectedOptionID
+                        )
+                        update.invalidatedOptionIDs = calculation.invalidatedOptionIDs
+                        update.validationContext = calculation.validationContext
+                        update.hasMoreOptions = count < calculation.options.count
+                        if count == calculation.options.count {
+                            update.supplementalOptions = calculation.supplementalOptions
+                        }
+                        continuation.yield(update)
+                        if count < calculation.options.count {
+                            try await Task.sleep(for: .milliseconds(100))
+                        }
+                    }
                     continuation.finish()
                 } catch {
                     continuation.finish(throwing: error)
