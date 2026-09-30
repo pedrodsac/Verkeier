@@ -73,15 +73,33 @@ MobiliteitKit’s `JourneyPlanner` keeps a `TransitRouter` and
 `HafasRealtimeRoutingProvider` paired to the active GTFS database generation.
 When that generation changes, both are rebuilt. A new calculation or explicit
 refresh bypasses the 60-second HAFAS board cache; earlier/later paging reuses
-covered snapshots. Live acquisition is capped at 32 concurrent board
-requests and a four-second deadline within the route calculation's overall
-15-second UI deadline. Failure, timeout, missing proxy configuration, and
+covered snapshots. Live acquisition uses at most four concurrent requests,
+four discovery waves, 24 stop targets, and a shared four-second deadline within
+the route calculation's overall 15-second UI deadline. Each target covers up to
+90 minutes in 30-minute slices (50 journeys per slice, at most eight requests
+per stop). Full slices are split; exhausted intervals remain partial. Boards
+start at the effective query time; a separate two-hour GTFS lookback matches
+scheduled departures delayed into that window. Failure, timeout, missing proxy configuration, and
 ambiguous HAFAS-to-GTFS matches all preserve valid schedule-only results.
 
 Realtime data is applied before RAPTOR selects a journey. Walking access,
 boardability, transfers, dominance, arrival times, and route ordering therefore
-use effective times. Reported boarding predictions remain observed, while a
-known delay propagated to later vehicle stops is marked estimated.
+use effective times. ATP passlists provide independent arrival and departure
+predictions for each matched GTFS stop sequence, preserving delay recovery and
+repeated stops. Reported predictions remain observed; missing predictions can
+inherit an estimate forward for up to 30 minutes from a report (delay limited
+to two hours). Earlier unobserved stops remain scheduled. Per-stop restrictions
+prevent boarding or alighting without cancelling the whole vehicle.
+
+Discovery includes reachable transfer departures absent from static winners,
+merges overlapping observations, then performs one final RAPTOR scan. The
+optimistic discovery envelope advances one ride per wave, avoiding repeated
+scans of all earlier waves. Matching
+rejects ambiguous or non-monotonic active updates. The shared cache coalesces
+requests and allows independent cancellation; explicit refresh bypasses both
+cache layers. Complete interval containment is required for provider reuse.
+Coverage beyond the acquisition budget stays partial. Metrics include actual
+HTTP requests, cache hits, bytes, incomplete boards, and reported event counts.
 
 `BikeShareService` provides vel’OH! static station data and on-demand dynamic
 availability. The public-transport routing engine merges direct bike journeys
@@ -154,3 +172,53 @@ reverse address routing measured 14.00s before and 13.52s after; two warm
 forward runs averaged 9.96s before and 9.81s after. This sample shows no material
 latency regression. The earlier app's additional filtering changed its visible
 result count; the new app passes the package alternatives through unchanged.
+
+## Live passlist routing verification
+
+The passlist implementation passes 87 MobiliteitKit tests, including delayed
+past departures, independently recovering arrivals/departures, transfers found
+in later acquisition waves, skipped stops, repeated stop occurrences,
+after-midnight service dates, DST transitions, ambiguous wall-clock rejection,
+truncated boards, refresh, coalescing, cancellation and schedule-only fallback.
+The app integration test verifies that reported downstream arrivals remain
+observed through the presentation adapter. The relay passes its four offline
+contract tests and TypeScript checks. Its deployed `passlist-v2` contract was
+verified against ATP with a one-journey request returning one departure and
+21 passlist stops; legacy `FULL` succeeds through translation and invalid modes
+return 400.
+
+`LiveRoutingBenchmark` is an opt-in Release scheme using the installed GTFS
+feed and the recorded September 30 Esch departure fixture in
+`VerkéierTests/Fixtures/`. It confirms that GTFS trip `24284828`, scheduled
+before the 18:35 query anchor, remains selectable using its reported delay.
+Run with code coverage disabled:
+
+```sh
+xcodebuild -project Verkeier.xcodeproj -scheme LiveRoutingBenchmark \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
+  -enableCodeCoverage NO test \
+  -only-testing:VerkeierTests/RecordedLiveRoutingBenchmarkTests
+```
+
+The simulator's installed feed must contain September 30, 2026 and that trip.
+For a device run, replace the destination with its device ID and install a
+compatible feed first. Normal app tests leave this benchmark disabled.
+
+The September 30 iPhone 17 simulator sample measured:
+
+| Run | Total engine time | Live acquisition | HTTP requests | Board cache hits |
+|---|---:|---:|---:|---:|
+| Cold, including snapshot | 14.48s | 0.99s | 72 | 0 |
+| Warm | 14.64s | 0.89s | 0 | 24 |
+| Explicit refresh | 13.82s | 0.89s | 72 | 0 |
+| Schedule-only comparison | 13.11s | 0s | 0 | 0 |
+
+Each live run used 24 stop targets with three 30-minute slices each. Coverage
+was correctly partial. Carrying the discovery envelope forward reduced four
+waves from ten reachability scans to four; the preceding replay's warm
+acquisition took 2.17s. These are individual simulator samples with replayed
+ATP data, not mobile-network or physical-device latency measurements. RAPTOR's
+24-hour profile still accounts for roughly 13 seconds on this route; this work
+reduces live acquisition cost without claiming instant full-route results.
+Device execution was deferred at the user's request after Xcode reported the
+connected iPhone locked.

@@ -145,7 +145,7 @@ struct MobiliteitLiveTransitService: LiveTransitService {
                 products: filter.products,
                 operators: filter.operators,
                 platforms: filter.platforms,
-                realtimeMode: filter.realtimeMode == .full ? .full : .off,
+                realtimeMode: filter.realtimeMode == .full ? .serverDefault : .off,
                 includePasslist: true
             )
         )

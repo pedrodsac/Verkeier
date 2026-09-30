@@ -16,6 +16,17 @@ Main endpoints:
 - `location.nearbystops`
 - `departureBoard`
 
+The verified board contract uses `rtMode=SERVER_DEFAULT` (or `OFF`) and
+`passlist=1`, with explicit `date`, `time`, `duration`, and `maxJourneys`.
+ATP rejects `FULL`; the relay translates that legacy value for older app
+versions and forwards the supported parameters. Per-stop `rtArrDate/Time`,
+`rtDepDate/Time`, cancellation, `rtBoarding` and `rtAlighting` are optional.
+Missing predictions are never labelled observed. ATP's wall-clock timestamps
+in the repeated autumn DST hour are ignored unless a verified offset contract
+can identify the intended instant. Bounded boards can truncate;
+the routing provider subdivides full intervals and retains partial coverage
+when its request or time budget expires.
+
 Implementation rules:
 
 - API key / `accessId` must not be hardcoded or shipped in the app bundle
