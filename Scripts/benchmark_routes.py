@@ -15,9 +15,10 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--device', help='Simulator UDID; defaults to the available iPhone 17')
 parser.add_argument('--app', required=True, type=Path)
 parser.add_argument('--output', required=True, type=Path)
-parser.add_argument('--scenarios', nargs='+', default=['depart', 'reverse', 'coordinates', 'arrive', 'exact', 'rural', 'paging', 'refresh'])
+parser.add_argument('--scenarios', nargs='+', default=['depart', 'reverse', 'coordinates', 'arrive', 'exact', 'rural', 'paging', 'refresh', 'recorded-live', 'deadline-arrive'])
 parser.add_argument('--warm', type=int, default=20)
 parser.add_argument('--cold', type=int, default=10)
+parser.add_argument('--p95-limit-ms', type=float, default=5000, help='Gate threshold; use 0 for a separate Debug audit')
 args = parser.parse_args()
 if args.device is None:
     inventory = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'devices', '--json']))
@@ -93,3 +94,7 @@ for scenario in args.scenarios:
                 for counter in sorted(set().union(*(v['counters'] for v in values)))}})
 (args.output / 'summary.json').write_text(json.dumps(summary, indent=2))
 print(json.dumps(summary, indent=2))
+failures = [row for row in summary if args.p95_limit_ms > 0 and row['p95_ms'] > args.p95_limit_ms]
+if failures:
+    raise RuntimeError('Rendered p95 exceeded the gate: ' + ', '.join(
+        f'{row["scenario"]} {row["process"]} {row["p95_ms"]:.0f} ms' for row in failures))

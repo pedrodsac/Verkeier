@@ -96,7 +96,9 @@ final class SimulatorRouteBenchmark {
         let formatter = ISO8601DateFormatter()
         var time: RoutePlanningTime = .departAt(formatter.date(from: "2026-09-30T08:00:00+02:00")!)
         if scenario == "reverse" { swap(&from, &to) }
-        if scenario == "arrive" || scenario == "live-arrive" { time = .arriveBy(formatter.date(from: "2026-09-30T09:00:00+02:00")!) }
+        if scenario == "arrive" || scenario == "live-arrive" || scenario == "deadline-arrive" {
+            time = .arriveBy(formatter.date(from: "2026-09-30T09:00:00+02:00")!)
+        }
         if scenario == "exact" || scenario == "refresh" || scenario == "paging" || scenario == "recorded-live" {
             from = .init(name: "Esch", latitude: 49.4959, longitude: 5.9805, transitStopID: "000220402034")
             to = .init(name: "Destination", latitude: 49.611, longitude: 6.13, transitStopID: "000400000095")
@@ -142,6 +144,9 @@ private nonisolated final class BenchmarkBoardProtocol: URLProtocol {
     override class func canInit(with request: URLRequest) -> Bool { request.url?.host() == "recorded-atp.invalid" }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
     override func startLoading() {
+        // A silent fixture exercises the entire acquisition budget; URLSession
+        // cancellation at the deadline calls stopLoading and ends the request.
+        if ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_SCENARIO"] == "deadline-arrive" { return }
         do {
             let stop = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems?
                 .first { $0.name == "id" }?.value
