@@ -1,0 +1,28 @@
+{
+  "packageRevision": "5649aeb2f611968821699d8c18da6a521d8f37c3",
+  "appBenchmarkCommit": "53858b6",
+  "configuration": "Release",
+  "device": "iPhone 17",
+  "measurementDates": [
+    "2026-09-30",
+    "2026-10-01"
+  ],
+  "simulatorOS": "iOS 27",
+  "host": "M4 MacBook Air, 10 cores, 16 GB RAM",
+  "codeCoverage": false,
+  "debuggerAttached": false,
+  "concurrentCPUProfiling": false,
+  "coldDefinition": "New app process; datasets installed; OS file cache may be warm",
+  "timedSamples": 300,
+  "primingSamples": 10,
+  "priorLiveNetworkPackageRevision": "5aaebf5e3b511cb38e042ed8a9981c6de8bc6101",
+  "priorLiveNetworkTimedSamples": 60,
+  "fixture": "Verk\u00e9ierTests/Fixtures/esch-delayed-passlist.json",
+  "gate": "Production view model operation start through window-attached RouteView display callbacks with loading finished",
+  "percentile": "Nearest rank",
+  "memory": "ru_maxrss bytes, process high-water mark",
+  "sourceDirectories": [
+    "/tmp/VerkeierRouteMatrixFinal-20261001",
+    "/tmp/VerkeierRouteFullBudgetFinal-20261001"
+  ]
+}
