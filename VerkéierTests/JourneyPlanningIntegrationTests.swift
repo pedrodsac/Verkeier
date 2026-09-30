@@ -53,6 +53,34 @@ struct JourneyPlanningIntegrationTests {
         #expect(staleSnapshots == 0)
     }
 
+    @Test("Passlist recovery reaches app timing evidence and explicit refresh")
+    func liveRecoveryPreservesObservedArrival() async throws {
+        let fixture = try await JourneyIntegrationFixture(); defer { fixture.remove() }
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [IntegrationRealtimeProtocol.self]
+        let client = MobiliteitAPIClient(apiKey: "fixture",
+            baseURL: URL(string: "https://integration-live.invalid")!,
+            session: URLSession(configuration: config))
+        let service = MobiliteitRouteService(databaseURL: fixture.database,
+            realtimeClient: client, walkingRouter: IntegrationWalkingRouter())
+        let origin = LocationPoint(latitude: 49.6, longitude: 6.1, transitStopID: "origin")
+        let started = ContinuousClock.now
+        let initial = try await service.calculateRoute(from: origin, to: fixture.destination,
+            time: .departAt(fixture.anchor), filters: .init(), realtimeRefreshPolicy: .forceRefresh)
+        let leg = try #require(initial.selectedOption?.transitLegs.first)
+        #expect(leg.tripId == "first")
+        #expect(leg.departureTime == fixture.anchor.addingTimeInterval(12 * 60))
+        #expect(leg.arrivalTime == fixture.anchor.addingTimeInterval(26 * 60))
+        #expect(leg.departureTimingSource == .observed)
+        #expect(leg.arrivalTimingSource == .observed)
+        let cold = started.duration(to: .now)
+        let warmStarted = ContinuousClock.now
+        let refreshed = try await service.calculateRoute(from: origin, to: fixture.destination,
+            time: .departAt(fixture.anchor), filters: .init(), realtimeRefreshPolicy: .forceRefresh)
+        #expect(refreshed.selectedOption?.transitLegs.first?.arrivalTime == leg.arrivalTime)
+        print("Live fixture routing cold: \(cold); warm refresh: \(warmStarted.duration(to: .now))")
+    }
+
     @Test("Missing local graphs surface a typed walking-unavailable error")
     func missingGraphIsReported() async throws {
         let fixture = try await JourneyIntegrationFixture()
@@ -119,4 +147,29 @@ private nonisolated struct IntegrationRoadProvider: RoadRouteProviding {
                             .init(latitude: to.latitude, longitude: to.longitude)],
               distanceMeters: 600, expectedTravelTime: 600)
     }
+}
+
+/// Fixed ATP response: no network or credentials are used by this integration test.
+private nonisolated final class IntegrationRealtimeProtocol: URLProtocol {
+    override class func canInit(with request: URLRequest) -> Bool {
+        request.url?.host() == "integration-live.invalid"
+    }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+    override func startLoading() {
+        let body = """
+        {"Departure":[{"JourneyDetailRef":{"ref":"first"},"Product":{"line":"10","cls":"32"},
+        "stopExtId":"origin","time":"08:05:00","date":"2026-09-04","rtTime":"08:12:00","rtDate":"2026-09-04",
+        "Stops":{"Stop":[{"extId":"origin","depTime":"08:05:00","depDate":"2026-09-04",
+        "rtDepTime":"08:12:00","rtDepDate":"2026-09-04"},
+        {"extId":"destination","arrTime":"08:25:00","arrDate":"2026-09-04",
+        "depTime":"08:25:00","depDate":"2026-09-04","rtArrTime":"08:26:00","rtArrDate":"2026-09-04",
+        "rtDepTime":"08:26:00","rtDepDate":"2026-09-04"}]}}]}
+        """
+        let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil,
+            headerFields: ["Content-Type": "application/json"])!
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: Data(body.utf8))
+        client?.urlProtocolDidFinishLoading(self)
+    }
+    override func stopLoading() {}
 }
