@@ -1,4 +1,5 @@
 import Foundation
+import MobiliteitKit
 
 /// The result of a ``RouteService`` calculation: a set of route alternatives
 /// plus the currently selected one.
@@ -8,6 +9,7 @@ import Foundation
 nonisolated struct RouteCalculation: Sendable {
     /// The primary route profile (at most five journeys), optionally including
     /// the direct all-the-way walking comparison.
+    var diagnostics: RoutingDiagnostics? = nil
     let options: [RouteOption]
     /// A best-effort bike-inclusive alternative that never consumes a transit slot.
     var supplementalOptions: [RouteOption] = []

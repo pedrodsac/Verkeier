@@ -53,6 +53,14 @@ struct RouteView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         // Haptic when a route plan is found.
         .sensoryFeedback(.success, trigger: viewModel.routeOptions.count)
+        .background {
+            if !viewModel.isCalculating, !viewModel.isLoadingEarlierRoutes, !viewModel.isLoadingLaterRoutes,
+               !viewModel.routeOptions.isEmpty,
+               let requestID = viewModel.diagnosticRequestID {
+                RouteRenderObserver(requestID: requestID, rendered: viewModel.resultsRendered)
+                    .frame(width: 0, height: 0).accessibilityHidden(true)
+            }
+        }
     }
 
     // MARK: - Commute presets
