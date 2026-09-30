@@ -14,6 +14,7 @@
 | How GTFS updates work end-to-end | `GTFS_AUTO_UPDATE_PLAN.md` |
 | Comprehensive feature roadmap (what to build next) | `FEATURE_ROADMAP.md` |
 | Route quality work | `ROUTE_QUALITY_IMPLEMENTATION_PLAN.md` |
+| Router performance, simulator measurements and reproduction | `ROUTE_CALCULATION_PERFORMANCE.md` |
 
 ## Two-read orientation
 
@@ -34,7 +35,9 @@ docs/
 ├── DATA_SOURCES.md                                ← ATP, GTFS, AVL contract details
 ├── GTFS_AUTO_UPDATE_PLAN.md                       ← GTFS update pipeline spec
 ├── FEATURE_ROADMAP.md                             ← comprehensive feature checklist
-└── ROUTE_QUALITY_IMPLEMENTATION_PLAN.md          ← route quality design notes
+├── ROUTE_QUALITY_IMPLEMENTATION_PLAN.md          ← route quality design notes
+├── ROUTE_CALCULATION_PERFORMANCE.md              ← implementation and measured five-second gate
+└── benchmarks/route-performance-2026-09-30/      ← per-request timing evidence
 ```
 
 ## What this app is
