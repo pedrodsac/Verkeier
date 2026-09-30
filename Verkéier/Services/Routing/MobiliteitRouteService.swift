@@ -71,56 +71,6 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         return complete
     }
 
-    /// Show a timetable route before attempting network-backed realtime boards.
-    /// A slow or unavailable connection must not consume the UI's first-result
-    /// deadline when the downloaded GTFS feed can already answer the query.
-    nonisolated func routeCalculationUpdates(
-        from: LocationPoint,
-        to: LocationPoint,
-        time: RoutePlanningTime,
-        filters: RoutePlannerFilters,
-        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy,
-        page: RouteSearchPage
-    ) -> AsyncThrowingStream<RouteCalculation, Error> {
-        let service = self
-        return AsyncThrowingStream { continuation in
-            let task = Task(priority: .userInitiated) {
-                do {
-                    guard realtimeRefreshPolicy == .forceRefresh,
-                          engine.hasRealtimeProvider else {
-                        continuation.yield(try await service.calculateRoute(
-                            from: from, to: to, time: time, filters: filters,
-                            realtimeRefreshPolicy: realtimeRefreshPolicy, page: page
-                        ))
-                        continuation.finish()
-                        return
-                    }
-
-                    // A live delay can make a scheduled connection possible,
-                    // so still try live search if the timetable has no route.
-                    do {
-                        let scheduled = try await service.calculateRoute(
-                            from: from, to: to, time: time, filters: filters,
-                            realtimeRefreshPolicy: .scheduleOnly, page: page
-                        )
-                        continuation.yield(scheduled)
-                    } catch RoutingError.noPublicTransportRoute {
-                        // Realtime may recover a connection missed by GTFS.
-                    }
-                    try Task.checkCancellation()
-                    continuation.yield(try await service.calculateRoute(
-                        from: from, to: to, time: time, filters: filters,
-                        realtimeRefreshPolicy: realtimeRefreshPolicy, page: page
-                    ))
-                    continuation.finish()
-                } catch {
-                    continuation.finish(throwing: error)
-                }
-            }
-            continuation.onTermination = { @Sendable _ in task.cancel() }
-        }
-    }
-
     /// Starts loading MobiliteitKit's full-feed snapshot without blocking UI
     /// work. Every request through this service joins the same engine actor.
     nonisolated func prepareForRouting() {
