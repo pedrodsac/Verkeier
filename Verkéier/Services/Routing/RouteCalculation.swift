@@ -5,7 +5,7 @@ import Foundation
 ///
 /// A calculation always holds at least one option; ``plan`` traps if asked for
 /// a plan when none exist, so treat an empty `options` as an error upstream.
-struct RouteCalculation: Sendable {
+nonisolated struct RouteCalculation: Sendable {
     /// The primary route profile (at most five journeys), optionally including
     /// the direct all-the-way walking comparison.
     let options: [RouteOption]
@@ -16,6 +16,9 @@ struct RouteCalculation: Sendable {
     var invalidatedOptionIDs: Set<String> = []
     /// More alternatives from this same calculation will be published shortly.
     var hasMoreOptions = false
+    var isAuthoritativeSnapshot = false
+    var canLoadEarlier: Bool? = nil
+    var canLoadLater: Bool? = nil
     /// Immutable request constraint used by walking refinement and validation.
     var validationContext: RouteValidationContext? = nil
     /// Identifier of the selected option; falls back to the first option.

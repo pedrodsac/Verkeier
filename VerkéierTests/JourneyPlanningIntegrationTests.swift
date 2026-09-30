@@ -1,0 +1,122 @@
+import Foundation
+import MobiliteitKit
+import Testing
+import ZIPFoundation
+@testable import Verkeier
+
+@Suite("Journey planning package integration")
+@MainActor
+struct JourneyPlanningIntegrationTests {
+    @Test("Measured walking feedback returns the package replacement snapshot")
+    func refinementFeedbackPreservesNativeTransit() async throws {
+        let fixture = try await JourneyIntegrationFixture()
+        defer { fixture.remove() }
+        let service = MobiliteitRouteService(databaseURL: fixture.database,
+            walkingRouter: IntegrationWalkingRouter(), roadRouteProvider: IntegrationRoadProvider())
+        let initial = try await service.calculateRoute(from: fixture.origin, to: fixture.destination,
+            time: .departAt(fixture.anchor), filters: .init(), realtimeRefreshPolicy: .scheduleOnly)
+        let original = try #require(initial.options.first)
+        #expect(initial.isAuthoritativeSnapshot)
+        #expect(original.journeySummary != nil)
+        #expect(original.refinementToken != nil)
+        #expect(original.plan.legs.first?.nativeWalkingRange == 0..<1)
+        #expect(original.transitLegs.first?.mapCoordinates.count == 3)
+        let originalTrip = try #require(original.transitLegs.first?.tripId)
+
+        var snapshot: RouteCalculation?
+        for await event in service.refinementEvents(in: [original], context: initial.validationContext) {
+            if case let .calculation(result) = event { snapshot = result }
+        }
+        let updated = try #require(snapshot)
+        #expect(updated.isAuthoritativeSnapshot)
+        #expect(updated.invalidatedOptionIDs.contains(original.id))
+        #expect(!updated.options.contains { $0.id == original.id })
+        #expect(!updated.options.isEmpty)
+        #expect(updated.selectedOptionID != original.id)
+        #expect(updated.options.allSatisfy { ($0.departureTime ?? .distantPast) >= fixture.anchor })
+        #expect(updated.options.allSatisfy { $0.transitLegs.first?.tripId != originalTrip })
+        let replacement = try #require(updated.selectedOption)
+        let access = try #require(replacement.plan.legs.first)
+        let departure = try #require(access.departureTime)
+        let arrival = try #require(access.arrivalTime)
+        #expect(arrival.timeIntervalSince(departure) == 600)
+        #expect(replacement.journeySummary?.walkingDuration == 600)
+        #expect(replacement.transitLegs.first?.mapCoordinates.count == 3)
+
+        // A new query supersedes the old refinement token, including through the app bridge.
+        _ = try await service.calculateRoute(from: fixture.origin, to: fixture.destination,
+            time: .departAt(fixture.anchor), filters: .init(), realtimeRefreshPolicy: .scheduleOnly)
+        var staleSnapshots = 0
+        for await event in service.refinementEvents(in: [original], context: initial.validationContext) {
+            if case .calculation = event { staleSnapshots += 1 }
+        }
+        #expect(staleSnapshots == 0)
+    }
+
+    @Test("Missing local graphs surface a typed walking-unavailable error")
+    func missingGraphIsReported() async throws {
+        let fixture = try await JourneyIntegrationFixture()
+        defer { fixture.remove() }
+        let service = MobiliteitRouteService(databaseURL: fixture.database)
+        await #expect(throws: RoutingError.walkingUnavailable) {
+            try await service.calculateRoute(from: fixture.origin, to: fixture.destination,
+                time: .departAt(fixture.anchor), filters: .init())
+        }
+    }
+}
+
+private struct JourneyIntegrationFixture {
+    let directory: URL
+    var database: URL { directory.appendingPathComponent("transit.sqlite") }
+    let anchor = ISO8601DateFormatter().date(from: "2026-09-04T06:00:00Z")!
+    var origin: LocationPoint { .init(latitude: 49.5999, longitude: 6.1) }
+    var destination: LocationPoint { .init(latitude: 49.61, longitude: 6.1, transitStopID: "destination") }
+
+    init() async throws {
+        directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let zip = directory.appendingPathComponent("fixture.zip")
+        let archive = try Archive(url: zip, accessMode: .create)
+        let files = [
+            "agency.txt": "agency_id,agency_name,agency_url,agency_timezone\noperator,Operator,https://example.com,Europe/Berlin\n",
+            "calendar_dates.txt": "service_id,date,exception_type\nservice,20260904,1\n",
+            "routes.txt": "route_id,agency_id,route_short_name,route_type\nbus,operator,10,3\n",
+            "stops.txt": "stop_id,stop_name,stop_lat,stop_lon\norigin,Origin,49.6,6.1\ndestination,Destination,49.61,6.1\n",
+            "shapes.txt": "shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence\nshape,49.6,6.1,1\nshape,49.605,6.11,2\nshape,49.61,6.1,3\n",
+            "trips.txt": "route_id,service_id,trip_id,shape_id\nbus,service,first,shape\nbus,service,second,shape\nbus,service,third,shape\n",
+            "stop_times.txt": "trip_id,arrival_time,departure_time,stop_id,stop_sequence\nfirst,08:05:00,08:05:00,origin,1\nfirst,08:25:00,08:25:00,destination,2\nsecond,08:10:00,08:10:00,origin,1\nsecond,08:30:00,08:30:00,destination,2\nthird,08:20:00,08:20:00,origin,1\nthird,08:40:00,08:40:00,destination,2\n"
+        ]
+        for (path, content) in files {
+            let data = Data(content.utf8)
+            try archive.addEntry(with: path, type: .file, uncompressedSize: Int64(data.count),
+                compressionMethod: .deflate) { position, size in
+                    data.subdata(in: Int(position)..<(Int(position) + size))
+                }
+        }
+        _ = try await GTFSArchiveInstaller.install(archiveAt: zip, databaseAt: database)
+    }
+    func remove() { try? FileManager.default.removeItem(at: directory) }
+}
+
+private nonisolated struct IntegrationWalkingRouter: WalkingRouting {
+    func estimates(from: LocationPoint, to destinations: [WalkingDestination]) async throws -> [OfflineWalkingEstimate] {
+        destinations.map { .init(destinationID: $0.id, distanceMeters: 60, duration: 60, source: .localOSM) }
+    }
+    func route(from: LocationPoint, to: LocationPoint) async throws -> OfflineWalkingRoute {
+        guard abs(from.latitude - to.latitude) < 0.002 else { throw WalkingRoutingError.noRoute }
+        return .init(distanceMeters: 60, duration: 60,
+            coordinates: [.init(latitude: from.latitude, longitude: from.longitude),
+                          .init(latitude: to.latitude, longitude: to.longitude)], source: .localOSM)
+    }
+}
+
+private nonisolated struct IntegrationRoadProvider: RoadRouteProviding {
+    func roadRouteCoordinates(from: LocationPoint, to: LocationPoint, transport: RoadRouteTransport) async -> [RouteMapCoordinate]? {
+        await roadRoute(from: from, to: to, transport: transport)?.coordinates
+    }
+    func roadRoute(from: LocationPoint, to: LocationPoint, transport: RoadRouteTransport) async -> RoadRoute? {
+        .init(coordinates: [.init(latitude: from.latitude, longitude: from.longitude),
+                            .init(latitude: to.latitude, longitude: to.longitude)],
+              distanceMeters: 600, expectedTravelTime: 600)
+    }
+}

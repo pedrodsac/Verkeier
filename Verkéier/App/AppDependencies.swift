@@ -11,7 +11,7 @@ extension EnvironmentValues {
     @Entry var gtfsService: any GTFSService = UnavailableGTFSService()
     @Entry var liveTransitService: any LiveTransitService = UnavailableLiveTransitService()
     @Entry var routeService: any RouteService = MapKitRouteService()
-    @Entry var walkingRouter: any WalkingRouting = MapKitWalkingRouter()
+    @Entry var walkingRouter: any WalkingRouting = UnavailableWalkingRouter()
     @Entry var avlClient: any AVLClient = LiveAVLClient(
         feedURL: AppConfiguration.current.avlMessagesURL
     )

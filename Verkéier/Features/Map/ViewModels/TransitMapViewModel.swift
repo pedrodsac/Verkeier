@@ -67,6 +67,7 @@ final class TransitMapViewModel {
     var canLoadEarlierRoutes = true
     var canLoadLaterRoutes = true
     var selectedRouteOptionID: String?
+    var routeRecommendedOptionID: String? = nil
     var routeSelectionWasManual = false
     var routeLoadingPhase: RouteLoadingPhase = .idle
     var routeErrorMessage: String?
@@ -95,9 +96,9 @@ final class TransitMapViewModel {
     let now: @Sendable () -> Date
     var routeCalculationGeneration = 0
     var unfilteredRouteOptions: [RouteOption] = []
+    var walkingRefinementScheduledIDs: Set<String> = []
     var walkingRefinedOptionIDs: Set<String> = []
     var invalidatedRouteOptionIDs: Set<String> = []
-    var walkingReplanGeneration: Int? = nil
 
     init(
         now: @escaping @Sendable () -> Date = { .now },
@@ -150,12 +151,13 @@ final class TransitMapViewModel {
 
     func clearRouteResult() {
         walkingRefinedOptionIDs = []
+        walkingRefinementScheduledIDs = []
         invalidatedRouteOptionIDs = []
-        walkingReplanGeneration = nil
         unfilteredRouteOptions = []
         routeOptions = []
         supplementalRouteOptions = []
         selectedRouteOptionID = nil
+        routeRecommendedOptionID = nil
         routeSelectionWasManual = false
         routeStatusMessage = nil
         routeLastCalculatedAt = nil
