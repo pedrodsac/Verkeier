@@ -45,14 +45,25 @@ struct VerkéierApp: App {
             roadRouteProvider: LocalFirstRoadRouteProvider(walkingRouter: walkingRouter),
             graphPreparation: graphPreparation
         )
+        #if targetEnvironment(simulator)
+        if !SimulatorRouteBenchmark.enabled { routeService.prepareForRouting() }
+        #else
         routeService.prepareForRouting()
+        #endif
         self.routeService = routeService
         modelContainer = AppModelContainer.make()
     }
 
     var body: some Scene {
         WindowGroup {
-            TransitMapScreen(locationService: locationService)
+            Group {
+                #if targetEnvironment(simulator)
+                if SimulatorRouteBenchmark.enabled { SimulatorRouteBenchmarkView() }
+                else { TransitMapScreen(locationService: locationService) }
+                #else
+                TransitMapScreen(locationService: locationService)
+                #endif
+            }
                 .environment(\.appConfiguration, configuration)
                 .environment(\.routeService, routeService)
                 .environment(\.walkingRouter, walkingRouter)
