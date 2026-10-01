@@ -91,6 +91,9 @@ inherit an estimate forward for up to 30 minutes from a report (delay limited
 to two hours). Earlier unobserved stops remain scheduled. Per-stop restrictions
 prevent boarding or alighting without cancelling the whole vehicle.
 
+Discovery prioritizes transfer stops with fewer remaining rides to the destination
+and skips outgoing trips whose downstream stops cannot reach it. This prevents
+earlier intermediate boards from exhausting the stop budget before later lines.
 Discovery includes reachable transfer departures absent from static winners,
 merges overlapping observations, then performs one final RAPTOR scan. The
 optimistic discovery envelope advances one ride per wave, avoiding repeated

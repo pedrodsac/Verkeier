@@ -81,6 +81,29 @@ struct JourneyPlanningIntegrationTests {
         print("Live fixture routing cold: \(cold); warm refresh: \(warmStarted.duration(to: .now))")
     }
 
+    @Test("Every transit line retains live evidence through the app adapter")
+    func transferLinesPreserveLiveStatus() async throws {
+        let fixture = try await JourneyIntegrationFixture(withTransfer: true)
+        defer { fixture.remove() }
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [IntegrationRealtimeProtocol.self]
+        let client = MobiliteitAPIClient(apiKey: "fixture",
+            baseURL: URL(string: "https://integration-live-transfer.invalid")!,
+            session: URLSession(configuration: config))
+        let service = MobiliteitRouteService(databaseURL: fixture.database,
+            realtimeClient: client, walkingRouter: IntegrationWalkingRouter())
+        let origin = LocationPoint(latitude: 49.6, longitude: 6.1, transitStopID: "origin")
+        let result = try await service.calculateRoute(from: origin, to: fixture.destination,
+            time: .departAt(fixture.anchor), filters: .init(), realtimeRefreshPolicy: .forceRefresh)
+        let option = try #require(result.selectedOption)
+        #expect(option.transitLegs.map(\.routeName) == ["10", "20"])
+        #expect(option.transitLegs.allSatisfy {
+            $0.liveStatus == .delayed && $0.departureTimingSource == .observed && $0.arrivalTimingSource == .observed
+        })
+        #expect(option.realtimeCoverage == .live)
+        #expect(option.arrivalTime == fixture.anchor.addingTimeInterval(47 * 60))
+    }
+
     @Test("Missing local graphs surface a typed walking-unavailable error")
     func missingGraphIsReported() async throws {
         let fixture = try await JourneyIntegrationFixture()
@@ -100,12 +123,12 @@ private struct JourneyIntegrationFixture {
     var origin: LocationPoint { .init(latitude: 49.5999, longitude: 6.1) }
     var destination: LocationPoint { .init(latitude: 49.61, longitude: 6.1, transitStopID: "destination") }
 
-    init() async throws {
+    init(withTransfer: Bool = false) async throws {
         directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let zip = directory.appendingPathComponent("fixture.zip")
         let archive = try Archive(url: zip, accessMode: .create)
-        let files = [
+        var files = [
             "agency.txt": "agency_id,agency_name,agency_url,agency_timezone\noperator,Operator,https://example.com,Europe/Berlin\n",
             "calendar_dates.txt": "service_id,date,exception_type\nservice,20260904,1\n",
             "routes.txt": "route_id,agency_id,route_short_name,route_type\nbus,operator,10,3\n",
@@ -114,6 +137,12 @@ private struct JourneyIntegrationFixture {
             "trips.txt": "route_id,service_id,trip_id,shape_id\nbus,service,first,shape\nbus,service,second,shape\nbus,service,third,shape\n",
             "stop_times.txt": "trip_id,arrival_time,departure_time,stop_id,stop_sequence\nfirst,08:05:00,08:05:00,origin,1\nfirst,08:25:00,08:25:00,destination,2\nsecond,08:10:00,08:10:00,origin,1\nsecond,08:30:00,08:30:00,destination,2\nthird,08:20:00,08:20:00,origin,1\nthird,08:40:00,08:40:00,destination,2\n"
         ]
+        if withTransfer {
+            files["routes.txt"]! += "connecting,operator,20,3\n"
+            files["stops.txt"]! += "transfer,Transfer,49.605,6.1\n"
+            files["trips.txt"] = "route_id,service_id,trip_id\nbus,service,first\nconnecting,service,connection\n"
+            files["stop_times.txt"] = "trip_id,arrival_time,departure_time,stop_id,stop_sequence\nfirst,08:05:00,08:05:00,origin,1\nfirst,08:25:00,08:25:00,transfer,2\nconnection,08:30:00,08:30:00,transfer,1\nconnection,08:45:00,08:45:00,destination,2\n"
+        }
         for (path, content) in files {
             let data = Data(content.utf8)
             try archive.addEntry(with: path, type: .file, uncompressedSize: Int64(data.count),
@@ -152,11 +181,11 @@ private nonisolated struct IntegrationRoadProvider: RoadRouteProviding {
 /// Fixed ATP response: no network or credentials are used by this integration test.
 private nonisolated final class IntegrationRealtimeProtocol: URLProtocol {
     override class func canInit(with request: URLRequest) -> Bool {
-        request.url?.host() == "integration-live.invalid"
+        ["integration-live.invalid", "integration-live-transfer.invalid"].contains(request.url?.host() ?? "")
     }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
     override func startLoading() {
-        let body = """
+        var body = """
         {"Departure":[{"JourneyDetailRef":{"ref":"first"},"Product":{"line":"10","cls":"32"},
         "stopExtId":"origin","time":"08:05:00","date":"2026-09-04","rtTime":"08:12:00","rtDate":"2026-09-04",
         "Stops":{"Stop":[{"extId":"origin","depTime":"08:05:00","depDate":"2026-09-04",
@@ -165,6 +194,22 @@ private nonisolated final class IntegrationRealtimeProtocol: URLProtocol {
         "depTime":"08:25:00","depDate":"2026-09-04","rtArrTime":"08:26:00","rtArrDate":"2026-09-04",
         "rtDepTime":"08:26:00","rtDepDate":"2026-09-04"}]}}]}
         """
+        if request.url?.host() == "integration-live-transfer.invalid" {
+            let stop = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems?
+                .first { $0.name == "id" }?.value
+            if stop == "transfer" {
+                body = """
+                {"Departure":[{"JourneyDetailRef":{"ref":"connection"},"Product":{"line":"20","cls":"32"},
+                "stopExtId":"transfer","time":"08:30:00","date":"2026-09-04","rtTime":"08:32:00","rtDate":"2026-09-04",
+                "Stops":{"Stop":[{"extId":"transfer","depTime":"08:30:00","depDate":"2026-09-04",
+                "rtDepTime":"08:32:00","rtDepDate":"2026-09-04"},
+                {"extId":"destination","arrTime":"08:45:00","arrDate":"2026-09-04",
+                "rtArrTime":"08:47:00","rtArrDate":"2026-09-04"}]}}]}
+                """
+            } else {
+                body = body.replacingOccurrences(of: "destination", with: "transfer")
+            }
+        }
         let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil,
             headerFields: ["Content-Type": "application/json"])!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
