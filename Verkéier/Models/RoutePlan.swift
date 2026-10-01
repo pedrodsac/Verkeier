@@ -70,6 +70,11 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
         var arrivalTimingSource: RouteTimingSource? = nil
         /// Additional allowance required after the preceding transfer walk.
         var requiredTransferSeconds: Int? = nil
+        var requiredTotalTransferSeconds: Int? = nil
+        var continuesInSeatFromTripID: String? = nil
+        var transitInstanceKey: String? = nil
+        var boardingStopSequence: Int? = nil
+        var alightingStopSequence: Int? = nil
         /// Whether walking time came from an actual pedestrian route or an estimate.
         var walkingEvidence: RouteWalkingEvidence? = nil
         var nativeWalkingRange: Range<Int>? = nil

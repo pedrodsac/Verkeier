@@ -49,12 +49,15 @@ struct PlaceNode: Identifiable, Equatable {
         case board
         /// Change directly between two rides at the same stop (arrive + depart).
         case transfer
+        /// Continue on the same vehicle, including a change of route number.
+        case stayAboard
         /// Get off a ride onto a final walk.
         case alight
         /// Journey end.
         case destination
     }
 
+    var stayAboardAccessibilityLabel: String { "Stay aboard at \(name)." }
     let id: String
     let name: String
     let role: Role
@@ -199,11 +202,11 @@ enum RouteTimelineBuilder {
                 ? incoming?.scheduledArrivalTime
                 : nil,
             scheduledDepartureTime: outgoingTransit?.scheduledDepartureTime,
-            waitMinutes: wait,
+            waitMinutes: outgoingTransit?.continuesInSeatFromTripID == nil ? wait : nil,
             delayMinutes: outgoingTransit?.delayMinutes,
             liveStatus: status,
             announcesDelay: announcesDelay,
-            platform: outgoingTransit?.platform,
+            platform: outgoingTransit?.continuesInSeatFromTripID == nil ? outgoingTransit?.platform : nil,
             transferWarning: outgoingTransit?.transferWarning,
             bikeShareStation: bikeShareStation,
             bikeShareStationRole: bikeShareStationRole,
@@ -218,6 +221,7 @@ enum RouteTimelineBuilder {
     private static func role(incoming: RoutePlan.Leg?, outgoing: RoutePlan.Leg?) -> PlaceNode.Role {
         guard let incoming else { return .origin }
         guard let outgoing else { return .destination }
+        if outgoing.continuesInSeatFromTripID == incoming.tripId, outgoing.continuesInSeatFromTripID != nil { return .stayAboard }
         switch (incoming.transportKind == .transit, outgoing.transportKind == .transit) {
         case (true, true): return .transfer
         case (true, false): return .alight

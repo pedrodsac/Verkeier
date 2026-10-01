@@ -1,4 +1,5 @@
 import Foundation
+import MobiliteitKit
 
 nonisolated struct WalkingGeometryRequest: Sendable {
     let origin: LocationPoint
@@ -156,6 +157,11 @@ extension RouteOption {
             updated.departureTimingSource = leg.departureTimingSource
             updated.arrivalTimingSource = leg.arrivalTimingSource
             updated.requiredTransferSeconds = leg.requiredTransferSeconds
+            updated.requiredTotalTransferSeconds = leg.requiredTotalTransferSeconds
+            updated.continuesInSeatFromTripID = leg.continuesInSeatFromTripID
+            updated.transitInstanceKey = leg.transitInstanceKey
+            updated.boardingStopSequence = leg.boardingStopSequence
+            updated.alightingStopSequence = leg.alightingStopSequence
             updated.walkingEvidence = geometry?.walkingEvidence ?? leg.walkingEvidence
             updated.nativeWalkingRange = leg.nativeWalkingRange
             return updated
@@ -193,6 +199,18 @@ extension RouteOption {
         let elapsed = first.flatMap { departure in last.map { max(0, $0.timeIntervalSince(departure)) } }
         let distance = legs.filter { $0.transportKind == .walking }
             .compactMap(\.distanceMeters).reduce(0, +)
+        var transferWalk = 0.0
+        var hasIncoming = false
+        for index in legs.indices {
+            if legs[index].transportKind == .walking, hasIncoming {
+                transferWalk += max(0, (legs[index].arrivalTime ?? .distantPast).timeIntervalSince(legs[index].departureTime ?? .distantPast))
+            } else if legs[index].transportKind == .transit {
+                if hasIncoming, legs[index].continuesInSeatFromTripID == nil, let total = legs[index].requiredTotalTransferSeconds {
+                    legs[index].requiredTransferSeconds = JourneyTransferArithmetic.requiredAfterWalking(totalMinimum: total, walkingSeconds: transferWalk)
+                }
+                hasIncoming = true; transferWalk = 0
+            }
+        }
         return replacingLegs(legs, expectedTravelTime: elapsed,
                              distanceMeters: distance)
     }

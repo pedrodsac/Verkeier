@@ -104,6 +104,19 @@ struct JourneyPlanningIntegrationTests {
         #expect(option.arrivalTime == fixture.anchor.addingTimeInterval(47 * 60))
     }
 
+    @Test("Faster direct walking remains the package recommendation in the app")
+    func fasterWalkingRecommendationPassesThrough() async throws {
+        let fixture = try await JourneyIntegrationFixture(withTransfer: true); defer { fixture.remove() }
+        let service = MobiliteitRouteService(databaseURL: fixture.database, walkingRouter: DirectComparisonWalkingRouter())
+        let result = try await service.calculateRoute(from: fixture.origin, to: fixture.destination,
+            time: .departAt(fixture.anchor), filters: .init(), realtimeRefreshPolicy: .scheduleOnly)
+        let selected = try #require(result.selectedOption)
+        #expect(selected.plan.legs.allSatisfy { $0.transportKind == .walking })
+        #expect(selected.plan.expectedTravelTime == 900)
+        #expect(result.isAuthoritativeSnapshot)
+        #expect(result.options.contains { !$0.transitLegs.isEmpty })
+    }
+
     @Test("Missing local graphs surface a typed walking-unavailable error")
     func missingGraphIsReported() async throws {
         let fixture = try await JourneyIntegrationFixture()
@@ -217,4 +230,15 @@ private nonisolated final class IntegrationRealtimeProtocol: URLProtocol {
         client?.urlProtocolDidFinishLoading(self)
     }
     override func stopLoading() {}
+}
+
+private nonisolated struct DirectComparisonWalkingRouter: WalkingRouting {
+    func estimates(from: LocationPoint, to destinations: [WalkingDestination]) async throws -> [OfflineWalkingEstimate] {
+        destinations.map { .init(destinationID: $0.id, distanceMeters: 60, duration: 60, source: .localOSM) }
+    }
+    func route(from: LocationPoint, to: LocationPoint) async throws -> OfflineWalkingRoute {
+        let duration: TimeInterval = abs(from.latitude - to.latitude) > 0.002 ? 900 : 60
+        return .init(distanceMeters: duration, duration: duration,
+            coordinates: [.init(latitude: from.latitude, longitude: from.longitude), .init(latitude: to.latitude, longitude: to.longitude)], source: .localOSM)
+    }
 }
