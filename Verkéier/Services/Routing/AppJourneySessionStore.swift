@@ -5,6 +5,7 @@ import MobiliteitKit
 actor AppJourneySessionStore {
     private let planner: JourneyPlanner
     private var session: JourneyResultSession?
+    private var preparedRouter: TransitRouter?
     private var request: JourneyPlanningRequest?
     private var databaseURL: URL?
     private var generation = 0
@@ -12,16 +13,17 @@ actor AppJourneySessionStore {
 
     func calculate(databaseURL: URL, request: JourneyPlanningRequest,
                    page: JourneyPlanningPage, refresh: JourneyRefreshPolicy) async throws -> JourneyPlanningResult {
-        if page == .initial || self.request != request || self.databaseURL != databaseURL || session == nil {
-            generation += 1
-            let current = generation
+        generation += 1
+        let current = generation
+        let router = try await planner.router(for: databaseURL)
+        guard current == generation else { throw JourneyPlanningError.supersededRequest }
+        if self.request != request || self.databaseURL != databaseURL || session == nil || preparedRouter !== router {
             let created = try await planner.makePlanningSession(databaseURL: databaseURL, request: request)
             guard current == generation else { throw JourneyPlanningError.supersededRequest }
-            session = created; self.request = request; self.databaseURL = databaseURL
+            session = created; preparedRouter = router; self.request = request; self.databaseURL = databaseURL
         }
         guard let session else { throw JourneyPlanningError.supersededRequest }
-        let current = generation
-        let result = try await session.calculate(page: page, refresh: refresh)
+        let result = try await session.calculate(page: page, refresh: refresh, now: .now)
         guard current == generation else { throw JourneyPlanningError.supersededRequest }
         return result
     }

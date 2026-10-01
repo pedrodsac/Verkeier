@@ -123,7 +123,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             case let .walk(walk):
                 guard walk.duration > 0 || walk.from.coordinate != walk.to.coordinate else { return nil }
                 var result = RoutePlan.Leg(
-                    id: "walk-\(walk.departure.timeIntervalSince1970)", mode: .walking,
+                    id: "walk-\(journey.id.value)-\(nativeIndex)", mode: .walking,
                     transportKind: .walking, origin: point(walk.from), destination: point(walk.to),
                     departureTime: walk.departure, arrivalTime: walk.arrival,
                     distanceMeters: walk.distanceMeters,
@@ -143,7 +143,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                 )
                 let delayed = usesRealtime && delaySeconds > 0
                 var result = RoutePlan.Leg(
-                    id: "transit-\(transit.tripID)-\(transit.board.stop.id)-\(transit.alight.stop.id)",
+                    id: "transit-\(transit.instance?.stableKey ?? transit.tripID)-\(transit.boardSequence ?? nativeIndex)-\(transit.alightSequence ?? nativeIndex)",
                     mode: Self.mode(forGTFSRouteType: transit.route.type), transportKind: .transit,
                     routeName: transit.route.shortName ?? transit.route.longName,
                     headsign: transit.headsign, routeId: transit.route.id, tripId: transit.tripID,
@@ -166,6 +166,14 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                 result.departureTimingSource = Self.timingSource(transit.board.timingSource)
                 result.arrivalTimingSource = Self.timingSource(transit.alight.timingSource)
                 result.requiredTransferSeconds = transit.requiredTransferSecondsAfterWalking
+                result.requiredTotalTransferSeconds = transit.requiredTotalTransferSeconds
+                result.transitInstanceKey = transit.instance?.stableKey
+                result.boardingStopSequence = transit.boardSequence
+                result.alightingStopSequence = transit.alightSequence
+                if nativeIndex > 0, case let .inSeatContinuation(link) = journey.legs[nativeIndex - 1] {
+                    result.continuesInSeatFromTripID = link.fromTripID
+                    result.transferWarning = nil
+                }
                 return result
             case .inSeatContinuation:
                 return nil

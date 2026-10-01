@@ -350,8 +350,8 @@ struct WalkingRouteRefinementTests {
         )) == .invalid(.unverifiedTransferWalk))
     }
 
-    @Test("A short same-stop connection stays visible with its published transfer risk")
-    func sameStopTransferShortfallIsAtRisk() {
+    @Test("A short same-stop connection remains invalid under legacy tolerance")
+    func sameStopTransferShortfallIsInvalid() {
         let start = Date(timeIntervalSince1970: 100_000)
         let origin = LocationPoint(id: "origin", name: "Origin", latitude: 49.60,
                                    longitude: 6.10, transitStopID: "origin")
@@ -382,9 +382,9 @@ struct WalkingRouteRefinementTests {
                                               minimumTransferSeconds: 120,
                                               sameStopTransferShortfallSeconds: 180)
         let assessment = RouteItineraryValidator.assess(option, context: tolerant)
-        #expect(assessment == .atRisk(minimumTransferSlack: -165))
+        #expect(assessment == .invalid(.missedTransfer))
         option.feasibility = assessment
-        #expect(option.status(at: start) == .atRisk)
+        #expect(option.status(at: start) == .connectionMayBeMissed)
         #expect(RouteTimelineBuilder.items(from: option.plan.legs).contains { item in
             if case let .place(node) = item {
                 return node.transferWarning == "Tight transfer"

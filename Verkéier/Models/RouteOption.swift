@@ -59,7 +59,7 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
 
     /// Number of transfers between transit legs (always `>= 0`).
     var transferCount: Int {
-        journeySummary?.transferCount ?? max(0, transitLegs.count - 1)
+        journeySummary?.transferCount ?? max(0, transitLegs.filter { $0.continuesInSeatFromTripID == nil }.count - 1)
     }
 
     /// Effective time available between each pair of consecutive transit legs.
@@ -76,6 +76,7 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
         var gaps: [TimeInterval] = []
         gaps.reserveCapacity(legs.count - 1)
         for (arrivingLeg, departingLeg) in zip(legs, legs.dropFirst()) {
+            if departingLeg.continuesInSeatFromTripID != nil { continue }
             guard let arrival = Self.effectiveArrivalTime(for: arrivingLeg),
                   let departure = Self.effectiveDepartureTime(for: departingLeg)
             else {

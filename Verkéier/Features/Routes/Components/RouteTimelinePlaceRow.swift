@@ -48,7 +48,7 @@ struct TimelinePlaceRow: View {
                 departureTimeBlock(node.departureTime)
             } else {
                 switch node.role {
-                case .origin, .board:
+                case .origin, .board, .stayAboard:
                     departureTimeBlock(node.departureTime)
                 case .alight, .destination:
                     arrivalTimeBlock(node.arrivalTime)
@@ -174,6 +174,7 @@ struct TimelinePlaceRow: View {
         if let platform = node.platform, !platform.isEmpty {
             parts.append("Platform \(platform)")
         }
+        if node.role == .stayAboard { parts.append("Stay aboard") }
         if node.role == .transfer, let wait = node.waitMinutes {
             parts.append("\(wait) min to change")
         }
@@ -213,7 +214,7 @@ struct TimelinePlaceRow: View {
     private var marker: TimelineRail.Marker {
         switch node.role {
         case .origin: .ring
-        case .board, .transfer, .alight: .dot
+        case .board, .transfer, .stayAboard, .alight: .dot
         case .destination: .pin
         }
     }
@@ -225,7 +226,7 @@ struct TimelinePlaceRow: View {
     /// Time shown for non-transfer roles: departure when leaving, arrival when landing.
     private var primaryTime: Date? {
         switch node.role {
-        case .origin, .board: node.departureTime
+        case .origin, .board, .stayAboard: node.departureTime
         case .alight, .destination: node.arrivalTime
         case .transfer: node.departureTime
         }
@@ -252,6 +253,8 @@ struct TimelinePlaceRow: View {
                 if let warning = node.transferWarning { s += " Warning: \(warning)." }
             }
             return s
+        case .stayAboard:
+            return node.stayAboardAccessibilityLabel
         case .transfer:
             var s = "Transfer at \(node.name)."
             if let arrive { s += " Arrives \(arrive)" }

@@ -19,6 +19,9 @@ extension RouteOption {
 
         for leg in plan.legs {
             if leg.transportKind == .transit {
+                if leg.continuesInSeatFromTripID != nil {
+                    lines.append("• Stay aboard at \(leg.origin.name?.stationDisplayName ?? "stop")")
+                }
                 let line = leg.routeName ?? "Transit"
                 let from = leg.origin.name?.stationDisplayName ?? "?"
                 let to = leg.destination.name?.stationDisplayName ?? "?"
