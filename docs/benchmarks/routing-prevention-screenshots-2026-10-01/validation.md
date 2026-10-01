@@ -8,7 +8,7 @@ The rule runs before full-profile publication and again for accumulated session 
 
 ## Actual installed-feed replay
 
-The replay uses the existing Gromscheed address fixture (49.6541071, 6.2296443), Konrad Adenauer stop `000200417019`, and 1 October 2026 at 20:18 Luxembourg time. The screenshots do not provide precise GPS or live predictions; this is a schedule-only reproduction using the installed generation-3 timetable and real Valhalla pedestrian graph, rather than an exact replay of their live state. The timetable covers 24 September–12 December 2026. The pedestrian dataset is 20260921. No network requests or downloads are used.
+The replay uses the existing Gromscheed address fixture (49.6541071, 6.2296443), Konrad Adenauer stop `000200417019`, and 1 October 2026 at 20:18 Luxembourg time. The screenshots do not provide precise GPS or live predictions; this is a schedule-only reproduction using the installed generation-3 timetable and real Valhalla pedestrian graph, rather than an exact replay of their live state. The timetable covers 24 September–12 December 2026. The pedestrian dataset is 20260921. No network requests or downloads are used. Replay input SHA-256: timetable `4cc3b13e437f883620cd262fa9ded30b4d1e3d401561040e101c5a41a152bc44`; pedestrian archive `0dd7dd3357e6962b251aaa494063f092cddc50c16e972f20a618e93df4f1600b`.
 
 | Choice | Leave home | Arrival | Total walking | Outcome |
 |---|---|---|---|---|
@@ -25,3 +25,9 @@ The app replay also verifies that actual trip `24264856` on line 326 directly re
 The offline package gate passes 143 tests in 17 suites with `ROUTING_VERIFY_KERNEL=1`. The Release iPhone 17 app gate passes 49 tests in 11 suites, including `RoutingScreenshotReplayTests.eveningConnectionsAvoidRedundant326` enabled with installed data. Six installed-feed package replay tests also pass in Release without live data. [Gate excerpts](verification.txt).
 
 To repeat the app replay, run `build-for-testing` using the project's simulator command. Set `ROUTING_SCREENSHOT_REPLAY_DATABASE` and `ROUTING_SCREENSHOT_REPLAY_TILES` in the generated `.xctestrun` test target's `EnvironmentVariables` to stable copies of this timetable and its `tiles.tar`. Keep the edited `.xctestrun` beside the original products, then use `xcodebuild -xctestrun <file> -destination 'platform=iOS Simulator,name=iPhone 17' test-without-building -only-testing:VerkeierTests/RoutingScreenshotReplayTests`. Ordinary tests leave this opt-in replay disabled.
+
+## Release rendered performance
+
+All **300 timed operations** across ten scenarios pass the five-second p95 target in every warm/cold group. Ten priming operations are recorded separately and excluded. Worst p95 is **3.882 seconds**; peak simulator resident memory is **811.3 MiB**. The runtime source is app `4ad7a5e` with remote package `fe43ae9`, built in Release with code coverage disabled. Measurements use iPhone 17 / iOS 27.0, the installed feed and pedestrian graph, and the existing recorded ATP fixtures.
+
+Run `python3 Scripts/benchmark_routes.py --app <Release simulator app> --output <directory>` with the default 20 warm and 10 cold samples per scenario. [Summary](summary.json) and [raw samples](samples.jsonl).
