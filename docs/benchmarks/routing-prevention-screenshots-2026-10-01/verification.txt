@@ -16,3 +16,5 @@ INSTALLED_PREVENTION_REPLAY first-service service=20260924 anchorTrip=24430430 j
 INSTALLED_PREVENTION_REPLAY last-service service=20260925 anchorTrip=24370189 journeys=1
 INSTALLED_PREVENTION_REPLAY cancellation trip=g3:24369626@20260924 remaining=0
 􁁛  Test run with 6 tests in 2 suites passed after 8.998 seconds.
+
+Release rendered gate: 300 timed operations; 20/20 warm/cold p95 groups <= 5000ms; worst 3882.274ms.
