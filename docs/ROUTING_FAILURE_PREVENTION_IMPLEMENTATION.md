@@ -12,7 +12,7 @@ Trip identity includes feed generation, trip/frequency ID and service date. Publ
 
 Only explicit linked GTFS type-4 rules produce stay-aboard segments; type 5 wins a conflicting equally scoped rule. Block and line identifiers grant no continuation permission. Continuations operate in the same vehicle-change round, work with zero allowed transfers, and retain both route numbers. Timeline, sharing and VoiceOver say “Stay aboard.” Intermediate stop boarding accessibility is unnecessary for a seated continuation; vehicle and actual boarding/alighting access remain mandatory.
 
-Main suggestions use a separate 120-second material-benefit policy, preserve meaningful accessibility/mode/departure tradeoffs, and reserve an independently catchable competitive first-vehicle fallback. At most two options share the first vehicle when such a fallback exists. Minor endpoint choices collapse after validation. Exact dominance removes demonstrably removable cycles; necessary reversals, barriers, circular rides and distinct same-line vehicles remain eligible. An eligible faster direct walk can become the recommendation, including when either endpoint is a selected stop. A valid previous recommendation survives changes smaller than the 60-second score margin; invalidation switches immediately.
+Main suggestions use a separate 120-second material-benefit policy, preserve meaningful accessibility/mode/departure tradeoffs, and reserve an independently catchable competitive first-vehicle fallback. At most two options share the first vehicle when such a fallback exists. Minor endpoint choices collapse after validation. A verified walk can also replace a feeder bus when it catches the same remaining trip instances, reaches the same alighting occurrences, leaves home no earlier, arrives no later, and adds at most five minutes of walking. The first remaining vehicle may be boarded at a different validated occurrence; all subsequent boarding actions match exactly. An explicit less-walking preference preserves the feeder when it saves walking. This rule applies to the complete profile and every session publication, including paging and refresh. Exact dominance removes demonstrably removable cycles; necessary reversals, barriers, circular rides and distinct same-line vehicles remain eligible. An eligible faster direct walk can become the recommendation, including when either endpoint is a selected stop. A valid previous recommendation survives changes smaller than the 60-second score margin; invalidation switches immediately.
 
 Result sessions freeze realtime evidence within a paging generation and recheck its observation age before every snapshot/refinement publication, track exploration separately from selected suggestions, backfill after deduplication and reject obsolete opaque cursors. Refresh rebases the generation and invalidations atomically. App services reuse the package session for the same request, replace it when the installed feed changes, and reject superseded calculation/refinement callbacks. The app consumes authoritative accumulated snapshots and retains a valid manual choice.
 
@@ -27,8 +27,8 @@ All names below refer to Swift Testing tests in MobiliteitKit unless prefixed `A
 | 03 | Oracle.redundantCycleAndNecessaryReverseInterchange |
 | 04 | Oracle.redundantCycleAndNecessaryReverseInterchange; Search.circularRideRetainsBoardingOccurrenceAndHeadsign |
 | 05 | Search.scannerNeverReboardsUsedInstanceButAllowsAnotherVehicleOnSameLine |
-| 06 | Policy.materialTransferBenefit; oneMinuteTransferBenefitDoesNotCrowdOutDirectService |
-| 07 | Policy.needlessWaitAndSlowerChangeLoseWhileSoleRuralServiceSurvives |
+| 06 | Policy.materialTransferBenefit; oneMinuteTransferBenefitDoesNotCrowdOutDirectService; RoutingWastefulConnectionTests.stayOn326Unless311IsNeededToCatch18 |
+| 07 | Policy.needlessWaitAndSlowerChangeLoseWhileSoleRuralServiceSurvives; RoutingWastefulConnectionTests.stayOn326Unless311IsNeededToCatch18 |
 | 08 | Policy.exactDominanceKeepsLaterDepartureAndLowerWalking |
 | 09 | Lifecycle.twentyAlternatingPagesMakeStrictProgressWithoutDuplicates; routePlannerCollapsesExactTripsAndKeepsTheSafestTransfer |
 | 10 | Policy.tinyEndpointVariationKeepsAccessibleException |
@@ -38,7 +38,7 @@ All names below refer to Swift Testing tests in MobiliteitKit unless prefixed `A
 | 14 | Policy.needlessWaitAndSlowerChangeLoseWhileSoleRuralServiceSurvives |
 | 15 | Policy.exactDominanceKeepsLaterDepartureAndLowerWalking; Policy.needlessWaitAndSlowerChangeLoseWhileSoleRuralServiceSurvives; arrivalDeadlineKeepsLatestDepartureBeyondEightEarlyTrips |
 | 16 | Policy.materialTransferBenefit; defaultTransferDepthFindsThreeVehicleJourney |
-| 17 | Oracle.inferiorBoardingVersusRequiredWalkingDetour (with/without barrier) |
+| 17 | Oracle.inferiorBoardingVersusRequiredWalkingDetour (with/without barrier); RoutingWastefulConnectionTests.walkTo850WhenItLeavesHomeLater; App.RoutingScreenshotReplayTests.eveningConnectionsAvoidRedundant326 |
 | 18 | Policy.longWalkForTwoMinutesLosesButAccessibleVariantSurvives |
 | 19 | Policy.fifteenMinuteWalkBeatsTwentyFiveMinuteTwoBusRide; App.JourneyPlanningIntegrationTests.fasterWalkingRecommendationPassesThrough |
 | 20 | Oracle.inferiorBoardingVersusRequiredWalkingDetour; Search.forbiddenPickupOrDropoff |
@@ -88,6 +88,10 @@ App coverage also includes continuation persistence/geometry replacement, invali
 - Release rendered gate: **300 timed operations**, all 20 warm/cold p95 groups pass. Worst p95 **4.787 seconds**, including the full realtime deadline. Peak simulator resident memory **987.3 MiB**. [Measurements and provenance](benchmarks/routing-prevention-2026-10-01/validation.md).
 
 Reproduce ordinary tests with `ROUTING_VERIFY_KERNEL=1 swift test` in the package and the plan's simulator command in the app. Installed replay uses `ROUTING_BENCHMARK_DATABASE` pointing at a previously installed database. The old Breedewues assertion allowed a 405-second gap against a 450-second requirement. The replay now verifies every connection against its scoped rule and measured movement; a valid occurrence using the same trip pair remains eligible. Six installed-feed replay tests pass on feed generation 3 (24 September–12 December 2026), without downloading data. `InstalledRoutingPreventionReplayTests.circularMidnightFirstLastAndCancellation` derives active trip occurrences from the feed, validates every returned itinerary against the immutable snapshot and verifies that cancelling a real selected instance removes it.
+
+## Screenshot follow-up
+
+The evening screenshots exposed a feeder that exact Pareto dominance retained because it saved a small amount of walking. MobiliteitKit `fe43ae9` now removes that feeder when a validated walk can catch the same remaining services and leave home no earlier. The app pins the tested remote revision. New regressions cover staying on the 326, walking to the 850 at another stop, legitimate transfer/walking exceptions, paging and refresh. The real pedestrian-graph replay reproduces the old failure and confirms its removal. [Behavior, replay and follow-up verification](benchmarks/routing-prevention-screenshots-2026-10-01/validation.md).
 
 ## Contract limits
 
