@@ -47,16 +47,6 @@ struct StopDetailView: View {
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
 
-                if !viewModel.displayedDepartures.isEmpty {
-                    ShareLink(
-                        item: stopDeparturesShareText(stop: stop, departures: viewModel.displayedDepartures)
-                    ) {
-                        Label("Share next departures", systemImage: "square.and.arrow.up")
-                            .font(.callout.weight(.medium))
-                    }
-                    .listRowInsets(actionRowInsets)
-                }
-
                 if let liveActivityErrorMessage = viewModel.liveActivityErrorMessage {
                     Label(liveActivityErrorMessage, systemImage: "exclamationmark.triangle.fill")
                         .font(.footnote)
@@ -192,24 +182,6 @@ struct StopDetailView: View {
         EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16)
     }
 
-    /// Formats the next five departures as a shareable plain-text message.
-    private func stopDeparturesShareText(stop: Stop, departures: [Departure]) -> String {
-        var lines = ["Next departures — \(stop.name)"]
-        for departure in departures.prefix(5) {
-            let time = (departure.realtimeDeparture ?? departure.scheduledDeparture)?
-                .formatted(date: .omitted, time: .shortened) ?? "--:--"
-            let status = if departure.isCancelled {
-                " (cancelled)"
-            } else if let delay = departure.delayMinutes, delay > 0 {
-                " (+\(delay) min)"
-            } else {
-                ""
-            }
-            lines.append("\(time)  \(departure.lineName) → \(departure.destination)\(status)")
-        }
-        lines.append("via Verkéier")
-        return lines.joined(separator: "\n")
-    }
 }
 
 private struct DepartureBoardAdvancedFilterMenu: View {
