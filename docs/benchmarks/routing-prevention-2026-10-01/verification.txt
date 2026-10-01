@@ -1,0 +1,46 @@
+Routing prevention verification — 1 October 2026
+App source milestone: 3427ef1; final remote pin milestone: f4ab96c
+MobiliteitKit revision: 6492c36fd02a8db53e96dfe3880a62b774d6691a
+
+ROUTING_VERIFY_KERNEL=1 swift test
+􁁛  Test run with 140 tests in 15 suites passed after 1.084 seconds.
+
+xcodebuild -project Verkeier.xcodeproj -scheme Verkeier -destination 'platform=iOS Simulator,name=iPhone 17' -enableCodeCoverage NO test
+✔ Test run with 48 tests in 10 suites passed after 0.995 seconds.
+** TEST SUCCEEDED **
+
+ROUTING_BENCHMARK_DATABASE=<previously installed generation-3 database> swift test -c release --filter 'installedFeed|InstalledTimetableBenchmarkTests'
+􁁛  Test installedTimetable() passed after 3.171 seconds.
+􁁛  Suite InstalledTimetableBenchmarkTests passed after 3.171 seconds.
+􁁛  Test installedFeedKonradAdenauerToGromscheedAddressWhenConfigured() passed after 3.465 seconds.
+􁁛  Test installedFeedGromscheedToHamiliusWhenConfigured() passed after 3.637 seconds.
+􁁛  Test installedFeedBreedewuesRegressionWhenConfigured() passed after 4.444 seconds.
+􁁛  Test installedFeedRouteBenchmarkWhenConfigured() passed after 4.532 seconds.
+􁁛  Test run with 5 tests in 1 suite passed after 4.532 seconds.
+
+xcodebuild -project Verkeier.xcodeproj -scheme Verkeier -configuration Release -destination 'platform=iOS Simulator,name=iPhone 17' ENABLE_CODE_COVERAGE=NO build
+** BUILD SUCCEEDED **
+
+
+Supplemental installed-feed replay (test-only addition; runtime Sources unchanged):
+ROUTING_BENCHMARK_DATABASE=<generation-3 database> swift test -c release --filter InstalledRoutingPreventionReplayTests
+INSTALLED_PREVENTION_REPLAY circular service=20260924 anchorTrip=24369626 journeys=1
+INSTALLED_PREVENTION_REPLAY midnight service=20260924 anchorTrip=24320752 journeys=4
+INSTALLED_PREVENTION_REPLAY overflow service=20260924 anchorTrip=24320912 journeys=1
+INSTALLED_PREVENTION_REPLAY first-service service=20260924 anchorTrip=24430430 journeys=1
+INSTALLED_PREVENTION_REPLAY last-service service=20260925 anchorTrip=24370189 journeys=1
+INSTALLED_PREVENTION_REPLAY cancellation trip=g3:24369626@20260924 remaining=0
+􁁛  Test run with 1 test in 1 suite passed after 1.294 seconds.
+
+Final package gate including supplemental replay tests:
+ROUTING_VERIFY_KERNEL=1 swift test
+􁁛  Test run with 141 tests in 16 suites passed after 1.034 seconds.
+Final remote package pin: 8bf4741bc16688eb20ea0408d612374538830cb1
+Production source/manifest diff from measured 6492c36: empty.
+
+Final remote-pin Release build (8bf4741):
+** BUILD SUCCEEDED **
+
+Rendered benchmark: Scripts/benchmark_routes.py defaults, 300 timed operations.
+All 20 warm/cold scenario p95 groups passed <= 5000 ms; worst 4786.919041 ms.
+49-case reference checker: 49 cases reference 63 existing @Test functions.
