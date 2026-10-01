@@ -14,7 +14,7 @@
 | How GTFS updates work end-to-end | `GTFS_AUTO_UPDATE_PLAN.md` |
 | Comprehensive feature roadmap (what to build next) | `FEATURE_ROADMAP.md` |
 | Route quality work | `ROUTE_QUALITY_IMPLEMENTATION_PLAN.md` |
-| Preventing invalid, wasteful, unstable or duplicate journeys | `ROUTING_FAILURE_PREVENTION_PLAN.md` (current 49-case audit and plan) |
+| Preventing invalid, wasteful, unstable or duplicate journeys | `ROUTING_FAILURE_PREVENTION_PLAN.md` + `ROUTING_FAILURE_PREVENTION_IMPLEMENTATION.md` (behavior, 49-case regressions and verification) |
 | Router performance, simulator measurements and reproduction | `ROUTE_CALCULATION_PERFORMANCE.md` |
 
 ## Two-read orientation
@@ -38,6 +38,7 @@ docs/
 ├── FEATURE_ROADMAP.md                             ← comprehensive feature checklist
 ├── ROUTE_QUALITY_IMPLEMENTATION_PLAN.md          ← route quality design notes
 ├── ROUTING_FAILURE_PREVENTION_PLAN.md            ← current safeguards, gaps and 49-case regression plan
+├── ROUTING_FAILURE_PREVENTION_IMPLEMENTATION.md  ← delivered behavior and regression traceability
 ├── ROUTE_CALCULATION_PERFORMANCE.md              ← implementation and measured five-second gate
 └── benchmarks/route-performance-2026-09-30/      ← per-request timing evidence
 ```

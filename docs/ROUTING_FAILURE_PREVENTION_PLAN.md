@@ -1,6 +1,6 @@
 # Routing failure prevention plan
 
-Prepared 1 October 2026 from the user's 49-case routing checklist. This is a source audit and implementation plan; it does not implement the proposed safeguards or certify that every case is prevented today.
+Prepared 1 October 2026 from the user's 49-case routing checklist. This document preserves the original source audit and implementation contract. Implementation behavior, the 49-case regression map and delivery evidence are recorded in [ROUTING_FAILURE_PREVENTION_IMPLEMENTATION.md](ROUTING_FAILURE_PREVENTION_IMPLEMENTATION.md).
 
 ## Goal and boundaries
 
@@ -43,7 +43,7 @@ Verified during this audit:
 | Refinement and lifecycle | Package validates refinement, invalidates unsafe choices, replans once, guards generation/fingerprint | Structural rules must also run here and at every publication |
 | Paging | `(departure, journey ID)` boundary; accumulated ID merge; equal-departure cursor test | Live-changing boundaries, selected noncontiguous initial results and repeated paging need broader coverage |
 
-### Confirmed gaps in current code
+### Confirmed gaps at the audited baseline
 
 1. `RoutingPreferences.init(preferredMode:avoidTightTransfers:)` permits up to 180 seconds of generic same-stop shortfall by default. Existing tests deliberately accept a below-minimum transfer as `.atRisk`. Under this checklist, published/user minimums must be strict; a warning cannot authorize violating them.
 2. Production search has no continuation leg in `Raptor.Leg`; `SnapshotTrip` does not retain block identity. Transfer type 4 currently shares the zero-allowance branch with type 1 and becomes an ordinary second ride. Public continuation types and a manually constructed summary test do not establish production through-service support.
@@ -172,6 +172,8 @@ Owner: `JourneyResultSession.resolved/makeQuery/merge/snapshot`, package bounded
 Acceptance: cases 9–10, 33, 48–49 plus equal-time cursors, changing delays, arrive-by paging, noncontiguous initial selection and interleaved stale callbacks.
 
 ## Complete checklist coverage
+
+The statuses below describe the pre-implementation audit. See the implementation document for current executable regressions.
 
 Status legend: **Existing** = a safeguard/test exists, but the acceptance below still needs dedicated proof; **Partial** = relevant checks exist but do not cover the entire case; **Gap** = an explicit guard or policy is missing; **Conflict** = current intended behavior permits the example. These are source-audit classifications, not claims that production reproductions have been observed.
 

@@ -1,6 +1,6 @@
 # Route calculation performance
 
-The five-second simulator target is implemented. Measurements and raw per-request evidence are in [`benchmarks/route-performance-2026-09-30/`](benchmarks/route-performance-2026-09-30/). This report distinguishes the Release acceptance run from the separate Debug audit.
+The five-second simulator target is implemented. The routing-failure prevention delivery also passes the full 300-operation Release gate: worst scenario/process p95 4.787 seconds, including the acquisition deadline. See [1 October validation](benchmarks/routing-prevention-2026-10-01/validation.md) for the newer evidence. Measurements and raw per-request evidence are in [`benchmarks/route-performance-2026-09-30/`](benchmarks/route-performance-2026-09-30/). This report distinguishes the Release acceptance run from the separate Debug audit.
 
 ## Acceptance boundary
 
