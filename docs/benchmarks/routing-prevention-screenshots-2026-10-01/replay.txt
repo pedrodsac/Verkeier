@@ -1,0 +1,30 @@
+BASELINE 8bf4741 (reproduces unnecessary feeder)
+SCREENSHOT_REPLAY depart=20:21:04 arrive=20:50:13 walk=1019 rides=["29:24365733:Senningerberg, Charlys Statioun->Senningerberg, Héienhaff", "T1:24320768:Senningerberg, Héienhaff P+R->Kirchberg, Universitéit"]
+SCREENSHOT_REPLAY depart=20:21:04 arrive=20:55:30 walk=496 rides=["29:24365733:Senningerberg, Charlys Statioun->Senningerberg, Héienhaff", "6:24368690:Senningerberg, Héienhaff->Kirchberg, Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:21:04 arrive=20:50:29 walk=746 rides=["29:24365733:Senningerberg, Charlys Statioun->Senningerberg, Héienhaff", "T1:24320768:Senningerberg, Héienhaff P+R->Kirchberg, Alphonse Weicker (Tram)", "21:24422906:Kirchberg, Alphonse Weicker (Bus)->Kirchberg, prov. Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:30:43 arrive=21:00:13 walk=967 rides=["223:24263717:Senningerberg, Breedewues->Senningerberg, Héienhaff", "T1:24320767:Senningerberg, Héienhaff P+R->Kirchberg, Universitéit"]
+SCREENSHOT_REPLAY depart=20:30:43 arrive=21:08:10 walk=753 rides=["223:24263717:Senningerberg, Breedewues->Aéroport Luxembourg/Findel", "T1:24320766:Findel - Luxembourg Airport->Kirchberg, Alphonse Weicker (Tram)", "30:24426310:Kirchberg, Chambre des Métiers->Kirchberg, Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:30:51 arrive=21:00:13 walk=1019 rides=["223:24263717:Senningerberg, Charlys Statioun->Senningerberg, Héienhaff", "T1:24320767:Senningerberg, Héienhaff P+R->Kirchberg, Universitéit"]
+SCREENSHOT_REPLAY depart=20:32:54 arrive=21:10:10 walk=271 rides=["326:24264856:Senningerberg, Gromscheed->Senningerberg, Rue du Golf", "850:24291397:Senningerberg, Rue du Golf->Senningerberg, Héienhaff", "16:24360285:Senningerberg, Héienhaff->Kirchberg, Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:32:54 arrive=21:10:10 walk=271 rides=["326:24264856:Senningerberg, Gromscheed->Senningerberg, Rue du Golf", "29:24365740:Senningerberg, Rue du Golf->Senningerberg, Héienhaff", "16:24360285:Senningerberg, Héienhaff->Kirchberg, Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:36:10 arrive=21:08:10 walk=776 rides=["850:24291397:Senningerberg, Breedewues->Senningerberg, Héienhaff", "T1:24320766:Senningerberg, Héienhaff P+R->Kirchberg, Alphonse Weicker (Tram)", "30:24426310:Kirchberg, Chambre des Métiers->Kirchberg, Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:36:10 arrive=21:10:10 walk=444 rides=["850:24291397:Senningerberg, Breedewues->Senningerberg, Héienhaff", "16:24360285:Senningerberg, Héienhaff->Kirchberg, Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:36:18 arrive=21:08:10 walk=828 rides=["850:24291397:Senningerberg, Charlys Statioun->Senningerberg, Héienhaff", "T1:24320766:Senningerberg, Héienhaff P+R->Kirchberg, Alphonse Weicker (Tram)", "30:24426310:Kirchberg, Chambre des Métiers->Kirchberg, Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:36:18 arrive=21:10:10 walk=496 rides=["850:24291397:Senningerberg, Charlys Statioun->Senningerberg, Héienhaff", "16:24360285:Senningerberg, Héienhaff->Kirchberg, Konrad Adenauer"]
+✘ Test eveningConnectionsAvoidRedundant326() recorded an issue at RoutingScreenshotReplayTests.swift:34:9: Expectation failed: !evening.contains { rides($0).map { $0.route.shortName ?? "" } == ["326", "850", "16"] }
+✘ Test eveningConnectionsAvoidRedundant326() failed after 3.393 seconds with 1 issue.
+✘ Test run with 1 test in 1 suite failed after 3.395 seconds with 1 issue.
+
+FIXED fe43ae9 (real timetable and Valhalla pedestrian graph)
+SCREENSHOT_REPLAY depart=20:21:04 arrive=20:50:13 walk=1019 rides=["29:24365733:Senningerberg, Charlys Statioun->Senningerberg, Héienhaff", "T1:24320768:Senningerberg, Héienhaff P+R->Kirchberg, Universitéit"]
+SCREENSHOT_REPLAY depart=20:21:04 arrive=20:55:30 walk=496 rides=["29:24365733:Senningerberg, Charlys Statioun->Senningerberg, Héienhaff", "6:24368690:Senningerberg, Héienhaff->Kirchberg, Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:21:04 arrive=20:50:29 walk=746 rides=["29:24365733:Senningerberg, Charlys Statioun->Senningerberg, Héienhaff", "T1:24320768:Senningerberg, Héienhaff P+R->Kirchberg, Alphonse Weicker (Tram)", "21:24422906:Kirchberg, Alphonse Weicker (Bus)->Kirchberg, prov. Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:30:43 arrive=21:00:13 walk=967 rides=["223:24263717:Senningerberg, Breedewues->Senningerberg, Héienhaff", "T1:24320767:Senningerberg, Héienhaff P+R->Kirchberg, Universitéit"]
+SCREENSHOT_REPLAY depart=20:30:43 arrive=21:08:10 walk=753 rides=["223:24263717:Senningerberg, Breedewues->Aéroport Luxembourg/Findel", "T1:24320766:Findel - Luxembourg Airport->Kirchberg, Alphonse Weicker (Tram)", "30:24426310:Kirchberg, Chambre des Métiers->Kirchberg, Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:30:51 arrive=21:00:13 walk=1019 rides=["223:24263717:Senningerberg, Charlys Statioun->Senningerberg, Héienhaff", "T1:24320767:Senningerberg, Héienhaff P+R->Kirchberg, Universitéit"]
+SCREENSHOT_REPLAY depart=20:36:10 arrive=21:08:10 walk=776 rides=["850:24291397:Senningerberg, Breedewues->Senningerberg, Héienhaff", "T1:24320766:Senningerberg, Héienhaff P+R->Kirchberg, Alphonse Weicker (Tram)", "30:24426310:Kirchberg, Chambre des Métiers->Kirchberg, Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:36:10 arrive=21:10:10 walk=444 rides=["850:24291397:Senningerberg, Breedewues->Senningerberg, Héienhaff", "16:24360285:Senningerberg, Héienhaff->Kirchberg, Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:36:18 arrive=21:08:10 walk=828 rides=["850:24291397:Senningerberg, Charlys Statioun->Senningerberg, Héienhaff", "T1:24320766:Senningerberg, Héienhaff P+R->Kirchberg, Alphonse Weicker (Tram)", "30:24426310:Kirchberg, Chambre des Métiers->Kirchberg, Konrad Adenauer"]
+SCREENSHOT_REPLAY depart=20:36:18 arrive=21:10:10 walk=496 rides=["850:24291397:Senningerberg, Charlys Statioun->Senningerberg, Héienhaff", "16:24360285:Senningerberg, Héienhaff->Kirchberg, Konrad Adenauer"]
+✔ Test eveningConnectionsAvoidRedundant326() passed after 7.087 seconds.
+✔ Test run with 49 tests in 11 suites passed after 8.275 seconds.
