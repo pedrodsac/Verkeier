@@ -100,6 +100,7 @@ final class TransitMapViewModel {
     let now: @Sendable () -> Date
     var routeCalculationGeneration = 0
     var unfilteredRouteOptions: [RouteOption] = []
+    var unfilteredSupplementalRouteOptions: [RouteOption] = []
     var walkingRefinementScheduledIDs: Set<String> = []
     var walkingRefinedOptionIDs: Set<String> = []
     var invalidatedRouteOptionIDs: Set<String> = []
@@ -158,6 +159,7 @@ final class TransitMapViewModel {
         walkingRefinementScheduledIDs = []
         invalidatedRouteOptionIDs = []
         unfilteredRouteOptions = []
+        unfilteredSupplementalRouteOptions = []
         routeOptions = []
         supplementalRouteOptions = []
         selectedRouteOptionID = nil

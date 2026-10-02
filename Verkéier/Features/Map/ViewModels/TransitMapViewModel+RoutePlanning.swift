@@ -212,21 +212,21 @@ extension TransitMapViewModel {
                 ).filter { !invalidatedRouteOptionIDs.contains($0.id) }
                 let incomingSupplementalOptions = calculation.isAuthoritativeSnapshot ? calculation.supplementalOptions : preservingWalkingRefinements(
                     in: calculation.supplementalOptions,
-                    existing: supplementalRouteOptions
+                    existing: unfilteredSupplementalRouteOptions
                 ).filter { !invalidatedRouteOptionIDs.contains($0.id) }
                 routeRecommendedOptionID = calculation.selectedOptionID
                 let preferredID = manualSelectionID ?? calculation.selectedOptionID
                 if !receivedRouteUpdate || calculation.isAuthoritativeSnapshot {
                     unfilteredRouteOptions = incomingOptions
-                    supplementalRouteOptions = incomingSupplementalOptions
+                    unfilteredSupplementalRouteOptions = incomingSupplementalOptions
                 } else {
                     unfilteredRouteOptions = Self.mergingAccumulatedOptions(
                         existing: unfilteredRouteOptions,
                         incoming: incomingOptions,
                         invalidatedOptionIDs: invalidatedRouteOptionIDs
                     )
-                    supplementalRouteOptions = Self.mergingAccumulatedOptions(
-                        existing: supplementalRouteOptions,
+                    unfilteredSupplementalRouteOptions = Self.mergingAccumulatedOptions(
+                        existing: unfilteredSupplementalRouteOptions,
                         incoming: incomingSupplementalOptions,
                         invalidatedOptionIDs: invalidatedRouteOptionIDs
                     )
@@ -339,9 +339,13 @@ extension TransitMapViewModel {
             let preferredID = routeSelectionWasManual ? selectedRouteOptionID : calculation.selectedOptionID
             if calculation.isAuthoritativeSnapshot {
                 unfilteredRouteOptions = calculation.options
+                unfilteredSupplementalRouteOptions = calculation.supplementalOptions
             } else {
                 unfilteredRouteOptions = Self.mergingAccumulatedOptions(
                     existing: unfilteredRouteOptions, incoming: calculation.options,
+                    invalidatedOptionIDs: calculation.invalidatedOptionIDs)
+                unfilteredSupplementalRouteOptions = Self.mergingAccumulatedOptions(
+                    existing: unfilteredSupplementalRouteOptions, incoming: calculation.supplementalOptions,
                     invalidatedOptionIDs: calculation.invalidatedOptionIDs)
             }
             applyRouteOptions(preferredID: preferredID, announceFallback: true)
@@ -532,7 +536,7 @@ extension TransitMapViewModel {
                 if case let .calculation(calculation) = event {
                     self.routeRecommendedOptionID = calculation.selectedOptionID
                     self.unfilteredRouteOptions = calculation.options
-                    self.supplementalRouteOptions = calculation.supplementalOptions
+                    self.unfilteredSupplementalRouteOptions = calculation.supplementalOptions
                     self.invalidatedRouteOptionIDs.formUnion(calculation.invalidatedOptionIDs)
                     self.canLoadEarlierRoutes = calculation.canLoadEarlier ?? self.canLoadEarlierRoutes
                     self.canLoadLaterRoutes = calculation.canLoadLater ?? self.canLoadLaterRoutes
@@ -545,7 +549,7 @@ extension TransitMapViewModel {
                 if case let .invalidated(id) = event {
                     self.invalidatedRouteOptionIDs.insert(id)
                     self.unfilteredRouteOptions.removeAll { $0.id == id }
-                    self.supplementalRouteOptions.removeAll { $0.id == id }
+                    self.unfilteredSupplementalRouteOptions.removeAll { $0.id == id }
                     self.walkingRefinedOptionIDs.remove(id)
                     self.applyRouteOptions(preferredID: selectedID, announceFallback: true)
                     continue
@@ -553,10 +557,10 @@ extension TransitMapViewModel {
                 guard case let .option(option) = event,
                       !self.invalidatedRouteOptionIDs.contains(option.id) else { continue }
                 if supplemental {
-                    let current = self.supplementalRouteOptions.first { $0.id == option.id }
+                    let current = self.unfilteredSupplementalRouteOptions.first { $0.id == option.id }
                     let refined = current.map { option.replacingLegs(of: .transit, from: $0) } ?? option
-                    self.supplementalRouteOptions = Self.mergingAccumulatedOptions(
-                        existing: self.supplementalRouteOptions,
+                    self.unfilteredSupplementalRouteOptions = Self.mergingAccumulatedOptions(
+                        existing: self.unfilteredSupplementalRouteOptions,
                         incoming: [refined],
                         invalidatedOptionIDs: []
                     )
@@ -617,7 +621,11 @@ extension TransitMapViewModel {
     }
 
     private func applyRouteOptions(preferredID: String?, announceFallback: Bool) {
-        routeOptions = unfilteredRouteOptions
+        let visible = RouteOptionVisibility.visibleOptions(
+            primary: unfilteredRouteOptions, supplemental: unfilteredSupplementalRouteOptions, at: now()
+        )
+        routeOptions = visible.primary
+        supplementalRouteOptions = visible.supplemental
         selectBestRouteOption(preferredID: preferredID, announceFallback: announceFallback)
     }
 
