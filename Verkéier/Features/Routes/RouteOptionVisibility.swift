@@ -1,0 +1,43 @@
+import Foundation
+
+/// Applies the walking comparison to presentation without discarding the
+/// underlying results needed by paging and subsequent timing refinements.
+nonisolated enum RouteOptionVisibility {
+    static func visibleOptions(
+        primary: [RouteOption], supplemental: [RouteOption], at now: Date
+    ) -> (primary: [RouteOption], supplemental: [RouteOption]) {
+        let all = primary + supplemental
+        let transit = all.filter { !$0.transitLegs.isEmpty && $0.status(at: now).isSelectable }
+        guard !transit.isEmpty else { return (primary, supplemental) }
+
+        let eligibleWalking = all.filter { walk in
+            guard walk.isWalkingOnly, walk.status(at: now).isSelectable,
+                  let arrival = walk.arrivalTime else { return false }
+            return transit.allSatisfy { ride in
+                guard let transitArrival = ride.arrivalTime else { return false }
+                return arrival < transitArrival
+            }
+        }
+        if let fastestWalk = eligibleWalking.min(by: { (duration($0) ?? .infinity) < (duration($1) ?? .infinity) }),
+           let walkingDuration = duration(fastestWalk),
+           transit.allSatisfy({ ride in
+               guard let transitDuration = duration(ride) else { return false }
+               return walkingDuration < transitDuration
+           }) {
+            return ([fastestWalk], [])
+        }
+
+        let walkingIDs = Set(eligibleWalking.map(\.id))
+        return (
+            primary.filter { !$0.isWalkingOnly || walkingIDs.contains($0.id) },
+            supplemental.filter { !$0.isWalkingOnly || walkingIDs.contains($0.id) }
+        )
+    }
+
+    private static func duration(_ option: RouteOption) -> TimeInterval? {
+        if let departure = option.departureTime, let arrival = option.arrivalTime {
+            return arrival.timeIntervalSince(departure)
+        }
+        return option.plan.expectedTravelTime
+    }
+}
