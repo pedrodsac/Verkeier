@@ -72,6 +72,9 @@ final class SimulatorRouteBenchmark {
                     "rounds": diagnostics.rounds.map { ["scan_ms": $0.patternScanMilliseconds, "merge_ms": $0.labelMergeMilliseconds,
                         "prepare_ms": $0.tripPreparationMilliseconds, "alights": $0.alightingChecks, "retained": $0.retainedLabels] },
                     "options": viewModel.routeOptions.map(\.id),
+                    "realtimeCoverage": Dictionary(uniqueKeysWithValues: viewModel.routeOptions.map {
+                        ($0.id, $0.realtimeCoverage.rawValue)
+                    }),
                     "counters": Dictionary(uniqueKeysWithValues: diagnostics.counters.map { ($0.key.rawValue, $0.value) }), "peak_memory_bytes": usage.ru_maxrss]
                 let json = try JSONSerialization.data(withJSONObject: record, options: [.sortedKeys])
                 print("ROUTING_BENCHMARK " + String(decoding: json, as: UTF8.self))

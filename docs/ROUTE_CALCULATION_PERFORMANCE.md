@@ -70,6 +70,38 @@ Stages overlap: walking is included in RAPTOR; realtime includes acquisition, sc
 
 The earlier 20/10 live-network series encountered unavailable boards (zero covered boards and prediction events at the median); those routes explicitly used scheduled data. Earlier live “now” spot checks acquired 53–90 predicted events and delayed-past boardings, expired around the two-second deadline with honest partial coverage, and rendered in approximately 2.1–2.7 seconds. Arrive-by spot checks rendered in approximately 4.2–4.6 seconds, with no matched predictions for their fixed historical query window. Their raw samples are retained separately. The recorded-live 20/10 series provides reproducible matched-prediction coverage, including the delayed Esch departure. The observed simulator p95 passes the target; these samples do not establish future network availability or physical-device performance.
 
+## Realtime matching deadline fix (2 October 2026)
+
+MobiliteitKit revision `a591a50` includes two realtime fixes. First, it reserves a quarter of each provider wave's
+remaining time (at most 500 ms) for GTFS matching. Previously, a slow later
+board slice could exhaust the shared deadline after an earlier slice returned
+predictions, causing all of those predictions and cancellations to be discarded.
+The earlier acquisition cutoff retains completed slices with partial coverage;
+matching still observes the original two-second app budget. A fixture regression
+reproduced the loss before the fix and now verifies live journey times and
+cancelled-trip exclusion through RAPTOR.
+
+Second, an ATP departure-only report could precede the unreported GTFS arrival
+at that same stop (for example, ATP `10:37:00` versus GTFS `10:37:25`). The
+provider rejected that entire trip as non-chronological, even though ATP's
+departure was valid. Acquisition and timeline resolution now constrain only
+unreported arrivals to the reported departure, marking them estimated and
+retaining the original scheduled timestamps. Conflicting direct observations
+remain rejected. Fixture regressions cover minute precision, early departures,
+recovery from a preceding delay, and contradictory direct reports. The package's
+146 tests passed.
+Simulator benchmark records now include per-option `realtimeCoverage`, so
+acquired prediction counts can be distinguished from evidence on displayed routes.
+
+A 2 October live-network simulator check acquired predictions but displayed five
+schedule-only options after the deadline fix alone. With both fixes, the current
+Gromscheed → Kirchberg query displayed one partly-live option and four scheduled
+options in each of three runs. Warm and cold rendered times were 3.13 and 3.70
+seconds; the discarded priming run took 4.03 seconds. These changing-clock spot
+checks verify usable displayed evidence, not universal ATP coverage or a new p95
+performance series. Unmatched legs remain scheduled. The pinned Release simulator
+build and all 60 app tests passed.
+
 ## Debug audit
 
 Debug was built with coverage disabled and run without a debugger. This is a small audit: one warm and one cold timed operation per scenario, plus one discarded priming operation; it is not a p95 acceptance series. All four timed operations rendered complete results, but Debug does **not** meet the five-second target.
