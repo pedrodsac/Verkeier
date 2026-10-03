@@ -6,8 +6,6 @@ nonisolated struct TransitBoardFilter: Codable, Hashable, Sendable {
     var operators: [String] = []
     var destinationStopID: String? = nil
     var platforms: [String] = []
-    var durationMinutes = 120
-    var maximumJourneys = 20
     var realtimeMode: TransitRealtimeMode = .full
 }
 

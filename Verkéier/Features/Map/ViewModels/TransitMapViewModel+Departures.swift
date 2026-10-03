@@ -24,7 +24,7 @@ extension TransitMapViewModel {
                         for: stop,
                         gtfsService: gtfsService
                     )
-                    let scheduled = await gtfsService.scheduledDepartures(for: boardStop, at: .now, limit: 10)
+                    let scheduled = await gtfsService.scheduledDepartures(for: boardStop, at: .now, limit: .max)
                     do {
                         let live = try await liveTransitService.departureBoard(for: boardStop, filter: TransitBoardFilter())
                         return FavouriteDepartureBoardResult(
@@ -77,7 +77,7 @@ extension TransitMapViewModel {
         snapshot.errorMessage = nil
         favouriteDepartureBoards[stop.id] = snapshot
         let boardStop = await liveTransitService.resolvedStop(for: stop, gtfsService: gtfsService)
-        let scheduled = await gtfsService.scheduledDepartures(for: boardStop, at: .now, limit: 10)
+        let scheduled = await gtfsService.scheduledDepartures(for: boardStop, at: .now, limit: .max)
         do {
             snapshot.departures = try await liveTransitService.departureBoard(for: boardStop, filter: filter)
             snapshot.phase = .loaded
@@ -149,7 +149,7 @@ extension TransitMapViewModel {
             scheduledDepartures = await gtfsService.scheduledDepartures(
                 for: boardStop,
                 at: now(),
-                limit: departureBoardFilter.maximumJourneys
+                limit: .max
             )
             liveError = error
         }
@@ -207,7 +207,7 @@ extension TransitMapViewModel {
         let scheduledDepartures = await gtfsService.scheduledDepartures(
             for: selectedStop,
             at: now,
-            limit: departureBoardFilter.maximumJourneys
+            limit: .max
         )
         guard self.selectedStop?.id == selectedStop.id else { return }
         offlineScheduledDepartures = scheduledDepartures

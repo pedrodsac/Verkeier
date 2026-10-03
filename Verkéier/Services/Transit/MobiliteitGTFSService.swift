@@ -219,7 +219,7 @@ actor MobiliteitGTFSService: GTFSService {
         guard let departures = try? await store.nextScheduledDepartures(
             fromStopID: stopID,
             at: date,
-            horizon: 4 * 60 * 60,
+            horizon: 1_439 * 60,
             limit: limit
         ) else { return [] }
         return departures.compactMap { departure in
