@@ -98,7 +98,11 @@ final class SimulatorRouteBenchmark {
                 // Large accumulated pages can block simctl's console bridge.
                 print("ROUTING_BENCHMARK_FILE " + file.path)
                 fflush(stdout)
-                if scenario.hasPrefix("live-") { await compareStopBoards() }
+                if scenario.hasPrefix("live-") {
+                    await compareStopBoards(phase: "initial")
+                    try await checkBoardCache(using: service)
+                    await compareStopBoards(phase: "after-cache")
+                }
                 status = "\(scenario) sample \(sample + 1)/\(samples): \(Int(diagnostics.totalMilliseconds)) ms"
                 // Geometry refinement is outside the gate. Let it finish before
                 // another sample, to avoid measuring concurrent search work.
@@ -130,7 +134,7 @@ final class SimulatorRouteBenchmark {
         if scenario == "recorded-live" || scenario == "cached" { time = .departAt(formatter.date(from: "2026-09-30T18:28:00+02:00")!) }
         if scenario == "live-reverse" { swap(&from, &to) }
         if scenario.hasPrefix("live-") {
-            time = scenario == "live-arrive" ? .arriveBy(Date.now.addingTimeInterval(3_600)) : .leaveNow
+            time = scenario == "live-arrive" ? .arriveBy(Date.now.addingTimeInterval(3_600)) : .departAt(.now)
         }
         if scenario == "rural" {
             to = .init(name: "Clervaux", latitude: 50.0605, longitude: 6.0316)
@@ -145,7 +149,7 @@ final class SimulatorRouteBenchmark {
 
     /// Opt-in live validation stays outside the displayed-result timing gate.
     /// It goes through the same app service as the departure screen.
-    private func compareStopBoards() async {
+    private func compareStopBoards(phase: String) async {
         let live = MobiliteitLiveTransitService(proxyURL: AppConfiguration.current.apiProxyURL)
         let legs = viewModel.routeOptions.flatMap(\.transitLegs)
         for stopID in Set(legs.compactMap(\.originStopId)).sorted() {
@@ -167,12 +171,38 @@ final class SimulatorRouteBenchmark {
                             "boardDeparture": row?.realtimeDeparture?.timeIntervalSince1970 ?? 0,
                             "boardCancelled": row?.isCancelled ?? false]
                 }
-                let result: [String: Any] = ["stop": stopID, "departures": board.departures.count,
+                let result: [String: Any] = ["phase": phase, "stop": stopID, "departures": board.departures.count,
                     "fetchedAt": board.fetchedAt.timeIntervalSince1970, "comparisons": comparisons]
                 let data = try JSONSerialization.data(withJSONObject: result, options: [.sortedKeys])
                 print("ROUTING_BOARD_COMPARISON " + String(decoding: data, as: UTF8.self))
             } catch { print("ROUTING_BOARD_COMPARISON_FAILED \(stopID) \(error)") }
         }
+        fflush(stdout)
+    }
+
+    private func checkBoardCache(using service: MobiliteitRouteService) async throws {
+        viewModel.routeOptions = []
+        await viewModel.calculateRoute(using: service, from: nil, realtimeRefreshPolicy: .useCache)
+        let deadline = ContinuousClock.now.advanced(by: .seconds(30))
+        while viewModel.routeDiagnostics?.milliseconds[.firstRender] == nil,
+              viewModel.routeErrorMessage == nil, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        guard let diagnostics = viewModel.routeDiagnostics,
+              diagnostics.milliseconds[.firstRender] != nil, !viewModel.routeOptions.isEmpty else {
+            throw RoutingError.noRouteFound
+        }
+        let result: [String: Any] = ["total_ms": diagnostics.totalMilliseconds,
+            "counters": Dictionary(uniqueKeysWithValues: diagnostics.counters.map { ($0.key.rawValue, $0.value) }),
+            "matchingRejections": Dictionary(uniqueKeysWithValues: diagnostics.realtimeMatchingRejections.map { ($0.key.rawValue, $0.value) }),
+            "legs": viewModel.routeOptions.flatMap { option in option.transitLegs.map { leg -> [String: Any] in
+                ["option": option.id, "trip": leg.tripId ?? "", "stop": leg.originStopId ?? "", "line": leg.routeName ?? "",
+                 "source": leg.departureTimingSource?.rawValue ?? "scheduled",
+                 "departure": leg.departureTime?.timeIntervalSince1970 ?? 0]
+            } }]
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent("route-cache-comparison-\(diagnostics.requestID).json")
+        try JSONSerialization.data(withJSONObject: result, options: [.sortedKeys]).write(to: file, options: .atomic)
+        print("ROUTING_CACHED_COMPARISON_FILE " + file.path)
         fflush(stdout)
     }
 

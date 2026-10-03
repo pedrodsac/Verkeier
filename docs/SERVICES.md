@@ -105,7 +105,10 @@ optimistic discovery envelope advances one ride per wave, avoiding repeated
 scans of all earlier waves. Matching
 rejects ambiguous or non-monotonic active updates and counts rejection reasons.
 The shared departure-board cache coalesces compatible overlapping requests,
-permits independent cancellation, and fetches only uncovered intervals. Endpoint,
+permits independent cancellation, and fetches only uncovered intervals. Fresh
+cached boards are acquired before unrelated slow requests occupy the bounded
+request slots, so previously loaded stop boards retain live evidence at the
+deadline. Endpoint,
 credentials, station, language, filters, realtime mode and passlist availability
 isolate coverage; truncated boards cannot establish complete coverage. Routing
 and stop boards use the app's configured language. Original acquisition dates

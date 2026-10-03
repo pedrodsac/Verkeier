@@ -35,6 +35,7 @@ repo = Path(__file__).resolve().parent.parent
 fixture = repo / 'VerkéierTests/Fixtures/esch-delayed-passlist.json'
 subprocess.run(['xcrun', 'simctl', 'install', args.device, str(args.app)], check=True)
 records = []
+cached_records = []
 
 def run(scenario, samples, label):
     log = args.output / f'{scenario}-{label}.log'
@@ -67,6 +68,13 @@ def run(scenario, samples, label):
             path = Path(line.split(' ', 1)[1])
             values.append(json.loads(path.read_text()))
             path.unlink()
+    for line in text.splitlines():
+        if line.startswith('ROUTING_CACHED_COMPARISON_FILE '):
+            path = Path(line.split(' ', 1)[1])
+            cached_records.append(json.loads(path.read_text()) | {'scenario': scenario})
+            path.unlink()
+    if cached_records:
+        (args.output / 'cached-comparisons.json').write_text(json.dumps(cached_records, indent=2))
     if len(values) != samples:
         raise RuntimeError(f'Expected {samples} rendered samples, received {len(values)}')
     if len({v['requestID'] for v in values}) != samples:
