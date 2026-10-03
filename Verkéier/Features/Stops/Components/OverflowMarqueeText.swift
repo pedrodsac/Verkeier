@@ -122,7 +122,9 @@ final class MarqueeLabelView: UIView, CAAnimationDelegate {
         let oldCycle = cycle
         let elapsed = cycleElapsed
         let displayedOffset = label.layer.presentation()?.value(forKeyPath: "transform.translation.x") as? CGFloat
-        viewportWidth = bounds.width
+        // Retain the last reconciled width so subpixel changes accumulate
+        // during interactive resizing instead of escaping the tolerance.
+        if resized { viewportWidth = bounds.width }
 
         CATransaction.begin()
         CATransaction.setDisableActions(true)
