@@ -190,24 +190,6 @@ private struct DepartureBoardAdvancedFilterMenu: View {
 
     var body: some View {
         Menu {
-            Section("Time window") {
-                ForEach([30, 60, 120, 240], id: \.self) { duration in
-                    Button(duration == filter.durationMinutes ? "✓ \(duration) minutes" : "\(duration) minutes") {
-                        var copy = filter
-                        copy.durationMinutes = duration
-                        update(copy)
-                    }
-                }
-            }
-            Section("Results") {
-                ForEach([5, 10, 20, 50], id: \.self) { count in
-                    Button(count == filter.maximumJourneys ? "✓ \(count) departures" : "\(count) departures") {
-                        var copy = filter
-                        copy.maximumJourneys = count
-                        update(copy)
-                    }
-                }
-            }
             Section("Data") {
                 Button(filter.realtimeMode == .full ? "✓ Live updates" : "Live updates") {
                     var copy = filter

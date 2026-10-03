@@ -140,8 +140,9 @@ struct MobiliteitLiveTransitService: LiveTransitService {
                 stationID: stationID,
                 language: language,
                 directionStationID: filter.destinationStopID,
-                durationMinutes: filter.durationMinutes,
-                maximumJourneys: filter.maximumJourneys,
+                // ATP supports at most 1,439 minutes; -1 returns every service in that window.
+                durationMinutes: 1_439,
+                maximumJourneys: -1,
                 products: filter.products,
                 operators: filter.operators,
                 platforms: filter.platforms,
