@@ -479,9 +479,10 @@ extension TransitMapScreen {
             requestLocation()
         }
 
+        let refresh: RouteRealtimeRefreshPolicy = viewModel.routeOptions.isEmpty ? .useCache : .forceRefresh
         Task {
             await viewModel.calculateRoute(
-                using: routeService, from: locationService.currentLocation
+                using: routeService, from: locationService.currentLocation, realtimeRefreshPolicy: refresh
             )
         }
     }

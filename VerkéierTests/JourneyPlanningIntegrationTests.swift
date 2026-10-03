@@ -104,6 +104,42 @@ struct JourneyPlanningIntegrationTests {
         #expect(option.arrivalTime == fixture.anchor.addingTimeInterval(47 * 60))
     }
 
+    @Test("Stop boards and routing consume the same acquisition evidence", arguments: ["on-time", "delay", "downstream", "cancelled"])
+    func boardAndRouteEvidenceAgree(_ variant: String) async throws {
+        let fixture = try await JourneyIntegrationFixture(); defer { fixture.remove() }
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [SharedEvidenceProtocol.self]
+        let client = MobiliteitAPIClient(apiKey: "fixture",
+            baseURL: URL(string: "https://evidence-\(variant)-\(UUID()).invalid")!,
+            session: URLSession(configuration: configuration), language: "en")
+        let board = try await client.departureBoardSnapshot(.init(stationID: "origin", language: "en",
+            date: GTFSDate(parsing: "20260904"), time: ServiceTime(parsing: "08:00:00"),
+            durationMinutes: 180, maximumJourneys: -1, realtimeMode: .serverDefault, includePasslist: true))
+        let source = try #require(board.board.departures.values.first)
+        let stop = Stop(id: "origin", name: "Origin", location: fixture.origin, dataSource: .gtfs, gtfsStopID: "origin")
+        let mapped = try #require(MobiliteitLiveTransitService(proxyURL: nil).map(source, stop: stop,
+            updatedAt: board.observedAt(for: source)))
+        let provider = try HafasRealtimeRoutingProvider(databaseURL: fixture.database, client: client)
+        let batch = try await provider.patches(for: ["origin"], from: fixture.anchor,
+            through: fixture.anchor.addingTimeInterval(90 * 60), refreshPolicy: .useCache)
+        let patch = try #require(batch.patches.first)
+        let departure = try #require(patch.events.first { $0.stopID == "origin" })
+        #expect(batch.networkRequests == 0 && batch.cacheHits == 1)
+        #expect(mapped.lastUpdated == departure.departureObservedAt)
+        #expect(mapped.realtimeDeparture == departure.effectiveDeparture)
+        #expect(mapped.isCancelled == (patch.status == .cancelled))
+        if variant != "cancelled" {
+            #expect(departure.departureSource == .reported)
+            let arrival = try #require(patch.events.first { $0.stopID == "destination" })
+            #expect(arrival.arrivalSource == .reported)
+            #expect(arrival.effectiveArrival == fixture.anchor.addingTimeInterval(variant == "on-time" ? 25 * 60 : 26 * 60))
+        }
+        let reused = try await client.departureBoardSnapshot(.init(stationID: "origin", language: "en",
+            date: GTFSDate(parsing: "20260904"), time: ServiceTime(parsing: "08:01:00"),
+            durationMinutes: 60, maximumJourneys: -1, realtimeMode: .serverDefault, includePasslist: true))
+        #expect(reused.fetchedAt == board.fetchedAt)
+    }
+
     @Test("Faster direct walking remains the package recommendation in the app")
     func fasterWalkingRecommendationPassesThrough() async throws {
         let fixture = try await JourneyIntegrationFixture(withTransfer: true); defer { fixture.remove() }
@@ -241,4 +277,28 @@ private nonisolated struct DirectComparisonWalkingRouter: WalkingRouting {
         return .init(distanceMeters: duration, duration: duration,
             coordinates: [.init(latitude: from.latitude, longitude: from.longitude), .init(latitude: to.latitude, longitude: to.longitude)], source: .localOSM)
     }
+}
+
+private nonisolated final class SharedEvidenceProtocol: URLProtocol {
+    override class func canInit(with request: URLRequest) -> Bool { request.url?.host()?.hasPrefix("evidence-") == true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+    override func startLoading() {
+        let host = request.url!.host()!
+        let onTime = host.hasPrefix("evidence-on-time-")
+        let departure = onTime || host.hasPrefix("evidence-downstream-") ? "08:05:00" : "08:12:00"
+        let arrival = onTime ? "08:25:00" : "08:26:00"
+        let cancelled = host.hasPrefix("evidence-cancelled-") ? ",\"cancelled\":true" : ""
+        let body = """
+        {"Departure":[{"JourneyDetailRef":{"ref":"first"},"Product":{"line":"10","cls":"32"},
+        "stopExtId":"origin","direction":"Destination","time":"08:05:00","date":"2026-09-04",
+        "rtTime":"\(departure)","rtDate":"2026-09-04"\(cancelled),"Stops":{"Stop":[
+        {"extId":"origin","depTime":"08:05:00","depDate":"2026-09-04","rtDepTime":"\(departure)","rtDepDate":"2026-09-04"},
+        {"extId":"destination","arrTime":"08:25:00","arrDate":"2026-09-04","rtArrTime":"\(arrival)","rtArrDate":"2026-09-04"}]}}]}
+        """
+        client?.urlProtocol(self, didReceive: HTTPURLResponse(url: request.url!, statusCode: 200,
+            httpVersion: nil, headerFields: ["Content-Type": "application/json"])!, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: Data(body.utf8))
+        client?.urlProtocolDidFinishLoading(self)
+    }
+    override func stopLoading() {}
 }

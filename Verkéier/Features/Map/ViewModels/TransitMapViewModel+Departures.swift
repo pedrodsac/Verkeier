@@ -24,21 +24,23 @@ extension TransitMapViewModel {
                         for: stop,
                         gtfsService: gtfsService
                     )
-                    let scheduled = await gtfsService.scheduledDepartures(for: boardStop, at: .now, limit: .max)
                     do {
-                        let live = try await liveTransitService.departureBoard(for: boardStop, filter: TransitBoardFilter())
+                        let live = try await liveTransitService.departureBoardSnapshot(for: boardStop, filter: TransitBoardFilter())
                         return FavouriteDepartureBoardResult(
                             stopId: stop.id,
-                            departures: live,
+                            departures: live.departures,
+                            fetchedAt: live.fetchedAt,
                             didFail: false,
                             usedLiveData: true,
                             index: index
                         )
                     } catch {
+                        let scheduled = await gtfsService.scheduledDepartures(for: boardStop, at: .now, limit: .max)
                         let fallback = scheduled.map { $0.asDeparture(stopID: stop.id) }
                         return FavouriteDepartureBoardResult(
                             stopId: stop.id,
                             departures: fallback,
+                            fetchedAt: .now,
                             didFail: fallback.isEmpty,
                             usedLiveData: false,
                             index: index
@@ -51,14 +53,14 @@ extension TransitMapViewModel {
             for result in results.sorted(by: { $0.index < $1.index }) {
                 var snapshot = FavouriteDepartureBoardSnapshot()
                 snapshot.departures = result.departures
-                snapshot.lastUpdated = .now
+                snapshot.lastUpdated = result.fetchedAt
                 snapshot.phase = result.didFail ? .failed : .loaded
                 snapshot.errorMessage = result.didFail ? "Departures could not be refreshed." : nil
                 favouriteDepartureBoards[result.stopId] = snapshot
                 saveFavouriteDepartureBoard(stopID: result.stopId, snapshot: snapshot)
             }
             if results.contains(where: \ .usedLiveData) {
-                liveTransitLastUpdated = .now
+                liveTransitLastUpdated = results.filter(\.usedLiveData).map(\.fetchedAt).min()
                 liveTransitErrorMessage = nil
             }
         }
@@ -77,14 +79,15 @@ extension TransitMapViewModel {
         snapshot.errorMessage = nil
         favouriteDepartureBoards[stop.id] = snapshot
         let boardStop = await liveTransitService.resolvedStop(for: stop, gtfsService: gtfsService)
-        let scheduled = await gtfsService.scheduledDepartures(for: boardStop, at: .now, limit: .max)
         do {
-            snapshot.departures = try await liveTransitService.departureBoard(for: boardStop, filter: filter)
+            let board = try await liveTransitService.departureBoardSnapshot(for: boardStop, filter: filter)
+            snapshot.departures = board.departures
             snapshot.phase = .loaded
-            snapshot.lastUpdated = .now
-            liveTransitLastUpdated = .now
+            snapshot.lastUpdated = board.fetchedAt
+            liveTransitLastUpdated = board.fetchedAt
             liveTransitErrorMessage = nil
         } catch {
+            let scheduled = await gtfsService.scheduledDepartures(for: boardStop, at: .now, limit: .max)
             snapshot.departures = scheduled.map { $0.asDeparture(stopID: stop.id) }
             snapshot.phase = snapshot.departures.isEmpty ? .failed : .loaded
             snapshot.lastUpdated = .now
@@ -135,17 +138,21 @@ extension TransitMapViewModel {
         }
 
         let liveDepartures: [Departure]
+        let fetchedAt: Date?
         let scheduledDepartures: [OfflineScheduleDeparture]
         let liveError: Error?
         do {
-            liveDepartures = try await liveTransitService.departureBoard(
+            let board = try await liveTransitService.departureBoardSnapshot(
                 for: boardStop,
                 filter: departureBoardFilter
             )
+            liveDepartures = board.departures
+            fetchedAt = board.fetchedAt
             scheduledDepartures = []
             liveError = nil
         } catch {
             liveDepartures = []
+            fetchedAt = nil
             scheduledDepartures = await gtfsService.scheduledDepartures(
                 for: boardStop,
                 at: now(),
@@ -165,8 +172,8 @@ extension TransitMapViewModel {
         departures = liveDepartures
         offlineScheduledDepartures = scheduledDepartures
         isUsingOfflineDepartures = liveError != nil
-        departuresLastUpdated = liveError == nil ? now() : nil
-        liveTransitLastUpdated = liveError == nil ? now() : liveTransitLastUpdated
+        departuresLastUpdated = fetchedAt
+        liveTransitLastUpdated = fetchedAt ?? liveTransitLastUpdated
         liveTransitErrorMessage = liveError?.localizedDescription
         departuresErrorMessage = liveError != nil && scheduledDepartures.isEmpty
             ? "No live or offline departures are available for this stop."

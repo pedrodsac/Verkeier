@@ -29,6 +29,19 @@ struct StopDepartureSourceTests {
         #expect(model.isShowingScheduledFallback)
     }
 
+    @Test @MainActor func cachedEmptySnapshotRetainsOriginalFreshness() async {
+        let fetchedAt = Date.now.addingTimeInterval(-45)
+        let viewModel = TransitMapViewModel()
+        viewModel.selectedStop = Stop(id: "cached-empty", name: "Origin",
+            location: .init(latitude: 49.6, longitude: 6.1), dataSource: .mock,
+            hafasStationIDs: ["a"])
+        await viewModel.loadDepartures(using: CachedEmptyBoard(fetchedAt: fetchedAt), gtfsService: FixtureGTFSService())
+        #expect(viewModel.departures.isEmpty)
+        #expect(!viewModel.isUsingOfflineDepartures)
+        #expect(viewModel.departuresLastUpdated == fetchedAt)
+        #expect(viewModel.liveTransitLastUpdated == fetchedAt)
+    }
+
     private let departureDate = Date(timeIntervalSince1970: 1_800_000_000)
 
     private var live: Departure {
@@ -79,5 +92,15 @@ struct StopDepartureSourceTests {
             activeReminder: nil,
             departureReminderErrorMessage: nil
         )
+    }
+}
+
+private nonisolated struct CachedEmptyBoard: LiveTransitService {
+    let isConfigured = true
+    let fetchedAt: Date
+    func nearbyStops(to location: LocationPoint, radiusMeters: Int, limit: Int) async throws -> [LiveTransitStop] { [] }
+    func departureBoard(for stop: Stop, filter: TransitBoardFilter) async throws -> [Departure] { [] }
+    func departureBoardSnapshot(for stop: Stop, filter: TransitBoardFilter) async throws -> LiveDepartureBoardSnapshot {
+        .init(departures: [], fetchedAt: fetchedAt)
     }
 }

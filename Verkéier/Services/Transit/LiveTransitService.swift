@@ -5,9 +5,20 @@ protocol LiveTransitService: Sendable {
     var isConfigured: Bool { get }
     func nearbyStops(to location: LocationPoint, radiusMeters: Int, limit: Int) async throws -> [LiveTransitStop]
     func departureBoard(for stop: Stop, filter: TransitBoardFilter) async throws -> [Departure]
+    func departureBoardSnapshot(for stop: Stop, filter: TransitBoardFilter) async throws -> LiveDepartureBoardSnapshot
+}
+
+struct LiveDepartureBoardSnapshot: Sendable {
+    let departures: [Departure]
+    let fetchedAt: Date
 }
 
 extension LiveTransitService {
+    func departureBoardSnapshot(for stop: Stop, filter: TransitBoardFilter) async throws -> LiveDepartureBoardSnapshot {
+        let departures = try await departureBoard(for: stop, filter: filter)
+        return .init(departures: departures, fetchedAt: departures.compactMap(\.lastUpdated).min() ?? .now)
+    }
+
     func resolvedStop(for stop: Stop, gtfsService: any GTFSService) async -> Stop {
         // ATP accepts the numeric identifiers published by Luxembourg's GTFS
         // feed. Do not require a unique nearby-platform match for those stops.
@@ -97,7 +108,7 @@ struct MobiliteitLiveTransitService: LiveTransitService {
         return MobiliteitAPIClient(
             apiKey: "",
             baseURL: proxyURL.appendingPathComponent("atp"),
-            session: session
+            session: session, language: language
         )
     }
 
@@ -130,12 +141,16 @@ struct MobiliteitLiveTransitService: LiveTransitService {
     }
 
     func departureBoard(for stop: Stop, filter: TransitBoardFilter) async throws -> [Departure] {
+        try await departureBoardSnapshot(for: stop, filter: filter).departures
+    }
+
+    func departureBoardSnapshot(for stop: Stop, filter: TransitBoardFilter) async throws -> LiveDepartureBoardSnapshot {
         guard proxyURL != nil else { throw LiveTransitError.notConfigured }
         guard let stationID = Self.stationIdentifier(for: stop) else {
             throw LiveTransitError.noLiveIdentifier
         }
 
-        let board = try await client.departureBoard(
+        let snapshot = try await client.departureBoardSnapshot(
             HafasDepartureBoardRequest(
                 stationID: stationID,
                 language: language,
@@ -151,14 +166,14 @@ struct MobiliteitLiveTransitService: LiveTransitService {
             )
         )
 
-        let updatedAt = Date.now
-        return board.departures.values.compactMap { departure in
-            map(departure, stop: stop, updatedAt: updatedAt)
+        let departures = snapshot.board.departures.values.compactMap { departure in
+            map(departure, stop: stop, updatedAt: snapshot.observedAt(for: departure))
         }
         .sorted {
             ($0.realtimeDeparture ?? $0.scheduledDeparture ?? .distantFuture)
                 < ($1.realtimeDeparture ?? $1.scheduledDeparture ?? .distantFuture)
         }
+        return .init(departures: departures, fetchedAt: snapshot.fetchedAt)
     }
 
     private var client: MobiliteitAPIClient {
