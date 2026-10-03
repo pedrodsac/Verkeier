@@ -175,6 +175,20 @@ struct MarqueeLabelViewTests {
         #expect(try label(in: view).layer.animationKeys() == nil)
     }
 
+    @Test func subpixelResizeStepsStillReconcileTotalWidthChange() throws {
+        let view = MarqueeLabelView()
+        let window = try host(view)
+        defer { view.stop(); view.removeFromSuperview(); _ = window }
+        configure(view, active: false)
+        for step in 1...10 {
+            view.frame.size.width = 120 + CGFloat(step) * 0.4
+            view.layoutIfNeeded()
+        }
+        let cycle = try #require(view.cycle)
+        let contentWidth = try label(in: view).intrinsicContentSize.width
+        #expect(abs(cycle.endOffset + contentWidth - view.bounds.width) <= 0.5)
+    }
+
     @Test func offscreenAndInactiveTimeDoNotAdvanceCycle() throws {
         var now: CFTimeInterval = 100
         let view = MarqueeLabelView(clock: { now })
