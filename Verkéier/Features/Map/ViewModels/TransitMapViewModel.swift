@@ -226,6 +226,7 @@ final class TransitMapViewModel {
     struct FavouriteDepartureBoardResult: Sendable {
         let stopId: String
         let departures: [Departure]
+        let fetchedAt: Date
         let didFail: Bool
         let usedLiveData: Bool
         let index: Int

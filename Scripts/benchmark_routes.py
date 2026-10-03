@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--device', help='Simulator UDID; defaults to the available iPhone 17')
 parser.add_argument('--app', required=True, type=Path)
 parser.add_argument('--output', required=True, type=Path)
-parser.add_argument('--scenarios', nargs='+', default=['depart', 'reverse', 'coordinates', 'arrive', 'exact', 'rural', 'paging', 'refresh', 'recorded-live', 'deadline-arrive'])
+parser.add_argument('--scenarios', nargs='+', default=['depart', 'reverse', 'coordinates', 'arrive', 'exact', 'rural', 'paging', 'refresh', 'recorded-live', 'deadline-arrive', 'cached'])
 parser.add_argument('--warm', type=int, default=20)
 parser.add_argument('--cold', type=int, default=10)
 parser.add_argument('--p95-limit-ms', type=float, default=5000, help='Gate threshold; use 0 for a separate Debug audit')
@@ -62,11 +62,18 @@ def run(scenario, samples, label):
             subprocess.run(['xcrun', 'simctl', 'terminate', args.device, 'dev.pedrocordeiro.Verkeier'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             process.wait(timeout=10)
     values = [json.loads(line.split('ROUTING_BENCHMARK ', 1)[1]) for line in text.splitlines() if line.startswith('ROUTING_BENCHMARK {')]
+    for line in text.splitlines():
+        if line.startswith('ROUTING_BENCHMARK_FILE '):
+            path = Path(line.split(' ', 1)[1])
+            values.append(json.loads(path.read_text()))
+            path.unlink()
     if len(values) != samples:
         raise RuntimeError(f'Expected {samples} rendered samples, received {len(values)}')
     if len({v['requestID'] for v in values}) != samples:
         raise RuntimeError('A sample reused stale diagnostics instead of calculating a fresh result')
     for value in values:
+        if scenario == 'cached' and value['counters'].get('networkRequests', 0) != 0:
+            raise RuntimeError('Fully cached search issued a board request')
         # The first calculation in a warm series is a priming operation.
         value['process'] = 'cold' if label.startswith('cold') else ('priming' if value['sample'] == 0 else 'warm')
         records.append(value)
@@ -88,6 +95,8 @@ for scenario in args.scenarios:
         summary.append({'scenario': scenario, 'process': kind, 'samples': len(times),
             'median_ms': statistics.median(times), 'p95_ms': times[math.ceil(len(times) * .95) - 1],
             'maximum_ms': max(times), 'peak_memory_bytes': max(v['peak_memory_bytes'] for v in values),
+            'median_observed_departure_coverage': statistics.median(
+                sum(leg['departureSource'] == 'observed' for leg in v.get('displayedLegs', [])) / max(1, len(v.get('displayedLegs', []))) for v in values),
             'median_stages_ms': {stage: statistics.median(v['stages_ms'].get(stage, 0) for v in values)
                 for stage in sorted(set().union(*(v['stages_ms'] for v in values)))},
             'median_counters': {counter: statistics.median(v['counters'].get(counter, 0) for v in values)

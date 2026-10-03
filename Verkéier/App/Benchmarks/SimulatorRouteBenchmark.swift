@@ -37,7 +37,7 @@ final class SimulatorRouteBenchmark {
             self.service = service
             let samples = Int(env["ROUTING_BENCHMARK_SAMPLES"] ?? "1") ?? 1
             configure(scenario)
-            if scenario == "paging" || scenario == "refresh" {
+            if scenario == "paging" || scenario == "refresh" || scenario == "cached" {
                 await viewModel.calculateRoute(using: service, from: nil)
                 try await Task.sleep(for: .seconds(1))
             }
@@ -47,7 +47,8 @@ final class SimulatorRouteBenchmark {
                     await viewModel.loadLaterRoutes(using: service, from: nil)
                 } else {
                     viewModel.routeOptions = []
-                    await viewModel.calculateRoute(using: service, from: nil)
+                    await viewModel.calculateRoute(using: service, from: nil,
+                        realtimeRefreshPolicy: scenario == "cached" ? .useCache : .forceRefresh)
                 }
                 let deadline = ContinuousClock.now.advanced(by: .seconds(120))
                 while viewModel.routeDiagnostics?.milliseconds[.firstRender] == nil,
@@ -64,6 +65,9 @@ final class SimulatorRouteBenchmark {
                 if scenario == "recorded-live", diagnostics.counters[.predictedEvents, default: 0] == 0 {
                     throw RoutingError.noRouteFound
                 }
+                if scenario == "cached", diagnostics.counters[.networkRequests, default: 0] != 0 {
+                    throw RoutingError.noRouteFound
+                }
                 var usage = rusage()
                 getrusage(RUSAGE_SELF, &usage)
                 let record: [String: Any] = ["scenario": scenario, "sample": sample,
@@ -72,13 +76,29 @@ final class SimulatorRouteBenchmark {
                     "rounds": diagnostics.rounds.map { ["scan_ms": $0.patternScanMilliseconds, "merge_ms": $0.labelMergeMilliseconds,
                         "prepare_ms": $0.tripPreparationMilliseconds, "alights": $0.alightingChecks, "retained": $0.retainedLabels] },
                     "options": viewModel.routeOptions.map(\.id),
+                    "refreshPolicy": scenario == "cached" || scenario == "paging" ? "useCache" : "forceRefresh",
+                    "displayedLegs": viewModel.routeOptions.flatMap { option in
+                        option.transitLegs.map { leg -> [String: Any] in
+                            ["option": option.id, "trip": leg.tripId ?? "", "stop": leg.originStopId ?? "",
+                             "line": leg.routeName ?? "", "departureSource": leg.departureTimingSource?.rawValue ?? "scheduled",
+                             "arrivalSource": leg.arrivalTimingSource?.rawValue ?? "scheduled", "status": leg.liveStatus.rawValue,
+                             "scheduledDeparture": leg.scheduledDepartureTime?.timeIntervalSince1970 ?? 0,
+                             "effectiveDeparture": leg.departureTime?.timeIntervalSince1970 ?? 0,
+                             "effectiveArrival": leg.arrivalTime?.timeIntervalSince1970 ?? 0]
+                        }
+                    },
+                    "matchingRejections": Dictionary(uniqueKeysWithValues: diagnostics.realtimeMatchingRejections.map { ($0.key.rawValue, $0.value) }),
                     "realtimeCoverage": Dictionary(uniqueKeysWithValues: viewModel.routeOptions.map {
                         ($0.id, $0.realtimeCoverage.rawValue)
                     }),
                     "counters": Dictionary(uniqueKeysWithValues: diagnostics.counters.map { ($0.key.rawValue, $0.value) }), "peak_memory_bytes": usage.ru_maxrss]
                 let json = try JSONSerialization.data(withJSONObject: record, options: [.sortedKeys])
-                print("ROUTING_BENCHMARK " + String(decoding: json, as: UTF8.self))
+                let file = FileManager.default.temporaryDirectory.appendingPathComponent("route-benchmark-\(diagnostics.requestID).json")
+                try json.write(to: file, options: .atomic)
+                // Large accumulated pages can block simctl's console bridge.
+                print("ROUTING_BENCHMARK_FILE " + file.path)
                 fflush(stdout)
+                if scenario.hasPrefix("live-") { await compareStopBoards() }
                 status = "\(scenario) sample \(sample + 1)/\(samples): \(Int(diagnostics.totalMilliseconds)) ms"
                 // Geometry refinement is outside the gate. Let it finish before
                 // another sample, to avoid measuring concurrent search work.
@@ -102,13 +122,16 @@ final class SimulatorRouteBenchmark {
         if scenario == "arrive" || scenario == "live-arrive" || scenario == "deadline-arrive" {
             time = .arriveBy(formatter.date(from: "2026-09-30T09:00:00+02:00")!)
         }
-        if scenario == "exact" || scenario == "refresh" || scenario == "paging" || scenario == "recorded-live" {
+        if scenario == "exact" || scenario == "refresh" || scenario == "paging" || scenario == "recorded-live" || scenario == "cached" || scenario == "live-esch" {
             from = .init(name: "Esch", latitude: 49.4959, longitude: 5.9805, transitStopID: "000220402034")
             to = .init(name: "Destination", latitude: 49.611, longitude: 6.13, transitStopID: "000400000095")
             time = .departAt(formatter.date(from: "2026-09-30T18:35:00+02:00")!)
         }
-        if scenario == "recorded-live" { time = .departAt(formatter.date(from: "2026-09-30T18:28:00+02:00")!) }
-        if scenario == "live-now" { time = .leaveNow }
+        if scenario == "recorded-live" || scenario == "cached" { time = .departAt(formatter.date(from: "2026-09-30T18:28:00+02:00")!) }
+        if scenario == "live-reverse" { swap(&from, &to) }
+        if scenario.hasPrefix("live-") {
+            time = scenario == "live-arrive" ? .arriveBy(Date.now.addingTimeInterval(3_600)) : .leaveNow
+        }
         if scenario == "rural" {
             to = .init(name: "Clervaux", latitude: 50.0605, longitude: 6.0316)
         }
@@ -118,6 +141,39 @@ final class SimulatorRouteBenchmark {
         viewModel.routeOrigin = .init(title: from.name ?? "Origin", location: from, source: .search)
         viewModel.routeDestination = .init(title: to.name ?? "Destination", location: to, source: .search)
         viewModel.routePlanningTime = time
+    }
+
+    /// Opt-in live validation stays outside the displayed-result timing gate.
+    /// It goes through the same app service as the departure screen.
+    private func compareStopBoards() async {
+        let live = MobiliteitLiveTransitService(proxyURL: AppConfiguration.current.apiProxyURL)
+        let legs = viewModel.routeOptions.flatMap(\.transitLegs)
+        for stopID in Set(legs.compactMap(\.originStopId)).sorted() {
+            guard let leg = legs.first(where: { $0.originStopId == stopID }) else { continue }
+            let stop = Stop(id: stopID, name: leg.origin.name ?? stopID, location: leg.origin,
+                            dataSource: .gtfs, gtfsStopID: stopID)
+            do {
+                let board = try await live.departureBoardSnapshot(for: stop, filter: .init())
+                let comparisons: [[String: Any]] = legs.filter { $0.originStopId == stopID }.map { leg in
+                    let rows = board.departures.filter { departure in
+                        departure.lineName == leg.routeName && departure.scheduledDeparture.map { planned in
+                            abs(planned.timeIntervalSince(leg.scheduledDepartureTime ?? .distantPast)) <= 90
+                        } == true
+                    }
+                    let row = rows.count == 1 ? rows.first : nil
+                    return ["trip": leg.tripId ?? "", "line": leg.routeName ?? "", "matches": rows.count,
+                            "routeSource": leg.departureTimingSource?.rawValue ?? "scheduled",
+                            "routeDeparture": leg.departureTime?.timeIntervalSince1970 ?? 0,
+                            "boardDeparture": row?.realtimeDeparture?.timeIntervalSince1970 ?? 0,
+                            "boardCancelled": row?.isCancelled ?? false]
+                }
+                let result: [String: Any] = ["stop": stopID, "departures": board.departures.count,
+                    "fetchedAt": board.fetchedAt.timeIntervalSince1970, "comparisons": comparisons]
+                let data = try JSONSerialization.data(withJSONObject: result, options: [.sortedKeys])
+                print("ROUTING_BOARD_COMPARISON " + String(decoding: data, as: UTF8.self))
+            } catch { print("ROUTING_BOARD_COMPARISON_FAILED \(stopID) \(error)") }
+        }
+        fflush(stdout)
     }
 
     var presentation: RoutePresentationModel {

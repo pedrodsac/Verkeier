@@ -91,7 +91,10 @@ struct RouteCalculationFlowTests {
             using: RecordingLiveRouteService(options: options, recorder: recorder), from: nil
         )
 
-        #expect(await recorder.policies == [.forceRefresh])
+        #expect(await recorder.policies == [.useCache])
+        await viewModel.calculateRoute(using: RecordingLiveRouteService(options: options, recorder: recorder),
+            from: nil, realtimeRefreshPolicy: .forceRefresh)
+        #expect(await recorder.policies == [.useCache, .forceRefresh])
         #expect(viewModel.routeOptions.map(\.id) == options.map(\.id))
         #expect(viewModel.selectedRouteOptionID == options.first?.id)
         #expect(viewModel.routeErrorMessage == nil)

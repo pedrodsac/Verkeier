@@ -148,7 +148,8 @@ extension TransitMapViewModel {
         clearRoute()
     }
 
-    func calculateRoute(using routeService: any RouteService, from location: CLLocation?) async {
+    func calculateRoute(using routeService: any RouteService, from location: CLLocation?,
+                        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy = .useCache) async {
         guard let destination = effectiveRouteDestination else {
             routeLoadingPhase = .idle
             routeErrorMessage = "Choose a route destination first."
@@ -201,7 +202,7 @@ extension TransitMapViewModel {
                 to: destination.location,
                 time: routePlanningTime,
                 filters: routeFilters,
-                realtimeRefreshPolicy: .forceRefresh
+                realtimeRefreshPolicy: realtimeRefreshPolicy
             )
             for try await calculation in updates {
                 guard requestGeneration == routeCalculationGeneration else { return }

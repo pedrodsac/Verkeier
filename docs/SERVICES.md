@@ -71,16 +71,21 @@ invalidated and one corrected-cost replan is attempted.
 
 MobiliteitKit’s `JourneyPlanner` keeps a `TransitRouter` and
 `HafasRealtimeRoutingProvider` paired to the active GTFS database generation.
-When that generation changes, both are rebuilt. A new calculation or explicit
-refresh bypasses the 60-second HAFAS board cache; earlier/later paging reuses
-covered snapshots. Live acquisition uses at most four concurrent requests,
-four discovery waves, 24 stop targets, and a shared four-second deadline within
-the route calculation's overall 15-second UI deadline. Each target covers up to
-90 minutes in 30-minute slices (50 journeys per slice, at most eight requests
-per stop). Full slices are split; exhausted intervals remain partial. Boards
-start at the effective query time; a separate two-hour GTFS lookback matches
-scheduled departures delayed into that window. Failure, timeout, missing proxy configuration, and
-ambiguous HAFAS-to-GTFS matches all preserve valid schedule-only results.
+When that generation changes, both are rebuilt. Find Routes, presets and new
+searches reuse compatible fresh evidence; Refresh Routes bypasses completed
+cache entries. Earlier/later pages retain fresh observations and acquire missing
+coverage for new boarding occurrences. New evidence revalidates accumulated
+results in the active generation before a complete snapshot is published.
+
+Live acquisition uses at most four concurrent requests, four discovery waves,
+24 stop targets, and one two-second budget. Reachability and effective boarding
+times select per-stop windows for the current search or page, including legs
+beyond the former 90-minute horizon. Adjacent windows merge into unrestricted
+`maxJourneys=-1` requests rather than 50-journey slices. ATP's 1,439-minute limit
+still applies. A trip prediction from another stop does not suppress checks for
+an occurrence without fresh live timing. Failure, timeout, missing configuration
+and ambiguous matches preserve valid scheduled results; completed evidence is
+retained when later acquisition times out.
 
 Realtime data is applied before RAPTOR selects a journey. Walking access,
 boardability, transfers, dominance, arrival times, and route ordering therefore
@@ -98,11 +103,22 @@ Discovery includes reachable transfer departures absent from static winners,
 merges overlapping observations, then performs one final RAPTOR scan. The
 optimistic discovery envelope advances one ride per wave, avoiding repeated
 scans of all earlier waves. Matching
-rejects ambiguous or non-monotonic active updates. The shared cache coalesces
-requests and allows independent cancellation; explicit refresh bypasses both
-cache layers. Complete interval containment is required for provider reuse.
-Coverage beyond the acquisition budget stays partial. Metrics include actual
-HTTP requests, cache hits, bytes, incomplete boards, and reported event counts.
+rejects ambiguous or non-monotonic active updates and counts rejection reasons.
+The shared departure-board cache coalesces compatible overlapping requests,
+permits independent cancellation, and fetches only uncovered intervals. Endpoint,
+credentials, station, language, filters, realtime mode and passlist availability
+isolate coverage; truncated boards cannot establish complete coverage. Routing
+and stop boards use the app's configured language. Original acquisition dates
+survive cache hits and gap assembly, with 60-second expiration and bounded
+eviction. Older requests cannot overwrite refreshed coverage.
+
+MobiliteitKit's additive `departureBoardSnapshot` API exposes the board,
+acquisition timestamp, requested interval and completeness. The app maps each
+row with its original observation timestamp and uses the snapshot date for
+board freshness, including empty boards. The stop board retains its 1,439-minute
+range and scheduled fallback on live failure. Metrics include board requests,
+cache hits, bytes, incomplete coverage and matched event counts; the simulator
+benchmark separately reports displayed-leg evidence and matching rejections.
 
 `BikeShareService` provides vel’OH! static station data and on-demand dynamic
 availability. The public-transport routing engine merges direct bike journeys
