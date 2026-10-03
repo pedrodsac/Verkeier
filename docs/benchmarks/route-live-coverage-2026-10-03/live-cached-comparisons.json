@@ -1,0 +1,297 @@
+[
+  {
+    "counters": {
+      "boardCacheHits": 5,
+      "boardsCovered": 16,
+      "candidates": 2259,
+      "delayedPastBoardings": 1,
+      "duplicatesSuppressed": 273,
+      "incompleteBoards": 4,
+      "invalidJourneys": 8,
+      "networkRequests": 18,
+      "pageNewJourneys": 2,
+      "predictedEvents": 443,
+      "recommendationSwitches": 0,
+      "responseBytes": 1387681,
+      "retainedAlternatives": 12,
+      "sharedFirstVehicleGroups": 0,
+      "walkingCacheHits": 402,
+      "walkingRequests": 432,
+      "workers": 10
+    },
+    "legs": [
+      {
+        "departure": 1791058260,
+        "line": "29",
+        "option": "g4:127>1962:24365775@20261003:0-2|24360282@20261003:2-7",
+        "source": "observed",
+        "stop": "000200508003",
+        "trip": "24365775"
+      },
+      {
+        "departure": 1791059380,
+        "line": "16",
+        "option": "g4:127>1962:24365775@20261003:0-2|24360282@20261003:2-7",
+        "source": "scheduled",
+        "stop": "000200508016",
+        "trip": "24360282"
+      },
+      {
+        "departure": 1791058680,
+        "line": "322",
+        "option": "g4:654>1962:24262721@20261003:16-19|24368507@20261003:3-8",
+        "source": "observed",
+        "stop": "000200508004",
+        "trip": "24262721"
+      },
+      {
+        "departure": 1791060710,
+        "line": "6",
+        "option": "g4:654>1962:24262721@20261003:16-19|24368507@20261003:3-8",
+        "source": "scheduled",
+        "stop": "000200417050",
+        "trip": "24368507"
+      },
+      {
+        "departure": 1791059887,
+        "line": "223",
+        "option": "g4:612>1962:24263715@20261003:13-16|24368507@20261003:2-8",
+        "source": "scheduled",
+        "stop": "000200508002",
+        "trip": "24263715"
+      },
+      {
+        "departure": 1791060430,
+        "line": "6",
+        "option": "g4:612>1962:24263715@20261003:13-16|24368507@20261003:2-8",
+        "source": "scheduled",
+        "stop": "000200508016",
+        "trip": "24368507"
+      },
+      {
+        "departure": 1791061920,
+        "line": "29",
+        "option": "g4:127>1962:24365489@20261003:0-2|24360281@20261003:2-7",
+        "source": "observed",
+        "stop": "000200508003",
+        "trip": "24365489"
+      },
+      {
+        "departure": 1791062340,
+        "line": "16",
+        "option": "g4:127>1962:24365489@20261003:0-2|24360281@20261003:2-7",
+        "source": "scheduled",
+        "stop": "000200508016",
+        "trip": "24360281"
+      },
+      {
+        "departure": 1791063780,
+        "line": "850",
+        "option": "g4:612>1962:24291394@20261003:31-34|24360279@20261003:2-7",
+        "source": "observed",
+        "stop": "000200508002",
+        "trip": "24291394"
+      },
+      {
+        "departure": 1791065460,
+        "line": "16",
+        "option": "g4:612>1962:24291394@20261003:31-34|24360279@20261003:2-7",
+        "source": "scheduled",
+        "stop": "000200508016",
+        "trip": "24360279"
+      }
+    ],
+    "matchingRejections": {
+      "invalidTripTimeline": 7
+    },
+    "total_ms": 2454.108875,
+    "scenario": "live-now",
+    "run": "cache-priority-retest",
+    "packageRevision": "65ca049952432e1da5771000b2347081b550adac",
+    "appRevision": "7191e8a56cad1d0a1e661f3c139b232d0d35339c"
+  },
+  {
+    "counters": {
+      "boardCacheHits": 8,
+      "boardsCovered": 16,
+      "candidates": 2752,
+      "delayedPastBoardings": 1,
+      "duplicatesSuppressed": 48,
+      "incompleteBoards": 4,
+      "invalidJourneys": 0,
+      "networkRequests": 12,
+      "pageNewJourneys": 0,
+      "predictedEvents": 770,
+      "recommendationSwitches": 0,
+      "responseBytes": 2167278,
+      "retainedAlternatives": 14,
+      "sharedFirstVehicleGroups": 1,
+      "walkingCacheHits": 432,
+      "walkingRequests": 432,
+      "workers": 10
+    },
+    "legs": [
+      {
+        "departure": 1791058140,
+        "line": "6",
+        "option": "g4:1962>1740:24368938@20261003:21-25|24265295@20261003:0-2",
+        "source": "observed",
+        "stop": "000200417019",
+        "trip": "24368938"
+      },
+      {
+        "departure": 1791058800,
+        "line": "327",
+        "option": "g4:1962>1740:24368938@20261003:21-25|24265295@20261003:0-2",
+        "source": "scheduled",
+        "stop": "000200417050",
+        "trip": "24265295"
+      },
+      {
+        "departure": 1791058140,
+        "line": "6",
+        "option": "g4:1962>612:24368938@20261003:21-26|24262446@20261003:0-3",
+        "source": "observed",
+        "stop": "000200417019",
+        "trip": "24368938"
+      },
+      {
+        "departure": 1791059490,
+        "line": "212",
+        "option": "g4:1962>612:24368938@20261003:21-26|24262446@20261003:0-3",
+        "source": "scheduled",
+        "stop": "000200417050",
+        "trip": "24262446"
+      },
+      {
+        "departure": 1791058920,
+        "line": "16",
+        "option": "g4:1962>127:24360682@20261003:20-25|24366050@20261003:28-30",
+        "source": "observed",
+        "stop": "000200417019",
+        "trip": "24360682"
+      },
+      {
+        "departure": 1791060600,
+        "line": "29",
+        "option": "g4:1962>127:24360682@20261003:20-25|24366050@20261003:28-30",
+        "source": "scheduled",
+        "stop": "000200508016",
+        "trip": "24366050"
+      },
+      {
+        "departure": 1791059340,
+        "line": "18",
+        "option": "g4:1962>612:24361572@20261003:19-23|24261826@20261003:0-3",
+        "source": "observed",
+        "stop": "000200417019",
+        "trip": "24361572"
+      },
+      {
+        "departure": 1791060300,
+        "line": "321",
+        "option": "g4:1962>612:24361572@20261003:19-23|24261826@20261003:0-3",
+        "source": "scheduled",
+        "stop": "000200417050",
+        "trip": "24261826"
+      },
+      {
+        "departure": 1791059820,
+        "line": "6",
+        "option": "g4:1962>654:24368936@20261003:21-26|24264829@20261003:0-3",
+        "source": "observed",
+        "stop": "000200417019",
+        "trip": "24368936"
+      },
+      {
+        "departure": 1791061200,
+        "line": "326",
+        "option": "g4:1962>654:24368936@20261003:21-26|24264829@20261003:0-3",
+        "source": "scheduled",
+        "stop": "000200417050",
+        "trip": "24264829"
+      }
+    ],
+    "matchingRejections": {
+      "invalidTripTimeline": 9,
+      "noCandidate": 16
+    },
+    "total_ms": 2638.323875,
+    "scenario": "live-reverse",
+    "run": "cache-priority-retest",
+    "packageRevision": "65ca049952432e1da5771000b2347081b550adac",
+    "appRevision": "7191e8a56cad1d0a1e661f3c139b232d0d35339c"
+  },
+  {
+    "counters": {
+      "boardCacheHits": 6,
+      "boardsCovered": 16,
+      "candidates": 937,
+      "delayedPastBoardings": 2,
+      "duplicatesSuppressed": 66,
+      "incompleteBoards": 4,
+      "invalidJourneys": 3,
+      "networkRequests": 14,
+      "pageNewJourneys": 0,
+      "predictedEvents": 798,
+      "recommendationSwitches": 0,
+      "responseBytes": 2827325,
+      "retainedAlternatives": 7,
+      "sharedFirstVehicleGroups": 0,
+      "walkingCacheHits": 368,
+      "walkingRequests": 379,
+      "workers": 10
+    },
+    "legs": [
+      {
+        "departure": 1791059040,
+        "line": "651",
+        "option": "g4:514>2078:24284817@20261003:20-40",
+        "source": "observed",
+        "stop": "000220402034",
+        "trip": "24284817"
+      },
+      {
+        "departure": 1791060840,
+        "line": "651",
+        "option": "g4:514>2078:24284816@20261003:20-40",
+        "source": "observed",
+        "stop": "000220402034",
+        "trip": "24284816"
+      },
+      {
+        "departure": 1791062680,
+        "line": "651",
+        "option": "g4:514>2078:24284815@20261003:20-40",
+        "source": "scheduled",
+        "stop": "000220402034",
+        "trip": "24284815"
+      },
+      {
+        "departure": 1791064920,
+        "line": "RB",
+        "option": "g4:1989>1993:24442828@20261004:0-3|24443269@20261004:0-5",
+        "source": "scheduled",
+        "stop": "000220402046",
+        "trip": "24442828"
+      },
+      {
+        "departure": 1791065940,
+        "line": "RB",
+        "option": "g4:1989>1993:24442828@20261004:0-3|24443269@20261004:0-5",
+        "source": "scheduled",
+        "stop": "000220102018",
+        "trip": "24443269"
+      }
+    ],
+    "matchingRejections": {
+      "invalidTripTimeline": 2,
+      "noCandidate": 5
+    },
+    "total_ms": 2235.481916,
+    "scenario": "live-esch",
+    "run": "cache-priority-retest",
+    "packageRevision": "65ca049952432e1da5771000b2347081b550adac",
+    "appRevision": "7191e8a56cad1d0a1e661f3c139b232d0d35339c"
+  }
+]
