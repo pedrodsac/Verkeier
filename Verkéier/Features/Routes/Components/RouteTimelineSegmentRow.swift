@@ -194,7 +194,8 @@ private struct TimelineTransitBadge: View {
                         text: direction,
                         font: .subheadline.weight(.semibold),
                         initialLeadingInset: 0,
-                        forceScroll: true
+                        forceScroll: true,
+                        foregroundColor: .black
                     )
                     .frame(maxWidth: .infinity, minHeight: 22, alignment: .leading)
                 }
