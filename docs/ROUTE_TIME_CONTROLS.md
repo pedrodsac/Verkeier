@@ -58,3 +58,30 @@ scenarios alongside existing `depart`, `arrive`, and `paging` scenarios. It uses
 the installed feed and walking graph, recorded ATP transport, and the production
 view model, adapter, and rendered route sheet. See
 `ROUTE_CALCULATION_PERFORMANCE.md` for the benchmark commands and five-second gate.
+
+## Results — 4 October 2026
+
+The final iPhone 17 / iOS 27 Release simulator run passed the five-second
+rendered-result gate for all six scenarios: 20 warm and 10 fresh-process samples
+each, plus one excluded priming operation. All 180 timed operations stayed below
+2.18 seconds. Full results are in
+[`summary.json`](benchmarks/route-time-controls-2026-10-04/summary.json).
+
+| Scenario | Warm p95 | Cold p95 |
+|---|---:|---:|
+| Leave at | 1.50 s | 2.08 s |
+| Arrive by | 1.56 s | 2.18 s |
+| Later | 0.59 s | 0.44 s |
+| Earlier | 1.17 s | 1.24 s |
+| Earlier arrivals | 1.04 s | 1.20 s |
+| Later arrivals | 2.06 s | 1.19 s |
+
+The benchmark re-primes an exhausted paging direction outside the timed
+operation, matching the initial-page prerequisite of the existing paging
+benchmark. An initial small audit recorded a 6.27-second cold departure; the
+final 20/10 series ran after builds and tests were complete and passed throughout.
+These are simulator measurements, not physical-device guarantees.
+
+Validation: 119 app tests passed, 176 package tests passed with
+`ROUTING_VERIFY_KERNEL=1`, and the Release build succeeded. The app pins
+MobiliteitKit revision `f19854837622e3ce702108263c89bd3f91edbf46`.
