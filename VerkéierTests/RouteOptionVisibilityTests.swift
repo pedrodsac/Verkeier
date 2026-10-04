@@ -7,6 +7,25 @@ import Testing
 struct RouteOptionVisibilityTests {
     private let anchor = Date(timeIntervalSince1970: 1_800_000_000)
 
+    @Test("Presentation hides the final result after time dominance filtering")
+    func hidesFinalFilteredResult() {
+        let slow = option("slow", departure: 0, arrival: 1_800)
+        let fast = option("fast", departure: 300, arrival: 1_200)
+        let later = option("later", departure: 900, arrival: 2_100)
+        let visible = RouteOptionVisibility.presentedOptions(
+            primary: [slow, fast, later], supplemental: [], at: anchor)
+        #expect(visible.primary.map(\.id) == [fast.id])
+    }
+
+    @Test("Presentation handles empty and single result lists")
+    func hidesSingleResult() {
+        for options in [[], [option("only", departure: 0, arrival: 1_200)]] {
+            let visible = RouteOptionVisibility.presentedOptions(
+                primary: options, supplemental: [], at: anchor)
+            #expect(visible.primary.isEmpty)
+        }
+    }
+
     @Test("Later departures and earlier arrivals hide slower routes, including equal boundaries",
           arguments: [0.0, 300.0], [1_200.0, 1_800.0])
     func hidesDominatedOptions(departure: TimeInterval, arrival: TimeInterval) {
