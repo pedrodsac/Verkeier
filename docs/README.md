@@ -16,6 +16,7 @@
 | Route quality work | `ROUTE_QUALITY_IMPLEMENTATION_PLAN.md` |
 | Leave at, Arrive by, Earlier and Later behavior | `ROUTE_TIME_CONTROLS.md` |
 | Preventing invalid, wasteful, unstable or duplicate journeys | `ROUTING_FAILURE_PREVENTION_PLAN.md` + `ROUTING_FAILURE_PREVENTION_IMPLEMENTATION.md` (behavior, 49-case regressions and verification) |
+| Missing live updates on connecting trips | `ROUTING_LIVE_CONNECTIONS.md` |
 | Router performance, simulator measurements and reproduction | `ROUTE_CALCULATION_PERFORMANCE.md` |
 | UI lag, launch work and map update performance | `UI_PERFORMANCE.md` |
 
