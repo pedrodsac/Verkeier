@@ -1,6 +1,13 @@
 # Route calculation performance
 
-The extended Release matrix and final affected-path retests pass, with worst scenario/process p95 **3.776 seconds**. Fully compatible cached searches issue **zero board requests**. [3 October validation](benchmarks/route-live-coverage-2026-10-03/validation.md) records the final package pin, 330 full-matrix operations plus 60 follow-up operations, displayed-leg evidence, live stop-board comparisons and complete distributions. Earlier benchmark results below are retained as historical measurements with their original feed and package revisions.
+The 4 October connecting-trip revision restores live acquisition for every
+itinerary vehicle while keeping the complete rendered search below five seconds.
+[4 October validation](benchmarks/route-live-connections-2026-10-04/validation.md)
+records the pinned Release build, full timing matrix, final affected-path runs,
+live board comparisons and distributions. The benchmark now rejects **any**
+operation at or above 5,000 ms, including priming; p95 remains descriptive.
+Compatible cached searches still issue zero board requests. Earlier results
+below remain historical measurements with their original feed and revisions.
 
 ## Acceptance boundary
 
@@ -12,7 +19,13 @@ Search coverage remains three hours for initial departure searches, 24 hours for
 
 - Correlated `RoutingDiagnostics` use `ContinuousClock` and fresh operation identifiers. Results carry preparation, endpoint, realtime acquisition, HTTP/decode, schedule preparation, matching/discovery, RAPTOR/round, walking, assembly, geometry, adapter, publication and rendering timings plus request/cache/coverage counters. Historical snapshot metrics remain separate. The former “RAPTOR CPU” number is identified as non-walking elapsed time.
 - RAPTOR scan candidates and profiles store compact scalar keys and lightweight indices. Fractional timestamps are retained. Incoming-trip bitmasks, cached eviction bounds and indexed boarding arrival ranks reject impossible candidates before allocation. Eligible alighting positions are computed once per trip/remaining-round constraint. Chunk merging retains the original deterministic order and identifiers; predecessor/leg objects are materialized only for surviving labels. Worker concurrency is bounded and expensive chunks start first.
-- Realtime boards use destination-aware occurrence windows, merge adjacent acquisition ranges and request unrestricted journeys. One shared cache assembles compatible coverage across stop boards and routing, fetches gaps and coalesces overlapping flights. Original acquisition timestamps retain the 60-second freshness rule. Normal searches reuse fresh evidence; explicit Refresh Routes bypasses completed coverage. One absolute deadline spans fetching, decoding, schedules, matching, event creation and discovery. `RealtimeConfiguration.acquisitionBudgetMilliseconds` defaults to 4,000, including decoding older configuration; Verkéier selects 2,000.
+- Realtime boards use destination-aware occurrence windows, merge adjacent acquisition ranges and request unrestricted journeys. One shared cache assembles compatible coverage across stop boards and routing, fetches gaps and coalesces overlapping flights. Original acquisition timestamps retain the 60-second freshness rule. Normal searches reuse fresh evidence; explicit Refresh Routes bypasses completed coverage. One absolute deadline spans fetching, decoding, schedules, matching, event creation and discovery. `RealtimeConfiguration.acquisitionBudgetMilliseconds` defaults to 4,000, including decoding older configuration. Verkéier selects a 2,500 ms shared
+  acquisition allowance, sixteen concurrent itinerary requests and four discovery
+  slots. Line-filtered boards retain unlimited journeys and full passlists. A
+  4,100 ms search-work allowance reserves measured scan time plus a margin for
+  the final complete scan before another live wave. Up to two refinement waves,
+  deferred intermediate-stop materialization and equivalent envelope pruning
+  bound repeat work without reducing the search horizon.
 - The route stream publishes the entire calculated snapshot immediately. Five staggered reveals and their roughly 400 ms artificial delay are removed. Startup preparation and the local walking-router pool remain. A conservative geodesic bound rejects impossible direct-walking comparisons before Valhalla, while actual paths still undergo the existing length validation.
 
 ## Measurement setup
