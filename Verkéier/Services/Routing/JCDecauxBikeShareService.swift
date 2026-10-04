@@ -52,11 +52,19 @@ actor JCDecauxBikeShareStore {
     private let session: URLSession
     private var staticStations: [BikeShareStation] = []
     private var currentSnapshot: BikeShareSnapshot?
+    private var didLoadCachedSnapshot = false
+    private let cacheURL: URL
 
-    init(configuration: AppConfiguration, session: URLSession) {
+    init(configuration: AppConfiguration, session: URLSession, cacheURL: URL? = nil) {
         self.configuration = configuration
         self.session = session
-        if let cached = Self.readCachedSnapshot() {
+        self.cacheURL = cacheURL ?? Self.defaultCacheURL
+    }
+
+    private func loadCachedSnapshotIfNeeded() {
+        guard !didLoadCachedSnapshot else { return }
+        didLoadCachedSnapshot = true
+        if let cached = Self.readCachedSnapshot(at: cacheURL) {
             staticStations = cached.stations.map { station in
                 BikeShareStation(
                     id: station.id,
@@ -71,14 +79,17 @@ actor JCDecauxBikeShareStore {
     }
 
     func stations() -> [BikeShareStation] {
-        currentSnapshot?.stations ?? staticStations
+        loadCachedSnapshotIfNeeded()
+        return currentSnapshot?.stations ?? staticStations
     }
 
     func snapshot() -> BikeShareSnapshot? {
-        currentSnapshot
+        loadCachedSnapshotIfNeeded()
+        return currentSnapshot
     }
 
     func refreshStaticStations() async {
+        loadCachedSnapshotIfNeeded()
         do {
             let (data, response) = try await session.data(from: configuration.bikeShareStaticStationsURL)
             try Self.validate(response: response, data: data)
@@ -94,13 +105,14 @@ actor JCDecauxBikeShareStore {
                 }
                 self.currentSnapshot = BikeShareSnapshot(stations: merged, fetchedAt: currentSnapshot.fetchedAt)
             }
-            Self.writeCachedSnapshot(BikeShareSnapshot(stations: parsed, fetchedAt: .now))
+            Self.writeCachedSnapshot(BikeShareSnapshot(stations: parsed, fetchedAt: .now), to: cacheURL)
         } catch {
             // The last valid snapshot remains available for offline startup.
         }
     }
 
     func refreshAvailability() async {
+        loadCachedSnapshotIfNeeded()
         if staticStations.isEmpty {
             await refreshStaticStations()
         }
@@ -227,17 +239,17 @@ actor JCDecauxBikeShareStore {
         return result
     }
 
-    private static var cacheURL: URL {
+    private static var defaultCacheURL: URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         return base.appendingPathComponent("veloh-stations.json")
     }
 
-    private static func readCachedSnapshot() -> BikeShareSnapshot? {
+    private static func readCachedSnapshot(at cacheURL: URL) -> BikeShareSnapshot? {
         guard let data = try? Data(contentsOf: cacheURL) else { return nil }
         return try? JSONDecoder().decode(BikeShareSnapshot.self, from: data)
     }
 
-    private static func writeCachedSnapshot(_ snapshot: BikeShareSnapshot) {
+    private static func writeCachedSnapshot(_ snapshot: BikeShareSnapshot, to cacheURL: URL) {
         let directory = cacheURL.deletingLastPathComponent()
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         guard let data = try? JSONEncoder().encode(snapshot) else { return }
