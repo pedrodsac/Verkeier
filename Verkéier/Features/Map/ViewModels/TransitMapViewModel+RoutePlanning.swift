@@ -535,7 +535,7 @@ extension TransitMapViewModel {
     }
 
     func applyRouteOptions(preferredID: String?, announceFallback: Bool) {
-        let visible = RouteOptionVisibility.visibleOptions(
+        let visible = RouteOptionVisibility.presentedOptions(
             primary: unfilteredRouteOptions, supplemental: unfilteredSupplementalRouteOptions, at: now()
         )
         routeOptions = visible.primary

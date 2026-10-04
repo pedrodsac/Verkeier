@@ -3,6 +3,14 @@ import Foundation
 /// Applies route comparisons to presentation without discarding the
 /// underlying results needed by paging and subsequent timing refinements.
 nonisolated enum RouteOptionVisibility {
+    /// Reserve the final filtered primary result while retaining it for paging.
+    static func presentedOptions(
+        primary: [RouteOption], supplemental: [RouteOption], at now: Date
+    ) -> (primary: [RouteOption], supplemental: [RouteOption]) {
+        let visible = visibleOptions(primary: primary, supplemental: supplemental, at: now)
+        return (Array(visible.primary.dropLast()), visible.supplemental)
+    }
+
     static func visibleOptions(
         primary: [RouteOption], supplemental: [RouteOption], at now: Date
     ) -> (primary: [RouteOption], supplemental: [RouteOption]) {
