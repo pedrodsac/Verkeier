@@ -175,6 +175,13 @@ route status and replacement planning after walking corrections. Verkéier rende
 `JourneyPlanningResult` snapshots through `MobiliteitRouteService`; it preserves a
 selectable manual choice or uses the package recommendation.
 
+Before selecting a visible option, the app hides any journey when another usable
+option departs no earlier and arrives no later, with at least one strictly better
+time. This comparison spans primary and supplemental options and uses effective
+door-to-door times, regardless of walking distance or transfer count. Equal-time
+alternatives remain available. Full snapshots remain retained so paging and timing
+refinements can restore an option that is no longer dominated.
+
 Verkéier retains GTFS installation, pedestrian routing exclusively with the local Valhalla graph, walking calibration, refinement requests and walking timing adjustments.
 `AppJourneySessionStore` bridges refined native walking spans back to the package
 session. UI loading deadlines, reveal timing, labels, overlays and Apple Maps handoff
@@ -193,7 +200,8 @@ feed, bundled pedestrian graph, simulator and fixed realtime provider. Cold
 reverse address routing measured 14.00s before and 13.52s after; two warm
 forward runs averaged 9.96s before and 9.81s after. This sample shows no material
 latency regression. The earlier app's additional filtering changed its visible
-result count; the new app passes the package alternatives through unchanged.
+result count; the migrated app initially passed package alternatives through
+unchanged. The current presentation applies the time-dominance rule above.
 
 ## Live passlist routing verification
 
