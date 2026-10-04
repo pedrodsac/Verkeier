@@ -53,6 +53,9 @@ struct RouteView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         // Haptic when a route plan is found.
         .sensoryFeedback(.success, trigger: viewModel.routeOptions.count)
+        .onChange(of: viewModel.statusMessage) { _, message in
+            if let message { AccessibilityNotification.Announcement(message).post() }
+        }
         .background {
             if !viewModel.isCalculating, !viewModel.isLoadingEarlierRoutes, !viewModel.isLoadingLaterRoutes,
                !viewModel.routeOptions.isEmpty,
@@ -233,6 +236,12 @@ struct RouteView: View {
 
     private var routeResultsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
+            if let range = viewModel.browsedTimeRange {
+                Text(range)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("route-browsing-window")
+            }
             ForEach(viewModel.chronologicallyOrderedRouteOptions) { option in
                 RouteOptionCard(
                     option: option,

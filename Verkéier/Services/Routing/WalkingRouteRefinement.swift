@@ -240,7 +240,8 @@ extension RouteOption {
             )
         })
         return RouteOption(id: id, plan: updatedPlan, mapOverlay: overlay.isEmpty ? nil : overlay,
-                           feasibility: feasibility, statusEvidence: statusEvidence, refinementToken: refinementToken)
+                           feasibility: feasibility, statusEvidence: statusEvidence,
+                           validationContext: validationContext, refinementToken: refinementToken)
     }
 
 }

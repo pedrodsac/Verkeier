@@ -14,6 +14,7 @@
 | How GTFS updates work end-to-end | `GTFS_AUTO_UPDATE_PLAN.md` |
 | Comprehensive feature roadmap (what to build next) | `FEATURE_ROADMAP.md` |
 | Route quality work | `ROUTE_QUALITY_IMPLEMENTATION_PLAN.md` |
+| Leave at, Arrive by, Earlier and Later behavior | `ROUTE_TIME_CONTROLS.md` |
 | Preventing invalid, wasteful, unstable or duplicate journeys | `ROUTING_FAILURE_PREVENTION_PLAN.md` + `ROUTING_FAILURE_PREVENTION_IMPLEMENTATION.md` (behavior, 49-case regressions and verification) |
 | Router performance, simulator measurements and reproduction | `ROUTE_CALCULATION_PERFORMANCE.md` |
 | UI lag, launch work and map update performance | `UI_PERFORMANCE.md` |

@@ -7,8 +7,8 @@ import MobiliteitKit
 /// A calculation always holds at least one option; ``plan`` traps if asked for
 /// a plan when none exist, so treat an empty `options` as an error upstream.
 nonisolated struct RouteCalculation: Sendable {
-    /// The primary route profile (at most five journeys), optionally including
-    /// the direct all-the-way walking comparison.
+    /// The primary route profile, including accumulated adjacent pages and
+    /// optionally the direct all-the-way walking comparison.
     var diagnostics: RoutingDiagnostics? = nil
     let options: [RouteOption]
     /// A best-effort bike-inclusive alternative that never consumes a transit slot.
@@ -21,8 +21,9 @@ nonisolated struct RouteCalculation: Sendable {
     var isAuthoritativeSnapshot = false
     var canLoadEarlier: Bool? = nil
     var canLoadLater: Bool? = nil
-    /// Immutable request constraint used by walking refinement and validation.
+    /// Compatibility fallback; each option carries its own page constraint.
     var validationContext: RouteValidationContext? = nil
+    var browsingWindow: JourneyBrowsingWindow? = nil
     /// Identifier of the selected option; falls back to the first option.
     let selectedOptionID: String?
 

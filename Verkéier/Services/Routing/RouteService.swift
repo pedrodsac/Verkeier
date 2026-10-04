@@ -67,7 +67,7 @@ extension WalkingRouteRefining {
             let task = Task {
                 for await option in refineWalkingRouteUpdates(in: options) {
                     guard !Task.isCancelled else { break }
-                    if let context {
+                    if let context = option.validationContext ?? context {
                         let feasibility = RouteItineraryValidator.assess(option, context: context)
                         if feasibility.isInvalid {
                             continuation.yield(.invalidated(option.id))
@@ -203,7 +203,8 @@ enum RoutingError: Error, Equatable {
 }
 
 /// Selects the portion of the departure profile returned by a route search.
-/// Page boundaries use door-to-door departure and, when available, stable ID.
+/// Adjacent pages follow the request's departure/arrival mode. Explicit date
+/// boundaries preserve the departure-profile API and its stable-ID ordering.
 nonisolated enum RouteSearchPage: Hashable, Sendable {
     case initial
     case earlierAdjacent, laterAdjacent

@@ -100,6 +100,7 @@ extension TransitMapScreen {
                 filters: viewModel.routeFilters,
                 planningTime: viewModel.routePlanningTime,
                 routeOptions: viewModel.routeOptions,
+                browsingWindow: viewModel.routeBrowsingWindow,
                 supplementalRouteOptions: viewModel.supplementalRouteOptions,
                 isLoadingEarlierRoutes: viewModel.isLoadingEarlierRoutes,
                 isLoadingLaterRoutes: viewModel.isLoadingLaterRoutes,

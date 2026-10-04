@@ -57,6 +57,7 @@ struct RoutePlanningTimeButton: View {
             )
         }
         .tint(current.isNow ? nil : .blue)
+        .accessibilityValue(timeDescription)
         .accessibilityFocused($isTimeButtonFocused)
         .sheet(item: $editing, onDismiss: restoreTimeButtonFocus) { mode in
             NavigationStack {
@@ -85,6 +86,14 @@ struct RoutePlanningTimeButton: View {
                 }
             }
             .presentationDetents([.medium, .large])
+        }
+    }
+
+    private var timeDescription: String {
+        switch current {
+        case .leaveNow: String(localized: "Leave now")
+        case let .departAt(date): String(localized: "Leave at \(date.formatted(date: .abbreviated, time: .shortened))")
+        case let .arriveBy(date): String(localized: "Arrive by \(date.formatted(date: .abbreviated, time: .shortened))")
         }
     }
 
