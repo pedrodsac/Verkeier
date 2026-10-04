@@ -93,6 +93,38 @@ Reproduce ordinary tests with `ROUTING_VERIFY_KERNEL=1 swift test` in the packag
 
 The evening screenshots exposed a feeder that exact Pareto dominance retained because it saved a small amount of walking. MobiliteitKit `fe43ae9` now removes that feeder when a validated walk can catch the same remaining services and leave home no earlier. The app pins the tested remote revision. New regressions cover staying on the 326, walking to the 850 at another stop, legitimate transfer/walking exceptions, paging and refresh. The real pedestrian-graph replay reproduces the old failure and confirms its removal. [Behavior, replay and follow-up verification](benchmarks/routing-prevention-screenshots-2026-10-01/validation.md).
 
+## Luxexpo intermediate-transfer follow-up
+
+MobiliteitKit `736bd29` also removes an intermediate vehicle when a validated
+journey stays aboard a shared trip to a later alighting occurrence and catches
+the same downstream trip instances. The replacement must leave no earlier,
+arrive no later, preserve accessibility and preferred-mode participation, and
+add at most five minutes of total walking. A less-walking preference preserves
+an interchange that saves walking. Both the complete search profile and every
+accumulated result-session snapshot apply this rule.
+
+`RoutingWastefulConnectionTests` reproduces 322 → 325 → T1 surviving because
+322 → T1 has a longer interchange walk. It covers the five-minute boundary,
+unreachable walking, necessary 325 connections, walking budgets, arrive-by,
+trip-instance/occurrence evidence, paging, refresh and a walking refinement
+that restores the necessary 325. All 165 package tests pass with
+`ROUTING_VERIFY_KERNEL=1`.
+
+The app's opt-in `morningLuxexpoConnectionAvoidsRedundant325` replay uses the
+installed generation-3 timetable, the real pedestrian graph, Gromscheed and
+Philharmonie / Mudam on 4 October 2026, with an 11:16 departure anchor. In this
+schedule, trip `24262729` arrives at Gare routière Luxexpo at 11:27:10. The
+137-second pedestrian route misses tram `24320542` at 11:29:20 by seven
+seconds, so the 325 legitimately catches an earlier tram. A controlled,
+fresh realtime fixture moves only the 322 arrival to 11:26:50 and verifies
+that 322 → T1 catches that same tram and removes 322 → 325 → T1. This is
+an offline schedule/control replay; the screenshot's original live evidence
+was not supplied.
+
+The app pins the tested remote revision. The Release iPhone 17 simulator
+build and full test suite pass: 110 tests in 21 suites, with both morning
+controls and the previous evening screenshot replay enabled.
+
 ## Contract limits
 
 These regressions establish behavior under the feed/provider contracts; they cannot certify the physical operation of an elevator or a vehicle's future arrival. Unknown wheelchair evidence does not satisfy a required-access request. Feeds without explicit linked type-4 trip evidence receive ordinary valid transfers, not inferred through-service. A legacy custom realtime provider may hand off a prevalidated patch without observation timestamps; the production HAFAS provider supplies acquisition timestamps, which are bounded here. New providers should supply them too. Bounded search and acquisition coverage remain exposed in existing metrics; missing realtime is not cancellation or proof of exhaustive coverage. No remote telemetry was added.
