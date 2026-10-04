@@ -31,6 +31,7 @@ final class TransitMapViewModel {
     var gtfsFeedStatus: GTFSFeedStatus = .unavailable
     var liveTransitLastUpdated: Date?
     var liveTransitErrorMessage: String?
+    @ObservationIgnored var departureBoardCache = StopDepartureBoardCache()
     var departures: [Departure] = []
 
     var offlineScheduledDepartures: [OfflineScheduleDeparture] = []

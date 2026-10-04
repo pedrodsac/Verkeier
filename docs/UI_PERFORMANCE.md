@@ -1,8 +1,48 @@
 # UI performance
 
-The October 4, 2026 performance pass addresses launch work and unnecessary map
-updates. These are code-backed causes of lag; device frame pacing still needs
-measurement against the user's exact interactions.
+The October 4, 2026 performance work initially addressed launch work and map
+updates. A subsequent physical-device recording identified the continuing
+scrolling freeze in the departure board, including when it was retained behind
+another tab.
+
+## Departure-board freeze
+
+A 32.82-second SwiftUI recording attached to Verkéier on an iPhone 13 running
+iOS 27.0.1 captured ten main-thread hangs. The longest lasted 6.19 seconds;
+combined hang duration was 30.31 seconds. The main thread was running throughout
+the sampled hang windows. `StopDetailView` had twelve body updates averaging
+2,246 ms, and `TransitSheetDestinationView` had twelve averaging 672 ms.
+Time Profiler stacks show Foundation string folding and locale-cache work
+called from the app's list-content construction. The installed app's UUID did
+not match the subsequently rebuilt local dSYM, so app-address symbolication
+was not used to infer function names.
+
+`StopDetailPresentationModel.board` previously rebuilt a board on every getter.
+The list and toolbar accessed its platforms and departures repeatedly. Each
+rebuild scanned previously accepted rows and normalized line/destination strings
+for every pair, including for hidden navigation destinations invalidated by
+shared presentation changes.
+
+The replacement prepares immutable board arrays once and caches them in
+`TransitMapViewModel` against explicit data, stop, route, source, line/platform,
+and locale inputs. Getter reads no longer normalize, deduplicate, or sort.
+Deduplication indexes accepted IDs and normalized journeys in minute buckets,
+preserving first-row selection and the inclusive one-minute tolerance without
+a pairwise scan. The cache is excluded from Observation, so populating it does
+not invalidate the view tree. Timetable source selection and freshness rules
+are unchanged.
+
+Baseline trace: `/tmp/verkeier-short-baseline.trace`; parsed analysis:
+`/tmp/verkeier-short-baseline-analysis.json`. The earlier device recording lost
+its samples when the connection dropped and was excluded from evidence.
+
+Validation: the Release simulator test action passed (108 passed, one optional
+test skipped). Six new tests cover journey tolerance and ID handling, unsorted
+feed equivalence, stable prediction ordering, platform/line filtering, and
+cache invalidation. The signed Release device build also passed and was
+installed on the same iPhone. A comparison recording is pending: iOS refused
+the launch because the phone was locked, and a subsequent launch attempt timed
+out. The fix's device frame pacing has not yet been verified.
 
 ## Changes
 

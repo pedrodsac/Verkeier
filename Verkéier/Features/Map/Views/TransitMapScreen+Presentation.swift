@@ -76,7 +76,8 @@ extension TransitMapScreen {
                 liveActivityErrorMessage: liveActivityManager.lastErrorMessage,
                 liveActivityStaleMessage: liveActivityManager.staleExplanation,
                 activeReminder: departureReminderForSelectedStop,
-                departureReminderErrorMessage: departureReminderService.lastErrorMessage
+                departureReminderErrorMessage: departureReminderService.lastErrorMessage,
+                departureBoard: viewModel.departureBoardPresentation
             ),
             route: RoutePresentationModel(
                 selectedStop: viewModel.selectedStop,

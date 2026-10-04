@@ -5,6 +5,20 @@ import SwiftUI
 import WidgetKit
 
 extension TransitMapViewModel {
+    /// Cache only board inputs. Location fixes, route results, and loading-state
+    /// changes must not repeat departure normalization and sorting.
+    var departureBoardPresentation: StopDepartureBoardPresentation {
+        departureBoardCache.presentation(for: .init(
+            stopID: selectedStop?.id ?? "",
+            routes: selectedStopRoutes,
+            liveDepartures: departures,
+            scheduledDepartures: offlineScheduledDepartures,
+            useScheduledFallback: isUsingOfflineDepartures,
+            selectedLine: selectedDepartureLine,
+            selectedPlatform: selectedDeparturePlatform
+        ))
+    }
+
     func loadFavouriteDepartures(
         favourites: [Stop],
         using liveTransitService: any LiveTransitService,
