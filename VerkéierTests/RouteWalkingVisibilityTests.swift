@@ -32,7 +32,7 @@ struct RouteWalkingVisibilityTests {
         let tram = option("tram", mode: .tram, duration: 1_199)
         let walk = option("walk", mode: .walking, duration: walkingDuration)
         let model = await calculate([bus, tram, walk], recommended: walk.id)
-        #expect(model.routeOptions.map(\.id) == [bus.id, tram.id])
+        #expect(model.routeOptions.map(\.id) == [tram.id])
         #expect(model.selectedRouteOptionID != walk.id)
     }
 
@@ -92,18 +92,18 @@ struct RouteWalkingVisibilityTests {
         #expect(model.selectedRouteOptionID == walk.id)
     }
 
-    @Test("A slower walking refinement restores hidden transit and bike alternatives")
+    @Test("A slower walking refinement restores hidden transit alongside a bike alternative")
     func refinementRestoresAlternatives() async throws {
         let bus = option("bus", duration: 1_200)
         let walk = option("walk", mode: .walking, duration: 600)
-        let bike = option("bike", mode: .bicycle, duration: 900)
+        let bike = option("bike", mode: .bicycle, departure: 300, duration: 1_000)
         let (updates, continuation) = AsyncStream<WalkingRefinementEvent>.makeStream()
         let service = WalkingVisibilityFixture(options: [bus, walk], supplemental: [bike],
             recommended: bus.id, refinements: updates)
         let model = configuredModel()
         await model.calculateRoute(using: service, from: nil)
         #expect(model.routeOptions.map(\.id) == [walk.id])
-        #expect(model.supplementalRouteOptions.isEmpty)
+        #expect(model.supplementalRouteOptions.map(\.id) == [bike.id])
 
         continuation.yield(.option(option("walk", mode: .walking, duration: 1_800)))
         continuation.finish()

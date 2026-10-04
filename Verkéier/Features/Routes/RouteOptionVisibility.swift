@@ -1,9 +1,31 @@
 import Foundation
 
-/// Applies the walking comparison to presentation without discarding the
+/// Applies route comparisons to presentation without discarding the
 /// underlying results needed by paging and subsequent timing refinements.
 nonisolated enum RouteOptionVisibility {
     static func visibleOptions(
+        primary: [RouteOption], supplemental: [RouteOption], at now: Date
+    ) -> (primary: [RouteOption], supplemental: [RouteOption]) {
+        let all = primary + supplemental
+        let candidates = all.filter { $0.status(at: now).isSelectable }
+        let dominatedIDs = Set(all.filter { option in
+            candidates.contains { other in
+                guard other.id != option.id,
+                      let departure = option.departureTime, let arrival = option.arrivalTime,
+                      let otherDeparture = other.departureTime, let otherArrival = other.arrivalTime
+                else { return false }
+                return otherDeparture >= departure && otherArrival <= arrival
+                    && (otherDeparture > departure || otherArrival < arrival)
+            }
+        }.map(\.id))
+        return walkingVisibleOptions(
+            primary: primary.filter { !dominatedIDs.contains($0.id) },
+            supplemental: supplemental.filter { !dominatedIDs.contains($0.id) },
+            at: now
+        )
+    }
+
+    private static func walkingVisibleOptions(
         primary: [RouteOption], supplemental: [RouteOption], at now: Date
     ) -> (primary: [RouteOption], supplemental: [RouteOption]) {
         let all = primary + supplemental
