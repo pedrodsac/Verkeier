@@ -139,7 +139,9 @@ extension TransitMapViewModel {
     }
 
     func updateRouteFilters(_ filters: RoutePlannerFilters) {
+        guard routeFilters != filters else { return }
         routeFilters = filters
+        clearRoute()
     }
 
     func setRoutePlanningTime(_ time: RoutePlanningTime) {
@@ -181,6 +183,7 @@ extension TransitMapViewModel {
             return
         }
 
+        routeRequestOrigin = origin
         resetRoutePagingState()
         walkingRefinedOptionIDs = []
         walkingRefinementScheduledIDs = []
@@ -215,6 +218,7 @@ extension TransitMapViewModel {
                     in: calculation.supplementalOptions,
                     existing: unfilteredSupplementalRouteOptions
                 ).filter { !invalidatedRouteOptionIDs.contains($0.id) }
+                routeBrowsingWindow = calculation.browsingWindow
                 routeRecommendedOptionID = calculation.selectedOptionID
                 let preferredID = manualSelectionID ?? calculation.selectedOptionID
                 if !receivedRouteUpdate || calculation.isAuthoritativeSnapshot {
@@ -286,98 +290,6 @@ extension TransitMapViewModel {
         }
     }
 
-    func loadEarlierRoutes(using routeService: any RouteService, from location: CLLocation?) async {
-        await loadRoutePage(.earlier, using: routeService, from: location)
-    }
-
-    func loadLaterRoutes(using routeService: any RouteService, from location: CLLocation?) async {
-        await loadRoutePage(.later, using: routeService, from: location)
-    }
-
-    private func loadRoutePage(
-        _ direction: RoutePagingDirection,
-        using routeService: any RouteService,
-        from location: CLLocation?
-    ) async {
-        guard !isLoadingEarlierRoutes, !isLoadingLaterRoutes else { return }
-        guard direction == .earlier ? canLoadEarlierRoutes : canLoadLaterRoutes else { return }
-        guard let destination = effectiveRouteDestination else { return }
-
-        let origin: LocationPoint
-        if let routeOrigin {
-            origin = routeOrigin.location
-        } else if let location {
-            origin = LocationPoint(
-                name: "Current Location",
-                latitude: location.coordinate.latitude,
-                longitude: location.coordinate.longitude
-            )
-        } else {
-            routeStatusMessage = "Current location is required to load more routes."
-            return
-        }
-
-        let page: RouteSearchPage = direction == .earlier ? .earlierAdjacent : .laterAdjacent
-        let requestGeneration = startRouteRequest()
-        routeOperationStarted = ContinuousClock.now
-        routeDiagnostics = nil
-        routePublishedAt = nil
-        setRoutePageLoading(true, direction: direction)
-        routeStatusMessage = nil
-
-        do {
-            let calculation = try await routeService.calculateRoute(
-                from: origin,
-                to: destination.location,
-                time: routePlanningTime,
-                filters: routeFilters,
-                realtimeRefreshPolicy: .useCache,
-                page: page
-            )
-            guard requestGeneration == routeCalculationGeneration else { return }
-            invalidatedRouteOptionIDs.formUnion(calculation.invalidatedOptionIDs)
-            routeRecommendedOptionID = calculation.selectedOptionID
-            let preferredID = routeSelectionWasManual ? selectedRouteOptionID : calculation.selectedOptionID
-            if calculation.isAuthoritativeSnapshot {
-                unfilteredRouteOptions = calculation.options
-                unfilteredSupplementalRouteOptions = calculation.supplementalOptions
-            } else {
-                unfilteredRouteOptions = Self.mergingAccumulatedOptions(
-                    existing: unfilteredRouteOptions, incoming: calculation.options,
-                    invalidatedOptionIDs: calculation.invalidatedOptionIDs)
-                unfilteredSupplementalRouteOptions = Self.mergingAccumulatedOptions(
-                    existing: unfilteredSupplementalRouteOptions, incoming: calculation.supplementalOptions,
-                    invalidatedOptionIDs: calculation.invalidatedOptionIDs)
-            }
-            applyRouteOptions(preferredID: preferredID, announceFallback: true)
-            // A partial page does not prove there are no more routes. Keep paging
-            // available until a search actually returns an empty page.
-            setRoutePageAvailable((direction == .earlier ? calculation.canLoadEarlier : calculation.canLoadLater)
-                ?? !calculation.options.isEmpty, direction: direction)
-            scheduleWalkingRouteRefinement(calculation, using: routeService, from: origin,
-                to: destination.location, requestGeneration: requestGeneration)
-            routeLastCalculatedAt = now()
-            recordRoutePublication(calculation)
-        } catch is CancellationError {
-            // A newer full search or page request owns the visible result set.
-        } catch let error as RoutingError where error == .noPublicTransportRoute {
-            guard requestGeneration == routeCalculationGeneration else { return }
-            setRoutePageAvailable(false, direction: direction)
-            routeStatusMessage = direction == .earlier
-                ? "No earlier routes were found."
-                : "No later routes were found."
-        } catch {
-            guard requestGeneration == routeCalculationGeneration else { return }
-            routeStatusMessage = direction == .earlier
-                ? "Earlier routes could not be loaded."
-                : "Later routes could not be loaded."
-        }
-
-        if requestGeneration == routeCalculationGeneration {
-            setRoutePageLoading(false, direction: direction)
-        }
-    }
-
     func failRouteLocationRequest() {
         clearRouteResult()
         routeLoadingPhase = .idle
@@ -415,11 +327,11 @@ extension TransitMapViewModel {
         routeService.openInAppleMaps(from: origin, to: destination.location)
     }
 
-    private var effectiveRouteDestination: RoutePlace? {
+    var effectiveRouteDestination: RoutePlace? {
         routeDestination ?? selectedStop.map { RoutePlace(stop: $0, source: .selectedStop) }
     }
 
-    private func startRouteRequest() -> Int {
+    func startRouteRequest() -> Int {
         routeCalculationGeneration += 1
         return routeCalculationGeneration
     }
@@ -437,13 +349,14 @@ extension TransitMapViewModel {
         }
     }
 
-    private func routeCalculationUpdatesWithDeadline(
+    func routeCalculationUpdatesWithDeadline(
         using routeService: any RouteService,
         from origin: LocationPoint,
         to destination: LocationPoint,
         time: RoutePlanningTime,
         filters: RoutePlannerFilters,
-        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy,
+        page: RouteSearchPage = .initial
     ) -> AsyncThrowingStream<RouteCalculation, Error> {
         let timeout = routeCalculationTimeout
         return AsyncThrowingStream<RouteCalculation, Error> { continuation in
@@ -463,7 +376,7 @@ extension TransitMapViewModel {
                         time: time,
                         filters: filters,
                         realtimeRefreshPolicy: realtimeRefreshPolicy,
-                        page: .initial
+                        page: page
                     )
                     var receivedUpdate = false
                     for try await calculation in updates {
@@ -487,7 +400,7 @@ extension TransitMapViewModel {
 
     /// Refine walking geometry and timing after the full timetable and live
     /// calculation is available.
-    private func scheduleWalkingRouteRefinement(
+    func scheduleWalkingRouteRefinement(
         _ calculation: RouteCalculation,
         using routeService: any RouteService,
         from origin: LocationPoint,
@@ -535,14 +448,14 @@ extension TransitMapViewModel {
 
                 let selectedID = self.selectedRouteOptionID
                 if case let .calculation(calculation) = event {
+                    self.routeBrowsingWindow = calculation.browsingWindow ?? self.routeBrowsingWindow
                     self.routeRecommendedOptionID = calculation.selectedOptionID
                     self.unfilteredRouteOptions = calculation.options
                     self.unfilteredSupplementalRouteOptions = calculation.supplementalOptions
                     self.invalidatedRouteOptionIDs.formUnion(calculation.invalidatedOptionIDs)
                     self.canLoadEarlierRoutes = calculation.canLoadEarlier ?? self.canLoadEarlierRoutes
                     self.canLoadLaterRoutes = calculation.canLoadLater ?? self.canLoadLaterRoutes
-                    self.applyRouteOptions(preferredID: self.routeSelectionWasManual
-                        ? selectedID : calculation.selectedOptionID, announceFallback: true)
+                    self.applyRouteOptions(preferredID: selectedID ?? calculation.selectedOptionID, announceFallback: true)
                     self.scheduleWalkingRouteRefinement(calculation, using: routeService,
                         from: origin, to: destination, requestGeneration: requestGeneration)
                     continue
@@ -621,27 +534,13 @@ extension TransitMapViewModel {
         }
     }
 
-    private func applyRouteOptions(preferredID: String?, announceFallback: Bool) {
+    func applyRouteOptions(preferredID: String?, announceFallback: Bool) {
         let visible = RouteOptionVisibility.visibleOptions(
             primary: unfilteredRouteOptions, supplemental: unfilteredSupplementalRouteOptions, at: now()
         )
         routeOptions = visible.primary
         supplementalRouteOptions = visible.supplemental
         selectBestRouteOption(preferredID: preferredID, announceFallback: announceFallback)
-    }
-
-    private func setRoutePageLoading(_ loading: Bool, direction: RoutePagingDirection) {
-        switch direction {
-        case .earlier: isLoadingEarlierRoutes = loading
-        case .later: isLoadingLaterRoutes = loading
-        }
-    }
-
-    private func setRoutePageAvailable(_ available: Bool, direction: RoutePagingDirection) {
-        switch direction {
-        case .earlier: canLoadEarlierRoutes = available
-        case .later: canLoadLaterRoutes = available
-        }
     }
 
     private func routeErrorMessage(for error: Error) -> String {
@@ -660,9 +559,4 @@ extension TransitMapViewModel {
             return "Route calculation is taking too long. Please try again."
         }
     }
-}
-
-private enum RoutePagingDirection {
-    case earlier
-    case later
 }

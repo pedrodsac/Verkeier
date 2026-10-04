@@ -37,14 +37,19 @@ final class SimulatorRouteBenchmark {
             self.service = service
             let samples = Int(env["ROUTING_BENCHMARK_SAMPLES"] ?? "1") ?? 1
             configure(scenario)
-            if scenario == "paging" || scenario == "refresh" || scenario == "cached" {
+            let paging = ["paging", "earlier", "arrival-earlier", "arrival-later"].contains(scenario)
+            if paging || scenario == "refresh" || scenario == "cached" {
                 await viewModel.calculateRoute(using: service, from: nil)
                 try await Task.sleep(for: .seconds(1))
             }
             var previousRequestID: UUID?
             for sample in 0..<samples {
-                if scenario == "paging" {
-                    await viewModel.loadLaterRoutes(using: service, from: nil)
+                if paging {
+                    if scenario == "earlier" || scenario == "arrival-earlier" {
+                        await viewModel.loadEarlierRoutes(using: service, from: nil)
+                    } else {
+                        await viewModel.loadLaterRoutes(using: service, from: nil)
+                    }
                 } else {
                     viewModel.routeOptions = []
                     await viewModel.calculateRoute(using: service, from: nil,
@@ -76,7 +81,7 @@ final class SimulatorRouteBenchmark {
                     "rounds": diagnostics.rounds.map { ["scan_ms": $0.patternScanMilliseconds, "merge_ms": $0.labelMergeMilliseconds,
                         "prepare_ms": $0.tripPreparationMilliseconds, "alights": $0.alightingChecks, "retained": $0.retainedLabels] },
                     "options": viewModel.routeOptions.map(\.id),
-                    "refreshPolicy": scenario == "cached" || scenario == "paging" ? "useCache" : "forceRefresh",
+                    "refreshPolicy": scenario == "cached" || paging ? "useCache" : "forceRefresh",
                     "displayedLegs": viewModel.routeOptions.flatMap { option in
                         option.transitLegs.map { leg -> [String: Any] in
                             ["option": option.id, "trip": leg.tripId ?? "", "stop": leg.originStopId ?? "",
@@ -123,7 +128,8 @@ final class SimulatorRouteBenchmark {
         let formatter = ISO8601DateFormatter()
         var time: RoutePlanningTime = .departAt(formatter.date(from: "2026-09-30T08:00:00+02:00")!)
         if scenario == "reverse" { swap(&from, &to) }
-        if scenario == "arrive" || scenario == "live-arrive" || scenario == "deadline-arrive" {
+        if scenario == "arrive" || scenario == "live-arrive" || scenario == "deadline-arrive"
+            || scenario == "arrival-earlier" || scenario == "arrival-later" {
             time = .arriveBy(formatter.date(from: "2026-09-30T09:00:00+02:00")!)
         }
         if scenario == "exact" || scenario == "refresh" || scenario == "paging" || scenario == "recorded-live" || scenario == "cached" || scenario == "live-esch" {
@@ -210,7 +216,10 @@ final class SimulatorRouteBenchmark {
         .init(selectedStop: nil, origin: viewModel.routeOrigin, destination: viewModel.routeDestination,
             currentLocation: nil, favouritePlaces: [], nearbyPlaces: [], recentPlaces: [], commutePresets: [],
             filters: viewModel.routeFilters, planningTime: viewModel.routePlanningTime,
-            routeOptions: viewModel.routeOptions, alerts: [], selectedRouteOptionID: viewModel.selectedRouteOptionID,
+            routeOptions: viewModel.routeOptions, browsingWindow: viewModel.routeBrowsingWindow,
+            isLoadingEarlierRoutes: viewModel.isLoadingEarlierRoutes, isLoadingLaterRoutes: viewModel.isLoadingLaterRoutes,
+            canLoadEarlierRoutes: viewModel.canLoadEarlierRoutes, canLoadLaterRoutes: viewModel.canLoadLaterRoutes,
+            alerts: [], selectedRouteOptionID: viewModel.selectedRouteOptionID,
             loadingPhase: viewModel.routeLoadingPhase, errorMessage: viewModel.routeErrorMessage,
             statusMessage: viewModel.routeStatusMessage, lastCalculatedAt: viewModel.routeLastCalculatedAt,
             diagnosticRequestID: viewModel.routeDiagnostics?.requestID, resultsRendered: viewModel.recordRouteResultsRendered)

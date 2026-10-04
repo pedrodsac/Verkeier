@@ -17,6 +17,7 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     var feasibility: RouteFeasibility? = nil
     var journeySummary: JourneySummary? = nil
     var statusEvidence: JourneyStatusEvidence? = nil
+    var validationContext: RouteValidationContext? = nil
     var refinementToken: JourneyRefinementToken? = nil
 
     /// The plan's transit legs (excludes walking/driving).

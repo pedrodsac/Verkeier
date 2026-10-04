@@ -63,6 +63,8 @@ final class TransitMapViewModel {
     var recentTrips: [RouteCommutePreset] = []
     var commutePresets: [RouteCommutePreset] = []
     var routeOptions: [RouteOption] = []
+    var routeBrowsingWindow: JourneyBrowsingWindow?
+    var routeRequestOrigin: LocationPoint?
     var routeDiagnostics: RoutingDiagnostics?
     @ObservationIgnored var routeOperationStarted: ContinuousClock.Instant?
     @ObservationIgnored var routePublishedAt: ContinuousClock.Instant?
@@ -156,6 +158,8 @@ final class TransitMapViewModel {
     }
 
     func clearRouteResult() {
+        routeBrowsingWindow = nil
+        routeRequestOrigin = nil
         walkingRefinedOptionIDs = []
         walkingRefinementScheduledIDs = []
         invalidatedRouteOptionIDs = []

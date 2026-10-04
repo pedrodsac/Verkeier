@@ -45,7 +45,8 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             let result = try await sessions.calculate(databaseURL: databaseURL,
                 request: .init(origin: Self.journeyEndpoint(for: from),
                     destination: Self.journeyEndpoint(for: to), time: time.packageTime,
-                    preferences: filters.packagePreferences, realtimeAcquisitionBudgetMilliseconds: 2_000),
+                    preferences: filters.packagePreferences, realtimeAcquisitionBudgetMilliseconds: 2_000,
+                    pagingPolicy: .adjacentTimeWindows),
                 page: page.packagePage, refresh: realtimeRefreshPolicy.packagePolicy)
             var calculation = calculation(from: result, origin: from, destination: to)
             calculation.diagnostics?.milliseconds[.timetableReadiness] = readiness
@@ -82,6 +83,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         }, selectedOptionID: result.recommendedJourneyID?.value)
         calculation.invalidatedOptionIDs = Set(result.invalidatedIDs.map(\.value))
         calculation.validationContext = result.validationContext
+        calculation.browsingWindow = result.browsingWindow
         calculation.isAuthoritativeSnapshot = true
         calculation.canLoadEarlier = result.hasEarlier
         calculation.canLoadLater = result.hasLater
@@ -194,6 +196,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             feasibility: planningResult.feasibility[journey.id],
             journeySummary: journey.summary,
             statusEvidence: journey.statusEvidence,
+            validationContext: planningResult.validationContexts[journey.id] ?? planningResult.validationContext,
             refinementToken: planningResult.refinementTokens[journey.id]
         )
     }

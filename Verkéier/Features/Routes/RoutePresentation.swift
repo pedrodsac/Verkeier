@@ -1,4 +1,5 @@
 import Foundation
+import MobiliteitKit
 
 enum RouteEndpoint: Hashable {
     case origin
@@ -36,6 +37,7 @@ struct RoutePresentationModel {
     let filters: RoutePlannerFilters
     let planningTime: RoutePlanningTime
     let routeOptions: [RouteOption]
+    var browsingWindow: JourneyBrowsingWindow? = nil
     var supplementalRouteOptions: [RouteOption] = []
     var isLoadingEarlierRoutes = false
     var isLoadingLaterRoutes = false
@@ -68,6 +70,11 @@ struct RoutePresentationModel {
 
     var chronologicallyOrderedRouteOptions: [RouteOption] {
         routeOptions.sorted { lhs, rhs in
+            if case .arriveBy = planningTime {
+                let a = lhs.arrivalTime ?? .distantFuture
+                let b = rhs.arrivalTime ?? .distantFuture
+                if a != b { return a < b }
+            }
             let lhsDeparture = lhs.departureTime ?? .distantFuture
             let rhsDeparture = rhs.departureTime ?? .distantFuture
             if lhsDeparture != rhsDeparture { return lhsDeparture < rhsDeparture }
@@ -76,6 +83,15 @@ struct RoutePresentationModel {
             if lhsArrival != rhsArrival { return lhsArrival < rhsArrival }
             return lhs.id < rhs.id
         }
+    }
+
+    var browsedTimeRange: String? {
+        guard let browsingWindow else { return nil }
+        let start = browsingWindow.range.start.formatted(date: .abbreviated, time: .shortened)
+        let end = browsingWindow.range.end.formatted(date: .abbreviated, time: .shortened)
+        return browsingWindow.axis == .arrival
+            ? String(localized: "Arrivals: \(start) – \(end)")
+            : String(localized: "Departures: \(start) – \(end)")
     }
 
     var isWaitingForLocation: Bool {
