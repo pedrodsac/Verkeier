@@ -16,6 +16,7 @@ actor MobiliteitGTFSService: GTFSService {
     private var store: GTFSStore?
     private var metadata: GTFSLocalMetadata?
     private var currentStatus: GTFSFeedStatus
+    private var didLoadInstalledFeed = false
 
     nonisolated static var installedDatabaseURL: URL {
         defaultDirectory().appendingPathComponent("gtfs.sqlite")
@@ -24,16 +25,26 @@ actor MobiliteitGTFSService: GTFSService {
     init(session: URLSession = .shared, directory: URL? = nil) {
         let base = directory ?? Self.defaultDirectory()
         let metadataURL = base.appendingPathComponent("metadata.json")
-        let metadata = Self.loadMetadata(at: metadataURL)
-        let databaseURL = base.appendingPathComponent(
-            metadata?.databaseFilename ?? Self.legacyDatabaseFilename
-        )
         directoryURL = base
-        self.databaseURL = databaseURL
+        databaseURL = base.appendingPathComponent(Self.legacyDatabaseFilename)
         self.metadataURL = metadataURL
         self.session = session
+        currentStatus = .unavailable
+    }
+
+    /// Actor initializers run synchronously on their caller. Delay filesystem
+    /// cleanup and SQLite opening until an actor-isolated service operation so
+    /// constructing app dependencies cannot block the launch UI with this work.
+    private func loadInstalledFeedIfNeeded() {
+        guard !didLoadInstalledFeed else { return }
+        didLoadInstalledFeed = true
+        try? FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        let metadata = Self.loadMetadata(at: metadataURL)
         self.metadata = metadata
-        Self.removeInactiveGenerationDatabases(in: base, keeping: databaseURL)
+        databaseURL = directoryURL.appendingPathComponent(
+            metadata?.databaseFilename ?? Self.legacyDatabaseFilename
+        )
+        Self.removeInactiveGenerationDatabases(in: directoryURL, keeping: databaseURL)
         store = try? GTFSStore(databaseAt: databaseURL)
         Self.debugLog("Initialized. Database present: \(store != nil); metadata: \(metadata?.resourceTitle ?? "none"); valid through: \(metadata?.validThrough ?? "unknown")")
         if let metadata, store != nil, !Self.isExpired(metadata.validThrough) {
@@ -72,16 +83,21 @@ actor MobiliteitGTFSService: GTFSService {
         return formatter.date(from: value)
     }
 
-    func feedStatus() async -> GTFSFeedStatus { currentStatus }
+    func feedStatus() async -> GTFSFeedStatus {
+        loadInstalledFeedIfNeeded()
+        return currentStatus
+    }
 
     /// Returns the current usable generation even while a newer feed is being
     /// checked or downloaded. The existing timetable remains valid for routing
     /// until its last service day has passed.
     func routingDatabaseURL() async -> URL? {
-        hasUsableStore ? databaseURL : nil
+        loadInstalledFeedIfNeeded()
+        return hasUsableStore ? databaseURL : nil
     }
 
     func refreshIfNeeded(force: Bool) async -> GTFSFeedStatus {
+        loadInstalledFeedIfNeeded()
         Self.debugLog("Refresh requested (force: \(force)). Current phase: \(currentStatus.phase.rawValue).")
         // Route planning and launch preparation can ask for the feed at the
         // same time. Actor methods are re-entrant across network awaits, so a
@@ -173,12 +189,14 @@ actor MobiliteitGTFSService: GTFSService {
     }
 
     func searchStops(query: String) async -> [Stop] {
+        loadInstalledFeedIfNeeded()
         guard let store else { return [] }
         guard let stops = try? await store.searchStops(matching: query, limit: 40) else { return [] }
         return await enrichedStops(stops, store: store)
     }
 
     func nearbyStops(to location: LocationPoint, radiusMeters: Double, limit: Int) async -> [Stop] {
+        loadInstalledFeedIfNeeded()
         guard let store else { return [] }
         guard let stops = try? await store.nearbyStops(
             to: Coordinate(latitude: location.latitude, longitude: location.longitude),
@@ -189,6 +207,7 @@ actor MobiliteitGTFSService: GTFSService {
     }
 
     func matchLiveStop(_ liveStop: LiveTransitStop) async -> Stop? {
+        loadInstalledFeedIfNeeded()
         guard let store else { return nil }
         guard let candidates = try? await store.nearbyStops(
             to: Coordinate(latitude: liveStop.location.latitude, longitude: liveStop.location.longitude),
@@ -208,12 +227,14 @@ actor MobiliteitGTFSService: GTFSService {
     }
 
     func routes(for stop: Stop) async -> [TransitRoute] {
+        loadInstalledFeedIfNeeded()
         guard let store, let stopID = stop.gtfsStopID else { return [] }
         guard let routes = try? await store.routes(servingStopIDs: [stopID])[stopID] else { return [] }
         return routes.map { Self.route($0, agency: nil) }
     }
 
     func scheduledDepartures(for stop: Stop, at date: Date, limit: Int) async -> [OfflineScheduleDeparture] {
+        loadInstalledFeedIfNeeded()
         guard let store, let stopID = stop.gtfsStopID else { return [] }
         let feed = await store.feedInfo()
         guard let departures = try? await store.nextScheduledDepartures(
@@ -240,6 +261,7 @@ actor MobiliteitGTFSService: GTFSService {
     }
 
     func lineDetail(for route: TransitRoute, directionID: String?, at date: Date) async -> LineDetail? {
+        loadInstalledFeedIfNeeded()
         guard let store else { return nil }
         let today = Self.gtfsDate(from: date)
         let feed = await store.feedInfo()
@@ -302,6 +324,7 @@ actor MobiliteitGTFSService: GTFSService {
     }
 
     func journeyDepartures(from stop: Stop, after date: Date, horizon: TimeInterval, limit: Int) async -> [GTFSJourneyDeparture] {
+        loadInstalledFeedIfNeeded()
         guard let store, let stopID = stop.gtfsStopID,
               let departures = try? await store.nextScheduledDepartures(
                 fromStopID: stopID,
@@ -327,6 +350,7 @@ actor MobiliteitGTFSService: GTFSService {
     }
 
     func journeyStops(for tripID: String) async -> [GTFSJourneyStopTime] {
+        loadInstalledFeedIfNeeded()
         guard let store, let raw = try? await store.stopTimes(forTripID: tripID),
               let serviceDay = await store.serviceDay(for: Self.gtfsDate(from: .now)) else { return [] }
         let feed = await store.feedInfo()
@@ -343,18 +367,21 @@ actor MobiliteitGTFSService: GTFSService {
     }
 
     func transferRules(from stop: Stop) async -> [GTFSTransferRule] {
+        loadInstalledFeedIfNeeded()
         guard let store, let stopID = stop.gtfsStopID,
               let raw = try? await store.transferRules(fromStopID: stopID) else { return [] }
         return raw.map { GTFSTransferRule(destinationStopID: $0.toStopID, minimumTransferSeconds: $0.minimumTransferSeconds) }
     }
 
     func routeShape(for tripID: String) async -> [RouteMapCoordinate] {
+        loadInstalledFeedIfNeeded()
         guard let store, let trip = try? await store.trip(id: tripID), let shapeID = trip.shapeID,
               let shape = try? await store.shape(id: shapeID) else { return [] }
         return shape.coordinates.map { RouteMapCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
     }
 
     func routeShapes(for tripIDs: [String]) async -> [String: [RouteMapCoordinate]] {
+        loadInstalledFeedIfNeeded()
         guard let store, let shapes = try? await store.shapes(forTripIDs: tripIDs) else { return [:] }
         return shapes.mapValues { coordinates in
             coordinates.map { RouteMapCoordinate(latitude: $0.latitude, longitude: $0.longitude) }
@@ -503,17 +530,10 @@ private extension MobiliteitGTFSService {
 
     nonisolated static func defaultDirectory() -> URL {
         let manager = FileManager.default
-        let root = (try? manager.url(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: true
-        )) ?? manager.temporaryDirectory
-        let directory = root.appendingPathComponent("Mobiliteit", isDirectory: true)
-        try? manager.createDirectory(at: directory, withIntermediateDirectories: true)
-        return directory
+        let root = manager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? manager.temporaryDirectory
+        return root.appendingPathComponent("Mobiliteit", isDirectory: true)
     }
-
 
     nonisolated static func loadMetadata(at url: URL) -> GTFSLocalMetadata? {
         guard let data = try? Data(contentsOf: url) else { return nil }

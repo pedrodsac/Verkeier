@@ -16,6 +16,7 @@
 | Route quality work | `ROUTE_QUALITY_IMPLEMENTATION_PLAN.md` |
 | Preventing invalid, wasteful, unstable or duplicate journeys | `ROUTING_FAILURE_PREVENTION_PLAN.md` + `ROUTING_FAILURE_PREVENTION_IMPLEMENTATION.md` (behavior, 49-case regressions and verification) |
 | Router performance, simulator measurements and reproduction | `ROUTE_CALCULATION_PERFORMANCE.md` |
+| UI lag, launch work and map update performance | `UI_PERFORMANCE.md` |
 
 ## Two-read orientation
 

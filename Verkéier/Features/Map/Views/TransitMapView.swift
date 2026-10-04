@@ -2,21 +2,6 @@ import CoreLocation
 import MapKit
 import SwiftUI
 
-/// The data the map renders from, bundled so the call site passes one value
-/// instead of eight positional arguments.
-struct MapViewState {
-    let region: MKCoordinateRegion
-    let cameraUpdateToken: Int
-    let liveStops: [Stop]
-    let gtfsStops: [Stop]
-    let selectedStopId: String?
-    let favouriteStopIds: Set<String>
-    let alertStopIds: Set<String>
-    let bikeShareStations: [BikeShareStation]
-    let routeOverlay: RouteMapOverlay?
-    let hideMapPins: Bool
-}
-
 struct TransitMapView: UIViewRepresentable {
     let state: MapViewState
     let selectStop: (Stop) -> Void
@@ -43,81 +28,15 @@ struct TransitMapView: UIViewRepresentable {
         context.coordinator.favouriteStopIds = state.favouriteStopIds
         context.coordinator.alertStopIds = state.alertStopIds
 
-        let stopAnnotations = !state.hideMapPins && state.routeOverlay == nil
-            ? state.liveStops.map {
-                StopMapAnnotation(stop: $0, layer: .liveNearby)
-            }
-            + state.gtfsStops.map {
-                StopMapAnnotation(stop: $0, layer: .gtfs)
-            }
-            : []
-        let transferAnnotations = state.routeOverlay?.transferMarkers.map(RouteTransferAnnotation.init) ?? []
-        let bikeAnnotations = !state.hideMapPins && state.routeOverlay == nil
-            ? state.bikeShareStations.map(BikeShareMapAnnotation.init)
-            : []
-
-        view.update(
-            snapshot: MapSnapshot(
-                region: state.region,
-                cameraUpdateToken: state.cameraUpdateToken,
-                annotations: stopAnnotations,
-                transferAnnotations: transferAnnotations,
-                bikeShareAnnotations: bikeAnnotations,
-                selectedStopId: state.selectedStopId,
-                favouriteStopIds: state.favouriteStopIds,
-                alertStopIds: state.alertStopIds,
-                routeOverlay: state.routeOverlay,
-                hideMapPins: state.hideMapPins
-            )
-        )
-    }
-
-    struct MapSnapshot {
-        let region: MKCoordinateRegion
-        let cameraUpdateToken: Int
-        let annotations: [StopMapAnnotation]
-        let transferAnnotations: [RouteTransferAnnotation]
-        let bikeShareAnnotations: [BikeShareMapAnnotation]
-        let selectedStopId: String?
-        let favouriteStopIds: Set<String>
-        let alertStopIds: Set<String>
-        let routeOverlay: RouteMapOverlay?
-        let hideMapPins: Bool
-
-        var key: MapSnapshotKey {
-            MapSnapshotKey(
-                cameraUpdateToken: cameraUpdateToken,
-                annotationKeys: annotations.map(\.key),
-                transferAnnotationKeys: transferAnnotations.map(\.key),
-                bikeShareAnnotationKeys: bikeShareAnnotations.map {
-                    "\($0.key):\($0.station.bikesAvailable ?? -1):\($0.station.docksAvailable ?? -1)"
-                },
-                selectedStopId: selectedStopId,
-                favouriteStopIds: favouriteStopIds,
-                alertStopIds: alertStopIds,
-                routeOverlay: routeOverlay,
-                hideMapPins: hideMapPins
-            )
-        }
-    }
-
-    struct MapSnapshotKey: Equatable {
-        let cameraUpdateToken: Int
-        let annotationKeys: [String]
-        let transferAnnotationKeys: [String]
-        let bikeShareAnnotationKeys: [String]
-        let selectedStopId: String?
-        let favouriteStopIds: Set<String>
-        let alertStopIds: Set<String>
-        let routeOverlay: RouteMapOverlay?
-        let hideMapPins: Bool
+        // Compare value inputs before constructing hundreds of NSObject pins.
+        view.update(state: state)
     }
 
     final class MapContainerView: UIView {
         private let coordinator: Coordinator
         private var mapView: MKMapView?
-        private var snapshot: MapSnapshot?
-        private var appliedSnapshotKey: MapSnapshotKey?
+        private var state: MapViewState?
+        private var appliedState: MapViewState?
         private var appliedCameraUpdateToken: Int?
 
         init(coordinator: Coordinator) {
@@ -131,10 +50,12 @@ struct TransitMapView: UIViewRepresentable {
             fatalError("init(coder:) has not been implemented")
         }
 
-        func update(snapshot: MapSnapshot) {
-            self.snapshot = snapshot
-            setNeedsLayout()
-            applySnapshotIfPossible()
+        func update(state: MapViewState) {
+            guard self.state != state else { return }
+            self.state = state
+            // Layout creates the MKMapView once valid bounds arrive. Content
+            // changes can be applied directly without requesting another layout.
+            applyStateIfPossible()
         }
 
         override func layoutSubviews() {
@@ -161,25 +82,44 @@ struct TransitMapView: UIViewRepresentable {
             }
 
             mapView?.frame = bounds
-            applySnapshotIfPossible()
+            applyStateIfPossible()
         }
 
-        private func applySnapshotIfPossible() {
-            guard let mapView, let snapshot, bounds.width > 0, bounds.height > 0 else { return }
-            let snapshotKey = snapshot.key
-            guard appliedSnapshotKey != snapshotKey else { return }
+        private func applyStateIfPossible() {
+            guard let mapView, let state, bounds.width > 0, bounds.height > 0 else { return }
+            guard appliedState != state else { return }
+            let previous = appliedState
 
-            if appliedCameraUpdateToken != snapshot.cameraUpdateToken {
+            if appliedCameraUpdateToken != state.cameraUpdateToken {
                 coordinator.isApplyingRegion = true
-                mapView.setRegion(snapshot.region, animated: appliedCameraUpdateToken != nil)
-                appliedCameraUpdateToken = snapshot.cameraUpdateToken
+                mapView.setRegion(state.region, animated: appliedCameraUpdateToken != nil)
+                appliedCameraUpdateToken = state.cameraUpdateToken
             }
 
-            coordinator.syncAnnotations(snapshot.annotations, in: mapView)
-            coordinator.syncTransferAnnotations(snapshot.transferAnnotations, in: mapView)
-            coordinator.syncBikeShareAnnotations(snapshot.bikeShareAnnotations, in: mapView)
-            coordinator.syncRoute(snapshot.routeOverlay, in: mapView)
-            appliedSnapshotKey = snapshotKey
+            let showsPins = !state.hideMapPins && state.routeOverlay == nil
+            let showedPins = previous.map { !$0.hideMapPins && $0.routeOverlay == nil }
+            let visibilityChanged = showedPins != showsPins
+            if visibilityChanged || previous?.liveStops != state.liveStops
+                || previous?.gtfsStops != state.gtfsStops
+                || previous?.selectedStopId != state.selectedStopId
+                || previous?.favouriteStopIds != state.favouriteStopIds
+                || previous?.alertStopIds != state.alertStopIds {
+                let annotations = showsPins
+                    ? state.liveStops.map { StopMapAnnotation(stop: $0, layer: .liveNearby) }
+                        + state.gtfsStops.map { StopMapAnnotation(stop: $0, layer: .gtfs) }
+                    : []
+                coordinator.syncAnnotations(annotations, in: mapView)
+            }
+            if previous?.routeOverlay != state.routeOverlay {
+                let transfers = state.routeOverlay?.transferMarkers.map(RouteTransferAnnotation.init) ?? []
+                coordinator.syncTransferAnnotations(transfers, in: mapView)
+                coordinator.syncRoute(state.routeOverlay, in: mapView)
+            }
+            if visibilityChanged || previous?.bikeShareStations != state.bikeShareStations {
+                let bikes = showsPins ? state.bikeShareStations.map(BikeShareMapAnnotation.init) : []
+                coordinator.syncBikeShareAnnotations(bikes, in: mapView)
+            }
+            appliedState = state
         }
     }
 
@@ -262,7 +202,8 @@ struct TransitMapView: UIViewRepresentable {
             mapView.removeAnnotations(staleAnnotations)
 
             for annotation in annotations {
-                if transferAnnotationsByKey[annotation.key] != nil {
+                if let existing = transferAnnotationsByKey[annotation.key] {
+                    existing.update(from: annotation)
                     continue
                 }
 

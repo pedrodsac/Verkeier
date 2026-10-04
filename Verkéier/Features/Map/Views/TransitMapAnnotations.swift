@@ -15,11 +15,11 @@ final class StopMapAnnotation: NSObject, MKAnnotation {
         "\(layer)-\(stop.id)"
     }
 
-    var coordinate: CLLocationCoordinate2D {
+    @objc dynamic var coordinate: CLLocationCoordinate2D {
         stop.location.coordinate
     }
 
-    var title: String? {
+    @objc dynamic var title: String? {
         stop.displayName
     }
 
@@ -29,27 +29,41 @@ final class StopMapAnnotation: NSObject, MKAnnotation {
     }
 
     func update(stop: Stop) {
+        guard self.stop != stop else { return }
+        willChangeValue(forKey: "coordinate")
+        willChangeValue(forKey: "title")
         self.stop = stop
+        didChangeValue(forKey: "title")
+        didChangeValue(forKey: "coordinate")
     }
 }
 
 final class RouteTransferAnnotation: NSObject, MKAnnotation {
-    private let marker: RouteTransferMarker
+    private var marker: RouteTransferMarker
 
     var key: String {
         marker.id
     }
 
-    var coordinate: CLLocationCoordinate2D {
+    @objc dynamic var coordinate: CLLocationCoordinate2D {
         marker.coordinate.coordinate
     }
 
-    var title: String? {
+    @objc dynamic var title: String? {
         marker.title
     }
 
     nonisolated init(marker: RouteTransferMarker) {
         self.marker = marker
+    }
+
+    func update(from annotation: RouteTransferAnnotation) {
+        guard marker != annotation.marker else { return }
+        willChangeValue(forKey: "coordinate")
+        willChangeValue(forKey: "title")
+        marker = annotation.marker
+        didChangeValue(forKey: "title")
+        didChangeValue(forKey: "coordinate")
     }
 }
 
@@ -57,9 +71,9 @@ final class BikeShareMapAnnotation: NSObject, MKAnnotation {
     private(set) var station: BikeShareStation
 
     var key: String { "bike-share-\(station.id)" }
-    var coordinate: CLLocationCoordinate2D { station.location.coordinate }
-    var title: String? { station.displayName }
-    var subtitle: String? {
+    @objc dynamic var coordinate: CLLocationCoordinate2D { station.location.coordinate }
+    @objc dynamic var title: String? { station.displayName }
+    @objc dynamic var subtitle: String? {
         let bikes = station.bikesAvailable.map { "\($0) bikes" } ?? "bikes unknown"
         let docks = station.docksAvailable.map { "\($0) free docks" } ?? "docks unknown"
         return "\(bikes) · \(docks)"
@@ -70,7 +84,14 @@ final class BikeShareMapAnnotation: NSObject, MKAnnotation {
     }
 
     func update(station: BikeShareStation) {
+        guard self.station != station else { return }
+        willChangeValue(forKey: "coordinate")
+        willChangeValue(forKey: "title")
+        willChangeValue(forKey: "subtitle")
         self.station = station
+        didChangeValue(forKey: "subtitle")
+        didChangeValue(forKey: "title")
+        didChangeValue(forKey: "coordinate")
     }
 }
 

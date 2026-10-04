@@ -207,20 +207,18 @@ final class TransitMapViewModel {
     }
 
     func rebuildGTFSOnlyMapStops() {
-        gtfsOnlyMapStops = gtfsMapStops.filter { gtfsStop in
-            !nearbyStops.contains { liveStop in
-                stopsRepresentSamePlace(liveStop, gtfsStop)
+        // Normalize each name once. The former nested scan repeated Foundation
+        // string folding for every GTFS/live pair on the main actor.
+        let liveIDs = Set(nearbyStops.map(\.id))
+        let liveStopsByName = Dictionary(grouping: nearbyStops) { $0.name.normalizedForSearch }
+        let nextStops = gtfsMapStops.filter { gtfsStop in
+            guard !liveIDs.contains(gtfsStop.id) else { return false }
+            let candidates = liveStopsByName[gtfsStop.name.normalizedForSearch] ?? []
+            return !candidates.contains {
+                squaredDistance(from: $0.location, to: gtfsStop.location) < 0.000002
             }
         }
-    }
-
-    private func stopsRepresentSamePlace(_ lhs: Stop, _ rhs: Stop) -> Bool {
-        if lhs.id == rhs.id { return true }
-
-        let namesMatch = lhs.name.normalizedForSearch == rhs.name.normalizedForSearch
-        guard namesMatch else { return false }
-
-        return squaredDistance(from: lhs.location, to: rhs.location) < 0.000002
+        if gtfsOnlyMapStops != nextStops { gtfsOnlyMapStops = nextStops }
     }
 
     struct FavouriteDepartureBoardResult: Sendable {
