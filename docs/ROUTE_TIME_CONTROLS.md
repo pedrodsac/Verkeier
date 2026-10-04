@@ -8,6 +8,8 @@ available to existing consumers.
 
 - **Leave now / Leave at:** the same calculation at the resolved departure
   instant. The departure constraint includes any initial access walk.
+  Picker selections use the displayed minute rather than retained hidden seconds;
+  a selection in the current minute is clamped to the actual current instant.
 - **Arrive by:** door-to-door arrival must meet the selected deadline; the
   recommended journey has the latest feasible departure.
 - **Earlier / Later:** add up to five useful transit alternatives, preserving
@@ -44,9 +46,12 @@ frozen for the browsing session so GPS movement cannot reset the package session
 suggestions, historical routes, moving arrival windows, latest feasible
 departures, access/egress, per-page walking refinement, sparse timetables,
 equal-time boundaries, repeated alternating pages, and overnight service dates.
-`RouteTimePagingTests` covers accumulation, selection, timeout/retry, empty pages,
+`RouteTimePagingTests` covers picker minute precision, accumulation, selection, timeout/retry, empty pages,
 superseded responses, GPS stability, arrival ordering, context persistence, and
 refinement fallback.
+
+Historical page searches retain realtime evidence for previously loaded journeys,
+so their freshness and cancellation checks remain active while browsing the past.
 
 The simulator benchmark adds `earlier`, `arrival-earlier`, and `arrival-later`
 scenarios alongside existing `depart`, `arrive`, and `paging` scenarios. It uses

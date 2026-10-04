@@ -78,7 +78,7 @@ struct RoutePlanningTimeButton: View {
                     }
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Done") {
-                            onChange(mode.planningTime(max(date, .now)))
+                            onChange(mode.planningTime(date).confirmedPickerTime(now: .now))
                             editing = nil
                         }
                         .fontWeight(.semibold)

@@ -45,6 +45,14 @@ final class SimulatorRouteBenchmark {
             var previousRequestID: UUID?
             for sample in 0..<samples {
                 if paging {
+                    let earlier = scenario == "earlier" || scenario == "arrival-earlier"
+                    // A finite timetable can legitimately exhaust a direction.
+                    // Re-prime outside the measured operation rather than time
+                    // a disabled button which performs no calculation.
+                    if earlier ? !viewModel.canLoadEarlierRoutes : !viewModel.canLoadLaterRoutes {
+                        await viewModel.calculateRoute(using: service, from: nil)
+                        try await Task.sleep(for: .milliseconds(500))
+                    }
                     if scenario == "earlier" || scenario == "arrival-earlier" {
                         await viewModel.loadEarlierRoutes(using: service, from: nil)
                     } else {
