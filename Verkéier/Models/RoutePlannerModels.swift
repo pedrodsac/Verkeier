@@ -64,6 +64,19 @@ nonisolated enum RoutePlanningTime: Hashable, Sendable {
         if case .leaveNow = self { return true }
         return false
     }
+
+    /// The picker exposes minutes, so hidden seconds must not move its anchor.
+    /// A selection in the current minute still starts at the actual current time.
+    func confirmedPickerTime(now: Date, calendar: Calendar = .current) -> Self {
+        guard let date else { return self }
+        let minute = calendar.dateInterval(of: .minute, for: date)?.start ?? date
+        let confirmed = max(minute, now)
+        return switch self {
+        case .leaveNow: .leaveNow
+        case .departAt: .departAt(confirmed)
+        case .arriveBy: .arriveBy(confirmed)
+        }
+    }
 }
 
 /// Where a ``RoutePlace`` originated, used for grouping and analytics-free

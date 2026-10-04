@@ -9,6 +9,15 @@ import Testing
 struct RouteTimePagingTests {
     private let anchor = Date(timeIntervalSince1970: 1_800_000_000)
 
+    @Test func timePickerDoesNotCarryHiddenSecondsIntoFutureRequests() {
+        let minute = Calendar.current.dateInterval(of: .minute, for: anchor)!.start.addingTimeInterval(3600)
+        let picked = minute.addingTimeInterval(45)
+        #expect(RoutePlanningTime.departAt(picked).confirmedPickerTime(now: anchor) == .departAt(minute))
+        #expect(RoutePlanningTime.arriveBy(picked).confirmedPickerTime(now: anchor) == .arriveBy(minute))
+        #expect(RoutePlanningTime.departAt(anchor.addingTimeInterval(-10)).confirmedPickerTime(now: anchor) == .departAt(anchor))
+        #expect(RoutePlanningTime.leaveNow.confirmedPickerTime(now: anchor) == .leaveNow)
+    }
+
     @Test func pagingKeepsSelectionAndAddsFiveRoutesWithoutDuplicates() async {
         let first = option("first", departure: 300)
         let added = (1...5).map { option("page-\($0)", departure: Double($0 * 900)) }
