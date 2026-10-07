@@ -134,5 +134,5 @@ Implementation rules:
 - refresh dynamic availability when calculating or explicitly refreshing a route
 - route the dynamic request through the Cloudflare Worker; never commit or log the API key
 - zero or unknown bike/dock counts remain selectable but are shown as warnings
-- MapKit walking geometry is used as a documented bicycle-path approximation;
+- local OSM pedestrian geometry is used as a documented bicycle-path approximation;
   bicycle duration uses a 15 km/h estimate plus pickup/return overhead

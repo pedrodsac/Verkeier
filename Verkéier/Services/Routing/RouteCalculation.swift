@@ -4,8 +4,8 @@ import MobiliteitKit
 /// The result of a ``RouteService`` calculation: a set of route alternatives
 /// plus the currently selected one.
 ///
-/// A calculation always holds at least one option; ``plan`` traps if asked for
-/// a plan when none exist, so treat an empty `options` as an error upstream.
+/// A successful calculation has at least one primary or supplemental option.
+/// ``plan`` traps when both lists are empty; use `allOptions` when checking results.
 nonisolated struct RouteCalculation: Sendable {
     /// The primary route profile, including accumulated adjacent pages and
     /// optionally the direct all-the-way walking comparison.
@@ -41,7 +41,7 @@ nonisolated struct RouteCalculation: Sendable {
         return allOptions.first
     }
 
-    /// The selected option's plan. Traps if `options` is empty.
+    /// The selected option's plan. Traps if `allOptions` is empty.
     var plan: RoutePlan {
         guard let selectedOption else {
             preconditionFailure("RouteCalculation requires at least one route option")

@@ -90,8 +90,9 @@ extension MobiliteitRouteService {
                     do {
                         if let original = originals[option.id],
                            let result = try await sessions.submit(option, replacing: original) {
-                            continuation.yield(.calculation(calculation(from: result,
-                                origin: option.plan.origin, destination: option.plan.destination)))
+                            continuation.yield(.calculation(calculation(from: result.result,
+                                origin: option.plan.origin, destination: option.plan.destination,
+                                supplemental: result.supplemental)))
                         } else if let context = option.validationContext ?? context {
                             let feasibility = RouteItineraryValidator.assess(option, context: context)
                             if feasibility.isInvalid { continuation.yield(.invalidated(option.id)) }

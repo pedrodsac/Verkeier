@@ -18,7 +18,9 @@ nonisolated enum RouteOptionVisibility {
         let candidates = all.filter { $0.status(at: now).isSelectable }
         let dominatedIDs = Set(all.filter { option in
             candidates.contains { other in
-                guard other.id != option.id,
+                // Bike share is a separate mode choice, even when transit is faster.
+                guard other.usesBikeShare == option.usesBikeShare,
+                      other.id != option.id,
                       let departure = option.departureTime, let arrival = option.arrivalTime,
                       let otherDeparture = other.departureTime, let otherArrival = other.arrivalTime
                 else { return false }
@@ -54,7 +56,7 @@ nonisolated enum RouteOptionVisibility {
                guard let transitDuration = duration(ride) else { return false }
                return walkingDuration < transitDuration
            }) {
-            return ([fastestWalk], [])
+            return ([fastestWalk], supplemental.filter { !$0.isWalkingOnly })
         }
 
         let walkingIDs = Set(eligibleWalking.map(\.id))
