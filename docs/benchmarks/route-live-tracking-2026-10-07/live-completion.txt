@@ -1,0 +1,29 @@
+initial journeys 3 legs 9 reported 0 estimated 0 rejects [:]
+initial 326 24264854 000200508004 2026-10-07 20:37:25 +0000 scheduled scheduled
+initial 850 24291395 000200508011 2026-10-07 20:45:44 +0000 scheduled scheduled
+initial 16 24360422 000200508016 2026-10-07 21:02:20 +0000 scheduled scheduled
+initial 322 24262720 000200508004 2026-10-07 21:17:50 +0000 scheduled scheduled
+initial 201 24261419 000200417050 2026-10-07 21:40:53 +0000 scheduled scheduled
+initial 18 24361194 000200417033 2026-10-07 21:51:50 +0000 scheduled scheduled
+initial 326 24264853 000200508004 2026-10-07 21:37:25 +0000 scheduled scheduled
+initial 456 24272894 000200417050 2026-10-07 22:03:54 +0000 scheduled scheduled
+initial 18 24361189 000200417060 2026-10-07 22:13:50 +0000 scheduled scheduled
+tracked journeys 3 legs 9 reported 9 estimated 0 rejects [:]
+tracked 326 24264854 000200508004 2026-10-07 20:37:25 +0000 reported reported
+tracked 850 24291395 000200508011 2026-10-07 20:45:44 +0000 reported reported
+tracked 16 24360422 000200508016 2026-10-07 21:02:20 +0000 reported reported
+tracked 322 24262720 000200508004 2026-10-07 21:17:50 +0000 reported reported
+tracked 201 24261419 000200417050 2026-10-07 21:40:53 +0000 reported reported
+tracked 18 24361194 000200417033 2026-10-07 21:51:50 +0000 reported reported
+tracked 326 24264853 000200508004 2026-10-07 21:37:25 +0000 reported reported
+tracked 456 24272894 000200417050 2026-10-07 22:03:54 +0000 reported estimated
+tracked 18 24361189 000200417060 2026-10-07 22:13:50 +0000 reported estimated
+comparison 18 24361194 source reported board matches 1 predictions ["23:51:00"]
+comparison 201 24261419 source reported board matches 1 predictions ["23:40:00"]
+comparison 456 24272894 source reported board matches 1 predictions ["00:03:00"]
+comparison 18 24361189 source reported board matches 1 predictions ["00:13:00"]
+comparison 326 24264854 source reported board matches 1 predictions ["22:38:00"]
+comparison 322 24262720 source reported board matches 2 predictions ["23:17:00", "23:18:00"]
+comparison 326 24264853 source reported board matches 1 predictions ["23:37:00"]
+comparison 850 24291395 source reported board matches 1 predictions ["22:46:00"]
+comparison 16 24360422 source reported board matches 2 predictions ["23:02:00", "23:02:00"]

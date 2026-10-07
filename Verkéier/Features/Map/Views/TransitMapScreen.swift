@@ -9,6 +9,7 @@ struct TransitMapScreen: View {
     @AppStorage("debugTransitDataMode") var debugTransitDataModeRawValue =
         DebugTransitDataMode.normal.rawValue
     @Environment(\.routeService) var routeService
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.walkingRouter) var walkingRouter
     @Environment(\.gtfsService) var gtfsService
     @Environment(\.liveTransitService) var liveTransitService
@@ -178,6 +179,10 @@ struct TransitMapScreen: View {
         .onChange(of: viewModel.searchQuery) {
             scheduleSearchUpdate()
         }
+        .task(id: activeRouteRealtimeRequest) {
+            guard let request = activeRouteRealtimeRequest else { return }
+            await viewModel.trackRouteRealtime(using: routeService, request: request)
+        }
         .onChange(of: favouriteEntities) {
             favouriteStopIds = Set(favouriteEntities.map(\.stopId))
             let activeIDs = favouriteStopIds
@@ -206,6 +211,15 @@ struct TransitMapScreen: View {
 
     var favouriteStops: [Stop] {
         favouriteEntities.map(\.stop)
+    }
+
+    private var activeRouteRealtimeRequest: RouteRealtimeRequest? {
+        guard scenePhase == .active else { return nil }
+        let showingRoutes: Bool = switch sheetNavigation.activePath.last {
+        case .directions, .directionsForPreset, .routeTimeline: true
+        default: sheetNavigation.selectedTab == .plan && sheetNavigation.activePath.isEmpty
+        }
+        return showingRoutes ? viewModel.routeRealtimeRequest : nil
     }
 
     var favouriteRefreshKey: String {
