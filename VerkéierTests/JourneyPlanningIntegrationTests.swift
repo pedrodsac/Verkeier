@@ -7,6 +7,61 @@ import ZIPFoundation
 @Suite("Journey planning package integration")
 @MainActor
 struct JourneyPlanningIntegrationTests {
+    @Test("A reachable bike remains available when the timetable has no journey")
+    func bikeWithoutTransit() async throws {
+        let fixture = try await JourneyIntegrationFixture()
+        defer { fixture.remove() }
+        let stations = BikeFixtureStations(values: [
+            BikeShareStation(id: "pickup", name: "Pickup", location: fixture.origin),
+            BikeShareStation(id: "return", name: "Return", location: fixture.destination)
+        ])
+        let service = MobiliteitRouteService(databaseURL: fixture.database,
+            bikeShareService: stations, walkingRouter: IntegrationWalkingRouter(),
+            roadRouteProvider: IntegrationRoadProvider())
+        let result = try await service.calculateRoute(from: fixture.origin, to: fixture.destination,
+            time: .departAt(fixture.anchor.addingTimeInterval(2 * 86_400)), filters: .init(),
+            realtimeRefreshPolicy: .scheduleOnly)
+        #expect(result.options.isEmpty)
+        #expect(result.supplementalOptions.count == 1)
+        #expect(result.selectedOption?.isVelohOnly == true)
+        #expect(result.canLoadLater == false)
+    }
+
+    @Test("Bike alternative survives transit paging, refresh and walking feedback")
+    func bikeAlternativeSurvivesSnapshots() async throws {
+        let fixture = try await JourneyIntegrationFixture()
+        defer { fixture.remove() }
+        let stations = BikeFixtureStations(values: [
+            BikeShareStation(id: "pickup", name: "Pickup", location: fixture.origin),
+            BikeShareStation(id: "return", name: "Return", location: fixture.destination)
+        ])
+        let service = MobiliteitRouteService(databaseURL: fixture.database,
+            bikeShareService: stations, walkingRouter: IntegrationWalkingRouter(),
+            roadRouteProvider: IntegrationRoadProvider())
+        let initial = try await service.calculateRoute(from: fixture.origin, to: fixture.destination,
+            time: .departAt(fixture.anchor), filters: .init(), realtimeRefreshPolicy: .scheduleOnly)
+        let bike = try #require(initial.supplementalOptions.first)
+        #expect(bike.isVelohOnly)
+        #expect(!initial.options.isEmpty)
+        #expect(initial.options.allSatisfy { !$0.usesBikeShare })
+        let original = try #require(initial.options.first)
+        var snapshots = 0
+        for await event in service.refinementEvents(in: [original], context: initial.validationContext) {
+            if case let .calculation(updated) = event {
+                #expect(updated.supplementalOptions == [bike])
+                snapshots += 1
+            }
+        }
+        #expect(snapshots > 0)
+        let paged = try await service.calculateRoute(from: fixture.origin, to: fixture.destination,
+            time: .departAt(fixture.anchor), filters: .init(), realtimeRefreshPolicy: .scheduleOnly,
+            page: .laterAdjacent)
+        #expect(paged.supplementalOptions == [bike])
+        let refreshed = try await service.calculateRoute(from: fixture.origin, to: fixture.destination,
+            time: .departAt(fixture.anchor), filters: .init(), realtimeRefreshPolicy: .forceRefresh)
+        #expect(refreshed.supplementalOptions.map(\.id) == [bike.id])
+    }
+
     @Test("Measured walking feedback returns the package replacement snapshot")
     func refinementFeedbackPreservesNativeTransit() async throws {
         let fixture = try await JourneyIntegrationFixture()

@@ -16,6 +16,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
     init(databaseURL: URL = MobiliteitGTFSService.installedDatabaseURL,
          gtfsService: (any GTFSService)? = nil, realtimeClient: MobiliteitAPIClient? = nil,
          engine: JourneyPlanner? = nil,
+         bikeShareService: any BikeShareService = UnavailableBikeShareService(),
          walkingRouter: any WalkingRouting = UnavailableWalkingRouter(),
          roadRouteProvider: (any RoadRouteProviding)? = nil,
          graphPreparation: Task<Void, Never>? = nil) {
@@ -23,9 +24,12 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         let planner = engine ?? JourneyPlanner(
             walkingProvider: LocalFirstWalkingRoutingProvider(walkingRouter: walkingRouter),
             realtimeClient: realtimeClient)
-        self.engine = planner; self.sessions = AppJourneySessionStore(planner: planner)
+        let roads = roadRouteProvider ?? LocalFirstRoadRouteProvider(walkingRouter: walkingRouter)
+        self.engine = planner
+        self.sessions = AppJourneySessionStore(planner: planner,
+            bikePlanner: BikeShareRoutePlanner(stations: bikeShareService, roads: roads))
         self.walkingRouter = walkingRouter
-        self.roadRouteProvider = roadRouteProvider ?? LocalFirstRoadRouteProvider(walkingRouter: walkingRouter)
+        self.roadRouteProvider = roads
         self.graphPreparation = graphPreparation
     }
 
@@ -48,8 +52,9 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                     preferences: filters.packagePreferences, realtimeAcquisitionBudgetMilliseconds: 2_500,
                     realtimeMaximumConcurrentBoardRequests: 16, realtimeSearchWorkBudgetMilliseconds: 4_100,
                     pagingPolicy: .adjacentTimeWindows),
-                page: page.packagePage, refresh: realtimeRefreshPolicy.packagePolicy)
-            var calculation = calculation(from: result, origin: from, destination: to)
+                page: page.packagePage, refresh: realtimeRefreshPolicy.packagePolicy,
+                origin: from, destination: to, time: time)
+            var calculation = calculation(from: result.result, origin: from, destination: to, supplemental: result.supplemental)
             calculation.diagnostics?.milliseconds[.timetableReadiness] = readiness
             calculation.diagnostics?.milliseconds[.graphPreparation] = graphMilliseconds
             calculation.diagnostics?.totalMilliseconds = RoutingDiagnostics.elapsed(since: started)
@@ -76,12 +81,20 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         return .coordinate(.init(latitude: point.latitude, longitude: point.longitude), label: point.name)
     }
 
-    nonisolated func calculation(from result: JourneyPlanningResult,
-        origin: LocationPoint, destination: LocationPoint) -> RouteCalculation {
+    nonisolated func calculation(from result: JourneyPlanningResult?,
+        origin: LocationPoint, destination: LocationPoint, supplemental: [RouteOption] = []) -> RouteCalculation {
         let started = ContinuousClock.now
+        guard let result else {
+            var calculation = RouteCalculation(options: [], supplementalOptions: supplemental, selectedOptionID: nil)
+            calculation.isAuthoritativeSnapshot = true
+            calculation.canLoadEarlier = false
+            calculation.canLoadLater = false
+            return calculation
+        }
         var calculation = RouteCalculation(options: result.journeys.map {
             option(from: $0, origin: origin, destination: destination, result: result)
         }, selectedOptionID: result.recommendedJourneyID?.value)
+        calculation.supplementalOptions = supplemental
         calculation.invalidatedOptionIDs = Set(result.invalidatedIDs.map(\.value))
         calculation.validationContext = result.validationContext
         calculation.browsingWindow = result.browsingWindow

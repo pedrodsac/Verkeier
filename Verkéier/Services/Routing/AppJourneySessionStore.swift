@@ -9,26 +9,48 @@ actor AppJourneySessionStore {
     private var request: JourneyPlanningRequest?
     private var databaseURL: URL?
     private var generation = 0
-    init(planner: JourneyPlanner) { self.planner = planner }
+    private let bikePlanner: BikeShareRoutePlanner
+    private var supplementalOptions: [RouteOption] = []
+    init(planner: JourneyPlanner, bikePlanner: BikeShareRoutePlanner) {
+        self.planner = planner; self.bikePlanner = bikePlanner
+    }
 
     func calculate(databaseURL: URL, request: JourneyPlanningRequest,
-                   page: JourneyPlanningPage, refresh: JourneyRefreshPolicy) async throws -> JourneyPlanningResult {
+                   page: JourneyPlanningPage, refresh: JourneyRefreshPolicy,
+                   origin: LocationPoint, destination: LocationPoint, time: RoutePlanningTime
+    ) async throws -> (result: JourneyPlanningResult?, supplemental: [RouteOption]) {
         generation += 1
         let current = generation
         let router = try await planner.router(for: databaseURL)
         guard current == generation else { throw JourneyPlanningError.supersededRequest }
-        if self.request != request || self.databaseURL != databaseURL || session == nil || preparedRouter !== router {
+        let isNewRequest = self.request != request || self.databaseURL != databaseURL || session == nil || preparedRouter !== router
+        if isNewRequest {
+            supplementalOptions = []
             let created = try await planner.makePlanningSession(databaseURL: databaseURL, request: request)
             guard current == generation else { throw JourneyPlanningError.supersededRequest }
             session = created; preparedRouter = router; self.request = request; self.databaseURL = databaseURL
         }
         guard let session else { throw JourneyPlanningError.supersededRequest }
-        let result = try await session.calculate(page: page, refresh: refresh, now: .now)
+        let isInitialPage: Bool
+        if case .initial = page { isInitialPage = true } else { isInitialPage = false }
+        async let bike = isNewRequest || isInitialPage || refresh == .forceRefresh
+            ? bikePlanner.option(from: origin, to: destination, time: time)
+            : supplementalOptions.first
+        let result: JourneyPlanningResult?
+        do {
+            result = try await session.calculate(page: page, refresh: refresh, now: .now)
+        } catch JourneyPlanningError.noRouteFound {
+            result = nil
+        }
+        let option = await bike
+        try Task.checkCancellation()
         guard current == generation else { throw JourneyPlanningError.supersededRequest }
-        return result
+        guard result != nil || option != nil else { throw JourneyPlanningError.noRouteFound }
+        supplementalOptions = option.map { [$0] } ?? []
+        return (result, supplementalOptions)
     }
 
-    func submit(_ option: RouteOption, replacing original: RouteOption) async throws -> JourneyPlanningResult? {
+    func submit(_ option: RouteOption, replacing original: RouteOption) async throws -> (result: JourneyPlanningResult, supplemental: [RouteOption])? {
         guard let session, let token = option.refinementToken else { return nil }
         let current = generation
         var result: JourneyPlanningResult?
@@ -49,8 +71,9 @@ actor AppJourneySessionStore {
             guard current == generation else { throw JourneyPlanningError.staleRefinement }
             if result?.invalidatedIDs.contains(token.journeyID) == true { break }
         }
-        return result
+        return result.map { ($0, supplementalOptions) }
     }
+
 }
 
 // Compatibility for fixtures that inject a prepared package engine.

@@ -124,8 +124,15 @@ cache hits, bytes, incomplete coverage and matched event counts; the simulator
 benchmark separately reports displayed-leg evidence and matching rejections.
 
 `BikeShareService` provides vel’OH! static station data and on-demand dynamic
-availability. The public-transport routing engine merges direct bike journeys
-and bike rentals into walking gaps around transit legs. Bike legs carry pickup
+availability. The app route service adds one direct bike-share journey outside the transit
+result budget when distinct pickup and return stations are within 700 metres
+of the endpoints and routed access walks are at most 1 km. It evaluates up to
+two stations per endpoint, preferring available bikes/docks before duration.
+Walking geometry from the local OSM graph approximates the ride; its ETA uses
+15 km/h plus two minutes for pickup and return. This is not a bicycle-specific
+path. Bike/transit combinations are not currently generated. The bike choice
+remains visible independently of transit time dominance and survives paging
+and walking refinement snapshots. Bike legs carry pickup
 and return station counts in `BikeShareLegDetails` so route cards, timelines,
 and map annotations can show the same snapshot.
 

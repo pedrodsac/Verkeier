@@ -68,19 +68,29 @@ struct RouteOptionVisibilityTests {
         #expect(visible.primary.map(\.id) == [fast.id])
     }
 
-    @Test("Time dominance compares primary and supplemental routes in both directions")
+    @Test("Bike alternatives remain a separate choice regardless of transit timing")
     func comparesSupplementalOptions() {
         let slowBus = option("slowBus", departure: 0, arrival: 1_800)
         let fastBike = option("fastBike", mode: .bicycle, departure: 300, arrival: 1_200)
         let bikeWins = RouteOptionVisibility.visibleOptions(primary: [slowBus], supplemental: [fastBike], at: anchor)
-        #expect(bikeWins.primary.isEmpty)
+        #expect(bikeWins.primary.map(\.id) == [slowBus.id])
         #expect(bikeWins.supplemental.map(\.id) == [fastBike.id])
 
         let fastBus = option("fastBus", departure: 300, arrival: 1_200)
         let slowBike = option("slowBike", mode: .bicycle, departure: 0, arrival: 1_800)
         let busWins = RouteOptionVisibility.visibleOptions(primary: [fastBus], supplemental: [slowBike], at: anchor)
         #expect(busWins.primary.map(\.id) == [fastBus.id])
-        #expect(busWins.supplemental.isEmpty)
+        #expect(busWins.supplemental.map(\.id) == [slowBike.id])
+    }
+
+    @Test("A walking recommendation keeps the separate bike alternative")
+    func walkingRecommendationPreservesBike() {
+        let bus = option("bus", departure: 600, arrival: 1_800)
+        let walk = option("walk", mode: .walking, departure: 0, arrival: 600)
+        let bike = option("bike", mode: .bicycle, departure: 0, arrival: 900)
+        let visible = RouteOptionVisibility.visibleOptions(primary: [bus, walk], supplemental: [bike], at: anchor)
+        #expect(visible.primary.map(\.id) == [walk.id])
+        #expect(visible.supplemental.map(\.id) == [bike.id])
     }
 
     @Test("Walking that departs later and arrives at the same time hides transit")

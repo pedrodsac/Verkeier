@@ -91,7 +91,7 @@ actor JCDecauxBikeShareStore {
     func refreshStaticStations() async {
         loadCachedSnapshotIfNeeded()
         do {
-            let (data, response) = try await session.data(from: configuration.bikeShareStaticStationsURL)
+            let (data, response) = try await session.data(for: URLRequest(url: configuration.bikeShareStaticStationsURL, timeoutInterval: 1.5))
             try Self.validate(response: response, data: data)
             let parsed = try Self.parseCSV(data)
             guard !parsed.isEmpty else { throw BikeShareFeedError.emptyStaticFeed }
@@ -133,7 +133,7 @@ actor JCDecauxBikeShareStore {
                 return
             }
 
-            let (data, response) = try await session.data(from: url)
+            let (data, response) = try await session.data(for: URLRequest(url: url, timeoutInterval: 1.5))
             try Self.validate(response: response, data: data)
             // JCDecaux's dynamic endpoint uses snake_case keys
             // (available_bikes, available_bike_stands, last_update).
@@ -141,6 +141,17 @@ actor JCDecauxBikeShareStore {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             let dynamic = try decoder.decode([DynamicStation].self, from: data)
             let dynamicByID = Dictionary(uniqueKeysWithValues: dynamic.map { (String($0.number), $0) })
+            // The live feed includes station coordinates, so a failed static
+            // download must not prevent first-launch bike routing.
+            if staticStations.isEmpty {
+                staticStations = dynamic.filter {
+                    (-90 ... 90).contains($0.position.lat) && (-180 ... 180).contains($0.position.lng)
+                }.map {
+                    BikeShareStation(id: String($0.number), name: $0.name,
+                        location: LocationPoint(id: "veloh-\($0.number)", name: $0.name,
+                            latitude: $0.position.lat, longitude: $0.position.lng), capacity: $0.bikeStands)
+                }
+            }
             let merged = staticStations.map { station -> BikeShareStation in
                 guard let live = dynamicByID[station.id] else { return station }
                 return BikeShareStation(
@@ -154,7 +165,10 @@ actor JCDecauxBikeShareStore {
                     lastUpdated: live.lastUpdate.map { Date(timeIntervalSince1970: Double($0) / 1000) }
                 )
             }
-            currentSnapshot = BikeShareSnapshot(stations: merged, fetchedAt: .now)
+            guard !merged.isEmpty else { return }
+            let snapshot = BikeShareSnapshot(stations: merged, fetchedAt: .now)
+            currentSnapshot = snapshot
+            Self.writeCachedSnapshot(snapshot, to: cacheURL)
         } catch {
             // Routes remain usable with static or last-known availability.
         }
