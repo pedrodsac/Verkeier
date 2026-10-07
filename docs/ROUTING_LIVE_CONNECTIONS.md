@@ -45,7 +45,35 @@ bypasses completed evidence. Unavailable, ambiguous, contradictory or expired
 reports retain honest scheduled or partial coverage.
 
 The app pins MobiliteitKit revision
-`60af526ac2d6f87e39fc02565c771164f37adf55`.
+`6f0158f27b26dc79c53a40332fcbd0f46702a306`.
+
+## Tracking calculated routes
+
+The initial search allowance does not end live acquisition. Once route results
+are visible, the app immediately calls `refreshDisplayedRealtime` through its
+injected `RouteRealtimeRefreshing` service. The package checks every transit
+boarding occurrence in the accumulated session, including connecting vehicles
+and previously loaded pages. Groups of eight boarding stops each receive their
+own eight-second allowance, so a failed or slow earlier group cannot consume
+the opportunity of later stops. This work runs after route publication.
+
+The first check reuses fresh board coverage. Subsequent checks request fresh
+reports every 45 seconds while the directions or timeline is visible and the
+app is active. Changing endpoints, starting another calculation or page,
+leaving the route screen, or backgrounding the app cancels the tracking task.
+Generation checks reject late reports from superseded requests.
+
+The package applies matched trip-instance updates to existing journeys, retaining
+measured walking geometry, page boundaries and per-journey validation contexts.
+It rechecks feasibility and ranking, removes cancellations and missed transfers,
+and returns an authoritative snapshot. The app preserves a usable manual
+selection or selects the package recommendation. Predictions keep their original
+observation timestamps; unavailable or expired evidence remains scheduled.
+
+[7 October validation](benchmarks/route-live-tracking-2026-10-07/validation.md)
+includes all 192 package tests, 18 focused app tests, and a live query that
+upgraded all nine initially scheduled transit legs to reported departure
+predictions with the initial acquisition allowance set to zero.
 
 ## Correctness verification
 
