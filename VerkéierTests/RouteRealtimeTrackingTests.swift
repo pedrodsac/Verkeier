@@ -31,7 +31,7 @@ struct RouteRealtimeTrackingTests {
         await model.calculateRoute(using: service, from: nil)
         let request = try #require(model.routeRealtimeRequest)
         await model.refreshRouteRealtime(using: service, request: request)
-        #expect(model.routeOptions.map(\.id) == ["replacement"])
+        #expect(model.routeOptions.map(\.id) == ["replacement", "backup"])
         #expect(model.selectedRouteOptionID == "replacement")
         #expect(model.invalidatedRouteOptionIDs.contains("first"))
     }
