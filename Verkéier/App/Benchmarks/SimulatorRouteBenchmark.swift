@@ -36,7 +36,7 @@ final class SimulatorRouteBenchmark {
                 realtimeClient: client, walkingRouter: walking)
             self.service = service
             let samples = Int(env["ROUTING_BENCHMARK_SAMPLES"] ?? "1") ?? 1
-            configure(scenario)
+            try configure(scenario)
             let paging = ["paging", "earlier", "arrival-earlier", "arrival-later"].contains(scenario)
             if paging || scenario == "refresh" || scenario == "cached" {
                 await viewModel.calculateRoute(using: service, from: nil)
@@ -84,11 +84,33 @@ final class SimulatorRouteBenchmark {
                 var usage = rusage()
                 getrusage(RUSAGE_SELF, &usage)
                 let record: [String: Any] = ["scenario": scenario, "sample": sample,
+                    "planningTime": viewModel.routePlanningTime.date?.timeIntervalSince1970 ?? 0,
+                    "avoidTightTransfers": viewModel.routeFilters.avoidTightTransfers,
+                    "recommendedOption": viewModel.selectedRouteOptionID ?? "",
                     "requestID": diagnostics.requestID.uuidString, "total_ms": diagnostics.totalMilliseconds,
                     "stages_ms": Dictionary(uniqueKeysWithValues: diagnostics.milliseconds.map { ($0.key.rawValue, $0.value) }),
                     "rounds": diagnostics.rounds.map { ["scan_ms": $0.patternScanMilliseconds, "merge_ms": $0.labelMergeMilliseconds,
                         "prepare_ms": $0.tripPreparationMilliseconds, "alights": $0.alightingChecks, "retained": $0.retainedLabels] },
                     "options": viewModel.routeOptions.map(\.id),
+                    "unfilteredJourneys": viewModel.unfilteredRouteOptions.map { option -> [String: Any] in
+                        ["id": option.id,
+                         "departure": option.departureTime?.timeIntervalSince1970 ?? 0,
+                         "arrival": option.arrivalTime?.timeIntervalSince1970 ?? 0,
+                         "lines": option.transitLegs.map { $0.routeName ?? "" }]
+                    },
+                    "journeys": viewModel.routeOptions.map { option -> [String: Any] in
+                        ["id": option.id,
+                         "departure": option.departureTime?.timeIntervalSince1970 ?? 0,
+                         "arrival": option.arrivalTime?.timeIntervalSince1970 ?? 0,
+                         "legs": option.plan.legs.map { leg -> [String: Any] in
+                             ["line": leg.routeName ?? "walk", "from": leg.origin.name ?? "",
+                              "to": leg.destination.name ?? "", "fromStop": leg.originStopId ?? "",
+                              "toStop": leg.destinationStopId ?? "",
+                              "transferWarning": leg.transferWarning ?? "",
+                              "departure": leg.departureTime?.timeIntervalSince1970 ?? 0,
+                              "arrival": leg.arrivalTime?.timeIntervalSince1970 ?? 0]
+                         }]
+                    },
                     "refreshPolicy": scenario == "cached" || paging ? "useCache" : "forceRefresh",
                     "displayedLegs": viewModel.routeOptions.flatMap { option in
                         option.transitLegs.map { leg -> [String: Any] in
@@ -130,7 +152,7 @@ final class SimulatorRouteBenchmark {
         }
     }
 
-    private func configure(_ scenario: String) {
+    private func configure(_ scenario: String) throws {
         var from = LocationPoint(name: "Gromscheed", latitude: 49.6541071, longitude: 6.2296443)
         var to = LocationPoint(name: "Kirchberg Konrad", latitude: 49.6301, longitude: 6.1682, transitStopID: "000200417019")
         let formatter = ISO8601DateFormatter()
@@ -156,6 +178,12 @@ final class SimulatorRouteBenchmark {
         if scenario == "coordinates" {
             to = .init(name: "Kirchberg", latitude: 49.6301, longitude: 6.1682)
         }
+        if let value = ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_TIME"] {
+            guard let anchor = formatter.date(from: value) else { throw CocoaError(.formatting) }
+            time = scenario.contains("arrive") ? .arriveBy(anchor) : .departAt(anchor)
+        }
+        viewModel.routeFilters.avoidTightTransfers =
+            ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_AVOID_TIGHT_TRANSFERS"] == "1"
         viewModel.routeOrigin = .init(title: from.name ?? "Origin", location: from, source: .search)
         viewModel.routeDestination = .init(title: to.name ?? "Destination", location: to, source: .search)
         viewModel.routePlanningTime = time
