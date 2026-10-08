@@ -1,0 +1,1458 @@
+[
+  {
+    "avoidTightTransfers": true,
+    "counters": {
+      "boardCacheHits": 0,
+      "boardsCovered": 27,
+      "candidates": 3140,
+      "delayedPastBoardings": 0,
+      "duplicatesSuppressed": 622,
+      "incompleteBoards": 0,
+      "invalidJourneys": 9,
+      "networkRequests": 30,
+      "pageNewJourneys": 10,
+      "predictedEvents": 0,
+      "recommendationSwitches": 0,
+      "responseBytes": 480,
+      "retainedAlternatives": 26,
+      "sharedFirstVehicleGroups": 3,
+      "walkingCacheHits": 127,
+      "walkingRequests": 432,
+      "workers": 10
+    },
+    "displayedLegs": [
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791476791,
+        "effectiveDeparture": 1791476516,
+        "line": "850",
+        "option": "g4:612>1962:24291374@20261008:31-34|24360347@20261008:2-7",
+        "scheduledDeparture": 1791476516,
+        "status": "scheduled",
+        "stop": "000200508002",
+        "trip": "24291374"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791477980,
+        "effectiveDeparture": 1791477240,
+        "line": "16",
+        "option": "g4:612>1962:24291374@20261008:31-34|24360347@20261008:2-7",
+        "scheduledDeparture": 1791477240,
+        "status": "scheduled",
+        "stop": "000200508016",
+        "trip": "24360347"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791477005,
+        "effectiveDeparture": 1791476410,
+        "line": "322",
+        "option": "g4:654>2775:24262705@20261008:16-19|24423069@20261008:2-8",
+        "scheduledDeparture": 1791476410,
+        "status": "scheduled",
+        "stop": "000200508004",
+        "trip": "24262705"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791478150,
+        "effectiveDeparture": 1791477700,
+        "line": "21",
+        "option": "g4:654>2775:24262705@20261008:16-19|24423069@20261008:2-8",
+        "scheduledDeparture": 1791477700,
+        "status": "scheduled",
+        "stop": "000200417050",
+        "trip": "24423069"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791477005,
+        "effectiveDeparture": 1791476410,
+        "line": "322",
+        "option": "g4:654>1962:24262705@20261008:16-19|24368580@20261008:3-8",
+        "scheduledDeparture": 1791476410,
+        "status": "scheduled",
+        "stop": "000200508004",
+        "trip": "24262705"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791478460,
+        "effectiveDeparture": 1791478070,
+        "line": "6",
+        "option": "g4:654>1962:24262705@20261008:16-19|24368580@20261008:3-8",
+        "scheduledDeparture": 1791478070,
+        "status": "scheduled",
+        "stop": "000200417050",
+        "trip": "24368580"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791476940,
+        "effectiveDeparture": 1791476790,
+        "line": "29",
+        "option": "g4:127>1962:24365618@20261008:0-2|24360347@20261008:2-7",
+        "scheduledDeparture": 1791476790,
+        "status": "scheduled",
+        "stop": "000200508003",
+        "trip": "24365618"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791477980,
+        "effectiveDeparture": 1791477240,
+        "line": "16",
+        "option": "g4:127>1962:24365618@20261008:0-2|24360347@20261008:2-7",
+        "scheduledDeparture": 1791477240,
+        "status": "scheduled",
+        "stop": "000200508016",
+        "trip": "24360347"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791478005,
+        "effectiveDeparture": 1791477445,
+        "line": "326",
+        "option": "g4:654>2775:24264858@20261008:27-30|24423073@20261008:2-8",
+        "scheduledDeparture": 1791477445,
+        "status": "scheduled",
+        "stop": "000200508004",
+        "trip": "24264858"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791479050,
+        "effectiveDeparture": 1791478600,
+        "line": "21",
+        "option": "g4:654>2775:24264858@20261008:27-30|24423073@20261008:2-8",
+        "scheduledDeparture": 1791478600,
+        "status": "scheduled",
+        "stop": "000200417050",
+        "trip": "24423073"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791478591,
+        "effectiveDeparture": 1791478316,
+        "line": "850",
+        "option": "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8",
+        "scheduledDeparture": 1791478316,
+        "status": "scheduled",
+        "stop": "000200508002",
+        "trip": "24291373"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791479660,
+        "effectiveDeparture": 1791478970,
+        "line": "6",
+        "option": "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8",
+        "scheduledDeparture": 1791478970,
+        "status": "scheduled",
+        "stop": "000200508016",
+        "trip": "24368579"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791478740,
+        "effectiveDeparture": 1791478590,
+        "line": "29",
+        "option": "g4:127>2500:24365632@20261008:0-2|24320781@20261008:1-5",
+        "scheduledDeparture": 1791478590,
+        "status": "scheduled",
+        "stop": "000200508003",
+        "trip": "24365632"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791479620,
+        "effectiveDeparture": 1791479030,
+        "line": "T1",
+        "option": "g4:127>2500:24365632@20261008:0-2|24320781@20261008:1-5",
+        "scheduledDeparture": 1791479030,
+        "status": "scheduled",
+        "stop": "000200508005",
+        "trip": "24320781"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791483390,
+        "effectiveDeparture": 1791483260,
+        "line": "29",
+        "option": "g4:127>1962:24365741@20261008:0-2|24360286@20261008:2-7",
+        "scheduledDeparture": 1791483260,
+        "status": "scheduled",
+        "stop": "000200508003",
+        "trip": "24365741"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791484810,
+        "effectiveDeparture": 1791484180,
+        "line": "16",
+        "option": "g4:127>1962:24365741@20261008:0-2|24360286@20261008:2-7",
+        "scheduledDeparture": 1791484180,
+        "status": "scheduled",
+        "stop": "000200508016",
+        "trip": "24360286"
+      }
+    ],
+    "journeys": [
+      {
+        "arrival": 1791477980,
+        "departure": 1791475961.2875,
+        "id": "g4:612>1962:24291374@20261008:31-34|24360347@20261008:2-7",
+        "legs": [
+          {
+            "arrival": 1791476516,
+            "departure": 1791475961.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791476791,
+            "departure": 1791476516,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "850",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791477980,
+            "departure": 1791477240,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791478223.33875,
+        "departure": 1791476071.6287498,
+        "id": "g4:654>2775:24262705@20261008:16-19|24423069@20261008:2-8",
+        "legs": [
+          {
+            "arrival": 1791476410,
+            "departure": 1791476071.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791477005,
+            "departure": 1791476410,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "322",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478150,
+            "departure": 1791477700,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "21",
+            "to": "Kirchberg, prov. Konrad Adenauer",
+            "toStop": "000900000058",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478223.33875,
+            "departure": 1791478150,
+            "from": "Kirchberg, prov. Konrad Adenauer",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791478460,
+        "departure": 1791476071.6287498,
+        "id": "g4:654>1962:24262705@20261008:16-19|24368580@20261008:3-8",
+        "legs": [
+          {
+            "arrival": 1791476410,
+            "departure": 1791476071.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791477005,
+            "departure": 1791476410,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "322",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478460,
+            "departure": 1791478070,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791477980,
+        "departure": 1791476170.1375,
+        "id": "g4:127>1962:24365618@20261008:0-2|24360347@20261008:2-7",
+        "legs": [
+          {
+            "arrival": 1791476790,
+            "departure": 1791476170.1375,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Charlys Statioun",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791476940,
+            "departure": 1791476790,
+            "from": "Senningerberg, Charlys Statioun",
+            "fromStop": "000200508003",
+            "line": "29",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791477980,
+            "departure": 1791477240,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791479123.33875,
+        "departure": 1791477106.6287498,
+        "id": "g4:654>2775:24264858@20261008:27-30|24423073@20261008:2-8",
+        "legs": [
+          {
+            "arrival": 1791477445,
+            "departure": 1791477106.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478005,
+            "departure": 1791477445,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "326",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791479050,
+            "departure": 1791478600,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "21",
+            "to": "Kirchberg, prov. Konrad Adenauer",
+            "toStop": "000900000058",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791479123.33875,
+            "departure": 1791479050,
+            "from": "Kirchberg, prov. Konrad Adenauer",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791479660,
+        "departure": 1791477761.2875,
+        "id": "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8",
+        "legs": [
+          {
+            "arrival": 1791478316,
+            "departure": 1791477761.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478591,
+            "departure": 1791478316,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "850",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791479660,
+            "departure": 1791478970,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791480114.3125,
+        "departure": 1791477970.1375,
+        "id": "g4:127>2500:24365632@20261008:0-2|24320781@20261008:1-5",
+        "legs": [
+          {
+            "arrival": 1791478590,
+            "departure": 1791477970.1375,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Charlys Statioun",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478740,
+            "departure": 1791478590,
+            "from": "Senningerberg, Charlys Statioun",
+            "fromStop": "000200508003",
+            "line": "29",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478902.83,
+            "departure": 1791478740,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, H\u00e9ienhaff P+R",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791479620,
+            "departure": 1791479030,
+            "from": "Senningerberg, H\u00e9ienhaff P+R",
+            "fromStop": "000200508005",
+            "line": "T1",
+            "to": "Kirchberg, Universit\u00e9it",
+            "toStop": "000200417046",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791480114.3125,
+            "departure": 1791479620,
+            "from": "Kirchberg, Universit\u00e9it",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791484810,
+        "departure": 1791482640.1375,
+        "id": "g4:127>1962:24365741@20261008:0-2|24360286@20261008:2-7",
+        "legs": [
+          {
+            "arrival": 1791483260,
+            "departure": 1791482640.1375,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Charlys Statioun",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791483390,
+            "departure": 1791483260,
+            "from": "Senningerberg, Charlys Statioun",
+            "fromStop": "000200508003",
+            "line": "29",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791484810,
+            "departure": 1791484180,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      }
+    ],
+    "matchingRejections": {},
+    "options": [
+      "g4:612>1962:24291374@20261008:31-34|24360347@20261008:2-7",
+      "g4:654>2775:24262705@20261008:16-19|24423069@20261008:2-8",
+      "g4:654>1962:24262705@20261008:16-19|24368580@20261008:3-8",
+      "g4:127>1962:24365618@20261008:0-2|24360347@20261008:2-7",
+      "g4:654>2775:24264858@20261008:27-30|24423073@20261008:2-8",
+      "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8",
+      "g4:127>2500:24365632@20261008:0-2|24320781@20261008:1-5",
+      "g4:127>1962:24365741@20261008:0-2|24360286@20261008:2-7"
+    ],
+    "peak_memory_bytes": 732725248,
+    "planningTime": 1791475860,
+    "realtimeCoverage": {
+      "g4:127>1962:24365618@20261008:0-2|24360347@20261008:2-7": "scheduleOnly",
+      "g4:127>1962:24365741@20261008:0-2|24360286@20261008:2-7": "scheduleOnly",
+      "g4:127>2500:24365632@20261008:0-2|24320781@20261008:1-5": "scheduleOnly",
+      "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8": "scheduleOnly",
+      "g4:612>1962:24291374@20261008:31-34|24360347@20261008:2-7": "scheduleOnly",
+      "g4:654>1962:24262705@20261008:16-19|24368580@20261008:3-8": "scheduleOnly",
+      "g4:654>2775:24262705@20261008:16-19|24423069@20261008:2-8": "scheduleOnly",
+      "g4:654>2775:24264858@20261008:27-30|24423073@20261008:2-8": "scheduleOnly"
+    },
+    "recommendedOption": "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8",
+    "refreshPolicy": "forceRefresh",
+    "requestID": "25A79857-6FAB-4B6B-A432-61718F65DF0C",
+    "rounds": [
+      {
+        "alights": 5574,
+        "merge_ms": 1,
+        "prepare_ms": 0,
+        "retained": 3542,
+        "scan_ms": 0
+      },
+      {
+        "alights": 536518,
+        "merge_ms": 32,
+        "prepare_ms": 5,
+        "retained": 199781,
+        "scan_ms": 13
+      },
+      {
+        "alights": 6238251,
+        "merge_ms": 75,
+        "prepare_ms": 4,
+        "retained": 800819,
+        "scan_ms": 78
+      },
+      {
+        "alights": 620198,
+        "merge_ms": 3,
+        "prepare_ms": 0,
+        "retained": 44629,
+        "scan_ms": 26
+      }
+    ],
+    "sample": 0,
+    "scenario": "depart",
+    "stages_ms": {
+      "adapterMapping": 0.27825,
+      "boardFetch": 10,
+      "boardMatching": 0,
+      "candidateBuilding": 98.794125,
+      "decode": 4,
+      "directWalkingWait": 0.000291,
+      "endpoints": 172.459625,
+      "firstRender": 83.253084,
+      "geometry": 2.513916,
+      "graphPreparation": 57.098584,
+      "http": 93,
+      "publication": 6.042458000000124,
+      "raptor": 565.86475,
+      "realtime": 58.165541,
+      "realtimeDiscovery": 30.927167,
+      "resultAssembly": 0.025667,
+      "schedulePreparation": 17,
+      "snapshotPreparation": 0.186208,
+      "timetableReadiness": 0.433625,
+      "walkingTransfers": 162
+    },
+    "total_ms": 1389.025375,
+    "unfilteredJourneys": [
+      {
+        "arrival": 1791477980,
+        "departure": 1791475961.2875,
+        "id": "g4:612>1962:24291374@20261008:31-34|24360347@20261008:2-7",
+        "lines": [
+          "850",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1791478223.33875,
+        "departure": 1791476071.6287498,
+        "id": "g4:654>2775:24262705@20261008:16-19|24423069@20261008:2-8",
+        "lines": [
+          "322",
+          "21"
+        ]
+      },
+      {
+        "arrival": 1791478460,
+        "departure": 1791476071.6287498,
+        "id": "g4:654>1962:24262705@20261008:16-19|24368580@20261008:3-8",
+        "lines": [
+          "322",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1791477980,
+        "departure": 1791476170.1375,
+        "id": "g4:127>1962:24365618@20261008:0-2|24360347@20261008:2-7",
+        "lines": [
+          "29",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1791479123.33875,
+        "departure": 1791477106.6287498,
+        "id": "g4:654>2775:24264858@20261008:27-30|24423073@20261008:2-8",
+        "lines": [
+          "326",
+          "21"
+        ]
+      },
+      {
+        "arrival": 1791479660,
+        "departure": 1791477106.6287498,
+        "id": "g4:654>1962:24264858@20261008:27-30|24368579@20261008:3-8",
+        "lines": [
+          "326",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1791479660,
+        "departure": 1791477761.2875,
+        "id": "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8",
+        "lines": [
+          "850",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1791480114.3125,
+        "departure": 1791477970.1375,
+        "id": "g4:127>2500:24365632@20261008:0-2|24320781@20261008:1-5",
+        "lines": [
+          "29",
+          "T1"
+        ]
+      },
+      {
+        "arrival": 1791480260,
+        "departure": 1791477970.1375,
+        "id": "g4:127>1962:24365632@20261008:0-2|24360392@20261008:2-7",
+        "lines": [
+          "29",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1791484810,
+        "departure": 1791482640.1375,
+        "id": "g4:127>1962:24365741@20261008:0-2|24360286@20261008:2-7",
+        "lines": [
+          "29",
+          "16"
+        ]
+      }
+    ],
+    "process": "priming"
+  },
+  {
+    "avoidTightTransfers": true,
+    "counters": {
+      "boardCacheHits": 0,
+      "boardsCovered": 27,
+      "candidates": 3140,
+      "delayedPastBoardings": 0,
+      "duplicatesSuppressed": 622,
+      "incompleteBoards": 0,
+      "invalidJourneys": 9,
+      "networkRequests": 30,
+      "pageNewJourneys": 10,
+      "predictedEvents": 0,
+      "recommendationSwitches": 0,
+      "responseBytes": 480,
+      "retainedAlternatives": 26,
+      "sharedFirstVehicleGroups": 3,
+      "walkingCacheHits": 127,
+      "walkingRequests": 432,
+      "workers": 10
+    },
+    "displayedLegs": [
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791476791,
+        "effectiveDeparture": 1791476516,
+        "line": "850",
+        "option": "g4:612>1962:24291374@20261008:31-34|24360347@20261008:2-7",
+        "scheduledDeparture": 1791476516,
+        "status": "scheduled",
+        "stop": "000200508002",
+        "trip": "24291374"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791477980,
+        "effectiveDeparture": 1791477240,
+        "line": "16",
+        "option": "g4:612>1962:24291374@20261008:31-34|24360347@20261008:2-7",
+        "scheduledDeparture": 1791477240,
+        "status": "scheduled",
+        "stop": "000200508016",
+        "trip": "24360347"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791477005,
+        "effectiveDeparture": 1791476410,
+        "line": "322",
+        "option": "g4:654>2775:24262705@20261008:16-19|24423069@20261008:2-8",
+        "scheduledDeparture": 1791476410,
+        "status": "scheduled",
+        "stop": "000200508004",
+        "trip": "24262705"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791478150,
+        "effectiveDeparture": 1791477700,
+        "line": "21",
+        "option": "g4:654>2775:24262705@20261008:16-19|24423069@20261008:2-8",
+        "scheduledDeparture": 1791477700,
+        "status": "scheduled",
+        "stop": "000200417050",
+        "trip": "24423069"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791477005,
+        "effectiveDeparture": 1791476410,
+        "line": "322",
+        "option": "g4:654>1962:24262705@20261008:16-19|24368580@20261008:3-8",
+        "scheduledDeparture": 1791476410,
+        "status": "scheduled",
+        "stop": "000200508004",
+        "trip": "24262705"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791478460,
+        "effectiveDeparture": 1791478070,
+        "line": "6",
+        "option": "g4:654>1962:24262705@20261008:16-19|24368580@20261008:3-8",
+        "scheduledDeparture": 1791478070,
+        "status": "scheduled",
+        "stop": "000200417050",
+        "trip": "24368580"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791476940,
+        "effectiveDeparture": 1791476790,
+        "line": "29",
+        "option": "g4:127>1962:24365618@20261008:0-2|24360347@20261008:2-7",
+        "scheduledDeparture": 1791476790,
+        "status": "scheduled",
+        "stop": "000200508003",
+        "trip": "24365618"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791477980,
+        "effectiveDeparture": 1791477240,
+        "line": "16",
+        "option": "g4:127>1962:24365618@20261008:0-2|24360347@20261008:2-7",
+        "scheduledDeparture": 1791477240,
+        "status": "scheduled",
+        "stop": "000200508016",
+        "trip": "24360347"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791478005,
+        "effectiveDeparture": 1791477445,
+        "line": "326",
+        "option": "g4:654>2775:24264858@20261008:27-30|24423073@20261008:2-8",
+        "scheduledDeparture": 1791477445,
+        "status": "scheduled",
+        "stop": "000200508004",
+        "trip": "24264858"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791479050,
+        "effectiveDeparture": 1791478600,
+        "line": "21",
+        "option": "g4:654>2775:24264858@20261008:27-30|24423073@20261008:2-8",
+        "scheduledDeparture": 1791478600,
+        "status": "scheduled",
+        "stop": "000200417050",
+        "trip": "24423073"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791478591,
+        "effectiveDeparture": 1791478316,
+        "line": "850",
+        "option": "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8",
+        "scheduledDeparture": 1791478316,
+        "status": "scheduled",
+        "stop": "000200508002",
+        "trip": "24291373"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791479660,
+        "effectiveDeparture": 1791478970,
+        "line": "6",
+        "option": "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8",
+        "scheduledDeparture": 1791478970,
+        "status": "scheduled",
+        "stop": "000200508016",
+        "trip": "24368579"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791478740,
+        "effectiveDeparture": 1791478590,
+        "line": "29",
+        "option": "g4:127>2500:24365632@20261008:0-2|24320781@20261008:1-5",
+        "scheduledDeparture": 1791478590,
+        "status": "scheduled",
+        "stop": "000200508003",
+        "trip": "24365632"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791479620,
+        "effectiveDeparture": 1791479030,
+        "line": "T1",
+        "option": "g4:127>2500:24365632@20261008:0-2|24320781@20261008:1-5",
+        "scheduledDeparture": 1791479030,
+        "status": "scheduled",
+        "stop": "000200508005",
+        "trip": "24320781"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791483390,
+        "effectiveDeparture": 1791483260,
+        "line": "29",
+        "option": "g4:127>1962:24365741@20261008:0-2|24360286@20261008:2-7",
+        "scheduledDeparture": 1791483260,
+        "status": "scheduled",
+        "stop": "000200508003",
+        "trip": "24365741"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1791484810,
+        "effectiveDeparture": 1791484180,
+        "line": "16",
+        "option": "g4:127>1962:24365741@20261008:0-2|24360286@20261008:2-7",
+        "scheduledDeparture": 1791484180,
+        "status": "scheduled",
+        "stop": "000200508016",
+        "trip": "24360286"
+      }
+    ],
+    "journeys": [
+      {
+        "arrival": 1791477980,
+        "departure": 1791475961.2875,
+        "id": "g4:612>1962:24291374@20261008:31-34|24360347@20261008:2-7",
+        "legs": [
+          {
+            "arrival": 1791476516,
+            "departure": 1791475961.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791476791,
+            "departure": 1791476516,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "850",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791477980,
+            "departure": 1791477240,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791478223.33875,
+        "departure": 1791476071.6287498,
+        "id": "g4:654>2775:24262705@20261008:16-19|24423069@20261008:2-8",
+        "legs": [
+          {
+            "arrival": 1791476410,
+            "departure": 1791476071.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791477005,
+            "departure": 1791476410,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "322",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478150,
+            "departure": 1791477700,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "21",
+            "to": "Kirchberg, prov. Konrad Adenauer",
+            "toStop": "000900000058",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478223.33875,
+            "departure": 1791478150,
+            "from": "Kirchberg, prov. Konrad Adenauer",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791478460,
+        "departure": 1791476071.6287498,
+        "id": "g4:654>1962:24262705@20261008:16-19|24368580@20261008:3-8",
+        "legs": [
+          {
+            "arrival": 1791476410,
+            "departure": 1791476071.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791477005,
+            "departure": 1791476410,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "322",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478460,
+            "departure": 1791478070,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791477980,
+        "departure": 1791476170.1375,
+        "id": "g4:127>1962:24365618@20261008:0-2|24360347@20261008:2-7",
+        "legs": [
+          {
+            "arrival": 1791476790,
+            "departure": 1791476170.1375,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Charlys Statioun",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791476940,
+            "departure": 1791476790,
+            "from": "Senningerberg, Charlys Statioun",
+            "fromStop": "000200508003",
+            "line": "29",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791477980,
+            "departure": 1791477240,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791479123.33875,
+        "departure": 1791477106.6287498,
+        "id": "g4:654>2775:24264858@20261008:27-30|24423073@20261008:2-8",
+        "legs": [
+          {
+            "arrival": 1791477445,
+            "departure": 1791477106.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478005,
+            "departure": 1791477445,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "326",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791479050,
+            "departure": 1791478600,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "21",
+            "to": "Kirchberg, prov. Konrad Adenauer",
+            "toStop": "000900000058",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791479123.33875,
+            "departure": 1791479050,
+            "from": "Kirchberg, prov. Konrad Adenauer",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791479660,
+        "departure": 1791477761.2875,
+        "id": "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8",
+        "legs": [
+          {
+            "arrival": 1791478316,
+            "departure": 1791477761.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478591,
+            "departure": 1791478316,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "850",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791479660,
+            "departure": 1791478970,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791480114.3125,
+        "departure": 1791477970.1375,
+        "id": "g4:127>2500:24365632@20261008:0-2|24320781@20261008:1-5",
+        "legs": [
+          {
+            "arrival": 1791478590,
+            "departure": 1791477970.1375,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Charlys Statioun",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478740,
+            "departure": 1791478590,
+            "from": "Senningerberg, Charlys Statioun",
+            "fromStop": "000200508003",
+            "line": "29",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791478902.83,
+            "departure": 1791478740,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, H\u00e9ienhaff P+R",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791479620,
+            "departure": 1791479030,
+            "from": "Senningerberg, H\u00e9ienhaff P+R",
+            "fromStop": "000200508005",
+            "line": "T1",
+            "to": "Kirchberg, Universit\u00e9it",
+            "toStop": "000200417046",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791480114.3125,
+            "departure": 1791479620,
+            "from": "Kirchberg, Universit\u00e9it",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1791484810,
+        "departure": 1791482640.1375,
+        "id": "g4:127>1962:24365741@20261008:0-2|24360286@20261008:2-7",
+        "legs": [
+          {
+            "arrival": 1791483260,
+            "departure": 1791482640.1375,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Charlys Statioun",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791483390,
+            "departure": 1791483260,
+            "from": "Senningerberg, Charlys Statioun",
+            "fromStop": "000200508003",
+            "line": "29",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1791484810,
+            "departure": 1791484180,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      }
+    ],
+    "matchingRejections": {},
+    "options": [
+      "g4:612>1962:24291374@20261008:31-34|24360347@20261008:2-7",
+      "g4:654>2775:24262705@20261008:16-19|24423069@20261008:2-8",
+      "g4:654>1962:24262705@20261008:16-19|24368580@20261008:3-8",
+      "g4:127>1962:24365618@20261008:0-2|24360347@20261008:2-7",
+      "g4:654>2775:24264858@20261008:27-30|24423073@20261008:2-8",
+      "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8",
+      "g4:127>2500:24365632@20261008:0-2|24320781@20261008:1-5",
+      "g4:127>1962:24365741@20261008:0-2|24360286@20261008:2-7"
+    ],
+    "peak_memory_bytes": 723533824,
+    "planningTime": 1791475860,
+    "realtimeCoverage": {
+      "g4:127>1962:24365618@20261008:0-2|24360347@20261008:2-7": "scheduleOnly",
+      "g4:127>1962:24365741@20261008:0-2|24360286@20261008:2-7": "scheduleOnly",
+      "g4:127>2500:24365632@20261008:0-2|24320781@20261008:1-5": "scheduleOnly",
+      "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8": "scheduleOnly",
+      "g4:612>1962:24291374@20261008:31-34|24360347@20261008:2-7": "scheduleOnly",
+      "g4:654>1962:24262705@20261008:16-19|24368580@20261008:3-8": "scheduleOnly",
+      "g4:654>2775:24262705@20261008:16-19|24423069@20261008:2-8": "scheduleOnly",
+      "g4:654>2775:24264858@20261008:27-30|24423073@20261008:2-8": "scheduleOnly"
+    },
+    "recommendedOption": "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8",
+    "refreshPolicy": "forceRefresh",
+    "requestID": "7FF4B89A-8C9C-4E5F-B2A5-FF6D2F936487",
+    "rounds": [
+      {
+        "alights": 5574,
+        "merge_ms": 1,
+        "prepare_ms": 0,
+        "retained": 3542,
+        "scan_ms": 1
+      },
+      {
+        "alights": 536518,
+        "merge_ms": 56,
+        "prepare_ms": 7,
+        "retained": 199781,
+        "scan_ms": 18
+      },
+      {
+        "alights": 6238251,
+        "merge_ms": 100,
+        "prepare_ms": 5,
+        "retained": 800819,
+        "scan_ms": 65
+      },
+      {
+        "alights": 620198,
+        "merge_ms": 4,
+        "prepare_ms": 0,
+        "retained": 44629,
+        "scan_ms": 34
+      }
+    ],
+    "sample": 0,
+    "scenario": "depart",
+    "stages_ms": {
+      "adapterMapping": 0.298917,
+      "boardFetch": 14,
+      "boardMatching": 0,
+      "candidateBuilding": 99.4415,
+      "decode": 7,
+      "directWalkingWait": 0.000459,
+      "endpoints": 149.318083,
+      "firstRender": 97.856542,
+      "geometry": 1.023041,
+      "graphPreparation": 80.578791,
+      "http": 135,
+      "publication": 5.297541999999794,
+      "raptor": 741.563125,
+      "realtime": 65.678459,
+      "realtimeDiscovery": 40.085458,
+      "resultAssembly": 0.046208,
+      "schedulePreparation": 17,
+      "snapshotPreparation": 0.180292,
+      "timetableReadiness": 0.390459,
+      "walkingTransfers": 219
+    },
+    "total_ms": 1611.614834,
+    "unfilteredJourneys": [
+      {
+        "arrival": 1791477980,
+        "departure": 1791475961.2875,
+        "id": "g4:612>1962:24291374@20261008:31-34|24360347@20261008:2-7",
+        "lines": [
+          "850",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1791478223.33875,
+        "departure": 1791476071.6287498,
+        "id": "g4:654>2775:24262705@20261008:16-19|24423069@20261008:2-8",
+        "lines": [
+          "322",
+          "21"
+        ]
+      },
+      {
+        "arrival": 1791478460,
+        "departure": 1791476071.6287498,
+        "id": "g4:654>1962:24262705@20261008:16-19|24368580@20261008:3-8",
+        "lines": [
+          "322",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1791477980,
+        "departure": 1791476170.1375,
+        "id": "g4:127>1962:24365618@20261008:0-2|24360347@20261008:2-7",
+        "lines": [
+          "29",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1791479123.33875,
+        "departure": 1791477106.6287498,
+        "id": "g4:654>2775:24264858@20261008:27-30|24423073@20261008:2-8",
+        "lines": [
+          "326",
+          "21"
+        ]
+      },
+      {
+        "arrival": 1791479660,
+        "departure": 1791477106.6287498,
+        "id": "g4:654>1962:24264858@20261008:27-30|24368579@20261008:3-8",
+        "lines": [
+          "326",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1791479660,
+        "departure": 1791477761.2875,
+        "id": "g4:612>1962:24291373@20261008:31-34|24368579@20261008:2-8",
+        "lines": [
+          "850",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1791480114.3125,
+        "departure": 1791477970.1375,
+        "id": "g4:127>2500:24365632@20261008:0-2|24320781@20261008:1-5",
+        "lines": [
+          "29",
+          "T1"
+        ]
+      },
+      {
+        "arrival": 1791480260,
+        "departure": 1791477970.1375,
+        "id": "g4:127>1962:24365632@20261008:0-2|24360392@20261008:2-7",
+        "lines": [
+          "29",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1791484810,
+        "departure": 1791482640.1375,
+        "id": "g4:127>1962:24365741@20261008:0-2|24360286@20261008:2-7",
+        "lines": [
+          "29",
+          "16"
+        ]
+      }
+    ],
+    "process": "cold"
+  }
+]

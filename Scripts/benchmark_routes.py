@@ -18,6 +18,8 @@ parser.add_argument('--output', required=True, type=Path)
 parser.add_argument('--scenarios', nargs='+', default=['depart', 'reverse', 'coordinates', 'arrive', 'exact', 'rural', 'paging', 'refresh', 'recorded-live', 'deadline-arrive', 'cached'])
 parser.add_argument('--warm', type=int, default=20)
 parser.add_argument('--cold', type=int, default=10)
+parser.add_argument('--time', help='Fixed ISO 8601 planning time for comparison with another journey planner')
+parser.add_argument('--avoid-tight-transfers', action='store_true', help='Enforce the full feed transfer buffers')
 parser.add_argument('--maximum-limit-ms', '--p95-limit-ms', dest='maximum_limit_ms', type=float,
     default=5000, help='Every operation must be below this threshold, including priming; use 0 for a separate Debug audit')
 args = parser.parse_args()
@@ -43,6 +45,9 @@ def run(scenario, samples, label):
     env = os.environ | {'SIMCTL_CHILD_ROUTING_BENCHMARK_SCENARIO': scenario,
         'SIMCTL_CHILD_ROUTING_BENCHMARK_SAMPLES': str(samples),
         'SIMCTL_CHILD_ROUTING_BENCHMARK_FIXTURE': str(fixture)}
+    if args.time:
+        env['SIMCTL_CHILD_ROUTING_BENCHMARK_TIME'] = args.time
+    env['SIMCTL_CHILD_ROUTING_BENCHMARK_AVOID_TIGHT_TRANSFERS'] = '1' if args.avoid_tight_transfers else '0'
     with log.open('w') as stream:
         process = subprocess.Popen(['xcrun', 'simctl', 'launch', '--console', '--terminate-running-process',
             args.device, 'dev.pedrocordeiro.Verkeier', '--routing-benchmark'], env=env, stdout=stream, stderr=subprocess.STDOUT)

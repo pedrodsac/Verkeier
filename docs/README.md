@@ -14,6 +14,7 @@
 | How GTFS updates work end-to-end | `GTFS_AUTO_UPDATE_PLAN.md` |
 | Comprehensive feature roadmap (what to build next) | `FEATURE_ROADMAP.md` |
 | Route quality work | `ROUTE_QUALITY_IMPLEMENTATION_PLAN.md` |
+| Gromscheed → Konrad Adenauer comparison with mobiliteit.lu | `ROUTING_MOBILITEIT_COMPARISON.md` |
 | Leave at, Arrive by, Earlier and Later behavior | `ROUTE_TIME_CONTROLS.md` |
 | Preventing invalid, wasteful, unstable or duplicate journeys | `ROUTING_FAILURE_PREVENTION_PLAN.md` + `ROUTING_FAILURE_PREVENTION_IMPLEMENTATION.md` (behavior, 49-case regressions and verification) |
 | Missing live updates on connecting trips | `ROUTING_LIVE_CONNECTIONS.md` |
