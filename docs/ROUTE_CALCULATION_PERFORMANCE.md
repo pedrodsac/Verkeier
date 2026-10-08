@@ -4,11 +4,14 @@ The 8 October correction makes live evidence part of transfer discovery before
 the first result. Selected and alternative lines share one concurrent batch;
 CPU work cannot consume required acquisition for initial or newly selected
 vehicles. Conversion memoization reduced matching from 2,926 ms to 173 ms on
-the same recorded boards, preserving matched timings and sources. The latest
-warm live departure query rendered in 4,847 ms; reverse took 6,085 ms and
-arrive-by 11,457 ms. Priming and those other search types still exceed five
-seconds. The eight-second live allowance, full profile and final feasibility
-scans remain intact. See [8 October validation](benchmarks/initial-live-routing-2026-10-08/validation.md)
+the same recorded boards, preserving matched timings and sources. The `fb4665f` complete-search check rendered warm live departure,
+reverse and Esch searches in 3,338–4,824 ms; live arrival remained 8,720 ms and
+cold live searches took 6,471–11,596 ms. All 37 unambiguous available forecasts
+checked on the initial routes matched the departure boards. The strict
+five-second gate still fails. Safe adaptive arrival lookback retains sparse,
+long-ride and overlapping-choice fallbacks; deterministic progressive merging
+reduces scan buffers, and vehicle discovery avoids repeated traversals. The
+eight-second live allowance and final feasibility scans remain intact. See [8 October validation](benchmarks/initial-live-routing-2026-10-08/validation.md)
 and [initial live-routing behavior](ROUTING_LIVE_CONNECTIONS.md).
 
 The 4 October connecting-trip revision restores live acquisition for every
