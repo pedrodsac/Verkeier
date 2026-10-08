@@ -7,22 +7,22 @@ import Testing
 struct RouteOptionVisibilityTests {
     private let anchor = Date(timeIntervalSince1970: 1_800_000_000)
 
-    @Test("Presentation hides the final result after time dominance filtering")
-    func hidesFinalFilteredResult() {
+    @Test("Presentation keeps all useful results after time dominance filtering")
+    func preservesFinalFilteredResult() {
         let slow = option("slow", departure: 0, arrival: 1_800)
         let fast = option("fast", departure: 300, arrival: 1_200)
         let later = option("later", departure: 900, arrival: 2_100)
         let visible = RouteOptionVisibility.presentedOptions(
             primary: [slow, fast, later], supplemental: [], at: anchor)
-        #expect(visible.primary.map(\.id) == [fast.id])
+        #expect(visible.primary.map(\.id) == [fast.id, later.id])
     }
 
     @Test("Presentation handles empty and single result lists")
-    func hidesSingleResult() {
+    func preservesSingleResult() {
         for options in [[], [option("only", departure: 0, arrival: 1_200)]] {
             let visible = RouteOptionVisibility.presentedOptions(
                 primary: options, supplemental: [], at: anchor)
-            #expect(visible.primary.isEmpty)
+            #expect(visible.primary.map(\.id) == options.map(\.id))
         }
     }
 
@@ -147,6 +147,17 @@ struct RouteOptionVisibilityTests {
             let visible = RouteOptionVisibility.visibleOptions(primary: [incomplete, known], supplemental: [], at: anchor)
             #expect(visible.primary.map(\.id) == [incomplete.id, known.id])
         }
+    }
+
+    @Test("A faster tight transfer keeps the comfortable alternative visible")
+    func tightTransferDoesNotHideComfortableRoute() {
+        let comfortable = option("comfortable", departure: 0, arrival: 1_800)
+        let fast = option("fast", departure: 0, arrival: 1_200)
+        var leg = fast.plan.legs[0]
+        leg.transferWarning = "Tight transfer"
+        let tight = fast.replacingLegs([leg])
+        let visible = RouteOptionVisibility.visibleOptions(primary: [tight, comfortable], supplemental: [], at: anchor)
+        #expect(visible.primary.map(\.id) == [tight.id, comfortable.id])
     }
 
     private func option(_ id: String, mode: TransportMode = .bus,

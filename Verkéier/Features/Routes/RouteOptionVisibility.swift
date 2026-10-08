@@ -1,14 +1,14 @@
 import Foundation
+import MobiliteitKit
 
 /// Applies route comparisons to presentation without discarding the
 /// underlying results needed by paging and subsequent timing refinements.
 nonisolated enum RouteOptionVisibility {
-    /// Reserve the final filtered primary result while retaining it for paging.
+    /// Publish every useful choice; paging state is maintained independently.
     static func presentedOptions(
         primary: [RouteOption], supplemental: [RouteOption], at now: Date
     ) -> (primary: [RouteOption], supplemental: [RouteOption]) {
-        let visible = visibleOptions(primary: primary, supplemental: supplemental, at: now)
-        return (Array(visible.primary.dropLast()), visible.supplemental)
+        visibleOptions(primary: primary, supplemental: supplemental, at: now)
     }
 
     static func visibleOptions(
@@ -24,6 +24,7 @@ nonisolated enum RouteOptionVisibility {
                       let departure = option.departureTime, let arrival = option.arrivalTime,
                       let otherDeparture = other.departureTime, let otherArrival = other.arrivalTime
                 else { return false }
+                guard !hasTightTransfer(other) || hasTightTransfer(option) else { return false }
                 return otherDeparture >= departure && otherArrival <= arrival
                     && (otherDeparture > departure || otherArrival < arrival)
             }
@@ -33,6 +34,11 @@ nonisolated enum RouteOptionVisibility {
             supplemental: supplemental.filter { !dominatedIDs.contains($0.id) },
             at: now
         )
+    }
+
+    private static func hasTightTransfer(_ option: RouteOption) -> Bool {
+        option.statusEvidence?.tightTransfer == true
+            || option.transitLegs.contains { $0.transferWarning == "Tight transfer" }
     }
 
     private static func walkingVisibleOptions(
