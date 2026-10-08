@@ -94,6 +94,12 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
         transferGapDurations?.min()
     }
 
+    /// Only an actual change with less than two minutes available is tight.
+    /// Use effective times so old feed-buffer warnings cannot revive the pill.
+    var hasTightTransfer: Bool {
+        transferGapDurations?.contains { $0 >= 0 && $0 < 120 } == true
+    }
+
     /// Total effective time spent between transit legs.
     var totalTransferGapDuration: TimeInterval? {
         transferGapDurations?.reduce(0, +)
@@ -197,13 +203,14 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     ///
     /// - Parameter now: The reference time, usually the current date.
     func status(at now: Date) -> RouteOptionStatus {
-        let evidence = statusEvidence ?? JourneyStatusEvidence(
-            firstBoarding: isVelohOnly ? nil : firstTransitDepartureTime,
-            cancelled: transitLegs.contains { $0.liveStatus == .cancelled },
-            delayed: transitLegs.contains { ($0.delayMinutes ?? 0) > 0 },
-            tightTransfer: transitLegs.contains { $0.transferWarning != nil },
-            connectionMiss: transitLegs.contains { $0.transferWarning == "Connection miss" },
-            coverage: JourneyRealtimeCoverage(rawValue: realtimeCoverage.rawValue) ?? .scheduleOnly)
+        let stored = statusEvidence
+        let evidence = JourneyStatusEvidence(
+            firstBoarding: stored?.firstBoarding ?? (isVelohOnly ? nil : firstTransitDepartureTime),
+            cancelled: stored?.cancelled ?? transitLegs.contains { $0.liveStatus == .cancelled },
+            delayed: stored?.delayed ?? transitLegs.contains { ($0.delayMinutes ?? 0) > 0 },
+            tightTransfer: hasTightTransfer,
+            connectionMiss: stored?.connectionMiss ?? transitLegs.contains { $0.transferWarning == "Connection miss" },
+            coverage: stored?.coverage ?? JourneyRealtimeCoverage(rawValue: realtimeCoverage.rawValue) ?? .scheduleOnly)
         return RouteOptionStatus(rawValue: evidence.status(at: now, feasibility: feasibility).rawValue)
             ?? .scheduledOnly
     }
