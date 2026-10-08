@@ -5,6 +5,8 @@ import SwiftUI
 /// centred on the junction. With `VStack(spacing: 0)` the per-row slices join
 /// into one continuous rail.
 struct TimelineRail: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let above: RailStyle?
     let below: RailStyle?
     let marker: Marker
@@ -114,8 +116,15 @@ struct TimelineRail: View {
     private func color(for style: RailStyle) -> Color {
         switch style {
         case let .transit(mode): mode.tint
-        case .walk: .green.opacity(0.7)
+        case .walk: walkingRailColor
         }
+    }
+
+    /// Solid tints keep overlapping rail slices from darkening at row joins.
+    private var walkingRailColor: Color {
+        colorScheme == .dark
+            ? Color(red: 0.20, green: 0.57, blue: 0.27)
+            : Color(red: 0.52, green: 0.84, blue: 0.58)
     }
 
     private var dotColor: Color {
