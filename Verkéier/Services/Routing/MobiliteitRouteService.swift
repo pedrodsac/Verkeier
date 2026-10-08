@@ -49,8 +49,8 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             let result = try await sessions.calculate(databaseURL: databaseURL,
                 request: .init(origin: Self.journeyEndpoint(for: from),
                     destination: Self.journeyEndpoint(for: to), time: time.packageTime,
-                    preferences: filters.packagePreferences, realtimeAcquisitionBudgetMilliseconds: 2_500,
-                    realtimeMaximumConcurrentBoardRequests: 16, realtimeSearchWorkBudgetMilliseconds: 4_100,
+                    preferences: filters.packagePreferences, realtimeAcquisitionBudgetMilliseconds: 8_000,
+                    realtimeMaximumConcurrentBoardRequests: 16,
                     pagingPolicy: .adjacentTimeWindows),
                 page: page.packagePage, refresh: realtimeRefreshPolicy.packagePolicy,
                 origin: from, destination: to, time: time)
