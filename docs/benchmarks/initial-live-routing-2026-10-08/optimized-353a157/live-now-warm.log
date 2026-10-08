@@ -1,0 +1,418 @@
+2026-10-08 06:49:42.553289 [32;1m[INFO][0m Tile extract successfully loaded with tile count: 20
+2026-10-08 06:49:42.553289 [32;1m[INFO][0m Tile extract successfully loaded with tile count: 20
+2026-10-08 06:49:42.557023 [33;1m[WARN][0m (stat): /data/valhalla/traffic.tar No such file or directory
+2026-10-08 06:49:42.557089 [33;1m[WARN][0m Traffic tile extract could not be loaded
+2026-10-08 06:49:42.557191 [33;1m[WARN][0m (stat): /data/valhalla/traffic.tar No such file or directory
+2026-10-08 06:49:42.557256 [33;1m[WARN][0m Traffic tile extract could not be loaded
+objc[57308]: Class UIAccessibilityLoaderWebShared is implemented in both /Library/Developer/CoreSimulator/Volumes/iOS_24A434/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebKit.axbundle/WebKit (0x107414398) and /Library/Developer/CoreSimulator/Volumes/iOS_24A434/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebCore.axbundle/WebCore (0x11438c310). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+2026-10-08 06:49:43.155848 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.167920 [32;1m[INFO][0m Tile extract successfully loaded with tile count: 20
+2026-10-08 06:49:43.168113 [33;1m[WARN][0m (stat): /data/valhalla/traffic.tar No such file or directory
+2026-10-08 06:49:43.168149 [33;1m[WARN][0m Traffic tile extract could not be loaded
+2026-10-08 06:49:43.171034 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.292564 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.292697 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.313032 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.313032 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.315970 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.316251 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.317822 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.317929 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.318869 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.319195 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.320784 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.321317 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.323012 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.323457 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.331592 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.331759 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.332814 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.332953 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.335027 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.335266 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.337578 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.338526 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.339848 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.340513 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.341796 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.342013 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.344430 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.347152 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.348866 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.350420 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.353168 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.356127 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.358142 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.359249 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.361193 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.361782 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.364188 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.364443 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.365624 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.367348 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.369952 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.370093 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.372206 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.372357 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.374747 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.374880 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.394126 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.394250 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.396215 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.396302 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.398240 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.398380 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.400167 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.400439 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.402204 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.402729 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.404033 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.404268 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.405284 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.405611 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.407075 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.407901 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.408073 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.408944 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.409123 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.410019 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.410243 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.411147 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.411308 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.412307 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.412675 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.413491 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.413734 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.415328 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.415701 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.416554 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.416927 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.418249 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.418645 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.419296 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.419474 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.420461 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.420529 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.421571 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.422202 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.422513 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.423386 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.423868 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.425160 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.425833 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.426271 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.427428 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.428245 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.428607 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.429420 [32;1m[INFO][0m algorithm::time_dependent_forward_a*
+2026-10-08 06:49:43.429768 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.430231 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.431525 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.431798 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.433036 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.433621 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.434507 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.435164 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.436271 [32;1m[INFO][0m algorithm::time_dependent_forward_a*
+2026-10-08 06:49:43.436518 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.437791 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.438291 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.439523 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.440004 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.440583 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.441613 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.441823 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.442791 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.442843 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.444095 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.444242 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.445251 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.445989 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.447584 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.449478 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.449664 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.451222 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.451328 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.453067 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.453225 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.454054 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.454898 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.455656 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.455859 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.456819 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.456951 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.458029 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.458152 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.458987 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.460590 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.461213 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.462992 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.463458 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.465492 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.466146 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.467441 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.468088 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.595835 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.598021 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.598114 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.598933 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.598992 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.599801 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.600418 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.601442 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.601908 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.602876 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.604093 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.605339 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.606108 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.606874 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.607757 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.608621 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.609946 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.610022 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.611173 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.611205 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.612224 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.612491 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.613312 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.613650 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.614414 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.615395 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.615847 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.617030 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.617073 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.617805 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.618065 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.618537 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.619478 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.620336 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.621218 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.622344 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.623289 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.624915 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.625390 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.627267 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.627631 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.629562 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.630279 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.632218 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.992465 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.992488 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.994523 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.994728 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.996558 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.996933 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.998555 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:43.999182 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.000898 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.001406 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.003196 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.003508 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.005761 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.005865 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.008010 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.008540 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.010757 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.011112 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.013291 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.013478 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.015668 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.015820 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.017957 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.018360 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.020503 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.020664 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.022737 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.022866 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.024855 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.265703 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.265768 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.268299 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.268309 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.271048 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.271055 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.273988 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.274078 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.276467 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.276774 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.278861 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.279056 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.281569 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.281677 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.284134 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.284339 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.286659 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.286918 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.289382 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.289568 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.291704 [32;1m[INFO][0m algorithm::time_dependent_forward_a*
+2026-10-08 06:49:44.292017 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.293801 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.294102 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.295851 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.296369 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.298184 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.298795 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.299991 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.300830 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.301887 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.302595 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.303780 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.304581 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.305854 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.306492 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.307883 [32;1m[INFO][0m algorithm::time_dependent_forward_a*
+2026-10-08 06:49:44.308516 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.309591 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.310342 [32;1m[INFO][0m algorithm::time_dependent_forward_a*
+2026-10-08 06:49:44.311388 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.311982 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.313301 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.314380 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.314981 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.316548 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.316676 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.318233 [32;1m[INFO][0m algorithm::time_dependent_forward_a*
+2026-10-08 06:49:44.318505 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.319938 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.320238 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.321631 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.322630 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.323992 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.325050 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.326612 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.327434 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.329054 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.330112 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.331366 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.332249 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.333716 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.335679 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.336347 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.338290 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.338586 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.340174 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.340471 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.341863 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.342734 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.344014 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.344714 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.346250 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.346280 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:44.348049 [32;1m[INFO][0m algorithm::time_dependent_forward_a*
+2026-10-08 06:49:44.348120 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.200776 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.200922 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.202072 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.202134 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.203183 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.203276 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.681317 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.681580 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.683658 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.683778 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.914207 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.914225 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.916995 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.917429 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.919374 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.919838 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.922060 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.922623 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.924260 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.925161 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.926410 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.927620 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.928844 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.929998 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.931361 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.932701 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.933610 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.935175 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.936003 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.937346 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.938960 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.940451 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.941606 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.943089 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.944934 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.946067 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.946945 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.949098 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.949533 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.951711 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.951879 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.954204 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.954743 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.957064 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:47.957652 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:49.348237 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:49.349053 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:49.350900 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:49.351610 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:49.355120 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:49.356204 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:49.358173 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:49.359002 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:49:49.361795 [32;1m[INFO][0m algorithm::bidirectional_a*
+ROUTING_BENCHMARK_FILE /Users/pedoataidecordeiro/Library/Developer/CoreSimulator/Devices/F726825E-2DB4-4F45-A51C-DBA5AA0E2664/data/Containers/Data/Application/65A76904-3AF4-4E16-94E9-B1748F72D0EA/tmp/route-benchmark-F3610A21-5BC4-4DB6-9028-04917C80C384.json
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791447900,"line":"32","matches":1,"routeDeparture":1791447900,"routeSource":"observed","trip":"24367160"},{"boardCancelled":false,"boardDeparture":1791449700,"line":"32","matches":1,"routeDeparture":1791449700,"routeSource":"observed","trip":"24367159"}],"departures":287,"fetchedAt":1791442189.539211,"phase":"initial","stop":"000200409005"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791444420,"line":"6","matches":1,"routeDeparture":1791444420,"routeSource":"observed","trip":"24368577"},{"boardCancelled":false,"boardDeparture":1791445140,"line":"21","matches":1,"routeDeparture":1791445140,"routeSource":"observed","trip":"24423025"},{"boardCancelled":false,"boardDeparture":0,"line":"25","matches":1,"routeDeparture":1791451790,"routeSource":"scheduled","trip":"24424746"}],"departures":1118,"fetchedAt":1791442191.1564569,"phase":"initial","stop":"000200417050"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"850","matches":1,"routeDeparture":1791446813,"routeSource":"scheduled","trip":"24291456"},{"boardCancelled":false,"boardDeparture":0,"line":"850","matches":1,"routeDeparture":1791448613,"routeSource":"scheduled","trip":"24291455"}],"departures":286,"fetchedAt":1791442200.5795112,"phase":"initial","stop":"000200508002"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791445260,"line":"29","matches":1,"routeDeparture":1791445260,"routeSource":"observed","trip":"24365658"}],"departures":364,"fetchedAt":1791442202.1113648,"phase":"initial","stop":"000200508003"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"326","matches":2,"routeDeparture":1791443340,"routeSource":"observed","trip":"24264846"},{"boardCancelled":false,"boardDeparture":0,"line":"322","matches":2,"routeDeparture":1791444000,"routeSource":"observed","trip":"24262708"}],"departures":93,"fetchedAt":1791442204.4297171,"phase":"initial","stop":"000200508004"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"311","matches":1,"routeDeparture":1791450715,"routeSource":"scheduled","trip":"24260166"}],"departures":239,"fetchedAt":1791442205.0504839,"phase":"initial","stop":"000200508008"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791445860,"line":"16","matches":1,"routeDeparture":1791445860,"routeSource":"observed","trip":"24360498"}],"departures":646,"fetchedAt":1791442206.613955,"phase":"initial","stop":"000200508016"}
+2026-10-08 06:50:14.701940 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:14.702531 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:14.704659 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:14.704958 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:14.707372 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:14.708752 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:14.709760 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:14.712202 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:14.714519 [32;1m[INFO][0m algorithm::bidirectional_a*
+ROUTING_CACHED_COMPARISON_FILE /Users/pedoataidecordeiro/Library/Developer/CoreSimulator/Devices/F726825E-2DB4-4F45-A51C-DBA5AA0E2664/data/Containers/Data/Application/65A76904-3AF4-4E16-94E9-B1748F72D0EA/tmp/route-cache-comparison-BA667B78-6C26-4917-97E2-B1BE446AE7A7.json
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791447900,"line":"32","matches":1,"routeDeparture":1791447900,"routeSource":"observed","trip":"24367160"},{"boardCancelled":false,"boardDeparture":1791449700,"line":"32","matches":1,"routeDeparture":1791449700,"routeSource":"observed","trip":"24367159"}],"departures":286,"fetchedAt":1791442189.539211,"phase":"after-cache","stop":"000200409005"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791444420,"line":"6","matches":1,"routeDeparture":1791444420,"routeSource":"observed","trip":"24368577"},{"boardCancelled":false,"boardDeparture":1791445140,"line":"21","matches":1,"routeDeparture":1791445140,"routeSource":"observed","trip":"24423025"},{"boardCancelled":false,"boardDeparture":0,"line":"25","matches":1,"routeDeparture":1791451790,"routeSource":"scheduled","trip":"24424746"}],"departures":1116,"fetchedAt":1791442191.1564569,"phase":"after-cache","stop":"000200417050"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"850","matches":1,"routeDeparture":1791446813,"routeSource":"scheduled","trip":"24291456"},{"boardCancelled":false,"boardDeparture":0,"line":"850","matches":1,"routeDeparture":1791448613,"routeSource":"scheduled","trip":"24291455"}],"departures":286,"fetchedAt":1791442200.5795112,"phase":"after-cache","stop":"000200508002"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791445260,"line":"29","matches":1,"routeDeparture":1791445260,"routeSource":"observed","trip":"24365658"}],"departures":364,"fetchedAt":1791442202.1113648,"phase":"after-cache","stop":"000200508003"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"326","matches":2,"routeDeparture":1791443340,"routeSource":"observed","trip":"24264846"},{"boardCancelled":false,"boardDeparture":0,"line":"322","matches":2,"routeDeparture":1791444000,"routeSource":"observed","trip":"24262708"}],"departures":93,"fetchedAt":1791442204.4297171,"phase":"after-cache","stop":"000200508004"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"311","matches":1,"routeDeparture":1791450715,"routeSource":"scheduled","trip":"24260166"}],"departures":239,"fetchedAt":1791442205.0504839,"phase":"after-cache","stop":"000200508008"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791445860,"line":"16","matches":1,"routeDeparture":1791445860,"routeSource":"observed","trip":"24360498"}],"departures":646,"fetchedAt":1791442206.613955,"phase":"after-cache","stop":"000200508016"}
+2026-10-08 06:50:21.790705 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:21.792086 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:21.793598 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:21.795431 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:21.797894 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:21.798130 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:21.799403 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:21.800365 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:21.802221 [32;1m[INFO][0m algorithm::bidirectional_a*
+ROUTING_BENCHMARK_FILE /Users/pedoataidecordeiro/Library/Developer/CoreSimulator/Devices/F726825E-2DB4-4F45-A51C-DBA5AA0E2664/data/Containers/Data/Application/65A76904-3AF4-4E16-94E9-B1748F72D0EA/tmp/route-benchmark-A66399A7-8269-4682-895C-44097849A24C.json
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791447900,"line":"32","matches":1,"routeDeparture":1791447900,"routeSource":"observed","trip":"24367160"},{"boardCancelled":false,"boardDeparture":1791449700,"line":"32","matches":1,"routeDeparture":1791449700,"routeSource":"observed","trip":"24367159"}],"departures":286,"fetchedAt":1791442189.539211,"phase":"initial","stop":"000200409005"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791444420,"line":"6","matches":1,"routeDeparture":1791444420,"routeSource":"observed","trip":"24368577"},{"boardCancelled":false,"boardDeparture":1791445140,"line":"21","matches":1,"routeDeparture":1791445140,"routeSource":"observed","trip":"24423025"},{"boardCancelled":false,"boardDeparture":0,"line":"25","matches":1,"routeDeparture":1791451790,"routeSource":"scheduled","trip":"24424746"}],"departures":1116,"fetchedAt":1791442191.1564569,"phase":"initial","stop":"000200417050"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"850","matches":1,"routeDeparture":1791446813,"routeSource":"scheduled","trip":"24291456"},{"boardCancelled":false,"boardDeparture":0,"line":"850","matches":1,"routeDeparture":1791448613,"routeSource":"scheduled","trip":"24291455"}],"departures":286,"fetchedAt":1791442200.5795112,"phase":"initial","stop":"000200508002"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791445260,"line":"29","matches":1,"routeDeparture":1791445260,"routeSource":"observed","trip":"24365658"}],"departures":364,"fetchedAt":1791442202.1113648,"phase":"initial","stop":"000200508003"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"326","matches":2,"routeDeparture":1791443340,"routeSource":"observed","trip":"24264846"},{"boardCancelled":false,"boardDeparture":0,"line":"322","matches":2,"routeDeparture":1791444000,"routeSource":"observed","trip":"24262708"}],"departures":93,"fetchedAt":1791442204.4297171,"phase":"initial","stop":"000200508004"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"311","matches":1,"routeDeparture":1791450715,"routeSource":"scheduled","trip":"24260166"}],"departures":239,"fetchedAt":1791442205.0504839,"phase":"initial","stop":"000200508008"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791445860,"line":"16","matches":1,"routeDeparture":1791445860,"routeSource":"observed","trip":"24360498"}],"departures":646,"fetchedAt":1791442206.613955,"phase":"initial","stop":"000200508016"}
+2026-10-08 06:50:25.792569 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:25.793100 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:25.794677 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:25.795157 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:25.796944 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:25.798018 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:25.798099 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:25.800231 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 06:50:25.803129 [32;1m[INFO][0m algorithm::bidirectional_a*
+ROUTING_CACHED_COMPARISON_FILE /Users/pedoataidecordeiro/Library/Developer/CoreSimulator/Devices/F726825E-2DB4-4F45-A51C-DBA5AA0E2664/data/Containers/Data/Application/65A76904-3AF4-4E16-94E9-B1748F72D0EA/tmp/route-cache-comparison-6F35DDD8-C025-4CCA-BFC1-D5532DDAFAB8.json
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791447900,"line":"32","matches":1,"routeDeparture":1791447900,"routeSource":"observed","trip":"24367160"},{"boardCancelled":false,"boardDeparture":1791449700,"line":"32","matches":1,"routeDeparture":1791449700,"routeSource":"observed","trip":"24367159"}],"departures":286,"fetchedAt":1791442189.539211,"phase":"after-cache","stop":"000200409005"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791444420,"line":"6","matches":1,"routeDeparture":1791444420,"routeSource":"observed","trip":"24368577"},{"boardCancelled":false,"boardDeparture":1791445140,"line":"21","matches":1,"routeDeparture":1791445140,"routeSource":"observed","trip":"24423025"},{"boardCancelled":false,"boardDeparture":0,"line":"25","matches":1,"routeDeparture":1791451790,"routeSource":"scheduled","trip":"24424746"}],"departures":1116,"fetchedAt":1791442191.1564569,"phase":"after-cache","stop":"000200417050"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"850","matches":1,"routeDeparture":1791446813,"routeSource":"scheduled","trip":"24291456"},{"boardCancelled":false,"boardDeparture":0,"line":"850","matches":1,"routeDeparture":1791448613,"routeSource":"scheduled","trip":"24291455"}],"departures":286,"fetchedAt":1791442200.5795112,"phase":"after-cache","stop":"000200508002"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791445260,"line":"29","matches":1,"routeDeparture":1791445260,"routeSource":"observed","trip":"24365658"}],"departures":364,"fetchedAt":1791442202.1113648,"phase":"after-cache","stop":"000200508003"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"326","matches":2,"routeDeparture":1791443340,"routeSource":"observed","trip":"24264846"},{"boardCancelled":false,"boardDeparture":0,"line":"322","matches":2,"routeDeparture":1791444000,"routeSource":"observed","trip":"24262708"}],"departures":93,"fetchedAt":1791442204.4297171,"phase":"after-cache","stop":"000200508004"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"311","matches":1,"routeDeparture":1791450715,"routeSource":"scheduled","trip":"24260166"}],"departures":239,"fetchedAt":1791442205.0504839,"phase":"after-cache","stop":"000200508008"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791445860,"line":"16","matches":1,"routeDeparture":1791445860,"routeSource":"observed","trip":"24360498"}],"departures":646,"fetchedAt":1791442206.613955,"phase":"after-cache","stop":"000200508016"}
+ROUTING_BENCHMARK_DONE
+dev.pedrocordeiro.Verkeier: 57308

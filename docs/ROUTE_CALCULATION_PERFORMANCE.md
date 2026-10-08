@@ -1,5 +1,16 @@
 # Route calculation performance
 
+The 8 October correction makes live evidence part of transfer discovery before
+the first result. Selected and alternative lines share one concurrent batch;
+CPU work cannot consume required acquisition for initial or newly selected
+vehicles. Conversion memoization reduced matching from 2,926 ms to 173 ms on
+the same recorded boards, preserving matched timings and sources. The latest
+warm live departure query rendered in 4,847 ms; reverse took 6,085 ms and
+arrive-by 11,457 ms. Priming and those other search types still exceed five
+seconds. The eight-second live allowance, full profile and final feasibility
+scans remain intact. See [8 October validation](benchmarks/initial-live-routing-2026-10-08/validation.md)
+and [initial live-routing behavior](ROUTING_LIVE_CONNECTIONS.md).
+
 The 4 October connecting-trip revision restores live acquisition for every
 itinerary vehicle while keeping the complete rendered search below five seconds.
 [4 October validation](benchmarks/route-live-connections-2026-10-04/validation.md)
@@ -19,13 +30,15 @@ Search coverage remains three hours for initial departure searches, 24 hours for
 
 - Correlated `RoutingDiagnostics` use `ContinuousClock` and fresh operation identifiers. Results carry preparation, endpoint, realtime acquisition, HTTP/decode, schedule preparation, matching/discovery, RAPTOR/round, walking, assembly, geometry, adapter, publication and rendering timings plus request/cache/coverage counters. Historical snapshot metrics remain separate. The former “RAPTOR CPU” number is identified as non-walking elapsed time.
 - RAPTOR scan candidates and profiles store compact scalar keys and lightweight indices. Fractional timestamps are retained. Incoming-trip bitmasks, cached eviction bounds and indexed boarding arrival ranks reject impossible candidates before allocation. Eligible alighting positions are computed once per trip/remaining-round constraint. Chunk merging retains the original deterministic order and identifiers; predecessor/leg objects are materialized only for surviving labels. Worker concurrency is bounded and expensive chunks start first.
-- Realtime boards use destination-aware occurrence windows, merge adjacent acquisition ranges and request unrestricted journeys. One shared cache assembles compatible coverage across stop boards and routing, fetches gaps and coalesces overlapping flights. Original acquisition timestamps retain the 60-second freshness rule. Normal searches reuse fresh evidence; explicit Refresh Routes bypasses completed coverage. One absolute deadline spans fetching, decoding, schedules, matching, event creation and discovery. `RealtimeConfiguration.acquisitionBudgetMilliseconds` defaults to 4,000, including decoding older configuration. Verkéier selects a 2,500 ms shared
-  acquisition allowance, sixteen concurrent itinerary requests and four discovery
-  slots. Line-filtered boards retain unlimited journeys and full passlists. A
-  4,100 ms search-work allowance reserves measured scan time plus a margin for
-  the final complete scan before another live wave. Up to two refinement waves,
-  deferred intermediate-stop materialization and equivalent envelope pruning
-  bound repeat work without reducing the search horizon.
+- Realtime boards use destination-aware occurrence windows, merge adjacent acquisition ranges and request unrestricted journeys. One shared cache assembles compatible coverage across stop boards and routing, fetches gaps and coalesces overlapping flights. Original acquisition timestamps retain the 60-second freshness rule. Normal searches reuse fresh evidence; explicit Refresh Routes bypasses completed coverage. One absolute deadline spans fetching, decoding, schedules, matching, event creation and discovery. `RealtimeConfiguration.acquisitionBudgetMilliseconds` defaults to 4,000, including decoding older configuration. Verkéier selects an 8,000 ms shared
+  acquisition allowance and sixteen concurrent board requests for selected and
+  discovered connecting lines. Line-filtered boards retain unlimited journeys
+  and full passlists. Both acquisition passes preserve selected-vehicle checks
+  regardless of CPU elapsed time. Bounded per-batch memoization reuses timestamp
+  parsing, normalized identities and service-day anchors across repeated
+  passlists. Up to two refinement waves, deferred intermediate-stop
+  materialization and equivalent envelope pruning bound repeat work without
+  reducing the search horizon.
 - The route stream publishes the entire calculated snapshot immediately. Five staggered reveals and their roughly 400 ms artificial delay are removed. Startup preparation and the local walking-router pool remain. A conservative geodesic bound rejects impossible direct-walking comparisons before Valhalla, while actual paths still undergo the existing length validation.
 
 ## Measurement setup

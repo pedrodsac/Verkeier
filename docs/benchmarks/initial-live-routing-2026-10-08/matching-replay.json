@@ -1,0 +1,77 @@
+{
+  "baselineRevision": "601bc095a2d30d9baab81c05ef03ba149316bc18",
+  "optimizedRevision": "738de00",
+  "platform": "macOS Release, M4 MacBook Air; isolated recorded board replay",
+  "networkDuringReplay": false,
+  "baseline": {
+    "totalMilliseconds": 3169.258458,
+    "matchingMilliseconds": 2926,
+    "fetchMilliseconds": 241,
+    "scheduledPreparationMilliseconds": 51
+  },
+  "optimized": {
+    "totalMilliseconds": 447.687958,
+    "matchingMilliseconds": 173,
+    "fetchMilliseconds": 274,
+    "scheduledPreparationMilliseconds": 50
+  },
+  "patches": 293,
+  "events": 8012,
+  "comparedFields": [
+    "trip",
+    "serviceDate",
+    "status",
+    "stop",
+    "sequence",
+    "effectiveDeparture",
+    "effectiveArrival",
+    "departureSource",
+    "arrivalSource"
+  ],
+  "identicalComparedOutput": true,
+  "normalizedOutputSHA256": "cb679cbb19b9a7d5a116af8efa73f54eaf467d2c31b62d3c02a47a67d07df3da",
+  "recordedBoards": [
+    {
+      "stop": "000200409005",
+      "bytes": 1032952,
+      "sha256": "8568f88cfd9afa6bf2cc27ef8ba00f6416fafa8e95c99bd5a8a2aa8ae85a21a6",
+      "departures": 59
+    },
+    {
+      "stop": "000200417050",
+      "bytes": 4307288,
+      "sha256": "4a96b5332249415b35d1a36dc5900da81bc95c6c8eff92b2b6c4f5cef34c6dad",
+      "departures": 215
+    },
+    {
+      "stop": "000200417052",
+      "bytes": 1307324,
+      "sha256": "49f40a4424a6c4cffaad451478b880c25f2724c653ac9b2dd955a651c61a2489",
+      "departures": 80
+    },
+    {
+      "stop": "000200508002",
+      "bytes": 845213,
+      "sha256": "e9a13ee12457db9a8ffda0d7adde0a000bb2fd4eab65081375630adec491b5b6",
+      "departures": 60
+    },
+    {
+      "stop": "000200508003",
+      "bytes": 1389252,
+      "sha256": "813419c66b8a8a1dd3fd2dbf6558e9375ad4b5f0bfb0cabf08e146787d4200f7",
+      "departures": 74
+    },
+    {
+      "stop": "000200508004",
+      "bytes": 173289,
+      "sha256": "c6f2c20bb7e920728ff050150a8d336dde88e6b3acabc491dbf21efe8ea1ce2f",
+      "departures": 15
+    },
+    {
+      "stop": "000200508016",
+      "bytes": 2297954,
+      "sha256": "a37cd23456290d9d9dbdf66abab6b407530d123ccc64b0aec1b97cb5a6815f08",
+      "departures": 133
+    }
+  ]
+}
