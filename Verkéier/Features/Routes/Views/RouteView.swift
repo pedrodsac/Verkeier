@@ -236,12 +236,6 @@ struct RouteView: View {
 
     private var routeResultsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            if let range = viewModel.browsedTimeRange {
-                Text(range)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .accessibilityIdentifier("route-browsing-window")
-            }
             ForEach(viewModel.chronologicallyOrderedRouteOptions) { option in
                 RouteOptionCard(
                     option: option,

@@ -5,8 +5,6 @@ struct AlertsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            AlertRefreshStatus(lastUpdated: viewModel.lastUpdated, isStale: viewModel.isStale)
-
             if viewModel.isLoading, viewModel.alerts.isEmpty {
                 DepartureLoadingCard(title: "Loading alerts")
             } else if let errorMessage = viewModel.errorMessage {
@@ -37,69 +35,39 @@ struct AlertsView: View {
 }
 
 #Preview {
-    AlertsView(
-        viewModel: AlertsPresentationModel(
-            alerts: [
-                AlertMessage(
-                    id: "alert-1",
-                    title: "Line 16 diverted",
-                    body: "Due to roadworks on Avenue de la Gare, buses are diverting via Rue du Fort Rheinsheim until further notice.",
-                    severity: .warning,
-                    affectedStopIds: ["stop-1", "stop-2"],
-                    affectedRouteIds: ["16"],
-                    startsAt: .now,
-                    endsAt: nil,
-                    dataSource: .mock
-                ),
-                AlertMessage(
-                    id: "alert-2",
-                    title: "T1 service restored",
-                    body: "Tram service between Rout Bréck–Pafendall and Luxexpo has resumed normal operation.",
-                    severity: .info,
-                    affectedStopIds: ["stop-3"],
-                    affectedRouteIds: ["T1"],
-                    startsAt: .now,
-                    endsAt: nil,
-                    dataSource: .mock
-                )
-            ],
-            isLoading: false,
-            errorMessage: nil,
-            lastUpdated: .now,
-            isStale: false
-        )
-    )
-    .padding(.horizontal, 16)
-}
-
-private struct AlertRefreshStatus: View {
-    let lastUpdated: Date?
-    let isStale: Bool
-
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: isStale ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
-                .font(.caption.weight(.semibold))
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(isStale ? .orange : .green)
-                .contentTransition(.symbolEffect(.replace))
-                .animation(Animation.respectingReduceMotion(.snappy, reduceMotion), value: isStale)
-                .accessibilityHidden(true)
-            Text(statusText)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-            Spacer(minLength: 0)
-        }
-        .accessibilityElement(children: .combine)
-    }
-
-    private var statusText: String {
-        guard let lastUpdated else { return "Not updated yet" }
-        let formatted = lastUpdated.formatted(date: .omitted, time: .shortened)
-        return isStale ? "Stale · updated \(formatted)" : "Updated \(formatted)"
-    }
+	AlertsView(
+		viewModel: AlertsPresentationModel(
+			alerts: [
+				AlertMessage(
+					id: "alert-1",
+					title: "Line 16 diverted",
+					body: "Due to roadworks on Avenue de la Gare, buses are diverting via Rue du Fort Rheinsheim until further notice.",
+					severity: .warning,
+					affectedStopIds: ["stop-1", "stop-2"],
+					affectedRouteIds: ["16"],
+					startsAt: .now,
+					endsAt: nil,
+					dataSource: .mock
+				),
+				AlertMessage(
+					id: "alert-2",
+					title: "T1 service restored",
+					body: "Tram service between Rout Bréck–Pafendall and Luxexpo has resumed normal operation.",
+					severity: .info,
+					affectedStopIds: ["stop-3"],
+					affectedRouteIds: ["T1"],
+					startsAt: .now,
+					endsAt: nil,
+					dataSource: .mock
+				)
+			],
+			isLoading: false,
+			errorMessage: nil,
+			lastUpdated: .now,
+			isStale: false
+		)
+	)
+	.padding(.horizontal, 16)
 }
 
 private struct AlertCard: View {

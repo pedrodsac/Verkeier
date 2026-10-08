@@ -225,5 +225,6 @@ private struct TimelineTransitBadge: View {
             in: RoundedRectangle(cornerRadius: 9, style: .continuous)
         )
         .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+        .shadow(color: .black.opacity(0.3), radius: 0.75, x: 0, y: 0)
     }
 }

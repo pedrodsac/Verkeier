@@ -152,6 +152,7 @@
       }
     },
     "%lld departures" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -242,6 +243,7 @@
       }
     },
     "%lld minutes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -301,6 +303,7 @@
 
     },
     "✓ %lld departures" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -329,6 +332,7 @@
       }
     },
     "✓ %lld minutes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -729,6 +733,16 @@
         }
       }
     },
+    "Arrivals: %@ – %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Arrivals: %1$@ – %2$@"
+          }
+        }
+      }
+    },
     "Arrive" : {
       "localizations" : {
         "de" : {
@@ -756,6 +770,9 @@
           }
         }
       }
+    },
+    "Arrive by %@" : {
+
     },
     "Arrive by…" : {
       "localizations" : {
@@ -1479,6 +1496,9 @@
         }
       }
     },
+    "Delayed" : {
+
+    },
     "Delete all local data" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1591,6 +1611,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Partidas"
+          }
+        }
+      }
+    },
+    "Departures: %@ – %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Departures: %1$@ – %2$@"
           }
         }
       }
@@ -2429,6 +2459,9 @@
         }
       }
     },
+    "Leave at %@" : {
+
+    },
     "Leave at…" : {
       "localizations" : {
         "de" : {
@@ -3198,6 +3231,9 @@
       }
     },
     "Offline schedules" : {
+
+    },
+    "On time" : {
 
     },
     "Open departures" : {
@@ -4727,6 +4763,7 @@
       }
     },
     "Results" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5644,6 +5681,7 @@
       }
     },
     "Time window" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5670,9 +5708,6 @@
           }
         }
       }
-    },
-    "Timetable" : {
-
     },
     "Timetable only" : {
       "localizations" : {
