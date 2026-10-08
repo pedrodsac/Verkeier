@@ -137,12 +137,12 @@ and counts. Those issues were outside the router change.
 
 ## Rendered timing verification
 
-The latest 8 October complete-search spot checks retain live forecasts and still
-fail the strict universal five-second gate. Warm live departure, reverse and
-Esch queries took 3.34–4.82 seconds; live arrival took 8.72 seconds and cold live
-queries took 6.47–11.60 seconds. All 37 available, unambiguous departure forecasts
-in the initial comparisons were already applied. The unchanged eight-second
-allowance makes the deliberately stalled fixture take about ten seconds.
+The pinned `f8d7b6a` complete-search check retains live forecasts and still
+fails the strict universal five-second gate: ten of 54 operations exceeded it.
+Warm live searches took 3.05–5.87 seconds; cold live searches took 4.43–7.39
+seconds. All 53 available, unambiguous departure forecasts in the initial
+comparisons were already applied. The unchanged eight-second allowance makes
+the deliberately stalled fixture take 9.14–10.75 seconds.
 [8 October measurements](benchmarks/initial-live-routing-2026-10-08/validation.md)
 keep these failures separate from the earlier passing runs below.
 

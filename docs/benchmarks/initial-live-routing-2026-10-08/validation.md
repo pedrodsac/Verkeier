@@ -242,3 +242,55 @@ when its board slots or permitted rides are already exhausted. In the same
 native full-feed diagnostic, discovery fell from its 250 ms ceiling to
 105–107 ms with identical final journeys. This is a planning measurement,
 not a new passing rendered gate.
+
+
+## Final pinned complete-search check
+
+The pinned `f8d7b6a` Release simulator build passes all **19 focused app tests**.
+All **202 package tests in 29 suites** pass with kernel verification and serial
+execution. An unrestricted concurrent package run encountered the existing
+100 ms matching-deadline test expiring before matching began; the complete
+serial verifier run passes, including that deadline regression. No test budget
+was relaxed to obtain a pass.
+
+The complete 18-scenario spot check includes 54 timed operations: one priming,
+one warm and one cold operation each. It uses the ordinary 5,000 ms maximum
+limit, which rejects ten operations. **The requested universal five-second gate
+is not met.** Raw stages, choices, sources, comparisons and explicit failures
+are in `performance-f8d7b6a/`. These changing-clock live samples are not a latency
+distribution or a controlled comparison against the previous live series.
+
+| Scenario | Priming seconds | Warm seconds | Cold seconds |
+|---|---:|---:|---:|
+| Recorded departure | 3.881 | 2.104 | 3.629 |
+| Recorded reverse | 4.938 | 1.685 | 2.831 |
+| Recorded arrival | 2.438 | 1.116 | 2.374 |
+| Recorded delayed live departure | 2.047 | 0.717 | 1.869 |
+| Stalled arrival boards | 10.749 | 9.140 | 10.376 |
+| Live departure | 7.463 | 5.159 | 7.393 |
+| Live reverse | 6.281 | 4.595 | 6.288 |
+| Live Esch | 4.066 | 3.053 | 4.433 |
+| Live arrival one hour ahead | 9.073 | 5.873 | 4.999 |
+
+Every recorded-data scenario except the stalled fixture passes, including
+priming, both paging directions, arrival paging, explicit refresh and compatible
+cache reuse. The 4.999-second live arrival cold result has essentially no margin.
+No live allowance or timetable coverage was shortened to make these timings.
+Discovery planning in the live app checks takes 42–120 ms, down from the
+250 ms ceiling per discovery probe in the previous series. Routing and board
+waiting still exceed five seconds in several combinations; the stalled fixture
+spends the full eight-second live allowance before routing and rendering.
+
+All **53 unambiguous available forecasts** in the initial-result departure-board
+comparisons were already observed with exactly matching departure times. Live
+departure displays all 10, 12 and 12 transit legs with reported departure and
+arrival timing on the first result. Missing or ambiguous comparator observations
+remain excluded from the available-forecast count. All twelve immediate cache
+comparisons issue zero network requests and preserve the observations.
+
+A real board has taken 7.4 seconds. Enforcing a first result below five seconds
+when a forecast arrives later requires a different publication contract: return
+an initial calculation, keep acquiring the late forecasts, then recalculate
+transfer discovery and ranking with them. That publication contract is not
+implemented. The current implementation continues waiting under the existing
+acquisition contract; later tracking alone does not discover new routes.
