@@ -7,25 +7,25 @@ import Testing
 struct RouteTightTransferTests {
     private let anchor = Date(timeIntervalSince1970: 1_000_000)
 
-    @Test(arguments: [-1.0, 0, 119, 119.9, 120, 155, 450])
-    func pillUsesEffectiveGapStrictlyBelowTwoMinutes(gap: Double) {
+    @Test(arguments: [-1.0, 0, 119, 120, 155, 179, 179.9, 180, 450])
+    func pillUsesEffectiveGapStrictlyBelowThreeMinutes(gap: Double) {
         let route = option(gap: gap)
-        #expect(route.hasTightTransfer == (gap >= 0 && gap < 120))
-        #expect((route.status(at: anchor) == .atRisk) == (gap >= 0 && gap < 120))
+        #expect(route.hasTightTransfer == (gap >= 0 && gap < 180))
+        #expect((route.status(at: anchor) == .atRisk) == (gap >= 0 && gap < 180))
     }
 
     @Test func staleWarningsAndOtherStatusesDoNotCreateTightPill() {
         for status in [RouteLegLiveStatus.scheduled, .live, .delayed, .cancelled] {
-            let route = option(gap: 155, liveStatus: status, warning: "Tight transfer")
+            let route = option(gap: 180, liveStatus: status, warning: "Tight transfer")
             #expect(!route.hasTightTransfer)
         }
     }
 
     @Test func realtimeTimesOverrideScheduledGapAndContinuationsHaveNoPill() {
-        let delayed = option(gap: 155, realtimeArrival: 636)
+        let delayed = option(gap: 215, realtimeArrival: 636)
         #expect(delayed.hasTightTransfer)
-        #expect(!option(gap: 155, realtimeArrival: 636, realtimeDeparture: 756).hasTightTransfer)
-        #expect(!option(gap: 155, realtimeArrival: 636, realtimeDeparture: 700, continuation: true).hasTightTransfer)
+        #expect(!option(gap: 215, realtimeArrival: 636, realtimeDeparture: 816).hasTightTransfer)
+        #expect(!option(gap: 215, realtimeArrival: 636, realtimeDeparture: 700, continuation: true).hasTightTransfer)
         #expect(!delayed.replacingLegs([delayed.plan.legs[0]]).hasTightTransfer)
         #expect(!option(gap: 155, unknownDeparture: true).hasTightTransfer)
     }

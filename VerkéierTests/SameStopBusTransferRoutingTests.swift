@@ -8,7 +8,7 @@ import ZIPFoundation
 @MainActor
 struct SameStopBusTransferRoutingTests {
     @Test(arguments: [false, true])
-    func luxexpoStyleTransferIsNotTightAndSurvivesAvoidance(avoidTightTransfers: Bool) async throws {
+    func luxexpoStyleTransferIsTightAndMatchesAvoidance(avoidTightTransfers: Bool) async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -40,16 +40,16 @@ struct SameStopBusTransferRoutingTests {
             time: .departAt(anchor), filters: .init(avoidTightTransfers: avoidTightTransfers),
             realtimeRefreshPolicy: .scheduleOnly, page: .initial)
         let short = result.options.first { $0.transitLegs.last?.tripId == "short" }
-        #expect(short != nil)
+        #expect((short != nil) == !avoidTightTransfers)
         if let short {
             #expect(short.transitLegs.map(\.routeName) == ["322", "6"])
-            #expect(short.transitLegs.last?.transferWarning == nil)
-            #expect(!short.hasTightTransfer)
+            #expect(short.transitLegs.last?.transferWarning == "Tight transfer")
+            #expect(short.hasTightTransfer)
             #expect(short.transitLegs.last?.requiredTotalTransferSeconds == 120)
-            #expect(short.status(at: anchor) == .scheduledOnly)
+            #expect(short.status(at: anchor) == .atRisk)
             #expect(short.arrivalTime == anchor.addingTimeInterval(28 * 60 + 10))
         }
-        #expect(result.options.allSatisfy { !$0.hasTightTransfer })
+        #expect(result.options.contains { $0.transitLegs.last?.tripId == "later" })
     }
 }
 

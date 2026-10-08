@@ -94,10 +94,12 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
         transferGapDurations?.min()
     }
 
-    /// Only an actual change with less than two minutes available is tight.
+    /// Only an actual change with less than three minutes available is tight.
     /// Use effective times so old feed-buffer warnings cannot revive the pill.
     var hasTightTransfer: Bool {
-        transferGapDurations?.contains { $0 >= 0 && $0 < 120 } == true
+        transferGapDurations?.contains {
+            $0 >= 0 && $0 < JourneyItineraryValidator.tightTransferThresholdSeconds
+        } == true
     }
 
     /// Total effective time spent between transit legs.
