@@ -1,10 +1,11 @@
 # Live updates for connecting trips
 
 Live observations participate in the initial route calculation. The router uses
-a scheduled scan to prioritize boarding requests, discovers other outgoing lines
-that can become catchable through delays, then runs RAPTOR with that evidence
-before returning the first result. A transfer that is impossible on the timetable
-can therefore appear immediately when its connecting vehicle is late.
+the timetable's optimistic reachable boardings to acquire outgoing lines that
+can become catchable through delays before the first RAPTOR scan. Newly selected
+vehicles then receive any missing live checks before the initial result returns.
+A transfer that is impossible on the timetable can therefore appear immediately
+when its connecting vehicle is late.
 
 Selected itinerary stops receive acquisition priority. An optimistic, destination-aware
 frontier identifies alternative outgoing lines before fetching; their targets are
@@ -25,15 +26,21 @@ and alternative lines at each stop, retaining unlimited journeys and full passli
 A sampled line-21 board fell from approximately 1.3 MB to 100 KB with
 the API's line filter; tram filtering was also checked against live responses.
 
-RAPTOR builds candidates before requesting their boarding occurrences, including
-walking and stay-aboard connections. These targets include the permitted two-hour
+After discovery acquisition, RAPTOR builds candidates and requests missing
+observations for their selected boarding occurrences, including walking and
+stay-aboard connections. These targets include the permitted two-hour
 delay range and stay within the current route search horizon. Discovery planning
 is limited to 250 ms, leaving the rest of the shared deadline for HTTP, decoding,
 matching and merging. Discovery boards use the same concurrency as itinerary boards.
 
-Live evidence triggers another RAPTOR scan so delays, cancellations and transfer
-restrictions affect feasibility and ranking. Refinement is limited to two waves;
-a final scan applies the last acquired evidence. Intermediate-stop presentation
+Evidence that changes effective times, cancellation, boarding/alighting rules,
+or a conservative estimated boarding deadline triggers another RAPTOR scan.
+Reports with identical routing inputs update freshness and platforms without
+repeating the full scan. After initial discovery, completion is limited to two
+waves; a final scan applies the last acquired feasibility changes. Arrival
+searches expand their lookback only when older departures could affect the
+requested selection, retaining the full-day fallback for sparse or overlapping
+choices. Intermediate-stop presentation
 events are built only for retained journeys, avoiding that work for discarded
 profile candidates. Search coverage, walking validation and quality selection
 remain intact. Quality-envelope selection first applies cheap necessary timing,
@@ -53,15 +60,15 @@ forecast propagation remain part of matching. The caches are bounded and cleared
 between batches; they cannot prolong a forecast's freshness.
 
 Shared caching reuses compatible coverage and preserves each observation's
-original timestamp. The coordinator matches all forecasts on requested lines,
-including alternative vehicles that may become useful after delays; it does not
-limit patch construction to the original scheduled winners. A complete unrestricted board can satisfy a filtered request;
+original timestamp. The coordinator matches selected and optimistically reachable vehicles,
+including alternatives that may become useful after delays. It resolves
+ambiguity against the full timetable before applying that eligibility filter. A complete unrestricted board can satisfy a filtered request;
 a filtered response cannot supply unrestricted board coverage. Explicit refresh
 bypasses completed evidence. Unavailable, ambiguous, contradictory or expired
 reports retain honest scheduled or partial coverage.
 
 The app pins MobiliteitKit revision
-`353a15755b9c98c5e8f23c80aa1124c35bf010f3`.
+`f8d7b6a61877b9ff0c8429470600b2486a10c993`.
 
 ## Tracking calculated routes
 
@@ -102,8 +109,8 @@ honors API line filters, so a line-203 request cannot accidentally supply line 2
 Both departure and arrive-by searches are checked with an available fallback,
 a stalled fallback board, no scheduled route, an exhausted positive CPU allowance,
 and 1.4-second live responses. The app adapter checks both time modes with cached
-and forced acquisition before any tracking refresh. All 194 package tests in
-26 suites pass with kernel verification enabled. An additional three-vehicle
+and forced acquisition before any tracking refresh. All 202 package tests in
+29 suites pass with kernel verification enabled and serial execution. An additional three-vehicle
 fixture with a missing discovery board verifies that the newly selected third
 vehicle gets its live departure and arrival before publication, even after a
 positive CPU allowance is exhausted.
@@ -129,6 +136,15 @@ isolated project with the previous `f198548` pin reproduced all 34 issue locatio
 and counts. Those issues were outside the router change.
 
 ## Rendered timing verification
+
+The latest 8 October complete-search spot checks retain live forecasts and still
+fail the strict universal five-second gate. Warm live departure, reverse and
+Esch queries took 3.34–4.82 seconds; live arrival took 8.72 seconds and cold live
+queries took 6.47–11.60 seconds. All 37 available, unambiguous departure forecasts
+in the initial comparisons were already applied. The unchanged eight-second
+allowance makes the deliberately stalled fixture take about ten seconds.
+[8 October measurements](benchmarks/initial-live-routing-2026-10-08/validation.md)
+keep these failures separate from the earlier passing runs below.
 
 [Validation and raw measurements](benchmarks/route-live-connections-2026-10-04/validation.md)
 record the 112-operation full matrix (maximum 3.43 seconds) and two twelve-operation

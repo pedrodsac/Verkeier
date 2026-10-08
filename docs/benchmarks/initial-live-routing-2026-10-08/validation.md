@@ -4,7 +4,7 @@ The initial calculation discovers alternative outgoing lines and applies their
 observations to RAPTOR feasibility before publishing routes. It does not depend
 on `refreshDisplayedRealtime` to discover the regression's connection.
 
-Current MobiliteitKit revision: `353a15755b9c98c5e8f23c80aa1124c35bf010f3`.
+Current MobiliteitKit revision: `f8d7b6a61877b9ff0c8429470600b2486a10c993`.
 Earlier measurements below retain their original revisions.
 
 ## Regression and policy
@@ -47,7 +47,7 @@ unrelated vehicles returned on the same board.
 ROUTING_VERIFY_KERNEL=1 swift test --disable-automatic-resolution --no-parallel
 ```
 
-All **194 tests in 26 suites passed** at the current revision. Existing coverage includes cancellation,
+All **202 tests in 29 suites passed** at the current revision with kernel verification and serial execution. Existing coverage includes cancellation,
 missed transfers, delayed-past boarding, full-timetable ambiguity, cache reuse,
 paging, stale observations, long trips with incomplete earlier passlists,
 and selected boarding priority over stalled discovery branches. Priority is
@@ -182,3 +182,63 @@ was not shortened to obtain faster timings. This run used the harness's explicit
 zero timing limit to characterize those failures; it is **not** a passing universal
 five-second acceptance gate. The deterministic replay in `matching-replay.json`
 separately establishes the matching speedup without changing input boards.
+
+
+## Complete-search performance work
+
+`a8225a2` reuses incoming-vehicle peer masks rather than looking up the same
+profile dictionary at every alighting candidate. `af6f1a0` merges completed
+parallel chunks progressively in their original deterministic order, with at
+most two worker windows buffered. A four-run native full-day static diagnostic
+retained byte-identical journeys and took 3.457–4.003 seconds, with a process
+peak of 608,419,840 bytes. This diagnostic uses straight-line walking and does
+not satisfy the app's rendered acceptance boundary.
+
+`f2d76b6` acquires reachable alternative vehicles before the first full routing
+scan. `a790e7e` rebuilds evidence without repeating RAPTOR when newly received
+reports do not change effective times, cancellation, boarding/alighting rules,
+or the conservative estimated boarding deadline. Actual feasibility changes
+still trigger a full scan. `fb4665f` starts arrival searches with three hours,
+expanding to six, twelve and twenty-four when the complete recent selection
+cannot be proved independent of older departures. Sparse services, long rides,
+near-boundary choices and earlier pickups of the same first vehicle retain the
+full-day fallback. Every probe retains the live acquisition contract.
+
+The `fb4665f` Release iPhone 17 build passed all 19 focused app tests. With one
+warm and one cold sample per scenario, plus each priming operation, the strict
+5,000 ms gate **failed**. All 54 operations are retained in
+`performance-fb4665/`; none were discarded to obtain a passing maximum.
+
+| Scenario | Priming seconds | Warm seconds | Cold seconds |
+|---|---:|---:|---:|
+| Recorded departure | 5.123 | 1.919 | 3.552 |
+| Recorded arrival | 2.500 | 1.285 | 2.486 |
+| Recorded delayed live departure | 2.051 | 0.886 | 2.066 |
+| Stalled arrival boards | 10.292 | 9.020 | 10.286 |
+| Live departure | 6.092 | 4.607 | 6.471 |
+| Live reverse | 6.408 | 4.824 | 7.524 |
+| Live Esch | 6.142 | 3.338 | 6.541 |
+| Live arrival one hour ahead | 12.844 | 8.720 | 11.596 |
+
+The other ten recorded-data scenarios stayed below five seconds in these spot
+checks. Live arrival required further lookback or live feasibility scans and
+spent 4.985–5.949 seconds in RAPTOR. The stalled fixture still waits for the
+unchanged eight-second acquisition allowance before returning its complete
+result. These failures are not evidence of a universal five-second bound.
+
+All **37 unambiguous available departure forecasts** from the live initial-result
+comparisons were already observed with exactly the board's departure timestamp.
+The comparator runs after publication and before displayed-route tracking;
+its raw rows are in `performance-fb4665/live/board-comparisons.jsonl`. Missing
+forecasts and ambiguous matches are excluded from that count and remain honest
+scheduled or partial evidence.
+
+`f8d7b6a` scans each discovered vehicle once per service day, carrying the minimum
+boarding rescue to its downstream stops. A differential fixture compares it
+with the independent traversal of every reachable boarding across repeated
+stops, reported/estimated delays, cancellation, mode filters and boarding/
+alighting restrictions. Discovery also stops before an unused transfer wave
+when its board slots or permitted rides are already exhausted. In the same
+native full-feed diagnostic, discovery fell from its 250 ms ceiling to
+105–107 ms with identical final journeys. This is a planning measurement,
+not a new passing rendered gate.
