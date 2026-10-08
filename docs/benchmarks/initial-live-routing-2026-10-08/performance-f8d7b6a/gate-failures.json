@@ -1,0 +1,67 @@
+{
+  "limit_ms": 5000,
+  "operations": 54,
+  "passed": false,
+  "failures": [
+    {
+      "scenario": "deadline-arrive",
+      "process": "priming",
+      "sample": 0,
+      "total_ms": 10749.341625000001
+    },
+    {
+      "scenario": "deadline-arrive",
+      "process": "warm",
+      "sample": 1,
+      "total_ms": 9140.012875
+    },
+    {
+      "scenario": "deadline-arrive",
+      "process": "cold",
+      "sample": 0,
+      "total_ms": 10375.925
+    },
+    {
+      "scenario": "live-now",
+      "process": "priming",
+      "sample": 0,
+      "total_ms": 7462.872208
+    },
+    {
+      "scenario": "live-now",
+      "process": "warm",
+      "sample": 1,
+      "total_ms": 5159.208666
+    },
+    {
+      "scenario": "live-now",
+      "process": "cold",
+      "sample": 0,
+      "total_ms": 7393.459792
+    },
+    {
+      "scenario": "live-reverse",
+      "process": "priming",
+      "sample": 0,
+      "total_ms": 6281.334792
+    },
+    {
+      "scenario": "live-reverse",
+      "process": "cold",
+      "sample": 0,
+      "total_ms": 6288.236875
+    },
+    {
+      "scenario": "live-arrive",
+      "process": "priming",
+      "sample": 0,
+      "total_ms": 9072.81525
+    },
+    {
+      "scenario": "live-arrive",
+      "process": "warm",
+      "sample": 1,
+      "total_ms": 5873.031
+    }
+  ]
+}
