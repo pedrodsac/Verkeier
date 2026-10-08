@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// A tappable route-option card displaying departure/arrival times, a
-/// ``RouteRibbon`` of mode/line badges, and a status badge.
+/// ``RouteRibbon`` of mode/line badges with individual status rings.
 ///
 /// Matches the Apple Maps Transit result row style: time range + duration on
 /// top, the mode ribbon as the dominant visual, metadata on the bottom.
@@ -15,7 +15,7 @@ struct RouteOptionCard: View {
     var body: some View {
         NavigationLink(value: TransitSheetRoute.routeTimeline(option.id)) {
             VStack(alignment: .leading, spacing: 8) {
-                // ── Header: time range / duration / status badge ──────────
+                // ── Header: time range / duration ──────────
                 HStack(alignment: .firstTextBaseline, spacing: 0) {
                     if option.isVelohOnly || option.isWalkingOnly {
                         Text(durationText)
@@ -33,11 +33,7 @@ struct RouteOptionCard: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    Spacer(minLength: -8)
-
-                    if !option.isVelohOnly, !option.isWalkingOnly {
-                        RouteOptionBadge(status: option.status(at: .now))
-                    }
+                    Spacer(minLength: 0)
                 }
 
                 // ── Mode / line ribbon ────────────────────────────────────
@@ -100,15 +96,11 @@ struct RouteOptionCard: View {
         default: "\(option.transferCount) transfers"
         }
 
-        let dataNote = if option.usesBikeShare {
-            option.hasBikeAvailabilityWarning ? "Bike availability uncertain" : "Bike availability live"
-        } else if let delay = option.transitLegs.compactMap(\.delayMinutes).max(), delay > 0 {
-            "+\(delay) min delay"
-        } else {
-            option.realtimeCoverage.displayText
-        }
-
-        return "\(transfers)  ·  \(distance)  ·  \(dataNote)"
+        let summary = "\(transfers)  ·  \(distance)"
+        guard option.usesBikeShare else { return summary }
+        let bikeNote = option.hasBikeAvailabilityWarning
+            ? "Bike availability uncertain" : "Bike availability live"
+        return "\(summary)  ·  \(bikeNote)"
     }
 
     private var cardBackground: AnyShapeStyle {
@@ -119,7 +111,10 @@ struct RouteOptionCard: View {
         let heading = option.isVelohOnly || option.isWalkingOnly
             ? durationText
             : "\(timeRangeText), \(durationText)"
-        return "\(heading). \(secondarySummary)"
+        let lines = option.transitLegs.map {
+            RouteLineStatus.accessibilityDescription(for: $0)
+        }.joined(separator: ", ")
+        return [heading, secondarySummary, lines].filter { !$0.isEmpty }.joined(separator: ". ")
     }
 }
 

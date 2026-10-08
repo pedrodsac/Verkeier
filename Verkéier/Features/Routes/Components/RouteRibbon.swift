@@ -3,7 +3,7 @@ import SwiftUI
 /// An Apple Maps-style horizontal sequence of mode/line badges and walking
 /// segments that summarises a multi-leg journey at a glance.
 ///
-/// Transit legs show a solid line badge (white text on the mode's gradient).
+/// Transit legs show a solid line badge with a ring for known live status.
 /// Walking legs show a walking icon and optional duration.
 /// Segments are separated by chevrons.
 ///
@@ -25,7 +25,7 @@ struct RouteRibbon: View {
             EmptyView()
         } else {
             ScrollView(.horizontal, showsIndicators: false) {
-				HStack(spacing: 7.5) {
+                HStack(spacing: 7.5) {
                     ForEach(Array(displayLegs.enumerated()), id: \.element.id) { index, leg in
                         if index > 0 {
                             Image(systemName: "chevron.right")
@@ -47,7 +47,8 @@ struct RouteRibbon: View {
         case .transit:
             TransitBadge(
                 routeName: leg.routeName ?? leg.mode.displayName,
-                mode: leg.mode
+                mode: leg.mode,
+                status: RouteLineStatus(leg: leg)
             )
         case .bikeShare:
             TransitBadge(routeName: "vel’OH!", mode: .bicycle)
@@ -70,8 +71,7 @@ struct RouteRibbon: View {
         displayLegs.compactMap { leg -> String? in
             switch leg.transportKind {
             case .transit:
-                let name = leg.routeName ?? leg.mode.displayName
-                return "\(leg.mode.displayName) \(name)"
+                return RouteLineStatus.accessibilityDescription(for: leg)
             case .walking:
                 if let mins = walkMinutes(for: leg) {
                     return "Walk \(mins) minutes"
@@ -89,17 +89,32 @@ struct RouteRibbon: View {
 private struct TransitBadge: View {
     let routeName: String
     let mode: TransportMode
+    var status: RouteLineStatus? = nil
+
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
 
     var body: some View {
-        Text(routeName)
-            .font(.callout.weight(.bold))
-            .foregroundStyle(.white)
-            .padding(.horizontal, 9)
-            .padding(.vertical, 4)
-            .background(
-                mode.tint.gradient,
-                in: RoundedRectangle(cornerRadius: 8, style: .continuous)
-            )
+        HStack(spacing: 4) {
+            Text(routeName)
+            if differentiateWithoutColor, let status {
+                Image(systemName: status.symbol)
+            }
+        }
+        .font(.callout.weight(.bold))
+        .foregroundStyle(.white)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 4)
+        .background(
+            mode.tint.gradient,
+            in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+        )
+        .padding(3)
+        .overlay {
+            if let status {
+                RoundedRectangle(cornerRadius: 11, style: .continuous)
+                    .strokeBorder(status.color, lineWidth: 3)
+            }
+        }
     }
 }
 
@@ -120,6 +135,18 @@ private struct WalkingSegment: View {
 }
 
 #if DEBUG
+#Preview("Line status rings", traits: .sizeThatFitsLayout) {
+    VStack(alignment: .leading, spacing: 12) {
+        HStack {
+            TransitBadge(routeName: "16", mode: .bus, status: .onTime)
+            TransitBadge(routeName: "850", mode: .bus, status: .delayed)
+            TransitBadge(routeName: "T1", mode: .tram, status: .cancelled)
+            TransitBadge(routeName: "18", mode: .bus)
+        }
+    }
+    .padding()
+}
+
 #Preview(traits: .sizeThatFitsLayout) {
     RouteRibbon(legs: [
         RoutePlan.Leg(
