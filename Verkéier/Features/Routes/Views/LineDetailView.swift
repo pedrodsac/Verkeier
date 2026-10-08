@@ -8,20 +8,20 @@ struct LineDetailView: View {
         Group {
             if let detail = viewModel.detail {
                 List {
-                if detail.directions.count > 1 {
-                    Picker(
-                        "Direction",
-                        selection: Binding(
-                            get: { detail.selectedDirectionID },
-                            set: actions.selectDirection
-                        )
-                    ) {
-                        ForEach(detail.directions) { direction in
-                            Text(direction.title).tag(direction.id)
-                        }
-                    }
-                    .pickerStyle(.inline)
-                }
+                	if detail.directions.count > 1 {
+                	    Picker(
+                	        "Direction",
+                	        selection: Binding(
+                	            get: { detail.selectedDirectionID },
+                	            set: actions.selectDirection
+                	        )
+                	    ) {
+                	        ForEach(detail.directions) { direction in
+                	            Text(direction.title).tag(direction.id)
+                	        }
+                	    }
+                	    .pickerStyle(.inline)
+                	}
 
                     Section("Stop Sequence") {
                         ForEach(Array(detail.stopSequence.enumerated()), id: \.element.id) { index, stop in

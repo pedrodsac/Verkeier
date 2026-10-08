@@ -35,7 +35,7 @@ struct SettingsView: View {
                 Toggle("Avoid tight transfers", isOn: $prefs.avoidTightTransfers)
             }
 
-            Section("Timetable") {
+            Section("Schedules") {
                 LabeledContent("Status", value: viewModel.gtfsStatus.statusText)
                 LabeledContent("Released") {
                     timetableDate(viewModel.gtfsStatus.releasedAt)
@@ -43,17 +43,17 @@ struct SettingsView: View {
                 LabeledContent("Last checked") {
                     timetableDate(viewModel.gtfsStatus.lastCheckedAt, includesTime: true)
                 }
+				
+				if viewModel.isRefreshingTimetable {
+					ProgressView()
+						.progressViewStyle(.linear)
+						.accessibilityLabel("Refreshing timetable")
+				}
 
                 Button(action: checkGTFSUpdate) {
                     Label("Refresh", systemImage: "arrow.clockwise")
                 }
                 .disabled(viewModel.isRefreshingTimetable)
-
-                if viewModel.isRefreshingTimetable {
-                    ProgressView()
-                        .progressViewStyle(.linear)
-                        .accessibilityLabel("Refreshing timetable")
-                }
             }
 
             Section("Map") {
