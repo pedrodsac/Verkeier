@@ -24,7 +24,7 @@ nonisolated enum RouteOptionVisibility {
                       let departure = option.departureTime, let arrival = option.arrivalTime,
                       let otherDeparture = other.departureTime, let otherArrival = other.arrivalTime
                 else { return false }
-                guard !hasTightTransfer(other) || hasTightTransfer(option) else { return false }
+                guard !other.hasTightTransfer || option.hasTightTransfer else { return false }
                 return otherDeparture >= departure && otherArrival <= arrival
                     && (otherDeparture > departure || otherArrival < arrival)
             }
@@ -34,11 +34,6 @@ nonisolated enum RouteOptionVisibility {
             supplemental: supplemental.filter { !dominatedIDs.contains($0.id) },
             at: now
         )
-    }
-
-    private static func hasTightTransfer(_ option: RouteOption) -> Bool {
-        option.statusEvidence?.tightTransfer == true
-            || option.transitLegs.contains { $0.transferWarning == "Tight transfer" }
     }
 
     private static func walkingVisibleOptions(

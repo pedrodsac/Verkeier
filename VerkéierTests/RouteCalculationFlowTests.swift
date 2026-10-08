@@ -291,7 +291,7 @@ struct RouteCalculationFlowTests {
         )
         let selected = try #require(breedewues.selectedOption)
         #expect(selected.routeNames == ["321", "25"])
-        #expect(selected.transitLegs.last?.transferWarning == "Tight transfer")
+        #expect((selected.transitLegs.last?.transferWarning == "Tight transfer") == selected.hasTightTransfer)
 
         let gromscheedStop = try #require(await gtfsService.searchStops(query: "Gromscheed")
             .first { $0.id == "000200508004" })

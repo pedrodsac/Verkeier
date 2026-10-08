@@ -34,6 +34,10 @@ struct RouteOptionCard: View {
                     }
 
                     Spacer(minLength: 0)
+
+                    if option.hasTightTransfer {
+                        RouteOptionBadge(status: .atRisk)
+                    }
                 }
 
                 // ── Mode / line ribbon ────────────────────────────────────
@@ -114,7 +118,8 @@ struct RouteOptionCard: View {
         let lines = option.transitLegs.map {
             RouteLineStatus.accessibilityDescription(for: $0)
         }.joined(separator: ", ")
-        return [heading, secondarySummary, lines].filter { !$0.isEmpty }.joined(separator: ". ")
+        let warning = option.hasTightTransfer ? "Tight transfer" : ""
+        return [heading, warning, secondarySummary, lines].filter { !$0.isEmpty }.joined(separator: ". ")
     }
 }
 
@@ -129,6 +134,10 @@ struct RouteOptionCard: View {
                 option: .previewBusOption,
                 isSelected: false
             )
+            RouteOptionCard(
+                option: .previewTightTransferOption,
+                isSelected: false
+            )
         }
         .padding()
         .background(Color(uiColor: .systemGroupedBackground))
@@ -136,6 +145,20 @@ struct RouteOptionCard: View {
     }
 
     private extension RouteOption {
+        static var previewTightTransferOption: RouteOption {
+            let option = previewBusOption
+            let original = option.plan.legs[0]
+            let incoming = RoutePlan.Leg(id: "bus1", mode: .bus, transportKind: .transit,
+                routeName: "16", origin: original.origin, destination: original.destination,
+                departureTime: original.departureTime,
+                arrivalTime: original.departureTime?.addingTimeInterval(5 * 60))
+            let outgoing = RoutePlan.Leg(id: "bus2", mode: .bus, transportKind: .transit,
+                routeName: "6", origin: incoming.destination, destination: incoming.destination,
+                departureTime: incoming.arrivalTime?.addingTimeInterval(119),
+                arrivalTime: incoming.arrivalTime?.addingTimeInterval(10 * 60))
+            return option.replacingLegs([incoming, outgoing])
+        }
+
         static var previewTramOption: RouteOption {
             RouteOption(
                 id: "tram-route",

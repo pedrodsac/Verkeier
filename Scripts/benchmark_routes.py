@@ -19,7 +19,7 @@ parser.add_argument('--scenarios', nargs='+', default=['depart', 'reverse', 'coo
 parser.add_argument('--warm', type=int, default=20)
 parser.add_argument('--cold', type=int, default=10)
 parser.add_argument('--time', help='Fixed ISO 8601 planning time for comparison with another journey planner')
-parser.add_argument('--avoid-tight-transfers', action='store_true', help='Enforce the full feed transfer buffers')
+parser.add_argument('--avoid-tight-transfers', action='store_true', help='Avoid transfers with less than two minutes available')
 parser.add_argument('--maximum-limit-ms', '--p95-limit-ms', dest='maximum_limit_ms', type=float,
     default=5000, help='Every operation must be below this threshold, including priming; use 0 for a separate Debug audit')
 args = parser.parse_args()

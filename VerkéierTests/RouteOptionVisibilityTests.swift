@@ -153,9 +153,10 @@ struct RouteOptionVisibilityTests {
     func tightTransferDoesNotHideComfortableRoute() {
         let comfortable = option("comfortable", departure: 0, arrival: 1_800)
         let fast = option("fast", departure: 0, arrival: 1_200)
-        var leg = fast.plan.legs[0]
-        leg.transferWarning = "Tight transfer"
-        let tight = fast.replacingLegs([leg])
+        let arriving = option("incoming", departure: 0, arrival: 60).plan.legs[0]
+        var departing = option("outgoing", departure: 179, arrival: 1_200).plan.legs[0]
+        departing.transferWarning = "Tight transfer"
+        let tight = fast.replacingLegs([arriving, departing])
         let visible = RouteOptionVisibility.visibleOptions(primary: [tight, comfortable], supplemental: [], at: anchor)
         #expect(visible.primary.map(\.id) == [tight.id, comfortable.id])
     }
