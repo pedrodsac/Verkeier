@@ -1,0 +1,420 @@
+2026-10-08 05:43:09.354667 [32;1m[INFO][0m Tile extract successfully loaded with tile count: 20
+2026-10-08 05:43:09.357930 [33;1m[WARN][0m (stat): /data/valhalla/traffic.tar No such file or directory
+2026-10-08 05:43:09.358245 [33;1m[WARN][0m Traffic tile extract could not be loaded
+2026-10-08 05:43:09.359814 [32;1m[INFO][0m Tile extract successfully loaded with tile count: 20
+2026-10-08 05:43:09.361729 [33;1m[WARN][0m (stat): /data/valhalla/traffic.tar No such file or directory
+2026-10-08 05:43:09.361809 [33;1m[WARN][0m Traffic tile extract could not be loaded
+objc[53552]: Class UIAccessibilityLoaderWebShared is implemented in both /Library/Developer/CoreSimulator/Volumes/iOS_24A434/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebKit.axbundle/WebKit (0x10b5a4398) and /Library/Developer/CoreSimulator/Volumes/iOS_24A434/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebCore.axbundle/WebCore (0x115ec4310). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+2026-10-08 05:43:10.063751 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.074182 [32;1m[INFO][0m Tile extract successfully loaded with tile count: 20
+2026-10-08 05:43:10.074386 [33;1m[WARN][0m (stat): /data/valhalla/traffic.tar No such file or directory
+2026-10-08 05:43:10.074436 [33;1m[WARN][0m Traffic tile extract could not be loaded
+2026-10-08 05:43:10.078777 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.211808 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.211953 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.218287 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.218309 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.219830 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.222171 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.223833 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.224162 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.226280 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.226470 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.227713 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.227951 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.228782 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.229229 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.230806 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.231474 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.233176 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.234974 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.238818 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.239078 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.240134 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.240344 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.242979 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.245910 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.248671 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.250878 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.253470 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.254203 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.256641 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.257224 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.259606 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.259699 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.261365 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.261557 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.264026 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.264196 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.267175 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.269023 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.269080 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.270757 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.271790 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.273261 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.274391 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.275947 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.277230 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.278809 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.296560 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.296984 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.297710 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.298779 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.299729 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.300742 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.300852 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.302677 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.302907 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.304017 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.304496 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.305865 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.306114 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.306995 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.308446 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.308881 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.309500 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.309876 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.310671 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.310903 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.311786 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.311982 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.312973 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.313165 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.314060 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.314482 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.315182 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.315617 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.316366 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.316569 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.317384 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.317585 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.318324 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.318447 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.319359 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.319401 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.320297 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.320554 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.321249 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.322383 [32;1m[INFO][0m algorithm::time_dependent_forward_a*
+2026-10-08 05:43:10.323008 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.324181 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.324847 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.325226 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.325842 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.326241 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.327363 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.328202 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.328440 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.330140 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.330843 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.332513 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.333208 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.334904 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.335624 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.337631 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.337746 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.339391 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.339668 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.341143 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.342741 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.343823 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.344684 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.345453 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.346402 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.347103 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.348360 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.348812 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.349524 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.349724 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.350411 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.351120 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.351865 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.352963 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.353662 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.354425 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.354556 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.355713 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.355922 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.356502 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.357083 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.357520 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.357744 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.358302 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.359473 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.359484 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.360489 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.360649 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.362015 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.362591 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.363475 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.364239 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.364807 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.366474 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.367161 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.367480 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.507408 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.507580 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.509313 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.510532 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.511013 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.512479 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.512699 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.514091 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.514499 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.516814 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.517527 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.518965 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.519366 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.520655 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.521072 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.522545 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.522655 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.524161 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.524617 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.525952 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.526419 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.527786 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.528138 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.529776 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.530000 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.532047 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.532391 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.534274 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.534655 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.536985 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.537324 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.916212 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.916356 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.918263 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.918476 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.920380 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.920485 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.922232 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.922403 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.924239 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.924652 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.925621 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.925811 [32;1m[INFO][0m algorithm::time_dependent_forward_a*
+2026-10-08 05:43:10.926451 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.926467 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.927789 [32;1m[INFO][0m algorithm::time_dependent_forward_a*
+2026-10-08 05:43:10.927823 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.928918 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.929140 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.930376 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.930633 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.932292 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.932712 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.934356 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.934803 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.936900 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.937149 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.939343 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.939679 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.941585 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.942117 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.943403 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.944093 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.945247 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.945656 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.946747 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.947215 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.948460 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:10.949452 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.156358 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.156655 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.159072 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.159219 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.161523 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.161708 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.164169 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.164342 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.166500 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.166837 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.168622 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.169216 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.170796 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.171583 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.173470 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.174233 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.175596 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.176552 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.177547 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.178354 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.179495 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.180378 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.181623 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.182263 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.183739 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.184406 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.185801 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.186598 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.187833 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.188949 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.190217 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.191857 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.192462 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.194145 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.196111 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.196422 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.198738 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.201307 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.202642 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.203251 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.206045 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.206738 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.208287 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.209008 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.210626 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.211695 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.215056 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.215275 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.217436 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.217606 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.219784 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.219836 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.222188 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.222770 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.225124 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.225917 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.227630 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.228437 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.230948 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.231406 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.232966 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.234300 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.235354 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.236704 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.237979 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.239096 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.240429 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.241713 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.242763 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.243883 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.245138 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.245763 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.247218 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.247683 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.249348 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.249936 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.251365 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.251856 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.253445 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.254425 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.255522 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:11.256591 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.017811 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.018513 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.019230 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.019549 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.020183 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.020746 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.022420 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.022601 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.023447 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.024894 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.268294 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.268438 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.270901 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.271062 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.273256 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.273339 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.276025 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.276305 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.278948 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.279033 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.281766 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.281892 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.284793 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.284814 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.287163 [32;1m[INFO][0m algorithm::time_dependent_forward_a*
+2026-10-08 05:43:19.287215 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.288983 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.289097 [32;1m[INFO][0m algorithm::time_dependent_forward_a*
+2026-10-08 05:43:19.290820 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.290883 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.292694 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.293266 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.294583 [32;1m[INFO][0m algorithm::time_dependent_forward_a*
+2026-10-08 05:43:19.295678 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.296661 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.297742 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.298636 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.300020 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.300975 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.302433 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.539253 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.541184 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.542308 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.543585 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.545583 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.546259 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:19.548779 [32;1m[INFO][0m algorithm::bidirectional_a*
+ROUTING_BENCHMARK_FILE /Users/pedoataidecordeiro/Library/Developer/CoreSimulator/Devices/F726825E-2DB4-4F45-A51C-DBA5AA0E2664/data/Containers/Data/Application/FB06445D-FE43-4DB2-BFA3-E06385E27181/tmp/route-benchmark-37687447-0097-438F-88D6-773647F57240.json
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791444300,"line":"32","matches":1,"routeDeparture":1791444340,"routeSource":"scheduled","trip":"24367162"}],"departures":287,"fetchedAt":1791438199.7505221,"phase":"initial","stop":"000200409005"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791439740,"line":"21","matches":1,"routeDeparture":1791439740,"routeSource":"observed","trip":"24422951"},{"boardCancelled":false,"boardDeparture":1791440940,"line":"25","matches":1,"routeDeparture":1791440940,"routeSource":"observed","trip":"24424752"}],"departures":1120,"fetchedAt":1791438201.345964,"phase":"initial","stop":"000200417050"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791441180,"line":"T1","matches":1,"routeDeparture":1791441180,"routeSource":"observed","trip":"24320303"}],"departures":393,"fetchedAt":1791438209.9437819,"phase":"initial","stop":"000200417052"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791439200,"line":"850","matches":1,"routeDeparture":1791439200,"routeSource":"observed","trip":"24291382"},{"boardCancelled":false,"boardDeparture":0,"line":"850","matches":1,"routeDeparture":1791443257,"routeSource":"scheduled","trip":"24291423"}],"departures":286,"fetchedAt":1791438211.9979801,"phase":"initial","stop":"000200508002"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791439860,"line":"29","matches":1,"routeDeparture":1791439860,"routeSource":"observed","trip":"24365620"}],"departures":364,"fetchedAt":1791438213.534833,"phase":"initial","stop":"000200508003"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"322","matches":1,"routeDeparture":1791438610,"routeSource":"scheduled","trip":"24262711"},{"boardCancelled":false,"boardDeparture":0,"line":"326","matches":2,"routeDeparture":1791439920,"routeSource":"observed","trip":"24264848"},{"boardCancelled":false,"boardDeparture":0,"line":"322","matches":2,"routeDeparture":1791440400,"routeSource":"observed","trip":"24262710"}],"departures":93,"fetchedAt":1791438215.816731,"phase":"initial","stop":"000200508004"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"6","matches":2,"routeDeparture":1791439920,"routeSource":"observed","trip":"24368610"},{"boardCancelled":false,"boardDeparture":0,"line":"16","matches":2,"routeDeparture":1791440340,"routeSource":"observed","trip":"24360501"}],"departures":646,"fetchedAt":1791438216.3524849,"phase":"initial","stop":"000200508016"}
+2026-10-08 05:43:45.957976 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:45.958399 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:45.960574 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:45.961784 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:45.964177 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:45.964865 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:45.967166 [32;1m[INFO][0m algorithm::bidirectional_a*
+ROUTING_CACHED_COMPARISON_FILE /Users/pedoataidecordeiro/Library/Developer/CoreSimulator/Devices/F726825E-2DB4-4F45-A51C-DBA5AA0E2664/data/Containers/Data/Application/FB06445D-FE43-4DB2-BFA3-E06385E27181/tmp/route-cache-comparison-FA7767EE-F1B3-48BB-ABD1-CA72D70D7984.json
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791444300,"line":"32","matches":1,"routeDeparture":1791444340,"routeSource":"scheduled","trip":"24367162"}],"departures":287,"fetchedAt":1791438199.7505221,"phase":"after-cache","stop":"000200409005"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791439740,"line":"21","matches":1,"routeDeparture":1791439740,"routeSource":"observed","trip":"24422951"},{"boardCancelled":false,"boardDeparture":1791440940,"line":"25","matches":1,"routeDeparture":1791440940,"routeSource":"observed","trip":"24424752"}],"departures":1120,"fetchedAt":1791438201.345964,"phase":"after-cache","stop":"000200417050"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791441180,"line":"T1","matches":1,"routeDeparture":1791441180,"routeSource":"observed","trip":"24320303"}],"departures":393,"fetchedAt":1791438209.9437819,"phase":"after-cache","stop":"000200417052"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791439200,"line":"850","matches":1,"routeDeparture":1791439200,"routeSource":"observed","trip":"24291382"},{"boardCancelled":false,"boardDeparture":0,"line":"850","matches":1,"routeDeparture":1791443257,"routeSource":"scheduled","trip":"24291423"}],"departures":286,"fetchedAt":1791438211.9979801,"phase":"after-cache","stop":"000200508002"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791439860,"line":"29","matches":1,"routeDeparture":1791439860,"routeSource":"observed","trip":"24365620"}],"departures":364,"fetchedAt":1791438213.534833,"phase":"after-cache","stop":"000200508003"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"322","matches":1,"routeDeparture":1791438610,"routeSource":"scheduled","trip":"24262711"},{"boardCancelled":false,"boardDeparture":0,"line":"326","matches":2,"routeDeparture":1791439920,"routeSource":"observed","trip":"24264848"},{"boardCancelled":false,"boardDeparture":0,"line":"322","matches":2,"routeDeparture":1791440400,"routeSource":"observed","trip":"24262710"}],"departures":93,"fetchedAt":1791438215.816731,"phase":"after-cache","stop":"000200508004"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"6","matches":2,"routeDeparture":1791439920,"routeSource":"observed","trip":"24368610"},{"boardCancelled":false,"boardDeparture":0,"line":"16","matches":2,"routeDeparture":1791440340,"routeSource":"observed","trip":"24360501"}],"departures":646,"fetchedAt":1791438216.3524849,"phase":"after-cache","stop":"000200508016"}
+2026-10-08 05:43:55.841119 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:55.841099 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:55.843920 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:55.844486 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:55.845997 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:55.847119 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:43:55.847263 [32;1m[INFO][0m algorithm::bidirectional_a*
+ROUTING_BENCHMARK_FILE /Users/pedoataidecordeiro/Library/Developer/CoreSimulator/Devices/F726825E-2DB4-4F45-A51C-DBA5AA0E2664/data/Containers/Data/Application/FB06445D-FE43-4DB2-BFA3-E06385E27181/tmp/route-benchmark-20017199-6C51-4B44-984D-1DCA41B709A8.json
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791444300,"line":"32","matches":1,"routeDeparture":1791444340,"routeSource":"scheduled","trip":"24367162"}],"departures":287,"fetchedAt":1791438199.7505221,"phase":"initial","stop":"000200409005"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791439740,"line":"21","matches":1,"routeDeparture":1791439740,"routeSource":"observed","trip":"24422951"},{"boardCancelled":false,"boardDeparture":1791440940,"line":"25","matches":1,"routeDeparture":1791440940,"routeSource":"observed","trip":"24424752"}],"departures":1120,"fetchedAt":1791438201.345964,"phase":"initial","stop":"000200417050"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791441180,"line":"T1","matches":1,"routeDeparture":1791441180,"routeSource":"observed","trip":"24320303"}],"departures":393,"fetchedAt":1791438209.9437819,"phase":"initial","stop":"000200417052"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791439200,"line":"850","matches":1,"routeDeparture":1791439200,"routeSource":"observed","trip":"24291382"},{"boardCancelled":false,"boardDeparture":0,"line":"850","matches":1,"routeDeparture":1791443257,"routeSource":"scheduled","trip":"24291423"}],"departures":286,"fetchedAt":1791438211.9979801,"phase":"initial","stop":"000200508002"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791439860,"line":"29","matches":1,"routeDeparture":1791439860,"routeSource":"observed","trip":"24365620"}],"departures":364,"fetchedAt":1791438213.534833,"phase":"initial","stop":"000200508003"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"322","matches":1,"routeDeparture":1791438610,"routeSource":"scheduled","trip":"24262711"},{"boardCancelled":false,"boardDeparture":0,"line":"326","matches":2,"routeDeparture":1791439920,"routeSource":"observed","trip":"24264848"},{"boardCancelled":false,"boardDeparture":0,"line":"322","matches":2,"routeDeparture":1791440400,"routeSource":"observed","trip":"24262710"}],"departures":93,"fetchedAt":1791438215.816731,"phase":"initial","stop":"000200508004"}
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":0,"line":"6","matches":2,"routeDeparture":1791439920,"routeSource":"observed","trip":"24368610"},{"boardCancelled":false,"boardDeparture":0,"line":"16","matches":2,"routeDeparture":1791440340,"routeSource":"observed","trip":"24360501"}],"departures":646,"fetchedAt":1791438216.3524849,"phase":"initial","stop":"000200508016"}
+2026-10-08 05:45:23.097347 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:45:23.097488 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:45:23.100309 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:45:23.100339 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:45:23.102956 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:45:23.103191 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:45:23.105456 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:45:23.105888 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:45:23.542102 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:45:23.543153 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:45:23.545150 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:45:23.545989 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:45:23.547818 [32;1m[INFO][0m algorithm::bidirectional_a*
+2026-10-08 05:45:23.548443 [32;1m[INFO][0m algorithm::bidirectional_a*
+ROUTING_CACHED_COMPARISON_FILE /Users/pedoataidecordeiro/Library/Developer/CoreSimulator/Devices/F726825E-2DB4-4F45-A51C-DBA5AA0E2664/data/Containers/Data/Application/FB06445D-FE43-4DB2-BFA3-E06385E27181/tmp/route-cache-comparison-9CD97E21-D89B-4168-A34D-CF7167DBCA30.json
+ROUTING_BOARD_COMPARISON {"comparisons":[{"boardCancelled":false,"boardDeparture":1791439740,"line":"21","matches":1,"routeDeparture":1791439770,"routeSource":"scheduled","trip":"24422951"},{"boardCancelled":false,"boardDeparture":1791440940,"line":"25","matches":1,"routeDeparture":1791440990,"routeSource":"scheduled","trip":"24424752"}],"departures":1120,"fetchedAt":1791438323.6127548,"phase":"after-cache","stop":"000200417050"}
+ROUTING_BOARD_COMPARISON_FAILED 000200417052 Error Domain=NSURLErrorDomain Code=-1009 "The Internet connection appears to be offline." UserInfo={_kCFStreamErrorCodeKey=50, NSUnderlyingError=0x10ae24540 {Error Domain=kCFErrorDomainCFNetwork Code=-1009 "(null)" UserInfo={_kCFStreamErrorDomainKey=1, _kCFStreamErrorCodeKey=50, NSErrorPeerAddressKey=<CFData 0x1078555e0 [0x222429348]>{length = 16, capacity = 16, bytes = 0x100201bb681524a80000000000000000}, _NSURLErrorNWResolutionReportKey=Resolved 0 endpoints in 0ms using unknown from cache, _NSURLErrorNWPathKey=unsatisfied (No network route)}}, _NSURLErrorFailingURLSessionTaskErrorKey=LocalDataTask <6FD904B6-012C-463B-B7FE-57860FDA0332>.<57>, _NSURLErrorRelatedURLSessionTaskErrorKey=(
+    "LocalDataTask <6FD904B6-012C-463B-B7FE-57860FDA0332>.<57>"
+), NSLocalizedDescription=The Internet connection appears to be offline., NSErrorFailingURLStringKey=https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?accessId=&format=json&id=000200417052&lang=en&date=2026-10-08&time=07:45:00&duration=1439&maxJourneys=-1&rtMode=SERVER_DEFAULT&passlist=1, NSErrorFailingURLKey=https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?accessId=&format=json&id=000200417052&lang=en&date=2026-10-08&time=07:45:00&duration=1439&maxJourneys=-1&rtMode=SERVER_DEFAULT&passlist=1, _kCFStreamErrorDomainKey=1}
+ROUTING_BOARD_COMPARISON_FAILED 000200508003 Error Domain=NSURLErrorDomain Code=-1009 "The Internet connection appears to be offline." UserInfo={_kCFStreamErrorCodeKey=50, NSUnderlyingError=0x10ae247b0 {Error Domain=kCFErrorDomainCFNetwork Code=-1009 "(null)" UserInfo={_kCFStreamErrorDomainKey=1, _kCFStreamErrorCodeKey=50, _NSURLErrorNWResolutionReportKey=Resolved 0 endpoints in 2ms using unknown from cache, _NSURLErrorNWPathKey=unsatisfied (No network route)}}, _NSURLErrorFailingURLSessionTaskErrorKey=LocalDataTask <76681FA2-D703-4644-B5E3-A52E21CE48BB>.<58>, _NSURLErrorRelatedURLSessionTaskErrorKey=(
+    "LocalDataTask <76681FA2-D703-4644-B5E3-A52E21CE48BB>.<58>"
+), NSLocalizedDescription=The Internet connection appears to be offline., NSErrorFailingURLStringKey=https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?accessId=&format=json&id=000200508003&lang=en&date=2026-10-08&time=07:48:00&duration=1439&maxJourneys=-1&rtMode=SERVER_DEFAULT&passlist=1, NSErrorFailingURLKey=https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?accessId=&format=json&id=000200508003&lang=en&date=2026-10-08&time=07:48:00&duration=1439&maxJourneys=-1&rtMode=SERVER_DEFAULT&passlist=1, _kCFStreamErrorDomainKey=1}
+ROUTING_BOARD_COMPARISON_FAILED 000200508004 Error Domain=NSURLErrorDomain Code=-1009 "The Internet connection appears to be offline." UserInfo={_kCFStreamErrorCodeKey=50, NSUnderlyingError=0x10ae24990 {Error Domain=kCFErrorDomainCFNetwork Code=-1009 "(null)" UserInfo={_kCFStreamErrorDomainKey=1, _kCFStreamErrorCodeKey=50, _NSURLErrorNWResolutionReportKey=Resolved 0 endpoints in 0ms using unknown from cache, _NSURLErrorNWPathKey=unsatisfied (No network route)}}, _NSURLErrorFailingURLSessionTaskErrorKey=LocalDataTask <79B7C5E7-601B-48EE-8AD2-62AC5D7FD48F>.<59>, _NSURLErrorRelatedURLSessionTaskErrorKey=(
+    "LocalDataTask <79B7C5E7-601B-48EE-8AD2-62AC5D7FD48F>.<59>"
+), NSLocalizedDescription=The Internet connection appears to be offline., NSErrorFailingURLStringKey=https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?accessId=&format=json&id=000200508004&lang=en&date=2026-10-08&time=07:48:00&duration=1439&maxJourneys=-1&rtMode=SERVER_DEFAULT&passlist=1, NSErrorFailingURLKey=https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?accessId=&format=json&id=000200508004&lang=en&date=2026-10-08&time=07:48:00&duration=1439&maxJourneys=-1&rtMode=SERVER_DEFAULT&passlist=1, _kCFStreamErrorDomainKey=1}
+ROUTING_BOARD_COMPARISON_FAILED 000200508016 Error Domain=NSURLErrorDomain Code=-1009 "The Internet connection appears to be offline." UserInfo={_kCFStreamErrorCodeKey=50, NSUnderlyingError=0x10ae24f30 {Error Domain=kCFErrorDomainCFNetwork Code=-1009 "(null)" UserInfo={_kCFStreamErrorDomainKey=1, _kCFStreamErrorCodeKey=50, _NSURLErrorNWResolutionReportKey=Resolved 0 endpoints in 1ms using unknown from cache, _NSURLErrorNWPathKey=unsatisfied (No network route)}}, _NSURLErrorFailingURLSessionTaskErrorKey=LocalDataTask <5AF65E38-C31C-4475-BE11-7F75B250A360>.<60>, _NSURLErrorRelatedURLSessionTaskErrorKey=(
+    "LocalDataTask <5AF65E38-C31C-4475-BE11-7F75B250A360>.<60>"
+), NSLocalizedDescription=The Internet connection appears to be offline., NSErrorFailingURLStringKey=https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?accessId=&format=json&id=000200508016&lang=en&date=2026-10-08&time=07:48:00&duration=1439&maxJourneys=-1&rtMode=SERVER_DEFAULT&passlist=1, NSErrorFailingURLKey=https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?accessId=&format=json&id=000200508016&lang=en&date=2026-10-08&time=07:48:00&duration=1439&maxJourneys=-1&rtMode=SERVER_DEFAULT&passlist=1, _kCFStreamErrorDomainKey=1}
+ROUTING_BENCHMARK_DONE
+dev.pedrocordeiro.Verkeier: 53552
