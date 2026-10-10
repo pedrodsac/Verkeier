@@ -132,3 +132,29 @@ controls and the previous evening screenshot replay enabled.
 ## Contract limits
 
 These regressions establish behavior under the feed/provider contracts; they cannot certify the physical operation of an elevator or a vehicle's future arrival. Unknown wheelchair evidence does not satisfy a required-access request. Feeds without explicit linked type-4 trip evidence receive ordinary valid transfers, not inferred through-service. A legacy custom realtime provider may hand off a prevalidated patch without observation timestamps; the production HAFAS provider supplies acquisition timestamps, which are bounded here. New providers should supply them too. Bounded search and acquisition coverage remain exposed in existing metrics; missing realtime is not cancellation or proof of exhaustive coverage. No remote telemetry was added.
+
+## Later walking access follow-up (10 October 2026)
+
+MobiliteitKit `a90827a` removes the fixed five-minute extra-walking cutoff
+for redundant **access** feeders. A validated walk within the requested hard
+walking budget that leaves no earlier and catches the same remaining trip
+instances and alighting occurrences now removes the feeder regardless of
+the extra walking duration. Less-walking preferences, accessibility,
+preferred modes and tight-transfer protections still apply. Intermediate
+vehicle replacements retain their existing five-minute allowance.
+
+`RoutingEveningAccessTests.breedewuesAccessReplacesBothFeederBuses` models
+322 → 326 → 850 → T1 across midnight. With a reachable 15-minute Breedewues
+walk, it publishes 850 → T1, leaving home at 23:28. Without that walk, it
+preserves 326 → 850 → T1 and removes the unnecessary 322. Profile, paging
+and refresh agree. This is a synthetic regression matching the reported
+topology, not a replay of the screenshot's unavailable live observations.
+The existing access boundary tests also now remove the 12-minute walk
+feeder when walking leaves home later. All 248 package tests in 39 suites
+pass with `ROUTING_VERIFY_KERNEL=1 swift test --no-parallel`.
+
+The new regression fails against the original policy and passes against the
+updated policy. App simulator build was attempted but is blocked by an
+existing workspace inconsistency at
+`MobiliteitRouteService.swift:108`: `addingMapTransferWalks` is still called
+while its defining files are deleted in unrelated in-progress changes.
