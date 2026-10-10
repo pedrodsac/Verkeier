@@ -1,5 +1,13 @@
 # Route calculation performance
 
+The 10 October implementation reuses immutable timetable work, indexes live
+evidence, reduces compact-kernel allocations and shares measured walking paths
+with bike alternatives. Diagnostics now retain every pass and round, with
+operation-relative spans and opt-in transport metrics. The exact-equivalence
+contract preserves all search and live-acquisition budgets. Current paired
+measurements and validation are in [10 October validation](benchmarks/routing-equivalence-2026-10-10/validation.md).
+Earlier results below describe their original revisions and measurement scope.
+
 The 8 October correction makes live evidence part of transfer discovery before
 the first result. Selected and alternative lines share one concurrent batch;
 CPU work cannot consume required acquisition for initial or newly selected
@@ -173,6 +181,6 @@ xcodebuild -project Verkeier.xcodeproj -scheme Verkeier \
   -destination 'platform=iOS Simulator,name=iPhone 17' -enableCodeCoverage NO test
 ```
 
-The script defaults to 20 warm and ten cold samples; `--warm`, `--cold` and `--device` allow an explicit audit configuration. It writes logs, `samples.json` and `summary.json`. A simulator launch without `--routing-benchmark` opens the normal app. Debug is measured by building with `-configuration Debug` and passing the Debug app path. Use `--p95-limit-ms 0` for the separate Debug audit. By default the script exits with an error if any measured scenario/process p95 exceeds 5,000 ms. Debug measurements do not satisfy the Release gate.
+The script now defaults to two warm and two fresh-process samples, plus one priming operation, and enforces five operations maximum per case. `--warm`, `--cold` and `--device` allow an explicit audit configuration within that limit. It writes logs, `samples.json` and `summary.json`. A simulator launch without `--routing-benchmark` opens the normal app. Debug is measured by building with `-configuration Debug` and passing the Debug app path. Use `--maximum-limit-ms 0` to disable the latency gate for an audit. By default the script exits with an error if any operation reaches 5,000 ms. Debug measurements do not satisfy the Release gate.
 
 In the MobiliteitKit checkout, `ROUTING_VERIFY_KERNEL=1 swift test --disable-automatic-resolution --no-parallel` runs the offline differential suite. The opt-in `InstalledTimetableBenchmarkTests` accepts `ROUTING_BENCHMARK_DATABASE=/absolute/installed/timetable.sqlite`; it never downloads feeds or contacts ATP. Full-feed reference verification should run separately from timing samples because it deliberately computes both kernels.

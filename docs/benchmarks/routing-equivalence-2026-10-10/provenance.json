@@ -1,0 +1,47 @@
+{
+  "appSource": "7a80d6d",
+  "package": "ca066cd0c666dd0fb7f9c085eba221234f62017f",
+  "baselineAppSource": "b91fc4e",
+  "baselinePackage": "91ad7171201b0c0bb21e5f94e04ecceb38fdb6b6",
+  "environment": {
+    "macOS": "27.0.1 (26A434)",
+    "xcode": "27.0 (27A266a)",
+    "host": "M4 MacBook Air, 10 CPU cores, 16 GB RAM",
+    "simulator": "iPhone 17, iOS 27",
+    "physical": "iPhone 13, unavailable for final measurements"
+  },
+  "sha256": {
+    "feed": "fd855d3cf1b6fb775791b6f086948fd2ef6c50cb42fa424bddad5c0f6de80b9c",
+    "walkingArchive": "0dd7dd3357e6962b251aaa494063f092cddc50c16e972f20a618e93df4f1600b",
+    "walkingManifest": "8b173e7b82ec6a98e0dbd99a955f71564b69915313c024284017802e3d28532f",
+    "BaselineExecutable": "c95b2b29d18e34a52780579bcbab6f81e8b726f7ca316567112d3d56d8868a64",
+    "OptimizedExecutable": "562d67e345f9fad4b6cbefe1a601e3c8ca8d4a69decfca299039348b9c8bf51f",
+    "CapturedBaselineExecutable": "3d28f8f39cdb64856ac282003bd7004700d4ba1ab2e9cf0970b96ad62f52271e",
+    "LiveOptimizedExecutable": "1efc4ac080738ba8522f96c3a72d5f9e83c8f413e359749b9852e6e74fd3fdf1",
+    "SettledBaselineExecutable": "11d017a201a57e5b1eb1a001960c0936fc24a2545e0550f21f28e4a5e7346ba4",
+    "SettledOptimizedExecutable": "1ac92c2f251d8a57f7c8c284632136f3d98b571607907cd14a2f15067037ad30"
+  },
+  "rawArtifacts": "/tmp/verkeier-routing-implementation-2026-10-10",
+  "timingHarness": "First-render snapshots for controlled/captured timings; completed walking refinements and full plans for settled quality checks.",
+  "historicalSelection": "Morning/arrival/exact/paging: first priming, first two warm and first two fresh samples recovered from pre-cap runs. Live departure baseline: first five records recovered from pre-cap run.",
+  "buildInputs": "Clean source archive plus the existing ignored walking archive and manifest; unrelated working-tree changes excluded.",
+  "testResults": {
+    "package": {
+      "tests": 232,
+      "suites": 34,
+      "kernelVerification": true
+    },
+    "releaseApp": {
+      "tests": 189,
+      "suites": 33
+    },
+    "nativeReplay": {
+      "operations": 18,
+      "journeys": 126,
+      "differences": [],
+      "canonicalSHA256": "cee3f0235e4fc48fbc715fb4db85ec3ab471893e99d133d6517ef51b20e465bd"
+    },
+    "signedReleaseBuild": true,
+    "physicalFinalTimings": false
+  }
+}

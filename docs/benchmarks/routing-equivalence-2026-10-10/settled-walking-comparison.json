@@ -1,0 +1,200 @@
+[
+  {
+    "case": "arrival-earlier",
+    "comparisons": [
+      {
+        "scenario": "arrival-earlier",
+        "process": "priming",
+        "samples": 1,
+        "before_ms": 693.021375,
+        "after_ms": 656.866958,
+        "change_percent": -5.2169266784880985,
+        "before_memory_bytes": 754221056,
+        "after_memory_bytes": 746323968,
+        "compared_fields": [
+          "planningTime",
+          "avoidTightTransfers",
+          "recommendedOption",
+          "options",
+          "unfilteredJourneys",
+          "journeys",
+          "displayedLegs",
+          "realtimeCoverage",
+          "refreshPolicy",
+          "canonicalPlans",
+          "canonicalSupplementalPlans",
+          "matchingRejections"
+        ],
+        "unavailable_fields": [
+          "modePreference",
+          "canLoadEarlier",
+          "canLoadLater",
+          "supplementalOptions"
+        ]
+      },
+      {
+        "scenario": "arrival-earlier",
+        "process": "warm",
+        "samples": 1,
+        "before_ms": 586.473167,
+        "after_ms": 582.168709,
+        "change_percent": -0.7339565119438674,
+        "before_memory_bytes": 761724928,
+        "after_memory_bytes": 754728960,
+        "compared_fields": [
+          "planningTime",
+          "avoidTightTransfers",
+          "recommendedOption",
+          "options",
+          "unfilteredJourneys",
+          "journeys",
+          "displayedLegs",
+          "realtimeCoverage",
+          "refreshPolicy",
+          "canonicalPlans",
+          "canonicalSupplementalPlans",
+          "matchingRejections"
+        ],
+        "unavailable_fields": [
+          "modePreference",
+          "canLoadEarlier",
+          "canLoadLater",
+          "supplementalOptions"
+        ]
+      }
+    ],
+    "differences": []
+  },
+  {
+    "case": "deep-earlier",
+    "comparisons": [
+      {
+        "scenario": "arrival-earlier",
+        "process": "priming",
+        "samples": 1,
+        "before_ms": 742.154375,
+        "after_ms": 675.839875,
+        "change_percent": -8.935405117028372,
+        "before_memory_bytes": 774340608,
+        "after_memory_bytes": 760463360,
+        "compared_fields": [
+          "planningTime",
+          "avoidTightTransfers",
+          "recommendedOption",
+          "options",
+          "unfilteredJourneys",
+          "journeys",
+          "displayedLegs",
+          "realtimeCoverage",
+          "refreshPolicy",
+          "canonicalPlans",
+          "canonicalSupplementalPlans",
+          "matchingRejections"
+        ],
+        "unavailable_fields": [
+          "modePreference",
+          "canLoadEarlier",
+          "canLoadLater",
+          "supplementalOptions"
+        ]
+      },
+      {
+        "scenario": "arrival-earlier",
+        "process": "warm",
+        "samples": 1,
+        "before_ms": 634.723125,
+        "after_ms": 634.024708,
+        "change_percent": -0.11003490695252749,
+        "before_memory_bytes": 783810560,
+        "after_memory_bytes": 770375680,
+        "compared_fields": [
+          "planningTime",
+          "avoidTightTransfers",
+          "recommendedOption",
+          "options",
+          "unfilteredJourneys",
+          "journeys",
+          "displayedLegs",
+          "realtimeCoverage",
+          "refreshPolicy",
+          "canonicalPlans",
+          "canonicalSupplementalPlans",
+          "matchingRejections"
+        ],
+        "unavailable_fields": [
+          "modePreference",
+          "canLoadEarlier",
+          "canLoadLater",
+          "supplementalOptions"
+        ]
+      }
+    ],
+    "differences": []
+  },
+  {
+    "case": "deep-later",
+    "comparisons": [
+      {
+        "scenario": "arrival-later",
+        "process": "priming",
+        "samples": 1,
+        "before_ms": 356.019334,
+        "after_ms": 342.69475,
+        "change_percent": -3.7426574142178537,
+        "before_memory_bytes": 639369216,
+        "after_memory_bytes": 635600896,
+        "compared_fields": [
+          "planningTime",
+          "avoidTightTransfers",
+          "recommendedOption",
+          "options",
+          "unfilteredJourneys",
+          "journeys",
+          "displayedLegs",
+          "realtimeCoverage",
+          "refreshPolicy",
+          "canonicalPlans",
+          "canonicalSupplementalPlans",
+          "matchingRejections"
+        ],
+        "unavailable_fields": [
+          "modePreference",
+          "canLoadEarlier",
+          "canLoadLater",
+          "supplementalOptions"
+        ]
+      },
+      {
+        "scenario": "arrival-later",
+        "process": "warm",
+        "samples": 1,
+        "before_ms": 735.32625,
+        "after_ms": 698.701291,
+        "change_percent": -4.980776764055406,
+        "before_memory_bytes": 768655360,
+        "after_memory_bytes": 759119872,
+        "compared_fields": [
+          "planningTime",
+          "avoidTightTransfers",
+          "recommendedOption",
+          "options",
+          "unfilteredJourneys",
+          "journeys",
+          "displayedLegs",
+          "realtimeCoverage",
+          "refreshPolicy",
+          "canonicalPlans",
+          "canonicalSupplementalPlans",
+          "matchingRejections"
+        ],
+        "unavailable_fields": [
+          "modePreference",
+          "canLoadEarlier",
+          "canLoadLater",
+          "supplementalOptions"
+        ]
+      }
+    ],
+    "differences": []
+  }
+]

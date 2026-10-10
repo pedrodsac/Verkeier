@@ -1,0 +1,335 @@
+{
+  "comparisons": [
+    {
+      "scenario": "cached",
+      "process": "cold",
+      "samples": 2,
+      "before_ms": 464.6198545,
+      "after_ms": 464.2284165,
+      "change_percent": -0.08424909013439175,
+      "before_memory_bytes": 802701312.0,
+      "after_memory_bytes": 801423360.0,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "matchingRejections"
+      ],
+      "unavailable_fields": [
+        "modePreference",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ]
+    },
+    {
+      "scenario": "cached",
+      "process": "priming",
+      "samples": 1,
+      "before_ms": 439.876583,
+      "after_ms": 456.070875,
+      "change_percent": 3.681553559762918,
+      "before_memory_bytes": 803553280,
+      "after_memory_bytes": 802340864,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "matchingRejections"
+      ],
+      "unavailable_fields": [
+        "modePreference",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ]
+    },
+    {
+      "scenario": "cached",
+      "process": "warm",
+      "samples": 2,
+      "before_ms": 443.9282505,
+      "after_ms": 452.086229,
+      "change_percent": 1.8376795103288934,
+      "before_memory_bytes": 804298752.0,
+      "after_memory_bytes": 803561472.0,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "matchingRejections"
+      ],
+      "unavailable_fields": [
+        "modePreference",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ]
+    },
+    {
+      "scenario": "live-esch",
+      "process": "cold",
+      "samples": 2,
+      "before_ms": 1154.54925,
+      "after_ms": 1241.442833,
+      "change_percent": 7.526191108781211,
+      "before_memory_bytes": 801947648.0,
+      "after_memory_bytes": 798662656.0,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "matchingRejections"
+      ],
+      "unavailable_fields": [
+        "modePreference",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ]
+    },
+    {
+      "scenario": "live-esch",
+      "process": "priming",
+      "samples": 1,
+      "before_ms": 1194.063708,
+      "after_ms": 1197.523083,
+      "change_percent": 0.2897144412666641,
+      "before_memory_bytes": 799735808,
+      "after_memory_bytes": 800489472,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "matchingRejections"
+      ],
+      "unavailable_fields": [
+        "modePreference",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ]
+    },
+    {
+      "scenario": "live-esch",
+      "process": "warm",
+      "samples": 2,
+      "before_ms": 568.7834795,
+      "after_ms": 531.3125835000001,
+      "change_percent": -6.587901609403179,
+      "before_memory_bytes": 805847040.0,
+      "after_memory_bytes": 806633472.0,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "matchingRejections"
+      ],
+      "unavailable_fields": [
+        "modePreference",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ]
+    },
+    {
+      "scenario": "live-now",
+      "process": "priming",
+      "samples": 1,
+      "before_ms": 2536.600583,
+      "after_ms": 2397.004916,
+      "change_percent": -5.503257703855857,
+      "before_memory_bytes": 868581376,
+      "after_memory_bytes": 866189312,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "matchingRejections"
+      ],
+      "unavailable_fields": [
+        "modePreference",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ]
+    },
+    {
+      "scenario": "live-now",
+      "process": "warm",
+      "samples": 4,
+      "before_ms": 1677.4091870000002,
+      "after_ms": 1532.7374375,
+      "change_percent": -8.624714268957934,
+      "before_memory_bytes": 878723072.0,
+      "after_memory_bytes": 873570304.0,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "matchingRejections"
+      ],
+      "unavailable_fields": [
+        "modePreference",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ]
+    },
+    {
+      "scenario": "live-reverse",
+      "process": "cold",
+      "samples": 2,
+      "before_ms": 2112.542521,
+      "after_ms": 2038.5537505,
+      "change_percent": -3.5023565094905784,
+      "before_memory_bytes": 877355008.0,
+      "after_memory_bytes": 883441664.0,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "matchingRejections"
+      ],
+      "unavailable_fields": [
+        "modePreference",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ]
+    },
+    {
+      "scenario": "live-reverse",
+      "process": "priming",
+      "samples": 1,
+      "before_ms": 2117.113417,
+      "after_ms": 2107.595833,
+      "change_percent": -0.4495547533531208,
+      "before_memory_bytes": 880574464,
+      "after_memory_bytes": 877936640,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "matchingRejections"
+      ],
+      "unavailable_fields": [
+        "modePreference",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ]
+    },
+    {
+      "scenario": "live-reverse",
+      "process": "warm",
+      "samples": 2,
+      "before_ms": 1364.3784795000001,
+      "after_ms": 1322.6946875,
+      "change_percent": -3.055148745476821,
+      "before_memory_bytes": 888274944.0,
+      "after_memory_bytes": 886456320.0,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "matchingRejections"
+      ],
+      "unavailable_fields": [
+        "modePreference",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ]
+    }
+  ],
+  "differences": []
+}
