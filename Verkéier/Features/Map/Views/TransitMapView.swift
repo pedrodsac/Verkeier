@@ -99,6 +99,15 @@ struct TransitMapView: UIViewRepresentable {
             guard appliedState != state else { return }
             let previous = appliedState
 
+            let showsRoute = state.routeOverlay != nil
+            if previous == nil || (previous?.routeOverlay != nil) != showsRoute {
+                let configuration = MKStandardMapConfiguration(elevationStyle: .flat)
+                configuration.pointOfInterestFilter = showsRoute
+                    ? .excludingAll
+                    : MKPointOfInterestFilter(excluding: [.publicTransport])
+                mapView.preferredConfiguration = configuration
+            }
+
             if appliedCameraUpdateToken != state.cameraUpdateToken {
                 coordinator.isApplyingRegion = true
                 mapView.setRegion(state.region, animated: appliedCameraUpdateToken != nil)
