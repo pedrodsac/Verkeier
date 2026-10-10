@@ -17,6 +17,10 @@ struct RouteTimelineView: View {
                 // Vertical leg-by-leg timeline
                 RouteLegList(legs: selectedOption.plan.legs, legAlerts: viewModel.legAlerts)
 
+                if let message = viewModel.statusMessage {
+                    RouteStatusMessage(text: message)
+                }
+
                 // Journey alerts
                 if !viewModel.alerts.isEmpty {
                     RouteAlertsSection(alerts: viewModel.alerts)

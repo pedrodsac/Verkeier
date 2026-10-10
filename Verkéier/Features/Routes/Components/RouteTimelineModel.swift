@@ -119,6 +119,7 @@ struct SegmentNode: Identifiable, Equatable {
     let distanceMeters: Double?
     let rail: RailStyle
     let bikeShareDetails: BikeShareLegDetails?
+    var tripSelection: TripDetailSelection? = nil
 }
 
 // MARK: - Builder
@@ -259,7 +260,8 @@ enum RouteTimelineBuilder {
             stopCount: kind == .transit ? leg.stopCount : nil,
             distanceMeters: kind == .transit ? nil : leg.distanceMeters,
             rail: railStyle(for: leg),
-            bikeShareDetails: leg.bikeShareDetails
+            bikeShareDetails: leg.bikeShareDetails,
+            tripSelection: TripDetailSelection(leg: leg)
         )
     }
 

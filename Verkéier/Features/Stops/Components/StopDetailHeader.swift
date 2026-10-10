@@ -6,9 +6,21 @@ struct StopDetailHeader: View {
     let selectedLine: String?
     let showDirections: () -> Void
     let toggleDepartureLine: (TransitRoute) -> Void
+	
+	let availablePlatforms: [String]
+	let selectedPlatform: String?
+	let selectDeparturePlatform: (String?) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
+			if !availablePlatforms.isEmpty {
+				PlatformFilterPicker(
+					platforms: availablePlatforms,
+					selectedPlatform: selectedPlatform,
+					selectPlatform: selectDeparturePlatform
+				)
+			}
+			
             StopMetadataPanel(
                 routes: routes,
                 selectedLine: selectedLine,

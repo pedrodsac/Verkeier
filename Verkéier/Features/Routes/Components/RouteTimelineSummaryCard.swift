@@ -18,10 +18,6 @@ struct RouteTimelineSummaryCard: View {
                     .foregroundStyle(.primary)
 
                 Spacer(minLength: 8)
-
-                if !option.isVelohOnly, !option.isWalkingOnly {
-                    RouteOptionBadge(status: option.status(at: .now))
-                }
             }
 
             RouteRibbon(legs: option.plan.legs)

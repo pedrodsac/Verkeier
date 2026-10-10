@@ -135,7 +135,8 @@ extension TransitMapScreen {
                 gtfsStatus: viewModel.gtfsFeedStatus,
                 supportBundleText: settingsSupportBundleText,
                 debugDataMode: debugTransitDataMode
-            )
+            ),
+            tripDetail: tripDetailViewModel
         )
     }
 

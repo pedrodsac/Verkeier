@@ -38,35 +38,6 @@ final class StopMapAnnotation: NSObject, MKAnnotation {
     }
 }
 
-final class RouteTransferAnnotation: NSObject, MKAnnotation {
-    private var marker: RouteTransferMarker
-
-    var key: String {
-        marker.id
-    }
-
-    @objc dynamic var coordinate: CLLocationCoordinate2D {
-        marker.coordinate.coordinate
-    }
-
-    @objc dynamic var title: String? {
-        marker.title
-    }
-
-    nonisolated init(marker: RouteTransferMarker) {
-        self.marker = marker
-    }
-
-    func update(from annotation: RouteTransferAnnotation) {
-        guard marker != annotation.marker else { return }
-        willChangeValue(forKey: "coordinate")
-        willChangeValue(forKey: "title")
-        marker = annotation.marker
-        didChangeValue(forKey: "title")
-        didChangeValue(forKey: "coordinate")
-    }
-}
-
 final class BikeShareMapAnnotation: NSObject, MKAnnotation {
     private(set) var station: BikeShareStation
 

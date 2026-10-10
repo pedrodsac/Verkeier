@@ -10,6 +10,7 @@ extension EnvironmentValues {
     @Entry var placeSearchService: any PlaceSearchService = LivePlaceSearchService()
     @Entry var gtfsService: any GTFSService = UnavailableGTFSService()
     @Entry var liveTransitService: any LiveTransitService = UnavailableLiveTransitService()
+    @Entry var tripDetailService: any TripDetailService = UnavailableTripDetailService()
     @Entry var routeService: any RouteService = MapKitRouteService()
     @Entry var walkingRouter: any WalkingRouting = UnavailableWalkingRouter()
     @Entry var avlClient: any AVLClient = LiveAVLClient(

@@ -116,8 +116,14 @@ struct TransitSheetDestinationView: View {
                 )
                 .safeAreaPadding(.horizontal, 16)
             }
+            .refreshable { await actions.refreshRouteRealtime() }
             .navigationTitle(route.navigationTitle)
             .toolbarTitleDisplayMode(.inline)
+
+        case let .tripDetail(selection):
+            if let model = viewModel.tripDetail {
+                TripDetailView(selection: selection, viewModel: model, refresh: actions.refreshTripDetail)
+            }
 
         case .lineDetail:
             LineDetailView(

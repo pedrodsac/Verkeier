@@ -305,9 +305,14 @@ actor MobiliteitGTFSService: GTFSService {
         }
         upcoming.sort { $0.departureTime < $1.departureTime }
         let geometry = await routeShape(for: representative.id)
-        let overlay = geometry.count >= 2 ? RouteMapOverlay(segments: [
-            RouteMapSegment(id: "line:\(route.id):\(selected)", mode: route.mode, routeName: route.shortName, routeId: route.id, coordinates: geometry)
-        ]) : nil
+        let publicShortName = (try? await store.route(id: route.id))?.shortName
+        let overlay = geometry.count >= 2 ? RouteMapOverlayBuilder.line(
+            segment: RouteMapSegment(id: "line:\(route.id):\(selected)", mode: route.mode,
+                routeName: route.shortName, routeId: route.id, coordinates: geometry, routeShortName: publicShortName),
+            stops: stops.enumerated().map { index, stop in
+                RouteStopOccurrence(id: "visit-\(index)", stopID: stop.id, name: stop.name,
+                    coordinate: RouteMapCoordinate(stop.location))
+            }) : nil
         return LineDetail(
             route: route,
             directions: directions,
@@ -569,7 +574,7 @@ private extension MobiliteitGTFSService {
         }
     }
 
-    nonisolated static func stop(
+    internal nonisolated static func stop(
         _ source: MobiliteitKit.TransitStop,
         routes: [MobiliteitKit.TransitRoute] = [],
         hafasStationIDs: [String] = [],

@@ -97,7 +97,11 @@ nonisolated struct BikeShareRoutePlanner: Sendable {
                 destination: dropoff.location, departureTime: bikeStart, arrivalTime: bikeEnd,
                 distanceMeters: ride.distanceMeters, mapCoordinates: ride.coordinates,
                 roadRoutingHint: .bicycle, bikeShareDetails: .init(pickupStation: pickup,
-                    returnStation: dropoff, isAvailabilityWarning: warning)),
+                    returnStation: dropoff, isAvailabilityWarning: warning),
+                mapStops: [
+                    .init(id: "pickup", stopID: pickup.id, name: pickup.name, coordinate: RouteMapCoordinate(pickup.location)),
+                    .init(id: "return", stopID: dropoff.id, name: dropoff.name, coordinate: RouteMapCoordinate(dropoff.location))
+                ]),
             RoutePlan.Leg(id: "\(id)-egress", mode: .walking, transportKind: .walking,
                 origin: dropoff.location, destination: destination, departureTime: bikeEnd,
                 arrivalTime: start.addingTimeInterval(duration), distanceMeters: egress.distanceMeters,
@@ -105,9 +109,6 @@ nonisolated struct BikeShareRoutePlanner: Sendable {
         ]
         return RouteOption(id: id, plan: RoutePlan(id: id, origin: origin, destination: destination,
             expectedTravelTime: duration, distanceMeters: access.distanceMeters + ride.distanceMeters + egress.distanceMeters,
-            legs: legs, dataSource: .local), mapOverlay: RouteMapOverlay(segments: legs.map {
-                RouteMapSegment(id: $0.id, mode: $0.mode, routeName: $0.routeName,
-                                routeId: nil, coordinates: $0.mapCoordinates)
-            }))
+            legs: legs, dataSource: .local), mapOverlay: RouteMapOverlayBuilder.itinerary(legs: legs))
     }
 }

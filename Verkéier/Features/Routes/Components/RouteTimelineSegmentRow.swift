@@ -33,7 +33,7 @@ struct TimelineSegmentRow: View {
             .frame(width: RouteTimelineLayout.railColumnWidth)
             .offset(x: timeColumnWidth + RouteTimelineLayout.columnSpacing)
         }
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: node.tripSelection == nil ? .combine : .contain)
         .accessibilityLabel(accessibilityLabel)
     }
 
@@ -42,11 +42,16 @@ struct TimelineSegmentRow: View {
         switch node.kind {
         case .transit:
             VStack(alignment: .leading, spacing: RouteTimelineLayout.blockLineSpacing) {
-                TimelineTransitBadge(
-                    routeText: node.badgeText ?? node.mode.displayName,
-                    mode: node.mode,
-                    direction: node.headsign
-                )
+                if let selection = node.tripSelection {
+                    NavigationLink(value: TransitSheetRoute.tripDetail(selection)) {
+                        transitBadge
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(accessibilityLabel)
+                    .accessibilityHint("Shows every stop and its live status")
+                } else {
+                    transitBadge
+                }
                 if let mins = node.durationMinutes {
                     Text(durationText(minutes: mins, stopCount: node.stopCount))
                         .font(.footnote)
@@ -81,6 +86,11 @@ struct TimelineSegmentRow: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    private var transitBadge: some View {
+        TimelineTransitBadge(routeText: node.badgeText ?? node.mode.displayName,
+            mode: node.mode, direction: node.headsign)
     }
 
     private var walkText: String {

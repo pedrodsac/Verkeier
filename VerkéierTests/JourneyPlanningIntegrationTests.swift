@@ -7,6 +7,26 @@ import ZIPFoundation
 @Suite("Journey planning package integration")
 @MainActor
 struct JourneyPlanningIntegrationTests {
+    @Test("Native stop occurrences reach journey and trip trace overlays")
+    func sourceStopsReachTraceOverlays() async throws {
+        let fixture = try await JourneyIntegrationFixture(withIntermediate: true)
+        defer { fixture.remove() }
+        let service = MobiliteitRouteService(databaseURL: fixture.database,
+            walkingRouter: IntegrationWalkingRouter(), roadRouteProvider: IntegrationRoadProvider())
+        let result = try await service.calculateRoute(from: fixture.origin, to: fixture.destination,
+            time: .departAt(fixture.anchor), filters: .init(), realtimeRefreshPolicy: .scheduleOnly)
+        let option = try #require(result.options.first)
+        let ride = try #require(option.transitLegs.first)
+        #expect(ride.mapStops?.map(\.stopID) == ["origin", "middle", "destination"])
+        #expect(ride.routeShortName == "10")
+        #expect(option.mapOverlay?.stopMarkers.map(\.stopID) == ["origin", "middle", "destination"])
+        let trip = try await service.tripDetail(for: #require(TripDetailSelection(leg: ride)), refreshPolicy: .scheduleOnly)
+        #expect(trip.mapOverlay.stopMarkers.map(\.stopID) == ["origin", "middle", "destination"])
+        #expect(trip.mapOverlay.stopMarkers.map(\.role) == [.boarding, .intermediate, .alighting])
+        #expect(trip.mapOverlay.segments.allSatisfy { $0.routeShortName == "10" })
+        #expect(trip.mapOverlay.segments.allSatisfy { $0.isApproximate == true })
+    }
+
     @Test("A reachable bike remains available when the timetable has no journey")
     func bikeWithoutTransit() async throws {
         let fixture = try await JourneyIntegrationFixture()
@@ -45,6 +65,11 @@ struct JourneyPlanningIntegrationTests {
         #expect(!initial.options.isEmpty)
         #expect(initial.options.allSatisfy { !$0.usesBikeShare })
         let original = try #require(initial.options.first)
+        let ride = try #require(original.transitLegs.first)
+        #expect(ride.mapStops?.first?.stopID == ride.originStopId)
+        #expect(ride.mapStops?.last?.stopID == ride.destinationStopId)
+        #expect(original.mapOverlay?.segments.first(where: { $0.id == ride.id })?.routeShortName == ride.routeShortName)
+        #expect(original.mapOverlay?.stopMarkers.isEmpty == false)
         var snapshots = 0
         for await event in service.refinementEvents(in: [original], context: initial.validationContext) {
             if case let .calculation(updated) = event {
@@ -227,7 +252,7 @@ private struct JourneyIntegrationFixture {
     var origin: LocationPoint { .init(latitude: 49.5999, longitude: 6.1) }
     var destination: LocationPoint { .init(latitude: 49.61, longitude: 6.1, transitStopID: "destination") }
 
-    init(withTransfer: Bool = false) async throws {
+    init(withTransfer: Bool = false, withIntermediate: Bool = false) async throws {
         directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let zip = directory.appendingPathComponent("fixture.zip")
@@ -241,6 +266,11 @@ private struct JourneyIntegrationFixture {
             "trips.txt": "route_id,service_id,trip_id,shape_id\nbus,service,first,shape\nbus,service,second,shape\nbus,service,third,shape\n",
             "stop_times.txt": "trip_id,arrival_time,departure_time,stop_id,stop_sequence\nfirst,08:05:00,08:05:00,origin,1\nfirst,08:25:00,08:25:00,destination,2\nsecond,08:10:00,08:10:00,origin,1\nsecond,08:30:00,08:30:00,destination,2\nthird,08:20:00,08:20:00,origin,1\nthird,08:40:00,08:40:00,destination,2\n"
         ]
+        if withIntermediate {
+            files["stops.txt"]! += "middle,Middle,49.605,6.11\n"
+            files["stop_times.txt"] = files["stop_times.txt"]!.replacingOccurrences(of: ",destination,2", with: ",destination,3")
+            files["stop_times.txt"]! += "first,08:15:00,08:15:00,middle,2\nsecond,08:20:00,08:20:00,middle,2\nthird,08:30:00,08:30:00,middle,2\n"
+        }
         if withTransfer {
             files["routes.txt"]! += "connecting,operator,20,3\n"
             files["stops.txt"]! += "transfer,Transfer,49.605,6.1\n"

@@ -5,7 +5,7 @@ import MobiliteitKit
 /// Presentation adapter. Transit policy and request state belong to MobiliteitKit.
 struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
     let databaseURL: URL
-    private let gtfsService: (any GTFSService)?
+    let gtfsService: (any GTFSService)?
     let engine: JourneyPlanner
     let sessions: AppJourneySessionStore
     private let walkingRouter: any WalkingRouting
@@ -106,7 +106,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         return calculation
     }
 
-    private nonisolated func readyDatabaseURL() async throws -> URL {
+    nonisolated func readyDatabaseURL() async throws -> URL {
         var activeDatabaseURL = databaseURL
         if let service = gtfsService as? MobiliteitGTFSService {
             if let installedDatabaseURL = await service.routingDatabaseURL() {
@@ -179,10 +179,19 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                 if let risk = planningResult.transferRisks[journey.id]?[nativeIndex] {
                     result.transferWarning = risk == .tight ? "Tight transfer" : "Connection miss"
                 }
+                result.routeShortName = transit.route.shortName
+                result.mapStops = ([transit.board] + transit.intermediateStops + [transit.alight])
+                    .enumerated().map { index, event in
+                        RouteStopOccurrence(id: "visit-\(index)", stopID: event.stop.id,
+                            name: event.stop.name, coordinate: RouteMapCoordinate(
+                                latitude: event.stop.coordinate.latitude, longitude: event.stop.coordinate.longitude))
+                    }
                 result.departureTimingSource = Self.timingSource(transit.board.timingSource)
                 result.arrivalTimingSource = Self.timingSource(transit.alight.timingSource)
                 result.requiredTransferSeconds = transit.requiredTransferSecondsAfterWalking
                 result.requiredTotalTransferSeconds = transit.requiredTotalTransferSeconds
+                result.tripInstance = transit.instance.map { .init(feedGeneration: $0.feedGeneration,
+                    tripID: $0.tripID, serviceDate: $0.serviceDate.compactString) }
                 result.transitInstanceKey = transit.instance?.stableKey
                 result.boardingStopSequence = transit.boardSequence
                 result.alightingStopSequence = transit.alightSequence
@@ -200,10 +209,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                              expectedTravelTime: journey.duration,
                              distanceMeters: journey.walkingDistance,
                              legs: legs, dataSource: .local)
-        let overlay = RouteMapOverlay(segments: legs.compactMap { leg in
-            guard leg.mapCoordinates.count >= 2 else { return nil }
-            return RouteMapSegment(id: leg.id, mode: leg.mode, routeName: leg.routeName, routeId: leg.routeId, coordinates: leg.mapCoordinates)
-        })
+        let overlay = RouteMapOverlayBuilder.itinerary(legs: legs)
         return RouteOption(
             id: journey.id.value, plan: plan,
             mapOverlay: overlay.segments.isEmpty ? nil : overlay,
