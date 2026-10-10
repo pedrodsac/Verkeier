@@ -18,7 +18,7 @@ nonisolated enum TripStopPresentation {
     static let maximumAge: TimeInterval = 120
 
     static func rows(snapshot: TripDetailSnapshot, selection: TripDetailSelection,
-        now: Date, refreshFailed: Bool) -> [TripStopRowModel] {
+        now: Date, refreshFailed: Bool, highlightsRide: Bool = true) -> [TripStopRowModel] {
         func fresh(_ timing: TripStopTiming) -> Bool {
             timing.observedAt.map { now.timeIntervalSince($0) <= maximumAge && $0 <= now.addingTimeInterval(60) } ?? false
         }
@@ -64,7 +64,7 @@ nonisolated enum TripStopPresentation {
                 scheduledTime: timing?.scheduled, liveTime: minutes == 0 ? nil : timing?.realtime,
                 status: status, accessibilityStatus: accessibilityStatus, statusTint: tint,
                 isPassed: passedSequence.map { entry.sequence <= $0 } ?? false,
-                isInRide: selection.boardingSequence...selection.alightingSequence ~= entry.sequence)
+                isInRide: highlightsRide && selection.boardingSequence...selection.alightingSequence ~= entry.sequence)
         }
     }
 

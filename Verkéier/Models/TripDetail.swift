@@ -18,6 +18,19 @@ nonisolated struct TripDetailSelection: Hashable, Sendable {
     let routeID: String?
     let rideCoordinates: [RouteMapCoordinate]
 
+    init(instance: TripRunIdentity, boardingSequence: Int, alightingSequence: Int,
+         lineName: String, routeShortName: String?, headsign: String?, mode: TransportMode, routeID: String?) {
+        self.instance = instance
+        self.boardingSequence = boardingSequence
+        self.alightingSequence = alightingSequence
+        self.lineName = lineName
+        self.routeShortName = routeShortName
+        self.headsign = headsign
+        self.mode = mode
+        self.routeID = routeID
+        rideCoordinates = []
+    }
+
     init?(leg: RoutePlan.Leg) {
         guard leg.transportKind == .transit, let instance = leg.tripInstance,
               let boarding = leg.boardingStopSequence, let alighting = leg.alightingStopSequence, boarding <= alighting else { return nil }
@@ -58,4 +71,5 @@ nonisolated struct TripDetailSnapshot: Hashable, Sendable {
     let liveDataAvailable: Bool
     let isCancelled: Bool
     let fetchedAt: Date
+    var continuations: [TripDetailContinuation] = []
 }

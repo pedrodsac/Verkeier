@@ -6,6 +6,8 @@ final class TripDetailViewModel {
     private(set) var selection: TripDetailSelection?
     private(set) var snapshot: TripDetailSnapshot?
     private(set) var rows: [TripStopRowModel] = []
+    private(set) var continuations: [TripContinuationSection] = []
+    private var requestFailed = false
     private(set) var isLoading = false
     private(set) var errorMessage: String?
     private(set) var refreshFailed = false
@@ -21,6 +23,8 @@ final class TripDetailViewModel {
         self.selection = selection
         snapshot = nil
         rows = []
+        continuations = []
+        requestFailed = false
         errorMessage = nil
         refreshFailed = false
         isLoading = false
@@ -57,27 +61,25 @@ final class TripDetailViewModel {
             guard !Task.isCancelled, expected == generation, revision == refreshRevision,
                   loaded.instance == selection.instance else { return }
             guard !loaded.stops.isEmpty else { throw TripDetailError.unavailable }
-            if !loaded.liveDataAvailable, let snapshot {
-                // A failed board fetch cannot erase useful live or historical evidence.
-                loaded = TripDetailSnapshot(instance: loaded.instance, stops: snapshot.stops,
-                    mapOverlay: loaded.mapOverlay, isApproximateRoute: loaded.isApproximateRoute,
-                    liveDataAvailable: false, isCancelled: snapshot.isCancelled, fetchedAt: snapshot.fetchedAt)
-            } else if let previous = snapshot {
+            if let previous = snapshot {
                 loaded = retainingHistoricalReports(in: loaded, from: previous)
             }
+            requestFailed = false
             snapshot = loaded
             refreshFailed = !loaded.liveDataAvailable
-            errorMessage = loaded.liveDataAvailable ? nil : "Live data is unavailable. Showing the last available information."
+            errorMessage = loaded.liveDataAvailable && loaded.continuations.allSatisfy { $0.snapshot.liveDataAvailable } ? nil : "Live data is unavailable. Showing the last available information."
             updateProgress()
         } catch is CancellationError { return }
         catch TripDetailError.obsoleteFeed {
             guard !Task.isCancelled, expected == generation, revision == refreshRevision else { return }
             snapshot = nil
             rows = []
+            continuations = []
             errorMessage = TripDetailError.obsoleteFeed.localizedDescription
         } catch {
             guard !Task.isCancelled, expected == generation, revision == refreshRevision else { return }
             refreshFailed = true
+            requestFailed = true
             errorMessage = snapshot == nil ? error.localizedDescription
                 : "Live data could not be refreshed. Showing the last available information."
             updateProgress()
@@ -85,15 +87,22 @@ final class TripDetailViewModel {
     }
 
     func updateProgress() {
-        guard let snapshot, let selection else { rows = []; return }
+        guard let snapshot, let selection else { rows = []; continuations = []; return }
         rows = TripStopPresentation.rows(snapshot: snapshot, selection: selection,
-            now: now(), refreshFailed: refreshFailed)
+            now: now(), refreshFailed: requestFailed || !snapshot.liveDataAvailable)
+        continuations = snapshot.continuations.map { continuation in
+            .init(id: continuation.selection.instance,
+                stopName: continuation.snapshot.stops.first?.stop.fullName ?? "",
+                lineName: continuation.selection.lineName, headsign: continuation.selection.headsign,
+                rows: TripStopPresentation.rows(snapshot: continuation.snapshot, selection: continuation.selection,
+                    now: now(), refreshFailed: requestFailed || !continuation.snapshot.liveDataAvailable, highlightsRide: false))
+        }
     }
 
     private func retainingHistoricalReports(in latest: TripDetailSnapshot,
         from previous: TripDetailSnapshot) -> TripDetailSnapshot {
         let old = Dictionary(uniqueKeysWithValues: previous.stops.map { ($0.sequence, $0) })
-        let stops = latest.stops.map { entry in
+        let stops = latest.liveDataAvailable ? latest.stops.map { entry in
             func retain(_ timing: TripStopTiming?, previous: TripStopTiming?) -> TripStopTiming? {
                 guard timing?.realtime == nil, let previous, previous.isHistoricalReport,
                       let realtime = previous.realtime, realtime <= now() else { return timing }
@@ -103,8 +112,15 @@ final class TripDetailViewModel {
                 arrival: retain(entry.arrival, previous: old[entry.sequence]?.arrival),
                 departure: retain(entry.departure, previous: old[entry.sequence]?.departure), platform: entry.platform)
         }
+        : previous.stops
+        let continuations = latest.continuations.map { continuation in
+            guard let old = previous.continuations.first(where: { $0.selection.instance == continuation.selection.instance }) else { return continuation }
+            return TripDetailContinuation(selection: continuation.selection,
+                snapshot: retainingHistoricalReports(in: continuation.snapshot, from: old.snapshot))
+        }
         return TripDetailSnapshot(instance: latest.instance, stops: stops, mapOverlay: latest.mapOverlay,
             isApproximateRoute: latest.isApproximateRoute, liveDataAvailable: latest.liveDataAvailable,
-            isCancelled: latest.isCancelled, fetchedAt: latest.fetchedAt)
+            isCancelled: latest.liveDataAvailable ? latest.isCancelled : previous.isCancelled,
+            fetchedAt: latest.liveDataAvailable ? latest.fetchedAt : previous.fetchedAt, continuations: continuations)
     }
 }

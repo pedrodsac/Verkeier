@@ -4,6 +4,32 @@ import MobiliteitKit
 extension MobiliteitRouteService: TripDetailService {
     nonisolated func tripDetail(for selection: TripDetailSelection,
         refreshPolicy: RouteRealtimeRefreshPolicy) async throws -> TripDetailSnapshot {
+        var detail = try await singleTripDetail(for: selection, refreshPolicy: refreshPolicy)
+        let database = try await readyDatabaseURL()
+        let router = try await engine.router(for: database)
+        let instance = TransitInstanceIdentity(feedGeneration: selection.instance.feedGeneration,
+            tripID: selection.instance.tripID, serviceDate: try GTFSDate(parsing: selection.instance.serviceDate))
+        let continuations: [TransitContinuingTrip]
+        do { continuations = try await router.continuingTrips(for: instance) }
+        catch TransitTripSnapshotError.obsoleteFeed { throw TripDetailError.obsoleteFeed }
+        for continuation in continuations {
+            try Task.checkCancellation()
+            let route = MobiliteitGTFSService.route(continuation.route, agency: nil)
+            let next = TripDetailSelection(instance: .init(feedGeneration: continuation.instance.feedGeneration,
+                tripID: continuation.instance.tripID, serviceDate: continuation.instance.serviceDate.compactString),
+                boardingSequence: continuation.boardingSequence, alightingSequence: continuation.alightingSequence,
+                lineName: route.shortName, routeShortName: route.shortName, headsign: continuation.headsign,
+                mode: route.mode, routeID: route.id)
+            let snapshot = try await singleTripDetail(for: next, refreshPolicy: refreshPolicy)
+            detail.continuations.append(.init(selection: next, snapshot: snapshot))
+        }
+        let currentRouter = try await engine.router(for: readyDatabaseURL())
+        guard router === currentRouter else { throw TripDetailError.obsoleteFeed }
+        return detail.includingContinuationOverlays()
+    }
+
+    private nonisolated func singleTripDetail(for selection: TripDetailSelection,
+        refreshPolicy: RouteRealtimeRefreshPolicy) async throws -> TripDetailSnapshot {
         let databaseURL = try await readyDatabaseURL()
         let router = try await engine.router(for: databaseURL)
         let instance = TransitInstanceIdentity(feedGeneration: selection.instance.feedGeneration,
