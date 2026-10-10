@@ -90,7 +90,7 @@ extension MobiliteitRouteService {
                     do {
                         if let original = originals[option.id],
                            let result = try await sessions.submit(option, replacing: original) {
-                            continuation.yield(.calculation(calculation(from: result.result,
+                            continuation.yield(.calculation(await calculation(from: result.result,
                                 origin: option.plan.origin, destination: option.plan.destination,
                                 supplemental: result.supplemental)))
                         } else if let context = option.validationContext ?? context {

@@ -13,7 +13,7 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     /// The underlying journey plan.
     let plan: RoutePlan
     /// Pre-built map geometry for drawing the option, if available.
-    let mapOverlay: RouteMapOverlay?
+    var mapOverlay: RouteMapOverlay?
     var feasibility: RouteFeasibility? = nil
     var journeySummary: JourneySummary? = nil
     var statusEvidence: JourneyStatusEvidence? = nil

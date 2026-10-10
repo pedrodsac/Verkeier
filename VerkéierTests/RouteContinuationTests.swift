@@ -89,7 +89,7 @@ struct RouteContinuationTests {
         let a = LocationPoint(name: "A", latitude: 49.6, longitude: 6.1, transitStopID: "a")
         let d = LocationPoint(name: "D", latitude: 49.62, longitude: 6.1, transitStopID: "d")
         let service = MobiliteitRouteService(databaseURL: database, engine: engine)
-        let calculation = service.calculation(from: result, origin: a, destination: d)
+        let calculation = await service.calculation(from: result, origin: a, destination: d)
         let mapped = try #require(calculation.options.first)
         #expect(calculation.isAuthoritativeSnapshot)
         #expect(mapped.plan.legs.count == 2 && mapped.transferCount == 0)

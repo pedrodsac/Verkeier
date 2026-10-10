@@ -7,6 +7,29 @@ import ZIPFoundation
 @Suite("Journey planning package integration")
 @MainActor
 struct JourneyPlanningIntegrationTests {
+    @Test("Platform shape gaps gain pedestrian map segments without itinerary legs")
+    func platformWalkIsOnlyMapGeometry() async throws {
+        let fixture = try await JourneyIntegrationFixture(withTransfer: true, withTransferShapeGap: true)
+        defer { fixture.remove() }
+        let service = MobiliteitRouteService(databaseURL: fixture.database,
+            walkingRouter: IntegrationWalkingRouter(), roadRouteProvider: IntegrationRoadProvider())
+        let origin = LocationPoint(latitude: 49.6, longitude: 6.1, transitStopID: "origin")
+        let result = try await service.calculateRoute(from: origin, to: fixture.destination,
+            time: .departAt(fixture.anchor), filters: .init(), realtimeRefreshPolicy: .scheduleOnly)
+        let option = try #require(result.options.first)
+        #expect(option.plan.legs.count == 2)
+        #expect(option.plan.legs.allSatisfy { $0.transportKind == .transit })
+        #expect(option.journeySummary?.walkingDuration == 0)
+        let path = try #require(option.mapOverlay?.segments.first { $0.mode == .walking })
+        #expect(path.coordinates.first == option.transitLegs.first?.mapCoordinates.last)
+        #expect(path.coordinates.last == option.transitLegs.last?.mapCoordinates.first)
+        #expect(path.isApproximate == false)
+        let refreshed = try await service.calculateRoute(from: origin, to: fixture.destination,
+            time: .departAt(fixture.anchor), filters: .init(), realtimeRefreshPolicy: .scheduleOnly)
+        #expect(refreshed.options.first?.mapOverlay == option.mapOverlay)
+        #expect(refreshed.options.first?.plan == option.plan)
+    }
+
     @Test("Native stop occurrences reach journey and trip trace overlays")
     func sourceStopsReachTraceOverlays() async throws {
         let fixture = try await JourneyIntegrationFixture(withIntermediate: true)
@@ -252,7 +275,7 @@ private struct JourneyIntegrationFixture {
     var origin: LocationPoint { .init(latitude: 49.5999, longitude: 6.1) }
     var destination: LocationPoint { .init(latitude: 49.61, longitude: 6.1, transitStopID: "destination") }
 
-    init(withTransfer: Bool = false, withIntermediate: Bool = false) async throws {
+    init(withTransfer: Bool = false, withIntermediate: Bool = false, withTransferShapeGap: Bool = false) async throws {
         directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let zip = directory.appendingPathComponent("fixture.zip")
@@ -276,6 +299,10 @@ private struct JourneyIntegrationFixture {
             files["stops.txt"]! += "transfer,Transfer,49.605,6.1\n"
             files["trips.txt"] = "route_id,service_id,trip_id\nbus,service,first\nconnecting,service,connection\n"
             files["stop_times.txt"] = "trip_id,arrival_time,departure_time,stop_id,stop_sequence\nfirst,08:05:00,08:05:00,origin,1\nfirst,08:25:00,08:25:00,transfer,2\nconnection,08:30:00,08:30:00,transfer,1\nconnection,08:45:00,08:45:00,destination,2\n"
+            if withTransferShapeGap {
+                files["trips.txt"] = "route_id,service_id,trip_id,shape_id\nbus,service,first,incoming\nconnecting,service,connection,outgoing\n"
+                files["shapes.txt"] = "shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence\nincoming,49.6,6.1,1\nincoming,49.6048,6.1,2\noutgoing,49.6052,6.1,1\noutgoing,49.61,6.1,2\n"
+            }
         }
         for (path, content) in files {
             let data = Data(content.utf8)
