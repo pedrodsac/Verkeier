@@ -7,8 +7,9 @@ extension TransitMapViewModel {
         routeDiagnostics = calculation.diagnostics
         routePublishedAt = ContinuousClock.now
         if let started = routeOperationStarted {
-            routeDiagnostics?.milliseconds[.publication] = max(0,
-                RoutingDiagnostics.elapsed(since: started) - (calculation.diagnostics?.totalMilliseconds ?? 0))
+            routeDiagnostics?.rebase(to: started)
+            let publicationStart = started.advanced(by: .nanoseconds(Int64((calculation.diagnostics?.totalMilliseconds ?? 0) * 1_000_000)))
+            routeDiagnostics?.record(.publication, since: publicationStart)
             routeDiagnostics?.totalMilliseconds = RoutingDiagnostics.elapsed(since: started)
         }
     }

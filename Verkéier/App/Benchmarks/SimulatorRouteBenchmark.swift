@@ -1,4 +1,4 @@
-#if targetEnvironment(simulator)
+#if targetEnvironment(simulator) || ROUTING_BENCHMARK
 import Foundation
 import MobiliteitKit
 import Observation
@@ -11,29 +11,57 @@ final class SimulatorRouteBenchmark {
     static var enabled: Bool { CommandLine.arguments.contains("--routing-benchmark") }
     let viewModel = TransitMapViewModel(routeCalculationTimeout: .seconds(120))
     var status = "Simulator route benchmark — recorded realtime"
-    private var service: MobiliteitRouteService?
+    private var service: (any RouteService)?
+    var fullMap: Bool { ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_FULL_MAP"] == "1" }
 
-    func run() async {
+    func run(productionService: any RouteService, walkingRouter: any WalkingRouting, bikes: any BikeShareService) async {
         guard service == nil else { return }
         do {
             let env = ProcessInfo.processInfo.environment
             let scenario = env["ROUTING_BENCHMARK_SCENARIO"] ?? "arrive"
             let gtfs = MobiliteitGTFSService()
-            guard let database = await gtfs.routingDatabaseURL() else { throw RoutingError.timetableUnavailable }
+            let database: URL
+            if let path = env["ROUTING_BENCHMARK_DATABASE"] { database = Self.inputURL(path) }
+            else {
+                guard let installed = await gtfs.routingDatabaseURL() else { throw RoutingError.timetableUnavailable }
+                database = installed
+            }
+            if env["ROUTING_BENCHMARK_DATABASE"] != nil {
+                await (productionService as? MobiliteitRouteService)?.waitForWalkingPreparation()
+            }
             let config = URLSessionConfiguration.ephemeral
             config.protocolClasses = [BenchmarkBoardProtocol.self]
             let recordedClient = MobiliteitAPIClient(apiKey: "fixture", baseURL: URL(string: "https://recorded-atp.invalid")!,
                 session: URLSession(configuration: config))
             let client: MobiliteitAPIClient
-            if scenario.hasPrefix("live-") {
-                guard let live = MobiliteitLiveTransitService(proxyURL: AppConfiguration.current.apiProxyURL).realtimeRoutingClient
+            let liveTransport = scenario.hasPrefix("live-") && env["ROUTING_BENCHMARK_CAPTURE_DIRECTORY"] == nil
+            if liveTransport {
+                guard let live = MobiliteitLiveTransitService(proxyURL: AppConfiguration.current.apiProxyURL,
+                    diagnostics: BenchmarkNetworkRecorder.shared.observer).realtimeRoutingClient
                 else { throw RoutingError.noRouteFound }
                 client = live
                 status = "Simulator route benchmark — live ATP"
             } else { client = recordedClient }
-            let walking = LocalFirstWalkingRouter(datasetManager: RoutingDatasetManager())
-            let service = MobiliteitRouteService(databaseURL: database, gtfsService: gtfs,
-                realtimeClient: client, walkingRouter: walking)
+            let production = (env["ROUTING_BENCHMARK_COMPOSITION"] ?? "production") == "production"
+            let benchmarkBikes: any BikeShareService
+            let bikeInput: String
+            if !production { benchmarkBikes = UnavailableBikeShareService(); bikeInput = "unavailable" }
+            else if let path = env["ROUTING_BENCHMARK_BIKE_FIXTURE"] {
+                benchmarkBikes = BenchmarkBikeShareService(value: try JSONDecoder().decode(BikeShareSnapshot.self,
+                    from: Data(contentsOf: Self.inputURL(path))))
+                bikeInput = "recorded"
+            } else if liveTransport { benchmarkBikes = bikes; bikeInput = "live" }
+            else if let snapshot = await bikes.snapshot() {
+                benchmarkBikes = BenchmarkBikeShareService(value: snapshot); bikeInput = "cached snapshot"
+            } else { benchmarkBikes = UnavailableBikeShareService(); bikeInput = "unavailable" }
+            let service: any RouteService
+            if production, liveTransport, env["ROUTING_BENCHMARK_BIKE_FIXTURE"] == nil,
+               env["ROUTING_BENCHMARK_DATABASE"] == nil { service = productionService }
+            else {
+                let walking: any WalkingRouting = production ? walkingRouter : LocalFirstWalkingRouter(datasetManager: RoutingDatasetManager())
+                service = MobiliteitRouteService(databaseURL: database, gtfsService: env["ROUTING_BENCHMARK_DATABASE"] == nil ? gtfs : nil,
+                    realtimeClient: client, bikeShareService: production ? benchmarkBikes : UnavailableBikeShareService(), walkingRouter: walking)
+            }
             self.service = service
             let samples = Int(env["ROUTING_BENCHMARK_SAMPLES"] ?? "1") ?? 1
             try configure(scenario)
@@ -81,14 +109,32 @@ final class SimulatorRouteBenchmark {
                 if scenario == "cached", diagnostics.counters[.networkRequests, default: 0] != 0 {
                     throw RoutingError.noRouteFound
                 }
+                if fullMap {
+                    while viewModel.routeDiagnostics?.milliseconds[.mapRender] == nil, ContinuousClock.now < deadline {
+                        try await Task.sleep(for: .milliseconds(10))
+                    }
+                }
+                if scenario == "urban-bike", !viewModel.supplementalRouteOptions.contains(where: \.isVelohOnly) {
+                    throw RoutingError.noRouteFound
+                }
                 var usage = rusage()
                 getrusage(RUSAGE_SELF, &usage)
+                let measured = viewModel.routeDiagnostics ?? diagnostics
                 let record: [String: Any] = ["scenario": scenario, "sample": sample,
+                    "composition": production ? "production" : "transit", "fullMap": fullMap, "bikeInput": bikeInput,
+                    "spanSemantics": "operation-relative elapsed intervals; http and decode are cumulative concurrent work",
+                    "spans": measured.spans.map { ["stage": $0.stage.rawValue, "start_ms": $0.startMilliseconds, "duration_ms": $0.durationMilliseconds] },
+                    "passes": diagnostics.searchPasses.map { ["start_ms": $0.startMilliseconds, "duration_ms": $0.durationMilliseconds, "horizon_s": $0.horizonSeconds, "wave": $0.realtimeWave, "rounds": $0.rounds.count, "candidates": $0.candidates] },
+                    "supplementalOptions": viewModel.supplementalRouteOptions.map(\.id),
                     "planningTime": viewModel.routePlanningTime.date?.timeIntervalSince1970 ?? 0,
                     "avoidTightTransfers": viewModel.routeFilters.avoidTightTransfers,
                     "recommendedOption": viewModel.selectedRouteOptionID ?? "",
                     "requestID": diagnostics.requestID.uuidString, "total_ms": diagnostics.totalMilliseconds,
-                    "stages_ms": Dictionary(uniqueKeysWithValues: diagnostics.milliseconds.map { ($0.key.rawValue, $0.value) }),
+                    "stages_ms": Dictionary(uniqueKeysWithValues: measured.milliseconds.map { ($0.key.rawValue, $0.value) }),
+                    "transport": try JSONSerialization.jsonObject(with: JSONEncoder().encode(diagnostics.transport)),
+                    "canonicalPlans": try JSONSerialization.jsonObject(with: JSONEncoder().encode(viewModel.unfilteredRouteOptions.map(\.plan))),
+                    "canonicalSupplementalPlans": try JSONSerialization.jsonObject(with: JSONEncoder().encode(viewModel.unfilteredSupplementalRouteOptions.map(\.plan))),
+                    "canLoadEarlier": viewModel.canLoadEarlierRoutes, "canLoadLater": viewModel.canLoadLaterRoutes,
                     "rounds": diagnostics.rounds.map { ["scan_ms": $0.patternScanMilliseconds, "merge_ms": $0.labelMergeMilliseconds,
                         "prepare_ms": $0.tripPreparationMilliseconds, "alights": $0.alightingChecks, "retained": $0.retainedLabels] },
                     "options": viewModel.routeOptions.map(\.id),
@@ -133,7 +179,7 @@ final class SimulatorRouteBenchmark {
                 // Large accumulated pages can block simctl's console bridge.
                 print("ROUTING_BENCHMARK_FILE " + file.path)
                 fflush(stdout)
-                if scenario.hasPrefix("live-") {
+                if liveTransport, env["ROUTING_BENCHMARK_COMPARE_BOARDS"] == "1" {
                     await compareStopBoards(phase: "initial")
                     try await checkBoardCache(using: service)
                     await compareStopBoards(phase: "after-cache")
@@ -143,13 +189,23 @@ final class SimulatorRouteBenchmark {
                 // another sample, to avoid measuring concurrent search work.
                 try await Task.sleep(for: .milliseconds(500))
             }
+            if production, let snapshot = await benchmarkBikes.snapshot() {
+                let path = FileManager.default.temporaryDirectory.appendingPathComponent("routing-bikes-\(UUID()).json")
+                try JSONEncoder().encode(snapshot).write(to: path, options: .atomic)
+                print("ROUTING_BIKE_FILE " + path.path)
+            }
             print("ROUTING_BENCHMARK_DONE")
             fflush(stdout)
         } catch {
-            status = "Benchmark failed: \(error)"
-            print("ROUTING_BENCHMARK_FAILED \(error)")
+            status = "Benchmark failed"
+            print("ROUTING_BENCHMARK_FAILED \(String(reflecting: type(of: error)))")
             fflush(stdout)
         }
+    }
+
+    nonisolated static func inputURL(_ path: String) -> URL {
+        if path.hasPrefix("/") { return URL(fileURLWithPath: path) }
+        return FileManager.default.temporaryDirectory.appendingPathComponent(path)
     }
 
     private func configure(_ scenario: String) throws {
@@ -172,6 +228,10 @@ final class SimulatorRouteBenchmark {
         if scenario.hasPrefix("live-") {
             time = scenario == "live-arrive" ? .arriveBy(Date.now.addingTimeInterval(3_600)) : .departAt(.now)
         }
+        if scenario == "urban-bike" {
+            from = .init(name: "Luxembourg Gare", latitude: 49.5991, longitude: 6.1334)
+            to = .init(name: "Kirchberg Konrad", latitude: 49.6301, longitude: 6.1682)
+        }
         if scenario == "rural" {
             to = .init(name: "Clervaux", latitude: 50.0605, longitude: 6.0316)
         }
@@ -180,6 +240,10 @@ final class SimulatorRouteBenchmark {
         }
         if let value = ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_TIME"] {
             guard let anchor = formatter.date(from: value) else { throw CocoaError(.formatting) }
+            time = scenario.contains("arrive") ? .arriveBy(anchor) : .departAt(anchor)
+        }
+        if let value = ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_EPOCH"], let seconds = Double(value) {
+            let anchor = Date(timeIntervalSince1970: seconds)
             time = scenario.contains("arrive") ? .arriveBy(anchor) : .departAt(anchor)
         }
         viewModel.routeFilters.avoidTightTransfers =
@@ -192,7 +256,8 @@ final class SimulatorRouteBenchmark {
     /// Opt-in live validation stays outside the displayed-result timing gate.
     /// It goes through the same app service as the departure screen.
     private func compareStopBoards(phase: String) async {
-        let live = MobiliteitLiveTransitService(proxyURL: AppConfiguration.current.apiProxyURL)
+        let live = MobiliteitLiveTransitService(proxyURL: AppConfiguration.current.apiProxyURL,
+            diagnostics: BenchmarkNetworkRecorder.shared.observer)
         let legs = viewModel.routeOptions.flatMap(\.transitLegs)
         for stopID in Set(legs.compactMap(\.originStopId)).sorted() {
             guard let leg = legs.first(where: { $0.originStopId == stopID }) else { continue }
@@ -217,12 +282,12 @@ final class SimulatorRouteBenchmark {
                     "fetchedAt": board.fetchedAt.timeIntervalSince1970, "comparisons": comparisons]
                 let data = try JSONSerialization.data(withJSONObject: result, options: [.sortedKeys])
                 print("ROUTING_BOARD_COMPARISON " + String(decoding: data, as: UTF8.self))
-            } catch { print("ROUTING_BOARD_COMPARISON_FAILED \(stopID) \(error)") }
+            } catch { print("ROUTING_BOARD_COMPARISON_FAILED \(stopID) \(String(reflecting: type(of: error)))") }
         }
         fflush(stdout)
     }
 
-    private func checkBoardCache(using service: MobiliteitRouteService) async throws {
+    private func checkBoardCache(using service: any RouteService) async throws {
         viewModel.routeOptions = []
         await viewModel.calculateRoute(using: service, from: nil, realtimeRefreshPolicy: .useCache)
         let deadline = ContinuousClock.now.advanced(by: .seconds(30))
@@ -248,11 +313,19 @@ final class SimulatorRouteBenchmark {
         fflush(stdout)
     }
 
+    func recordMapRendered(_ id: UUID) {
+        guard viewModel.routeDiagnostics?.requestID == id,
+              viewModel.routeDiagnostics?.milliseconds[.mapRender] == nil,
+              let published = viewModel.routePublishedAt else { return }
+        viewModel.routeDiagnostics?.record(.mapRender, since: published)
+    }
+
     var presentation: RoutePresentationModel {
         .init(selectedStop: nil, origin: viewModel.routeOrigin, destination: viewModel.routeDestination,
             currentLocation: nil, favouritePlaces: [], nearbyPlaces: [], recentPlaces: [], commutePresets: [],
             filters: viewModel.routeFilters, planningTime: viewModel.routePlanningTime,
             routeOptions: viewModel.routeOptions, browsingWindow: viewModel.routeBrowsingWindow,
+            supplementalRouteOptions: viewModel.supplementalRouteOptions,
             isLoadingEarlierRoutes: viewModel.isLoadingEarlierRoutes, isLoadingLaterRoutes: viewModel.isLoadingLaterRoutes,
             canLoadEarlierRoutes: viewModel.canLoadEarlierRoutes, canLoadLaterRoutes: viewModel.canLoadLaterRoutes,
             alerts: [], selectedRouteOptionID: viewModel.selectedRouteOptionID,
@@ -262,39 +335,4 @@ final class SimulatorRouteBenchmark {
     }
 }
 
-struct SimulatorRouteBenchmarkView: View {
-    @State private var benchmark = SimulatorRouteBenchmark()
-    var body: some View {
-        Color.clear.sheet(isPresented: .constant(true)) {
-            ScrollView {
-                Text(benchmark.status).font(.caption).padding()
-                RouteView(viewModel: benchmark.presentation, actions: RouteActions()).padding()
-            }.presentationDetents([.large]).interactiveDismissDisabled()
-        }.task { await benchmark.run() }
-    }
-}
-
-private nonisolated final class BenchmarkBoardProtocol: URLProtocol {
-    override class func canInit(with request: URLRequest) -> Bool { request.url?.host() == "recorded-atp.invalid" }
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
-    override func startLoading() {
-        // A silent fixture exercises the entire acquisition budget; URLSession
-        // cancellation at the deadline calls stopLoading and ends the request.
-        if ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_SCENARIO"] == "deadline-arrive" { return }
-        do {
-            let stop = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems?
-                .first { $0.name == "id" }?.value
-            let body: Data
-            if stop == "000220402034", let path = ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_FIXTURE"] {
-                body = try Data(contentsOf: URL(fileURLWithPath: path))
-            } else { body = Data("{\"Departure\":[]}".utf8) }
-            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil,
-                                           headerFields: ["Content-Type": "application/json"])!
-            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-            client?.urlProtocol(self, didLoad: body)
-            client?.urlProtocolDidFinishLoading(self)
-        } catch { client?.urlProtocol(self, didFailWithError: error) }
-    }
-    override func stopLoading() {}
-}
 #endif
