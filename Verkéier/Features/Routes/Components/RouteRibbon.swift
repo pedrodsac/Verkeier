@@ -13,11 +13,7 @@ struct RouteRibbon: View {
     let legs: [RoutePlan.Leg]
 
     private var displayLegs: [RoutePlan.Leg] {
-        legs.filter {
-            $0.transportKind == .transit
-                || $0.transportKind == .walking
-                || $0.transportKind == .bikeShare
-        }
+        RouteTimelinePresentation.ribbonLegs(from: legs)
     }
 
     var body: some View {
