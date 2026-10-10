@@ -184,6 +184,23 @@ struct RouteLegList: View {
         .background(Color(uiColor: .systemGroupedBackground))
     }
 
+    #Preview("Timeline – Stay aboard", traits: .sizeThatFitsLayout) {
+        let incoming = RoutePlan.Leg(
+            id: "preview-incoming", mode: .bus, transportKind: .transit,
+            routeName: "7", tripId: "preview-incoming",
+            origin: previewHamilius, destination: previewKirchberg,
+            departureTime: Date().addingTimeInterval(6 * 60),
+            arrivalTime: Date().addingTimeInterval(14 * 60)
+        )
+        var onward = previewBusLeg
+        onward.continuesInSeatFromTripID = incoming.tripId
+        return ScrollView {
+            RouteLegList(legs: [previewWalkLeg, incoming, onward, previewFinalWalkLeg])
+                .padding()
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
+    }
+
     #Preview("Timeline – Delayed", traits: .sizeThatFitsLayout) {
         RouteLegList(legs: previewDelayedOption.plan.legs)
             .padding()

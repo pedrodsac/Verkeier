@@ -7,7 +7,7 @@ import ZIPFoundation
 @Suite("Verified stay-aboard presentation")
 @MainActor
 struct RouteContinuationTests {
-    private func option(continues: Bool) -> RouteOption {
+    private func option(continues: Bool, onwardLine: String = "18") -> RouteOption {
         let a = LocationPoint(name: "A", latitude: 49.6, longitude: 6.1, transitStopID: "a")
         let b = LocationPoint(name: "B", latitude: 49.61, longitude: 6.1, transitStopID: "b")
         let d = LocationPoint(name: "D", latitude: 49.62, longitude: 6.1, transitStopID: "d")
@@ -15,7 +15,7 @@ struct RouteContinuationTests {
         let first = RoutePlan.Leg(id: "first", mode: .bus, transportKind: .transit, routeName: "16", tripId: "first",
             originStopId: "a", destinationStopId: "b", origin: a, destination: b,
             departureTime: start, arrivalTime: start.addingTimeInterval(600))
-        var second = RoutePlan.Leg(id: "second", mode: .bus, transportKind: .transit, routeName: "18", tripId: "second",
+        var second = RoutePlan.Leg(id: "second", mode: .bus, transportKind: .transit, routeName: onwardLine, tripId: "second",
             originStopId: "b", destinationStopId: "d", origin: b, destination: d,
             departureTime: start.addingTimeInterval(600), arrivalTime: start.addingTimeInterval(1200))
         if continues { second.continuesInSeatFromTripID = "first" }
@@ -30,13 +30,28 @@ struct RouteContinuationTests {
         }.first)
         #expect(boundary.role == .stayAboard)
         #expect(boundary.platform == nil && boundary.transferWarning == nil && boundary.waitMinutes == nil)
-        #expect(boundary.stayAboardAccessibilityLabel == "Stay aboard at B.")
+        #expect(boundary.continuationLineName == "18")
+        #expect(boundary.stayAboardAccessibilityLabel.contains("Stay aboard at B."))
+        #expect(boundary.stayAboardDetail.contains("line 18"))
+        #expect(boundary.stayAboardDetail.contains("No need to get off"))
         let text = route.shareText(originTitle: "A", destinationTitle: "D")
         #expect(text.contains("Stay aboard at B"))
         #expect(text.contains("0 transfers"))
         #expect(text.contains("16") && text.contains("18"))
         #expect(route.transferCount == 0 && route.transferGapDurations == [])
         #expect(RouteItineraryValidator.assess(route, context: .init(anchor: Date(timeIntervalSince1970: 100_000), arriveBy: false, minimumTransferSeconds: 120)) == .feasible(minimumTransferSlack: nil))
+    }
+
+    @Test(arguments: ["16", "", "   "])
+    func continuationWithoutLineChangeExplainsSameVehicle(lineName: String) throws {
+        var legs = option(continues: true, onwardLine: lineName).plan.legs
+        legs[1].transferWarning = "Only 1 min to transfer"
+        let boundary = try #require(RouteTimelineBuilder.items(from: legs).compactMap {
+            if case let .place(node) = $0, node.role == .stayAboard { node } else { nil }
+        }.first)
+        #expect(boundary.continuationLineName == nil)
+        #expect(boundary.stayAboardDetail == "Continue on the same vehicle. No need to get off.")
+        #expect(boundary.transferWarning == nil)
     }
 
     @Test(arguments: [false, true]) func packageContinuationMapsToAppWithoutLostBoundary(useVehicleBlock: Bool) async throws {
