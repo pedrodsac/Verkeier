@@ -120,7 +120,7 @@ final class SimulatorRouteBenchmark {
                 var usage = rusage()
                 getrusage(RUSAGE_SELF, &usage)
                 let measured = viewModel.routeDiagnostics ?? diagnostics
-                let record: [String: Any] = ["scenario": scenario, "sample": sample,
+                var record: [String: Any] = ["scenario": scenario, "sample": sample,
                     "composition": production ? "production" : "transit", "fullMap": fullMap, "bikeInput": bikeInput,
                     "spanSemantics": "operation-relative elapsed intervals; http and decode are cumulative concurrent work",
                     "spans": measured.spans.map { ["stage": $0.stage.rawValue, "start_ms": $0.startMilliseconds, "duration_ms": $0.durationMilliseconds] },
@@ -128,12 +128,11 @@ final class SimulatorRouteBenchmark {
                     "supplementalOptions": viewModel.supplementalRouteOptions.map(\.id),
                     "planningTime": viewModel.routePlanningTime.date?.timeIntervalSince1970 ?? 0,
                     "avoidTightTransfers": viewModel.routeFilters.avoidTightTransfers,
+                    "modePreference": viewModel.routeFilters.modePreference.rawValue,
                     "recommendedOption": viewModel.selectedRouteOptionID ?? "",
                     "requestID": diagnostics.requestID.uuidString, "total_ms": diagnostics.totalMilliseconds,
                     "stages_ms": Dictionary(uniqueKeysWithValues: measured.milliseconds.map { ($0.key.rawValue, $0.value) }),
                     "transport": try JSONSerialization.jsonObject(with: JSONEncoder().encode(diagnostics.transport)),
-                    "canonicalPlans": try JSONSerialization.jsonObject(with: JSONEncoder().encode(viewModel.unfilteredRouteOptions.map(\.plan))),
-                    "canonicalSupplementalPlans": try JSONSerialization.jsonObject(with: JSONEncoder().encode(viewModel.unfilteredSupplementalRouteOptions.map(\.plan))),
                     "canLoadEarlier": viewModel.canLoadEarlierRoutes, "canLoadLater": viewModel.canLoadLaterRoutes,
                     "rounds": diagnostics.rounds.map { ["scan_ms": $0.patternScanMilliseconds, "merge_ms": $0.labelMergeMilliseconds,
                         "prepare_ms": $0.tripPreparationMilliseconds, "alights": $0.alightingChecks, "retained": $0.retainedLabels] },
@@ -173,6 +172,12 @@ final class SimulatorRouteBenchmark {
                         ($0.id, $0.realtimeCoverage.rawValue)
                     }),
                     "counters": Dictionary(uniqueKeysWithValues: diagnostics.counters.map { ($0.key.rawValue, $0.value) }), "peak_memory_bytes": usage.ru_maxrss]
+                if env["ROUTING_BENCHMARK_FULL_EVIDENCE"] == "1" {
+                    record["canonicalPlans"] = try JSONSerialization.jsonObject(with:
+                        JSONEncoder().encode(viewModel.unfilteredRouteOptions.map(\.plan)))
+                    record["canonicalSupplementalPlans"] = try JSONSerialization.jsonObject(with:
+                        JSONEncoder().encode(viewModel.unfilteredSupplementalRouteOptions.map(\.plan)))
+                }
                 let json = try JSONSerialization.data(withJSONObject: record, options: [.sortedKeys])
                 let file = FileManager.default.temporaryDirectory.appendingPathComponent("route-benchmark-\(diagnostics.requestID).json")
                 try json.write(to: file, options: .atomic)
@@ -198,7 +203,9 @@ final class SimulatorRouteBenchmark {
             fflush(stdout)
         } catch {
             status = "Benchmark failed"
-            print("ROUTING_BENCHMARK_FAILED \(String(reflecting: type(of: error)))")
+            if let routing = error as? RoutingError {
+                print("ROUTING_BENCHMARK_FAILED \(routing)")
+            } else { print("ROUTING_BENCHMARK_FAILED \(String(reflecting: type(of: error)))") }
             fflush(stdout)
         }
     }
@@ -246,6 +253,7 @@ final class SimulatorRouteBenchmark {
             let anchor = Date(timeIntervalSince1970: seconds)
             time = scenario.contains("arrive") ? .arriveBy(anchor) : .departAt(anchor)
         }
+        viewModel.routeFilters = RoutePlannerFilters()
         viewModel.routeFilters.avoidTightTransfers =
             ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_AVOID_TIGHT_TRANSFERS"] == "1"
         viewModel.routeOrigin = .init(title: from.name ?? "Origin", location: from, source: .search)
