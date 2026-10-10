@@ -15,7 +15,7 @@ extension MobiliteitRouteService: RouteRealtimeRefreshing {
                 optionID: optionID, origin: Self.journeyEndpoint(for: origin), destination: Self.journeyEndpoint(for: destination),
                 force: refreshPolicy == .forceRefresh)
         else { return nil }
-        return calculation(from: snapshot.result, origin: origin, destination: destination,
+        return await calculation(from: snapshot.result, origin: origin, destination: destination,
                            supplemental: snapshot.supplemental)
     }
 }

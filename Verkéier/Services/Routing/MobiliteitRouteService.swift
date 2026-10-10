@@ -58,7 +58,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                 page: page.packagePage, refresh: realtimeRefreshPolicy.packagePolicy,
                 origin: from, destination: to, time: time)
             let mappingStarted = ContinuousClock.now
-            var calculation = calculation(from: result.result, origin: from, destination: to, supplemental: result.supplemental)
+            var calculation = await calculation(from: result.result, origin: from, destination: to, supplemental: result.supplemental)
             // The app operation includes router preparation and the concurrent bike branch.
             var diagnostics = result.diagnostics
             diagnostics.record(.adapterMapping, since: mappingStarted)
@@ -93,7 +93,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
     }
 
     nonisolated func calculation(from result: JourneyPlanningResult?,
-        origin: LocationPoint, destination: LocationPoint, supplemental: [RouteOption] = []) -> RouteCalculation {
+        origin: LocationPoint, destination: LocationPoint, supplemental: [RouteOption] = []) async -> RouteCalculation {
         let started = ContinuousClock.now
         guard let result else {
             var calculation = RouteCalculation(options: [], supplementalOptions: supplemental, selectedOptionID: nil)
@@ -102,9 +102,11 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             calculation.canLoadLater = false
             return calculation
         }
-        var calculation = RouteCalculation(options: result.journeys.map {
+        let options = result.journeys.map {
             option(from: $0, origin: origin, destination: destination, result: result)
-        }, selectedOptionID: result.recommendedJourneyID?.value)
+        }
+        let mappedOptions = await addingMapTransferWalks(to: options)
+        var calculation = RouteCalculation(options: mappedOptions, selectedOptionID: result.recommendedJourneyID?.value)
         calculation.supplementalOptions = supplemental
         calculation.invalidatedOptionIDs = Set(result.invalidatedIDs.map(\.value))
         calculation.validationContext = result.validationContext
