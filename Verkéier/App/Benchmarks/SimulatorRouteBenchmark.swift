@@ -234,6 +234,7 @@ final class SimulatorRouteBenchmark {
     }
 
     private func configure(_ scenario: String) throws {
+        let environment = ProcessInfo.processInfo.environment
         var from = LocationPoint(name: "Gromscheed", latitude: 49.6541071, longitude: 6.2296443)
         var to = LocationPoint(name: "Kirchberg Konrad", latitude: 49.6301, longitude: 6.1682, transitStopID: "000200417019")
         let formatter = ISO8601DateFormatter()
@@ -270,6 +271,15 @@ final class SimulatorRouteBenchmark {
         if let value = ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_EPOCH"], let seconds = Double(value) {
             let anchor = Date(timeIntervalSince1970: seconds)
             time = scenario.contains("arrive") ? .arriveBy(anchor) : .departAt(anchor)
+        }
+        if let latitude = environment["ROUTING_BENCHMARK_DESTINATION_LATITUDE"].flatMap(Double.init),
+           let longitude = environment["ROUTING_BENCHMARK_DESTINATION_LONGITUDE"].flatMap(Double.init) {
+            guard (-90...90).contains(latitude), (-180...180).contains(longitude) else {
+                throw CocoaError(.formatting)
+            }
+            to = LocationPoint(name: environment["ROUTING_BENCHMARK_DESTINATION_NAME"] ?? "Destination",
+                latitude: latitude, longitude: longitude,
+                transitStopID: environment["ROUTING_BENCHMARK_DESTINATION_STOP"])
         }
         viewModel.routeFilters = RoutePlannerFilters()
         viewModel.routeFilters.avoidTightTransfers =

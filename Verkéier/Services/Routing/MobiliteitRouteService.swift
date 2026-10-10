@@ -105,8 +105,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         let options = result.journeys.map {
             option(from: $0, origin: origin, destination: destination, result: result)
         }
-        let mappedOptions = await addingMapTransferWalks(to: options)
-        var calculation = RouteCalculation(options: mappedOptions, selectedOptionID: result.recommendedJourneyID?.value)
+        var calculation = RouteCalculation(options: options, selectedOptionID: result.recommendedJourneyID?.value)
         calculation.supplementalOptions = supplemental
         calculation.invalidatedOptionIDs = Set(result.invalidatedIDs.map(\.value))
         calculation.validationContext = result.validationContext
@@ -147,10 +146,10 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         destination: LocationPoint,
         result planningResult: JourneyPlanningResult
     ) -> RouteOption {
-        let legs = journey.legs.enumerated().compactMap { nativeIndex, leg -> RoutePlan.Leg? in
+        let legs = journey.legs.enumerated().flatMap { nativeIndex, leg -> [RoutePlan.Leg] in
             switch leg {
             case let .walk(walk):
-                guard walk.duration > 0 || walk.from.coordinate != walk.to.coordinate else { return nil }
+                guard walk.duration > 0 || walk.from.coordinate != walk.to.coordinate else { return [] }
                 var result = RoutePlan.Leg(
                     id: "walk-\(journey.id.value)-\(nativeIndex)", mode: .walking,
                     transportKind: .walking, origin: point(walk.from), destination: point(walk.to),
@@ -162,7 +161,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                 result.nativeWalkingRange = walk.nativeRange ?? (nativeIndex..<(nativeIndex + 1))
                 result.walkingEvidence = walk.evidence == .routedPedestrian
                     ? .routedPedestrian : .estimate
-                return result
+                return StationConnectionLegMapper.legs(from: result, segments: walk.segments)
             case let .transit(transit):
                 let departureIsRealtime = transit.board.timingSource != .scheduled
                 let arrivalIsRealtime = transit.alight.timingSource != .scheduled
@@ -212,9 +211,9 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                     result.continuesInSeatFromTripID = link.fromTripID
                     result.transferWarning = nil
                 }
-                return result
+                return [result]
             case .inSeatContinuation:
-                return nil
+                return []
             }
         }
 
@@ -261,7 +260,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         case 0, 900...999: .tram
         case 1, 2: .train
         case 3, 700...799: .bus
-        case 7: .funicular
+        case 7, 1400...1499: .funicular
         default: .unknown
         }
     }
