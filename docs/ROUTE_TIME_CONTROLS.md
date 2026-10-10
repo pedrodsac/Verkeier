@@ -12,15 +12,21 @@ available to existing consumers.
   a selection in the current minute is clamped to the actual current instant.
 - **Arrive by:** door-to-door arrival must meet the selected deadline; the
   recommended journey has the latest feasible departure.
-- **Earlier / Later:** add up to five useful transit alternatives, preserving
+- **Initial search:** show up to six useful transit alternatives. Direct walking
+  and bike comparisons do not consume transit slots.
+- **Earlier / Later:** add up to six useful transit alternatives, preserving
   the current valid selection. Departure searches browse departure boundaries;
   arrive-by searches browse destination-arrival boundaries. Later arrivals can
   exceed the originally chosen deadline and can depart before the previous
   arrival boundary.
 - Earlier can show past timetable journeys. Missed services retain their status;
   a wholly historical search uses schedules rather than historical predictions.
-- Adjacent searches start with three-hour windows and expand across gaps up to
-  the existing 24-hour horizon. Stable journey IDs resolve equal-time boundaries.
+- Initial departure and adjacent searches start with 90-minute windows and expand
+  until six useful routes are found or the existing 24-hour horizon is reached.
+  Initial arrive-by searches also start at 90 minutes and retain their safe stopping
+  proof. Later arrival pages keep the preceding 24-hour lookback fixed at the
+  original boundary while the future window grows, preserving earlier departures.
+  Stable journey IDs resolve equal-time boundaries.
   A partial page leaves browsing available; an exhausted search disables its
   direction and announces that no additional routes were found.
 
