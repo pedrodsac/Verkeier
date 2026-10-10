@@ -131,6 +131,9 @@ struct SegmentNode: Identifiable, Equatable {
     let rail: RailStyle
     let bikeShareDetails: BikeShareLegDetails?
     var tripSelection: TripDetailSelection? = nil
+    var continuationCaptions: [String] = []
+    var sourceSegmentIDs: [String] = []
+    var hasCancelledContinuation = false
 }
 
 // MARK: - Builder

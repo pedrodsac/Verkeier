@@ -13,7 +13,7 @@ struct RouteLegList: View {
     var legAlerts: [String: [AlertMessage]] = [:]
 
     private var items: [RouteTimelineItem] {
-        RouteTimelineBuilder.items(from: legs)
+        RouteTimelinePresentation.items(from: legs)
     }
 
     private var alertsBySegmentID: [String: [AlertMessage]] {
@@ -28,7 +28,8 @@ struct RouteLegList: View {
                     case let .place(node):
                         TimelinePlaceRow(node: node)
                     case let .segment(node):
-                        TimelineSegmentRow(node: node, alerts: alertsBySegmentID[node.id] ?? [])
+                        TimelineSegmentRow(node: node, alerts: (node.sourceSegmentIDs.isEmpty ? [node.id] : node.sourceSegmentIDs)
+                            .flatMap { alertsBySegmentID[$0] ?? [] })
                     }
                 }
             }

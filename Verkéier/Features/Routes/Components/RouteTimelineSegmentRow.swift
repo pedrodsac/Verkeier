@@ -52,6 +52,17 @@ struct TimelineSegmentRow: View {
                 } else {
                     transitBadge
                 }
+                ForEach(Array(node.continuationCaptions.enumerated()), id: \.offset) { _, caption in
+                    Text(caption)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                if node.hasCancelledContinuation {
+                    Label("Cancelled", systemImage: "xmark.circle.fill")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.red)
+                }
                 if let mins = node.durationMinutes {
                     Text(durationText(minutes: mins, stopCount: node.stopCount))
                         .font(.footnote)
@@ -134,7 +145,10 @@ struct TimelineSegmentRow: View {
             if let badge = node.badgeText { s += " \(badge)" }
             if let headsign = node.headsign, !headsign.isEmpty { s += " to \(headsign)" }
             if let mins = node.durationMinutes { s += ", \(mins) minutes" }
+            if let count = node.stopCount { s += ", \(count) stops" }
             s += "."
+            for caption in node.continuationCaptions { s += " \(caption). Stay aboard." }
+            if node.hasCancelledContinuation { s += " Cancelled." }
             if !alerts.isEmpty { s += " Disruption affects this leg." }
             return s
         case .bikeShare:
