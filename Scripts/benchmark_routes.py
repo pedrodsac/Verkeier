@@ -21,6 +21,7 @@ parser.add_argument('--capture-directory', type=Path, help='Replay successful tr
 parser.add_argument('--bike-fixture', type=Path, help='Recorded bike availability snapshot')
 parser.add_argument('--composition', choices=['transit', 'production'], default='production')
 parser.add_argument('--full-map', action='store_true')
+parser.add_argument('--full-evidence', action='store_true', help='Export complete plans; use separately from memory measurements')
 parser.add_argument('--request-budget', type=int, default=200, help='Maximum ATP requests across this invocation')
 parser.add_argument('--compare-boards', action='store_true', help='Extra opt-in board equivalence requests')
 parser.add_argument('--warm', type=int, default=20)
@@ -59,6 +60,7 @@ def run(scenario, samples, label):
         'SIMCTL_CHILD_ROUTING_BENCHMARK_FIXTURE': str(fixture.resolve()),
         'SIMCTL_CHILD_ROUTING_BENCHMARK_COMPOSITION': args.composition,
         'SIMCTL_CHILD_ROUTING_BENCHMARK_FULL_MAP': '1' if args.full_map else '0',
+        'SIMCTL_CHILD_ROUTING_BENCHMARK_FULL_EVIDENCE': '1' if args.full_evidence else '0',
         'SIMCTL_CHILD_ROUTING_BENCHMARK_COMPARE_BOARDS': '1' if args.compare_boards else '0',
         'SIMCTL_CHILD_ROUTING_BENCHMARK_REQUEST_BUDGET': str(max(0, args.request_budget - network_requests))}
     if args.capture_directory:

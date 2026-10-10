@@ -21,7 +21,7 @@ def samples(folder):
     return result
 
 before, after = samples(args.baseline), samples(args.optimized)
-fields = ['planningTime', 'avoidTightTransfers', 'recommendedOption', 'options', 'unfilteredJourneys',
+fields = ['planningTime', 'avoidTightTransfers', 'modePreference', 'recommendedOption', 'options', 'unfilteredJourneys',
           'journeys', 'displayedLegs', 'realtimeCoverage', 'refreshPolicy', 'canonicalPlans',
           'canonicalSupplementalPlans', 'matchingRejections',
           'canLoadEarlier', 'canLoadLater', 'supplementalOptions']
