@@ -21,9 +21,9 @@ available to existing consumers.
   arrival boundary.
 - Earlier can show past timetable journeys. Missed services retain their status;
   a wholly historical search uses schedules rather than historical predictions.
-- Initial departure and adjacent searches start with 90-minute windows and expand
+- Initial departure and adjacent searches start with two-hour windows and expand
   until six useful routes are found or the existing 24-hour horizon is reached.
-  Initial arrive-by searches also start at 90 minutes and retain their safe stopping
+  Initial arrive-by searches also start at two hours and retain their safe stopping
   proof. Later arrival pages keep the preceding 24-hour lookback fixed at the
   original boundary while the future window grows, preserving earlier departures.
   Stable journey IDs resolve equal-time boundaries.
