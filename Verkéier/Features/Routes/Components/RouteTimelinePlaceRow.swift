@@ -15,6 +15,43 @@ struct TimelinePlaceRow: View {
     @ScaledMetric(relativeTo: .subheadline) private var timeColumnWidth = RouteTimelineLayout.timeColumnWidth
 
     var body: some View {
+        if node.role == .stayAboard {
+            continuationRow
+        } else {
+            standardRow
+        }
+    }
+
+    /// An inline bridge between ride segments, rather than a stop/boarding node.
+    private var continuationRow: some View {
+        HStack(spacing: RouteTimelineLayout.columnSpacing) {
+            Color.clear.frame(width: timeColumnWidth)
+            Color.clear.frame(width: RouteTimelineLayout.railColumnWidth)
+            VStack(alignment: .leading, spacing: RouteTimelineLayout.blockLineSpacing) {
+                Text("Stay aboard")
+                    .font(.caption.weight(.semibold))
+                Text(node.name)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if node.liveStatus == .cancelled {
+                    Label("Cancelled", systemImage: "xmark.circle.fill")
+                        .foregroundStyle(.red)
+                }
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 4)
+        }
+        .overlay(alignment: .leading) {
+            TimelineRail(above: node.railAbove, below: node.railBelow, marker: .continuation)
+                .frame(width: RouteTimelineLayout.railColumnWidth)
+                .offset(x: timeColumnWidth + RouteTimelineLayout.columnSpacing)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    private var standardRow: some View {
         HStack(alignment: .top, spacing: RouteTimelineLayout.columnSpacing) {
             timeColumn
                 .padding(.vertical, RouteTimelineLayout.placeRowPadding)
@@ -174,7 +211,6 @@ struct TimelinePlaceRow: View {
         if let platform = node.platform, !platform.isEmpty {
             parts.append("Platform \(platform)")
         }
-        if node.role == .stayAboard { parts.append("Stay aboard") }
         if node.role == .transfer, let wait = node.waitMinutes {
             parts.append("\(wait) min to change")
         }
@@ -214,7 +250,8 @@ struct TimelinePlaceRow: View {
     private var marker: TimelineRail.Marker {
         switch node.role {
         case .origin: .ring
-        case .board, .transfer, .stayAboard, .alight: .dot
+        case .board, .transfer, .alight: .dot
+        case .stayAboard: .continuation
         case .destination: .pin
         }
     }
@@ -254,7 +291,14 @@ struct TimelinePlaceRow: View {
             }
             return s
         case .stayAboard:
-            return node.stayAboardAccessibilityLabel
+            var s = node.stayAboardAccessibilityLabel
+            if let depart { s += " Continues at \(depart)." }
+            if node.liveStatus == .cancelled {
+                s += " Cancelled."
+            } else if node.announcesDelay {
+                s += " \(delaySpoken)."
+            }
+            return s
         case .transfer:
             var s = "Transfer at \(node.name)."
             if let arrive { s += " Arrives \(arrive)" }

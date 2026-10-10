@@ -57,7 +57,16 @@ struct PlaceNode: Identifiable, Equatable {
         case destination
     }
 
-    var stayAboardAccessibilityLabel: String { "Stay aboard at \(name)." }
+    var stayAboardAccessibilityLabel: String {
+        "Stay aboard at \(name). \(stayAboardDetail)"
+    }
+
+    var stayAboardDetail: String {
+        if let continuationLineName {
+            return String(localized: "This vehicle continues as line \(continuationLineName). No need to get off.")
+        }
+        return String(localized: "Continue on the same vehicle. No need to get off.")
+    }
     let id: String
     let name: String
     let role: Role
@@ -94,6 +103,8 @@ struct PlaceNode: Identifiable, Equatable {
     let railAbove: RailStyle?
     /// Rail style leaving below (`nil` for the final place).
     let railBelow: RailStyle?
+    /// Published line name when the same vehicle changes lines here.
+    var continuationLineName: String? = nil
 }
 
 /// One leg of the journey: walk, transfer, or transit ride.
@@ -163,6 +174,7 @@ enum RouteTimelineBuilder {
         outgoing: RoutePlan.Leg?
     ) -> PlaceNode {
         let outgoingTransit = outgoing?.transportKind == .transit ? outgoing : nil
+        let placeRole = role(incoming: incoming, outgoing: outgoing)
 
         let arrival = incoming.flatMap { arrivalTime(of: $0) }
         let departure = outgoing.flatMap { departureTime(of: $0) }
@@ -196,23 +208,26 @@ enum RouteTimelineBuilder {
         return PlaceNode(
             id: id,
             name: point.name ?? "Stop",
-            role: role(incoming: incoming, outgoing: outgoing),
+            role: placeRole,
             arrivalTime: arrival,
             departureTime: departure,
             scheduledArrivalTime: incoming?.transportKind == .transit
                 ? incoming?.scheduledArrivalTime
                 : nil,
             scheduledDepartureTime: outgoingTransit?.scheduledDepartureTime,
-            waitMinutes: outgoingTransit?.continuesInSeatFromTripID == nil ? wait : nil,
+            waitMinutes: placeRole == .stayAboard ? nil : wait,
             delayMinutes: outgoingTransit?.delayMinutes,
             liveStatus: status,
             announcesDelay: announcesDelay,
-            platform: outgoingTransit?.continuesInSeatFromTripID == nil ? outgoingTransit?.platform : nil,
-            transferWarning: outgoingTransit?.transferWarning,
+            platform: placeRole == .stayAboard ? nil : outgoingTransit?.platform,
+            transferWarning: placeRole == .stayAboard ? nil : outgoingTransit?.transferWarning,
             bikeShareStation: bikeShareStation,
             bikeShareStationRole: bikeShareStationRole,
             railAbove: incoming.map(railStyle(for:)),
-            railBelow: outgoing.map(railStyle(for:))
+            railBelow: outgoing.map(railStyle(for:)),
+            continuationLineName: placeRole == .stayAboard && incoming?.routeName != outgoing?.routeName
+                ? outgoing?.routeName.flatMap { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }
+                : nil
         )
     }
 

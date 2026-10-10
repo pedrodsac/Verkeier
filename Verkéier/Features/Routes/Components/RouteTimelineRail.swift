@@ -23,6 +23,8 @@ struct TimelineRail: View {
         case ring
         /// Board / transfer / alight — a filled dot in the adjacent rail's tint.
         case dot
+        /// Same vehicle continues through the stop without boarding again.
+        case continuation
         /// Journey destination — a red map pin.
         case pin
         /// A walk / transfer segment — the walking glyph on a material disc.
@@ -83,6 +85,10 @@ struct TimelineRail: View {
             Circle()
                 .fill(dotColor)
                 .frame(width: dotSize, height: dotSize)
+        case .continuation:
+            Image(systemName: "chevron.down")
+                .font(.system(size: ringSize, weight: .bold))
+                .foregroundStyle(dotColor)
         case .pin:
             Image(systemName: "mappin.circle.fill")
                 .font(.system(size: pinSize))
