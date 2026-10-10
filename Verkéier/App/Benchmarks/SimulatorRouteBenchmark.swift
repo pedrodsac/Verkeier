@@ -56,11 +56,20 @@ final class SimulatorRouteBenchmark {
             } else { benchmarkBikes = UnavailableBikeShareService(); bikeInput = "unavailable" }
             let service: any RouteService
             if production, liveTransport, env["ROUTING_BENCHMARK_BIKE_FIXTURE"] == nil,
-               env["ROUTING_BENCHMARK_DATABASE"] == nil { service = productionService }
+               env["ROUTING_BENCHMARK_DATABASE"] == nil,
+               env["ROUTING_BENCHMARK_LIVE_CONCURRENCY"] == nil { service = productionService }
             else {
                 let walking: any WalkingRouting = production ? walkingRouter : LocalFirstWalkingRouter(datasetManager: RoutingDatasetManager())
+                let planner: JourneyPlanner?
+                if let value = env["ROUTING_BENCHMARK_LIVE_CONCURRENCY"], let limit = Int(value) {
+                    await (productionService as? MobiliteitRouteService)?.waitForWalkingPreparation()
+                    planner = JourneyPlanner(walkingProvider: LocalFirstWalkingRoutingProvider(walkingRouter: walking),
+                        realtimeProvider: try HafasRealtimeRoutingProvider(databaseURL: database, client: client,
+                            maximumConcurrentBoardRequests: limit, cacheLifetime: 60, requestTimeout: .seconds(4)))
+                } else { planner = nil }
                 service = MobiliteitRouteService(databaseURL: database, gtfsService: env["ROUTING_BENCHMARK_DATABASE"] == nil ? gtfs : nil,
-                    realtimeClient: client, bikeShareService: production ? benchmarkBikes : UnavailableBikeShareService(), walkingRouter: walking)
+                    realtimeClient: client, engine: planner, bikeShareService: production ? benchmarkBikes : UnavailableBikeShareService(), walkingRouter: walking,
+                    realtimeConcurrency: Int(env["ROUTING_BENCHMARK_LIVE_CONCURRENCY"] ?? "16") ?? 16)
             }
             self.service = service
             let samples = Int(env["ROUTING_BENCHMARK_SAMPLES"] ?? "1") ?? 1
@@ -122,6 +131,7 @@ final class SimulatorRouteBenchmark {
                 let measured = viewModel.routeDiagnostics ?? diagnostics
                 var record: [String: Any] = ["scenario": scenario, "sample": sample,
                     "composition": production ? "production" : "transit", "fullMap": fullMap, "bikeInput": bikeInput,
+                    "liveConcurrency": Int(env["ROUTING_BENCHMARK_LIVE_CONCURRENCY"] ?? "16") ?? 16,
                     "spanSemantics": "operation-relative elapsed intervals; http and decode are cumulative concurrent work",
                     "spans": measured.spans.map { ["stage": $0.stage.rawValue, "start_ms": $0.startMilliseconds, "duration_ms": $0.durationMilliseconds] },
                     "passes": diagnostics.searchPasses.map { ["start_ms": $0.startMilliseconds, "duration_ms": $0.durationMilliseconds, "horizon_s": $0.horizonSeconds, "wave": $0.realtimeWave, "rounds": $0.rounds.count, "candidates": $0.candidates] },

@@ -8,6 +8,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
     let gtfsService: (any GTFSService)?
     let engine: JourneyPlanner
     let sessions: AppJourneySessionStore
+    private let realtimeConcurrency: Int
     private let walkingRouter: any WalkingRouting
     let roadRouteProvider: any RoadRouteProviding
     private let graphPreparation: Task<Void, Never>?
@@ -19,7 +20,8 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
          bikeShareService: any BikeShareService = UnavailableBikeShareService(),
          walkingRouter: any WalkingRouting = UnavailableWalkingRouter(),
          roadRouteProvider: (any RoadRouteProviding)? = nil,
-         graphPreparation: Task<Void, Never>? = nil) {
+         graphPreparation: Task<Void, Never>? = nil,
+         realtimeConcurrency: Int = 16) {
         self.databaseURL = databaseURL; self.gtfsService = gtfsService
         let planner = engine ?? JourneyPlanner(
             walkingProvider: LocalFirstWalkingRoutingProvider(walkingRouter: walkingRouter),
@@ -31,6 +33,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         self.walkingRouter = walkingRouter
         self.roadRouteProvider = roads
         self.graphPreparation = graphPreparation
+        self.realtimeConcurrency = max(1, realtimeConcurrency)
     }
 
     nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint,
@@ -50,7 +53,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                 request: .init(origin: Self.journeyEndpoint(for: from),
                     destination: Self.journeyEndpoint(for: to), time: time.packageTime,
                     preferences: filters.packagePreferences, realtimeAcquisitionBudgetMilliseconds: 8_000,
-                    realtimeMaximumConcurrentBoardRequests: 16,
+                    realtimeMaximumConcurrentBoardRequests: realtimeConcurrency,
                     pagingPolicy: .adjacentTimeWindows),
                 page: page.packagePage, refresh: realtimeRefreshPolicy.packagePolicy,
                 origin: from, destination: to, time: time)
