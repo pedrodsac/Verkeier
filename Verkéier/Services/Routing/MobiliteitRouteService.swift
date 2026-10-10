@@ -39,13 +39,13 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
     ) async throws -> RouteCalculation {
         let started = ContinuousClock.now
         let databaseURL = try await readyDatabaseURL()
-        let readiness = RoutingDiagnostics.elapsed(since: started)
+        let readinessEnd = ContinuousClock.now
         let graphStarted = ContinuousClock.now
         await graphPreparation?.value
         try Task.checkCancellation()
         do {
             try await walkingRouter.checkAvailability()
-            let graphMilliseconds = RoutingDiagnostics.elapsed(since: graphStarted)
+            let graphEnd = ContinuousClock.now
             let result = try await sessions.calculate(databaseURL: databaseURL,
                 request: .init(origin: Self.journeyEndpoint(for: from),
                     destination: Self.journeyEndpoint(for: to), time: time.packageTime,
@@ -54,9 +54,15 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                     pagingPolicy: .adjacentTimeWindows),
                 page: page.packagePage, refresh: realtimeRefreshPolicy.packagePolicy,
                 origin: from, destination: to, time: time)
+            let mappingStarted = ContinuousClock.now
             var calculation = calculation(from: result.result, origin: from, destination: to, supplemental: result.supplemental)
-            calculation.diagnostics?.milliseconds[.timetableReadiness] = readiness
-            calculation.diagnostics?.milliseconds[.graphPreparation] = graphMilliseconds
+            // The app operation includes router preparation and the concurrent bike branch.
+            var diagnostics = result.diagnostics
+            diagnostics.record(.adapterMapping, since: mappingStarted)
+            diagnostics.rebase(to: started)
+            diagnostics.record(.timetableReadiness, since: started, through: readinessEnd)
+            diagnostics.record(.graphPreparation, since: graphStarted, through: graphEnd)
+            calculation.diagnostics = diagnostics
             calculation.diagnostics?.totalMilliseconds = RoutingDiagnostics.elapsed(since: started)
             return calculation
         } catch is CancellationError { throw CancellationError() }

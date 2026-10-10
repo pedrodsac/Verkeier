@@ -10,6 +10,7 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         var routers: [ValhallaWalkingRouter]
         var activeCounts: [Int]
     }
+    private let measuredRoutes = MeasuredWalkingRouteCache()
     private var routerPool: RouterPool?
     // Each Valhalla actor serializes its own native calls. Open the second
     // instance only when another request is already using the first.
@@ -50,9 +51,16 @@ actor LocalFirstWalkingRouter: WalkingRouting {
     }
 
     func route(from origin: LocationPoint, to destination: LocationPoint) async throws -> OfflineWalkingRoute {
-        calibrated(try await withLocalRouter {
-            try await $0.route(from: origin, to: destination)
-        })
+        guard let dataset = try await datasetManager.activeDataset() else { throw WalkingRoutingError.datasetUnavailable }
+        return try await measuredRoutes.route(from: origin, to: destination, revision: dataset.revision) {
+            try await self.uncachedRoute(from: origin, to: destination)
+        }
+    }
+
+    func cacheRevision() async -> String? { try? await datasetManager.activeDataset()?.revision }
+
+    private func uncachedRoute(from: LocationPoint, to: LocationPoint) async throws -> OfflineWalkingRoute {
+        calibrated(try await withLocalRouter { try await $0.route(from: from, to: to) })
     }
 
     private func withLocalRouter<Value: Sendable>(
@@ -62,8 +70,8 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         guard let dataset = try await datasetManager.activeDataset() else {
             throw WalkingRoutingError.datasetUnavailable
         }
-        if routerPool?.version != dataset.version {
-            routerPool = RouterPool(version: dataset.version, routers: [], activeCounts: [])
+        if routerPool?.version != dataset.revision {
+            routerPool = RouterPool(version: dataset.revision, routers: [], activeCounts: [])
         }
         guard var pool = routerPool else { throw WalkingRoutingError.datasetUnavailable }
         let leastBusy = pool.activeCounts.enumerated().min { $0.element < $1.element }
@@ -92,7 +100,7 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         let router = pool.routers[index]
         routerPool = pool
         defer {
-            if routerPool?.version == dataset.version,
+            if routerPool?.version == dataset.revision,
                routerPool?.activeCounts.indices.contains(index) == true {
                 routerPool?.activeCounts[index] -= 1
             }
@@ -175,6 +183,11 @@ nonisolated struct LocalFirstWalkingRoutingProvider: WalkingRoutingProvider {
 
     init(walkingRouter: any WalkingRouting) {
         self.walkingRouter = walkingRouter
+    }
+
+    func cacheRevision() async -> String? {
+        if let router = walkingRouter as? LocalFirstWalkingRouter { return await router.cacheRevision() }
+        return nil
     }
 
     func estimate(_ request: WalkingRequest) async throws -> WalkingEstimate {

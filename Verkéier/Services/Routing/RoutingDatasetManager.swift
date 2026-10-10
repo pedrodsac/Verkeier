@@ -68,7 +68,9 @@ nonisolated struct RoutingDataset: Hashable, Sendable {
     let manifest: RoutingDatasetManifest
     let tileArchiveURL: URL
 
+    var storageRevision: String? = nil
     var version: String { manifest.datasetVersion }
+    var revision: String { storageRevision ?? version }
 }
 
 nonisolated enum RoutingDataState: Equatable, Sendable {
@@ -104,6 +106,19 @@ actor RoutingDatasetManager {
         let version: String
     }
 
+    private struct FileStamp: Equatable {
+        let inode: UInt64
+        let size: UInt64
+        let modified: Date?
+        init(_ url: URL) throws {
+            let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+            inode = (attributes[.systemFileNumber] as? NSNumber)?.uint64Value ?? 0
+            size = (attributes[.size] as? NSNumber)?.uint64Value ?? 0
+            modified = attributes[.modificationDate] as? Date
+        }
+        var revision: String { "\(inode):\(size):\(modified?.timeIntervalSince1970 ?? 0)" }
+    }
+    private var activeCache: (current: FileStamp, manifest: FileStamp, archive: FileStamp, dataset: RoutingDataset)?
     private let rootURL: URL
     private let versionsURL: URL
     private let stagingURL: URL
@@ -127,19 +142,29 @@ actor RoutingDatasetManager {
     }
 
     func activeDataset() throws -> RoutingDataset? {
-        guard FileManager.default.fileExists(atPath: currentURL.path) else { return nil }
+        guard FileManager.default.fileExists(atPath: currentURL.path) else {
+            activeCache = nil; return nil
+        }
+        let currentStamp = try FileStamp(currentURL)
+        if let cached = activeCache, cached.current == currentStamp {
+            let directory = versionDirectory(for: cached.dataset.version)
+            guard let manifest = try? FileStamp(directory.appendingPathComponent("manifest.json")),
+                  let archive = try? FileStamp(cached.dataset.tileArchiveURL) else {
+                activeCache = nil; throw RoutingDatasetError.activeDatasetMissing
+            }
+            if cached.manifest == manifest, cached.archive == archive { return cached.dataset }
+        }
         let current = try JSONDecoder().decode(CurrentDataset.self, from: Data(contentsOf: currentURL))
         let manifestURL = versionDirectory(for: current.version).appendingPathComponent("manifest.json")
         let archiveURL = versionDirectory(for: current.version).appendingPathComponent("tiles.tar")
-        guard FileManager.default.fileExists(atPath: manifestURL.path),
-              FileManager.default.fileExists(atPath: archiveURL.path)
-        else {
-            throw RoutingDatasetError.activeDatasetMissing
-        }
-        return RoutingDataset(
+        guard let manifestStamp = try? FileStamp(manifestURL), let archiveStamp = try? FileStamp(archiveURL)
+        else { activeCache = nil; throw RoutingDatasetError.activeDatasetMissing }
+        let dataset = RoutingDataset(
             manifest: try JSONDecoder.routing.decode(RoutingDatasetManifest.self, from: Data(contentsOf: manifestURL)),
-            tileArchiveURL: archiveURL
-        )
+            tileArchiveURL: archiveURL,
+            storageRevision: "\(current.version):\(manifestStamp.revision):\(archiveStamp.revision)")
+        activeCache = (currentStamp, manifestStamp, archiveStamp, dataset)
+        return dataset
     }
 
     /// Installs an already-downloaded `.tar` archive. The source file is never
