@@ -43,6 +43,10 @@ trying the middle and nearby alternate positions. Invisible and very short
 paths get no shield. These rules avoid collisions among our own decorations;
 MapKit controls basemap labels separately.
 
+Apple Maps points of interest are hidden while a Verkéier route overlay is
+present (journey, line, or trip traces). Clearing the overlay restores nearby
+points of interest, with Apple's public-transport locations still excluded.
+
 ## Data and update contract
 
 `RouteMapOverlayBuilder` maps source data without networking. Journey legs
