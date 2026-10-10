@@ -15,27 +15,48 @@ nonisolated struct BikeShareRoutePlanner: Sendable {
         let returns = candidates(in: all, near: destination)
         guard !pickups.isEmpty, !returns.isEmpty else { return nil }
 
-        var best: RouteOption?
-        for pickup in pickups {
-            guard let access = await path(from: origin, to: pickup.location),
-                  access.distanceMeters <= 1_000 else { continue }
-            for dropoff in returns where pickup.id != dropoff.id {
-                guard !Task.isCancelled else { return nil }
-                guard let egress = await path(from: dropoff.location, to: destination),
-                      egress.distanceMeters <= 1_000,
-                      let ride = await path(from: pickup.location, to: dropoff.location),
-                      ride.distanceMeters > 0, ride.distanceMeters <= 12_000 else { continue }
-                let candidate = makeOption(origin: origin, destination: destination,
-                    pickup: pickup, dropoff: dropoff, access: access, ride: ride,
-                    egress: egress, time: time, now: now)
-                // Prefer known available bikes/docks; unknown or zero counts still
-                // produce a selectable option with the existing warning badge.
-                if let previous = best {
-                    if isBetter(candidate, than: previous) { best = candidate }
-                } else { best = candidate }
+        let access = await paths(pickups.map { (origin, $0.location) })
+        let egress = await paths(returns.map { ($0.location, destination) })
+        let pairs = pickups.indices.flatMap { pickup in
+            returns.indices.compactMap { dropoff -> (Int, Int)? in
+                guard pickups[pickup].id != returns[dropoff].id,
+                      let start = access[pickup], start.distanceMeters <= 1_000,
+                      let end = egress[dropoff], end.distanceMeters <= 1_000 else { return nil }
+                return (pickup, dropoff)
             }
         }
+        let rides = await paths(pairs.map { (pickups[$0.0].location, returns[$0.1].location) })
+        var best: RouteOption?
+        // Completion order never determines the winner or changes tie breaking.
+        for (index, pair) in pairs.enumerated() {
+            guard !Task.isCancelled else { return nil }
+            guard let ride = rides[index], ride.distanceMeters > 0, ride.distanceMeters <= 12_000,
+                  let start = access[pair.0], let end = egress[pair.1] else { continue }
+            let candidate = makeOption(origin: origin, destination: destination,
+                pickup: pickups[pair.0], dropoff: returns[pair.1], access: start,
+                ride: ride, egress: end, time: time, now: now)
+            if let previous = best {
+                if isBetter(candidate, than: previous) { best = candidate }
+            } else { best = candidate }
+        }
         return Task.isCancelled ? nil : best
+    }
+
+    private func paths(_ pairs: [(LocationPoint, LocationPoint)]) async -> [RoadRoute?] {
+        guard !Task.isCancelled, !pairs.isEmpty else { return Array(repeating: nil, count: pairs.count) }
+        return await withTaskGroup(of: (Int, RoadRoute?).self) { group in
+            var next = 0
+            var results = Array<RoadRoute?>(repeating: nil, count: pairs.count)
+            func add(_ index: Int) {
+                group.addTask { (index, await path(from: pairs[index].0, to: pairs[index].1)) }
+            }
+            for _ in 0..<min(2, pairs.count) { add(next); next += 1 }
+            while let (index, route) = await group.next() {
+                results[index] = route
+                if next < pairs.count, !Task.isCancelled { add(next); next += 1 }
+            }
+            return results
+        }
     }
 
     private func isBetter(_ candidate: RouteOption, than other: RouteOption) -> Bool {

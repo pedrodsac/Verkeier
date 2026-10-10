@@ -18,10 +18,13 @@ actor AppJourneySessionStore {
     func calculate(databaseURL: URL, request: JourneyPlanningRequest,
                    page: JourneyPlanningPage, refresh: JourneyRefreshPolicy,
                    origin: LocationPoint, destination: LocationPoint, time: RoutePlanningTime
-    ) async throws -> (result: JourneyPlanningResult?, supplemental: [RouteOption]) {
+    ) async throws -> (result: JourneyPlanningResult?, supplemental: [RouteOption], diagnostics: RoutingDiagnostics) {
         generation += 1
         let current = generation
+        var preparation = RoutingDiagnostics()
+        let snapshotStarted = ContinuousClock.now
         let router = try await planner.router(for: databaseURL)
+        preparation.record(.snapshotPreparation, since: snapshotStarted)
         guard current == generation else { throw JourneyPlanningError.supersededRequest }
         let isNewRequest = self.request != request || self.databaseURL != databaseURL || session == nil || preparedRouter !== router
         if isNewRequest {
@@ -33,21 +36,35 @@ actor AppJourneySessionStore {
         guard let session else { throw JourneyPlanningError.supersededRequest }
         let isInitialPage: Bool
         if case .initial = page { isInitialPage = true } else { isInitialPage = false }
-        async let bike = isNewRequest || isInitialPage || refresh == .forceRefresh
-            ? bikePlanner.option(from: origin, to: destination, time: time)
-            : supplementalOptions.first
+        async let bike = Self.measuredBike(planner: bikePlanner,
+            calculate: isNewRequest || isInitialPage || refresh == .forceRefresh,
+            cached: supplementalOptions.first, origin: origin, destination: destination, time: time)
         let result: JourneyPlanningResult?
         do {
             result = try await session.calculate(page: page, refresh: refresh, now: .now)
         } catch JourneyPlanningError.noRouteFound {
             result = nil
         }
-        let option = await bike
+        let (option, bikeDiagnostics) = await bike
         try Task.checkCancellation()
         guard current == generation else { throw JourneyPlanningError.supersededRequest }
         guard result != nil || option != nil else { throw JourneyPlanningError.noRouteFound }
         supplementalOptions = option.map { [$0] } ?? []
-        return (result, supplementalOptions)
+        var diagnostics = preparation
+        if let result { diagnostics.include(result.diagnostics) }
+        diagnostics.include(bikeDiagnostics)
+        return (result, supplementalOptions, diagnostics)
+    }
+
+    private nonisolated static func measuredBike(planner: BikeShareRoutePlanner, calculate: Bool,
+        cached: RouteOption?, origin: LocationPoint, destination: LocationPoint, time: RoutePlanningTime
+    ) async -> (RouteOption?, RoutingDiagnostics) {
+        var diagnostics = RoutingDiagnostics()
+        guard calculate else { return (cached, diagnostics) }
+        let started = ContinuousClock.now
+        let option = await planner.option(from: origin, to: destination, time: time)
+        diagnostics.record(.bikeCalculation, since: started)
+        return (option, diagnostics)
     }
 
     func submit(_ option: RouteOption, replacing original: RouteOption) async throws -> (result: JourneyPlanningResult, supplemental: [RouteOption])? {
