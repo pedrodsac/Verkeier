@@ -23,9 +23,10 @@ parser.add_argument('--composition', choices=['transit', 'production'], default=
 parser.add_argument('--full-map', action='store_true')
 parser.add_argument('--full-evidence', action='store_true', help='Export complete plans; use separately from memory measurements')
 parser.add_argument('--request-budget', type=int, default=200, help='Maximum ATP requests across this invocation')
+parser.add_argument('--live-concurrency', type=int, help='Explicit benchmark override; production remains at its default')
 parser.add_argument('--compare-boards', action='store_true', help='Extra opt-in board equivalence requests')
-parser.add_argument('--warm', type=int, default=20)
-parser.add_argument('--cold', type=int, default=10)
+parser.add_argument('--warm', type=int, default=2, help='Warm samples after one priming operation')
+parser.add_argument('--cold', type=int, default=2, help='Fresh-process samples; at most five operations total per case')
 parser.add_argument('--epoch', type=float, help='Exact Unix planning timestamp from a captured sample')
 parser.add_argument('--verify-kernel', action='store_true', help='Quality verification only; changes CPU timings')
 parser.add_argument('--time', help='Fixed ISO 8601 planning time for comparison with another journey planner')
@@ -33,6 +34,8 @@ parser.add_argument('--avoid-tight-transfers', action='store_true', help='Avoid 
 parser.add_argument('--maximum-limit-ms', '--p95-limit-ms', dest='maximum_limit_ms', type=float,
     default=5000, help='Every operation must be below this threshold, including priming; use 0 for a separate Debug audit')
 args = parser.parse_args()
+if args.warm < 0 or args.cold < 0 or args.warm + args.cold + 1 > 5:
+    parser.error('Each case permits at most five operations, including one priming operation')
 if args.device is None:
     inventory = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'devices', '--json']))
     matches = [d for devices in inventory['devices'].values() for d in devices if d.get('isAvailable') and d['name'] == 'iPhone 17']
@@ -63,6 +66,8 @@ def run(scenario, samples, label):
         'SIMCTL_CHILD_ROUTING_BENCHMARK_FULL_EVIDENCE': '1' if args.full_evidence else '0',
         'SIMCTL_CHILD_ROUTING_BENCHMARK_COMPARE_BOARDS': '1' if args.compare_boards else '0',
         'SIMCTL_CHILD_ROUTING_BENCHMARK_REQUEST_BUDGET': str(max(0, args.request_budget - network_requests))}
+    if args.live_concurrency is not None:
+        env["SIMCTL_CHILD_ROUTING_BENCHMARK_LIVE_CONCURRENCY"] = str(args.live_concurrency)
     if args.capture_directory:
         env["SIMCTL_CHILD_ROUTING_BENCHMARK_CAPTURE_DIRECTORY"] = str(args.capture_directory.resolve())
     if args.bike_fixture:

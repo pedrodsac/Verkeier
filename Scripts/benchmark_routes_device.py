@@ -16,8 +16,10 @@ parser.add_argument('--app', required=True, type=Path)
 parser.add_argument('--database', required=True, type=Path)
 parser.add_argument('--fixture', required=True, type=Path)
 parser.add_argument('--output', required=True, type=Path)
-parser.add_argument('--samples', type=int, default=5)
+parser.add_argument('--samples', type=int, default=4, help='Measured samples after priming; at most five operations total per case')
 args = parser.parse_args()
+if args.samples < 0 or args.samples + 1 > 5:
+    parser.error('Each case permits at most five operations, including one priming operation')
 args.output.mkdir(parents=True, exist_ok=True)
 bundle = 'dev.pedrocordeiro.Verkeier'
 domain = ['--device', args.device, '--domain-type', 'appDataContainer', '--domain-identifier', bundle]
