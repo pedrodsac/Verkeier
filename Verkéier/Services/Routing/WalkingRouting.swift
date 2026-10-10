@@ -182,6 +182,8 @@ nonisolated extension OfflineWalkingEstimate {
     }
 
     var formattedDuration: String {
-        Duration.seconds(duration).formatted(.units(allowed: [.minutes], width: .abbreviated))
+        Duration.seconds(duration).formatted(.units(
+            allowed: [.minutes], width: .abbreviated, fractionalPart: .hide(rounded: .up)
+        ))
     }
 }

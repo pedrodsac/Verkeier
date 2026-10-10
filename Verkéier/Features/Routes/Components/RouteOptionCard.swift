@@ -84,7 +84,8 @@ struct RouteOptionCard: View {
 
     private var durationText: String {
         let duration = option.plan.expectedTravelTime ?? 0
-        let minutes = max(1, Int((duration / 60).rounded()))
+        let minutes = DurationDisplay.minutes(duration,
+            rounding: option.isWalkingOnly ? .up : .toNearestOrAwayFromZero) ?? 1
         return "\(minutes) min"
     }
 

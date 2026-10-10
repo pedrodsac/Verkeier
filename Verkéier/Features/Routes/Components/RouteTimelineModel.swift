@@ -184,8 +184,7 @@ enum RouteTimelineBuilder {
 
         let wait: Int? = {
             guard let arrival, let departure else { return nil }
-            let minutes = Int((departure.timeIntervalSince(arrival) / 60).rounded())
-            return minutes >= 1 ? minutes : nil
+            return DurationDisplay.minutes(departure.timeIntervalSince(arrival), rounding: .up)
         }()
 
         // Announce only when there's something to say: a non-zero delay or a
@@ -302,7 +301,8 @@ enum RouteTimelineBuilder {
 
     private static func durationMinutes(of leg: RoutePlan.Leg) -> Int? {
         guard let dep = departureTime(of: leg), let arr = arrivalTime(of: leg) else { return nil }
-        let minutes = Int((arr.timeIntervalSince(dep) / 60).rounded())
-        return minutes > 0 ? minutes : nil
+        let rounding: FloatingPointRoundingRule = leg.transportKind == .walking || leg.mode == .funicular
+            ? .up : .toNearestOrAwayFromZero
+        return DurationDisplay.minutes(arr.timeIntervalSince(dep), rounding: rounding)
     }
 }

@@ -66,10 +66,14 @@ struct RouteTimelineSummaryCard: View {
     /// arrival − departure shown in the header; falls back to the plan's
     /// estimate only when endpoints are unknown.
     private var durationText: String? {
+        let duration: TimeInterval
         if let dep = option.departureTime, let arr = option.arrivalTime {
-            return "\(max(1, Int((arr.timeIntervalSince(dep) / 60).rounded()))) min"
-        }
-        guard let estimate = option.plan.expectedTravelTime else { return nil }
-        return "\(max(1, Int((estimate / 60).rounded()))) min"
+            duration = arr.timeIntervalSince(dep)
+        } else if let estimate = option.plan.expectedTravelTime {
+            duration = estimate
+        } else { return nil }
+        let minutes = DurationDisplay.minutes(duration,
+            rounding: option.isWalkingOnly ? .up : .toNearestOrAwayFromZero) ?? 1
+        return "\(minutes) min"
     }
 }
