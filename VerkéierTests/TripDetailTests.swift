@@ -161,6 +161,50 @@ struct TripDetailTests {
         #expect(try JSONDecoder().decode(RoutePlan.Leg.self, from: data).tripInstance == leg.tripInstance)
     }
 
+    @Test func continuationSectionsKeepLiveStatusAndStopSequencesSeparate() async throws {
+        let selected = try selection()
+        let next = try selection(tripID: "next")
+        let child = TripDetailSnapshot(instance: next.instance,
+            stops: [stop(1, delay: 5), stop(2, delay: 5)], mapOverlay: .init(segments: []),
+            isApproximateRoute: false, liveDataAvailable: true, isCancelled: false, fetchedAt: anchor)
+        var root = snapshot([stop(1, delay: 0), stop(2, delay: 0)])
+        root.continuations = [.init(selection: next, snapshot: child)]
+        let model = TripDetailViewModel(now: { anchor })
+        model.select(selected)
+        await model.refresh(using: FixtureTripDetailService(snapshot: root))
+        #expect(model.rows.allSatisfy { $0.status == "On time" })
+        let section = try #require(model.continuations.first)
+        #expect(section.id == next.instance)
+        #expect(TripStopOccurrenceIdentity(instance: selected.instance, sequence: 1)
+            != TripStopOccurrenceIdentity(instance: next.instance, sequence: 1))
+        #expect(section.rows.map(\.id) == [1, 2])
+        #expect(section.rows.allSatisfy { $0.status == "+5" && !$0.isInRide })
+        #expect(section.stopName == "Stop 1")
+    }
+
+    @Test func failedContinuationRefreshRetainsItsOwnReportsWithoutStalingIncomingRun() async throws {
+        let selected = try selection()
+        let next = try selection(tripID: "next")
+        let child = TripDetailSnapshot(instance: next.instance,
+            stops: [stop(1, delay: 5)], mapOverlay: .init(segments: []), isApproximateRoute: false,
+            liveDataAvailable: true, isCancelled: false, fetchedAt: anchor)
+        var root = snapshot([stop(1, delay: 0)])
+        root.continuations = [.init(selection: next, snapshot: child)]
+        let model = TripDetailViewModel(now: { anchor })
+        model.select(selected)
+        await model.refresh(using: FixtureTripDetailService(snapshot: root))
+        let unavailable = TripDetailSnapshot(instance: next.instance, stops: [stop(1, delay: nil)], mapOverlay: child.mapOverlay,
+            isApproximateRoute: false, liveDataAvailable: false, isCancelled: false, fetchedAt: anchor)
+        root.continuations = [.init(selection: next, snapshot: unavailable)]
+        await model.refresh(using: FixtureTripDetailService(snapshot: root))
+        #expect(model.rows[0].status == "On time")
+        #expect(model.rows[0].statusTint == .green)
+        #expect(model.continuations[0].rows[0].status == "+5 · Stale")
+        #expect(model.errorMessage != nil)
+        model.select(try selection(tripID: "different"))
+        #expect(model.continuations.isEmpty)
+    }
+
     private func selection(tripID: String = "trip") throws -> TripDetailSelection {
         var value = leg()
         value.tripInstance = .init(feedGeneration: 1, tripID: tripID, serviceDate: "20261009")

@@ -69,6 +69,7 @@ struct VerkéierApp: App {
                 #if DEBUG
                 if RouteTracePreviewData.enabled { RouteTracePreviewHost() }
                 else if TripDetailPreviewData.enabled { TripDetailPreviewHost() }
+                else if TripContinuationPreviewHost.enabled { TripContinuationPreviewHost() }
                 else if SimulatorRouteBenchmark.enabled { SimulatorRouteBenchmarkView() }
                 else { TransitMapScreen(locationService: locationService) }
                 #else

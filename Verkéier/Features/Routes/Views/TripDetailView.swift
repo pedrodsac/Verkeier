@@ -14,7 +14,7 @@ struct TripDetailView: View {
                     // Let the loaded native rows register their scroll identities.
                     await Task.yield()
                     guard !Task.isCancelled else { return }
-                    proxy.scrollTo(target.boardingSequence, anchor: .top)
+                    proxy.scrollTo(TripStopOccurrenceIdentity(instance: target.instance, sequence: target.boardingSequence), anchor: .top)
                     scrolledSelection = target
                 }
         }
@@ -39,20 +39,40 @@ struct TripDetailView: View {
                     ForEach(viewModel.rows) { row in
 						if row.isInRide {
 							TripStopRow(row: row)
-								.id(row.id)
+								.id(TripStopOccurrenceIdentity(instance: selection.instance, sequence: row.id))
 								.listRowBackground(selection.mode.tint.opacity(0.10))
 						} else if row.isPassed {
 							TripStopRow(row: row)
-								.id(row.id)
+								.id(TripStopOccurrenceIdentity(instance: selection.instance, sequence: row.id))
 								.listRowBackground(Color(uiColor: .secondarySystemFill))
 						} else {
 							TripStopRow(row: row)
-								.id(row.id)
+								.id(TripStopOccurrenceIdentity(instance: selection.instance, sequence: row.id))
 						}
                     }
-                } footer: {
-                    if snapshot.isApproximateRoute {
+                }
+                ForEach(viewModel.continuations) { continuation in
+                    Section {
+                        ForEach(continuation.rows) { row in
+                            TripStopRow(row: row)
+                                .id(TripStopOccurrenceIdentity(instance: continuation.id, sequence: row.id))
+                        }
+                    } header: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Label("Stay aboard at \(continuation.stopName)", systemImage: "arrow.right")
+                            Text("Continues as \(continuation.lineName)")
+                            if let headsign = continuation.headsign {
+                                Text(headsign)
+                            }
+                        }
+                        .textCase(nil)
+                        .accessibilityElement(children: .combine)
+                    }
+                }
+                if snapshot.isApproximateRoute {
+                    Section {
                         Text("The dashed line connects stops. The exact route path is unavailable.")
+                            .font(.footnote).foregroundStyle(.secondary)
                     }
                 }
             } else if viewModel.isLoading {
@@ -84,8 +104,6 @@ private struct TripStopRow: View {
         VStack(alignment: .leading, spacing: 5) {
 			HStack(alignment: .center) {
 				stopName
-					.lineLimit(1)
-					.minimumScaleFactor(0.8)
 				Spacer(minLength: 12)
 				times
 			}

@@ -8,10 +8,12 @@ The engine checks active trips on the same service day, scheduled vehicle order,
 
 The app already maps verified continuations into its timeline, sharing, accessibility, transfer counts and itinerary validation. No route-number-specific exception or production data is embedded in the app.
 
+The bus detail page also follows verified onward runs, using MobiliteitKit revision `e881780`. It lists each onward line under a “Stay aboard at…” / “Continues as…” heading and includes its geometry on the map. Stop sequences, cancellations and live reports remain scoped to their original run; an unavailable onward report does not stale fresh incoming-run data. Only the originally selected ride is highlighted. A simulator-only `--trip-continuation-preview` launch mode provides an explicitly labelled 7 → 25 fixture, with `--trip-detail-accessibility` for large-text inspection. Both the normal and accessibility-size layouts were inspected on iPhone 17.
+
 Verification:
 
 - Full routing package suite: 242 tests in 36 suites passed (installed-feed replays are opt-in).
-- Full app suite: 190 tests in 33 suites passed on iPhone 17, Release, coverage disabled.
+- Full app suite: 192 tests in 33 suites passed on iPhone 17, Release, coverage disabled.
 - Installed-feed replay: the 20:33 line 7 → 25 connection above passed using a local timetable, without network requests.
 - Fixture coverage includes departure and arrival searches, a 30-second continuation despite a generic 450-second transfer buffer, explicit restrictions, invalid blocks and app mapping for both explicit links and vehicle blocks.
 

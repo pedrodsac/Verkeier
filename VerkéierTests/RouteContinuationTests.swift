@@ -82,6 +82,17 @@ struct RouteContinuationTests {
         #expect(mapped.plan.legs.first?.transitInstanceKey == "g7:first@20260904")
         #expect(mapped.plan.legs.first?.boardingStopSequence == 1)
         #expect(mapped.shareText(originTitle: "A", destinationTitle: "D").contains("Stay aboard"))
+        let selection = try #require(TripDetailSelection(leg: mapped.plan.legs[0]))
+        let detail = try await service.tripDetail(for: selection, refreshPolicy: .useCache)
+        #expect(detail.stops.map(\.sequence) == [1, 2])
+        let continuation = try #require(detail.continuations.first)
+        #expect(detail.continuations.count == 1)
+        #expect(continuation.selection.instance.tripID == "second")
+        #expect(continuation.selection.lineName == "18")
+        #expect(continuation.snapshot.stops.map(\.sequence) == [1, 2])
+        #expect(continuation.snapshot.stops.first?.stop.fullName == "B")
+        #expect(detail.mapOverlay.segments.contains { $0.routeShortName == "18" })
+        #expect(Set(detail.mapOverlay.stopMarkers.map(\.id)).count == detail.mapOverlay.stopMarkers.count)
     }
 
     @Test func ordinaryChangeStillRequiresTransferMinimum() {
