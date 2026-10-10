@@ -104,16 +104,41 @@ struct RouteWalkingVisibilityTests {
         await model.calculateRoute(using: service, from: nil)
         #expect(model.routeOptions.map(\.id) == [walk.id])
         #expect(model.supplementalRouteOptions.map(\.id) == [bike.id])
+        #expect(model.hasPendingWalkingRefinements)
 
         continuation.yield(.option(option("walk", mode: .walking, duration: 1_800)))
         continuation.finish()
         let deadline = ContinuousClock.now.advanced(by: .seconds(2))
-        while model.routeOptions.first?.id != bus.id, ContinuousClock.now < deadline {
+        while model.hasPendingWalkingRefinements, ContinuousClock.now < deadline {
             try await Task.sleep(for: .milliseconds(10))
         }
         #expect(model.routeOptions.map(\.id) == [bus.id])
         #expect(model.supplementalRouteOptions.map(\.id) == [bike.id])
         #expect(model.selectedRouteOptionID != walk.id)
+        #expect(!model.hasPendingWalkingRefinements)
+    }
+
+    @Test("An unfinished previous refinement does not delay the current generation")
+    func supersededRefinementDoesNotDelayCurrentGeneration() async throws {
+        let walk = option("walk", mode: .walking, duration: 600)
+        let (updates, continuation) = AsyncStream<WalkingRefinementEvent>.makeStream()
+        let model = configuredModel()
+        await model.calculateRoute(using: WalkingVisibilityFixture(options: [walk],
+            recommended: walk.id, refinements: updates), from: nil)
+        #expect(model.hasPendingWalkingRefinements)
+        let bus = option("bus", duration: 1_200)
+        await model.calculateRoute(using: WalkingVisibilityFixture(options: [bus], recommended: bus.id), from: nil)
+        let deadline = ContinuousClock.now.advanced(by: .seconds(2))
+        while model.hasPendingWalkingRefinements, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        #expect(!model.hasPendingWalkingRefinements)
+        continuation.finish()
+        while !model.pendingWalkingRefinements.isEmpty, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        #expect(model.pendingWalkingRefinements.isEmpty)
+        #expect(model.routeOptions.map(\.id) == [bus.id])
     }
 
     @Test("Paging applies the same walking visibility rule")

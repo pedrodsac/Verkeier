@@ -77,7 +77,7 @@ final class SimulatorRouteBenchmark {
             let paging = ["paging", "earlier", "arrival-earlier", "arrival-later"].contains(scenario)
             if paging || scenario == "refresh" || scenario == "cached" {
                 await viewModel.calculateRoute(using: service, from: nil)
-                try await Task.sleep(for: .seconds(1))
+                try await waitForWalkingRefinements()
             }
             var previousRequestID: UUID?
             for sample in 0..<samples {
@@ -88,7 +88,7 @@ final class SimulatorRouteBenchmark {
                     // a disabled button which performs no calculation.
                     if earlier ? !viewModel.canLoadEarlierRoutes : !viewModel.canLoadLaterRoutes {
                         await viewModel.calculateRoute(using: service, from: nil)
-                        try await Task.sleep(for: .milliseconds(500))
+                        try await waitForWalkingRefinements()
                     }
                     if scenario == "earlier" || scenario == "arrival-earlier" {
                         await viewModel.loadEarlierRoutes(using: service, from: nil)
@@ -123,6 +123,8 @@ final class SimulatorRouteBenchmark {
                         try await Task.sleep(for: .milliseconds(10))
                     }
                 }
+                // Keep first-render latency, but compare complete walking evidence.
+                try await waitForWalkingRefinements()
                 if scenario == "urban-bike", !viewModel.supplementalRouteOptions.contains(where: \.isVelohOnly) {
                     throw RoutingError.noRouteFound
                 }
@@ -200,9 +202,7 @@ final class SimulatorRouteBenchmark {
                     await compareStopBoards(phase: "after-cache")
                 }
                 status = "\(scenario) sample \(sample + 1)/\(samples): \(Int(diagnostics.totalMilliseconds)) ms"
-                // Geometry refinement is outside the gate. Let it finish before
-                // another sample, to avoid measuring concurrent search work.
-                try await Task.sleep(for: .milliseconds(500))
+                await Task.yield()
             }
             if production, let snapshot = await benchmarkBikes.snapshot() {
                 let path = FileManager.default.temporaryDirectory.appendingPathComponent("routing-bikes-\(UUID()).json")
@@ -223,6 +223,14 @@ final class SimulatorRouteBenchmark {
     nonisolated static func inputURL(_ path: String) -> URL {
         if path.hasPrefix("/") { return URL(fileURLWithPath: path) }
         return FileManager.default.temporaryDirectory.appendingPathComponent(path)
+    }
+
+    private func waitForWalkingRefinements() async throws {
+        let deadline = ContinuousClock.now.advanced(by: .seconds(120))
+        while viewModel.hasPendingWalkingRefinements, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        guard !viewModel.hasPendingWalkingRefinements else { throw RoutingError.noRouteFound }
     }
 
     private func configure(_ scenario: String) throws {

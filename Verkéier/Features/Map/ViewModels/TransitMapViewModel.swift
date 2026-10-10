@@ -68,6 +68,10 @@ final class TransitMapViewModel {
     var routeDiagnostics: RoutingDiagnostics?
     @ObservationIgnored var routeOperationStarted: ContinuousClock.Instant?
     @ObservationIgnored var routePublishedAt: ContinuousClock.Instant?
+    @ObservationIgnored var pendingWalkingRefinements: [Int: Int] = [:]
+    var hasPendingWalkingRefinements: Bool {
+        pendingWalkingRefinements[routeCalculationGeneration, default: 0] > 0
+    }
     var supplementalRouteOptions: [RouteOption] = []
     var isLoadingEarlierRoutes = false
     var isLoadingLaterRoutes = false
