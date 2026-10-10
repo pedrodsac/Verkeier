@@ -437,11 +437,17 @@ extension TransitMapViewModel {
         destination: LocationPoint,
         requestGeneration: Int
     ) {
+        pendingWalkingRefinements[requestGeneration, default: 0] += 1
         Task { [weak self] in
             let refinementStarted = ContinuousClock.now
             defer {
-                if let self, requestGeneration == self.routeCalculationGeneration {
-                    self.routeDiagnostics?.record(.refinement, since: refinementStarted)
+                if let self {
+                    let remaining = self.pendingWalkingRefinements[requestGeneration, default: 0] - 1
+                    if remaining > 0 { self.pendingWalkingRefinements[requestGeneration] = remaining }
+                    else { self.pendingWalkingRefinements.removeValue(forKey: requestGeneration) }
+                    if requestGeneration == self.routeCalculationGeneration {
+                        self.routeDiagnostics?.record(.refinement, since: refinementStarted)
+                    }
                 }
             }
             for await event in updates {
