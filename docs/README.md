@@ -20,6 +20,7 @@
 | Missing live updates on connecting trips | `ROUTING_LIVE_CONNECTIONS.md` |
 | Router performance, simulator measurements and reproduction | `ROUTE_CALCULATION_PERFORMANCE.md` |
 | UI lag, launch work and map update performance | `UI_PERFORMANCE.md` |
+| Route trace appearance, stop labels, and map shields | `MAP_TRACE_DESIGN.md` |
 
 ## Two-read orientation
 

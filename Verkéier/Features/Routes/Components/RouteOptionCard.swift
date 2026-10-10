@@ -4,7 +4,7 @@ import SwiftUI
 /// ``RouteRibbon`` of mode/line badges with individual status rings.
 ///
 /// Matches the Apple Maps Transit result row style: time range + duration on
-/// top, the mode ribbon as the dominant visual, metadata on the bottom.
+/// top with distance, and the mode ribbon as the dominant visual below.
 struct RouteOptionCard: View {
     let option: RouteOption
     let isSelected: Bool
@@ -15,7 +15,7 @@ struct RouteOptionCard: View {
     var body: some View {
         NavigationLink(value: TransitSheetRoute.routeTimeline(option.id)) {
             VStack(alignment: .leading, spacing: 8) {
-                // ── Header: time range / duration ──────────
+                // ── Header: time range / duration / distance ──────────
                 HStack(alignment: .firstTextBaseline, spacing: 0) {
                     if option.isVelohOnly || option.isWalkingOnly {
                         Text(durationText)
@@ -33,21 +33,21 @@ struct RouteOptionCard: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    Spacer(minLength: 0)
+                    Text("  ·  \(distanceText)")
+                        .font(.callout.weight(.semibold))
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
 
-                    if option.hasTightTransfer {
-                        RouteOptionBadge(status: .atRisk)
-                    }
+                    Spacer(minLength: 0)
                 }
 
                 // ── Mode / line ribbon ────────────────────────────────────
                 RouteRibbon(legs: option.plan.legs)
-
-                // ── Secondary metadata ────────────────────────────────────
-                Text(secondarySummary)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+				
+				if option.hasTightTransfer {
+					RouteOptionStrip(status: .atRisk)
+						.padding([.horizontal, .bottom], -4)
+				}
             }
             .padding(14)
             .background(cardBackground, in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
@@ -88,27 +88,27 @@ struct RouteOptionCard: View {
         return "\(minutes) min"
     }
 
-    private var secondarySummary: String {
-        let distance = preferences.formattedDistance(option.plan.distanceMeters ?? 0)
+    private var distanceText: String {
+        preferences.formattedDistance(option.plan.distanceMeters ?? 0)
+    }
+
+    private var accessibilitySummary: String {
         if option.isWalkingOnly {
-            return "Walking  ·  \(distance)"
+            return "Walking  ·  \(distanceText)"
         }
 
-        let transfers = switch option.transferCount {
-        case 0: "Direct"
-        case 1: "1 transfer"
-        default: "\(option.transferCount) transfers"
-        }
-
-        let summary = "\(transfers)  ·  \(distance)"
-        guard option.usesBikeShare else { return summary }
+        guard option.usesBikeShare else { return distanceText }
         let bikeNote = option.hasBikeAvailabilityWarning
             ? "Bike availability uncertain" : "Bike availability live"
-        return "\(summary)  ·  \(bikeNote)"
+        return "\(distanceText)  ·  \(bikeNote)"
     }
 
     private var cardBackground: AnyShapeStyle {
-        AnyShapeStyle(.thinMaterial)
+		if option.hasTightTransfer {
+			AnyShapeStyle(Color.orange.opacity(0.14))
+		} else {
+			AnyShapeStyle(.thinMaterial)
+		}
     }
 
     private var accessibilityLabel: String {
@@ -119,7 +119,7 @@ struct RouteOptionCard: View {
             RouteLineStatus.accessibilityDescription(for: $0)
         }.joined(separator: ", ")
         let warning = option.hasTightTransfer ? "Tight transfer" : ""
-        return [heading, warning, secondarySummary, lines].filter { !$0.isEmpty }.joined(separator: ". ")
+        return [heading, warning, accessibilitySummary, lines].filter { !$0.isEmpty }.joined(separator: ". ")
     }
 }
 

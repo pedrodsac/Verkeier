@@ -77,6 +77,7 @@ extension TransitMapScreen {
             refreshDepartures: refreshDepartures,
             refreshAlerts: refreshAlerts,
             calculateRoute: calculateRoute,
+            refreshRouteRealtime: refreshSelectedRouteRealtime,
             showDirections: showDirections,
             showHome: showHome,
             openSpecialEvent: openSpecialEvent,
@@ -115,7 +116,8 @@ extension TransitMapScreen {
                 updateAppearance: updateFavouriteAppearance,
                 removeFavourite: removeFavourite,
                 findStop: showSearch
-            )
+            ),
+            refreshTripDetail: { await tripDetailViewModel.refresh(using: tripDetailService) }
         )
     }
 
@@ -485,6 +487,10 @@ extension TransitMapScreen {
                 using: routeService, from: locationService.currentLocation, realtimeRefreshPolicy: refresh
             )
         }
+    }
+
+    func refreshSelectedRouteRealtime() async {
+        await viewModel.refreshSelectedRouteRealtime(using: routeService)
     }
 
     func loadEarlierRoutes() {

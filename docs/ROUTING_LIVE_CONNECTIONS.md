@@ -68,30 +68,25 @@ bypasses completed evidence. Unavailable, ambiguous, contradictory or expired
 reports retain honest scheduled or partial coverage.
 
 The app pins MobiliteitKit revision
-`f8d7b6a61877b9ff0c8429470600b2486a10c993`.
+`c7b19fec48196a8e998026f1f7c6336e49c7067c`.
 
-## Tracking calculated routes
+## Refreshing a route's live data
 
-The initial search allowance does not end live acquisition. Once route results
-are visible, the app immediately calls `refreshDisplayedRealtime` through its
-injected `RouteRealtimeRefreshing` service. The package checks every transit
-boarding occurrence in the accumulated session, including connecting vehicles
-and previously loaded pages. Groups of eight boarding stops each receive their
-own eight-second allowance, so a failed or slow earlier group cannot consume
-the opportunity of later stops. This work runs after route publication.
+Route results do not refresh automatically. Pull to refresh in the route detail
+(step-by-step timeline) screen requests fresh live data for that selected
+journey through the injected `RouteRealtimeRefreshing` service. The route list
+has no pull-to-refresh action; its Refresh Routes button remains a new search.
 
-The first check reuses fresh board coverage. Subsequent checks request fresh
-reports every 45 seconds while the directions or timeline is visible and the
-app is active. Changing endpoints, starting another calculation or page,
-leaving the route screen, or backgrounding the app cancels the tracking task.
-Generation checks reject late reports from superseded requests.
+The package scopes acquisition to the selected journey's boarding stops and
+trip instances, including its connecting vehicles. It applies those reports
+to that itinerary while retaining measured walking geometry and paging state.
+The app merges only the selected option, preserving the other alternatives and
+the user's selection. If the journey becomes invalid, normal selection fallback
+applies. A failed refresh keeps the last available result and displays a status
+message. Generation and selection checks reject updates after endpoints,
+calculation, paging or the selected route have changed.
 
-The package applies matched trip-instance updates to existing journeys, retaining
-measured walking geometry, page boundaries and per-journey validation contexts.
-It rechecks feasibility and ranking, removes cancellations and missed transfers,
-and returns an authoritative snapshot. The app preserves a usable manual
-selection or selects the package recommendation. Predictions keep their original
-observation timestamps; unavailable or expired evidence remains scheduled.
+The historical validation below describes the previous automatic tracking:
 
 [7 October validation](benchmarks/route-live-tracking-2026-10-07/validation.md)
 includes all 192 package tests, 18 focused app tests, and a live query that

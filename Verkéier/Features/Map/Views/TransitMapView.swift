@@ -43,6 +43,14 @@ struct TransitMapView: UIViewRepresentable {
             self.coordinator = coordinator
             super.init(frame: .zero)
             clipsToBounds = true
+            registerForTraitChanges([UITraitUserInterfaceStyle.self, UITraitAccessibilityContrast.self]) {
+                (view: MapContainerView, _: UITraitCollection) in
+                if let mapView = view.mapView { view.coordinator.routeContent.refreshAppearance(in: mapView) }
+            }
+            registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) {
+                (view: MapContainerView, _: UITraitCollection) in
+                if let mapView = view.mapView { view.coordinator.routeContent.layout(in: mapView) }
+            }
         }
 
         @available(*, unavailable)
@@ -83,6 +91,7 @@ struct TransitMapView: UIViewRepresentable {
 
             mapView?.frame = bounds
             applyStateIfPossible()
+            if let mapView { coordinator.routeContent.layout(in: mapView) }
         }
 
         private func applyStateIfPossible() {
@@ -111,9 +120,7 @@ struct TransitMapView: UIViewRepresentable {
                 coordinator.syncAnnotations(annotations, in: mapView)
             }
             if previous?.routeOverlay != state.routeOverlay {
-                let transfers = state.routeOverlay?.transferMarkers.map(RouteTransferAnnotation.init) ?? []
-                coordinator.syncTransferAnnotations(transfers, in: mapView)
-                coordinator.syncRoute(state.routeOverlay, in: mapView)
+                coordinator.routeContent.sync(state.routeOverlay, in: mapView)
             }
             if visibilityChanged || previous?.bikeShareStations != state.bikeShareStations {
                 let bikes = showsPins ? state.bikeShareStations.map(BikeShareMapAnnotation.init) : []
@@ -135,11 +142,8 @@ struct TransitMapView: UIViewRepresentable {
         var alertStopIds: Set<String> = []
         var isApplyingRegion = false
         private var annotationsByKey: [String: StopMapAnnotation] = [:]
-        private var transferAnnotationsByKey: [String: RouteTransferAnnotation] = [:]
         private var bikeShareAnnotationsByKey: [String: BikeShareMapAnnotation] = [:]
-        private var routeOverlay: RouteMapOverlay?
-        private var routePolylines: [MKPolyline] = []
-        private var routePolylineSegments: [ObjectIdentifier: RouteMapSegment] = [:]
+        let routeContent = RouteMapContent()
         private var walkRing: MKCircle?
         // ponytail: fixed 10-min ring at ~80 m/min; add a walk-time picker to vary it.
         private let walkRingRadiusMeters: CLLocationDistance = 800
@@ -190,28 +194,6 @@ struct TransitMapView: UIViewRepresentable {
             }
         }
 
-        func syncTransferAnnotations(
-            _ annotations: [RouteTransferAnnotation],
-            in mapView: MKMapView
-        ) {
-            let nextKeys = Set(annotations.map(\.key))
-            let staleKeys = Set(transferAnnotationsByKey.keys).subtracting(nextKeys)
-            let staleAnnotations = staleKeys.compactMap {
-                transferAnnotationsByKey.removeValue(forKey: $0)
-            }
-            mapView.removeAnnotations(staleAnnotations)
-
-            for annotation in annotations {
-                if let existing = transferAnnotationsByKey[annotation.key] {
-                    existing.update(from: annotation)
-                    continue
-                }
-
-                transferAnnotationsByKey[annotation.key] = annotation
-                mapView.addAnnotation(annotation)
-            }
-        }
-
         func syncBikeShareAnnotations(
             _ annotations: [BikeShareMapAnnotation],
             in mapView: MKMapView
@@ -234,33 +216,12 @@ struct TransitMapView: UIViewRepresentable {
             }
         }
 
-        func syncRoute(_ overlay: RouteMapOverlay?, in mapView: MKMapView) {
-            if routeOverlay == overlay {
-                return
-            }
-
-            if !routePolylines.isEmpty {
-                mapView.removeOverlays(routePolylines)
-                routePolylines = []
-                routePolylineSegments = [:]
-            }
-
-            routeOverlay = overlay
-
-            if let overlay {
-                let polylines = overlay.segments.compactMap { segment -> MKPolyline? in
-                    var coordinates = segment.coordinates.map(\.coordinate)
-                    guard coordinates.count >= 2 else { return nil }
-                    let polyline = MKPolyline(coordinates: &coordinates, count: coordinates.count)
-                    routePolylineSegments[ObjectIdentifier(polyline)] = segment
-                    return polyline
-                }
-                mapView.addOverlays(polylines)
-                routePolylines = polylines
-            }
+        func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
+            routeContent.scheduleLayout(in: mapView)
         }
 
         func mapView(_ mapView: MKMapView, regionDidChangeAnimated _: Bool) {
+            routeContent.layout(in: mapView)
             if isApplyingRegion {
                 isApplyingRegion = false
                 return
@@ -288,20 +249,7 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-            if let annotation = annotation as? RouteTransferAnnotation {
-                let identifier = "RouteTransferAnnotation"
-                let view =
-                    mapView.dequeueReusableAnnotationView(
-                        withIdentifier: identifier
-                    ) as? MKMarkerAnnotationView
-                    ?? MKMarkerAnnotationView(
-                        annotation: annotation,
-                        reuseIdentifier: identifier
-                    )
-                view.annotation = annotation
-                configureTransfer(view, for: annotation)
-                return view
-            }
+            if let view = routeContent.view(for: annotation, in: mapView) { return view }
 
             if let annotation = annotation as? BikeShareMapAnnotation {
                 let identifier = "BikeShareMapAnnotation"
@@ -336,7 +284,7 @@ struct TransitMapView: UIViewRepresentable {
             return view
         }
 
-        func mapView(_: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
             if let circle = overlay as? MKCircle {
                 let renderer = MKCircleRenderer(circle: circle)
                 renderer.fillColor = UIColor.systemBlue.withAlphaComponent(0.12)
@@ -349,64 +297,8 @@ struct TransitMapView: UIViewRepresentable {
                 return MKOverlayRenderer(overlay: overlay)
             }
 
-            let renderer = MKPolylineRenderer(polyline: polyline)
-            let segment = routePolylineSegments[ObjectIdentifier(polyline)]
-            let mode = segment?.mode ?? .unknown
-            renderer.strokeColor = routeColor(for: segment)
-            renderer.lineWidth = mode == .walking ? 2 : 3
-            renderer.lineCap = .round
-            renderer.lineJoin = .round
-            if mode == .walking {
-                renderer.lineDashPattern = [1, 4]
-            }
-            return renderer
-        }
-
-        private func routeColor(for segment: RouteMapSegment?) -> UIColor {
-            guard let segment else { return .systemBlue }
-            let palette: [UIColor] = switch segment.mode {
-            case .bus:
-                [.systemBlue, .link, .systemCyan, .systemIndigo]
-            case .train:
-                [
-                    .systemRed,
-                    .red,
-                    UIColor(red: 0.72, green: 0.08, blue: 0.12, alpha: 1),
-                    UIColor(red: 0.95, green: 0.22, blue: 0.18, alpha: 1)
-                ]
-            case .tram:
-                [
-                    .systemOrange,
-                    UIColor(red: 0.92, green: 0.42, blue: 0.06, alpha: 1),
-                    UIColor(red: 0.78, green: 0.31, blue: 0.02, alpha: 1),
-                    UIColor(red: 1.0, green: 0.55, blue: 0.12, alpha: 1)
-                ]
-            case .funicular:
-                [.systemTeal]
-            case .bicycle:
-                [Self.bicycleRouteColor]
-            case .walking:
-                [.secondaryLabel]
-            case .unknown:
-                [.systemBlue]
-            }
-
-            let routeKey = segment.routeId ?? segment.routeName ?? segment.id
-            let index = abs(routeKey.hashValue) % palette.count
-            return palette[index]
-        }
-
-        private func configureTransfer(
-            _ view: MKMarkerAnnotationView,
-            for _: RouteTransferAnnotation
-        ) {
-            view.markerTintColor = .systemIndigo
-            view.glyphTintColor = .white
-            view.glyphImage = UIImage(systemName: "arrow.triangle.2.circlepath")
-            view.titleVisibility = .visible
-            view.subtitleVisibility = .hidden
-            view.displayPriority = .required
-            view.canShowCallout = false
+            return routeContent.renderer(for: polyline, traits: mapView.traitCollection)
+                ?? MKOverlayRenderer(overlay: overlay)
         }
 
         private func configure(_ view: MKMarkerAnnotationView, for annotation: StopMapAnnotation) {

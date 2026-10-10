@@ -2,12 +2,12 @@ import Foundation
 import Testing
 @testable import Verkeier
 
-@Suite("Calculated route live tracking")
+@Suite("Route detail live refresh")
 @MainActor
 struct RouteRealtimeTrackingTests {
     private let anchor = Date(timeIntervalSince1970: 1_800_000_000)
 
-    @Test func allAlternativesUpdateAndManualSelectionSurvives() async throws {
+    @Test func onlySelectedRouteUpdatesAndManualSelectionSurvives() async throws {
         let model = configuredModel()
         let initial = (0..<10).map { option("route-\($0)", offset: Double($0 * 300)) }
         let live = (0..<10).map { option("route-\($0)", offset: Double($0 * 300), live: true) }
@@ -17,7 +17,8 @@ struct RouteRealtimeTrackingTests {
         let request = try #require(model.routeRealtimeRequest)
         await model.refreshRouteRealtime(using: service, request: request)
         #expect(model.unfilteredRouteOptions.count == 10)
-        #expect(model.unfilteredRouteOptions.flatMap(\.transitLegs).allSatisfy { $0.liveStatus == .live })
+        #expect(model.unfilteredRouteOptions.first { $0.id == "route-4" }?.transitLegs.first?.liveStatus == .live)
+        #expect(model.unfilteredRouteOptions.filter { $0.id != "route-4" } == initial.filter { $0.id != "route-4" })
         #expect(model.selectedRouteOptionID == "route-4")
         #expect(!model.isCalculatingRoute)
     }
@@ -51,26 +52,47 @@ struct RouteRealtimeTrackingTests {
         #expect(model.routeRealtimeRequest == nil)
     }
 
-    @Test func visibleSessionRefreshesRepeatedlyAndCancellationStopsIt() async throws {
+    @Test func manualRefreshMakesOneForcedRequestForTheSelectedRoute() async throws {
         let model = configuredModel()
         let recorder = TrackingRecorder()
-        let service = TrackingRouteService(initial: [option("route")], updated: [option("route", live: true)], recorder: recorder)
+        let service = TrackingRouteService(initial: [option("first"), option("second", offset: 600)],
+            updated: [option("second", offset: 600, live: true)], recorder: recorder)
         await model.calculateRoute(using: service, from: nil)
-        let request = try #require(model.routeRealtimeRequest)
-        let task = Task { await model.trackRouteRealtime(using: service, request: request, interval: .milliseconds(5)) }
-        await recorder.waitForTwoRefreshes()
-        task.cancel()
-        await task.value
-        let count = await recorder.count
-        try await Task.sleep(for: .milliseconds(20))
-        #expect(await recorder.count == count)
-        #expect(count >= 2)
-        let policies = await recorder.policies
-        #expect(policies.first == .useCache)
-        #expect(policies.dropFirst().allSatisfy { $0 == .forceRefresh })
+        #expect(await recorder.policies.isEmpty)
+        _ = model.selectRouteOption(id: "second")
+        await model.refreshSelectedRouteRealtime(using: service)
+        #expect(await recorder.policies == [.forceRefresh])
+        #expect(await recorder.optionIDs == ["second"])
+        #expect(model.selectedRouteOptionID == "second")
     }
 
-    @Test func pagingTemporarilyDisablesTrackingAndKeepsAllLoadedOptions() async throws {
+    @Test func selectionChangeRejectsAnInFlightUpdate() async throws {
+        let model = configuredModel()
+        let initial = [option("first"), option("second", offset: 600)]
+        let gate = TrackingGate()
+        let service = TrackingRouteService(initial: initial, updated: [option("first", live: true)], gate: gate)
+        await model.calculateRoute(using: service, from: nil)
+        let refresh = Task { await model.refreshSelectedRouteRealtime(using: service) }
+        await gate.waitUntilEntered()
+        _ = model.selectRouteOption(id: "second")
+        await gate.release()
+        await refresh.value
+        #expect(model.unfilteredRouteOptions == initial)
+        #expect(model.selectedRouteOptionID == "second")
+    }
+
+    @Test func failedRefreshKeepsExistingRouteAndReportsTheFailure() async throws {
+        let model = configuredModel()
+        let initial = [option("route")]
+        let service = TrackingRouteService(initial: initial, updated: [], fail: true)
+        await model.calculateRoute(using: service, from: nil)
+        await model.refreshSelectedRouteRealtime(using: service)
+        #expect(model.unfilteredRouteOptions == initial)
+        #expect(model.selectedRouteOptionID == "route")
+        #expect(model.routeStatusMessage?.contains("could not be refreshed") == true)
+    }
+
+    @Test func pagingDisablesDetailRefreshAndKeepsAllLoadedOptions() async throws {
         let model = configuredModel()
         let all = [option("first"), option("later", offset: 1_200)]
         let service = TrackingRouteService(initial: all, updated: all)
@@ -109,15 +131,17 @@ private struct TrackingRouteService: RouteService, RouteRealtimeRefreshing {
     var invalidated: Set<String> = []
     var gate: TrackingGate? = nil
     var recorder: TrackingRecorder? = nil
+    var fail = false
     nonisolated func calculateRoute(from: LocationPoint, to: LocationPoint, time: RoutePlanningTime,
         filters: RoutePlannerFilters, realtimeRefreshPolicy: RouteRealtimeRefreshPolicy, page: RouteSearchPage
     ) async throws -> RouteCalculation {
         .init(options: initial, selectedOptionID: initial.first?.id)
     }
-    nonisolated func refreshRouteRealtime(from: LocationPoint, to: LocationPoint,
+    nonisolated func refreshRouteRealtime(optionID: String, from: LocationPoint, to: LocationPoint,
         refreshPolicy: RouteRealtimeRefreshPolicy) async throws -> RouteCalculation? {
         await gate?.enter()
-        await recorder?.record(refreshPolicy)
+        await recorder?.record(optionID, refreshPolicy)
+        if fail { throw URLError(.notConnectedToInternet) }
         var calculation = RouteCalculation(options: updated, selectedOptionID: updated.first?.id)
         calculation.isAuthoritativeSnapshot = true
         calculation.invalidatedOptionIDs = invalidated
@@ -143,16 +167,10 @@ private actor TrackingGate {
 }
 
 private actor TrackingRecorder {
-    var count = 0
     var policies: [RouteRealtimeRefreshPolicy] = []
-    private var waiter: CheckedContinuation<Void, Never>?
-    func record(_ policy: RouteRealtimeRefreshPolicy) {
-        count += 1
+    var optionIDs: [String] = []
+    func record(_ optionID: String, _ policy: RouteRealtimeRefreshPolicy) {
+        optionIDs.append(optionID)
         policies.append(policy)
-        if count >= 2 { waiter?.resume(); waiter = nil }
-    }
-    func waitForTwoRefreshes() async {
-        if count >= 2 { return }
-        await withCheckedContinuation { waiter = $0 }
     }
 }

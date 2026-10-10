@@ -59,7 +59,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "000000000000000100000000"
             BuildableName = "Verkeier.app"
-            BlueprintName = "Verkeier"
             ReferencedContainer = "container:Verkeier.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

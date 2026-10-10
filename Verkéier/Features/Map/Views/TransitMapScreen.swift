@@ -8,8 +8,9 @@ import SwiftUI
 struct TransitMapScreen: View {
     @AppStorage("debugTransitDataMode") var debugTransitDataModeRawValue =
         DebugTransitDataMode.normal.rawValue
+    @Environment(\.scenePhase) var scenePhase
+    @Environment(\.tripDetailService) var tripDetailService
     @Environment(\.routeService) var routeService
-    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.walkingRouter) var walkingRouter
     @Environment(\.gtfsService) var gtfsService
     @Environment(\.liveTransitService) var liveTransitService
@@ -25,6 +26,10 @@ struct TransitMapScreen: View {
     @Query(sort: \PersistedFavouriteStop.createdAt) var favouriteEntities:
         [PersistedFavouriteStop]
     @State var viewModel = TransitMapViewModel()
+    @State var tripDetailViewModel = TripDetailViewModel()
+    @State var tripDetailReturnRegion: MKCoordinateRegion?
+    @State var tripDetailReturnDetent: BottomSheetDetent?
+    @State var tripDetailCameraDidFit = false
     @State var mapRegionUpdateTask: Task<Void, Never>?
     @State var searchUpdateContinuation: AsyncStream<String>.Continuation?
     @State var nearbyStopsUpdateTask: Task<Void, Never>?
@@ -43,6 +48,7 @@ struct TransitMapScreen: View {
         ZStack(alignment: .bottom) {
             TransitMapLayer(
                 viewModel: viewModel,
+                tripDetail: tripDetailViewModel,
                 navigation: sheetNavigation,
                 favouriteStopIds: favouriteStopIds,
                 bikeShareStations: bikeShareStations,
@@ -138,6 +144,19 @@ struct TransitMapScreen: View {
         .task {
             await observeSearchUpdates()
         }
+        .onChange(of: tripDetailSelection) { _, selection in
+            tripDetailNavigationChanged(to: selection)
+        }
+        .onChange(of: tripDetailViewModel.snapshot?.instance) {
+            fitTripDetailMapIfNeeded()
+        }
+        .task(id: activeTripDetailSelection) {
+            guard let selection = activeTripDetailSelection else {
+                tripDetailViewModel.deactivate()
+                return
+            }
+            await tripDetailViewModel.observe(selection, using: tripDetailService)
+        }
         .sensoryFeedback(.selection, trigger: viewModel.selectedStop?.id)
         .sensoryFeedback(.impact(weight: .light), trigger: favouriteStopIds.count)
         .onChange(of: locationService.currentLocation) {
@@ -179,10 +198,6 @@ struct TransitMapScreen: View {
         .onChange(of: viewModel.searchQuery) {
             scheduleSearchUpdate()
         }
-        .task(id: activeRouteRealtimeRequest) {
-            guard let request = activeRouteRealtimeRequest else { return }
-            await viewModel.trackRouteRealtime(using: routeService, request: request)
-        }
         .onChange(of: favouriteEntities) {
             favouriteStopIds = Set(favouriteEntities.map(\.stopId))
             let activeIDs = favouriteStopIds
@@ -211,15 +226,6 @@ struct TransitMapScreen: View {
 
     var favouriteStops: [Stop] {
         favouriteEntities.map(\.stop)
-    }
-
-    private var activeRouteRealtimeRequest: RouteRealtimeRequest? {
-        guard scenePhase == .active else { return nil }
-        let showingRoutes: Bool = switch sheetNavigation.activePath.last {
-        case .directions, .directionsForPreset, .routeTimeline: true
-        default: sheetNavigation.selectedTab == .plan && sheetNavigation.activePath.isEmpty
-        }
-        return showingRoutes ? viewModel.routeRealtimeRequest : nil
     }
 
     var favouriteRefreshKey: String {

@@ -12,6 +12,7 @@ struct TransitSheetPresentationModel {
     let lineDetail: LineDetailPresentationModel
     let alerts: AlertsPresentationModel
     let settings: SettingsPresentationModel
+    var tripDetail: TripDetailViewModel? = nil
 }
 
 struct TransitSheetActions {
@@ -20,6 +21,7 @@ struct TransitSheetActions {
     let refreshDepartures: () async -> Void
     let refreshAlerts: () -> Void
     let calculateRoute: () -> Void
+    let refreshRouteRealtime: () async -> Void
     let showDirections: () -> Void
     let showHome: () -> Void
     let openSpecialEvent: (SpecialEvent) -> Void
@@ -49,6 +51,7 @@ struct TransitSheetActions {
     let checkGTFSUpdate: () -> Void
     let setDebugDataMode: (DebugTransitDataMode) -> Void
     let favourites: FavouritesActions
+    var refreshTripDetail: () async -> Void = {}
 }
 
 struct NearbyStopsPresentationModel {

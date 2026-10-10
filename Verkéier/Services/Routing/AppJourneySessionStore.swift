@@ -74,11 +74,12 @@ actor AppJourneySessionStore {
         return result.map { ($0, supplementalOptions) }
     }
 
-    func refreshRealtime(origin: JourneyEndpoint, destination: JourneyEndpoint, force: Bool) async throws
+    func refreshRealtime(optionID: String, origin: JourneyEndpoint, destination: JourneyEndpoint, force: Bool) async throws
         -> (result: JourneyPlanningResult, supplemental: [RouteOption])? {
         guard let session, request?.origin == origin, request?.destination == destination else { return nil }
         let current = generation
-        let result = try await session.refreshDisplayedRealtime(refresh: force ? .forceRefresh : .useCache)
+        let result = try await session.refreshDisplayedRealtime(journeyID: .init(optionID),
+            refresh: force ? .forceRefresh : .useCache)
         guard current == generation else { throw JourneyPlanningError.supersededRequest }
         return (result, supplementalOptions)
     }

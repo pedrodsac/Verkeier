@@ -263,9 +263,6 @@ struct RouteView: View {
             }
 
             if !viewModel.supplementalRouteOptions.isEmpty {
-                Text("Bike option")
-                    .font(.headline)
-                    .padding(.top, 6)
                 ForEach(viewModel.supplementalRouteOptions) { option in
                     RouteOptionCard(
                         option: option,

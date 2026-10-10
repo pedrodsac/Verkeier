@@ -10,13 +10,28 @@ nonisolated struct RouteMapOverlay: Codable, Hashable, Sendable {
     let segments: [RouteMapSegment]
     /// Pins marking transfer points between legs.
     let transferMarkers: [RouteTransferMarker]
+    /// Ordered, source-backed stop occurrences. Legacy payloads have none.
+    let stopMarkers: [RouteMapStopMarker]
 
     init(
         segments: [RouteMapSegment],
-        transferMarkers: [RouteTransferMarker] = []
+        transferMarkers: [RouteTransferMarker] = [],
+        stopMarkers: [RouteMapStopMarker] = []
     ) {
         self.segments = segments
         self.transferMarkers = transferMarkers
+        self.stopMarkers = stopMarkers
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case segments, transferMarkers, stopMarkers
+    }
+
+    init(from decoder: any Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        segments = try values.decode([RouteMapSegment].self, forKey: .segments)
+        transferMarkers = try values.decodeIfPresent([RouteTransferMarker].self, forKey: .transferMarkers) ?? []
+        stopMarkers = try values.decodeIfPresent([RouteMapStopMarker].self, forKey: .stopMarkers) ?? []
     }
 
     /// `true` when no segment has enough coordinates to draw a line.
@@ -33,23 +48,35 @@ nonisolated struct RouteMapSegment: Codable, Hashable, Identifiable, Sendable {
     let mode: TransportMode
     /// Line label for transit segments.
     let routeName: String?
+    /// Public short line name, never inferred from a descriptive route name.
+    let routeShortName: String?
     /// Route identifier for transit segments.
     let routeId: String?
     /// Ordered polyline coordinates.
     let coordinates: [RouteMapCoordinate]
+
+    /// Optional styling keeps existing itinerary overlays and stored values compatible.
+    let emphasis: RouteMapEmphasis?
+    let isApproximate: Bool?
 
     init(
         id: String,
         mode: TransportMode,
         routeName: String? = nil,
         routeId: String? = nil,
-        coordinates: [RouteMapCoordinate]
+        coordinates: [RouteMapCoordinate],
+        emphasis: RouteMapEmphasis? = nil,
+        isApproximate: Bool? = nil,
+        routeShortName: String? = nil
     ) {
         self.id = id
         self.mode = mode
         self.routeName = routeName
+        self.routeShortName = routeShortName
         self.routeId = routeId
         self.coordinates = coordinates
+        self.emphasis = emphasis
+        self.isApproximate = isApproximate
     }
 }
 
@@ -86,4 +113,8 @@ nonisolated struct RouteMapCoordinate: Codable, Hashable, Sendable {
     var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
+}
+
+nonisolated enum RouteMapEmphasis: String, Codable, Hashable, Sendable {
+    case context, highlighted
 }

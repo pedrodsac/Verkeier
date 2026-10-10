@@ -6,6 +6,7 @@ import SwiftUI
 struct TransitMapLayer: View {
     @Environment(AppPreferences.self) private var preferences
     let viewModel: TransitMapViewModel
+    var tripDetail: TripDetailViewModel? = nil
     let navigation: TransitSheetNavigationState
     let favouriteStopIds: Set<String>
     let bikeShareStations: [BikeShareStation]
@@ -96,6 +97,8 @@ struct TransitMapLayer: View {
         switch navigation.activePath.last {
         case .routeTimeline:
             return viewModel.routeMapOverlay
+        case let .tripDetail(selection):
+            return tripDetail?.snapshot?.instance == selection.instance ? tripDetail?.snapshot?.mapOverlay : nil
         case .lineDetail:
             return viewModel.selectedLineDetail?.mapOverlay
         default:

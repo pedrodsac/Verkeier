@@ -12,6 +12,7 @@ struct VerkéierApp: App {
     private let gtfsService: any GTFSService
     private let liveTransitService: any LiveTransitService
     private let routeService: any RouteService
+    private let tripDetailService: any TripDetailService
     private let walkingRouter: any WalkingRouting
     private let bundledRoutingDatasetInstaller: BundledRoutingDatasetInstaller
     private let modelContainer: ModelContainer
@@ -52,6 +53,7 @@ struct VerkéierApp: App {
         routeService.prepareForRouting()
         #endif
         self.routeService = routeService
+        self.tripDetailService = routeService
         modelContainer = AppModelContainer.make()
     }
 
@@ -59,14 +61,22 @@ struct VerkéierApp: App {
         WindowGroup {
             Group {
                 #if targetEnvironment(simulator)
+                #if DEBUG
+                if RouteTracePreviewData.enabled { RouteTracePreviewHost() }
+                else if TripDetailPreviewData.enabled { TripDetailPreviewHost() }
+                else if SimulatorRouteBenchmark.enabled { SimulatorRouteBenchmarkView() }
+                else { TransitMapScreen(locationService: locationService) }
+                #else
                 if SimulatorRouteBenchmark.enabled { SimulatorRouteBenchmarkView() }
                 else { TransitMapScreen(locationService: locationService) }
+                #endif
                 #else
                 TransitMapScreen(locationService: locationService)
                 #endif
             }
                 .environment(\.appConfiguration, configuration)
                 .environment(\.routeService, routeService)
+                .environment(\.tripDetailService, tripDetailService)
                 .environment(\.walkingRouter, walkingRouter)
                 .environment(\.gtfsService, gtfsService)
                 .environment(\.liveTransitService, liveTransitService)

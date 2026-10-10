@@ -25,27 +25,20 @@ struct StopDetailView: View {
     var body: some View {
         List {
             if let stop = viewModel.stop {
-                if !viewModel.availablePlatforms.isEmpty {
-                    PlatformFilterPicker(
-                        platforms: viewModel.availablePlatforms,
-                        selectedPlatform: viewModel.selectedPlatform,
-                        selectPlatform: actions.selectDeparturePlatform
-                    )
-                    .listRowInsets(chromeRowInsets)
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-                }
-
                 StopDetailHeader(
                     stop: stop,
                     routes: viewModel.routes,
                     selectedLine: viewModel.selectedLine,
                     showDirections: actions.showDirections,
-                    toggleDepartureLine: actions.toggleDepartureLine
+                    toggleDepartureLine: actions.toggleDepartureLine,
+					availablePlatforms: viewModel.availablePlatforms,
+					selectedPlatform: viewModel.selectedPlatform,
+					selectDeparturePlatform: actions.selectDeparturePlatform
                 )
-                .listRowInsets(chromeRowInsets)
+                .listRowInsets(chipsRowInsets)
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
+				.safeAreaPadding(.horizontal, 16)
 
                 if let liveActivityErrorMessage = viewModel.liveActivityErrorMessage {
                     Label(liveActivityErrorMessage, systemImage: "exclamationmark.triangle.fill")
@@ -165,6 +158,10 @@ struct StopDetailView: View {
             }
         }
     }
+	
+	private var chipsRowInsets: EdgeInsets {
+		EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0)
+	}
 
     private var chromeRowInsets: EdgeInsets {
         EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)

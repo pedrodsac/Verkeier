@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "  ·  %@" : {
       "localizations" : {
         "de" : {
@@ -119,6 +122,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "%@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
           }
         }
       }
@@ -646,6 +659,9 @@
         }
       }
     },
+    "Alighting stop" : {
+
+    },
     "All" : {
       "localizations" : {
         "de" : {
@@ -945,6 +961,9 @@
           }
         }
       }
+    },
+    "Boarding stop" : {
+
     },
     "Bus 000" : {
       "localizations" : {
@@ -2314,6 +2333,9 @@
     "Information may be incomplete or delayed." : {
 
     },
+    "Intermediate stop" : {
+
+    },
     "Journey Alerts" : {
       "localizations" : {
         "de" : {
@@ -2673,6 +2695,9 @@
           }
         }
       }
+    },
+    "Loading stops…" : {
+
     },
     "Location" : {
       "extractionState" : "stale",
@@ -3800,6 +3825,9 @@
         }
       }
     },
+    "Part of your ride" : {
+
+    },
     "Permissions" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4138,6 +4166,9 @@
           }
         }
       }
+    },
+    "Platform unavailable" : {
+
     },
     "Preferred mode" : {
       "extractionState" : "stale",
@@ -5304,6 +5335,9 @@
         }
       }
     },
+    "Shows every stop and its live status" : {
+
+    },
     "Start typing to find stops from local GTFS data." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5394,6 +5428,9 @@
           }
         }
       }
+    },
+    "Stop details unavailable" : {
+
     },
     "Stop Sequence" : {
       "localizations" : {
@@ -5566,6 +5603,12 @@
           }
         }
       }
+    },
+    "Terminus" : {
+
+    },
+    "The dashed line connects stops. The exact route path is unavailable." : {
+
     },
     "Theme" : {
       "localizations" : {
@@ -5905,10 +5948,16 @@
         }
       }
     },
+    "Transfer stop" : {
+
+    },
     "Transit data details" : {
 
     },
     "Travel" : {
+
+    },
+    "Try again" : {
 
     },
     "Try again when your location is available." : {

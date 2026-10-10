@@ -159,11 +159,14 @@ extension RouteOption {
             updated.requiredTransferSeconds = leg.requiredTransferSeconds
             updated.requiredTotalTransferSeconds = leg.requiredTotalTransferSeconds
             updated.continuesInSeatFromTripID = leg.continuesInSeatFromTripID
+            updated.tripInstance = leg.tripInstance
             updated.transitInstanceKey = leg.transitInstanceKey
             updated.boardingStopSequence = leg.boardingStopSequence
             updated.alightingStopSequence = leg.alightingStopSequence
             updated.walkingEvidence = geometry?.walkingEvidence ?? leg.walkingEvidence
             updated.nativeWalkingRange = leg.nativeWalkingRange
+            updated.mapStops = leg.mapStops
+            updated.routeShortName = leg.routeShortName
             return updated
         }
 
@@ -229,16 +232,7 @@ extension RouteOption {
             legs: legs,
             dataSource: plan.dataSource
         )
-        let overlay = RouteMapOverlay(segments: legs.compactMap { leg in
-            guard leg.mapCoordinates.count >= 2 else { return nil }
-            return RouteMapSegment(
-                id: leg.id,
-                mode: leg.mode,
-                routeName: leg.routeName,
-                routeId: leg.routeId,
-                coordinates: leg.mapCoordinates
-            )
-        })
+        let overlay = RouteMapOverlayBuilder.itinerary(legs: legs)
         return RouteOption(id: id, plan: updatedPlan, mapOverlay: overlay.isEmpty ? nil : overlay,
                            feasibility: feasibility, statusEvidence: statusEvidence,
                            validationContext: validationContext, refinementToken: refinementToken)

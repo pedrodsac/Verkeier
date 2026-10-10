@@ -72,12 +72,16 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
         var requiredTransferSeconds: Int? = nil
         var requiredTotalTransferSeconds: Int? = nil
         var continuesInSeatFromTripID: String? = nil
+        var tripInstance: TripRunIdentity? = nil
         var transitInstanceKey: String? = nil
         var boardingStopSequence: Int? = nil
         var alightingStopSequence: Int? = nil
         /// Whether walking time came from an actual pedestrian route or an estimate.
         var walkingEvidence: RouteWalkingEvidence? = nil
         var nativeWalkingRange: Range<Int>? = nil
+        /// Includes boarding, intermediate visits, and alighting in travel order.
+        var mapStops: [RouteStopOccurrence]? = nil
+        var routeShortName: String? = nil
 
         init(
             id: String,
@@ -106,7 +110,9 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
             delayMinutes: Int? = nil,
             liveStatus: RouteLegLiveStatus = .scheduled,
             transferWarning: String? = nil,
-            bikeShareDetails: BikeShareLegDetails? = nil
+            bikeShareDetails: BikeShareLegDetails? = nil,
+            mapStops: [RouteStopOccurrence]? = nil,
+            routeShortName: String? = nil
         ) {
             self.id = id
             self.mode = mode
@@ -135,6 +141,8 @@ nonisolated struct RoutePlan: Codable, Hashable, Identifiable, Sendable {
             self.liveStatus = liveStatus
             self.transferWarning = transferWarning
             self.bikeShareDetails = bikeShareDetails
+            self.mapStops = mapStops
+            self.routeShortName = routeShortName
         }
     }
 
