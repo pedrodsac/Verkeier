@@ -35,9 +35,16 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         to destinations: [WalkingDestination]
     ) async throws -> [OfflineWalkingEstimate] {
         guard !destinations.isEmpty else { return [] }
-        return calibrated(try await withLocalRouter {
-            try await $0.estimates(from: origin, to: destinations)
-        })
+        var results: [OfflineWalkingEstimate] = []
+        for destination in destinations {
+            try Task.checkCancellation()
+            do {
+                let path = try await route(from: origin, to: destination.location)
+                results.append(.init(destinationID: destination.id, distanceMeters: path.distanceMeters,
+                                     duration: path.duration, source: path.source))
+            } catch WalkingRoutingError.noRoute { continue }
+        }
+        return results
     }
 
     func estimates(
@@ -45,21 +52,48 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         to destination: LocationPoint
     ) async throws -> [OfflineWalkingEstimate] {
         guard !origins.isEmpty else { return [] }
-        return calibrated(try await withLocalRouter {
-            try await $0.estimates(from: origins, to: destination)
-        })
+        var results: [OfflineWalkingEstimate] = []
+        for origin in origins {
+            try Task.checkCancellation()
+            do {
+                let path = try await route(from: origin.location, to: destination)
+                results.append(.init(destinationID: origin.id, distanceMeters: path.distanceMeters,
+                                     duration: path.duration, source: path.source))
+            } catch WalkingRoutingError.noRoute { continue }
+        }
+        return results
     }
 
     func route(from origin: LocationPoint, to destination: LocationPoint) async throws -> OfflineWalkingRoute {
         guard let dataset = try await datasetManager.activeDataset() else { throw WalkingRoutingError.datasetUnavailable }
-        return try await measuredRoutes.route(from: origin, to: destination, revision: dataset.revision) {
+        return try await measuredRoutes.route(from: origin, to: destination, revision: Self.revision(dataset)) {
             try await self.uncachedRoute(from: origin, to: destination, dataset: dataset)
         }
     }
 
-    func cacheRevision() async -> String? { try? await datasetManager.activeDataset()?.revision }
+    func cacheRevision() async -> String? {
+        guard let dataset = try? await datasetManager.activeDataset() else { return nil }
+        return Self.revision(dataset)
+    }
+
+    private static func revision(_ dataset: RoutingDataset) -> String {
+        "\(dataset.revision)|\(PafendallFunicularConnection.revision)"
+    }
 
     private func uncachedRoute(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset) async throws -> OfflineWalkingRoute {
+        let direct = try? await pedestrianRoute(from: from, to: to, dataset: dataset)
+        try Task.checkCancellation()
+        if let connection = try? await PafendallFunicularConnection.route(from: from, to: to, pedestrian: {
+            try await self.pedestrianRoute(from: $0, to: $1, dataset: dataset)
+        }), direct == nil || connection.duration < direct!.duration {
+            return connection
+        }
+        try Task.checkCancellation()
+        guard let direct else { throw WalkingRoutingError.noRoute }
+        return direct
+    }
+
+    private func pedestrianRoute(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset) async throws -> OfflineWalkingRoute {
         calibrated(try await withLocalRouter(dataset: dataset) { try await $0.route(from: from, to: to) })
     }
 
@@ -115,17 +149,6 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         return try await operation(router)
     }
 
-    private func calibrated(_ estimates: [OfflineWalkingEstimate]) -> [OfflineWalkingEstimate] {
-        estimates.map {
-            OfflineWalkingEstimate(
-                destinationID: $0.destinationID,
-                distanceMeters: $0.distanceMeters,
-                duration: WalkingDurationCalibration.adjusted($0.duration),
-                source: $0.source
-            )
-        }
-    }
-
     private func calibrated(_ route: OfflineWalkingRoute) -> OfflineWalkingRoute {
         OfflineWalkingRoute(
             distanceMeters: route.distanceMeters,
@@ -163,6 +186,9 @@ nonisolated struct LocalFirstRoadRouteProvider: RoadRouteProviding {
         guard let route = try? await walkingRouter.route(from: origin, to: destination) else {
             return nil
         }
+        // Station rides are presented from the native structured transfer.
+        // This legacy geometry-only seam must never flatten one into a walk.
+        guard route.segments.isEmpty else { return nil }
         return RoadRoute(
             coordinates: route.coordinates,
             distanceMeters: route.distanceMeters,
@@ -221,7 +247,8 @@ nonisolated struct LocalFirstWalkingRoutingProvider: WalkingRoutingProvider {
             polyline: route.coordinates.map {
                 Coordinate(latitude: $0.latitude, longitude: $0.longitude)
             },
-            evidence: route.source == .straightLineEstimate ? .estimate : .routedPedestrian
+            evidence: route.source == .straightLineEstimate ? .estimate : .routedPedestrian,
+            segments: route.segments
         )
     }
 
@@ -259,7 +286,8 @@ nonisolated struct LocalFirstWalkingRoutingProvider: WalkingRoutingProvider {
                         polyline: route.coordinates.map {
                             Coordinate(latitude: $0.latitude, longitude: $0.longitude)
                         },
-                        evidence: route.source == .straightLineEstimate ? .estimate : .routedPedestrian
+                        evidence: route.source == .straightLineEstimate ? .estimate : .routedPedestrian,
+                        segments: route.segments
                     ))
                 }
             }

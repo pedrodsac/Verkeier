@@ -1,0 +1,272 @@
+{
+  "date": "2026-10-11",
+  "device": "iPhone 17 simulator",
+  "package_revision": "4bfe3e96b9ae168fd059e05b312927267d2ce95e",
+  "transfer_measurement": {
+    "configuration": "Release, coverage disabled; installed Valhalla graph",
+    "directions": [
+      {
+        "calculation_ms": 130.194625,
+        "direction": "tram-to-train",
+        "distance_meters": 370.527314916562,
+        "duration_seconds": 251,
+        "segments": [
+          {
+            "distance_meters": 106,
+            "duration_seconds": 94,
+            "mode": "walking"
+          },
+          {
+            "distance_meters": 225.52731491656198,
+            "duration_seconds": 123,
+            "mode": "funicular"
+          },
+          {
+            "distance_meters": 39,
+            "duration_seconds": 34,
+            "mode": "walking"
+          }
+        ],
+        "source": "stationConnection"
+      },
+      {
+        "calculation_ms": 67.263375,
+        "direction": "train-to-tram",
+        "distance_meters": 370.527314916562,
+        "duration_seconds": 251,
+        "segments": [
+          {
+            "distance_meters": 39,
+            "duration_seconds": 34,
+            "mode": "walking"
+          },
+          {
+            "distance_meters": 225.52731491656195,
+            "duration_seconds": 123,
+            "mode": "funicular"
+          },
+          {
+            "distance_meters": 106,
+            "duration_seconds": 94,
+            "mode": "walking"
+          }
+        ],
+        "source": "stationConnection"
+      }
+    ]
+  },
+  "overnight_verification": {
+    "planning_time": "2026-10-10T23:33:00+02:00",
+    "origin": "Senningerberg, Gromscheed",
+    "destination": "Lorentzweiler, Gare",
+    "configuration": "Release test host, coverage instrumentation enabled; installed GTFS generation 5 and Valhalla graph; empty recorded ATP boards, no live network",
+    "total_ms": 10719.623917,
+    "stages_ms": {
+      "adapterMapping": 0.707583,
+      "bikeCalculation": 115.8955,
+      "boardFetch": 49,
+      "boardMatching": 0,
+      "candidateBuilding": 41.293458,
+      "decode": 8,
+      "directWalkingWait": 0.001166,
+      "endpoints": 216.363041,
+      "firstRender": 182.447625,
+      "geometry": 2.519541,
+      "graphPreparation": 50.043084,
+      "http": 338,
+      "publication": 7.875916,
+      "ranking": 0.09325,
+      "raptor": 9576.014417,
+      "realtime": 184.40391599999998,
+      "realtimeDiscovery": 125.418667,
+      "refinement": 7.533415000000001,
+      "resultAssembly": 0.35275,
+      "schedulePreparation": 37,
+      "snapshotPreparation": 446.689667,
+      "timetableReadiness": 0.59225,
+      "validation": 0.073959,
+      "walkingTransfers": 6948
+    },
+    "passes": [
+      {
+        "candidates": 295,
+        "duration_ms": 1674.431125,
+        "horizon_s": 7200,
+        "rounds": 4,
+        "start_ms": 802.2761670000001,
+        "wave": 0
+      },
+      {
+        "candidates": 295,
+        "duration_ms": 100.57775,
+        "horizon_s": 14400,
+        "rounds": 4,
+        "start_ms": 2546.3513330000005,
+        "wave": 0
+      },
+      {
+        "candidates": 515,
+        "duration_ms": 7801.015625,
+        "horizon_s": 28800,
+        "rounds": 4,
+        "start_ms": 2703.667375,
+        "wave": 0
+      }
+    ],
+    "first_journey": {
+      "arrival": 1791674700,
+      "departure": 1791669700.57125,
+      "id": "g5:1740>2015:24264581@20261010:31-33|24446402@20261010:0-7|24455256@20261011:1-5",
+      "legs": [
+        {
+          "arrival": 1791670886,
+          "departure": 1791669700.57125,
+          "from": "Gromscheed",
+          "fromStop": "",
+          "line": "walk",
+          "to": "Senningerberg, M\u00ebnsterb\u00ebsch",
+          "toStop": "",
+          "transferWarning": ""
+        },
+        {
+          "arrival": 1791671201,
+          "departure": 1791670886,
+          "from": "Senningerberg, M\u00ebnsterb\u00ebsch",
+          "fromStop": "000200508008",
+          "line": "325",
+          "to": "Kirchberg, Hugo Gernsback",
+          "toStop": "000200417040",
+          "transferWarning": ""
+        },
+        {
+          "arrival": 1791671336.02125,
+          "departure": 1791671201,
+          "from": "Kirchberg, Hugo Gernsback",
+          "fromStop": "",
+          "line": "walk",
+          "to": "Kirchberg, Luxexpo",
+          "toStop": "",
+          "transferWarning": ""
+        },
+        {
+          "arrival": 1791672710,
+          "departure": 1791672120,
+          "from": "Kirchberg, Luxexpo",
+          "fromStop": "000200417052",
+          "line": "T1",
+          "to": "Kirchberg, Rout Br\u00e9ck - Pafendall",
+          "toStop": "000200417058",
+          "transferWarning": ""
+        },
+        {
+          "arrival": 1791672804,
+          "departure": 1791672710,
+          "from": "Kirchberg, Rout Br\u00e9ck - Pafendall",
+          "fromStop": "",
+          "line": "walk",
+          "to": "Rout Br\u00e9ck-Pafendall, Funicular",
+          "toStop": "",
+          "transferWarning": ""
+        },
+        {
+          "arrival": 1791672927,
+          "departure": 1791672804,
+          "from": "Rout Br\u00e9ck-Pafendall, Funicular",
+          "fromStop": "",
+          "line": "Funicular",
+          "to": "Pfaffenthal-Kirchberg, Funicular",
+          "toStop": "",
+          "transferWarning": ""
+        },
+        {
+          "arrival": 1791672961,
+          "departure": 1791672927,
+          "from": "Pfaffenthal-Kirchberg, Funicular",
+          "fromStop": "",
+          "line": "walk",
+          "to": "Pfaffenthal-Kirchberg, Gare",
+          "toStop": "",
+          "transferWarning": ""
+        },
+        {
+          "arrival": 1791674700,
+          "departure": 1791674040,
+          "from": "Pfaffenthal-Kirchberg, Gare",
+          "fromStop": "000200417051",
+          "line": "RB",
+          "to": "Lorentzweiler, Gare",
+          "toStop": "000160807006",
+          "transferWarning": ""
+        }
+      ]
+    },
+    "unfiltered_journeys": [
+      {
+        "arrival": 1791674700,
+        "departure": 1791668059.2875,
+        "id": "g5:612>2015:24291394@20261010:31-34|24360279@20261010:2-12|24455256@20261011:1-5",
+        "lines": [
+          "850",
+          "16",
+          "Funicular",
+          "RB"
+        ]
+      },
+      {
+        "arrival": 1791674700,
+        "departure": 1791668059.2875,
+        "id": "g5:612>2015:24291394@20261010:31-34|24360279@20261010:2-12|24429227@20261010:2-14|24455256@20261011:2-5",
+        "lines": [
+          "850",
+          "16",
+          "CN5",
+          "RB"
+        ]
+      },
+      {
+        "arrival": 1791674700,
+        "departure": 1791669155.2875,
+        "id": "g5:612>2015:24262420@20261010:23-26|24446402@20261010:0-7|24455256@20261011:1-5",
+        "lines": [
+          "212",
+          "T1",
+          "Funicular",
+          "RB"
+        ]
+      },
+      {
+        "arrival": 1791674700,
+        "departure": 1791669700.57125,
+        "id": "g5:1740>2015:24264581@20261010:31-33|24446402@20261010:0-7|24455256@20261011:1-5",
+        "lines": [
+          "325",
+          "T1",
+          "Funicular",
+          "RB"
+        ]
+      },
+      {
+        "arrival": 1791691680,
+        "departure": 1791687740.1375,
+        "id": "g5:127>2015:24365491@20261011:0-20|24455413@20261011:0-5",
+        "lines": [
+          "29",
+          "RB"
+        ]
+      },
+      {
+        "arrival": 1791695280,
+        "departure": 1791691340.1375,
+        "id": "g5:127>2015:24365511@20261011:0-20|24455412@20261011:0-5",
+        "lines": [
+          "29",
+          "RB"
+        ]
+      }
+    ]
+  },
+  "tests": {
+    "app": 205,
+    "package": 250
+  }
+}

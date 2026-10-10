@@ -1,11 +1,13 @@
 import CoreLocation
 import Foundation
+import MobiliteitKit
 
 /// The provenance of an on-foot calculation. This remains in the domain model
 /// so persisted routes retain provenance. Legacy cases remain decodable;
 /// production walking calculations use only the local pedestrian graph.
 nonisolated enum WalkingEstimateSource: String, Codable, Sendable {
     case localOSM
+    case stationConnection
     case mapKit
     case straightLineEstimate
 }
@@ -53,17 +55,20 @@ nonisolated struct OfflineWalkingRoute: Hashable, Sendable {
     let duration: TimeInterval
     let coordinates: [RouteMapCoordinate]
     let source: WalkingEstimateSource
+    let segments: [WalkingRouteSegment]
 
     init(
         distanceMeters: Double,
         duration: TimeInterval,
         coordinates: [RouteMapCoordinate],
-        source: WalkingEstimateSource
+        source: WalkingEstimateSource,
+        segments: [WalkingRouteSegment] = []
     ) {
         self.distanceMeters = distanceMeters
         self.duration = duration
         self.coordinates = coordinates
         self.source = source
+        self.segments = segments
     }
 }
 
