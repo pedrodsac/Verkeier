@@ -18,6 +18,7 @@
 | Leave at, Arrive by, Earlier and Later behavior | `ROUTE_TIME_CONTROLS.md` |
 | Preventing invalid, wasteful, unstable or duplicate journeys | `ROUTING_FAILURE_PREVENTION_PLAN.md` + `ROUTING_FAILURE_PREVENTION_IMPLEMENTATION.md` (behavior, 49-case regressions and verification) |
 | Missing live updates on connecting trips | `ROUTING_LIVE_CONNECTIONS.md` |
+| Buses continuing under another line number (7 → 25) | `ROUTING_BLOCK_CONTINUATIONS.md` |
 | Router performance, simulator measurements and reproduction | `ROUTE_CALCULATION_PERFORMANCE.md` |
 | UI lag, launch work and map update performance | `UI_PERFORMANCE.md` |
 | Route trace appearance, stop labels, and map shields | `MAP_TRACE_DESIGN.md` |

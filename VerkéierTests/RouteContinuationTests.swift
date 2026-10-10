@@ -39,7 +39,7 @@ struct RouteContinuationTests {
         #expect(RouteItineraryValidator.assess(route, context: .init(anchor: Date(timeIntervalSince1970: 100_000), arriveBy: false, minimumTransferSeconds: 120)) == .feasible(minimumTransferSlack: nil))
     }
 
-    @Test func packageContinuationMapsToAppWithoutLostBoundary() async throws {
+    @Test(arguments: [false, true]) func packageContinuationMapsToAppWithoutLostBoundary(useVehicleBlock: Bool) async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -51,9 +51,13 @@ struct RouteContinuationTests {
             "calendar_dates.txt": "service_id,date,exception_type\nservice,20260904,1\n",
             "routes.txt": "route_id,agency_id,route_short_name,route_type\nr1,op,16,3\nr2,op,18,3\n",
             "stops.txt": "stop_id,stop_name,stop_lat,stop_lon\na,A,49.6,6.1\nb,B,49.61,6.1\nd,D,49.62,6.1\n",
-            "trips.txt": "route_id,service_id,trip_id\nr1,service,first\nr2,service,second\n",
+            "trips.txt": useVehicleBlock
+                ? "route_id,service_id,trip_id,block_id\nr1,service,first,vehicle\nr2,service,second,vehicle\n"
+                : "route_id,service_id,trip_id\nr1,service,first\nr2,service,second\n",
             "stop_times.txt": "trip_id,arrival_time,departure_time,stop_id,stop_sequence\nfirst,08:00:00,08:00:00,a,1\nfirst,08:10:00,08:10:00,b,2\nsecond,08:10:00,08:10:00,b,1\nsecond,08:20:00,08:20:00,d,2\n",
-            "transfers.txt": "from_trip_id,to_trip_id,transfer_type\nfirst,second,4\n"
+            "transfers.txt": useVehicleBlock
+                ? "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nb,b,2,450\n"
+                : "from_trip_id,to_trip_id,transfer_type\nfirst,second,4\n"
         ]
         for (path, content) in files {
             let bytes = Data(content.utf8)
