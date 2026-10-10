@@ -67,6 +67,7 @@ ATP (mobiliteit.lu) access is routed through the Cloudflare Worker in the `verke
 - async/await + typed models over ad-hoc dictionaries or string parsing.
 - Keep new files inside the relevant feature/layer folder — **no root-level source files**.
 - Support Dynamic Type and VoiceOver; handle loading, empty, error, stale, and offline states.
+- Display walking and transfer durations rounded up to the next whole minute, including sub-minute legs. Keep precise durations for route calculations.
 
 ## Hard rules
 

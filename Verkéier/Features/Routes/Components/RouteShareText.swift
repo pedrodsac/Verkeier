@@ -11,7 +11,10 @@ extension RouteOption {
 
         if let arrive = arrivalTime {
             let depart = firstTransitDepartureTime ?? plan.legs.first?.departureTime
-            let minutes = plan.expectedTravelTime.map { "\(Int($0 / 60)) min" }
+            let minutes = plan.expectedTravelTime.map { duration in
+                let value = isWalkingOnly ? (DurationDisplay.minutes(duration, rounding: .up) ?? 0) : Int(duration / 60)
+                return "\(value) min"
+            }
             let detail = [minutes, "\(transferCount) transfer\(transferCount == 1 ? "" : "s")"]
                 .compactMap(\.self).joined(separator: ", ")
             lines.append("Depart \(clock(depart)), arrive \(clock(arrive)) (\(detail))")

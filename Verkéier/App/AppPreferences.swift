@@ -130,7 +130,7 @@ final class AppPreferences {
     }
 
     func formattedWalkingMinutes(for meters: CLLocationDistance) -> String {
-        let minutes = max(1, Int((meters / 1.33 / 60).rounded()))
+        let minutes = DurationDisplay.minutes(meters / 1.33, rounding: .up) ?? 1
         return "\(minutes) min"
     }
 

@@ -59,8 +59,7 @@ struct RouteRibbon: View {
         let dep = leg.realtimeDepartureTime ?? leg.scheduledDepartureTime ?? leg.departureTime
         let arr = leg.realtimeArrivalTime ?? leg.scheduledArrivalTime ?? leg.arrivalTime
         guard let dep, let arr else { return nil }
-        let minutes = Int((arr.timeIntervalSince(dep) / 60).rounded())
-        return minutes > 0 ? minutes : nil
+        return DurationDisplay.minutes(arr.timeIntervalSince(dep), rounding: .up)
     }
 
     private var accessibilityDescription: String {
