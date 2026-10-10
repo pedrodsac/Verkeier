@@ -3,6 +3,19 @@ import Foundation
 /// Collapses verified stay-aboard boundaries into the first ride's row while
 /// preserving original segment identities for alerts and journey navigation.
 enum RouteTimelinePresentation {
+    /// One line badge per vehicle ride, with walking and bike links preserved.
+    static func ribbonLegs(from legs: [RoutePlan.Leg]) -> [RoutePlan.Leg] {
+        legs.enumerated().compactMap { index, leg in
+            guard [.transit, .walking, .bikeShare].contains(leg.transportKind) else { return nil }
+            if index > 0, leg.transportKind == .transit {
+                let incoming = legs[index - 1]
+                if incoming.transportKind == .transit, let tripID = incoming.tripId,
+                   leg.continuesInSeatFromTripID == tripID { return nil }
+            }
+            return leg
+        }
+    }
+
     static func items(from legs: [RoutePlan.Leg]) -> [RouteTimelineItem] {
         let original = RouteTimelineBuilder.items(from: legs)
         var result: [RouteTimelineItem] = []
