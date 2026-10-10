@@ -53,22 +53,28 @@ actor LocalFirstWalkingRouter: WalkingRouting {
     func route(from origin: LocationPoint, to destination: LocationPoint) async throws -> OfflineWalkingRoute {
         guard let dataset = try await datasetManager.activeDataset() else { throw WalkingRoutingError.datasetUnavailable }
         return try await measuredRoutes.route(from: origin, to: destination, revision: dataset.revision) {
-            try await self.uncachedRoute(from: origin, to: destination)
+            try await self.uncachedRoute(from: origin, to: destination, dataset: dataset)
         }
     }
 
     func cacheRevision() async -> String? { try? await datasetManager.activeDataset()?.revision }
 
-    private func uncachedRoute(from: LocationPoint, to: LocationPoint) async throws -> OfflineWalkingRoute {
-        calibrated(try await withLocalRouter { try await $0.route(from: from, to: to) })
+    private func uncachedRoute(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset) async throws -> OfflineWalkingRoute {
+        calibrated(try await withLocalRouter(dataset: dataset) { try await $0.route(from: from, to: to) })
     }
 
     private func withLocalRouter<Value: Sendable>(
+        dataset selectedDataset: RoutingDataset? = nil,
         _ operation: @Sendable (ValhallaWalkingRouter) async throws -> Value
     ) async throws -> Value {
         try Task.checkCancellation()
-        guard let dataset = try await datasetManager.activeDataset() else {
-            throw WalkingRoutingError.datasetUnavailable
+        let dataset: RoutingDataset
+        if let selectedDataset { dataset = selectedDataset }
+        else {
+            guard let active = try await datasetManager.activeDataset() else {
+                throw WalkingRoutingError.datasetUnavailable
+            }
+            dataset = active
         }
         if routerPool?.version != dataset.revision {
             routerPool = RouterPool(version: dataset.revision, routers: [], activeCounts: [])

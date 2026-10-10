@@ -23,7 +23,10 @@ def samples(folder):
 before, after = samples(args.baseline), samples(args.optimized)
 fields = ['planningTime', 'avoidTightTransfers', 'recommendedOption', 'options', 'unfilteredJourneys',
           'journeys', 'displayedLegs', 'realtimeCoverage', 'refreshPolicy', 'canonicalPlans',
+          'canonicalSupplementalPlans', 'matchingRejections',
           'canLoadEarlier', 'canLoadLater', 'supplementalOptions']
+if not before or not after:
+    raise SystemExit('Both inputs must contain benchmark samples')
 report = []
 errors = []
 for key in sorted(before.keys() | after.keys()):

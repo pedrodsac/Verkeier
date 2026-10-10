@@ -62,6 +62,26 @@ struct BikeShareRoutePlannerTests {
         #expect(!option.hasBikeAvailabilityWarning)
     }
 
+    @Test func completionOrderPreservesTieWinnerAndSharesEgress() async throws {
+        let pickupA = station("pickup-a", latitude: 49.6001)
+        let pickupB = station("pickup-b", latitude: 49.6002)
+        let returnA = station("return-a", latitude: 49.6101)
+        let returnB = station("return-b", latitude: 49.6102)
+        let roads = ReorderedBikeRoads()
+        let planner = BikeShareRoutePlanner(stations: BikeFixtureStations(
+            values: [returnB, pickupB, returnA, pickupA]), roads: roads)
+        let result = try #require(await planner.option(from: origin, to: destination,
+            time: .departAt(anchor), now: anchor))
+        let expected = await BikeShareRoutePlanner(stations: BikeFixtureStations(
+            values: [pickupA, returnA]), roads: BikeFixtureRoads()).option(
+                from: origin, to: destination, time: .departAt(anchor), now: anchor)
+        #expect(result == expected)
+        let counts = await roads.counts()
+        #expect(counts.maximum == 2)
+        #expect(counts.egress == 2)
+        #expect(counts.total == 8)
+    }
+
     @Test func cancelledWorkCannotPublishOption() async {
         let planner = BikeShareRoutePlanner(stations: fixture(), roads: BikeFixtureRoads())
         let task = Task {
@@ -103,5 +123,35 @@ nonisolated struct BikeFixtureRoads: RoadRouteProviding {
         return RoadRoute(coordinates: [RouteMapCoordinate(from), RouteMapCoordinate(to)],
             distanceMeters: ride ? rideDistance : walkDistance, expectedTravelTime: ride ? 720 : 60,
             walkingEvidence: estimated ? .estimate : .routedPedestrian)
+    }
+}
+
+/// Finish the second pickup first so task completion cannot choose a tie winner.
+nonisolated private struct ReorderedBikeRoads: RoadRouteProviding {
+    private let probe = BikeRoadProbe()
+    func counts() async -> (maximum: Int, egress: Int, total: Int) { await probe.counts() }
+    func roadRouteCoordinates(from: LocationPoint, to: LocationPoint,
+                              transport: RoadRouteTransport) async -> [RouteMapCoordinate]? {
+        await roadRoute(from: from, to: to, transport: transport)?.coordinates
+    }
+    func roadRoute(from: LocationPoint, to: LocationPoint,
+                   transport: RoadRouteTransport) async -> RoadRoute? {
+        await probe.route(from: from, to: to, transport: transport)
+    }
+}
+
+private actor BikeRoadProbe {
+    private var active = 0
+    private var maximum = 0
+    private var egress = 0
+    private var total = 0
+    func counts() -> (maximum: Int, egress: Int, total: Int) { (maximum, egress, total) }
+    func route(from: LocationPoint, to: LocationPoint,
+                   transport: RoadRouteTransport) async -> RoadRoute? {
+        active += 1; total += 1; maximum = max(maximum, active)
+        if to.id == "destination" { egress += 1 }
+        defer { active -= 1 }
+        try? await Task.sleep(for: .milliseconds(from.id == "pickup-a" ? 20 : 1))
+        return await BikeFixtureRoads().roadRoute(from: from, to: to, transport: transport)
     }
 }
