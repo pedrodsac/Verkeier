@@ -3,26 +3,12 @@ import Foundation
 /// Pure mapping shared by initial journeys and every subsequent refinement.
 nonisolated enum RouteMapOverlayBuilder {
     static func itinerary(legs: [RoutePlan.Leg]) -> RouteMapOverlay {
-        var segments = legs.compactMap { leg -> RouteMapSegment? in
+        let segments = legs.compactMap { leg -> RouteMapSegment? in
             guard leg.mapCoordinates.count >= 2 else { return nil }
             return RouteMapSegment(id: leg.id, mode: leg.mode, routeName: leg.routeName,
                 routeId: leg.routeId, coordinates: leg.mapCoordinates,
                 isApproximate: leg.transportKind == .walking && leg.walkingEvidence == .estimate ? true : nil,
                 routeShortName: leg.routeShortName)
-        }
-        // Station transfers can be represented as adjacent rides without an
-        // explicit walking leg. Keep the platform gap visible without changing
-        // the planner's transfer allowance or claiming a surveyed footpath.
-        for (incoming, outgoing) in zip(legs, legs.dropFirst()) {
-            guard incoming.transportKind == .transit,
-                  outgoing.transportKind == .transit,
-                  outgoing.continuesInSeatFromTripID == nil else { continue }
-            let from = RouteMapCoordinate(incoming.destination)
-            let to = RouteMapCoordinate(outgoing.origin)
-            guard from != to else { continue }
-            segments.append(RouteMapSegment(
-                id: "transfer-walk:\(incoming.id):\(outgoing.id)",
-                mode: .walking, coordinates: [from, to], isApproximate: true))
         }
         let rides = legs.enumerated().filter { $0.element.transportKind == .transit || $0.element.transportKind == .bikeShare }
         var markers: [RouteMapStopMarker] = []

@@ -58,6 +58,10 @@ Only coincident stop boundaries of adjacent transit legs can merge. Walking
 interchanges retain their separate stop locations. In-seat continuations do
 not create transfer markers. Line and trip maps use their own real ordered
 stop sequences. No geometry is synthesized to connect missing route shapes.
+When clipping a GTFS shape to a ride, stop coordinates select the source range;
+they never replace its endpoints. Aggregate station coordinates can sit between
+platforms, so separate trip shapes stay disconnected across a transfer unless
+the itinerary supplies an explicit walking path.
 
 The same itinerary builder is used after walking, shape, and realtime updates.
 Added Codable metadata is optional or decodes missing collections as empty.

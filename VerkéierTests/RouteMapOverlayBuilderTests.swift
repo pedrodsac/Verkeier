@@ -97,7 +97,7 @@ struct RouteMapOverlayBuilderTests {
         #expect(overlay.stopMarkers.isEmpty)
     }
 
-    @Test func adjacentPlatformTransferShowsWalkingConnection() throws {
+    @Test func adjacentPlatformTransferStaysDisconnected() {
         let arrivalPlatform = RouteStopOccurrence(id: "platform-1", stopID: "station", name: "Station",
             coordinate: .init(latitude: 49.61, longitude: 6.1))
         let departurePlatform = RouteStopOccurrence(id: "platform-2", stopID: "station", name: "Station",
@@ -105,16 +105,9 @@ struct RouteMapOverlayBuilderTests {
         let incoming = ride("incoming", stops: [stop("a"), arrivalPlatform])
         let outgoing = ride("outgoing", stops: [departurePlatform, stop("d")])
         let overlay = RouteMapOverlayBuilder.itinerary(legs: [incoming, outgoing])
-        let walk = try #require(overlay.segments.first { $0.mode == .walking })
-        #expect(walk.coordinates == [RouteMapCoordinate(incoming.destination), RouteMapCoordinate(outgoing.origin)])
-        #expect(walk.isApproximate == true)
-
-        var continuation = outgoing
-        continuation.continuesInSeatFromTripID = "incoming-trip"
-        #expect(!RouteMapOverlayBuilder.itinerary(legs: [incoming, continuation]).segments.contains { $0.mode == .walking })
-
-        let samePlatform = ride("same-platform", stops: [stop("b"), stop("d")])
-        #expect(!RouteMapOverlayBuilder.itinerary(legs: [incoming, samePlatform]).segments.contains { $0.mode == .walking })
+        #expect(overlay.segments.map(\.id) == [incoming.id, outgoing.id])
+        #expect(overlay.segments.map(\.coordinates) == [incoming.mapCoordinates, outgoing.mapCoordinates])
+        #expect(!overlay.segments.contains { $0.mode == .walking })
 
         let explicitWalk = RoutePlan.Leg(id: "walk", mode: .walking, transportKind: .walking,
             origin: incoming.destination, destination: outgoing.origin,
