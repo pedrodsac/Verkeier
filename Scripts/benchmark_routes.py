@@ -16,8 +16,17 @@ parser.add_argument('--device', help='Simulator UDID; defaults to the available 
 parser.add_argument('--app', required=True, type=Path)
 parser.add_argument('--output', required=True, type=Path)
 parser.add_argument('--scenarios', nargs='+', default=['depart', 'reverse', 'coordinates', 'arrive', 'exact', 'rural', 'paging', 'refresh', 'recorded-live', 'deadline-arrive', 'cached'])
+parser.add_argument('--fixture', type=Path, help='Recorded ATP board, with dates matching --time')
+parser.add_argument('--capture-directory', type=Path, help='Replay successful transport capture for identical board queries')
+parser.add_argument('--bike-fixture', type=Path, help='Recorded bike availability snapshot')
+parser.add_argument('--composition', choices=['transit', 'production'], default='production')
+parser.add_argument('--full-map', action='store_true')
+parser.add_argument('--request-budget', type=int, default=200, help='Maximum ATP requests across this invocation')
+parser.add_argument('--compare-boards', action='store_true', help='Extra opt-in board equivalence requests')
 parser.add_argument('--warm', type=int, default=20)
 parser.add_argument('--cold', type=int, default=10)
+parser.add_argument('--epoch', type=float, help='Exact Unix planning timestamp from a captured sample')
+parser.add_argument('--verify-kernel', action='store_true', help='Quality verification only; changes CPU timings')
 parser.add_argument('--time', help='Fixed ISO 8601 planning time for comparison with another journey planner')
 parser.add_argument('--avoid-tight-transfers', action='store_true', help='Avoid transfers with less than three minutes available')
 parser.add_argument('--maximum-limit-ms', '--p95-limit-ms', dest='maximum_limit_ms', type=float,
@@ -35,16 +44,31 @@ if args.device is None:
         subprocess.run(['xcrun', 'simctl', 'bootstatus', args.device, '-b'], check=True)
 args.output.mkdir(parents=True, exist_ok=True)
 repo = Path(__file__).resolve().parent.parent
-fixture = repo / 'VerkéierTests/Fixtures/esch-delayed-passlist.json'
+fixture = args.fixture or repo / 'VerkéierTests/Fixtures/esch-delayed-passlist.json'
+network_requests = 0
+network_records = []
 subprocess.run(['xcrun', 'simctl', 'install', args.device, str(args.app)], check=True)
 records = []
 cached_records = []
 
 def run(scenario, samples, label):
+    global network_requests
     log = args.output / f'{scenario}-{label}.log'
     env = os.environ | {'SIMCTL_CHILD_ROUTING_BENCHMARK_SCENARIO': scenario,
         'SIMCTL_CHILD_ROUTING_BENCHMARK_SAMPLES': str(samples),
-        'SIMCTL_CHILD_ROUTING_BENCHMARK_FIXTURE': str(fixture)}
+        'SIMCTL_CHILD_ROUTING_BENCHMARK_FIXTURE': str(fixture.resolve()),
+        'SIMCTL_CHILD_ROUTING_BENCHMARK_COMPOSITION': args.composition,
+        'SIMCTL_CHILD_ROUTING_BENCHMARK_FULL_MAP': '1' if args.full_map else '0',
+        'SIMCTL_CHILD_ROUTING_BENCHMARK_COMPARE_BOARDS': '1' if args.compare_boards else '0',
+        'SIMCTL_CHILD_ROUTING_BENCHMARK_REQUEST_BUDGET': str(max(0, args.request_budget - network_requests))}
+    if args.capture_directory:
+        env["SIMCTL_CHILD_ROUTING_BENCHMARK_CAPTURE_DIRECTORY"] = str(args.capture_directory.resolve())
+    if args.bike_fixture:
+        env["SIMCTL_CHILD_ROUTING_BENCHMARK_BIKE_FIXTURE"] = str(args.bike_fixture.resolve())
+    if args.epoch is not None:
+        env["SIMCTL_CHILD_ROUTING_BENCHMARK_EPOCH"] = repr(args.epoch)
+    if args.verify_kernel:
+        env["SIMCTL_CHILD_ROUTING_VERIFY_KERNEL"] = "1"
     if args.time:
         env['SIMCTL_CHILD_ROUTING_BENCHMARK_TIME'] = args.time
     env['SIMCTL_CHILD_ROUTING_BENCHMARK_AVOID_TIGHT_TRANSFERS'] = '1' if args.avoid_tight_transfers else '0'
@@ -52,9 +76,12 @@ def run(scenario, samples, label):
         process = subprocess.Popen(['xcrun', 'simctl', 'launch', '--console', '--terminate-running-process',
             args.device, 'dev.pedrocordeiro.Verkeier', '--routing-benchmark'], env=env, stdout=stream, stderr=subprocess.STDOUT)
         deadline = time.monotonic() + max(180, samples * 130)
+        failure = None
         try:
             while process.poll() is None:
                 text = log.read_text(errors='replace')
+                if 'ROUTING_BENCHMARK_ABORT' in text:
+                    raise RuntimeError(f'Live benchmark stopped (quota, budget or capture failure); see {log}')
                 if 'ROUTING_BENCHMARK_FAILED' in text:
                     raise RuntimeError(f'Benchmark failed; see {log}')
                 if 'ROUTING_BENCHMARK_DONE' in text:
@@ -65,9 +92,33 @@ def run(scenario, samples, label):
             text = log.read_text(errors='replace')
             if 'ROUTING_BENCHMARK_DONE' not in text:
                 raise RuntimeError(f'App exited before rendering results; see {log}')
+        except Exception as error:
+            failure = error
         finally:
             subprocess.run(['xcrun', 'simctl', 'terminate', args.device, 'dev.pedrocordeiro.Verkeier'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             process.wait(timeout=10)
+    network_requests += sum(line.startswith("ROUTING_NETWORK_REQUEST ") for line in text.splitlines())
+    for line in text.splitlines():
+        if line.startswith("ROUTING_BIKE_FILE "):
+            source = Path(line.split(" ", 1)[1])
+            (args.output / "bike-snapshot.json").write_bytes(source.read_bytes())
+    capture = args.output / "network"
+    for line in text.splitlines():
+        if line.startswith("ROUTING_NETWORK_FILE "):
+            source = Path(line.split(" ", 1)[1])
+            metadata = json.loads(source.read_text())
+            capture.mkdir(exist_ok=True)
+            if body := metadata.get("body"):
+                source_body = Path(body)
+                target_body = capture / source_body.name
+                target_body.write_bytes(source_body.read_bytes())
+                metadata["body"] = target_body.name
+            (capture / source.name).write_text(json.dumps(metadata, indent=2))
+            network_records.append(metadata)
+    (args.output / "transport.json").write_text(json.dumps(network_records, indent=2))
+    if failure is not None:
+        (args.output / "aborted.json").write_text(json.dumps({"scenario": scenario, "reason": str(failure), "requests": network_requests}, indent=2))
+        raise failure
     values = [json.loads(line.split('ROUTING_BENCHMARK ', 1)[1]) for line in text.splitlines() if line.startswith('ROUTING_BENCHMARK {')]
     for line in text.splitlines():
         if line.startswith('ROUTING_BENCHMARK_FILE '):

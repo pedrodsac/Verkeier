@@ -16,6 +16,7 @@ nonisolated struct BikeShareRoutePlanner: Sendable {
         guard !pickups.isEmpty, !returns.isEmpty else { return nil }
 
         let access = await paths(pickups.map { (origin, $0.location) })
+        guard access.contains(where: { $0.map { $0.distanceMeters <= 1_000 } == true }) else { return nil }
         let egress = await paths(returns.map { ($0.location, destination) })
         let pairs = pickups.indices.flatMap { pickup in
             returns.indices.compactMap { dropoff -> (Int, Int)? in

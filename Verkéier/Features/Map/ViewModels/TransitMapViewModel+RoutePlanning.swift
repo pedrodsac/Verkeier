@@ -438,6 +438,12 @@ extension TransitMapViewModel {
         requestGeneration: Int
     ) {
         Task { [weak self] in
+            let refinementStarted = ContinuousClock.now
+            defer {
+                if let self, requestGeneration == self.routeCalculationGeneration {
+                    self.routeDiagnostics?.record(.refinement, since: refinementStarted)
+                }
+            }
             for await event in updates {
                 guard !Task.isCancelled,
                       let self,

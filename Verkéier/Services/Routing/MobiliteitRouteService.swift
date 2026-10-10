@@ -72,6 +72,8 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         catch { throw RoutingError.noRouteFound }
     }
 
+    nonisolated func waitForWalkingPreparation() async { await graphPreparation?.value }
+
     nonisolated func prepareForRouting() {
         Task(priority: .utility) { _ = try? await engine.router(for: readyDatabaseURL()) }
     }

@@ -26,7 +26,12 @@ struct VerkéierApp: App {
         bikeShareService = JCDecauxBikeShareService(configuration: configuration)
         let gtfsService = MobiliteitGTFSService()
         self.gtfsService = gtfsService
+        #if targetEnvironment(simulator) || ROUTING_BENCHMARK
+        let liveTransitService = MobiliteitLiveTransitService(proxyURL: configuration.apiProxyURL,
+            diagnostics: SimulatorRouteBenchmark.enabled ? BenchmarkNetworkRecorder.shared.observer : nil)
+        #else
         let liveTransitService = MobiliteitLiveTransitService(proxyURL: configuration.apiProxyURL)
+        #endif
         self.liveTransitService = liveTransitService
         let routingDatasetManager = RoutingDatasetManager()
         let walkingRouter = LocalFirstWalkingRouter(datasetManager: routingDatasetManager)
@@ -47,7 +52,7 @@ struct VerkéierApp: App {
             roadRouteProvider: LocalFirstRoadRouteProvider(walkingRouter: walkingRouter),
             graphPreparation: graphPreparation
         )
-        #if targetEnvironment(simulator)
+        #if targetEnvironment(simulator) || ROUTING_BENCHMARK
         if !SimulatorRouteBenchmark.enabled { routeService.prepareForRouting() }
         #else
         routeService.prepareForRouting()
@@ -60,7 +65,7 @@ struct VerkéierApp: App {
     var body: some Scene {
         WindowGroup {
             Group {
-                #if targetEnvironment(simulator)
+                #if targetEnvironment(simulator) || ROUTING_BENCHMARK
                 #if DEBUG
                 if RouteTracePreviewData.enabled { RouteTracePreviewHost() }
                 else if TripDetailPreviewData.enabled { TripDetailPreviewHost() }

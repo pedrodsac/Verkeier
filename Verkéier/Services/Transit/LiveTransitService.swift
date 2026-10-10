@@ -93,10 +93,12 @@ struct UnavailableLiveTransitService: LiveTransitService {
 struct MobiliteitLiveTransitService: LiveTransitService {
     let proxyURL: URL?
     let session: URLSession
+    let diagnostics: HTTPDiagnosticsObserver?
 
-    init(proxyURL: URL?, session: URLSession = .shared) {
+    init(proxyURL: URL?, session: URLSession = .shared, diagnostics: HTTPDiagnosticsObserver? = nil) {
         self.proxyURL = proxyURL
         self.session = session
+        self.diagnostics = diagnostics
     }
 
     var isConfigured: Bool { proxyURL != nil }
@@ -108,7 +110,7 @@ struct MobiliteitLiveTransitService: LiveTransitService {
         return MobiliteitAPIClient(
             apiKey: "",
             baseURL: proxyURL.appendingPathComponent("atp"),
-            session: session, language: language
+            session: session, language: language, diagnostics: diagnostics
         )
     }
 
