@@ -1,0 +1,6 @@
+Package (reference verification enabled)
+􁁛  Test run with 238 tests in 34 suites passed after 2.262 seconds.
+
+Integrated app Release
+✔ Test run with 189 tests in 33 suites passed after 2.129 seconds.
+** TEST SUCCEEDED **

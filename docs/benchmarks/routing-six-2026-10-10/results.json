@@ -1,0 +1,2886 @@
+{
+  "baseline_package": "ca066cd0c666dd0fb7f9c085eba221234f62017f",
+  "six_package": "89d25e63c5a8e61770bdcb9082583882b2865fb6",
+  "operations_per_scenario_and_build": 5,
+  "samples": 90,
+  "composition": "production",
+  "full_map": false,
+  "live_data": "recorded ATP responses",
+  "comparison": [
+    {
+      "scenario": "depart",
+      "process": "warm",
+      "baseline_ms": 622.2847495,
+      "six_ms": 508.77729150000005,
+      "change_percent": -18.240437049309357,
+      "baseline_journeys": [
+        10,
+        10
+      ],
+      "six_journeys": [
+        6,
+        6
+      ],
+      "baseline_peak_memory_bytes": 720322560,
+      "six_peak_memory_bytes": 689700864,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "depart",
+      "process": "cold",
+      "baseline_ms": 1230.896917,
+      "six_ms": 1159.5129375,
+      "change_percent": -5.799346680791151,
+      "baseline_journeys": [
+        10,
+        10
+      ],
+      "six_journeys": [
+        6,
+        6
+      ],
+      "baseline_peak_memory_bytes": 719749120,
+      "six_peak_memory_bytes": 683294720,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "rural",
+      "process": "warm",
+      "baseline_ms": 384.1936255,
+      "six_ms": 698.444146,
+      "change_percent": 81.79482938870366,
+      "baseline_journeys": [
+        5,
+        5
+      ],
+      "six_journeys": [
+        6,
+        6
+      ],
+      "baseline_peak_memory_bytes": 661356544,
+      "six_peak_memory_bytes": 684867584,
+      "six_search_horizons_seconds": [
+        [
+          7200,
+          14400
+        ],
+        [
+          7200,
+          14400
+        ]
+      ]
+    },
+    {
+      "scenario": "rural",
+      "process": "cold",
+      "baseline_ms": 956.961292,
+      "six_ms": 1288.7762914999998,
+      "change_percent": 34.67381620070793,
+      "baseline_journeys": [
+        5,
+        5
+      ],
+      "six_journeys": [
+        6,
+        6
+      ],
+      "baseline_peak_memory_bytes": 654163968,
+      "six_peak_memory_bytes": 676544512,
+      "six_search_horizons_seconds": [
+        [
+          7200,
+          14400
+        ],
+        [
+          7200,
+          14400
+        ]
+      ]
+    },
+    {
+      "scenario": "arrive",
+      "process": "warm",
+      "baseline_ms": 624.1188545,
+      "six_ms": 468.869875,
+      "change_percent": -24.874906178627555,
+      "baseline_journeys": [
+        10,
+        10
+      ],
+      "six_journeys": [
+        6,
+        6
+      ],
+      "baseline_peak_memory_bytes": 728170496,
+      "six_peak_memory_bytes": 690749440,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "arrive",
+      "process": "cold",
+      "baseline_ms": 1228.4691245,
+      "six_ms": 1110.859479,
+      "change_percent": -9.573675329273602,
+      "baseline_journeys": [
+        10,
+        10
+      ],
+      "six_journeys": [
+        6,
+        6
+      ],
+      "baseline_peak_memory_bytes": 724467712,
+      "six_peak_memory_bytes": 690716672,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "arrival-earlier",
+      "process": "warm",
+      "baseline_ms": 340.9026665,
+      "six_ms": 515.899271,
+      "change_percent": 51.333304692704715,
+      "baseline_journeys": [
+        30,
+        32
+      ],
+      "six_journeys": [
+        18,
+        24
+      ],
+      "baseline_peak_memory_bytes": 743817216,
+      "six_peak_memory_bytes": 711180288,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "arrival-earlier",
+      "process": "cold",
+      "baseline_ms": 639.327063,
+      "six_ms": 540.0779375,
+      "change_percent": -15.523998786204984,
+      "baseline_journeys": [
+        20,
+        20
+      ],
+      "six_journeys": [
+        12,
+        12
+      ],
+      "baseline_peak_memory_bytes": 735657984,
+      "six_peak_memory_bytes": 693583872,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "arrival-later",
+      "process": "warm",
+      "baseline_ms": 633.9556875000001,
+      "six_ms": 469.0794995,
+      "change_percent": -26.007525644290407,
+      "baseline_journeys": [
+        26,
+        36
+      ],
+      "six_journeys": [
+        18,
+        23
+      ],
+      "baseline_peak_memory_bytes": 760840192,
+      "six_peak_memory_bytes": 700776448,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "arrival-later",
+      "process": "cold",
+      "baseline_ms": 653.0914375,
+      "six_ms": 523.8243749999999,
+      "change_percent": -19.793103243678654,
+      "baseline_journeys": [
+        18,
+        18
+      ],
+      "six_journeys": [
+        12,
+        12
+      ],
+      "baseline_peak_memory_bytes": 731807744,
+      "six_peak_memory_bytes": 686637056,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "paging",
+      "process": "warm",
+      "baseline_ms": 411.090625,
+      "six_ms": 499.6093955,
+      "change_percent": 21.532665820340725,
+      "baseline_journeys": [
+        19,
+        29
+      ],
+      "six_journeys": [
+        18,
+        24
+      ],
+      "baseline_peak_memory_bytes": 685473792,
+      "six_peak_memory_bytes": 670695424,
+      "six_search_horizons_seconds": [
+        [
+          7200,
+          14400,
+          28800
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "paging",
+      "process": "cold",
+      "baseline_ms": 242.1060835,
+      "six_ms": 514.7928334999999,
+      "change_percent": 112.63110205985383,
+      "baseline_journeys": [
+        14,
+        14
+      ],
+      "six_journeys": [
+        12,
+        12
+      ],
+      "baseline_peak_memory_bytes": 647856128,
+      "six_peak_memory_bytes": 634339328,
+      "six_search_horizons_seconds": [
+        [
+          7200,
+          14400
+        ],
+        [
+          7200,
+          14400
+        ]
+      ]
+    },
+    {
+      "scenario": "earlier",
+      "process": "warm",
+      "baseline_ms": 658.7831455,
+      "six_ms": 508.034396,
+      "change_percent": -22.88290927442982,
+      "baseline_journeys": [
+        28,
+        38
+      ],
+      "six_journeys": [
+        15,
+        21
+      ],
+      "baseline_peak_memory_bytes": 770015232,
+      "six_peak_memory_bytes": 711802880,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "earlier",
+      "process": "cold",
+      "baseline_ms": 715.5570829999999,
+      "six_ms": 524.005083,
+      "change_percent": -26.769632297805078,
+      "baseline_journeys": [
+        18,
+        18
+      ],
+      "six_journeys": [
+        10,
+        10
+      ],
+      "baseline_peak_memory_bytes": 737918976,
+      "six_peak_memory_bytes": 693747712,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "recorded-live",
+      "process": "warm",
+      "baseline_ms": 367.569417,
+      "six_ms": 341.481229,
+      "change_percent": -7.09748602398006,
+      "baseline_journeys": [
+        9,
+        9
+      ],
+      "six_journeys": [
+        6,
+        6
+      ],
+      "baseline_peak_memory_bytes": 645857280,
+      "six_peak_memory_bytes": 632946688,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "recorded-live",
+      "process": "cold",
+      "baseline_ms": 949.3709160000001,
+      "six_ms": 927.3472710000001,
+      "change_percent": -2.319814587621094,
+      "baseline_journeys": [
+        9,
+        9
+      ],
+      "six_journeys": [
+        6,
+        6
+      ],
+      "baseline_peak_memory_bytes": 642662400,
+      "six_peak_memory_bytes": 630554624,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "cached",
+      "process": "warm",
+      "baseline_ms": 376.963625,
+      "six_ms": 326.9743125,
+      "change_percent": -13.26104408615022,
+      "baseline_journeys": [
+        9,
+        9
+      ],
+      "six_journeys": [
+        6,
+        6
+      ],
+      "baseline_peak_memory_bytes": 647299072,
+      "six_peak_memory_bytes": 632651776,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "cached",
+      "process": "cold",
+      "baseline_ms": 370.380604,
+      "six_ms": 333.1161875,
+      "change_percent": -10.061114458358622,
+      "baseline_journeys": [
+        9,
+        9
+      ],
+      "six_journeys": [
+        6,
+        6
+      ],
+      "baseline_peak_memory_bytes": 646201344,
+      "six_peak_memory_bytes": 632487936,
+      "six_search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    }
+  ],
+  "summaries": [
+    {
+      "scenario": "depart",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 622.2847495,
+      "p95_ms": 623.713583,
+      "maximum_ms": 623.713583,
+      "peak_memory_bytes": 720322560,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.287104,
+        "bikeCalculation": 3.2241045,
+        "boardFetch": 2.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 92.91912500000001,
+        "decode": 0.0,
+        "directWalkingWait": 0.0002495,
+        "endpoints": 1.717854,
+        "firstRender": 55.221354000000005,
+        "geometry": 0.8728125,
+        "graphPreparation": 0.4839375,
+        "http": 11.0,
+        "publication": 1.0220415,
+        "ranking": 0.08127100000000001,
+        "raptor": 421.0617085,
+        "realtime": 36.8246045,
+        "realtimeDiscovery": 23.627499999999998,
+        "refinement": 3.5237684999999996,
+        "resultAssembly": 0.1860205,
+        "schedulePreparation": 2.0,
+        "snapshotPreparation": 0.12231249999999999,
+        "timetableReadiness": 0.41922899999999996,
+        "validation": 0.062667,
+        "walkingTransfers": 15.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 26.0,
+        "candidates": 3372.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 559.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 29.0,
+        "pageNewJourneys": 0.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 464.0,
+        "retainedAlternatives": 39.0,
+        "sharedFirstVehicleGroups": 2.0,
+        "walkingCacheHits": 432.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        10,
+        10
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "depart",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 1230.896917,
+      "p95_ms": 1240.336709,
+      "maximum_ms": 1240.336709,
+      "peak_memory_bytes": 719749120,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.31337499999999996,
+        "bikeCalculation": 86.71112500000001,
+        "boardFetch": 8.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 98.4729585,
+        "decode": 4.0,
+        "directWalkingWait": 0.000292,
+        "endpoints": 107.219188,
+        "firstRender": 87.0197295,
+        "geometry": 0.927937,
+        "graphPreparation": 42.691354000000004,
+        "http": 87.0,
+        "publication": 3.8209375000000003,
+        "ranking": 0.08925,
+        "raptor": 545.871729,
+        "realtime": 45.517333,
+        "realtimeDiscovery": 22.240562,
+        "refinement": 11.925042,
+        "resultAssembly": 0.2146045,
+        "schedulePreparation": 9.5,
+        "snapshotPreparation": 283.6186455,
+        "timetableReadiness": 0.3923755,
+        "validation": 0.06852050000000001,
+        "walkingTransfers": 149.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 26.0,
+        "candidates": 3372.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 559.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 29.0,
+        "pageNewJourneys": 10.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 464.0,
+        "retainedAlternatives": 39.0,
+        "sharedFirstVehicleGroups": 2.0,
+        "walkingCacheHits": 144.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        10,
+        10
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "rural",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 384.1936255,
+      "p95_ms": 389.835584,
+      "maximum_ms": 389.835584,
+      "peak_memory_bytes": 661356544,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.2739375,
+        "bikeCalculation": 0.0875625,
+        "boardFetch": 3.5,
+        "boardMatching": 0.0,
+        "candidateBuilding": 12.098813,
+        "decode": 0.0,
+        "directWalkingWait": 0.00020800000000000001,
+        "endpoints": 1.0908120000000001,
+        "firstRender": 53.9375,
+        "geometry": 1.113208,
+        "graphPreparation": 0.554,
+        "http": 11.0,
+        "publication": 1.014292,
+        "ranking": 0.0524585,
+        "raptor": 283.2839585,
+        "realtime": 28.3055205,
+        "realtimeDiscovery": 23.7575,
+        "refinement": 13.313792000000001,
+        "resultAssembly": 0.13695849999999998,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.1335625,
+        "timetableReadiness": 0.5311250000000001,
+        "validation": 0.0528755,
+        "walkingTransfers": 11.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 29.0,
+        "candidates": 385.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 48.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 31.0,
+        "pageNewJourneys": 0.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 496.0,
+        "retainedAlternatives": 8.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 387.0,
+        "walkingRequests": 387.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        5,
+        5
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "rural",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 956.961292,
+      "p95_ms": 970.158042,
+      "maximum_ms": 970.158042,
+      "peak_memory_bytes": 654163968,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.3217085,
+        "bikeCalculation": 0.1097295,
+        "boardFetch": 9.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 15.6921045,
+        "decode": 4.0,
+        "directWalkingWait": 0.000375,
+        "endpoints": 96.9824165,
+        "firstRender": 78.91158300000001,
+        "geometry": 1.229792,
+        "graphPreparation": 40.6067915,
+        "http": 87.5,
+        "publication": 3.7255000000000003,
+        "ranking": 0.060459,
+        "raptor": 392.923146,
+        "realtime": 35.524625,
+        "realtimeDiscovery": 22.124541999999998,
+        "refinement": 12.2174165,
+        "resultAssembly": 0.167375,
+        "schedulePreparation": 7.5,
+        "snapshotPreparation": 285.591271,
+        "timetableReadiness": 0.41225,
+        "validation": 0.0596665,
+        "walkingTransfers": 115.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 29.0,
+        "candidates": 385.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 48.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 31.0,
+        "pageNewJourneys": 5.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 496.0,
+        "retainedAlternatives": 8.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 125.0,
+        "walkingRequests": 387.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        5,
+        5
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "depart",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 508.77729150000005,
+      "p95_ms": 509.233875,
+      "maximum_ms": 509.233875,
+      "peak_memory_bytes": 689700864,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.179375,
+        "bikeCalculation": 3.3907495,
+        "boardFetch": 2.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 92.772771,
+        "decode": 0.0,
+        "directWalkingWait": 0.00037499999999999995,
+        "endpoints": 1.776563,
+        "firstRender": 50.1129165,
+        "geometry": 0.540333,
+        "graphPreparation": 0.559292,
+        "http": 10.5,
+        "publication": 1.0442915,
+        "ranking": 0.048771,
+        "raptor": 308.1026665,
+        "realtime": 36.1067915,
+        "realtimeDiscovery": 24.8295625,
+        "refinement": 3.6831679999999993,
+        "resultAssembly": 0.115688,
+        "schedulePreparation": 0.5,
+        "snapshotPreparation": 0.1317705,
+        "timetableReadiness": 0.38972949999999995,
+        "validation": 0.040146,
+        "walkingTransfers": 14.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 26.0,
+        "candidates": 3321.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 550.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 29.0,
+        "pageNewJourneys": 0.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 464.0,
+        "retainedAlternatives": 34.0,
+        "sharedFirstVehicleGroups": 1.0,
+        "walkingCacheHits": 432.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        6,
+        6
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "depart",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 1159.5129375,
+      "p95_ms": 1180.530875,
+      "maximum_ms": 1180.530875,
+      "peak_memory_bytes": 683294720,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.206542,
+        "bikeCalculation": 90.4522915,
+        "boardFetch": 9.5,
+        "boardMatching": 0.0,
+        "candidateBuilding": 101.936271,
+        "decode": 4.5,
+        "directWalkingWait": 0.0003125,
+        "endpoints": 111.925813,
+        "firstRender": 86.069104,
+        "geometry": 0.6106039999999999,
+        "graphPreparation": 45.8555005,
+        "http": 93.5,
+        "publication": 4.3624585,
+        "ranking": 0.0533535,
+        "raptor": 451.611667,
+        "realtime": 45.365021,
+        "realtimeDiscovery": 23.418417,
+        "refinement": 40.5081265,
+        "resultAssembly": 0.138334,
+        "schedulePreparation": 11.0,
+        "snapshotPreparation": 291.708708,
+        "timetableReadiness": 0.358333,
+        "validation": 0.043896,
+        "walkingTransfers": 151.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 26.0,
+        "candidates": 3321.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 550.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 29.0,
+        "pageNewJourneys": 6.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 464.0,
+        "retainedAlternatives": 34.0,
+        "sharedFirstVehicleGroups": 1.0,
+        "walkingCacheHits": 144.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        6,
+        6
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "rural",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 698.444146,
+      "p95_ms": 706.40975,
+      "maximum_ms": 706.40975,
+      "peak_memory_bytes": 684867584,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.37095849999999997,
+        "bikeCalculation": 0.078667,
+        "boardFetch": 10.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 29.981979,
+        "decode": 0.0,
+        "directWalkingWait": 0.000584,
+        "endpoints": 1.0671045000000001,
+        "firstRender": 50.0948955,
+        "geometry": 1.3606875,
+        "graphPreparation": 0.490896,
+        "http": 15.5,
+        "publication": 1.1091039999999999,
+        "ranking": 0.072,
+        "raptor": 549.5641244999999,
+        "realtime": 59.7110625,
+        "realtimeDiscovery": 45.187208500000004,
+        "refinement": 5.693248500000001,
+        "resultAssembly": 0.1783545,
+        "schedulePreparation": 2.0,
+        "snapshotPreparation": 0.1209585,
+        "timetableReadiness": 0.367396,
+        "validation": 0.066417,
+        "walkingTransfers": 24.0
+      },
+      "median_counters": {
+        "boardCacheHits": 35.0,
+        "boardsCovered": 33.0,
+        "candidates": 663.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 154.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 48.0,
+        "pageNewJourneys": 0.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 768.0,
+        "retainedAlternatives": 12.0,
+        "sharedFirstVehicleGroups": 2.0,
+        "walkingCacheHits": 688.0,
+        "walkingRequests": 688.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        6,
+        6
+      ],
+      "search_horizons_seconds": [
+        [
+          7200,
+          14400
+        ],
+        [
+          7200,
+          14400
+        ]
+      ]
+    },
+    {
+      "scenario": "rural",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 1288.7762914999998,
+      "p95_ms": 1297.584375,
+      "maximum_ms": 1297.584375,
+      "peak_memory_bytes": 676544512,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.4128125,
+        "bikeCalculation": 0.12825,
+        "boardFetch": 17.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 33.406437499999996,
+        "decode": 3.5,
+        "directWalkingWait": 0.0007295,
+        "endpoints": 96.85131200000001,
+        "firstRender": 79.3276875,
+        "geometry": 1.376479,
+        "graphPreparation": 41.7030835,
+        "http": 83.5,
+        "publication": 4.6011875,
+        "ranking": 0.077042,
+        "raptor": 668.6104585,
+        "realtime": 69.8062285,
+        "realtimeDiscovery": 45.070062500000006,
+        "refinement": 5.1618955,
+        "resultAssembly": 0.1982285,
+        "schedulePreparation": 12.0,
+        "snapshotPreparation": 284.603333,
+        "timetableReadiness": 0.392521,
+        "validation": 0.0700415,
+        "walkingTransfers": 132.0
+      },
+      "median_counters": {
+        "boardCacheHits": 25.0,
+        "boardsCovered": 33.0,
+        "candidates": 663.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 154.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 58.0,
+        "pageNewJourneys": 6.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 928.0,
+        "retainedAlternatives": 12.0,
+        "sharedFirstVehicleGroups": 2.0,
+        "walkingCacheHits": 417.0,
+        "walkingRequests": 688.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        6,
+        6
+      ],
+      "search_horizons_seconds": [
+        [
+          7200,
+          14400
+        ],
+        [
+          7200,
+          14400
+        ]
+      ]
+    },
+    {
+      "scenario": "arrive",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 624.1188545,
+      "p95_ms": 624.786459,
+      "maximum_ms": 624.786459,
+      "peak_memory_bytes": 728170496,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.288854,
+        "bikeCalculation": 3.136083,
+        "boardFetch": 2.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 69.7182085,
+        "decode": 0.0,
+        "directWalkingWait": 0.00025,
+        "endpoints": 1.646792,
+        "firstRender": 53.512625,
+        "geometry": 0.933521,
+        "graphPreparation": 0.506292,
+        "http": 12.0,
+        "publication": 1.018771,
+        "ranking": 0.0811875,
+        "raptor": 463.23812499999997,
+        "realtime": 26.5062705,
+        "realtimeDiscovery": 20.470125000000003,
+        "refinement": 3.7101245,
+        "resultAssembly": 0.1831045,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.120354,
+        "timetableReadiness": 0.42193749999999997,
+        "validation": 0.060396,
+        "walkingTransfers": 15.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 27.0,
+        "candidates": 3326.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 587.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 30.0,
+        "pageNewJourneys": 0.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 480.0,
+        "retainedAlternatives": 20.0,
+        "sharedFirstVehicleGroups": 2.0,
+        "walkingCacheHits": 432.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        10,
+        10
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "arrive",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 1228.4691245,
+      "p95_ms": 1234.662583,
+      "maximum_ms": 1234.662583,
+      "peak_memory_bytes": 724467712,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.317208,
+        "bikeCalculation": 88.374875,
+        "boardFetch": 8.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 73.6101465,
+        "decode": 4.0,
+        "directWalkingWait": 0.000375,
+        "endpoints": 109.84797900000001,
+        "firstRender": 86.4992705,
+        "geometry": 0.943917,
+        "graphPreparation": 45.726208,
+        "http": 91.0,
+        "publication": 4.00125,
+        "ranking": 0.0887085,
+        "raptor": 577.9469375000001,
+        "realtime": 35.8279585,
+        "realtimeDiscovery": 19.50225,
+        "refinement": 35.7697085,
+        "resultAssembly": 0.2169795,
+        "schedulePreparation": 9.0,
+        "snapshotPreparation": 283.643542,
+        "timetableReadiness": 0.3992915,
+        "validation": 0.0670415,
+        "walkingTransfers": 139.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 27.0,
+        "candidates": 3326.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 587.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 30.0,
+        "pageNewJourneys": 10.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 480.0,
+        "retainedAlternatives": 20.0,
+        "sharedFirstVehicleGroups": 2.0,
+        "walkingCacheHits": 162.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        10,
+        10
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "arrival-earlier",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 340.9026665,
+      "p95_ms": 537.498792,
+      "maximum_ms": 537.498792,
+      "peak_memory_bytes": 743817216,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.841604,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 66.134875,
+        "decode": 0.0,
+        "directWalkingWait": 0.0009584999999999999,
+        "endpoints": 0.9635,
+        "firstRender": 55.737812500000004,
+        "geometry": 1.9402295,
+        "graphPreparation": 0.437833,
+        "http": 0.0,
+        "publication": 0.17404199999999997,
+        "ranking": 0.3173545,
+        "raptor": 210.73791649999998,
+        "refinement": 23.4509765,
+        "resultAssembly": 0.5813539999999999,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.1075415,
+        "timetableReadiness": 0.3522085,
+        "validation": 0.184916,
+        "walkingTransfers": 53.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 2370.5,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 662.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 7.5,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 16.0,
+        "sharedFirstVehicleGroups": 3.0,
+        "walkingCacheHits": 374.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        30,
+        32
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "arrival-earlier",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 639.327063,
+      "p95_ms": 642.282167,
+      "maximum_ms": 642.282167,
+      "peak_memory_bytes": 735657984,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.5693745,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 91.922729,
+        "decode": 0.0,
+        "directWalkingWait": 0.001042,
+        "endpoints": 1.1458750000000002,
+        "firstRender": 57.046375,
+        "geometry": 1.0302289999999998,
+        "graphPreparation": 0.539813,
+        "http": 0.0,
+        "publication": 0.188,
+        "ranking": 0.1725,
+        "raptor": 481.1054375,
+        "refinement": 24.997418,
+        "resultAssembly": 0.3534165,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.137583,
+        "timetableReadiness": 0.5776875,
+        "validation": 0.1129375,
+        "walkingTransfers": 50.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 3321.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 630.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 10.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 1.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 23.0,
+        "sharedFirstVehicleGroups": 2.0,
+        "walkingCacheHits": 380.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        20,
+        20
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "arrival-later",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 633.9556875000001,
+      "p95_ms": 644.607583,
+      "maximum_ms": 644.607583,
+      "peak_memory_bytes": 760840192,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.8788750000000001,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 97.1910835,
+        "decode": 0.0,
+        "directWalkingWait": 0.0010415,
+        "endpoints": 0.984396,
+        "firstRender": 57.7600835,
+        "geometry": 1.903229,
+        "graphPreparation": 0.44572900000000004,
+        "http": 0.0,
+        "publication": 0.1859585,
+        "ranking": 0.3595625,
+        "raptor": 463.7269165,
+        "refinement": 36.2651695,
+        "resultAssembly": 0.646583,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.1103335,
+        "timetableReadiness": 0.3698125,
+        "validation": 0.2027295,
+        "walkingTransfers": 38.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 3403.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 540.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 10.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 38.5,
+        "sharedFirstVehicleGroups": 7.5,
+        "walkingCacheHits": 391.5,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        26,
+        36
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "arrival-later",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 653.0914375,
+      "p95_ms": 655.091708,
+      "maximum_ms": 655.091708,
+      "peak_memory_bytes": 731807744,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.5004580000000001,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 94.6249795,
+        "decode": 0.0,
+        "directWalkingWait": 0.0009584999999999999,
+        "endpoints": 1.2196245000000001,
+        "firstRender": 62.64470850000001,
+        "geometry": 1.484646,
+        "graphPreparation": 0.5561255,
+        "http": 0.0,
+        "publication": 0.1902085,
+        "ranking": 0.16441650000000002,
+        "raptor": 481.2644375,
+        "refinement": 16.925977,
+        "resultAssembly": 0.35091700000000003,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.143271,
+        "timetableReadiness": 0.5215624999999999,
+        "validation": 0.1180205,
+        "walkingTransfers": 81.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 3330.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 495.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 10.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 34.0,
+        "sharedFirstVehicleGroups": 4.0,
+        "walkingCacheHits": 331.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        18,
+        18
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "arrive",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 468.869875,
+      "p95_ms": 474.749208,
+      "maximum_ms": 474.749208,
+      "peak_memory_bytes": 690749440,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.1995625,
+        "bikeCalculation": 3.259646,
+        "boardFetch": 3.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 70.57835399999999,
+        "decode": 0.0,
+        "directWalkingWait": 0.00033299999999999996,
+        "endpoints": 1.7504374999999999,
+        "firstRender": 46.494167000000004,
+        "geometry": 0.684979,
+        "graphPreparation": 0.6968755,
+        "http": 17.5,
+        "publication": 1.095333,
+        "ranking": 0.050896,
+        "raptor": 312.2494585,
+        "realtime": 28.2869795,
+        "realtimeDiscovery": 21.647416999999997,
+        "refinement": 5.3522295,
+        "resultAssembly": 0.124625,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.12824950000000002,
+        "timetableReadiness": 0.3953335,
+        "validation": 0.0426665,
+        "walkingTransfers": 14.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 26.0,
+        "candidates": 3253.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 550.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 29.0,
+        "pageNewJourneys": 0.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 464.0,
+        "retainedAlternatives": 18.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 432.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        6,
+        6
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "arrive",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 1110.859479,
+      "p95_ms": 1128.492292,
+      "maximum_ms": 1128.492292,
+      "peak_memory_bytes": 690716672,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.2037495,
+        "bikeCalculation": 89.380729,
+        "boardFetch": 9.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 74.192375,
+        "decode": 4.5,
+        "directWalkingWait": 0.000312,
+        "endpoints": 110.8682915,
+        "firstRender": 83.47539549999999,
+        "geometry": 0.6812290000000001,
+        "graphPreparation": 42.544292,
+        "http": 85.0,
+        "publication": 4.1655619999999995,
+        "ranking": 0.0554995,
+        "raptor": 461.1690625,
+        "realtime": 35.8535,
+        "realtimeDiscovery": 20.6690625,
+        "refinement": 6.1873135,
+        "resultAssembly": 0.14197900000000002,
+        "schedulePreparation": 8.0,
+        "snapshotPreparation": 287.64824999999996,
+        "timetableReadiness": 0.361333,
+        "validation": 0.044396000000000005,
+        "walkingTransfers": 147.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 26.0,
+        "candidates": 3253.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 550.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 29.0,
+        "pageNewJourneys": 6.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 464.0,
+        "retainedAlternatives": 18.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 135.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        6,
+        6
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "arrival-earlier",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 515.899271,
+      "p95_ms": 540.688542,
+      "maximum_ms": 540.688542,
+      "peak_memory_bytes": 711180288,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.5810415,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 88.634438,
+        "decode": 0.0,
+        "directWalkingWait": 0.0012085,
+        "endpoints": 0.990979,
+        "firstRender": 55.851104500000005,
+        "geometry": 1.5455625,
+        "graphPreparation": 0.4745625,
+        "http": 0.0,
+        "publication": 0.16658299999999998,
+        "ranking": 0.1941045,
+        "raptor": 359.07325000000003,
+        "refinement": 15.517833999999999,
+        "resultAssembly": 0.36954200000000004,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.115062,
+        "timetableReadiness": 0.34420850000000003,
+        "validation": 0.1181455,
+        "walkingTransfers": 49.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 3136.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 560.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 6.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.5,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 33.5,
+        "sharedFirstVehicleGroups": 2.5,
+        "walkingCacheHits": 379.5,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        18,
+        24
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "arrival-earlier",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 540.0779375,
+      "p95_ms": 542.187,
+      "maximum_ms": 542.187,
+      "peak_memory_bytes": 693583872,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.351771,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 97.146896,
+        "decode": 0.0,
+        "directWalkingWait": 0.0013755,
+        "endpoints": 1.240625,
+        "firstRender": 61.282187,
+        "geometry": 0.6809585,
+        "graphPreparation": 0.65725,
+        "http": 0.0,
+        "publication": 0.205729,
+        "ranking": 0.1035005,
+        "raptor": 372.18118749999996,
+        "refinement": 3.0144980000000006,
+        "resultAssembly": 0.22887449999999998,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.1578755,
+        "timetableReadiness": 0.608188,
+        "validation": 0.07170850000000001,
+        "walkingTransfers": 42.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 3392.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 691.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 6.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 1.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 26.0,
+        "sharedFirstVehicleGroups": 1.0,
+        "walkingCacheHits": 397.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        12,
+        12
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "arrival-later",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 469.0794995,
+      "p95_ms": 469.896791,
+      "maximum_ms": 469.896791,
+      "peak_memory_bytes": 700776448,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.5808335,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 89.906625,
+        "decode": 0.0,
+        "directWalkingWait": 0.0009375,
+        "endpoints": 1.040083,
+        "firstRender": 61.56281250000001,
+        "geometry": 1.5574585,
+        "graphPreparation": 0.468375,
+        "http": 0.0,
+        "publication": 0.1591455,
+        "ranking": 0.2018545,
+        "raptor": 304.025167,
+        "refinement": 14.252104,
+        "resultAssembly": 0.38627049999999996,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.1240835,
+        "timetableReadiness": 0.36735399999999996,
+        "validation": 0.1260835,
+        "walkingTransfers": 36.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 3192.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 553.5,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 6.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 36.5,
+        "sharedFirstVehicleGroups": 5.0,
+        "walkingCacheHits": 397.5,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        18,
+        23
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "arrival-later",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 523.8243749999999,
+      "p95_ms": 526.073,
+      "maximum_ms": 526.073,
+      "peak_memory_bytes": 686637056,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.33277049999999997,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 92.514896,
+        "decode": 0.0,
+        "directWalkingWait": 0.001083,
+        "endpoints": 1.2510415,
+        "firstRender": 57.257354500000005,
+        "geometry": 0.6931035,
+        "graphPreparation": 0.597521,
+        "http": 0.0,
+        "publication": 0.1782915,
+        "ranking": 0.0962295,
+        "raptor": 363.64102049999997,
+        "refinement": 11.132417,
+        "resultAssembly": 0.21210400000000001,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.13606200000000002,
+        "timetableReadiness": 0.48050000000000004,
+        "validation": 0.0673125,
+        "walkingTransfers": 88.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 3247.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 425.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 6.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 31.0,
+        "sharedFirstVehicleGroups": 3.0,
+        "walkingCacheHits": 326.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        12,
+        12
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "paging",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 411.090625,
+      "p95_ms": 464.484083,
+      "maximum_ms": 464.484083,
+      "peak_memory_bytes": 685473792,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.452458,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 22.5776875,
+        "decode": 0.0,
+        "directWalkingWait": 0.000959,
+        "endpoints": 1.451854,
+        "firstRender": 50.2206875,
+        "geometry": 1.027104,
+        "graphPreparation": 0.473667,
+        "http": 0.0,
+        "publication": 0.16052,
+        "ranking": 0.179333,
+        "raptor": 332.5584165,
+        "refinement": 10.2490205,
+        "resultAssembly": 0.3048335,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.1198545,
+        "timetableReadiness": 0.380625,
+        "validation": 0.084146,
+        "walkingTransfers": 83.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 973.5,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 473.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 8.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 9.5,
+        "sharedFirstVehicleGroups": 0.5,
+        "walkingCacheHits": 402.5,
+        "walkingRequests": 539.5,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        19,
+        29
+      ],
+      "search_horizons_seconds": [
+        [
+          10800,
+          21600
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "paging",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 242.1060835,
+      "p95_ms": 242.679542,
+      "maximum_ms": 242.679542,
+      "peak_memory_bytes": 647856128,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.279625,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 22.5275835,
+        "decode": 0.0,
+        "directWalkingWait": 0.0008539999999999999,
+        "endpoints": 1.0436459999999999,
+        "firstRender": 51.698375,
+        "geometry": 0.417604,
+        "graphPreparation": 0.469083,
+        "http": 0.0,
+        "publication": 0.1574385,
+        "ranking": 0.0875415,
+        "raptor": 163.8983125,
+        "refinement": 9.569106,
+        "resultAssembly": 0.1728745,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.11908350000000001,
+        "timetableReadiness": 0.4177705,
+        "validation": 0.0466045,
+        "walkingTransfers": 38.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 968.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 360.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 6.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 10.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 330.0,
+        "walkingRequests": 379.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        14,
+        14
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "earlier",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 658.7831455,
+      "p95_ms": 672.827416,
+      "maximum_ms": 672.827416,
+      "peak_memory_bytes": 770015232,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.8953955,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 96.9623335,
+        "decode": 0.0,
+        "directWalkingWait": 0.001187,
+        "endpoints": 1.153583,
+        "firstRender": 67.2267085,
+        "geometry": 1.572375,
+        "graphPreparation": 0.5231250000000001,
+        "http": 0.0,
+        "publication": 0.1880205,
+        "ranking": 0.3740415,
+        "raptor": 480.97583299999997,
+        "refinement": 32.589397500000004,
+        "resultAssembly": 0.656833,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.131688,
+        "timetableReadiness": 0.4777495,
+        "validation": 0.1978335,
+        "walkingTransfers": 33.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 3409.5,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 530.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 10.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 33.5,
+        "sharedFirstVehicleGroups": 4.0,
+        "walkingCacheHits": 406.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        28,
+        38
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "earlier",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 715.5570829999999,
+      "p95_ms": 722.434583,
+      "maximum_ms": 722.434583,
+      "peak_memory_bytes": 737918976,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.5151245,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 93.171313,
+        "decode": 0.0,
+        "directWalkingWait": 0.001229,
+        "endpoints": 1.12975,
+        "firstRender": 64.718146,
+        "geometry": 1.130396,
+        "graphPreparation": 0.557979,
+        "http": 0.0,
+        "publication": 0.19352049999999998,
+        "ranking": 0.1784375,
+        "raptor": 547.4277705,
+        "refinement": 15.5063125,
+        "resultAssembly": 0.3646665,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.12635449999999998,
+        "timetableReadiness": 0.4895835,
+        "validation": 0.11947949999999999,
+        "walkingTransfers": 83.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 3368.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 764.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 10.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 1.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 24.0,
+        "sharedFirstVehicleGroups": 2.0,
+        "walkingCacheHits": 316.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        18,
+        18
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "paging",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 499.6093955,
+      "p95_ms": 607.862458,
+      "maximum_ms": 607.862458,
+      "peak_memory_bytes": 670695424,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.4083335,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 40.9930625,
+        "decode": 0.0,
+        "directWalkingWait": 0.00148,
+        "endpoints": 2.0213125,
+        "firstRender": 57.234229,
+        "geometry": 0.6429375,
+        "graphPreparation": 0.4810835,
+        "http": 0.0,
+        "publication": 0.1538955,
+        "ranking": 0.147104,
+        "raptor": 395.02777100000003,
+        "refinement": 8.4342285,
+        "resultAssembly": 0.258312,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.12218749999999999,
+        "timetableReadiness": 0.406229,
+        "validation": 0.074229,
+        "walkingTransfers": 54.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 1011.5,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 590.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 6.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 11.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 705.0,
+        "walkingRequests": 759.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        18,
+        24
+      ],
+      "search_horizons_seconds": [
+        [
+          7200,
+          14400,
+          28800
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "paging",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 514.7928334999999,
+      "p95_ms": 514.989125,
+      "maximum_ms": 514.989125,
+      "peak_memory_bytes": 634339328,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.2281045,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 43.741292,
+        "decode": 0.0,
+        "directWalkingWait": 0.0016250000000000001,
+        "endpoints": 2.07475,
+        "firstRender": 52.516999999999996,
+        "geometry": 0.5384585,
+        "graphPreparation": 0.5226045,
+        "http": 0.0,
+        "publication": 0.159104,
+        "ranking": 0.0732085,
+        "raptor": 412.12093749999997,
+        "refinement": 13.2289375,
+        "resultAssembly": 0.1458335,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.12693700000000002,
+        "timetableReadiness": 0.5751255,
+        "validation": 0.0374585,
+        "walkingTransfers": 50.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 1004.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 603.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 6.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 14.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 711.0,
+        "walkingRequests": 758.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        12,
+        12
+      ],
+      "search_horizons_seconds": [
+        [
+          7200,
+          14400
+        ],
+        [
+          7200,
+          14400
+        ]
+      ]
+    },
+    {
+      "scenario": "earlier",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 508.034396,
+      "p95_ms": 521.851667,
+      "maximum_ms": 521.851667,
+      "peak_memory_bytes": 711802880,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.49754149999999997,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 84.722521,
+        "decode": 0.0,
+        "directWalkingWait": 0.0008755,
+        "endpoints": 0.963625,
+        "firstRender": 58.7857085,
+        "geometry": 1.5606665,
+        "graphPreparation": 0.42825,
+        "http": 0.0,
+        "publication": 0.1505835,
+        "ranking": 0.164208,
+        "raptor": 354.622,
+        "refinement": 9.047938,
+        "resultAssembly": 0.334021,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.1114375,
+        "timetableReadiness": 0.347854,
+        "validation": 0.1202085,
+        "walkingTransfers": 51.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 3084.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 628.5,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 6.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 0.5,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 26.0,
+        "sharedFirstVehicleGroups": 1.0,
+        "walkingCacheHits": 366.5,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        15,
+        21
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "earlier",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 524.005083,
+      "p95_ms": 526.102208,
+      "maximum_ms": 526.102208,
+      "peak_memory_bytes": 693747712,
+      "median_observed_departure_coverage": 0.0,
+      "median_stages_ms": {
+        "adapterMapping": 0.2815835,
+        "boardFetch": 0.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 87.037521,
+        "decode": 0.0,
+        "directWalkingWait": 0.000917,
+        "endpoints": 1.393021,
+        "firstRender": 53.833604,
+        "geometry": 0.7158545000000001,
+        "graphPreparation": 0.609584,
+        "http": 0.0,
+        "publication": 0.1776665,
+        "ranking": 0.08147950000000001,
+        "raptor": 373.7014795,
+        "refinement": 9.457209,
+        "resultAssembly": 0.193896,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.13302049999999999,
+        "timetableReadiness": 0.49735450000000003,
+        "validation": 0.0678335,
+        "walkingTransfers": 56.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 0.0,
+        "candidates": 3144.0,
+        "delayedPastBoardings": 0.0,
+        "duplicatesSuppressed": 482.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 6.0,
+        "predictedEvents": 0.0,
+        "recommendationSwitches": 1.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 25.0,
+        "sharedFirstVehicleGroups": 1.0,
+        "walkingCacheHits": 366.0,
+        "walkingRequests": 432.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        10,
+        10
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "recorded-live",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 367.569417,
+      "p95_ms": 370.893959,
+      "maximum_ms": 370.893959,
+      "peak_memory_bytes": 645857280,
+      "median_observed_departure_coverage": 0.1111111111111111,
+      "median_stages_ms": {
+        "adapterMapping": 0.159458,
+        "bikeCalculation": 0.0958955,
+        "boardFetch": 4.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 24.455000499999997,
+        "decode": 0.0,
+        "directWalkingWait": 0.000375,
+        "endpoints": 0.9484375,
+        "firstRender": 41.312875,
+        "geometry": 0.4884585,
+        "graphPreparation": 0.459021,
+        "http": 12.0,
+        "publication": 0.9995205,
+        "ranking": 0.0510625,
+        "raptor": 252.13131249999998,
+        "realtime": 44.720228999999996,
+        "realtimeDiscovery": 38.5461045,
+        "refinement": 0.12502049999999998,
+        "resultAssembly": 0.106083,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.1121665,
+        "timetableReadiness": 0.3655005,
+        "validation": 0.0292295,
+        "walkingTransfers": 12.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 24.0,
+        "candidates": 1011.0,
+        "delayedPastBoardings": 15.0,
+        "duplicatesSuppressed": 563.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 25.0,
+        "pageNewJourneys": 0.0,
+        "predictedEvents": 21.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 19306.0,
+        "retainedAlternatives": 12.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 379.0,
+        "walkingRequests": 379.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        9,
+        9
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "recorded-live",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 949.3709160000001,
+      "p95_ms": 957.288541,
+      "maximum_ms": 957.288541,
+      "peak_memory_bytes": 642662400,
+      "median_observed_departure_coverage": 0.1111111111111111,
+      "median_stages_ms": {
+        "adapterMapping": 0.191521,
+        "bikeCalculation": 0.1522705,
+        "boardFetch": 17.0,
+        "boardMatching": 2.0,
+        "candidateBuilding": 26.997979,
+        "decode": 9.5,
+        "directWalkingWait": 0.000375,
+        "endpoints": 104.29110449999999,
+        "firstRender": 62.007333,
+        "geometry": 0.541167,
+        "graphPreparation": 40.986583499999995,
+        "http": 167.0,
+        "publication": 3.6076449999999998,
+        "ranking": 0.0609795,
+        "raptor": 362.29337499999997,
+        "realtime": 61.7174585,
+        "realtimeDiscovery": 38.3935205,
+        "refinement": 0.7386670000000001,
+        "resultAssembly": 0.1379375,
+        "schedulePreparation": 5.0,
+        "snapshotPreparation": 281.601688,
+        "timetableReadiness": 0.397792,
+        "validation": 0.0384795,
+        "walkingTransfers": 117.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 24.0,
+        "candidates": 1011.0,
+        "delayedPastBoardings": 15.0,
+        "duplicatesSuppressed": 563.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 25.0,
+        "pageNewJourneys": 9.0,
+        "predictedEvents": 21.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 19306.0,
+        "retainedAlternatives": 12.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 116.0,
+        "walkingRequests": 379.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        9,
+        9
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "cached",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 376.963625,
+      "p95_ms": 378.8685,
+      "maximum_ms": 378.8685,
+      "peak_memory_bytes": 647299072,
+      "median_observed_departure_coverage": 0.1111111111111111,
+      "median_stages_ms": {
+        "adapterMapping": 0.1560005,
+        "bikeCalculation": 0.09493750000000001,
+        "boardFetch": 6.5,
+        "boardMatching": 0.0,
+        "candidateBuilding": 24.365707999999998,
+        "decode": 0.0,
+        "directWalkingWait": 0.00025,
+        "endpoints": 0.9494795,
+        "firstRender": 44.944063,
+        "geometry": 0.47662499999999997,
+        "graphPreparation": 0.4422085,
+        "http": 0.0,
+        "publication": 1.020229,
+        "ranking": 0.0502915,
+        "raptor": 256.16275,
+        "realtime": 46.6161665,
+        "realtimeDiscovery": 37.869313,
+        "refinement": 0.074688,
+        "resultAssembly": 0.10222899999999999,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.11147950000000001,
+        "timetableReadiness": 0.336291,
+        "validation": 0.0272915,
+        "walkingTransfers": 12.5
+      },
+      "median_counters": {
+        "boardCacheHits": 25.0,
+        "boardsCovered": 24.0,
+        "candidates": 1011.0,
+        "delayedPastBoardings": 15.0,
+        "duplicatesSuppressed": 563.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 0.0,
+        "predictedEvents": 21.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 12.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 379.0,
+        "walkingRequests": 379.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        9,
+        9
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "cached",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 370.380604,
+      "p95_ms": 370.681833,
+      "maximum_ms": 370.681833,
+      "peak_memory_bytes": 646201344,
+      "median_observed_departure_coverage": 0.1111111111111111,
+      "median_stages_ms": {
+        "adapterMapping": 0.1598955,
+        "bikeCalculation": 0.1013125,
+        "boardFetch": 6.5,
+        "boardMatching": 0.0,
+        "candidateBuilding": 23.8242915,
+        "decode": 0.0,
+        "directWalkingWait": 0.000333,
+        "endpoints": 0.97725,
+        "firstRender": 43.257333,
+        "geometry": 0.47775,
+        "graphPreparation": 0.6280414999999999,
+        "http": 0.0,
+        "publication": 1.0800420000000002,
+        "ranking": 0.050833,
+        "raptor": 251.2557915,
+        "realtime": 46.790167,
+        "realtimeDiscovery": 38.0464375,
+        "refinement": 0.0673125,
+        "resultAssembly": 0.10377049999999999,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.113375,
+        "timetableReadiness": 0.436375,
+        "validation": 0.027417,
+        "walkingTransfers": 12.5
+      },
+      "median_counters": {
+        "boardCacheHits": 25.0,
+        "boardsCovered": 24.0,
+        "candidates": 1011.0,
+        "delayedPastBoardings": 15.0,
+        "duplicatesSuppressed": 563.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 0.0,
+        "predictedEvents": 21.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 12.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 379.0,
+        "walkingRequests": 379.0,
+        "workers": 10.0
+      },
+      "version": "baseline",
+      "journey_counts": [
+        9,
+        9
+      ],
+      "search_horizons_seconds": [
+        [
+          10800
+        ],
+        [
+          10800
+        ]
+      ]
+    },
+    {
+      "scenario": "recorded-live",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 341.481229,
+      "p95_ms": 344.319666,
+      "maximum_ms": 344.319666,
+      "peak_memory_bytes": 632946688,
+      "median_observed_departure_coverage": 0.16666666666666666,
+      "median_stages_ms": {
+        "adapterMapping": 0.1124165,
+        "bikeCalculation": 0.0954795,
+        "boardFetch": 4.5,
+        "boardMatching": 0.0,
+        "candidateBuilding": 23.267854,
+        "decode": 0.0,
+        "directWalkingWait": 0.0002705,
+        "endpoints": 1.039542,
+        "firstRender": 53.723709,
+        "geometry": 0.3480415,
+        "graphPreparation": 0.4919795,
+        "http": 10.5,
+        "publication": 1.006229,
+        "ranking": 0.0343955,
+        "raptor": 215.500687,
+        "realtime": 44.206666999999996,
+        "realtimeDiscovery": 38.295312499999994,
+        "refinement": 1.091125,
+        "resultAssembly": 0.0745835,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.11922949999999999,
+        "timetableReadiness": 0.394125,
+        "validation": 0.0211875,
+        "walkingTransfers": 12.0
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 24.0,
+        "candidates": 971.0,
+        "delayedPastBoardings": 15.0,
+        "duplicatesSuppressed": 535.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 25.0,
+        "pageNewJourneys": 0.0,
+        "predictedEvents": 21.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 19306.0,
+        "retainedAlternatives": 8.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 379.0,
+        "walkingRequests": 379.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        6,
+        6
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "recorded-live",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 927.3472710000001,
+      "p95_ms": 949.59,
+      "maximum_ms": 949.59,
+      "peak_memory_bytes": 630554624,
+      "median_observed_departure_coverage": 0.16666666666666666,
+      "median_stages_ms": {
+        "adapterMapping": 0.14585399999999998,
+        "bikeCalculation": 0.1279375,
+        "boardFetch": 17.5,
+        "boardMatching": 2.5,
+        "candidateBuilding": 26.974604499999998,
+        "decode": 10.0,
+        "directWalkingWait": 0.00047900000000000004,
+        "endpoints": 105.3503335,
+        "firstRender": 71.4411255,
+        "geometry": 0.4224375,
+        "graphPreparation": 43.311561999999995,
+        "http": 139.0,
+        "publication": 3.75673,
+        "ranking": 0.042124999999999996,
+        "raptor": 324.89425,
+        "realtime": 63.82439599999999,
+        "realtimeDiscovery": 40.2853745,
+        "refinement": 40.6966665,
+        "resultAssembly": 0.10389599999999999,
+        "schedulePreparation": 5.0,
+        "snapshotPreparation": 282.181396,
+        "timetableReadiness": 0.44535399999999997,
+        "validation": 0.030979,
+        "walkingTransfers": 116.5
+      },
+      "median_counters": {
+        "boardCacheHits": 0.0,
+        "boardsCovered": 24.0,
+        "candidates": 971.0,
+        "delayedPastBoardings": 15.0,
+        "duplicatesSuppressed": 535.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 25.0,
+        "pageNewJourneys": 6.0,
+        "predictedEvents": 21.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 19306.0,
+        "retainedAlternatives": 8.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 116.0,
+        "walkingRequests": 379.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        6,
+        6
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "cached",
+      "process": "warm",
+      "samples": 2,
+      "median_ms": 326.9743125,
+      "p95_ms": 328.76225,
+      "maximum_ms": 328.76225,
+      "peak_memory_bytes": 632651776,
+      "median_observed_departure_coverage": 0.16666666666666666,
+      "median_stages_ms": {
+        "adapterMapping": 0.1087085,
+        "bikeCalculation": 0.0927915,
+        "boardFetch": 6.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 23.281,
+        "decode": 0.0,
+        "directWalkingWait": 0.00033350000000000003,
+        "endpoints": 0.948396,
+        "firstRender": 41.4207915,
+        "geometry": 0.338854,
+        "graphPreparation": 0.46675049999999996,
+        "http": 0.0,
+        "publication": 1.008563,
+        "ranking": 0.034562,
+        "raptor": 210.7374375,
+        "realtime": 46.924792,
+        "realtimeDiscovery": 38.951271,
+        "refinement": 0.0667915,
+        "resultAssembly": 0.0751455,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.116375,
+        "timetableReadiness": 0.342146,
+        "validation": 0.0204375,
+        "walkingTransfers": 12.0
+      },
+      "median_counters": {
+        "boardCacheHits": 25.0,
+        "boardsCovered": 24.0,
+        "candidates": 971.0,
+        "delayedPastBoardings": 15.0,
+        "duplicatesSuppressed": 535.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 0.0,
+        "predictedEvents": 21.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 8.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 379.0,
+        "walkingRequests": 379.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        6,
+        6
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    },
+    {
+      "scenario": "cached",
+      "process": "cold",
+      "samples": 2,
+      "median_ms": 333.1161875,
+      "p95_ms": 335.0835,
+      "maximum_ms": 335.0835,
+      "peak_memory_bytes": 632487936,
+      "median_observed_departure_coverage": 0.16666666666666666,
+      "median_stages_ms": {
+        "adapterMapping": 0.12045800000000001,
+        "bikeCalculation": 0.111979,
+        "boardFetch": 6.0,
+        "boardMatching": 0.0,
+        "candidateBuilding": 23.303271000000002,
+        "decode": 0.0,
+        "directWalkingWait": 0.0003965,
+        "endpoints": 1.1318955000000002,
+        "firstRender": 45.004708,
+        "geometry": 0.3353955,
+        "graphPreparation": 0.5394165,
+        "http": 0.0,
+        "publication": 1.0664165,
+        "ranking": 0.034958,
+        "raptor": 212.85775,
+        "realtime": 46.843500000000006,
+        "realtimeDiscovery": 38.6606665,
+        "refinement": 0.07235449999999999,
+        "resultAssembly": 0.0767085,
+        "schedulePreparation": 0.0,
+        "snapshotPreparation": 0.144813,
+        "timetableReadiness": 0.4717085,
+        "validation": 0.021478999999999998,
+        "walkingTransfers": 12.0
+      },
+      "median_counters": {
+        "boardCacheHits": 25.0,
+        "boardsCovered": 24.0,
+        "candidates": 971.0,
+        "delayedPastBoardings": 15.0,
+        "duplicatesSuppressed": 535.0,
+        "incompleteBoards": 0.0,
+        "invalidJourneys": 0.0,
+        "networkRequests": 0.0,
+        "pageNewJourneys": 0.0,
+        "predictedEvents": 21.0,
+        "recommendationSwitches": 0.0,
+        "responseBytes": 0.0,
+        "retainedAlternatives": 8.0,
+        "sharedFirstVehicleGroups": 0.0,
+        "walkingCacheHits": 379.0,
+        "walkingRequests": 379.0,
+        "workers": 10.0
+      },
+      "version": "six",
+      "journey_counts": [
+        6,
+        6
+      ],
+      "search_horizons_seconds": [
+        [
+          7200
+        ],
+        [
+          7200
+        ]
+      ]
+    }
+  ],
+  "shared_journey_validation": {
+    "journeys_compared": 307,
+    "transit_leg_sources_compared": 508,
+    "mismatches": [],
+    "scope": "Exported times, legs, warnings and live sources for shared IDs; result counts and window scope intentionally change."
+  }
+}

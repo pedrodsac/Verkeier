@@ -1,5 +1,14 @@
 # Route calculation performance
 
+The six-route update returns up to six useful transit routes initially and per
+Earlier/Later operation. It starts initial and adjacent searches at two hours
+instead of three hours, expands incomplete windows, and retains the safe arrive-by
+lookback and full later-arrival lookback. Live completion checks the same six
+journeys selected for the page. Feasibility, transfer rules, walking evidence,
+live freshness and the eight-second acquisition allowance remain unchanged.
+This requested result-count/window change supersedes the earlier exact-result
+scope. See [six-route verification](benchmarks/routing-six-2026-10-10/validation.md).
+
 The 10 October implementation reuses immutable timetable work, indexes live
 evidence, reduces compact-kernel allocations and shares measured walking paths
 with bike alternatives. Diagnostics now retain every pass and round, with
@@ -35,7 +44,7 @@ below remain historical measurements with their original feed and revisions.
 
 The clock starts in the production `TransitMapViewModel` calculation or paging operation and stops after the production `RouteView` has committed the complete initial result and idle loading state. A window-attached `CADisplayLink` observes two display callbacks after publication. It includes timetable readiness, remaining graph/snapshot preparation, endpoint walking, the realtime attempt, local routing, mapping, publication and the rendered sheet. It excludes dataset downloads, unresolved location and later decorative geometry refinement. A routing timeout, empty result, stale diagnostic identifier or still-loading sheet fails the harness.
 
-Search coverage remains three hours for initial departure searches, 24 hours for arrive-by/paging, three transfers, and 48 labels per profile. Walking validation, preferences, useful alternative selection and recommendation policy are retained. Realtime acquisition can expire independently; acquired evidence survives and incomplete coverage is reported honestly while the full scheduled search continues.
+Searches start at two hours and expand incomplete windows up to 24 hours. Initial arrive-by searches retain their safe stopping proof, and later arrival pages retain a full lookback. Limits remain three transfers and 48 labels per profile. Walking validation, preferences, useful alternative selection and recommendation policy are retained. Realtime acquisition can expire independently; acquired evidence survives and incomplete coverage is reported honestly while the full scheduled search continues.
 
 ## Implementation
 
