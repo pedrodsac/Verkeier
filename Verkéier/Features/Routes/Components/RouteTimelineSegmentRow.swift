@@ -52,12 +52,6 @@ struct TimelineSegmentRow: View {
                 } else {
                     transitBadge
                 }
-                ForEach(Array(node.continuationCaptions.enumerated()), id: \.offset) { _, caption in
-                    Text(caption)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
                 if node.hasCancelledContinuation {
                     Label("Cancelled", systemImage: "xmark.circle.fill")
                         .font(.footnote.weight(.semibold))
