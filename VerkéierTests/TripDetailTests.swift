@@ -182,6 +182,45 @@ struct TripDetailTests {
         #expect(section.stopName == "Stop 1")
     }
 
+    @Test func journeyContinuationHighlightsOnlySelectedStopOccurrences() async throws {
+        var selected = try selection()
+        let next = try selection(tripID: "next")
+        let later = try selection(tripID: "later")
+        selected.continuingRides = [next]
+        let stops = (1...5).map { stop($0, delay: 0) }
+        var root = snapshot(stops)
+        root.continuations = [next, later].map {
+            .init(selection: $0, snapshot: .init(instance: $0.instance, stops: stops,
+                mapOverlay: .init(segments: []), isApproximateRoute: false,
+                liveDataAvailable: true, isCancelled: false, fetchedAt: anchor))
+        }
+        let model = TripDetailViewModel(now: { anchor })
+        model.select(selected)
+        let service = FixtureTripDetailService(snapshot: root)
+        await model.refresh(using: service)
+        #expect(model.continuations[0].rows.filter(\.isInRide).map(\.id) == [2, 3, 4])
+        #expect(model.continuations[1].rows.allSatisfy { !$0.isInRide })
+        await model.refresh(using: service)
+        #expect(model.continuations[0].rows.filter(\.isInRide).map(\.id) == [2, 3, 4])
+    }
+
+    @Test func timelineSelectionIncludesOnlyVerifiedOnwardJourneyLegs() throws {
+        let first = leg()
+        var next = leg(tripID: "next")
+        next.continuesInSeatFromTripID = "trip"
+        var last = leg(tripID: "last")
+        last.continuesInSeatFromTripID = "next"
+        let segments = RouteTimelineBuilder.items(from: [first, next, last]).compactMap {
+            if case let .segment(node) = $0 { node } else { nil }
+        }
+        #expect(segments[0].tripSelection?.continuingRides.map(\.instance.tripID) == ["next", "last"])
+        #expect(segments[1].tripSelection?.continuingRides.map(\.instance.tripID) == ["last"])
+        #expect(segments[0].tripSelection?.continuingRides.first?.boardingSequence == 2)
+        #expect(segments[0].tripSelection?.continuingRides.first?.alightingSequence == 4)
+        next.continuesInSeatFromTripID = nil
+        #expect(TripDetailSelection(leg: first, followingLegs: [next, last])?.continuingRides.isEmpty == true)
+    }
+
     @Test func failedContinuationRefreshRetainsItsOwnReportsWithoutStalingIncomingRun() async throws {
         let selected = try selection()
         let next = try selection(tripID: "next")
@@ -211,10 +250,10 @@ struct TripDetailTests {
         return try #require(TripDetailSelection(leg: value))
     }
 
-    private func leg() -> RoutePlan.Leg {
-        var value = RoutePlan.Leg(id: "leg", mode: .bus, transportKind: .transit, routeName: "850", headsign: "Airport",
+    private func leg(tripID: String = "trip") -> RoutePlan.Leg {
+        var value = RoutePlan.Leg(id: "leg", mode: .bus, transportKind: .transit, routeName: "850", headsign: "Airport", tripId: tripID,
             origin: .init(latitude: 49.6, longitude: 6.1), destination: .init(latitude: 49.7, longitude: 6.2))
-        value.tripInstance = .init(feedGeneration: 1, tripID: "trip", serviceDate: "20261009")
+        value.tripInstance = .init(feedGeneration: 1, tripID: tripID, serviceDate: "20261009")
         value.boardingStopSequence = 2
         value.alightingStopSequence = 4
         return value

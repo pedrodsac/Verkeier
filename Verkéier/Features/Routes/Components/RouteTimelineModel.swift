@@ -150,7 +150,7 @@ enum RouteTimelineBuilder {
                 incoming: prev,
                 outgoing: leg
             )))
-            items.append(.segment(segmentNode(id: "segment-\(index)", leg: leg, prev: prev, next: next)))
+            items.append(.segment(segmentNode(id: "segment-\(index)", leg: leg, prev: prev, next: next, followingLegs: Array(legs.dropFirst(index + 1)))))
         }
 
         // Final place: the last leg's destination, arrival only.
@@ -251,7 +251,8 @@ enum RouteTimelineBuilder {
         id: String,
         leg: RoutePlan.Leg,
         prev: RoutePlan.Leg?,
-        next: RoutePlan.Leg?
+        next: RoutePlan.Leg?,
+        followingLegs: [RoutePlan.Leg]
     ) -> SegmentNode {
         let kind: SegmentNode.Kind = if leg.transportKind == .transit {
             .transit
@@ -276,7 +277,7 @@ enum RouteTimelineBuilder {
             distanceMeters: kind == .transit ? nil : leg.distanceMeters,
             rail: railStyle(for: leg),
             bikeShareDetails: leg.bikeShareDetails,
-            tripSelection: TripDetailSelection(leg: leg)
+            tripSelection: TripDetailSelection(leg: leg, followingLegs: followingLegs)
         )
     }
 

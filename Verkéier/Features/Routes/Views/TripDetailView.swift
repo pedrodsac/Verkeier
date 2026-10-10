@@ -56,6 +56,9 @@ struct TripDetailView: View {
                         ForEach(continuation.rows) { row in
                             TripStopRow(row: row)
                                 .id(TripStopOccurrenceIdentity(instance: continuation.id, sequence: row.id))
+                                .listRowBackground(row.isInRide
+                                    ? continuation.mode.tint.opacity(0.10)
+                                    : row.isPassed ? Color(uiColor: .secondarySystemFill) : nil)
                         }
                     } header: {
                         VStack(alignment: .leading, spacing: 4) {

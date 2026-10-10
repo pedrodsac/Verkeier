@@ -91,11 +91,13 @@ final class TripDetailViewModel {
         rows = TripStopPresentation.rows(snapshot: snapshot, selection: selection,
             now: now(), refreshFailed: requestFailed || !snapshot.liveDataAvailable)
         continuations = snapshot.continuations.map { continuation in
-            .init(id: continuation.selection.instance,
+            let ride = selection.continuingRides.first { $0.instance == continuation.selection.instance }
+            return .init(id: continuation.selection.instance,
                 stopName: continuation.snapshot.stops.first?.stop.fullName ?? "",
                 lineName: continuation.selection.lineName, headsign: continuation.selection.headsign,
-                rows: TripStopPresentation.rows(snapshot: continuation.snapshot, selection: continuation.selection,
-                    now: now(), refreshFailed: requestFailed || !continuation.snapshot.liveDataAvailable, highlightsRide: false))
+                mode: continuation.selection.mode,
+                rows: TripStopPresentation.rows(snapshot: continuation.snapshot, selection: ride ?? continuation.selection,
+                    now: now(), refreshFailed: requestFailed || !continuation.snapshot.liveDataAvailable, highlightsRide: ride != nil))
         }
     }
 
