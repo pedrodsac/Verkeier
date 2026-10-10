@@ -5,5 +5,6 @@ nonisolated struct TripContinuationSection: Identifiable {
     let stopName: String
     let lineName: String
     let headsign: String?
+    let mode: TransportMode
     let rows: [TripStopRowModel]
 }

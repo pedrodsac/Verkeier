@@ -1,21 +1,21 @@
 import Foundation
 
 extension TripDetailSnapshot {
-    nonisolated func includingContinuationOverlays() -> TripDetailSnapshot {
+    nonisolated func includingContinuationOverlays(highlighting rides: [TripDetailSelection] = []) -> TripDetailSnapshot {
         var segments = mapOverlay.segments
         var markers = mapOverlay.stopMarkers
         for continuation in continuations {
             let prefix = "continuation:\(continuation.selection.instance.tripID):"
-            // The onward run is context, not an extension of the selected ride.
-            segments += continuation.snapshot.mapOverlay.segments.filter { $0.id == "full-run" }.map {
+            let isInJourney = rides.contains { $0.instance == continuation.selection.instance }
+            segments += continuation.snapshot.mapOverlay.segments.filter { $0.id == "full-run" || isInJourney }.map {
                 .init(id: prefix + $0.id, mode: $0.mode, routeName: $0.routeName, routeId: $0.routeId,
-                    coordinates: $0.coordinates, emphasis: .context,
+                    coordinates: $0.coordinates, emphasis: isInJourney ? $0.emphasis : .context,
                     isApproximate: $0.isApproximate, routeShortName: $0.routeShortName)
             }
             markers += continuation.snapshot.mapOverlay.stopMarkers.map {
                 .init(id: prefix + $0.id, stopID: $0.stopID, name: $0.name, coordinate: $0.coordinate,
-                    segmentIDs: [prefix + "full-run"], mode: $0.mode,
-                    role: .intermediate, emphasis: .context)
+                    segmentIDs: isInJourney ? $0.segmentIDs.map { prefix + $0 } : [prefix + "full-run"], mode: $0.mode,
+                    role: isInJourney ? $0.role : .intermediate, emphasis: isInJourney ? $0.emphasis : .context)
             }
         }
         return .init(instance: instance, stops: stops,

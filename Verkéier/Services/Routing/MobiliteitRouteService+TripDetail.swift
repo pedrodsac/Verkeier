@@ -15,17 +15,18 @@ extension MobiliteitRouteService: TripDetailService {
         for continuation in continuations {
             try Task.checkCancellation()
             let route = MobiliteitGTFSService.route(continuation.route, agency: nil)
-            let next = TripDetailSelection(instance: .init(feedGeneration: continuation.instance.feedGeneration,
+            let contextualNext = TripDetailSelection(instance: .init(feedGeneration: continuation.instance.feedGeneration,
                 tripID: continuation.instance.tripID, serviceDate: continuation.instance.serviceDate.compactString),
                 boardingSequence: continuation.boardingSequence, alightingSequence: continuation.alightingSequence,
                 lineName: route.shortName, routeShortName: route.shortName, headsign: continuation.headsign,
                 mode: route.mode, routeID: route.id)
+            let next = selection.continuingRides.first { $0.instance == contextualNext.instance } ?? contextualNext
             let snapshot = try await singleTripDetail(for: next, refreshPolicy: refreshPolicy)
             detail.continuations.append(.init(selection: next, snapshot: snapshot))
         }
         let currentRouter = try await engine.router(for: readyDatabaseURL())
         guard router === currentRouter else { throw TripDetailError.obsoleteFeed }
-        return detail.includingContinuationOverlays()
+        return detail.includingContinuationOverlays(highlighting: selection.continuingRides)
     }
 
     private nonisolated func singleTripDetail(for selection: TripDetailSelection,
