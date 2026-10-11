@@ -13,7 +13,7 @@ struct BenchmarkBikeShareService: BikeShareService {
 nonisolated enum BenchmarkRecordedTransport {
     static let bodies: [String: Data]? = {
         guard let path = ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_CAPTURE_DIRECTORY"] else { return nil }
-        let folder = URL(fileURLWithPath: path)
+        let folder = SimulatorRouteBenchmark.inputURL(path)
         do {
             var result: [String: Data] = [:]
             let files = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)
