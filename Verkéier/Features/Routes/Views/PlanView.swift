@@ -7,11 +7,7 @@ struct PlanView: View {
     let actions: RouteActions
 
     var body: some View {
-        ScrollView {
-            RouteView(viewModel: viewModel, actions: actions)
-                .safeAreaPadding(.horizontal, 16)
-                .padding(.bottom, 12)
-        }
+        RouteView(viewModel: viewModel, actions: actions)
         .refreshable { await actions.refreshRoutes() }
         .navigationTitle("Plan")
         .toolbarTitleDisplayMode(.inline)

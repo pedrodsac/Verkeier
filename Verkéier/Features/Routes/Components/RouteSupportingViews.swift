@@ -76,7 +76,7 @@ struct RouteAlertsSection: View {
 // MARK: - RouteOptionSkeletonRow
 
 /// A placeholder card shown while routes are loading, matching the layout of
-/// a real ``RouteOptionCard`` so the transition is smooth.
+/// a real ``RouteOptionRow`` so the transition is smooth.
 struct RouteOptionSkeletonRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -115,15 +115,7 @@ struct RouteOptionSkeletonRow: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
-        .padding(14)
-        .background(
-            .background.opacity(0.76),
-            in: RoundedRectangle(cornerRadius: 18, style: .continuous)
-        )
-        .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.separator.opacity(0.16), lineWidth: 0.5)
-        }
+        .padding(.vertical, 4)
         .redacted(reason: .placeholder)
         .accessibilityHidden(true)
     }

@@ -1,52 +1,37 @@
 import SwiftUI
 
-// MARK: - RouteView
-
-/// The route-planner navigation destination.
-///
-/// Composes a unified endpoints card, state-driven middle section (loading
-/// skeletons, error/empty cards, results list). All business logic lives upstream — this view is fully stateless,
-/// driven by ``RoutePresentationModel`` and closure callbacks.
+/// One native list owns planning inputs, suggestions, and journey results.
+/// All route calculations and state changes remain in the injected actions.
 struct RouteView: View {
     let viewModel: RoutePresentationModel
     let actions: RouteActions
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            // ── From / To unified card ────────────────────────────────────
-            RouteEndpointsCard(
+        List {
+            RouteEndpointsSection(
                 viewModel: viewModel,
                 showRoutePlaceSearch: actions.showRoutePlaceSearch,
                 swapRouteEndpoints: actions.swapRouteEndpoints
             )
 
-            // ── Commute presets ───────────────────────────────────────────
-            if !viewModel.commutePresets.isEmpty {
-                commutePresetsRow
-            }
+            Group {
+                savedTripsSections
+                stateSections
 
-            // ── Recent trips ──────────────────────────────────────────────
-            if !viewModel.recentTrips.isEmpty {
-                recentTripsRow
-            }
-
-            // ── State-driven body ─────────────────────────────────────────
-            stateBody
-
-            // ── Apple Maps handoff ────────────────────────────────────────
-            if viewModel.hasDestination {
-                Button(action: actions.openInAppleMaps) {
-                    Label("Open in Apple Maps", systemImage: "map")
-                        .frame(maxWidth: .infinity)
+                if viewModel.hasDestination {
+                    Section {
+                        Button(action: actions.openInAppleMaps) {
+                            Label("Open in Apple Maps", systemImage: "map")
+                        }
+                    }
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-                .tint(.primary)
             }
-
-            Spacer(minLength: 0)
+            // Keep navigation and normal button selection outside endpoint editing.
+            .environment(\.editMode, .constant(.inactive))
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .listStyle(.insetGrouped)
+        .listSectionSpacing(14)
+        .environment(\.editMode, .constant(.active))
         .task(id: [viewModel.origin?.id, viewModel.selectedPlace(for: .destination)?.id,
                    viewModel.currentLocation == nil ? nil : "location-available"]) {
             await actions.maintainRoutes()
@@ -66,209 +51,191 @@ struct RouteView: View {
         }
     }
 
-    // MARK: - Commute presets
-
-    private var commutePresetsRow: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+    @ViewBuilder
+    private var savedTripsSections: some View {
+        if !viewModel.commutePresets.isEmpty {
+            Section("Saved trips") {
                 ForEach(viewModel.commutePresets) { preset in
                     Button {
                         actions.applyAndCalculatePreset(preset.id)
                     } label: {
                         Label(preset.title, systemImage: "bookmark.fill")
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .tint(.blue)
                 }
             }
-            .safeAreaPadding(.horizontal, 1) // avoid clipping focus rings
         }
-    }
 
-    // MARK: - Recent trips
-
-    private var recentTripsRow: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+        if !viewModel.recentTrips.isEmpty {
+            Section("Recent trips") {
                 ForEach(viewModel.recentTrips) { trip in
                     Button {
                         actions.applyAndCalculatePreset(trip.id)
                     } label: {
                         Label(trip.title, systemImage: "clock.arrow.circlepath")
-                            .lineLimit(1)
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .tint(.secondary)
                 }
             }
-            .safeAreaPadding(.horizontal, 1)
         }
     }
 
-    // MARK: - State-driven body
-
     @ViewBuilder
-    private var stateBody: some View {
-
+    private var stateSections: some View {
         if viewModel.isWaitingForLocation {
-            ProgressView("Waiting for Location…")
-                .frame(maxWidth: .infinity)
-        }
-
-        // Initial load: show skeleton cards instead of a lone spinner
-        if viewModel.isCalculating, viewModel.routeOptions.isEmpty {
-            VStack(alignment: .leading, spacing: 10) {
-                RouteOptionSkeletonRow()
-                RouteOptionSkeletonRow()
-                RouteOptionSkeletonRow()
+            Section {
+                ProgressView("Waiting for Location…")
+                    .frame(maxWidth: .infinity)
             }
         }
 
-        // Error
-        if let errorMessage = viewModel.errorMessage, viewModel.routeOptions.isEmpty {
-            CompactUnavailableCard(
-                title: "Route unavailable",
-                message: errorMessage,
-                systemImage: "tram.fill"
-            )
+        if viewModel.isCalculating, viewModel.routeOptions.isEmpty {
+            Section("Finding routes") {
+                ForEach(0..<3) { _ in
+                    RouteOptionSkeletonRow()
+                }
+            }
         }
 
-        // Empty — no route selected yet; offer quick destination picks
+        if let errorMessage = viewModel.errorMessage, viewModel.routeOptions.isEmpty {
+            Section {
+                Label {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Route unavailable").font(.headline)
+                        Text(errorMessage).font(.subheadline).foregroundStyle(.secondary)
+                    }
+                } icon: {
+                    Image(systemName: "tram.fill").foregroundStyle(.secondary)
+                }
+            }
+        }
+
         if !viewModel.isCalculating,
            !viewModel.isWaitingForLocation,
            viewModel.routeOptions.isEmpty,
            viewModel.errorMessage == nil {
-            emptyState
+            emptySections
         }
 
-        // Status note
-        if let statusMessage = viewModel.statusMessage {
-            RouteStatusMessage(text: statusMessage)
+        if viewModel.statusMessage != nil || viewModel.isStale {
+            Section {
+                if let statusMessage = viewModel.statusMessage {
+                    Label(statusMessage, systemImage: "info.circle.fill")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                if viewModel.isStale {
+                    Label("Routes may have changed. Pull to refresh for the latest information.",
+                          systemImage: "clock.arrow.circlepath")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
 
-        if viewModel.isStale {
-            RouteStatusMessage(text: "Routes may have changed. Pull to refresh for the latest information.")
-        }
-
-        // Journey alerts
         if !viewModel.alerts.isEmpty {
-            RouteAlertsSection(alerts: viewModel.alerts)
+            Section("Journey Alerts") {
+                ForEach(viewModel.alerts.prefix(3)) { alert in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Label(alert.title, systemImage: "exclamationmark.triangle")
+                            .font(.subheadline.weight(.semibold))
+                        Text(alert.body)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
         }
 
-        // Cross-border hint
         if viewModel.selectedRouteOption?.crossesBorder == true {
-            RouteInfoBanner(
-                title: "Crosses a border — CFL / SNCF / DB live data may be incomplete",
-                systemImage: "flag.checkered"
-            )
+            Section {
+                Label("Crosses a border — CFL / SNCF / DB live data may be incomplete",
+                      systemImage: "flag.checkered")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
         }
 
-        // Results
         if !viewModel.routeOptions.isEmpty || !viewModel.supplementalRouteOptions.isEmpty {
-            routeResultsSection
+            resultsSections
         }
     }
 
-    // MARK: - Empty state
-
-    private var emptyState: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            CompactUnavailableCard(
-                title: "No destination selected",
-                message: "Choose a destination above to see public transport options.",
-                systemImage: "point.topleft.down.curvedto.point.bottomright.up"
-            )
-
-            // Quick-pick chips from favourites + nearby
-            let quickPicks = (viewModel.favouritePlaces + viewModel.nearbyPlaces).prefix(6)
-            if !quickPicks.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Quick destinations")
-                        .font(.footnote.weight(.semibold))
+    @ViewBuilder
+    private var emptySections: some View {
+        Section {
+            Label {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(viewModel.hasDestination ? "No routes found" : "No destination selected")
+                        .font(.headline)
+                    Text(viewModel.hasDestination
+                         ? "Try a different time or adjust your route options."
+                         : "Choose a destination above to see public transport options.")
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
+                }
+            } icon: {
+                Image(systemName: "point.topleft.down.curvedto.point.bottomright.up")
+                    .foregroundStyle(.secondary)
+            }
+        }
 
-                    FlexibleWrappingRow(spacing: 8) {
-                        ForEach(Array(quickPicks)) { place in
-                            Button {
-                                actions.selectRouteDestination(place)
-                            } label: {
-                                Label(
-                                    place.title,
-                                    systemImage: place.source == .favourite ? "bookmark.fill" : "location.fill"
-                                )
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                        }
+        let quickPicks = (viewModel.favouritePlaces + viewModel.nearbyPlaces).prefix(6)
+        if !quickPicks.isEmpty {
+            Section("Quick destinations") {
+                ForEach(quickPicks.enumerated(), id: \.offset) { _, place in
+                    Button {
+                        actions.selectRouteDestination(place)
+                    } label: {
+                        Label(place.displayTitle, systemImage: place.source == .favourite ? "bookmark.fill" : "mappin")
                     }
                 }
             }
         }
     }
 
-    // MARK: - Results section
-
-    private var routeResultsSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+    @ViewBuilder
+    private var resultsSections: some View {
+        Section("Routes") {
             ForEach(viewModel.chronologicallyOrderedRouteOptions) { option in
-                RouteOptionCard(
-                    option: option,
-                    isSelected: option.id == viewModel.selectedRouteOptionID,
-                )
+                RouteOptionRow(option: option, isSelected: option.id == viewModel.selectedRouteOptionID)
+                    .listRowBackground(option.hasTightTransfer ? Color.orange.opacity(0.14) : Color(uiColor: .secondarySystemGroupedBackground))
             }
+        }
 
-            if viewModel.routeOptions.contains(where: { !$0.transitLegs.isEmpty }) {
-                HStack(spacing: 10) {
-                    routePageButton(
-                        title: "Earlier",
-                        systemImage: "chevron.left",
-                        isLoading: viewModel.isLoadingEarlierRoutes,
-                        isEnabled: viewModel.canLoadEarlierRoutes,
-                        action: actions.loadEarlierRoutes
-                    )
-                    routePageButton(
-                        title: "Later",
-                        systemImage: "chevron.right",
-                        isLoading: viewModel.isLoadingLaterRoutes,
-                        isEnabled: viewModel.canLoadLaterRoutes,
-                        action: actions.loadLaterRoutes
-                    )
-                }
+        if viewModel.routeOptions.contains(where: { !$0.transitLegs.isEmpty }) {
+            Section {
+                routePageButton(title: "Earlier", systemImage: "chevron.up",
+                                isLoading: viewModel.isLoadingEarlierRoutes,
+                                isEnabled: viewModel.canLoadEarlierRoutes,
+                                action: actions.loadEarlierRoutes)
+                routePageButton(title: "Later", systemImage: "chevron.down",
+                                isLoading: viewModel.isLoadingLaterRoutes,
+                                isEnabled: viewModel.canLoadLaterRoutes,
+                                action: actions.loadLaterRoutes)
             }
+        }
 
-            if !viewModel.supplementalRouteOptions.isEmpty {
+        if !viewModel.supplementalRouteOptions.isEmpty {
+            Section("Other options") {
                 ForEach(viewModel.supplementalRouteOptions) { option in
-                    RouteOptionCard(
-                        option: option,
-                        isSelected: option.id == viewModel.selectedRouteOptionID
-                    )
+                    RouteOptionRow(option: option, isSelected: option.id == viewModel.selectedRouteOptionID)
                 }
             }
         }
     }
 
     private func routePageButton(
-        title: String,
-        systemImage: String,
-        isLoading: Bool,
-        isEnabled: Bool,
-        action: @escaping () -> Void
+        title: LocalizedStringKey, systemImage: String,
+        isLoading: Bool, isEnabled: Bool, action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            HStack(spacing: 7) {
+            HStack {
+                Label(title, systemImage: systemImage)
                 if isLoading {
-                    ProgressView()
-                        .controlSize(.small)
-                } else {
-                    Image(systemName: systemImage)
+                    Spacer()
+                    ProgressView().controlSize(.small)
                 }
-                Text(title)
             }
-            .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.bordered)
         .disabled(!isEnabled || viewModel.isLoadingEarlierRoutes || viewModel.isLoadingLaterRoutes)
     }
 }

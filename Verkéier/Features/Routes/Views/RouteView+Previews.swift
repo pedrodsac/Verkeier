@@ -4,58 +4,53 @@ import SwiftUI
 
 #if DEBUG
     #Preview("Route Options") {
-        ScrollView {
+        NavigationStack {
             RouteView(
                 viewModel: .previewWithRoutes,
                 actions: RouteActions()
             )
-            .padding()
         }
-        .background(Color(uiColor: .systemGroupedBackground))
+        .environment(AppPreferences())
     }
 
     #Preview("Calculating (skeleton)") {
-        ScrollView {
+        NavigationStack {
             RouteView(
                 viewModel: .previewCalculating,
                 actions: RouteActions()
             )
-            .padding()
         }
-        .background(Color(uiColor: .systemGroupedBackground))
+        .environment(AppPreferences())
     }
 
     #Preview("Waiting For Location") {
-        ScrollView {
+        NavigationStack {
             RouteView(
                 viewModel: .previewWaitingForLocation,
                 actions: RouteActions()
             )
-            .padding()
         }
-        .background(Color(uiColor: .systemGroupedBackground))
+        .environment(AppPreferences())
     }
 
     #Preview("Empty state") {
-        ScrollView {
+        NavigationStack {
             RouteView(
                 viewModel: .previewEmpty,
                 actions: RouteActions()
             )
-            .padding()
         }
-        .background(Color(uiColor: .systemGroupedBackground))
+        .environment(AppPreferences())
     }
 
     #Preview("Error state") {
-        ScrollView {
+        NavigationStack {
             RouteView(
                 viewModel: .previewError,
                 actions: RouteActions()
             )
-            .padding()
         }
-        .background(Color(uiColor: .systemGroupedBackground))
+        .environment(AppPreferences())
     }
 
     #Preview("Route Timeline") {
