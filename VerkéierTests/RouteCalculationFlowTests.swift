@@ -6,6 +6,46 @@ import Testing
 @Suite("Route calculations through the app UI flow", .serialized)
 @MainActor
 struct RouteCalculationFlowTests {
+    @Test("Swapping a device-location origin preserves it as the destination and restores live origin on reversal")
+    func swapCurrentLocationEndpoints() {
+        let viewModel = TransitMapViewModel()
+        let currentLocation = RoutePlace.currentLocation(
+            LocationPoint(name: "Device", latitude: 49.61, longitude: 6.12)
+        )
+        let destination = RoutePlace(
+            title: "Lorentzweiler",
+            location: LocationPoint(latitude: 49.7, longitude: 6.14),
+            modes: [.train], source: .search
+        )
+        viewModel.routeDestination = destination
+
+        viewModel.swapRouteEndpoints(currentLocation: currentLocation)
+
+        #expect(viewModel.routeOrigin == destination)
+        #expect(viewModel.routeDestination == currentLocation)
+
+        viewModel.swapRouteEndpoints(currentLocation: currentLocation)
+
+        #expect(viewModel.routeOrigin == nil)
+        #expect(viewModel.routeDestination == destination)
+    }
+
+    @Test("Swapping without an available device location leaves the journey unchanged")
+    func swapWithoutCurrentLocation() {
+        let viewModel = TransitMapViewModel()
+        let destination = RoutePlace(
+            title: "Lorentzweiler",
+            location: LocationPoint(latitude: 49.7, longitude: 6.14),
+            modes: [.train], source: .search
+        )
+        viewModel.routeDestination = destination
+
+        viewModel.swapRouteEndpoints()
+
+        #expect(viewModel.routeOrigin == nil)
+        #expect(viewModel.routeDestination == destination)
+    }
+
     @Test("Later pages prioritise departures near their page boundary for realtime")
     func laterPageRealtimeWindow() {
         let boundary = Date(timeIntervalSince1970: 1_800_000_000)

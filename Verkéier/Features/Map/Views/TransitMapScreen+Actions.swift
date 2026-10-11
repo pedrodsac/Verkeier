@@ -283,8 +283,15 @@ extension TransitMapScreen {
     }
 
     func swapRouteEndpoints() {
+        let currentLocation = locationService.currentLocation.map { location in
+            RoutePlace.currentLocation(LocationPoint(
+                name: "Current Location",
+                latitude: location.coordinate.latitude,
+                longitude: location.coordinate.longitude
+            ))
+        }
         animateSheetChange {
-            viewModel.swapRouteEndpoints()
+            viewModel.swapRouteEndpoints(currentLocation: currentLocation)
         }
     }
 
