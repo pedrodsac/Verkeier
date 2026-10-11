@@ -55,8 +55,8 @@ final class AppPreferences {
         didSet { saveString(distanceUnit.rawValue, forKey: Keys.distanceUnit) }
     }
 
-    var defaultModePreference: RoutePlannerModePreference {
-        didSet { saveString(defaultModePreference.rawValue, forKey: Keys.defaultModePreference) }
+    var includedRouteModes: Set<TransportMode> {
+        didSet { defaults.set(includedRouteModes.map(\.rawValue).sorted(), forKey: Keys.includedRouteModes) }
     }
 
     var avoidTightTransfers: Bool {
@@ -95,8 +95,12 @@ final class AppPreferences {
         self.defaults = defaults
         appearance = AppearancePreference(rawValue: defaults.string(forKey: Keys.appearance) ?? "") ?? .system
         distanceUnit = DistanceUnitPreference(rawValue: defaults.string(forKey: Keys.distanceUnit) ?? "") ?? .metric
-        defaultModePreference = RoutePlannerModePreference(rawValue: defaults
-            .string(forKey: Keys.defaultModePreference) ?? "") ?? .any
+        if let savedModes = defaults.stringArray(forKey: Keys.includedRouteModes) {
+            includedRouteModes = Set(savedModes.compactMap(TransportMode.init(rawValue:)))
+        } else {
+            // The old preference only affected ranking, so preserve inclusion of every mode.
+            includedRouteModes = Set(RoutePlannerFilters.selectableModes)
+        }
         avoidTightTransfers = defaults.bool(forKey: Keys.avoidTightTransfers)
         offlineMode = defaults.bool(forKey: Keys.offlineMode)
         showBikeShareStations = Self.savedBool(
@@ -112,7 +116,7 @@ final class AppPreferences {
 
     var defaultRouteFilters: RoutePlannerFilters {
         RoutePlannerFilters(
-            modePreference: defaultModePreference,
+            includedModes: includedRouteModes,
             avoidTightTransfers: avoidTightTransfers
         )
     }
@@ -145,7 +149,7 @@ final class AppPreferences {
     private enum Keys {
         static let appearance = "AppPreferences.appearance"
         static let distanceUnit = "AppPreferences.distanceUnit"
-        static let defaultModePreference = "AppPreferences.defaultModePreference"
+        static let includedRouteModes = "AppPreferences.includedRouteModes"
         static let avoidTightTransfers = "AppPreferences.avoidTightTransfers"
         static let offlineMode = "AppPreferences.offlineMode"
         static let showBikeShareStations = "AppPreferences.showBikeShareStations"

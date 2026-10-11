@@ -89,7 +89,7 @@ struct RouteTimePagingTests {
         await model.calculateRoute(using: service, from: nil)
         let task = Task { await model.loadLaterRoutes(using: service, from: nil) }
         while !(await gate.isWaiting) { await Task.yield() }
-        model.updateRouteFilters(.init(modePreference: .train))
+        model.updateRouteFilters(.init(includedModes: [.train]))
         await gate.release()
         await task.value
         #expect(model.routeOptions.isEmpty)

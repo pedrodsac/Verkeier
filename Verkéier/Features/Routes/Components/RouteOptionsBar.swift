@@ -30,23 +30,20 @@ struct RouteOptionsBar: View {
 
     private var optionsMenu: some View {
 		Menu("Route options", systemImage: "slider.horizontal.3") {
-            // Mode preference
-            Picker(
-                "Mode preference",
-                selection: Binding(
-                    get: { filters.modePreference },
-                    set: { updated in apply(\.modePreference, value: updated) }
-                )
-            ) {
-                ForEach(RoutePlannerModePreference.allCases) { option in
-                    Label(
-                        option.title,
-                        systemImage: option.transportMode?.symbolName ?? "circle.grid.2x2"
-                    )
-                    .tag(option)
+            Section("Transport in routes") {
+                ForEach(RoutePlannerFilters.selectableModes) { mode in
+                    Toggle(isOn: Binding(
+                        get: { filters.includedModes.contains(mode) },
+                        set: { included in
+                            var modes = filters.includedModes
+                            if included { modes.insert(mode) } else { modes.remove(mode) }
+                            apply(\.includedModes, value: modes)
+                        }
+                    )) {
+                        Label(LocalizedStringKey(mode.displayName), systemImage: mode.symbolName)
+                    }
                 }
             }
-            .pickerStyle(.inline)
 
             Divider()
 

@@ -140,7 +140,7 @@ final class SimulatorRouteBenchmark {
                     "supplementalOptions": viewModel.supplementalRouteOptions.map(\.id),
                     "planningTime": viewModel.routePlanningTime.date?.timeIntervalSince1970 ?? 0,
                     "avoidTightTransfers": viewModel.routeFilters.avoidTightTransfers,
-                    "modePreference": viewModel.routeFilters.modePreference.rawValue,
+                    "includedModes": viewModel.routeFilters.includedModes.map(\.rawValue).sorted(),
                     "recommendedOption": viewModel.selectedRouteOptionID ?? "",
                     "requestID": diagnostics.requestID.uuidString, "total_ms": diagnostics.totalMilliseconds,
                     "stages_ms": Dictionary(uniqueKeysWithValues: measured.milliseconds.map { ($0.key.rawValue, $0.value) }),

@@ -1,46 +1,11 @@
 import Foundation
 
-/// A rider's preferred transport mode for route planning.
-nonisolated enum RoutePlannerModePreference: String, Codable, CaseIterable, Identifiable, Sendable {
-    /// No mode preference.
-    case any
-    case bus
-    case tram
-    case train
-
-    var id: String {
-        rawValue
-    }
-
-    /// Localized title for the picker.
-    var title: String {
-        switch self {
-        case .any: "Any"
-        case .bus: "Bus"
-        case .tram: "Tram"
-        case .train: "Train"
-        }
-    }
-
-    /// The matching ``TransportMode``, or `nil` for ``any``.
-    var transportMode: TransportMode? {
-        switch self {
-        case .any:
-            nil
-        case .bus:
-            .bus
-        case .tram:
-            .tram
-        case .train:
-            .train
-        }
-    }
-}
-
 /// The set of user-configurable constraints applied to route planning.
 nonisolated struct RoutePlannerFilters: Codable, Hashable, Sendable {
-    /// Preferred transport mode.
-    var modePreference: RoutePlannerModePreference = .any
+    /// Transport types permitted in journeys. Walking connections are always available.
+    var includedModes: Set<TransportMode> = Set(Self.selectableModes)
+
+    static let selectableModes: [TransportMode] = [.bus, .tram, .train, .funicular, .bicycle]
     /// When `true`, avoid options with tight transfers.
     var avoidTightTransfers = false
 }
@@ -147,7 +112,7 @@ nonisolated struct RoutePlace: Codable, Hashable, Identifiable {
         self.init(
             id: stop.id,
             title: stop.displayName,
-            subtitle: stop.locality,
+            subtitle: stop.displaySubtitle,
             location: location,
             stopId: gtfsStopID,
             modes: stop.modes,

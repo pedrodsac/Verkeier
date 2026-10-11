@@ -118,6 +118,12 @@ struct TransitMapScreen: View {
                 isOnboardingPresented = true
             }
         }
+        .onChange(of: preferences.includedRouteModes, initial: true) {
+            guard viewModel.routeFilters.includedModes != preferences.includedRouteModes else { return }
+            var filters = viewModel.routeFilters
+            filters.includedModes = preferences.includedRouteModes
+            updateRouteFilters(filters)
+        }
         .onChange(of: isMainSheetPresented) {
             if !isMainSheetPresented, hasCompletedOnboarding, !isOnboardingPresented {
                 isMainSheetPresented = true
