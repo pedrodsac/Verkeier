@@ -12,9 +12,9 @@ actor LocalFirstWalkingRouter: WalkingRouting {
     }
     private let measuredRoutes = MeasuredWalkingRouteCache()
     private var routerPool: RouterPool?
-    // Each Valhalla actor serializes its own native calls. Open the second
-    // instance only when another request is already using the first.
-    private let maximumLocalRouters = 2
+    // Each native instance remains serialized. Independent instances allow
+    // the bounded four-request transfer batch to use four cores.
+    private let maximumLocalRouters = 4
 
     init(datasetManager: RoutingDatasetManager) {
         self.datasetManager = datasetManager
@@ -66,8 +66,26 @@ actor LocalFirstWalkingRouter: WalkingRouting {
 
     func route(from origin: LocationPoint, to destination: LocationPoint) async throws -> OfflineWalkingRoute {
         guard let dataset = try await datasetManager.activeDataset() else { throw WalkingRoutingError.datasetUnavailable }
+        return try await route(from: origin, to: destination, dataset: dataset)
+    }
+
+    func routes(_ requests: [OfflineWalkingRequest], maximumConcurrency: Int) async -> [OfflineWalkingRoute?] {
+        guard !requests.isEmpty else { return [] }
+        guard let dataset = try? await datasetManager.activeDataset() else {
+            return Array(repeating: nil, count: requests.count)
+        }
+        // One immutable graph revision for the whole batch. Checking the
+        // current/manifest/archive files for every pair repeated thousands of
+        // filesystem operations inside each walking-transfer round.
+        return await WalkingRouteBatch.resolve(requests, maximumConcurrency: maximumConcurrency) {
+            try await self.route(from: $0.from, to: $0.to, dataset: dataset, preferShortSearch: true)
+        }
+    }
+
+    private func route(from origin: LocationPoint, to destination: LocationPoint,
+                       dataset: RoutingDataset, preferShortSearch: Bool = false) async throws -> OfflineWalkingRoute {
         return try await measuredRoutes.route(from: origin, to: destination, revision: Self.revision(dataset)) {
-            try await self.uncachedRoute(from: origin, to: destination, dataset: dataset)
+            try await self.uncachedRoute(from: origin, to: destination, dataset: dataset, preferShortSearch: preferShortSearch)
         }
     }
 
@@ -80,8 +98,9 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         "\(dataset.revision)|\(PafendallFunicularConnection.revision)"
     }
 
-    private func uncachedRoute(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset) async throws -> OfflineWalkingRoute {
-        let direct = try? await pedestrianRoute(from: from, to: to, dataset: dataset)
+    private func uncachedRoute(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset,
+                               preferShortSearch: Bool = false) async throws -> OfflineWalkingRoute {
+        let direct = try? await pedestrianRoute(from: from, to: to, dataset: dataset, preferShortSearch: preferShortSearch)
         try Task.checkCancellation()
         if let connection = try? await PafendallFunicularConnection.route(from: from, to: to, pedestrian: {
             try await self.pedestrianRoute(from: $0, to: $1, dataset: dataset)
@@ -93,8 +112,12 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         return direct
     }
 
-    private func pedestrianRoute(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset) async throws -> OfflineWalkingRoute {
-        calibrated(try await withLocalRouter(dataset: dataset) { try await $0.route(from: from, to: to) })
+    private func pedestrianRoute(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset,
+                                 preferShortSearch: Bool = false) async throws -> OfflineWalkingRoute {
+        calibrated(try await withLocalRouter(dataset: dataset) {
+            if preferShortSearch { return try await $0.shortRoute(from: from, to: to) }
+            return try await $0.route(from: from, to: to)
+        })
     }
 
     private func withLocalRouter<Value: Sendable>(
@@ -256,54 +279,17 @@ nonisolated struct LocalFirstWalkingRoutingProvider: WalkingRoutingProvider {
         _ requests: [WalkingRequest],
         maximumConcurrency: Int
     ) async -> [MobiliteitKit.WalkingRoute?] {
-        guard !requests.isEmpty else { return [] }
-        guard !Task.isCancelled else { return Array(repeating: nil, count: requests.count) }
-        // Resolve every pair on the same pedestrian graph with bounded A* calls.
-        // A Valhalla matrix can spend tens of seconds expanding one distant target.
-        return await pairwiseRoutes(requests, maximumConcurrency: maximumConcurrency)
-    }
-
-    private func pairwiseRoutes(
-        _ requests: [WalkingRequest],
-        maximumConcurrency: Int
-    ) async -> [MobiliteitKit.WalkingRoute?] {
-        let router = walkingRouter
-        let limit = min(max(1, maximumConcurrency), requests.count)
-        return await withTaskGroup(of: (Int, MobiliteitKit.WalkingRoute?).self) { group in
-            var nextIndex = 0
-            var results = Array<MobiliteitKit.WalkingRoute?>(repeating: nil, count: requests.count)
-
-            func add(_ index: Int) -> Bool {
-                let request = requests[index]
-                return group.addTaskUnlessCancelled {
-                    guard let route = try? await router.route(
-                        from: locationPoint(from: request.source),
-                        to: locationPoint(from: request.destination)
-                    ) else { return (index, nil) }
-                    return (index, MobiliteitKit.WalkingRoute(
-                        durationSeconds: max(1, Int(route.duration.rounded())),
-                        distanceMeters: route.distanceMeters,
-                        polyline: route.coordinates.map {
-                            Coordinate(latitude: $0.latitude, longitude: $0.longitude)
-                        },
-                        evidence: route.source == .straightLineEstimate ? .estimate : .routedPedestrian,
-                        segments: route.segments
-                    ))
-                }
+        let routes = await walkingRouter.routes(requests.map {
+            OfflineWalkingRequest(from: locationPoint(from: $0.source), to: locationPoint(from: $0.destination))
+        }, maximumConcurrency: maximumConcurrency)
+        return routes.map { route in
+            route.map {
+                MobiliteitKit.WalkingRoute(durationSeconds: max(1, Int($0.duration.rounded())),
+                    distanceMeters: $0.distanceMeters,
+                    polyline: $0.coordinates.map { Coordinate(latitude: $0.latitude, longitude: $0.longitude) },
+                    evidence: $0.source == .straightLineEstimate ? .estimate : .routedPedestrian,
+                    segments: $0.segments)
             }
-
-            for _ in 0..<limit {
-                guard add(nextIndex) else { break }
-                nextIndex += 1
-            }
-            while let (index, route) = await group.next() {
-                results[index] = route
-                if nextIndex < requests.count, !Task.isCancelled {
-                    guard add(nextIndex) else { break }
-                    nextIndex += 1
-                }
-            }
-            return results
         }
     }
 

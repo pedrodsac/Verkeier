@@ -1,0 +1,66 @@
+{
+  "simulatorUDID": "F726825E-2DB4-4F45-A51C-DBA5AA0E2664",
+  "simulator": "iPhone 17",
+  "runtime": "iOS 27.0",
+  "planningEpoch": 1791712032.890348,
+  "aggregation": "median of all five fresh-process samples, including priming",
+  "baselineMedianMilliseconds": 4702.567333,
+  "optimizedMedianMilliseconds": 2313.461958,
+  "targetMilliseconds": 2351.2836665,
+  "improvementPercent": 50.80427787252696,
+  "qualityChecks": {
+    "canonicalPlansIdentical": true,
+    "canonicalSupplementalPlansIdentical": true,
+    "unfilteredJourneysIdentical": true,
+    "originalDisplayedJourneysRetained": true,
+    "originalDisplayedLegEvidenceRetained": true,
+    "countersIdentical": true,
+    "logicalRoundsIdentical": true
+  },
+  "stagesMedianMilliseconds": {
+    "snapshotPreparation": {
+      "baseline": 302.705209,
+      "optimized": 294.37850000000003
+    },
+    "graphPreparation": {
+      "baseline": 51.685459,
+      "optimized": 42.775834
+    },
+    "endpoints": {
+      "baseline": 133.006084,
+      "optimized": 87.969458
+    },
+    "raptor": {
+      "baseline": 3709.6126249999998,
+      "optimized": 1381.734583
+    },
+    "walkingTransfers": {
+      "baseline": 2462,
+      "optimized": 1005
+    },
+    "candidateBuilding": {
+      "baseline": 219.390875,
+      "optimized": 219.826792
+    },
+    "realtime": {
+      "baseline": 193.84149899999997,
+      "optimized": 188.315041
+    },
+    "firstRender": {
+      "baseline": 93.087875,
+      "optimized": 90.692125
+    },
+    "bikeCalculation": {
+      "baseline": 108.9565,
+      "optimized": 77.549375
+    }
+  },
+  "maximumPeakMemoryBytes": {
+    "baseline": 858701824,
+    "optimized": 948043776
+  },
+  "packageRevisions": {
+    "baseline": "ac6945e96e84cc3614317024cae716b0f90aca5c",
+    "optimized": "562bca26973968113cc6c5d9d69228142c8819d5"
+  }
+}
