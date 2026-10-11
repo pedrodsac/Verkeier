@@ -6,26 +6,67 @@ struct RouteEndpointsCard: View {
     let showRoutePlaceSearch: (RouteEndpoint) -> Void
     let swapRouteEndpoints: () -> Void
 
-    @State private var dragSessionID = UUID()
+    // Stable row identities let List animate the actual move while the endpoint
+    // at each position continues to represent the route's origin or destination.
+    @State private var rowIDs = [UUID(), UUID()]
+    @State private var rowHeights: [RouteEndpoint: CGFloat] = [:]
     @ScaledMetric(relativeTo: .body) private var badgeSize = 32
 
     var body: some View {
-        VStack(spacing: 0) {
-            endpointRow(.origin)
-            Divider()
-                .padding(.leading, badgeSize + 22)
-                .padding(.trailing, 12)
-            endpointRow(.destination)
+        List {
+            ForEach(rowIDs.enumerated(), id: \.element) { index, _ in
+                let endpoint: RouteEndpoint = index == 0 ? .origin : .destination
+                endpointRow(endpoint)
+                    .onGeometryChange(for: CGFloat.self) { geometry in
+                        geometry.size.height
+                    } action: { height in
+                        rowHeights[endpoint] = height
+                    }
+                    .listRowInsets(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden, edges: .top)
+                    .listRowSeparator(endpoint == .origin ? .visible : .hidden, edges: .bottom)
+                    .alignmentGuide(.listRowSeparatorLeading) { _ in badgeSize + 10 }
+                    .moveDisabled(!canSwap)
+            }
+            .onMove(perform: moveEndpoints)
         }
-        .background(alignment: .leading) {
+        .listStyle(.plain)
+        .environment(\.editMode, .constant(.active))
+        .environment(\.defaultMinListRowHeight, 0)
+        .scrollDisabled(true)
+        .scrollContentBackground(.hidden)
+        .contentMargins(0)
+        .frame(height: cardHeight)
+        .background(alignment: .topLeading) {
             Capsule()
                 .fill(.quaternary)
                 .frame(width: 4, height: 10)
-                .padding(.leading, 12 + badgeSize / 2 - 2)
+                .offset(x: 12 + badgeSize / 2 - 2, y: originRowHeight - 5)
                 .accessibilityHidden(true)
         }
-        .background(Color(uiColor: .secondarySystemGroupedBackground), in: .rect(cornerRadius: 22))
-        .fixedSize(horizontal: false, vertical: true)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(.rect(cornerRadius: 22))
+    }
+
+    private var canSwap: Bool {
+        viewModel.hasDestination && (viewModel.origin != nil || viewModel.currentLocation != nil)
+    }
+
+    private var originRowHeight: CGFloat {
+        rowHeights[.origin] ?? badgeSize + 16
+    }
+
+    private var cardHeight: CGFloat {
+        originRowHeight + (rowHeights[.destination] ?? badgeSize + 16)
+    }
+
+    private func moveEndpoints(from source: IndexSet, to destination: Int) {
+        guard canSwap,
+              (source == IndexSet(integer: 0) && destination == 2)
+                || (source == IndexSet(integer: 1) && destination == 0) else { return }
+        rowIDs.move(fromOffsets: source, toOffset: destination)
+        swapRouteEndpoints()
     }
 
     private func endpointRow(_ endpoint: RouteEndpoint) -> some View {
@@ -36,8 +77,7 @@ struct RouteEndpointsCard: View {
             title: isCurrentLocation ? String(localized: "My Location")
                 : (endpoint == .origin ? viewModel.originTitle : viewModel.destinationTitle),
             place: place,
-            canSwap: viewModel.hasDestination && (viewModel.origin != nil || viewModel.currentLocation != nil),
-            dragSessionID: dragSessionID,
+            canSwap: canSwap,
             select: { showRoutePlaceSearch(endpoint) },
             swap: swapRouteEndpoints
         )
