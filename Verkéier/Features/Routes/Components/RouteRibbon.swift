@@ -90,7 +90,12 @@ private struct TransitBadge: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            Text(routeName)
+            if mode == .funicular {
+                Image(systemName: "cablecar")
+                    .accessibilityLabel(mode.displayName)
+            } else {
+                Text(routeName)
+            }
             if differentiateWithoutColor, let status {
                 Image(systemName: status.symbol)
             }
