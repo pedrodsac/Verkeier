@@ -56,7 +56,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
                     realtimeMaximumConcurrentBoardRequests: realtimeConcurrency,
                     pagingPolicy: .adjacentTimeWindows),
                 page: page.packagePage, refresh: realtimeRefreshPolicy.packagePolicy,
-                origin: from, destination: to, time: time)
+                origin: from, destination: to, time: time, includeBike: filters.includedModes.contains(.bicycle))
             let mappingStarted = ContinuousClock.now
             var calculation = await calculation(from: result.result, origin: from, destination: to, supplemental: result.supplemental)
             // The app operation includes router preparation and the concurrent bike branch.

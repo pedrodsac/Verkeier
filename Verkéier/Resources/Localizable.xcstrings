@@ -1,6 +1,50 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Choose which types of transport routes can include. Walking is always included." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle, welche Verkehrsmittel Routen enthalten dürfen. Fußwege sind immer enthalten."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez les types de transport autorisés dans les itinéraires. La marche est toujours incluse."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wielt, wéi eng Transportmëttel a Routen erlaabt sinn. Foussweeër sinn ëmmer abegraff."
+          }
+        }
+      }
+    },
+    "Transport in routes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkehrsmittel für Routen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transports dans les itinéraires"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transportmëttel a Routen"
+          }
+        }
+      }
+    },
     "" : {
       "localizations" : {
         "de" : {

@@ -17,7 +17,7 @@ actor AppJourneySessionStore {
 
     func calculate(databaseURL: URL, request: JourneyPlanningRequest,
                    page: JourneyPlanningPage, refresh: JourneyRefreshPolicy,
-                   origin: LocationPoint, destination: LocationPoint, time: RoutePlanningTime
+                   origin: LocationPoint, destination: LocationPoint, time: RoutePlanningTime, includeBike: Bool
     ) async throws -> (result: JourneyPlanningResult?, supplemental: [RouteOption], diagnostics: RoutingDiagnostics) {
         generation += 1
         let current = generation
@@ -37,7 +37,7 @@ actor AppJourneySessionStore {
         let isInitialPage: Bool
         if case .initial = page { isInitialPage = true } else { isInitialPage = false }
         async let bike = Self.measuredBike(planner: bikePlanner,
-            calculate: isNewRequest || isInitialPage || refresh == .forceRefresh,
+            calculate: isNewRequest || isInitialPage || refresh == .forceRefresh, included: includeBike,
             cached: supplementalOptions.first, origin: origin, destination: destination, time: time)
         let result: JourneyPlanningResult?
         do {
@@ -57,9 +57,10 @@ actor AppJourneySessionStore {
     }
 
     private nonisolated static func measuredBike(planner: BikeShareRoutePlanner, calculate: Bool,
-        cached: RouteOption?, origin: LocationPoint, destination: LocationPoint, time: RoutePlanningTime
+        included: Bool, cached: RouteOption?, origin: LocationPoint, destination: LocationPoint, time: RoutePlanningTime
     ) async -> (RouteOption?, RoutingDiagnostics) {
         var diagnostics = RoutingDiagnostics()
+        guard included else { return (nil, diagnostics) }
         guard calculate else { return (cached, diagnostics) }
         let started = ContinuousClock.now
         let option = await planner.option(from: origin, to: destination, time: time)
@@ -116,13 +117,14 @@ extension RoutePlanningTime {
 }
 extension RoutePlannerFilters {
     nonisolated var packagePreferences: RoutingPreferences {
-        let preferred: TransitModeMask? = switch modePreference {
-        case .any: nil
-        case .bus: .init(rawValue: 1 << 3)
-        case .tram: .init(rawValue: 1 << 0)
-        case .train: .init(rawValue: (1 << 1) | (1 << 2))
-        }
-        return .init(preferredMode: preferred, avoidTightTransfers: avoidTightTransfers)
+        var mask: UInt64 = 0
+        if includedModes.contains(.tram) { mask |= 1 << 0 }
+        if includedModes.contains(.train) { mask |= (1 << 1) | (1 << 2) | (1 << 12) }
+        if includedModes.contains(.bus) { mask |= (1 << 3) | (1 << 11) }
+        if includedModes.contains(.funicular) { mask |= 1 << 7 }
+        var preferences = RoutingPreferences(preferredMode: nil, avoidTightTransfers: avoidTightTransfers)
+        preferences.allowedModes = .init(rawValue: mask)
+        return preferences
     }
 }
 extension RouteSearchPage {
