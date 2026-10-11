@@ -152,6 +152,8 @@ struct RoutePresentationModel {
 /// Callbacks the route-planner sheet needs, sliced from ``TransitSheetActions``.
 struct RouteActions {
     var calculateRoute: () -> Void = {}
+    var refreshRoutes: () async -> Void = {}
+    var maintainRoutes: () async -> Void = {}
     var openInAppleMaps: () -> Void = {}
     var selectRouteOrigin: (RoutePlace?) -> Void = { _ in }
     var selectRouteDestination: (RoutePlace) -> Void = { _ in }
@@ -170,6 +172,8 @@ extension RouteActions {
     init(from actions: TransitSheetActions) {
         self.init()
         calculateRoute = actions.calculateRoute
+        refreshRoutes = actions.refreshRoutes
+        maintainRoutes = actions.maintainRoutes
         openInAppleMaps = actions.openRouteInAppleMaps
         selectRouteOrigin = actions.selectRouteOrigin
         selectRouteDestination = actions.selectRouteDestination

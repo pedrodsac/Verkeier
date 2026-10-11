@@ -125,7 +125,9 @@ extension TransitMapScreen {
                 case .settings: break
                 }
             },
-            refreshTripDetail: { await tripDetailViewModel.refresh(using: tripDetailService) }
+            refreshTripDetail: { await tripDetailViewModel.refresh(using: tripDetailService) },
+            refreshRoutes: refreshRoutes,
+            maintainRoutes: maintainRoutes
         )
     }
 
@@ -477,7 +479,7 @@ extension TransitMapScreen {
     }
 
     func calculateRoute() {
-        if locationService.currentLocation == nil {
+        if viewModel.routeOrigin == nil, locationService.currentLocation == nil {
             switch locationService.authorizationStatus {
             case .denied, .restricted:
                 viewModel.failRouteLocationRequest()
@@ -494,6 +496,35 @@ extension TransitMapScreen {
             await viewModel.calculateRoute(
                 using: routeService, from: locationService.currentLocation, realtimeRefreshPolicy: refresh
             )
+        }
+    }
+
+    func refreshRoutes() async {
+        guard viewModel.effectiveRouteDestination != nil,
+              !viewModel.isCalculatingRoute,
+              !viewModel.isLoadingEarlierRoutes, !viewModel.isLoadingLaterRoutes else { return }
+        guard viewModel.routeOrigin != nil || locationService.currentLocation != nil else {
+            calculateRoute()
+            return
+        }
+        await viewModel.calculateRoute(
+            using: routeService, from: locationService.currentLocation,
+            realtimeRefreshPolicy: .forceRefresh
+        )
+    }
+
+    func maintainRoutes() async {
+        guard viewModel.effectiveRouteDestination != nil else { return }
+        if viewModel.routeOptions.isEmpty {
+            await refreshRoutes()
+        }
+        while !Task.isCancelled {
+            do { try await Task.sleep(for: .seconds(45)) }
+            catch { return }
+            guard !Task.isCancelled else { return }
+            if scenePhase == .active {
+                await refreshRoutes()
+            }
         }
     }
 

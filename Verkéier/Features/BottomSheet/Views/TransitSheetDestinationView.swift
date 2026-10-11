@@ -84,6 +84,7 @@ struct TransitSheetDestinationView: View {
                 )
                 .safeAreaPadding(.horizontal, 16)
             }
+            .refreshable { await actions.refreshRoutes() }
             .navigationTitle(route.navigationTitle)
             .toolbarTitleDisplayMode(.inline)
             .toolbar {

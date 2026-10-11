@@ -12,6 +12,7 @@ struct PlanView: View {
                 .safeAreaPadding(.horizontal, 16)
                 .padding(.bottom, 12)
         }
+        .refreshable { await actions.refreshRoutes() }
         .navigationTitle("Plan")
         .toolbarTitleDisplayMode(.inline)
         .toolbar {

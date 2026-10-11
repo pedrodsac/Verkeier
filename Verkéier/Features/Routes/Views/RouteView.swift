@@ -5,8 +5,7 @@ import SwiftUI
 /// The route-planner navigation destination.
 ///
 /// Composes a unified endpoints card, state-driven middle section (loading
-/// skeletons, error/empty cards, results list), and a primary Find Routes
-/// action. All business logic lives upstream — this view is fully stateless,
+/// skeletons, error/empty cards, results list). All business logic lives upstream — this view is fully stateless,
 /// driven by ``RoutePresentationModel`` and closure callbacks.
 struct RouteView: View {
     let viewModel: RoutePresentationModel
@@ -31,9 +30,6 @@ struct RouteView: View {
                 recentTripsRow
             }
 
-            // ── Primary action ────────────────────────────────────────────
-            findRoutesButton
-
             // ── State-driven body ─────────────────────────────────────────
             stateBody
 
@@ -51,6 +47,10 @@ struct RouteView: View {
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .task(id: [viewModel.origin?.id, viewModel.selectedPlace(for: .destination)?.id,
+                   viewModel.currentLocation == nil ? nil : "location-available"]) {
+            await actions.maintainRoutes()
+        }
         // Haptic when a route plan is found.
         .sensoryFeedback(.success, trigger: viewModel.routeOptions.count)
         .onChange(of: viewModel.statusMessage) { _, message in
@@ -107,39 +107,15 @@ struct RouteView: View {
         }
     }
 
-    // MARK: - Find Routes button
-
-    private var findRoutesButton: some View {
-        Button(action: actions.calculateRoute) {
-            HStack {
-                if viewModel.isCalculating {
-                    ProgressView()
-                        .controlSize(.small)
-                        .tint(.white)
-                }
-                Text(calculateButtonTitle)
-                    .frame(maxWidth: .infinity)
-            }
-        }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
-        .disabled(
-            !viewModel.hasDestination
-                || viewModel.isCalculating
-                || viewModel.isWaitingForLocation
-        )
-    }
-
-    private var calculateButtonTitle: String {
-        if viewModel.isWaitingForLocation { return "Waiting for Location..." }
-        if viewModel.isCalculating { return "Finding Routes…" }
-        return viewModel.routeOptions.isEmpty ? "Find Routes" : "Refresh Routes"
-    }
-
     // MARK: - State-driven body
 
     @ViewBuilder
     private var stateBody: some View {
+
+        if viewModel.isWaitingForLocation {
+            ProgressView("Waiting for Location…")
+                .frame(maxWidth: .infinity)
+        }
 
         // Initial load: show skeleton cards instead of a lone spinner
         if viewModel.isCalculating, viewModel.routeOptions.isEmpty {
@@ -173,7 +149,7 @@ struct RouteView: View {
         }
 
         if viewModel.isStale {
-            RouteStatusMessage(text: "Routes may have changed. Refresh routes for the latest information.")
+            RouteStatusMessage(text: "Routes may have changed. Pull to refresh for the latest information.")
         }
 
         // Journey alerts
