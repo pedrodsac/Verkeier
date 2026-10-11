@@ -71,8 +71,9 @@ small rings.
 Route content is synchronized by stable identity. Unchanged camera/sheet updates
 do not rebuild polylines or annotation objects. Layout is coalesced during map
 gestures and recomputed at their end, after resizing, and when text size changes.
-Appearance changes replace renderer colors while retaining geometry. Drawing
-uses immutable paths and colors because MapKit may draw tiles concurrently.
+Appearance changes replace renderer colors while retaining geometry. Each segment
+retains a casing/foreground pair of native vector polyline renderers. Screen widths and dashes stay fixed during continuous zoom without
+custom bitmap-tile drawing or per-camera width updates.
 
 Stop circles are display-only, with VoiceOver names, modes, and roles. Shields
 are decorative and excluded from VoiceOver. The journey and trip sheets remain
