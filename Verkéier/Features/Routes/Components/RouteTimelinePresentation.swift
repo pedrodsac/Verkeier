@@ -110,15 +110,6 @@ enum RouteTimelinePresentation {
             }
             index += 1
         }
-        // Internal funicular terminals are just boundaries within the station
-        // connection, rather than stops the traveller needs to identify.
-        let hiddenTerminalIDs = Set(legs.indices.dropFirst().compactMap { index -> String? in
-            let incoming = legs[index - 1]
-            let outgoing = legs[index]
-            let entersFunicular = incoming.transportKind == .walking && outgoing.mode == .funicular
-            let leavesFunicular = incoming.mode == .funicular && outgoing.transportKind == .walking
-            return entersFunicular || leavesFunicular ? "place-\(index)" : nil
-        })
-        return result.filter { !hiddenTerminalIDs.contains($0.id) }
+        return result
     }
 }

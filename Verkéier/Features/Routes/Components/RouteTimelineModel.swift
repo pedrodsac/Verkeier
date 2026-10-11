@@ -213,9 +213,14 @@ enum RouteTimelineBuilder {
             nil
         }
 
+        let isInternalFunicularTerminal =
+            (incoming?.transportKind == .walking && outgoing?.mode == .funicular)
+            || (incoming?.mode == .funicular && outgoing?.transportKind == .walking)
+
         return PlaceNode(
             id: id,
-            name: (point.name ?? "Stop").stationDisplayName(hidingLocality: incoming?.mode == .tram || outgoing?.mode == .tram),
+            name: isInternalFunicularTerminal ? ""
+                : (point.name ?? "Stop").stationDisplayName(hidingLocality: incoming?.mode == .tram || outgoing?.mode == .tram),
             role: placeRole,
             arrivalTime: arrival,
             departureTime: departure,

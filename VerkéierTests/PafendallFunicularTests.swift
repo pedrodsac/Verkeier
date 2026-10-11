@@ -69,7 +69,11 @@ struct PafendallFunicularTests {
             return
         }
         let presentedTimeline = RouteTimelinePresentation.items(from: legs)
-        #expect(presentedTimeline.map(\.id) == ["place-0", "segment-0", "segment-1", "segment-2", "place-3"])
+        #expect(presentedTimeline.map(\.id) == ["place-0", "segment-0", "place-1", "segment-1", "place-2", "segment-2", "place-3"])
+        #expect(board.name == "")
+        #expect(alight.name == "")
+        #expect(presentedTimeline.contains(.place(board)))
+        #expect(presentedTimeline.contains(.place(alight)))
         #expect(presentedTimeline.contains(.segment(ride)))
         #expect(ride.kind == .funicular)
         #expect(ride.rail == .transit(.funicular))
