@@ -130,10 +130,10 @@ extension TransitMapViewModel {
         store.saveCommutePresets(updated)
     }
 
-    func swapRouteEndpoints() {
-        guard let destination = effectiveRouteDestination else { return }
-        let previousOrigin = routeOrigin
-        routeOrigin = destination
+    func swapRouteEndpoints(currentLocation: RoutePlace? = nil) {
+        guard let destination = effectiveRouteDestination,
+              let previousOrigin = routeOrigin ?? currentLocation else { return }
+        routeOrigin = destination.source == .currentLocation ? nil : destination
         routeDestination = previousOrigin
         clearRoute()
     }
