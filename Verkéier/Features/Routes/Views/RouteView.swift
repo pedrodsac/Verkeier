@@ -15,6 +15,7 @@ struct RouteView: View {
                 showRoutePlaceSearch: actions.showRoutePlaceSearch,
                 swapRouteEndpoints: actions.swapRouteEndpoints
             )
+            .environment(\.editMode, .constant(.active))
 
             Group {
                 savedTripsSections
@@ -28,12 +29,12 @@ struct RouteView: View {
                     }
                 }
             }
-            // Keep navigation and normal button selection outside endpoint editing.
-            .environment(\.editMode, .constant(.inactive))
         }
         .listStyle(.insetGrouped)
         .listSectionSpacing(14)
-        .environment(\.editMode, .constant(.active))
+        // List-wide editing suppresses navigation selection. Only the endpoint
+        // section opts into editing; pickers and route links stay interactive.
+        .environment(\.editMode, .constant(.inactive))
         .onChange(of: viewModel.selectedRecentTripID, initial: true) { _, tripID in
             selectedRecentTripID = tripID
         }
