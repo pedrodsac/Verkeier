@@ -61,6 +61,24 @@ struct PafendallFunicularTests {
         #expect(legs.map(\.transportKind) == [.walking, .transit, .walking])
         #expect(legs[1].routeName == "Funicular")
         #expect(legs[1].tripId == nil) // Continuous station link, without an invented GTFS trip.
+        let timeline = RouteTimelineBuilder.items(from: legs)
+        guard case let .segment(ride) = timeline[3],
+              case let .place(board) = timeline[2],
+              case let .place(alight) = timeline[4] else {
+            Issue.record("Expected funicular segment between its terminals")
+            return
+        }
+        #expect(ride.kind == .funicular)
+        #expect(ride.rail == .transit(.funicular))
+        #expect(ride.durationMinutes == 3)
+        #expect(ride.badgeText == nil)
+        #expect(ride.tripSelection == nil)
+        #expect(board.departureTime == nil)
+        #expect(board.scheduledDepartureTime == nil)
+        #expect(alight.arrivalTime == nil)
+        #expect(alight.departureTime == nil)
+        #expect(alight.scheduledArrivalTime == nil)
+        #expect(RouteTimelinePresentation.ribbonLegs(from: legs).map(\.mode) == [.walking, .walking])
         #expect(legs[1].mapCoordinates.count == 9)
         #expect(legs.first?.origin == tram)
         #expect(legs.last?.destination == train)

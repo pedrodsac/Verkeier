@@ -116,7 +116,7 @@ struct RouteOptionCard: View {
         let heading = option.isVelohOnly || option.isWalkingOnly
             ? durationText
             : "\(timeRangeText), \(durationText)"
-        let lines = option.transitLegs.map {
+        let lines = option.transitLegs.filter { $0.mode != .funicular }.map {
             RouteLineStatus.accessibilityDescription(for: $0)
         }.joined(separator: ", ")
         let warning = option.hasTightTransfer ? "Tight transfer" : ""

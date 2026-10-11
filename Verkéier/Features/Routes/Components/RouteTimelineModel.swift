@@ -114,6 +114,7 @@ struct SegmentNode: Identifiable, Equatable {
         case transfer
         case transit
         case bikeShare
+        case funicular
     }
 
     let id: String
@@ -176,11 +177,16 @@ enum RouteTimelineBuilder {
         incoming: RoutePlan.Leg?,
         outgoing: RoutePlan.Leg?
     ) -> PlaceNode {
-        let outgoingTransit = outgoing?.transportKind == .transit ? outgoing : nil
+        let outgoingTransit = outgoing?.transportKind == .transit && outgoing?.mode != .funicular ? outgoing : nil
         let placeRole = role(incoming: incoming, outgoing: outgoing)
 
-        let arrival = incoming.flatMap { arrivalTime(of: $0) }
-        let departure = outgoing.flatMap { departureTime(of: $0) }
+        let arrival = incoming.flatMap { $0.mode == .funicular ? nil : arrivalTime(of: $0) }
+        // A continuous funicular connection has no fixed boarding/alighting
+        // time. Keep the adjoining scheduled vehicle time when there is one.
+        let departure = outgoing.flatMap {
+            $0.mode == .funicular || (incoming?.mode == .funicular && $0.transportKind != .transit)
+                ? nil : departureTime(of: $0)
+        }
 
         let wait: Int? = {
             guard let arrival, let departure else { return nil }
@@ -213,7 +219,7 @@ enum RouteTimelineBuilder {
             role: placeRole,
             arrivalTime: arrival,
             departureTime: departure,
-            scheduledArrivalTime: incoming?.transportKind == .transit
+            scheduledArrivalTime: incoming?.transportKind == .transit && incoming?.mode != .funicular
                 ? incoming?.scheduledArrivalTime
                 : nil,
             scheduledDepartureTime: outgoingTransit?.scheduledDepartureTime,
@@ -240,7 +246,8 @@ enum RouteTimelineBuilder {
         guard let incoming else { return .origin }
         guard let outgoing else { return .destination }
         if outgoing.continuesInSeatFromTripID == incoming.tripId, outgoing.continuesInSeatFromTripID != nil { return .stayAboard }
-        switch (incoming.transportKind == .transit, outgoing.transportKind == .transit) {
+        switch (incoming.transportKind == .transit && incoming.mode != .funicular,
+                outgoing.transportKind == .transit && outgoing.mode != .funicular) {
         case (true, true): return .transfer
         case (true, false): return .alight
         default: return .board
@@ -256,7 +263,9 @@ enum RouteTimelineBuilder {
         next: RoutePlan.Leg?,
         followingLegs: [RoutePlan.Leg]
     ) -> SegmentNode {
-        let kind: SegmentNode.Kind = if leg.transportKind == .transit {
+        let kind: SegmentNode.Kind = if leg.mode == .funicular {
+            .funicular
+        } else if leg.transportKind == .transit {
             .transit
         } else if leg.transportKind == .bikeShare {
             .bikeShare
@@ -279,7 +288,7 @@ enum RouteTimelineBuilder {
             distanceMeters: kind == .transit ? nil : leg.distanceMeters,
             rail: railStyle(for: leg),
             bikeShareDetails: leg.bikeShareDetails,
-            tripSelection: TripDetailSelection(leg: leg, followingLegs: followingLegs)
+            tripSelection: kind == .transit ? TripDetailSelection(leg: leg, followingLegs: followingLegs) : nil
         )
     }
 

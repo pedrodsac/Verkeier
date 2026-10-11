@@ -85,6 +85,11 @@ struct TimelineSegmentRow: View {
                         .foregroundStyle(.orange)
                 }
             }
+        case .funicular:
+            Text(node.durationMinutes.map { "Funicular \($0) min" } ?? "Funicular")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         case .walk, .transfer:
             Text(walkText)
                 .font(.footnote)
@@ -122,6 +127,7 @@ struct TimelineSegmentRow: View {
         switch node.kind {
         case .transit: .none
         case .bikeShare: .bicycle
+        case .funicular: .funicular
         case .walk, .transfer: .walk
         }
     }
@@ -157,6 +163,8 @@ struct TimelineSegmentRow: View {
                 }
             }
             return s
+        case .funicular:
+            return node.durationMinutes.map { "Funicular, \($0) minutes." } ?? "Funicular."
         case .transfer:
             return node.durationMinutes.map { "Transfer on foot, \($0) minutes." } ?? "Transfer on foot."
         case .walk:
