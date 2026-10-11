@@ -181,7 +181,14 @@ private struct TimelineLineBadge: View {
     private let verticalInset: CGFloat = 2
 
     var body: some View {
-        Text(text)
+        Group {
+            if mode == .funicular {
+                Image(systemName: "cablecar")
+                    .accessibilityLabel(mode.displayName)
+            } else {
+                Text(text)
+            }
+        }
             .font(.callout.weight(.bold))
             .foregroundStyle(.white)
             .padding(.horizontal, horizontalInset)
