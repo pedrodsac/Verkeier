@@ -14,7 +14,7 @@ nonisolated final class BenchmarkBoardProtocol: URLProtocol {
             let body: Data
             if let bodies = BenchmarkRecordedTransport.bodies {
                 guard let captured = bodies[BenchmarkRecordedTransport.key(request.url!)] else {
-                    print("ROUTING_BENCHMARK_ABORT missing-replay-query"); fflush(stdout)
+                    print("ROUTING_BENCHMARK_ABORT missing-replay-query \(BenchmarkRecordedTransport.key(request.url!))"); fflush(stdout)
                     throw CocoaError(.fileReadNoSuchFile)
                 }
                 body = captured
