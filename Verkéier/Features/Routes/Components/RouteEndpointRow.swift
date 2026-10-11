@@ -27,11 +27,6 @@ struct RouteEndpointRow: View {
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
-
-                Image(systemName: "line.3.horizontal")
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .accessibilityHidden(true)
             }
             .padding(.vertical, 8)
             .frame(minHeight: 44)

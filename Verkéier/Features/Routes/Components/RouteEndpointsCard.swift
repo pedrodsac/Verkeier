@@ -27,7 +27,6 @@ struct RouteEndpointsCard: View {
                     .listRowSeparator(.hidden, edges: .top)
                     .listRowSeparator(endpoint == .origin ? .visible : .hidden, edges: .bottom)
                     .alignmentGuide(.listRowSeparatorLeading) { _ in badgeSize + 10 }
-                    .moveDisabled(!canSwap)
             }
             .onMove(perform: moveEndpoints)
         }
