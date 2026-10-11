@@ -6,6 +6,7 @@ enum RouteTimelinePresentation {
     /// One line badge per vehicle ride, with walking and bike links preserved.
     static func ribbonLegs(from legs: [RoutePlan.Leg]) -> [RoutePlan.Leg] {
         legs.enumerated().compactMap { index, leg in
+            guard leg.mode != .funicular else { return nil }
             guard [.transit, .walking, .bikeShare].contains(leg.transportKind) else { return nil }
             if index > 0, leg.transportKind == .transit {
                 let incoming = legs[index - 1]
