@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Row content only; the enclosing List supplies the system reorder control.
+/// Endpoint content with a visible handle; the enclosing List supports reordering.
 struct RouteEndpointRow: View {
     let endpoint: RouteEndpoint
     let title: String
@@ -27,6 +27,11 @@ struct RouteEndpointRow: View {
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: "line.3.horizontal")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
             }
             .padding(.vertical, 8)
             .frame(minHeight: 44)
