@@ -6,6 +6,8 @@ struct RouteView: View {
     let viewModel: RoutePresentationModel
     let actions: RouteActions
 
+    @State private var selectedRecentTripID: String?
+
     var body: some View {
         List {
             RouteEndpointsSection(
@@ -32,6 +34,13 @@ struct RouteView: View {
         .listStyle(.insetGrouped)
         .listSectionSpacing(14)
         .environment(\.editMode, .constant(.active))
+        .onChange(of: viewModel.selectedRecentTripID, initial: true) { _, tripID in
+            selectedRecentTripID = tripID
+        }
+        .onChange(of: selectedRecentTripID) { _, tripID in
+            guard let tripID, tripID != viewModel.selectedRecentTripID else { return }
+            actions.applyAndCalculatePreset(tripID)
+        }
         .task(id: [viewModel.origin?.id, viewModel.selectedPlace(for: .destination)?.id,
                    viewModel.currentLocation == nil ? nil : "location-available"]) {
             await actions.maintainRoutes()
@@ -66,14 +75,16 @@ struct RouteView: View {
         }
 
         if !viewModel.recentTrips.isEmpty {
-            Section("Recent trips") {
-                ForEach(viewModel.recentTrips) { trip in
-                    Button {
-                        actions.applyAndCalculatePreset(trip.id)
-                    } label: {
-                        Label(trip.title, systemImage: "clock.arrow.circlepath")
+            Section {
+                Picker(selection: $selectedRecentTripID) {
+                    Text("Choose a trip").tag(String?.none)
+                    ForEach(viewModel.recentTrips) { trip in
+                        Text(trip.title).tag(Optional(trip.id))
                     }
+                } label: {
+                    Label("Recent trips", systemImage: "clock.arrow.circlepath")
                 }
+                .pickerStyle(.navigationLink)
             }
         }
     }
