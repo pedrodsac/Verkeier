@@ -148,6 +148,9 @@ struct Stop: Codable, Hashable, Identifiable {
     /// The rider-facing name without a locality prefix that is already shown
     /// separately in the UI.
     nonisolated var displayName: String {
+        if modes.contains(.tram) {
+            return name.stationDisplayName(hidingLocality: true)
+        }
         let cleanedName = name.stationDisplayName
         let trimmedName = cleanedName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let locality,

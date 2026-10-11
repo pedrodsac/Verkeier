@@ -232,9 +232,7 @@ extension RouteOption {
             legs: legs,
             dataSource: plan.dataSource
         )
-        let itinerary = RouteMapOverlayBuilder.itinerary(legs: legs)
-        let overlay = RouteMapOverlay(segments: itinerary.segments + mapTransferWalks(for: legs),
-            transferMarkers: itinerary.transferMarkers, stopMarkers: itinerary.stopMarkers)
+        let overlay = RouteMapOverlayBuilder.itinerary(legs: legs)
         return RouteOption(id: id, plan: updatedPlan, mapOverlay: overlay.isEmpty ? nil : overlay,
                            feasibility: feasibility, statusEvidence: statusEvidence,
                            validationContext: validationContext, refinementToken: refinementToken)

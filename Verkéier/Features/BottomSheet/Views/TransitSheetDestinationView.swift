@@ -120,6 +120,11 @@ struct TransitSheetDestinationView: View {
             .navigationTitle(route.navigationTitle)
             .toolbarTitleDisplayMode(.inline)
 
+        case let .departureTrip(departure, stop):
+            DepartureTripDestination(departure: departure, stop: stop) { selection in
+                actions.openDepartureTrip(departure, stop, selection)
+            }
+
         case let .tripDetail(selection):
             if let model = viewModel.tripDetail {
                 TripDetailView(selection: selection, viewModel: model, refresh: actions.refreshTripDetail)
@@ -153,7 +158,7 @@ struct TransitSheetDestinationView: View {
 
     /// Formats the next five departures as a shareable plain-text message.
     private func stopDeparturesShareText(stop: Stop, departures: [Departure]) -> String {
-        var lines = ["Next departures — \(stop.name)"]
+        var lines = ["Next departures — \(stop.displayName)"]
         for departure in departures.prefix(5) {
             let time = (departure.realtimeDeparture ?? departure.scheduledDeparture)?
                 .formatted(date: .omitted, time: .shortened) ?? "--:--"
@@ -164,7 +169,7 @@ struct TransitSheetDestinationView: View {
             } else {
                 ""
             }
-            lines.append("\(time)  \(departure.lineName) → \(departure.destination)\(status)")
+            lines.append("\(time)  \(departure.lineName) → \(departure.displayDestination)\(status)")
         }
         lines.append("via Verkéier")
         return lines.joined(separator: "\n")

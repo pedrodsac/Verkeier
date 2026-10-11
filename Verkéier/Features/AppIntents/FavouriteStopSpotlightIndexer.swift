@@ -12,7 +12,7 @@ enum FavouriteStopSpotlightIndexer {
     static func index(_ stops: [Stop]) {
         let items = stops.map { stop -> CSSearchableItem in
             let attrs = CSSearchableItemAttributeSet(contentType: .item)
-            attrs.title = stop.name
+            attrs.title = stop.displayName
             attrs.contentDescription = [
                 stop.locality,
                 stop.modes.map(\.displayName).joined(separator: ", ")

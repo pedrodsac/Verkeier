@@ -8,6 +8,7 @@ enum TransitSheetRoute: Hashable {
     case directionsForPreset(String)
     case routePlaceSearch(RouteEndpoint)
     case routeTimeline(String)
+    case departureTrip(Departure, Stop)
     case tripDetail(TripDetailSelection)
     case lineDetail(TransitRoute)
     case alerts
@@ -16,7 +17,7 @@ enum TransitSheetRoute: Hashable {
         switch self {
         case .search, .routePlaceSearch, .routeTimeline, .lineDetail, .alerts:
             .expanded
-        case .stopGroup, .stopDetail, .directions, .directionsForPreset, .tripDetail:
+        case .stopGroup, .stopDetail, .directions, .directionsForPreset, .tripDetail, .departureTrip:
             .medium
         }
     }
@@ -35,6 +36,8 @@ enum TransitSheetRoute: Hashable {
             endpoint.searchTitle
         case .routeTimeline:
             "Selected route"
+        case let .departureTrip(departure, _):
+            departure.lineName
         case let .tripDetail(selection):
             selection.lineName
         case let .lineDetail(route):
@@ -67,7 +70,7 @@ struct TransitSheetRouteActivationCoordinator {
         guard !isBackNavigation else { return }
 
         switch route {
-        case .search, .stopGroup, .routePlaceSearch, .alerts, .tripDetail:
+        case .search, .stopGroup, .routePlaceSearch, .alerts, .tripDetail, .departureTrip:
             break
 
         case let .stopDetail(stop):

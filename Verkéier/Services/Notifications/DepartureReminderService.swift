@@ -116,7 +116,7 @@ final class DepartureReminderService {
                 try await sendStatusNotification(
                     id: cancelledIdentifier(for: departure.id),
                     title: "Departure cancelled",
-                    body: "\(departure.lineName) to \(departure.destination) from \(updatedReminder.stopName) has been cancelled."
+                    body: "\(departure.lineName) to \(departure.displayDestination) from \(updatedReminder.stopName.stationDisplayName(hidingLocality: departure.lineName.uppercased().hasPrefix("T"))) has been cancelled."
                 )
                 updatedReminder = SharedTrackedDepartureReminder(
                     departureId: updatedReminder.departureId,
@@ -143,7 +143,7 @@ final class DepartureReminderService {
                 try await sendStatusNotification(
                     id: delayedIdentifier(for: departure.id),
                     title: "Departure delayed",
-                    body: "\(departure.lineName) to \(departure.destination) is now \(delayMinutes) min late."
+                    body: "\(departure.lineName) to \(departure.displayDestination) is now \(delayMinutes) min late."
                 )
                 updatedReminder = SharedTrackedDepartureReminder(
                     departureId: updatedReminder.departureId,
@@ -178,7 +178,7 @@ final class DepartureReminderService {
 
         let triggerDate = departureDate.addingTimeInterval(TimeInterval(-reminder.leadTimeMinutes * 60))
         let title = "Leave in \(reminder.leadTimeMinutes) min"
-        let body = "\(reminder.lineName) to \(reminder.destination) leaves from \(reminder.stopName) at \(departureDate.formatted(date: .omitted, time: .shortened))."
+        let body = "\(reminder.lineName) to \(reminder.destination.stationDisplayName(hidingLocality: reminder.lineName.uppercased().hasPrefix("T"))) leaves from \(reminder.stopName.stationDisplayName(hidingLocality: reminder.lineName.uppercased().hasPrefix("T"))) at \(departureDate.formatted(date: .omitted, time: .shortened))."
 
         if triggerDate <= now() {
             try await sendStatusNotification(

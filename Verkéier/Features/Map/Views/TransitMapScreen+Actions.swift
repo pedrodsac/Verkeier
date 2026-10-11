@@ -117,6 +117,14 @@ extension TransitMapScreen {
                 removeFavourite: removeFavourite,
                 findStop: showSearch
             ),
+            openDepartureTrip: { departure, stop, selection in
+                guard sheetNavigation.activePath.last == .departureTrip(departure, stop) else { return }
+                switch sheetNavigation.selectedTab {
+                case .home: sheetNavigation.homePath[sheetNavigation.homePath.count - 1] = .tripDetail(selection)
+                case .plan: sheetNavigation.planPath[sheetNavigation.planPath.count - 1] = .tripDetail(selection)
+                case .settings: break
+                }
+            },
             refreshTripDetail: { await tripDetailViewModel.refresh(using: tripDetailService) }
         )
     }

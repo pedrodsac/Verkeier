@@ -119,7 +119,7 @@ struct RoutePlaceSearchView: View {
             dismiss()
         } label: {
             RoutePlaceRow(
-                title: place.title,
+                title: place.displayTitle,
                 subtitle: place.subtitle,
                 systemImage: place.searchSystemImage,
                 tint: place.searchIconTint

@@ -152,7 +152,7 @@ final class RouteMapContent {
         let stops = markers(for: overlay).compactMap { marker -> RouteTraceLayout.StopInput? in
             guard let annotation = stopsByID[marker.id] else { return nil }
             return .init(id: marker.id, point: mapView.convert(annotation.coordinate, toPointTo: mapView),
-                diameter: RouteTraceStyle.diameter(for: marker.role), labelSize: RouteTraceStyle.labelSize(marker.name, in: traits),
+                diameter: RouteTraceStyle.diameter(for: marker.role), labelSize: RouteTraceStyle.labelSize(marker.displayName, in: traits),
                 isKey: marker.role != .intermediate)
         }
         let shields = shieldsByID.values.sorted { $0.segment.id < $1.segment.id }.map { annotation in

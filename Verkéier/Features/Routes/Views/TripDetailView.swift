@@ -29,11 +29,12 @@ struct TripDetailView: View {
     private var stopList: some View {
         List {
             if let snapshot = viewModel.snapshot {
-                Section {
-                    if let message = viewModel.errorMessage {
+				if let message = viewModel.errorMessage {
+                	Section {
                         Label(message, systemImage: "wifi.exclamationmark")
 							.foregroundStyle(.secondary)
-                    }
+					}
+					.listSectionMargins(.top, 10)
                 }
                 Section {
                     ForEach(viewModel.rows) { row in
@@ -51,6 +52,7 @@ struct TripDetailView: View {
 						}
                     }
                 }
+				.listSectionMargins(.top, viewModel.errorMessage == nil ? 10 : nil)
                 ForEach(viewModel.continuations) { continuation in
                     Section {
                         ForEach(continuation.rows) { row in
@@ -62,15 +64,17 @@ struct TripDetailView: View {
                         }
                     } header: {
                         VStack(alignment: .leading, spacing: 4) {
-                            Label("Stay aboard at \(continuation.stopName)", systemImage: "arrow.right")
-                            Text("Continues as \(continuation.lineName)")
-                            if let headsign = continuation.headsign {
-                                Text(headsign)
-                            }
+							if let headsign = continuation.headsign?.stationDisplayName(hidingLocality: continuation.mode == .tram) {
+								Text("Continues as \(continuation.lineName): \(headsign)")
+									.lineLimit(1)
+							} else {
+								Text("Continues as \(continuation.lineName)")
+							}
                         }
                         .textCase(nil)
-                        .accessibilityElement(children: .combine)
+						.font(.caption)
                     }
+					.listSectionMargins(.top, -15)
                 }
                 if snapshot.isApproximateRoute {
                     Section {
@@ -95,7 +99,7 @@ struct TripDetailView: View {
         }
         .listStyle(.insetGrouped)
         .refreshable { await refresh() }
-		.navigationTitle("\(selection.lineName): \(selection.headsign ?? "Destination unknown")")
+		.navigationTitle("\(selection.lineName): \(selection.headsign?.stationDisplayName(hidingLocality: selection.mode == .tram) ?? "Destination unknown")")
         .toolbarTitleDisplayMode(.inline)
     }
 }
@@ -130,6 +134,8 @@ private struct TripStopRow: View {
         Text(row.name).font(.body.weight(row.isInRide ? .semibold : .regular))
             .foregroundStyle(row.isPassed ? .secondary : .primary)
             .fixedSize(horizontal: false, vertical: true)
+			.lineLimit(1)
+			.minimumScaleFactor(0.7)
     }
 
     private var times: some View {

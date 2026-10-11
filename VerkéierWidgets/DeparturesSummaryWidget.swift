@@ -75,7 +75,7 @@ private struct LiveDeparturesWidgetView: View {
 
     private var metadata: some View {
         HStack(spacing: 4) {
-            if let locality = entry.stop?.locality?.trimmingCharacters(in: .whitespacesAndNewlines),
+            if entry.stop?.isTramStop != true, let locality = entry.stop?.locality?.trimmingCharacters(in: .whitespacesAndNewlines),
                !locality.isEmpty {
                 Text(locality)
                     .foregroundStyle(.secondary)
@@ -134,7 +134,7 @@ private struct DepartureRow: View {
                 .background(routeColor, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
 
             VStack(alignment: .leading, spacing: 1) {
-                Text(departure.destination.isEmpty ? "Destination unavailable" : departure.destination)
+                Text(departure.destination.isEmpty ? "Destination unavailable" : departure.displayDestination)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.primary)
                     .lineLimit(1)

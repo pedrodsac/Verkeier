@@ -23,17 +23,17 @@ extension RouteOption {
         for leg in plan.legs {
             if leg.transportKind == .transit {
                 if leg.continuesInSeatFromTripID != nil {
-                    lines.append("• Stay aboard at \(leg.origin.name?.stationDisplayName ?? "stop")")
+                    lines.append("• Stay aboard at \(leg.origin.name?.stationDisplayName(hidingLocality: leg.mode == .tram) ?? "stop")")
                 }
                 let line = leg.routeName ?? "Transit"
-                let from = leg.origin.name?.stationDisplayName ?? "?"
-                let to = leg.destination.name?.stationDisplayName ?? "?"
+                let from = leg.origin.name?.stationDisplayName(hidingLocality: leg.mode == .tram) ?? "?"
+                let to = leg.destination.name?.stationDisplayName(hidingLocality: leg.mode == .tram) ?? "?"
                 lines.append("• \(line)  \(clock(leg.departureTime)) \(from) → \(clock(leg.arrivalTime)) \(to)")
             } else if leg.transportKind == .bikeShare {
                 let from = leg.bikeShareDetails?.pickupStation.displayName
-                    ?? leg.origin.name?.stationDisplayName ?? "station"
+                    ?? leg.origin.name?.stationDisplayName(hidingLocality: leg.mode == .tram) ?? "station"
                 let to = leg.bikeShareDetails?.returnStation.displayName
-                    ?? leg.destination.name?.stationDisplayName ?? "station"
+                    ?? leg.destination.name?.stationDisplayName(hidingLocality: leg.mode == .tram) ?? "station"
                 let bikes = leg.bikeShareDetails?.pickupStation.bikesAvailable.map { "\($0) bikes" } ?? "availability unknown"
                 let docks = leg.bikeShareDetails?.returnStation.docksAvailable.map { "\($0) free docks" } ?? "availability unknown"
                 lines.append("• vel’OH! bike \(clock(leg.departureTime)) \(from) → \(clock(leg.arrivalTime)) \(to) (\(bikes), \(docks))")

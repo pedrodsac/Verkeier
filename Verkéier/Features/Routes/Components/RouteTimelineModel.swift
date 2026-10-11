@@ -209,7 +209,7 @@ enum RouteTimelineBuilder {
 
         return PlaceNode(
             id: id,
-            name: point.name ?? "Stop",
+            name: (point.name ?? "Stop").stationDisplayName(hidingLocality: incoming?.mode == .tram || outgoing?.mode == .tram),
             role: placeRole,
             arrivalTime: arrival,
             departureTime: departure,
@@ -273,7 +273,7 @@ enum RouteTimelineBuilder {
             kind: kind,
             mode: leg.mode,
             badgeText: kind == .transit ? leg.routeName : (kind == .bikeShare ? "vel’OH!" : nil),
-            headsign: kind == .transit ? leg.headsign : nil,
+            headsign: kind == .transit ? leg.headsign?.stationDisplayName(hidingLocality: leg.mode == .tram) : nil,
             durationMinutes: durationMinutes(of: leg),
             stopCount: kind == .transit ? leg.stopCount : nil,
             distanceMeters: kind == .transit ? nil : leg.distanceMeters,

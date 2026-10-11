@@ -60,12 +60,8 @@ not create transfer markers. Line and trip maps use their own real ordered
 stop sequences. No geometry is synthesized to connect missing route shapes.
 When clipping a GTFS shape to a ride, stop coordinates select the source range;
 they never replace its endpoints. Aggregate station coordinates can sit between
-platforms, so separate trip shapes stay disconnected across a transfer until
-the local pedestrian router supplies a walking path between their actual shape
-endpoints. For adjacent rides without an itinerary walk, this path is a map-only
-segment: it never adds a journey leg, duration, distance, or transfer allowance.
-Unavailable or estimated paths leave the gap disconnected. Explicit itinerary
-walks and in-seat continuations do not receive extra map-only segments.
+platforms, so separate trip shapes stay disconnected across a transfer unless
+the itinerary supplies an explicit walking path.
 
 The same itinerary builder is used after walking, shape, and realtime updates.
 Added Codable metadata is optional or decodes missing collections as empty.

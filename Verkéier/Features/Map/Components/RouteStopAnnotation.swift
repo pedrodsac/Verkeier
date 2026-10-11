@@ -5,14 +5,14 @@ final class RouteStopAnnotation: NSObject, MKAnnotation {
     var placement: RouteTraceLayout.StopPlacement?
 
     @objc dynamic var coordinate: CLLocationCoordinate2D { marker.coordinate.coordinate }
-    @objc dynamic var title: String? { marker.name }
+    @objc dynamic var title: String? { marker.displayName }
 
     init(marker: RouteMapStopMarker) { self.marker = marker }
 
     func update(_ marker: RouteMapStopMarker) {
         guard self.marker != marker else { return }
         let moves = self.marker.coordinate != marker.coordinate
-        let renames = self.marker.name != marker.name
+        let renames = self.marker.displayName != marker.displayName
         if moves { willChangeValue(forKey: "coordinate") }
         if renames { willChangeValue(forKey: "title") }
         self.marker = marker

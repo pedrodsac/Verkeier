@@ -29,9 +29,9 @@ final class LiveActivityManager {
         let attributes = DepartureActivityAttributes(
             departureId: departure.id,
             stopId: stop.id,
-            stopName: stop.name,
+            stopName: stop.displayName,
             lineName: departure.lineName,
-            destination: departure.destination,
+            destination: departure.displayDestination,
             platform: departure.platform
         )
 

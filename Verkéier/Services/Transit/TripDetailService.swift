@@ -1,6 +1,7 @@
 import Foundation
 
 protocol TripDetailService: Sendable {
+    nonisolated func selection(for departure: Departure, at stop: Stop) async throws -> TripDetailSelection
     nonisolated func tripDetail(for selection: TripDetailSelection,
         refreshPolicy: RouteRealtimeRefreshPolicy) async throws -> TripDetailSnapshot
 }
@@ -28,5 +29,11 @@ struct FixtureTripDetailService: TripDetailService {
         refreshPolicy _: RouteRealtimeRefreshPolicy) async throws -> TripDetailSnapshot {
         guard snapshot.instance == selection.instance else { throw TripDetailError.unavailable }
         return snapshot
+    }
+}
+
+extension TripDetailService {
+    nonisolated func selection(for departure: Departure, at stop: Stop) async throws -> TripDetailSelection {
+        throw TripDetailError.unavailable
     }
 }

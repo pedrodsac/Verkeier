@@ -103,7 +103,7 @@ struct RoutePresentationModel {
     }
 
     var originTitle: String {
-        origin?.title ?? "Current Location"
+        origin?.displayTitle ?? "Current Location"
     }
 
     var originSubtitle: String? {
@@ -111,7 +111,7 @@ struct RoutePresentationModel {
     }
 
     var destinationTitle: String {
-        destination?.title ?? selectedStop?.name ?? "Choose Destination"
+        destination?.displayTitle ?? selectedStop?.displayName ?? "Choose Destination"
     }
 
     var destinationSubtitle: String? {
