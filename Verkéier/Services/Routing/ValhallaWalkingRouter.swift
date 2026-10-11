@@ -8,11 +8,14 @@ import ValhallaModels
 /// Swift actor also ensures the work never runs on the main actor.
 actor ValhallaWalkingRouter: WalkingRouting {
     private let engine: Valhalla
+    private let requestEncoder = JSONEncoder()
+    private let responseDecoder = JSONDecoder()
 
     init(tileArchiveURL: URL, datasetVersion: String) throws {
         guard FileManager.default.fileExists(atPath: tileArchiveURL.path) else {
             throw WalkingRoutingError.datasetUnavailable
         }
+        VKConfigurePedestrianLogging()
         let config = try ValhallaConfig(tileExtractTar: tileArchiveURL)
         engine = try Valhalla(config, configName: "verkeier-valhalla-\(datasetVersion).json")
     }
@@ -67,40 +70,23 @@ actor ValhallaWalkingRouter: WalkingRouting {
         from origin: LocationPoint,
         to destination: LocationPoint
     ) async throws -> OfflineWalkingRoute {
-        let request = RouteRequest(
-            locations: [
-                RoutingWaypoint(lat: origin.latitude, lon: origin.longitude),
-                RoutingWaypoint(lat: destination.latitude, lon: destination.longitude),
-            ],
-            costing: .pedestrian,
-            units: .km,
-            directionsType: .none,
-            shapeFormat: .polyline6
-        )
-        let response = try engine.route(request: request)
-        guard response.trip.status == 0,
-              response.trip.summary.length.isFinite,
-              response.trip.summary.length >= 0
-        else {
-            throw WalkingRoutingError.noRoute
-        }
-
-        let coordinates = try response.trip.legs.flatMap { try Self.decodePolyline6($0.shape) }
-            .removingConsecutiveDuplicates()
-        guard coordinates.count >= 2 else { throw WalkingRoutingError.invalidResponse }
-
-        return OfflineWalkingRoute(
-            distanceMeters: Self.meters(from: response.trip.summary.length, units: response.trip.units),
-            duration: response.trip.summary.time,
-            coordinates: coordinates,
-            source: .localOSM
-        )
+        try await route(from: origin, to: destination, minimumReachability: 50)
     }
 
-    nonisolated private static func meters(from distance: Double, units: ValhallaLongUnits) -> Double {
-        switch units {
-        case .kilometers: distance * 1_000
-        case .miles: distance * 1_609.344
+    private func route(
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        minimumReachability: Int
+    ) async throws -> OfflineWalkingRoute {
+        let request = WalkingPathRequest.make(from: origin, to: destination, minimumReachability: minimumReachability)
+        let data = try requestEncoder.encode(request)
+        let response = try engine.route(rawRequest: String(decoding: data, as: UTF8.self))
+        return try WalkingPathResponse.route(from: Data(response.utf8), using: responseDecoder)
+    }
+
+    func shortRoute(from origin: LocationPoint, to destination: LocationPoint) async throws -> OfflineWalkingRoute {
+        try await ShortWalkingRouteSearch.route {
+            try await self.route(from: origin, to: destination, minimumReachability: $0)
         }
     }
 
@@ -137,14 +123,5 @@ actor ValhallaWalkingRouter: WalkingRouting {
             ))
         }
         return coordinates
-    }
-}
-
-private extension Array where Element == RouteMapCoordinate {
-    nonisolated func removingConsecutiveDuplicates() -> [RouteMapCoordinate] {
-        reduce(into: []) { result, coordinate in
-            guard result.last != coordinate else { return }
-            result.append(coordinate)
-        }
     }
 }

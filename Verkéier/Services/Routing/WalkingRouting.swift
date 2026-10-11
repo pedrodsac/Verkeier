@@ -72,8 +72,13 @@ nonisolated struct OfflineWalkingRoute: Hashable, Sendable {
     }
 }
 
-/// A walking-routing engine. Implementations are deliberately independent of
-/// the UI and backed by the installed pedestrian graph in production.
+/// One directed pair in a bounded walking batch.
+nonisolated struct OfflineWalkingRequest: Sendable {
+    let from: LocationPoint
+    let to: LocationPoint
+}
+
+/// A walking-routing engine, independent of UI and backed by the installed graph.
 nonisolated protocol WalkingRouting: Sendable {
     func checkAvailability() async throws
     func estimates(
@@ -90,10 +95,18 @@ nonisolated protocol WalkingRouting: Sendable {
         from origin: LocationPoint,
         to destination: LocationPoint
     ) async throws -> OfflineWalkingRoute
+
+    func routes(_ requests: [OfflineWalkingRequest], maximumConcurrency: Int) async -> [OfflineWalkingRoute?]
 }
 
 nonisolated extension WalkingRouting {
     func checkAvailability() async throws {}
+
+    func routes(_ requests: [OfflineWalkingRequest], maximumConcurrency: Int) async -> [OfflineWalkingRoute?] {
+        await WalkingRouteBatch.resolve(requests, maximumConcurrency: maximumConcurrency) {
+            try await route(from: $0.from, to: $0.to)
+        }
+    }
 
     func estimates(
         from origins: [WalkingOrigin],
