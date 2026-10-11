@@ -53,6 +53,8 @@ struct TransitSheetActions {
     let favourites: FavouritesActions
     var openDepartureTrip: (Departure, Stop, TripDetailSelection) -> Void = { _, _, _ in }
     var refreshTripDetail: () async -> Void = {}
+    var refreshRoutes: () async -> Void = {}
+    var maintainRoutes: () async -> Void = {}
 }
 
 struct NearbyStopsPresentationModel {
