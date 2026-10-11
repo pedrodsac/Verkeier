@@ -5,17 +5,24 @@ final class RouteTraceRenderer: MKPolylineRenderer {
     private let traceColor: CGColor
     private let casingColor: CGColor
     private let traceWidth: CGFloat
+    private let casingWidth: CGFloat
     private let dashes: [CGFloat]
     private var tracePath: CGPath?
 
     init(polyline: MKPolyline, segment: RouteMapSegment, traits: UITraitCollection) {
-        let opacity = segment.emphasis == .context ? 0.55 : 1.0
+        let isFaded = segment.emphasis == .context || segment.isApproximate == true
+        let opacity = isFaded ? 0.55 : 1.0
         traceColor = RouteTraceStyle.color(for: segment.mode).resolvedColor(with: traits)
             .withAlphaComponent(opacity).cgColor
         casingColor = UIColor.systemBackground.resolvedColor(with: traits)
-            .withAlphaComponent(segment.emphasis == .context ? 0.45 : 0.85).cgColor
-        traceWidth = segment.mode == .walking ? 3 : 5
-        dashes = segment.mode == .walking ? [6, 4] : segment.isApproximate == true ? [6, 5] : []
+            .withAlphaComponent(isFaded ? 0.45 : 1.0).cgColor
+        // Geographic widths shrink on screen as the map zooms out. Convert
+        // metres to MapKit's drawing units once, without zoom compensation.
+        let pointsPerMetre = CGFloat(MKMapPointsPerMeterAtLatitude(polyline.coordinate.latitude))
+        traceWidth = (segment.mode == .walking ? 3 : 5) * pointsPerMetre
+        casingWidth = traceWidth + 2 * pointsPerMetre
+        let dashMetres: [CGFloat] = segment.mode == .walking ? [6, 4] : segment.isApproximate == true ? [6, 5] : []
+        dashes = dashMetres.map { $0 * pointsPerMetre }
         // MKPolylineRenderer's convenience initializer redispatches through
         // self.init(overlay:). Call the designated initializer directly so a
         // subclass with custom drawing inputs does not hit its inherited trap.
@@ -31,13 +38,13 @@ final class RouteTraceRenderer: MKPolylineRenderer {
         context.clip(to: rect(for: mapRect))
         context.setLineCap(.round)
         context.setLineJoin(.round)
-        context.setLineDash(phase: 0, lengths: dashes.map { $0 / zoomScale })
+        context.setLineDash(phase: 0, lengths: dashes)
         context.setStrokeColor(casingColor)
-        context.setLineWidth((traceWidth + 2) / zoomScale)
+        context.setLineWidth(casingWidth)
         context.addPath(tracePath)
         context.strokePath()
         context.setStrokeColor(traceColor)
-        context.setLineWidth(traceWidth / zoomScale)
+        context.setLineWidth(traceWidth)
         context.addPath(tracePath)
         context.strokePath()
         context.restoreGState()
