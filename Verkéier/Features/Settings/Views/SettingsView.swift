@@ -27,25 +27,10 @@ struct SettingsView: View {
                         Text(unit.title).tag(unit)
                     }
                 }
-                Toggle("Avoid tight transfers", isOn: $prefs.avoidTightTransfers)
-            }
-
-            Section {
-                ForEach(RoutePlannerFilters.selectableModes) { mode in
-                    Toggle(isOn: Binding(
-                        get: { preferences.includedRouteModes.contains(mode) },
-                        set: { included in
-                            if included { preferences.includedRouteModes.insert(mode) }
-                            else { preferences.includedRouteModes.remove(mode) }
-                        }
-                    )) {
-                        mapPinLabel(LocalizedStringKey(mode.displayName), mode: mode)
-                    }
+                NavigationLink("Transport in routes") {
+                    RouteTransportSettingsView()
                 }
-            } header: {
-                Text("Transport in routes")
-            } footer: {
-                Text("Choose which types of transport routes can include. Walking is always included.")
+                Toggle("Avoid tight transfers", isOn: $prefs.avoidTightTransfers)
             }
 
             Section("Schedules") {
