@@ -122,6 +122,14 @@ struct RoutePresentationModel {
         destination != nil || selectedStop != nil
     }
 
+    /// Keep the recent-trip picker aligned with the currently chosen endpoints.
+    var selectedRecentTripID: String? {
+        guard let destination = selectedPlace(for: .destination) else { return nil }
+        return recentTrips.first {
+            $0.origin?.id == origin?.id && $0.destination.id == destination.id
+        }?.id
+    }
+
     func selectedPlace(for endpoint: RouteEndpoint) -> RoutePlace? {
         switch endpoint {
         case .origin:
