@@ -45,7 +45,7 @@ struct RouteEndpointsCard: View {
                 .offset(x: 12 + badgeSize / 2 - 2, y: originRowHeight - 5)
                 .accessibilityHidden(true)
         }
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .background(Color(uiColor: .secondarySystemBackground))
         .clipShape(.rect(cornerRadius: 22))
     }
 

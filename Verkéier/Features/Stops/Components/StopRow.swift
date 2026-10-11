@@ -57,7 +57,7 @@ struct StopRow: View {
     }
 
     private var subtitleLocation: String {
-        if let locality = stop.locality?.trimmingCharacters(in: .whitespacesAndNewlines),
+        if let locality = stop.displaySubtitle?.trimmingCharacters(in: .whitespacesAndNewlines),
            !locality.isEmpty {
             return locality
         }

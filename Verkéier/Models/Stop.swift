@@ -145,9 +145,25 @@ struct Stop: Codable, Hashable, Identifiable {
             .filter { !$0.isEmpty && seen.insert($0).inserted }
     }
 
-    /// The rider-facing name without a locality prefix that is already shown
-    /// separately in the UI.
+    /// Train stations lead with their locality; other stops lead with the
+    /// station name. Source names remain unchanged for search and routing.
     nonisolated var displayName: String {
+        if modes.contains(.train), let locality {
+            return locality
+        }
+        return stationName
+    }
+
+    /// The secondary label paired with ``displayName``.
+    nonisolated var displaySubtitle: String? {
+        if modes.contains(.train), locality != nil {
+            return stationName
+        }
+        return locality
+    }
+
+    /// The station name without its locality prefix.
+    private nonisolated var stationName: String {
         if modes.contains(.tram) {
             return name.stationDisplayName(hidingLocality: true)
         }
