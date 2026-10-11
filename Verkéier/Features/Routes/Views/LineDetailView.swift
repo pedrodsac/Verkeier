@@ -17,7 +17,7 @@ struct LineDetailView: View {
                 	        )
                 	    ) {
                 	        ForEach(detail.directions) { direction in
-                	            Text(direction.title).tag(direction.id)
+                            Text(direction.title.stationDisplayName(hidingLocality: detail.route.mode == .tram)).tag(direction.id)
                 	        }
                 	    }
                 	    .pickerStyle(.inline)
@@ -39,7 +39,7 @@ struct LineDetailView: View {
                                     .foregroundStyle(.secondary)
                                     .frame(width: 18)
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(stop.name)
+                                    Text(stop.name.stationDisplayName(hidingLocality: detail.route.mode == .tram))
                                         .font(.subheadline.weight(.semibold))
                                         .foregroundStyle(.primary)
                                     if let platform = stop.platform {
@@ -70,9 +70,9 @@ struct LineDetailView: View {
                                 Text(departure.departureTime, style: .time)
                                     .font(.subheadline.monospacedDigit().weight(.semibold))
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(departure.destinationName)
+                                    Text(departure.destinationName.stationDisplayName(hidingLocality: detail.route.mode == .tram))
                                         .font(.subheadline.weight(.semibold))
-                                    Text("From \(departure.originName)")
+                                    Text("From \(departure.originName.stationDisplayName(hidingLocality: detail.route.mode == .tram))")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }

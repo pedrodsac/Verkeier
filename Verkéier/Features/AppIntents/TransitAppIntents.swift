@@ -22,7 +22,7 @@ struct OpenFavouriteStopIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         TransitIntentHandoff.save(.openFavouriteStop(stopId: stop.id))
-        return .result(dialog: "Opening \(stop.name).")
+        return .result(dialog: "Opening \(stop.displayName).")
     }
 }
 
@@ -64,7 +64,7 @@ struct GetNextDeparturesIntent: AppIntent {
     func perform() async throws -> some IntentResult & ProvidesDialog {
         let now = Date.now
         guard let board = SharedTransitDataStore.favouriteDepartureBoards()[stop.id] else {
-            return .result(dialog: IntentDialog(stringLiteral: "No saved departure board is available for \(stop.name) yet. Open Verkéier to refresh it."))
+            return .result(dialog: IntentDialog(stringLiteral: "No saved departure board is available for \(stop.displayName) yet. Open Verkéier to refresh it."))
         }
 
         let freshness = boardFreshness(board, now: now)
@@ -79,10 +79,10 @@ struct GetNextDeparturesIntent: AppIntent {
             .first
 
         guard let next, let date = next.displayDepartureDate else {
-            return .result(dialog: IntentDialog(stringLiteral: "There are no upcoming departures in the latest saved board for \(stop.name). \(freshness)"))
+            return .result(dialog: IntentDialog(stringLiteral: "There are no upcoming departures in the latest saved board for \(stop.displayName). \(freshness)"))
         }
         let departureTime = date.formatted(date: .omitted, time: .shortened)
-        return .result(dialog: IntentDialog(stringLiteral: "Next from \(stop.name): \(next.lineName) to \(next.destination) at \(departureTime). \(freshness)"))
+        return .result(dialog: IntentDialog(stringLiteral: "Next from \(stop.displayName): \(next.lineName) to \(next.displayDestination) at \(departureTime). \(freshness)"))
     }
 
     private func boardFreshness(_ board: SharedDepartureBoard, now: Date) -> String {

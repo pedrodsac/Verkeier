@@ -130,6 +130,10 @@ struct SharedWidgetDeparture: Codable, Hashable, Identifiable, Sendable {
     /// fallback after a failed live refresh, so provenance lives on the row too.
     let sourceLabel: String?
 
+    nonisolated var displayDestination: String {
+        destination.stationDisplayName(hidingLocality: lineName.uppercased().hasPrefix("T"))
+    }
+
     nonisolated var displayDepartureDate: Date? { realtimeDeparture ?? scheduledDeparture }
 }
 
@@ -137,6 +141,7 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
     let id: String
     let name: String
     let locality: String?
+    var isTramStop: Bool? = nil
     let platformIds: [String]
     /// Opaque, app-owned filter payload. Older widgets can safely ignore it.
     let boardFilterData: Data?
@@ -180,6 +185,7 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
         case id
         case name
         case locality
+        case isTramStop
         case platformIds
         case boardFilterData
     }
@@ -191,6 +197,7 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
         self.id = id
         name = try container.decode(String.self, forKey: .name).stationDisplayName
         locality = try container.decodeIfPresent(String.self, forKey: .locality)
+        isTramStop = try container.decodeIfPresent(Bool.self, forKey: .isTramStop)
         platformIds = Self.normalizedPlatformIds(
             try container.decodeIfPresent([String].self, forKey: .platformIds),
             fallbackId: id

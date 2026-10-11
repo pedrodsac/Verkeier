@@ -602,7 +602,7 @@ private extension MobiliteitGTFSService {
         )
     }
 
-    nonisolated static func route(_ source: MobiliteitKit.TransitRoute, agency: Agency?) -> TransitRoute {
+    internal nonisolated static func route(_ source: MobiliteitKit.TransitRoute, agency: Agency?) -> TransitRoute {
         TransitRoute(
             id: source.id,
             shortName: source.shortName ?? source.longName ?? "Service",
@@ -624,7 +624,7 @@ private extension MobiliteitGTFSService {
         return try! GTFSDate(year: values.year!, month: values.month!, day: values.day!)
     }
 
-    nonisolated static func date(for time: ServiceTime?, serviceDay: ServiceDay, feed: FeedInfo) -> Date? {
+    internal nonisolated static func date(for time: ServiceTime?, serviceDay: ServiceDay, feed: FeedInfo) -> Date? {
         guard let time else { return nil }
         // GTFSStore already returns service-day values. Luxembourg's GTFS feed
         // uses Europe/Luxembourg, so deliberately preserve 24:00+ service time.

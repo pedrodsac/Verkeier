@@ -89,7 +89,8 @@ final class TripDetailViewModel {
     func updateProgress() {
         guard let snapshot, let selection else { rows = []; continuations = []; return }
         rows = TripStopPresentation.rows(snapshot: snapshot, selection: selection,
-            now: now(), refreshFailed: requestFailed || !snapshot.liveDataAvailable)
+            now: now(), refreshFailed: requestFailed || !snapshot.liveDataAvailable,
+            highlightsRide: selection.highlightsRide)
         continuations = snapshot.continuations.map { continuation in
             let ride = selection.continuingRides.first { $0.instance == continuation.selection.instance }
             return .init(id: continuation.selection.instance,
@@ -97,7 +98,7 @@ final class TripDetailViewModel {
                 lineName: continuation.selection.lineName, headsign: continuation.selection.headsign,
                 mode: continuation.selection.mode,
                 rows: TripStopPresentation.rows(snapshot: continuation.snapshot, selection: ride ?? continuation.selection,
-                    now: now(), refreshFailed: requestFailed || !continuation.snapshot.liveDataAvailable, highlightsRide: ride != nil))
+                    now: now(), refreshFailed: requestFailed || !continuation.snapshot.liveDataAvailable, highlightsRide: selection.highlightsRide && ride != nil))
         }
     }
 

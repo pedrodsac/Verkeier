@@ -129,6 +129,11 @@ nonisolated struct RoutePlace: Codable, Hashable, Identifiable {
         self.source = source
     }
 
+    /// Rider-facing title; preserve the stored title for search and route matching.
+    var displayTitle: String {
+        title.stationDisplayName(hidingLocality: modes.contains(.tram))
+    }
+
     /// Creates a place from an existing ``Stop``.
     init(stop: Stop, source: RoutePlaceSource) {
         let gtfsStopID = stop.gtfsStopID ?? (stop.dataSource == .gtfs ? stop.id : nil)

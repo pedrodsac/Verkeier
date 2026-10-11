@@ -34,7 +34,7 @@ struct DepartureListRow: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 OverflowMarqueeText(
-                    text: departure.destination.isEmpty ? "Destination unknown" : departure.destination,
+                    text: departure.destination.isEmpty ? "Destination unknown" : departure.displayDestination,
                     font: .body.weight(.semibold)
                 )
 

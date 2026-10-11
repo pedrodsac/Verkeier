@@ -60,7 +60,7 @@ nonisolated enum TripStopPresentation {
                 accessibilityStatus = status
                 tint = .secondary
             }
-            return TripStopRowModel(id: entry.sequence, name: entry.stop.fullName, platform: entry.platform,
+            return TripStopRowModel(id: entry.sequence, name: entry.stop.fullName.stationDisplayName(hidingLocality: selection.mode == .tram || entry.stop.modes.contains(.tram)), platform: entry.platform,
                 scheduledTime: timing?.scheduled, liveTime: minutes == 0 ? nil : timing?.realtime,
                 status: status, accessibilityStatus: accessibilityStatus, statusTint: tint,
                 isPassed: passedSequence.map { entry.sequence <= $0 } ?? false,

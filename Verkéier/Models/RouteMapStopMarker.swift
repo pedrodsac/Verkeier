@@ -8,6 +8,8 @@ nonisolated struct RouteMapStopMarker: Codable, Hashable, Identifiable, Sendable
     let id: String
     let stopID: String?
     let name: String
+    var displayName: String { name.stationDisplayName(hidingLocality: mode == .tram) }
+
     let coordinate: RouteMapCoordinate
     let segmentIDs: [String]
     let mode: TransportMode

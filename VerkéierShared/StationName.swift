@@ -13,6 +13,16 @@ nonisolated extension String {
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    /// Presentation only: retain the original name for matching and routing.
+    /// Tram feeds prefix the station with its locality before the first comma.
+    func stationDisplayName(hidingLocality: Bool) -> String {
+        let cleaned = stationDisplayName
+        guard hidingLocality, let comma = cleaned.firstIndex(of: ",") else { return cleaned }
+        let station = cleaned[cleaned.index(after: comma)...]
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return station.isEmpty ? cleaned : station
+    }
+
     /// Whether two feed-provided names identify the same station.
     ///
     /// ATP directions can omit the locality prefix used by GTFS stop names,

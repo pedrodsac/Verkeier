@@ -110,6 +110,11 @@ struct StopDetailView: View {
 
                     ForEach(departed, id: \.id) { departure in
                         DepartureListRow(departure: departure, showsControls: false)
+                            .background {
+                                NavigationLink(value: TransitSheetRoute.departureTrip(departure, stop)) { EmptyView() }
+                                    .opacity(0)
+                                    .accessibilityLabel("View full course for \(departure.lineName) to \(departure.displayDestination)")
+                            }
                             .opacity(0.55)
                             .listRowInsets(departureRowInsets)
                     }
@@ -128,6 +133,11 @@ struct StopDetailView: View {
                             },
                             cancelReminder: actions.cancelDepartureReminder
                         )
+                        .background {
+                            NavigationLink(value: TransitSheetRoute.departureTrip(departure, stop)) { EmptyView() }
+                                .opacity(0)
+                                    .accessibilityLabel("View full course for \(departure.lineName) to \(departure.displayDestination)")
+                        }
                         .listRowInsets(departureRowInsets)
                     }
                 }

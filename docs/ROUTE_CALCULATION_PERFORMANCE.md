@@ -1,5 +1,11 @@
 # Route calculation performance
 
+The bus continuation timeout correction restores destination and final-round
+pruning across stay-aboard links. The same Gromscheed → Konrad Adenauer Release
+spot check completed in 1.5 seconds warm and 2.0 seconds in a fresh process. See
+[continuation correction validation](benchmarks/continuation-timeout-2026-10-10/validation.md)
+for revision, transport and sample limitations.
+
 The six-route update returns up to six useful transit routes initially and per
 Earlier/Later operation. It starts initial and adjacent searches at two hours
 instead of three hours, expands incomplete windows, and retains the safe arrive-by

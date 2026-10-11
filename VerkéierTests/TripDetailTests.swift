@@ -18,6 +18,19 @@ struct TripDetailTests {
         #expect(rows[4].liveTime == nil)
     }
 
+    @Test func departureBoardBrowsingDoesNotHighlightRideStops() async throws {
+        var selected = try selection()
+        selected.highlightsRide = false
+        let model = TripDetailViewModel(now: { anchor })
+        model.select(selected)
+        let entries = (1...5).map { stop($0, scheduledOffset: Double($0 - 3) * 60, delay: 0) }
+        await model.refresh(using: FixtureTripDetailService(snapshot: snapshot(entries)))
+        #expect(model.rows.allSatisfy { !$0.isInRide })
+        #expect(model.rows.map(\.isPassed) == [true, true, true, false, false])
+        model.updateProgress()
+        #expect(model.rows.allSatisfy { !$0.isInRide })
+    }
+
     @Test func eachStopKeepsItsOwnDelayAndMissingReportsStayUnavailable() throws {
         let entries = [stop(1, scheduledOffset: -600, delay: 2, historical: true),
                        stop(2, scheduledOffset: 60, delay: 5), stop(3, scheduledOffset: 600, delay: nil),

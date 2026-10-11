@@ -9,6 +9,7 @@ struct FavouriteStopEntity: AppEntity, Identifiable {
     let id: String
     let name: String
     let locality: String?
+    var isTramStop: Bool = false
     let platformIds: [String]
     let boardFilterData: Data?
 
@@ -37,10 +38,12 @@ struct FavouriteStopEntity: AppEntity, Identifiable {
         return filter
     }
 
+    var displayName: String { name.stationDisplayName(hidingLocality: isTramStop) }
+
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(
-            title: "\(name)",
-            subtitle: locality.map { "\($0)" }
+            title: "\(displayName)",
+            subtitle: (isTramStop ? nil : locality).map { "\($0)" }
         )
     }
 }
@@ -62,12 +65,14 @@ struct FavouriteStopEntityQuery: EntityQuery {
 nonisolated enum FavouriteStopEntityStore {
     nonisolated static func save(stops: [Stop]) {
         let entities = stops.map {
-            SharedFavouriteStop(
+            var shared = SharedFavouriteStop(
                 id: $0.id,
                 name: $0.name,
                 locality: $0.locality,
                 platformIds: $0.platformIds
             )
+            shared.isTramStop = $0.modes.contains(.tram)
+            return shared
         }
         SharedTransitDataStore.saveFavouriteStops(entities)
         WidgetCenter.shared.reloadAllTimelines()
@@ -75,13 +80,15 @@ nonisolated enum FavouriteStopEntityStore {
 
     nonisolated static func save(favourites: [PersistedFavouriteStop]) {
         let entities = favourites.map { favourite in
-            SharedFavouriteStop(
+            var shared = SharedFavouriteStop(
                 id: favourite.stopId,
                 name: favourite.name,
                 locality: favourite.locality,
                 platformIds: favourite.stop.platformIds,
                 boardFilterData: favourite.boardFilterData
             )
+            shared.isTramStop = favourite.stop.modes.contains(.tram)
+            return shared
         }
         SharedTransitDataStore.saveFavouriteStops(entities)
         WidgetCenter.shared.reloadAllTimelines()
@@ -89,13 +96,15 @@ nonisolated enum FavouriteStopEntityStore {
 
     nonisolated static func entities() -> [FavouriteStopEntity] {
         SharedTransitDataStore.favouriteStops().map {
-            FavouriteStopEntity(
+            var entity = FavouriteStopEntity(
                 id: $0.id,
                 name: $0.name,
                 locality: $0.locality,
                 platformIds: $0.platformIds,
                 boardFilterData: $0.boardFilterData
             )
+            entity.isTramStop = $0.isTramStop == true
+            return entity
         }
     }
 }

@@ -17,6 +17,8 @@ nonisolated struct TripDetailSelection: Hashable, Sendable {
     let mode: TransportMode
     let routeID: String?
     let rideCoordinates: [RouteMapCoordinate]
+    /// Departure-board browsing has no selected itinerary to highlight.
+    var highlightsRide = true
     /// Only verified onward legs included in the selected itinerary.
     var continuingRides: [TripDetailSelection] = []
 

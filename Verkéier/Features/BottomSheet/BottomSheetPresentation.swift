@@ -51,6 +51,7 @@ struct TransitSheetActions {
     let checkGTFSUpdate: () -> Void
     let setDebugDataMode: (DebugTransitDataMode) -> Void
     let favourites: FavouritesActions
+    var openDepartureTrip: (Departure, Stop, TripDetailSelection) -> Void = { _, _, _ in }
     var refreshTripDetail: () async -> Void = {}
 }
 

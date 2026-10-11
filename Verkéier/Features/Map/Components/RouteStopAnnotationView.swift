@@ -38,7 +38,7 @@ final class RouteStopAnnotationView: MKAnnotationView {
             .resolvedColor(with: mapView.traitCollection).cgColor
         circle.layer.borderWidth = marker.role == .intermediate ? 2 : 2.5
         alpha = marker.emphasis == .context ? 0.65 : 1
-        nameLabel.text = marker.name
+        nameLabel.text = marker.displayName
         nameLabel.font = RouteTraceStyle.font(in: mapView.traitCollection)
         nameLabel.textColor = .label
         if let labelFrame = annotation.placement?.labelFrame {
@@ -49,7 +49,7 @@ final class RouteStopAnnotationView: MKAnnotationView {
         } else {
             nameLabel.isHidden = true
         }
-        accessibilityLabel = "\(marker.name), \(RouteTraceStyle.roleDescription(marker.role)), \(marker.mode.displayName)"
+        accessibilityLabel = "\(marker.displayName), \(RouteTraceStyle.roleDescription(marker.role)), \(marker.mode.displayName)"
     }
 
     override func prepareForReuse() {

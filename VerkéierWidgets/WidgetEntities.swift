@@ -9,11 +9,12 @@ struct WidgetFavouriteStopEntity: AppEntity, Identifiable {
     let id: String
     let name: String
     let locality: String?
+    var isTramStop = false
 
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(
-            title: "\(name)",
-            subtitle: locality.map { "\($0)" }
+            title: "\(name.stationDisplayName(hidingLocality: isTramStop))",
+            subtitle: (isTramStop ? nil : locality).map { "\($0)" }
         )
     }
 }
@@ -33,7 +34,7 @@ struct WidgetFavouriteStopEntityQuery: EntityQuery {
 
     private var entities: [WidgetFavouriteStopEntity] {
         SharedTransitDataStore.favouriteStops().map {
-            WidgetFavouriteStopEntity(id: $0.id, name: $0.name, locality: $0.locality)
+            WidgetFavouriteStopEntity(id: $0.id, name: $0.name, locality: $0.locality, isTramStop: $0.isTramStop == true)
         }
     }
 }
