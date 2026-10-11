@@ -17,7 +17,7 @@ struct RouteEndpointRow: View {
     var body: some View {
         HStack(spacing: 0) {
             Button(action: select) {
-                HStack(spacing: 12) {
+                HStack(spacing: 10) {
                     badge
                     Text(title)
                         .font(.body)
@@ -26,8 +26,8 @@ struct RouteEndpointRow: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(.leading, 16)
-                .padding(.vertical, 12)
+                .padding(.leading, 12)
+                .padding(.vertical, 8)
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
@@ -80,7 +80,7 @@ struct RouteEndpointRow: View {
             .font(.title3.weight(.medium))
             .foregroundStyle(.tertiary)
             .frame(width: 44, height: 44)
-            .padding(.trailing, 8)
+            .padding(.trailing, 4)
             .contentShape(.rect)
             .accessibilityHidden(true)
     }

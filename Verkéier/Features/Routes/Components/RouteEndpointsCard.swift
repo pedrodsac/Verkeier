@@ -13,19 +13,18 @@ struct RouteEndpointsCard: View {
         VStack(spacing: 0) {
             endpointRow(.origin)
             Divider()
-                .padding(.leading, badgeSize + 28)
-                .padding(.trailing, 16)
+                .padding(.leading, badgeSize + 22)
+                .padding(.trailing, 12)
             endpointRow(.destination)
         }
         .background(alignment: .leading) {
             Capsule()
                 .fill(.quaternary)
-                .frame(width: 4, height: 16)
-                .padding(.leading, 16 + badgeSize / 2 - 2)
+                .frame(width: 4, height: 10)
+                .padding(.leading, 12 + badgeSize / 2 - 2)
                 .accessibilityHidden(true)
         }
-        .padding(.vertical, 4)
-        .background(Color(uiColor: .secondarySystemGroupedBackground), in: .rect(cornerRadius: 26))
+        .background(Color(uiColor: .secondarySystemGroupedBackground), in: .rect(cornerRadius: 22))
         .fixedSize(horizontal: false, vertical: true)
     }
 
