@@ -3,18 +3,60 @@ import Foundation
 /// Collapses verified stay-aboard boundaries into the first ride's row while
 /// preserving original segment identities for alerts and journey navigation.
 enum RouteTimelinePresentation {
-    /// One line badge per vehicle ride, with walking and bike links preserved.
+    /// One line badge per vehicle ride; funicular connections become one walk chip.
     static func ribbonLegs(from legs: [RoutePlan.Leg]) -> [RoutePlan.Leg] {
-        legs.enumerated().compactMap { index, leg in
+        let displayLegs = combiningFunicularConnections(in: legs)
+        return displayLegs.enumerated().compactMap { index, leg in
             guard leg.mode != .funicular else { return nil }
             guard [.transit, .walking, .bikeShare].contains(leg.transportKind) else { return nil }
             if index > 0, leg.transportKind == .transit {
-                let incoming = legs[index - 1]
+                let incoming = displayLegs[index - 1]
                 if incoming.transportKind == .transit, let tripID = incoming.tripId,
                    leg.continuesInSeatFromTripID == tripID { return nil }
             }
             return leg
         }
+    }
+
+    /// Only the card ribbon uses these synthetic legs. Routing and the detailed
+    /// timeline retain the separate walks and purple funicular ride.
+    private static func combiningFunicularConnections(in legs: [RoutePlan.Leg]) -> [RoutePlan.Leg] {
+        var result: [RoutePlan.Leg] = []
+        var index = 0
+        while index < legs.count {
+            let first = legs[index]
+            guard first.transportKind == .walking || first.mode == .funicular else {
+                result.append(first)
+                index += 1
+                continue
+            }
+            var end = index + 1
+            while end < legs.count,
+                  legs[end].transportKind == .walking || legs[end].mode == .funicular {
+                end += 1
+            }
+            let connection = legs[index..<end]
+            if connection.contains(where: { $0.mode == .funicular }) {
+                let durations = connection.compactMap { leg -> TimeInterval? in
+                    let departure = leg.realtimeDepartureTime ?? leg.scheduledDepartureTime ?? leg.departureTime
+                    let arrival = leg.realtimeArrivalTime ?? leg.scheduledArrivalTime ?? leg.arrivalTime
+                    guard let departure, let arrival else { return nil }
+                    return max(0, arrival.timeIntervalSince(departure))
+                }
+                let departure = first.realtimeDepartureTime ?? first.scheduledDepartureTime ?? first.departureTime
+                let duration = durations.count == connection.count ? durations.reduce(0, +) : nil
+                result.append(RoutePlan.Leg(
+                    id: first.id, mode: .walking, transportKind: .walking,
+                    origin: first.origin, destination: legs[end - 1].destination,
+                    departureTime: departure,
+                    arrivalTime: departure.flatMap { start in duration.map { start.addingTimeInterval($0) } }
+                ))
+            } else {
+                result.append(contentsOf: connection)
+            }
+            index = end
+        }
+        return result
     }
 
     static func items(from legs: [RoutePlan.Leg]) -> [RouteTimelineItem] {
