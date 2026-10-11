@@ -27,9 +27,9 @@ struct SimulatorRouteBenchmarkView: View {
             navigation.selectedTab = .plan
             navigation.planPath = id.map { [.routeTimeline($0)] } ?? []
         }.sheet(isPresented: .constant(true)) {
-            ScrollView {
+            VStack(spacing: 0) {
                 Text(benchmark.status).font(.caption).padding()
-                RouteView(viewModel: benchmark.presentation, actions: RouteActions()).padding()
+                RouteView(viewModel: benchmark.presentation, actions: RouteActions())
             }.presentationDetents([.large]).interactiveDismissDisabled()
         }.task { await benchmark.run(productionService: service, walkingRouter: walking, bikes: bikes) }
     }
