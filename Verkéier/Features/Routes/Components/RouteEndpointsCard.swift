@@ -30,6 +30,9 @@ struct RouteEndpointsCard: View {
                     .moveDisabled(!canSwap)
             }
             .onMove(perform: moveEndpoints)
+            // The row content must receive edit mode directly for List to
+            // display its reorder controls, in addition to allowing moves.
+            .environment(\.editMode, .constant(.active))
         }
         .listStyle(.plain)
         .environment(\.editMode, .constant(.active))
