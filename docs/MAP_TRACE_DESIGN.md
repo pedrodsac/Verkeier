@@ -18,18 +18,17 @@ labeled and is never a substitute for production data.
 
 | Element | Rule |
 | --- | --- |
-| Transit/bicycle stroke | 5 metres, rounded caps and joins, opaque 7 metre adaptive casing; shrinks on screen when zooming out |
+| Transit/bicycle stroke | 5 pt, rounded caps and joins, subtle 7 pt adaptive casing |
 | Mode color | Canonical `TransportMode.tint`: bus blue, train red, tram orange, funicular purple, bicycle teal |
 | Walking/unknown color | Adaptive neutral gray |
-| Walking stroke | 3 metres; 6 metre dash, 4 metre gap; no zoom compensation |
-| Approximate transit geometry | Dashed and faded to 55% stroke / 45% casing opacity, including within highlighted trip geometry |
+| Walking stroke | 3 pt; 6 pt dash, 4 pt gap |
+| Approximate transit geometry | Dashed, including within highlighted trip geometry |
 | Intermediate stop | 8 pt ring, 2 pt border, adaptive white/dark center |
 | Boarding/alighting/transfer | 12 pt ring, 2.5 pt border |
 | Full-line/trip terminus | 16 pt filled circle with contrasting border; boarding/alighting takes priority |
 | Stop name | Primary text color, semibold 12 pt base, scaled as caption text, wraps without a line cap, adaptive halo |
 | Line shield | Upright rounded rectangle, mode color, white bold 10 pt base, Dynamic Type |
-| Full-trip context | Same mode hue at 55% stroke / 45% casing opacity; highlighted ride drawn above it |
-| Accurate ride geometry | Fully opaque stroke and casing, regardless of live-data availability |
+| Full-trip context | Same mode hue at 55% stroke opacity; highlighted ride drawn above it |
 
 The public short line name is separate from the descriptive route name. Do not
 derive line numbers from route IDs or long names. Omit shields when no short
