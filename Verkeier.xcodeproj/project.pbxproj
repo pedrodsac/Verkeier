@@ -734,7 +734,7 @@
 			repositoryURL = "https://github.com/pedrodsac/MobiliteitKit";
 			requirement = {
 				kind = revision;
-				revision = 73cd8f6724cca5f2bb1e75d78fed4ecf678d7f10;
+				revision = ac6945e96e84cc3614317024cae716b0f90aca5c;
 			};
 		};
 		E8D57E30304F173F00F569AC /* XCRemoteSwiftPackageReference "valhalla-mobile" */ = {
