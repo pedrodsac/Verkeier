@@ -152,7 +152,8 @@ struct CommuteDashboardView: View {
                 stop: favourite.stop,
                 markerColor: favourite.colorHex.map { Color(hex: $0) } ?? favourite.stop.modes.primaryMode.tint,
                 title: favourite.displayLabel ?? favourite.stop.displayName,
-                subtitle: favourite.stop.fullName,
+                subtitle: favourite.stop.modes.contains(.train)
+                    ? favourite.stop.displaySubtitle : favourite.stop.fullName,
                 iconName: favourite.iconName
             )
         }

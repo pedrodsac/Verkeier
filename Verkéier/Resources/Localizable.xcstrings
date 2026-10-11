@@ -1,50 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Choose which types of transport routes can include. Walking is always included." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wähle, welche Verkehrsmittel Routen enthalten dürfen. Fußwege sind immer enthalten."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choisissez les types de transport autorisés dans les itinéraires. La marche est toujours incluse."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wielt, wéi eng Transportmëttel a Routen erlaabt sinn. Foussweeër sinn ëmmer abegraff."
-          }
-        }
-      }
-    },
-    "Transport in routes" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verkehrsmittel für Routen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transports dans les itinéraires"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transportmëttel a Routen"
-          }
-        }
-      }
-    },
     "" : {
       "localizations" : {
         "de" : {
@@ -1189,6 +1145,9 @@
         }
       }
     },
+    "Choose a different place" : {
+
+    },
     "Choose travel time" : {
       "localizations" : {
         "de" : {
@@ -1213,6 +1172,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Escolher a hora da viagem"
+          }
+        }
+      }
+    },
+    "Choose which types of transport routes can include. Walking is always included." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle, welche Verkehrsmittel Routen enthalten dürfen. Fußwege sind immer enthalten."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez les types de transport autorisés dans les itinéraires. La marche est toujours incluse."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wielt, wéi eng Transportmëttel a Routen erlaabt sinn. Foussweeër sinn ëmmer abegraff."
           }
         }
       }
@@ -2160,6 +2142,15 @@
         }
       }
     },
+    "From: %@" : {
+
+    },
+    "Funicular" : {
+
+    },
+    "Funicular %lld min" : {
+
+    },
     "Get directions" : {
       "localizations" : {
         "de" : {
@@ -2895,6 +2886,7 @@
       }
     },
     "Mode preference" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2921,6 +2913,9 @@
           }
         }
       }
+    },
+    "My Location" : {
+
     },
     "Name this trip so you can re-plan it in one tap. Use “Home → Work” for time-of-day commute suggestions." : {
       "localizations" : {
@@ -4044,6 +4039,7 @@
       }
     },
     "Preferred transport" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5627,6 +5623,9 @@
         }
       }
     },
+    "To: %@" : {
+
+    },
     "Track departure" : {
       "localizations" : {
         "de" : {
@@ -5847,6 +5846,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Detalhes dos dados de transporte"
+          }
+        }
+      }
+    },
+    "Transport in routes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkehrsmittel für Routen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transports dans les itinéraires"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transportmëttel a Routen"
           }
         }
       }
@@ -6118,6 +6139,9 @@
           }
         }
       }
+    },
+    "Waiting for Location…" : {
+
     },
     "Walking routes" : {
       "localizations" : {
