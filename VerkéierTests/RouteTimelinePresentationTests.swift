@@ -66,6 +66,29 @@ struct RouteTimelinePresentationTests {
         #expect(ride.durationMinutes == 6)
     }
 
+    @Test func ribbonCombinesOnlyFunicularConnectionsBetweenRides() throws {
+        func connection(_ id: String, mode: TransportMode, departure: TimeInterval, arrival: TimeInterval) -> RoutePlan.Leg {
+            RoutePlan.Leg(id: id, mode: mode, transportKind: mode == .funicular ? .transit : .walking,
+                origin: .init(name: "Origin", latitude: 49.6, longitude: 6.1),
+                destination: .init(name: "Destination", latitude: 49.7, longitude: 6.2),
+                departureTime: start.addingTimeInterval(departure),
+                arrivalTime: start.addingTimeInterval(arrival))
+        }
+        let first = leg("bus", line: "7", departure: 0, arrival: 120)
+        let walkIn = connection("in", mode: .walking, departure: 120, arrival: 145)
+        let ride = connection("funicular", mode: .funicular, departure: 145, arrival: 208)
+        let walkOut = connection("out", mode: .walking, departure: 208, arrival: 233)
+        let onward = leg("train", line: "RE", departure: 300, arrival: 600)
+        let finalWalk = connection("final", mode: .walking, departure: 600, arrival: 620)
+        let ribbon = RouteTimelinePresentation.ribbonLegs(from: [first, walkIn, ride, walkOut, onward, finalWalk])
+        #expect(ribbon.map(\.id) == ["bus", "in", "train", "final"])
+        #expect(ribbon[1].mode == .walking)
+        let duration = try #require(ribbon[1].arrivalTime).timeIntervalSince(try #require(ribbon[1].departureTime))
+        #expect(duration == 113)
+        #expect(DurationDisplay.minutes(duration, rounding: .up) == 2)
+        #expect(RouteTimelinePresentation.ribbonLegs(from: [walkIn, walkOut]) == [walkIn, walkOut])
+    }
+
     @Test func ordinaryTransfersKeepBothChipsAndStopNode() {
         let legs = [leg("first", line: "7", departure: 0, arrival: 120, stops: 1),
                     leg("onward", line: "25", departure: 180, arrival: 360, stops: 5)]
