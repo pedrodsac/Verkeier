@@ -1,12 +1,13 @@
 import MapKit
 
 /// Owns only route content. Panning, sheet updates, and text-size changes keep
-/// polyline and annotation identities; changed source geometry replaces one line.
+/// polyline and annotation identities; changed geometry replaces one stroke pair.
 @MainActor
 final class RouteMapContent {
     private var overlay: RouteMapOverlay?
     private var segmentsByID: [String: RouteMapSegment] = [:]
-    private var polylinesByID: [String: MKPolyline] = [:]
+    private var polylinesByID: [String: [MKPolyline]] = [:]
+    private var casingPolylines: Set<ObjectIdentifier> = []
     private var segmentsByPolyline: [ObjectIdentifier: RouteMapSegment] = [:]
     private var stopsByID: [String: RouteStopAnnotation] = [:]
     private var shieldsByID: [String: RouteShieldAnnotation] = [:]
@@ -25,37 +26,53 @@ final class RouteMapContent {
         let drawable = segments.filter { $0.coordinates.count >= 2 }
         let nextIDs = Set(drawable.map(\.id))
         for id in Set(polylinesByID.keys).subtracting(nextIDs) {
-            if let polyline = polylinesByID.removeValue(forKey: id) {
-                mapView.removeOverlay(polyline)
-                segmentsByPolyline.removeValue(forKey: ObjectIdentifier(polyline))
+            if let polylines = polylinesByID.removeValue(forKey: id) {
+                remove(polylines, from: mapView)
             }
             segmentsByID.removeValue(forKey: id)
         }
         for segment in drawable {
             guard segmentsByID[segment.id] != segment else { continue }
             let old = polylinesByID[segment.id]
-            if let old { mapView.removeOverlay(old); segmentsByPolyline.removeValue(forKey: ObjectIdentifier(old)) }
-            let polyline: MKPolyline
-            if segmentsByID[segment.id]?.coordinates == segment.coordinates, let old { polyline = old }
+            if let old { remove(old, from: mapView) }
+            let polylines: [MKPolyline]
+            if segmentsByID[segment.id]?.coordinates == segment.coordinates, let old { polylines = old }
             else {
                 let coordinates = segment.coordinates.map(\.coordinate)
-                polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+                // Native vector renderers each draw one stroke. Keep the wider
+                // casing directly below its foreground, sharing source geometry.
+                polylines = (0..<2).map { _ in
+                    MKPolyline(coordinates: coordinates, count: coordinates.count)
+                }
             }
             segmentsByID[segment.id] = segment
-            polylinesByID[segment.id] = polyline
-            segmentsByPolyline[ObjectIdentifier(polyline)] = segment
-            mapView.addOverlay(polyline, level: .aboveRoads)
+            polylinesByID[segment.id] = polylines
+            casingPolylines.insert(ObjectIdentifier(polylines[0]))
+            for polyline in polylines {
+                segmentsByPolyline[ObjectIdentifier(polyline)] = segment
+            }
+            mapView.addOverlays(polylines, level: .aboveRoads)
         }
         // Context always lies below the highlighted ride, including partial updates.
-        let ordered = drawable.filter { $0.emphasis == .context } + drawable.filter { $0.emphasis != .context }
+        let ordered = (drawable.filter { $0.emphasis == .context } + drawable.filter { $0.emphasis != .context })
+            .flatMap { polylinesByID[$0.id] ?? [] }
         let routeIndices = mapView.overlays.indices.filter { index in
             segmentsByPolyline[ObjectIdentifier(mapView.overlays[index])] != nil
         }
-        for (position, segment) in ordered.enumerated() {
-            guard let polyline = polylinesByID[segment.id], position < routeIndices.count,
+        for (position, polyline) in ordered.enumerated() {
+            guard position < routeIndices.count,
                   let current = mapView.overlays.firstIndex(where: { $0 === polyline }) else { continue }
             let target = routeIndices[position]
             if current != target { mapView.exchangeOverlay(at: current, withOverlayAt: target) }
+        }
+    }
+
+    private func remove(_ polylines: [MKPolyline], from mapView: MKMapView) {
+        mapView.removeOverlays(polylines)
+        for polyline in polylines {
+            let identity = ObjectIdentifier(polyline)
+            segmentsByPolyline.removeValue(forKey: identity)
+            casingPolylines.remove(identity)
         }
     }
 
@@ -107,7 +124,8 @@ final class RouteMapContent {
 
     func renderer(for polyline: MKPolyline, traits: UITraitCollection) -> MKOverlayRenderer? {
         guard let segment = segmentsByPolyline[ObjectIdentifier(polyline)] else { return nil }
-        return RouteTraceRenderer(polyline: polyline, segment: segment, traits: traits)
+        return RouteTraceRenderer(polyline: polyline, segment: segment, traits: traits,
+            isCasing: casingPolylines.contains(ObjectIdentifier(polyline)))
     }
 
     func view(for annotation: any MKAnnotation, in mapView: MKMapView) -> MKAnnotationView? {

@@ -5,7 +5,7 @@ import Testing
 
 @MainActor
 struct RouteTracePresentationTests {
-    @Test func customRendererInitializesAndDrawsEveryTraceStyle() {
+    @Test func vectorRendererInitializesAndDrawsEveryTraceStyle() {
         let coordinates = [CLLocationCoordinate2D(latitude: 49.6, longitude: 6.1),
                            CLLocationCoordinate2D(latitude: 49.61, longitude: 6.11)]
         let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
@@ -15,12 +15,52 @@ struct RouteTracePresentationTests {
                 traits: UITraitCollection(userInterfaceStyle: .light))
             #expect(renderer.polyline === polyline)
             #expect(renderer.path != nil)
+            #expect(!renderer.shouldRasterize)
+            #expect(renderer.lineWidth == (mode == .walking ? 3 : 5))
             // No map or network is needed to exercise MapKit's renderer setup.
             let image = UIGraphicsImageRenderer(size: CGSize(width: 32, height: 32)).image { output in
                 renderer.draw(polyline.boundingMapRect, zoomScale: 1, in: output.cgContext)
             }
             #expect(image.size == CGSize(width: 32, height: 32))
         }
+    }
+
+    @Test func vectorStrokePairsRetainIdentityAndStackContextBelowRide() throws {
+        let mapView = MKMapView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+        let content = RouteMapContent()
+        let coordinates: [RouteMapCoordinate] = [
+            .init(latitude: 49.6, longitude: 6.1), .init(latitude: 49.61, longitude: 6.11)
+        ]
+        let ride = RouteMapSegment(id: "ride", mode: .bus, coordinates: coordinates, emphasis: .highlighted)
+        let context = RouteMapSegment(id: "context", mode: .bus, coordinates: coordinates, emphasis: .context)
+        let overlay = RouteMapOverlay(segments: [ride, context])
+        content.sync(overlay, in: mapView)
+        let original = mapView.overlays.compactMap { $0 as? MKPolyline }
+        #expect(original.count == 4)
+        let traits = UITraitCollection(userInterfaceStyle: .light)
+        let renderers = try original.map { polyline in
+            try #require(content.renderer(for: polyline, traits: traits) as? RouteTraceRenderer)
+        }
+        #expect(renderers.map(\.lineWidth) == [7, 5, 7, 5])
+        #expect(renderers.allSatisfy { !$0.shouldRasterize })
+        let contextAlpha = try #require(renderers[1].strokeColor?.cgColor.alpha)
+        #expect(abs(contextAlpha - 0.55) < 0.001)
+        #expect(renderers[3].strokeColor?.cgColor.alpha == 1)
+
+        content.sync(overlay, in: mapView)
+        content.layout(in: mapView)
+        content.refreshAppearance(in: mapView)
+        let refreshed = mapView.overlays.compactMap { $0 as? MKPolyline }
+        #expect(refreshed.map(ObjectIdentifier.init) == original.map(ObjectIdentifier.init))
+
+        // Removing context removes both of its strokes, leaving the ride intact.
+        content.sync(RouteMapOverlay(segments: [ride]), in: mapView)
+        #expect(mapView.overlays.count == 2)
+        #expect(mapView.overlays[0] === original[2])
+        #expect(mapView.overlays[1] === original[3])
+        #expect(content.renderer(for: original[0], traits: traits) == nil)
+        content.sync(nil, in: mapView)
+        #expect(mapView.overlays.isEmpty)
     }
 
     @Test(arguments: [TransportMode.bus, .train, .tram, .funicular, .bicycle])
