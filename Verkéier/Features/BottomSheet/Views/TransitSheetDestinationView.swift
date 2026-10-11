@@ -77,10 +77,13 @@ struct TransitSheetDestinationView: View {
             }
 
         case .directions, .directionsForPreset:
-            RouteView(
-                viewModel: viewModel.route,
-                actions: RouteActions(from: actions)
-            )
+            ScrollView {
+                RouteView(
+                    viewModel: viewModel.route,
+                    actions: RouteActions(from: actions)
+                )
+                .safeAreaPadding(.horizontal, 16)
+            }
             .refreshable { await actions.refreshRoutes() }
             .navigationTitle(route.navigationTitle)
             .toolbarTitleDisplayMode(.inline)

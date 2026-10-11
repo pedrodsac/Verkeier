@@ -1,11 +1,11 @@
 import SwiftUI
 
-/// A native navigation row displaying departure/arrival times, a
+/// A tappable route-option card displaying departure/arrival times, a
 /// ``RouteRibbon`` of mode/line badges with individual status rings.
 ///
 /// Matches the Apple Maps Transit result row style: time range + duration on
 /// top with distance, and the mode ribbon as the dominant visual below.
-struct RouteOptionRow: View {
+struct RouteOptionCard: View {
     let option: RouteOption
     let isSelected: Bool
 
@@ -46,11 +46,18 @@ struct RouteOptionRow: View {
 				
 				if option.hasTightTransfer {
 					RouteOptionStrip(status: .atRisk)
+						.padding([.horizontal, .bottom], -4)
 				}
             }
-            .padding(.vertical, 4)
-            .contentShape(.rect)
+            .padding(14)
+            .background(cardBackground, in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
+                    .stroke(.separator.opacity(0.3), lineWidth: 0.5)
+            }
+            .contentShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
         }
+        .buttonStyle(.pressable)
         .animation(Animation.respectingReduceMotion(.snappy(duration: 0.22), reduceMotion), value: isSelected)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
         .accessibilityHint("Opens route step-by-step timeline")
@@ -97,6 +104,14 @@ struct RouteOptionRow: View {
         return "\(distanceText)  ·  \(bikeNote)"
     }
 
+    private var cardBackground: AnyShapeStyle {
+		if option.hasTightTransfer {
+			AnyShapeStyle(Color.orange.opacity(0.14))
+		} else {
+			AnyShapeStyle(.thinMaterial)
+		}
+    }
+
     private var accessibilityLabel: String {
         let heading = option.isVelohOnly || option.isWalkingOnly
             ? durationText
@@ -110,22 +125,23 @@ struct RouteOptionRow: View {
 }
 
 #if DEBUG
-    #Preview {
-        List {
-            RouteOptionRow(
+    #Preview(traits: .sizeThatFitsLayout) {
+        VStack(spacing: 10) {
+            RouteOptionCard(
                 option: .previewTramOption,
                 isSelected: true
             )
-            RouteOptionRow(
+            RouteOptionCard(
                 option: .previewBusOption,
                 isSelected: false
             )
-            RouteOptionRow(
+            RouteOptionCard(
                 option: .previewTightTransferOption,
                 isSelected: false
             )
         }
-        .listStyle(.insetGrouped)
+        .padding()
+        .background(Color(uiColor: .systemGroupedBackground))
         .environment(AppPreferences())
     }
 

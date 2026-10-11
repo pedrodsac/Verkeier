@@ -1,31 +1,64 @@
 import SwiftUI
 
-/// Native endpoint rows hosted directly by the planner's list.
-struct RouteEndpointsSection: View {
+/// Editable route endpoints with native drag handles for reversing the journey.
+struct RouteEndpointsCard: View {
     let viewModel: RoutePresentationModel
     let showRoutePlaceSearch: (RouteEndpoint) -> Void
     let swapRouteEndpoints: () -> Void
 
-    // Identity follows each moved row; its position defines the endpoint role.
+    // Stable row identities let List animate the actual move while the endpoint
+    // at each position continues to represent the route's origin or destination.
     @State private var rowIDs = [UUID(), UUID()]
-    @ScaledMetric(relativeTo: .body) private var badgeSize = 24
+    @State private var rowHeights: [RouteEndpoint: CGFloat] = [:]
+    @ScaledMetric(relativeTo: .body) private var badgeSize = 32
 
     var body: some View {
-        Section {
+        List {
             ForEach(rowIDs.enumerated(), id: \.element) { index, _ in
                 let endpoint: RouteEndpoint = index == 0 ? .origin : .destination
                 endpointRow(endpoint)
+                    .onGeometryChange(for: CGFloat.self) { geometry in
+                        geometry.size.height
+                    } action: { height in
+                        rowHeights[endpoint] = height
+                    }
                     .listRowInsets(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden, edges: .top)
+                    .listRowSeparator(endpoint == .origin ? .visible : .hidden, edges: .bottom)
                     .alignmentGuide(.listRowSeparatorLeading) { _ in badgeSize + 10 }
                     .moveDisabled(!canSwap)
             }
             .onMove(perform: moveEndpoints)
-            .environment(\.editMode, .constant(.active))
         }
+        .listStyle(.plain)
+        .environment(\.editMode, .constant(.active))
+        .environment(\.defaultMinListRowHeight, 0)
+        .scrollDisabled(true)
+        .scrollContentBackground(.hidden)
+        .contentMargins(0)
+        .frame(height: cardHeight)
+        .background(alignment: .topLeading) {
+            Capsule()
+                .fill(.quaternary)
+                .frame(width: 4, height: 10)
+                .offset(x: 12 + badgeSize / 2 - 2, y: originRowHeight - 5)
+                .accessibilityHidden(true)
+        }
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(.rect(cornerRadius: 22))
     }
 
     private var canSwap: Bool {
         viewModel.hasDestination && (viewModel.origin != nil || viewModel.currentLocation != nil)
+    }
+
+    private var originRowHeight: CGFloat {
+        rowHeights[.origin] ?? badgeSize + 16
+    }
+
+    private var cardHeight: CGFloat {
+        originRowHeight + (rowHeights[.destination] ?? badgeSize + 16)
     }
 
     private func moveEndpoints(from source: IndexSet, to destination: Int) {
@@ -52,16 +85,14 @@ struct RouteEndpointsSection: View {
 }
 
 #if DEBUG
-    #Preview {
-        List {
-            RouteEndpointsSection(
-                viewModel: .previewForCard,
-                showRoutePlaceSearch: { _ in },
-                swapRouteEndpoints: {}
-            )
-        }
-        .listStyle(.insetGrouped)
-        .environment(\.editMode, .constant(.active))
+    #Preview(traits: .sizeThatFitsLayout) {
+        RouteEndpointsCard(
+            viewModel: .previewForCard,
+            showRoutePlaceSearch: { _ in },
+            swapRouteEndpoints: {}
+        )
+        .padding()
+        .background(Color(uiColor: .systemGroupedBackground))
     }
 
     private extension RoutePresentationModel {
