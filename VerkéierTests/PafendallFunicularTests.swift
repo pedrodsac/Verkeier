@@ -68,6 +68,9 @@ struct PafendallFunicularTests {
             Issue.record("Expected funicular segment between its terminals")
             return
         }
+        let presentedTimeline = RouteTimelinePresentation.items(from: legs)
+        #expect(presentedTimeline.map(\.id) == ["place-0", "segment-0", "segment-1", "segment-2", "place-3"])
+        #expect(presentedTimeline.contains(.segment(ride)))
         #expect(ride.kind == .funicular)
         #expect(ride.rail == .transit(.funicular))
         #expect(ride.durationMinutes == 3)
