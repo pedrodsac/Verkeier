@@ -22,7 +22,7 @@ actor MeasuredWalkingRouteCache {
     private var accessCursor = 0
     private let capacity: Int
 
-    init(capacity: Int = 512) {
+    init(capacity: Int = 8_192) {
         self.capacity = max(1, capacity)
     }
 

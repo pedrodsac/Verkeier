@@ -22,7 +22,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
          walkingRouter: any WalkingRouting = UnavailableWalkingRouter(),
          roadRouteProvider: (any RoadRouteProviding)? = nil,
          graphPreparation: Task<Void, Never>? = nil,
-         realtimeConcurrency: Int = 16) {
+         realtimeConcurrency: Int = 32) {
         self.databaseURL = databaseURL; self.gtfsService = gtfsService
         let planner = engine ?? JourneyPlanner(
             walkingProvider: LocalFirstWalkingRoutingProvider(walkingRouter: walkingRouter),

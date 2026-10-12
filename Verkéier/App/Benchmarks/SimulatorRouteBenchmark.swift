@@ -69,7 +69,7 @@ final class SimulatorRouteBenchmark {
                 } else { planner = nil }
                 service = MobiliteitRouteService(databaseURL: database, gtfsService: env["ROUTING_BENCHMARK_DATABASE"] == nil ? gtfs : nil,
                     realtimeClient: client, engine: planner, bikeShareService: production ? benchmarkBikes : UnavailableBikeShareService(), walkingRouter: walking,
-                    realtimeConcurrency: Int(env["ROUTING_BENCHMARK_LIVE_CONCURRENCY"] ?? "16") ?? 16)
+                    realtimeConcurrency: Int(env["ROUTING_BENCHMARK_LIVE_CONCURRENCY"] ?? "32") ?? 32)
             }
             self.service = service
             let samples = Int(env["ROUTING_BENCHMARK_SAMPLES"] ?? "1") ?? 1
@@ -133,7 +133,7 @@ final class SimulatorRouteBenchmark {
                 let measured = viewModel.routeDiagnostics ?? diagnostics
                 var record: [String: Any] = ["scenario": scenario, "sample": sample,
                     "composition": production ? "production" : "transit", "fullMap": fullMap, "bikeInput": bikeInput,
-                    "liveConcurrency": Int(env["ROUTING_BENCHMARK_LIVE_CONCURRENCY"] ?? "16") ?? 16,
+                    "liveConcurrency": Int(env["ROUTING_BENCHMARK_LIVE_CONCURRENCY"] ?? "32") ?? 32,
                     "spanSemantics": "operation-relative elapsed intervals; http and decode are cumulative concurrent work",
                     "spans": measured.spans.map { ["stage": $0.stage.rawValue, "start_ms": $0.startMilliseconds, "duration_ms": $0.durationMilliseconds] },
                     "passes": diagnostics.searchPasses.map { ["start_ms": $0.startMilliseconds, "duration_ms": $0.durationMilliseconds, "horizon_s": $0.horizonSeconds, "wave": $0.realtimeWave, "rounds": $0.rounds.count, "candidates": $0.candidates] },
