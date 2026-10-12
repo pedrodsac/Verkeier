@@ -33,12 +33,17 @@ parser.add_argument('--time', help='Fixed ISO 8601 planning time for comparison 
 parser.add_argument('--destination-name', help='Destination label for a custom comparison')
 parser.add_argument('--destination-coordinate', nargs=2, type=float, metavar=('LATITUDE', 'LONGITUDE'))
 parser.add_argument('--destination-stop', help='GTFS stop ID at the custom destination')
+parser.add_argument('--origin-name', help='Origin label for a custom comparison')
+parser.add_argument('--origin-coordinate', nargs=2, type=float, metavar=('LATITUDE', 'LONGITUDE'))
+parser.add_argument('--origin-stop', help='GTFS stop ID at the custom origin')
 parser.add_argument('--avoid-tight-transfers', action='store_true', help='Avoid transfers with less than three minutes available')
 parser.add_argument('--maximum-limit-ms', '--p95-limit-ms', dest='maximum_limit_ms', type=float,
     default=5000, help='Every operation must be below this threshold, including priming; use 0 for a separate Debug audit')
 args = parser.parse_args()
 if (args.destination_name or args.destination_stop) and not args.destination_coordinate:
     parser.error('Custom destination requires --destination-coordinate LATITUDE LONGITUDE')
+if (args.origin_name or args.origin_stop) and not args.origin_coordinate:
+    parser.error('Custom origin requires --origin-coordinate LATITUDE LONGITUDE')
 if args.warm < 0 or args.cold < 0 or args.warm + args.cold + 1 > 5:
     parser.error('Each case permits at most five operations, including one priming operation')
 if args.device is None:
@@ -89,6 +94,12 @@ def run(scenario, samples, label):
         env['SIMCTL_CHILD_ROUTING_BENCHMARK_DESTINATION_NAME'] = args.destination_name or 'Destination'
         if args.destination_stop:
             env['SIMCTL_CHILD_ROUTING_BENCHMARK_DESTINATION_STOP'] = args.destination_stop
+    if args.origin_coordinate:
+        env['SIMCTL_CHILD_ROUTING_BENCHMARK_ORIGIN_LATITUDE'] = str(args.origin_coordinate[0])
+        env['SIMCTL_CHILD_ROUTING_BENCHMARK_ORIGIN_LONGITUDE'] = str(args.origin_coordinate[1])
+        env['SIMCTL_CHILD_ROUTING_BENCHMARK_ORIGIN_NAME'] = args.origin_name or 'Origin'
+        if args.origin_stop:
+            env['SIMCTL_CHILD_ROUTING_BENCHMARK_ORIGIN_STOP'] = args.origin_stop
     env['SIMCTL_CHILD_ROUTING_BENCHMARK_AVOID_TIGHT_TRANSFERS'] = '1' if args.avoid_tight_transfers else '0'
     with log.open('w') as stream:
         process = subprocess.Popen(['xcrun', 'simctl', 'launch', '--console', '--terminate-running-process',

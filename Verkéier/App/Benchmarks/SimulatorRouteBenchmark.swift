@@ -272,6 +272,15 @@ final class SimulatorRouteBenchmark {
             let anchor = Date(timeIntervalSince1970: seconds)
             time = scenario.contains("arrive") ? .arriveBy(anchor) : .departAt(anchor)
         }
+        if let latitude = environment["ROUTING_BENCHMARK_ORIGIN_LATITUDE"].flatMap(Double.init),
+           let longitude = environment["ROUTING_BENCHMARK_ORIGIN_LONGITUDE"].flatMap(Double.init) {
+            guard (-90...90).contains(latitude), (-180...180).contains(longitude) else {
+                throw CocoaError(.formatting)
+            }
+            from = LocationPoint(name: environment["ROUTING_BENCHMARK_ORIGIN_NAME"] ?? "Origin",
+                latitude: latitude, longitude: longitude,
+                transitStopID: environment["ROUTING_BENCHMARK_ORIGIN_STOP"])
+        }
         if let latitude = environment["ROUTING_BENCHMARK_DESTINATION_LATITUDE"].flatMap(Double.init),
            let longitude = environment["ROUTING_BENCHMARK_DESTINATION_LONGITUDE"].flatMap(Double.init) {
             guard (-90...90).contains(latitude), (-180...180).contains(longitude) else {

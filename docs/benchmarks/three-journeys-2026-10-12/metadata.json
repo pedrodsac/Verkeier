@@ -1,0 +1,58 @@
+{
+  "time": "2026-10-12T18:16:07+02:00",
+  "app": "/Users/pedoataidecordeiro/Library/Developer/Xcode/DerivedData/Verkeier-eabrfywuqshqpzgmqjmpjyitopza/Build/Products/Release-iphonesimulator/Verkeier.app",
+  "device": "F726825E-2DB4-4F45-A51C-DBA5AA0E2664",
+  "cases": [
+    [
+      "gromscheed-konrad",
+      null,
+      [
+        "Kirchberg, Konrad Adenauer",
+        49.62995,
+        6.158028,
+        "000200417019"
+      ]
+    ],
+    [
+      "sandweiler-lorentzweiler",
+      [
+        "Sandweiler-Contern, Gare routi\u00e8re",
+        49.59965,
+        6.212505,
+        "000200601013"
+      ],
+      [
+        "Lorentzweiler, Gare",
+        49.698461,
+        6.140417,
+        "000160807006"
+      ]
+    ],
+    [
+      "beiler-rumelange",
+      [
+        "Beiler, Bei der aler Schull",
+        50.164186,
+        6.087887,
+        "000110701002"
+      ],
+      [
+        "Rumelange, M\u00e4rtyrerstrooss",
+        49.455954,
+        6.029926,
+        "000221201008"
+      ]
+    ]
+  ],
+  "appCommit": "468cc78b022cf6dca1da629d5417d5edae2ac0b6",
+  "mobiliteitKitRevision": "562bca26973968113cc6c5d9d69228142c8819d5",
+  "configuration": "Release; ENABLE_CODE_COVERAGE=NO; no debugger or concurrent build; production composition and full map",
+  "rawArtifacts": "/tmp/verkeier-three-benchmarks-2026-10-12",
+  "buildLog": "/tmp/verkeier-three-benchmarks-build.log",
+  "workingTreeNote": "Includes existing uncommitted RouteView.swift and RouteTimelinePlaceRow.swift edits, plus custom-origin benchmark support.",
+  "workingTreeDiffSHA256": "ca23d4121d8958c47b8fb3e692ae65f3fe9213d3bac0bcb51755ba9f71fcb445",
+  "planningTimezone": "Europe/Luxembourg",
+  "gtfsGeneration": 5,
+  "walkingGraphVersion": "20260921",
+  "capturePolicy": "One live search per journey; strict offline replay with fixed timestamp and recorded bike snapshot; 200 live request total budget."
+}
