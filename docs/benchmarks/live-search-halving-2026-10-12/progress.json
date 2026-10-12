@@ -1,5 +1,5 @@
 {
-  "status": "resumed; all three half-time targets remain unmet",
+  "status": "incomplete; repeated live provider503 responses prevent complete comparison",
   "targets_ms": {
     "gromscheed-konrad": 3668.7338330000002,
     "sandweiler-lorentzweiler": 2610.7304375,
@@ -7,7 +7,7 @@
   },
   "appMilestoneCommit": "ad587ea",
   "packageSource": "/Users/pedoataidecordeiro/Developer/Mobilite\u0301itKit",
-  "packageChanges": "Routing changes committed and pushed through 00536fd. Complete live boards now use one work unit per stop rather than line shards; full original windows/passlists and shared request limit remain. All 289 offline package tests pass; The Release build passed. The live run is pending. All half-time targets remain unmet.",
+  "packageChanges": "Routing changes committed and pushed through 00536fd; app pin ad587ea. All 289 offline package tests, 235 app tests, and Release build pass. Separate sequential runs with 30 s quiet gaps yielded Grom 3.865 s (target 3.669 s), Sandweiler 503, Beiler 503. No quota response. All three half-time targets remain unmet.",
   "rawArtifacts": "/tmp/verkeier-live-halving",
   "quotaObserved": true,
   "experiments": [
@@ -1113,6 +1113,126 @@
       ],
       "rawSamples": "/tmp/verkeier-live-halving/shared-scheduling32-live/sandweiler-lorentzweiler/samples.json",
       "notes": "Committed package pin 686f84f; shared provider-wide acquisition scheduling and no added Session lookahead. Beiler aborted503. Single samples, no causal speedup claimed."
+    },
+    {
+      "experiment": "whole-stop-boards32-live",
+      "journey": "gromscheed-konrad",
+      "total_ms": 3752.3682909999998,
+      "stages_ms": {
+        "adapterMapping": 0.255583,
+        "bikeCalculation": 605.571958,
+        "boardFetch": 1651,
+        "boardMatching": 11,
+        "candidateBuilding": 227.578041,
+        "decode": 162,
+        "directWalkingWait": 0.000542,
+        "endpoints": 109.287458,
+        "firstRender": 153.120834,
+        "geometry": 2.246333,
+        "graphPreparation": 91.565792,
+        "http": 21951,
+        "mapRender": 153.096084,
+        "publication": 4.511624,
+        "ranking": 0.082667,
+        "raptor": 501.106333,
+        "realtime": 2410.0190829999997,
+        "realtimeDiscovery": 49.20425,
+        "refinement": 3.847918,
+        "resultAssembly": 0.235583,
+        "schedulePreparation": 22,
+        "snapshotPreparation": 431.457167,
+        "timetableReadiness": 2.012042,
+        "validation": 0.062625,
+        "walkingPreparation": 2036.434375,
+        "walkingTransfers": 146
+      },
+      "counters": {
+        "boardCacheHits": 11,
+        "boardsCovered": 28,
+        "candidates": 3600,
+        "delayedPastBoardings": 0,
+        "duplicatesSuppressed": 860,
+        "incompleteBoards": 0,
+        "invalidJourneys": 0,
+        "networkRequests": 29,
+        "pageNewJourneys": 6,
+        "predictedEvents": 0,
+        "recommendationSwitches": 0,
+        "responseBytes": 12677325,
+        "retainedAlternatives": 33,
+        "sharedFirstVehicleGroups": 1,
+        "walkingCacheHits": 12898,
+        "walkingRequests": 18198,
+        "workers": 10
+      },
+      "displayedJourneys": 6,
+      "unfilteredJourneys": 6,
+      "planningTime": 1791821767,
+      "responseStatusCodes": [
+        200
+      ],
+      "rawSamples": "/tmp/verkeier-live-halving/whole-stop-boards32-live/gromscheed-konrad/samples.json",
+      "notes": "Committed package pin 00536fd; complete per-stop boards with all selected lines. Sandweiler aborted503, Beiler not started. Original fixed anchor now yields no matched predicted events in this Grom sample; not a causal percentage-improvement claim."
+    },
+    {
+      "experiment": "whole-stop-boards32-spaced-live",
+      "journey": "gromscheed-konrad",
+      "total_ms": 3865.476833,
+      "stages_ms": {
+        "adapterMapping": 0.391416,
+        "bikeCalculation": 624.541541,
+        "boardFetch": 2714,
+        "boardMatching": 9,
+        "candidateBuilding": 221.95637499999998,
+        "decode": 119,
+        "directWalkingWait": 0.000375,
+        "endpoints": 144.077208,
+        "firstRender": 177.562542,
+        "geometry": 2.175458,
+        "graphPreparation": 193.002541,
+        "http": 36681,
+        "mapRender": 177.538834,
+        "publication": 4.370333,
+        "ranking": 0.090166,
+        "raptor": 498.949625,
+        "realtime": 2552.8065420000003,
+        "realtimeDiscovery": 48.232625,
+        "refinement": 3.978457,
+        "resultAssembly": 0.218625,
+        "schedulePreparation": 27,
+        "snapshotPreparation": 349.88212599999997,
+        "timetableReadiness": 2.727167,
+        "validation": 0.062667,
+        "walkingPreparation": 1843.308875,
+        "walkingTransfers": 147
+      },
+      "counters": {
+        "boardCacheHits": 11,
+        "boardsCovered": 28,
+        "candidates": 3600,
+        "delayedPastBoardings": 0,
+        "duplicatesSuppressed": 860,
+        "incompleteBoards": 0,
+        "invalidJourneys": 0,
+        "networkRequests": 29,
+        "pageNewJourneys": 6,
+        "predictedEvents": 0,
+        "recommendationSwitches": 0,
+        "responseBytes": 12674383,
+        "retainedAlternatives": 33,
+        "sharedFirstVehicleGroups": 1,
+        "walkingCacheHits": 12898,
+        "walkingRequests": 18198,
+        "workers": 10
+      },
+      "displayedJourneys": 6,
+      "unfilteredJourneys": 6,
+      "planningTime": 1791821767,
+      "responseStatusCodes": [
+        200
+      ],
+      "rawSamples": "/tmp/verkeier-live-halving/whole-stop-boards32-spaced-live/gromscheed-konrad/samples.json",
+      "notes": "Package pin00536fd; separate sequential benchmark subprocesses with at least30s quiet gap between journeys. Sandweiler and Beiler each returned503. Grom has no matched predicted events at the original fixed anchor. Single sample; no causal percentage-improvement claim."
     }
   ],
   "quotaEvidence": "/tmp/verkeier-live-halving/candidate32-live/quota-hit.json",
@@ -1148,16 +1268,17 @@
   "lastAppValidation": {
     "tests": 235,
     "suites": 42,
-    "log": "/tmp/verkeier-halving-full-app-tests.log",
-    "result": "passed"
+    "log": "/tmp/verkeier-whole-stop-app-tests.log",
+    "result": "passed",
+    "packagePin": "00536fd"
   },
   "lastProviderFailure": {
-    "experiment": "shared-scheduling32-live",
+    "experiment": "whole-stop-boards32-spaced-live",
     "journey": "beiler-rumelange",
     "status": 503,
     "quota": false,
     "acceptedTotal": false,
-    "artifact": "/tmp/verkeier-live-halving/shared-scheduling32-live/beiler-rumelange/aborted.json"
+    "artifact": "/tmp/verkeier-live-halving/whole-stop-boards32-spaced-live/beiler-rumelange/aborted.json"
   },
   "verification": {
     "packageTests": 289,
@@ -1168,7 +1289,33 @@
     "releaseResult": "passed",
     "appFocusedTests": "/tmp/verkeier-flight-sharing-app-tests.log",
     "appFocusedResult": "10 tests in 2 suites passed",
-    "appFullResult": "235 tests in 42 suites passed",
-    "appFullTests": "/tmp/verkeier-halving-full-app-tests.log"
+    "appFullResult": "235 tests in42 suites passed against00536fd",
+    "appFullTests": "/tmp/verkeier-whole-stop-app-tests.log"
+  },
+  "lastSpacedRun": {
+    "experiment": "whole-stop-boards32-spaced-live",
+    "order": [
+      "gromscheed-konrad",
+      "sandweiler-lorentzweiler",
+      "beiler-rumelange"
+    ],
+    "betweenJourneysSeconds": 30,
+    "appProcessTerminatedAfterEachJourney": true,
+    "results": {
+      "gromscheed-konrad": {
+        "total_ms": 3865.476833,
+        "acceptedTotal": true
+      },
+      "sandweiler-lorentzweiler": {
+        "status": 503,
+        "acceptedTotal": false
+      },
+      "beiler-rumelange": {
+        "status": 503,
+        "acceptedTotal": false
+      }
+    },
+    "quota": false,
+    "artifacts": "/tmp/verkeier-live-halving/whole-stop-boards32-spaced-live"
   }
 }
