@@ -211,13 +211,15 @@ struct RouteView: View {
     // MARK: - Results section
 
     private var routeResultsSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            ForEach(viewModel.chronologicallyOrderedRouteOptions) { option in
-                RouteOptionCard(
-                    option: option,
-                    isSelected: option.id == viewModel.selectedRouteOptionID,
-                )
-            }
+        VStack(alignment: .leading, spacing: 14) {
+			VStack(alignment: .leading, spacing: 10) {
+				ForEach(viewModel.chronologicallyOrderedRouteOptions) { option in
+					RouteOptionCard(
+						option: option,
+						isSelected: option.id == viewModel.selectedRouteOptionID,
+					)
+				}
+			}
 
             if viewModel.routeOptions.contains(where: { !$0.transitLegs.isEmpty }) {
                 HStack(spacing: 10) {
@@ -226,6 +228,7 @@ struct RouteView: View {
                         systemImage: "chevron.left",
                         isLoading: viewModel.isLoadingEarlierRoutes,
                         isEnabled: viewModel.canLoadEarlierRoutes,
+						icon: .leading,
                         action: actions.loadEarlierRoutes
                     )
                     routePageButton(
@@ -233,6 +236,7 @@ struct RouteView: View {
                         systemImage: "chevron.right",
                         isLoading: viewModel.isLoadingLaterRoutes,
                         isEnabled: viewModel.canLoadLaterRoutes,
+						icon: .trailing,
                         action: actions.loadLaterRoutes
                     )
                 }
@@ -254,17 +258,31 @@ struct RouteView: View {
         systemImage: String,
         isLoading: Bool,
         isEnabled: Bool,
+		icon: HorizontalAlignment,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
             HStack(spacing: 7) {
-                if isLoading {
-                    ProgressView()
-                        .controlSize(.small)
-                } else {
-                    Image(systemName: systemImage)
-                }
-                Text(title)
+				switch icon {
+					case .leading:
+						if isLoading {
+							ProgressView()
+								.controlSize(.small)
+						} else {
+							Image(systemName: systemImage)
+						}
+						Text(title)
+					case .trailing:
+						Text(title)
+						if isLoading {
+							ProgressView()
+								.controlSize(.small)
+						} else {
+							Image(systemName: systemImage)
+						}
+					default: EmptyView()
+				}
+                
             }
             .frame(maxWidth: .infinity)
         }

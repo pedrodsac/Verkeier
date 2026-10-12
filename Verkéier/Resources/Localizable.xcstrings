@@ -893,6 +893,9 @@
         }
       }
     },
+    "Bike share stations" : {
+
+    },
     "Board filters" : {
       "localizations" : {
         "de" : {
@@ -1175,6 +1178,12 @@
           }
         }
       }
+    },
+    "Choose which stops and stations appear on the map." : {
+
+    },
+    "Choose which transport modes route planning can use." : {
+
     },
     "Choose which types of transport routes can include. Walking is always included." : {
       "extractionState" : "stale",
@@ -2404,6 +2413,7 @@
       }
     },
     "Last checked" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2830,6 +2840,7 @@
       }
     },
     "Map" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2856,6 +2867,9 @@
           }
         }
       }
+    },
+    "Map pins" : {
+
     },
     "Maps" : {
       "localizations" : {
@@ -4236,6 +4250,7 @@
       }
     },
     "Refresh" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4320,6 +4335,7 @@
       }
     },
     "Refreshing timetable" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4348,6 +4364,7 @@
       }
     },
     "Released" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5141,6 +5158,7 @@
       }
     },
     "Status" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
