@@ -507,7 +507,17 @@ extension TransitMapScreen {
     }
 
     func refreshRoutes() async {
+        guard viewModel.effectiveRouteDestination != nil else { return }
+        guard viewModel.routeOrigin != nil || locationService.currentLocation != nil else {
+            calculateRoute()
+            return
+        }
+        await viewModel.refreshRoutes(using: routeService, from: locationService.currentLocation)
+    }
+
+    private func refreshRoutesIfIdle() async {
         guard viewModel.effectiveRouteDestination != nil,
+              viewModel.routeRefreshTask == nil,
               !viewModel.isCalculatingRoute,
               !viewModel.isLoadingEarlierRoutes, !viewModel.isLoadingLaterRoutes else { return }
         guard viewModel.routeOrigin != nil || locationService.currentLocation != nil else {
@@ -523,14 +533,14 @@ extension TransitMapScreen {
     func maintainRoutes() async {
         guard viewModel.effectiveRouteDestination != nil else { return }
         if viewModel.routeOptions.isEmpty {
-            await refreshRoutes()
+            await refreshRoutesIfIdle()
         }
         while !Task.isCancelled {
             do { try await Task.sleep(for: .seconds(45)) }
             catch { return }
             guard !Task.isCancelled else { return }
             if scenePhase == .active {
-                await refreshRoutes()
+                await refreshRoutesIfIdle()
             }
         }
     }
