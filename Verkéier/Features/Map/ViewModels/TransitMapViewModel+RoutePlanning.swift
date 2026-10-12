@@ -152,6 +152,7 @@ extension TransitMapViewModel {
 
     func calculateRoute(using routeService: any RouteService, from location: CLLocation?,
                         realtimeRefreshPolicy: RouteRealtimeRefreshPolicy = .useCache) async {
+        guard !Task.isCancelled else { return }
         guard let destination = effectiveRouteDestination else {
             routeLoadingPhase = .idle
             routeErrorMessage = "Choose a route destination first."
@@ -264,7 +265,10 @@ extension TransitMapViewModel {
                     recordRoutePublication(calculation)
                 }
             }
+            try Task.checkCancellation()
             guard receivedRouteUpdate else { throw RoutingError.noRouteFound }
+        } catch is CancellationError {
+            // Cancellation is not evidence that a journey is unavailable.
         } catch {
             guard requestGeneration == routeCalculationGeneration else { return }
             if receivedRouteUpdate {

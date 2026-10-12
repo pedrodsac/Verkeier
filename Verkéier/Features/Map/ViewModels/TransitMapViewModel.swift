@@ -106,6 +106,7 @@ final class TransitMapViewModel {
     let nearbyStopsRefreshDistance: CLLocationDistance = 100
     let now: @Sendable () -> Date
     var routeCalculationGeneration = 0
+    @ObservationIgnored var routeRefreshTask: Task<Void, Never>?
     var unfilteredRouteOptions: [RouteOption] = []
     var unfilteredSupplementalRouteOptions: [RouteOption] = []
     var walkingRefinementScheduledIDs: Set<String> = []

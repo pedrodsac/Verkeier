@@ -1,6 +1,7 @@
 import Foundation
 import MapKit
 import MobiliteitKit
+import OSLog
 
 /// Presentation adapter. Transit policy and request state belong to MobiliteitKit.
 struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
@@ -72,7 +73,11 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         catch JourneyPlanningError.supersededRequest { throw CancellationError() }
         catch WalkingRoutingError.datasetUnavailable { throw RoutingError.walkingUnavailable }
         catch JourneyPlanningError.noRouteFound { throw RoutingError.noPublicTransportRoute }
-        catch { throw RoutingError.noRouteFound }
+        catch {
+            Logger(subsystem: "dev.pedrocordeiro.Verkeier", category: "RoutePlanning")
+                .error("Route calculation failed: \(String(reflecting: error), privacy: .private)")
+            throw error
+        }
     }
 
     nonisolated func waitForWalkingPreparation() async { await graphPreparation?.value }
