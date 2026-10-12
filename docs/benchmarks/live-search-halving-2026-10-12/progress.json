@@ -5,9 +5,9 @@
     "sandweiler-lorentzweiler": 2610.7304375,
     "beiler-rumelange": 4287.008125
   },
-  "appMilestoneCommit": "46df707",
+  "appMilestoneCommit": "ad587ea",
   "packageSource": "/Users/pedoataidecordeiro/Developer/Mobilite\u0301itKit",
-  "packageChanges": "Routing changes committed and pushed through 686f84f. App pins that revision. All 293 offline package tests pass and Release builds. The latest live run misses Gromscheed and Sandweiler targets; Beiler aborted on503 without a quota response. All half-time targets remain unmet.",
+  "packageChanges": "Routing changes committed and pushed through 00536fd. Complete live boards now use one work unit per stop rather than line shards; full original windows/passlists and shared request limit remain. All 289 offline package tests pass; The Release build passed. The live run is pending. All half-time targets remain unmet.",
   "rawArtifacts": "/tmp/verkeier-live-halving",
   "quotaObserved": true,
   "experiments": [
@@ -1118,9 +1118,9 @@
   "quotaEvidence": "/tmp/verkeier-live-halving/candidate32-live/quota-hit.json",
   "quotaLiftedByUser": true,
   "lastOfflineValidation": {
-    "tests": 293,
-    "suites": 58,
-    "log": "/tmp/verkeier-shared-scheduling-full-tests2.log",
+    "tests": 289,
+    "suites": 57,
+    "log": "/tmp/verkeier-whole-stop-full-tests.log",
     "liveTestsExcluded": true
   },
   "appMilestoneCommits": [
@@ -1129,7 +1129,8 @@
     "77ecd1d",
     "aeb406f",
     "dee1513",
-    "46df707"
+    "46df707",
+    "ad587ea"
   ],
   "packageMilestoneCommits": [
     "e67385f",
@@ -1141,7 +1142,8 @@
     "05b14a6",
     "cef6074",
     "1ef25e6",
-    "686f84f"
+    "686f84f",
+    "00536fd"
   ],
   "lastAppValidation": {
     "tests": 235,
@@ -1158,11 +1160,11 @@
     "artifact": "/tmp/verkeier-live-halving/shared-scheduling32-live/beiler-rumelange/aborted.json"
   },
   "verification": {
-    "packageTests": 293,
-    "packageSuites": 58,
-    "packageLog": "/tmp/verkeier-shared-scheduling-full-tests2.log",
+    "packageTests": 289,
+    "packageSuites": 57,
+    "packageLog": "/tmp/verkeier-whole-stop-full-tests.log",
     "packageResult": "passed",
-    "releaseBuild": "/tmp/verkeier-shared-scheduling-build.log",
+    "releaseBuild": "/tmp/verkeier-whole-stop-build.log",
     "releaseResult": "passed",
     "appFocusedTests": "/tmp/verkeier-flight-sharing-app-tests.log",
     "appFocusedResult": "10 tests in 2 suites passed",
