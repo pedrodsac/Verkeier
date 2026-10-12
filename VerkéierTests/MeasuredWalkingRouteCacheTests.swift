@@ -3,6 +3,26 @@ import Testing
 @testable import Verkeier
 
 struct MeasuredWalkingRouteCacheTests {
+    @Test func evictionRetainsRecentlyUsedPathsAcrossRepeatedHotAccesses() async throws {
+        let cache = MeasuredWalkingRouteCache(capacity: 3)
+        let counter = WalkingCacheCounter()
+        let origin = LocationPoint(latitude: 49.6, longitude: 6.1)
+        func route(_ index: Int) async throws -> OfflineWalkingRoute {
+            try await cache.route(from: origin,
+                to: .init(latitude: 49.61, longitude: 6.11 + Double(index) * 0.001),
+                revision: "one") { await counter.calculate() }
+        }
+        for index in 0..<3 { _ = try await route(index) }
+        // Repeated hits must keep the path hot even after bookkeeping compacts.
+        for _ in 0..<50 { _ = try await route(0) }
+        _ = try await route(3)
+        _ = try await route(0)
+        _ = try await route(2)
+        #expect(await counter.calls == 4)
+        _ = try await route(1)
+        #expect(await counter.calls == 5)
+    }
+
     @Test func cachedPathsAreDirectedAndInvalidateWithGraph() async throws {
         let cache = MeasuredWalkingRouteCache()
         let counter = WalkingCacheCounter()

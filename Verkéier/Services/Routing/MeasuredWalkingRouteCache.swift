@@ -9,6 +9,7 @@ actor MeasuredWalkingRouteCache {
         let revision: String
     }
     private struct Entry { let route: OfflineWalkingRoute; let access: UInt64 }
+    private struct Access { let key: Key; let generation: UInt64 }
     private struct Flight {
         let id: UUID
         let task: Task<OfflineWalkingRoute, Error>
@@ -17,7 +18,13 @@ actor MeasuredWalkingRouteCache {
     private var entries: [Key: Entry] = [:]
     private var flights: [Key: Flight] = [:]
     private var access: UInt64 = 0
-    private let capacity = 512
+    private var accesses: [Access] = []
+    private var accessCursor = 0
+    private let capacity: Int
+
+    init(capacity: Int = 512) {
+        self.capacity = max(1, capacity)
+    }
 
     func route(from: LocationPoint, to: LocationPoint, revision: String,
                calculate: @escaping @Sendable () async throws -> OfflineWalkingRoute) async throws -> OfflineWalkingRoute {
@@ -27,6 +34,7 @@ actor MeasuredWalkingRouteCache {
         access &+= 1
         if let cached = entries[key] {
             entries[key] = Entry(route: cached.route, access: access)
+            recordAccess(key)
             return cached.route
         }
         let waiter = UUID()
@@ -39,13 +47,29 @@ actor MeasuredWalkingRouteCache {
             try Task.checkCancellation()
             if flights[key]?.id == id {
                 access &+= 1; entries[key] = Entry(route: result, access: access)
-                if entries.count > capacity, let oldest = entries.min(by: { $0.value.access < $1.value.access })?.key {
-                    entries[oldest] = nil
+                recordAccess(key)
+                while entries.count > capacity {
+                    let oldest = accesses[accessCursor]
+                    accessCursor += 1
+                    if entries[oldest.key]?.access == oldest.generation {
+                        entries[oldest.key] = nil
+                    }
                 }
             }
             return result
         } onCancel: {
             Task { await self.release(waiter, key: key, id: id) }
+        }
+    }
+    private func recordAccess(_ key: Key) {
+        accesses.append(.init(key: key, generation: access))
+        // Bound bookkeeping on hits as well as insertions. Each live entry has
+        // one current record; obsolete records can be discarded in one pass.
+        if accesses.count >= capacity * 4 {
+            accesses = accesses[accessCursor...].filter {
+                entries[$0.key]?.access == $0.generation
+            }
+            accessCursor = 0
         }
     }
     private func release(_ waiter: UUID, key: Key, id: UUID) {
