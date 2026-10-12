@@ -27,37 +27,55 @@ struct SettingsView: View {
                         Text(unit.title).tag(unit)
                     }
                 }
-                NavigationLink("Transport in routes") {
-                    RouteTransportSettingsView()
-                }
                 Toggle("Avoid tight transfers", isOn: $prefs.avoidTightTransfers)
             }
-
-            Section("Schedules") {
-                LabeledContent("Status", value: viewModel.gtfsStatus.statusText)
-                LabeledContent("Released") {
-                    timetableDate(viewModel.gtfsStatus.releasedAt)
-                }
-                LabeledContent("Last checked") {
-                    timetableDate(viewModel.gtfsStatus.lastCheckedAt, includesTime: true)
-                }
-				
-				if viewModel.isRefreshingTimetable {
-					ProgressView()
-						.progressViewStyle(.linear)
-						.accessibilityLabel("Refreshing timetable")
+			
+			Section {
+				ForEach(RoutePlannerFilters.selectableModes) { mode in
+					Toggle(isOn: Binding(
+						get: { preferences.includedRouteModes.contains(mode) },
+						set: { included in
+							if included { preferences.includedRouteModes.insert(mode) }
+							else { preferences.includedRouteModes.remove(mode) }
+						}
+					)) {
+						Label {
+							Text(LocalizedStringKey(mode.displayName))
+								.foregroundStyle(.primary)
+						} icon: {
+							Image(systemName: mode.symbolName)
+								.foregroundStyle(mode.tint)
+						}
+					}
 				}
+			} header: {
+				Text("Transport in routes")
+			} footer: {
+				Text("Choose which transport modes route planning can use.")
+			}
 
-                Button(action: checkGTFSUpdate) {
-                    Label("Refresh", systemImage: "arrow.clockwise")
-                }
-                .disabled(viewModel.isRefreshingTimetable)
-            }
+//            Section("Schedules") {
+//                LabeledContent("Status", value: viewModel.gtfsStatus.statusText)
+//                LabeledContent("Released") {
+//                    timetableDate(viewModel.gtfsStatus.releasedAt)
+//                }
+//                LabeledContent("Last checked") {
+//                    timetableDate(viewModel.gtfsStatus.lastCheckedAt, includesTime: true)
+//                }
+//				
+//				if viewModel.isRefreshingTimetable {
+//					ProgressView()
+//						.progressViewStyle(.linear)
+//						.accessibilityLabel("Refreshing timetable")
+//				}
+//
+//                Button(action: checkGTFSUpdate) {
+//                    Label("Refresh", systemImage: "arrow.clockwise")
+//                }
+//                .disabled(viewModel.isRefreshingTimetable)
+//            }
 
-            Section("Map") {
-                Toggle(isOn: $prefs.showBikeShareStations) {
-                    mapPinLabel("Bike share", mode: .bicycle)
-                }
+            Section {
                 Toggle(isOn: $prefs.showBusStops) {
                     mapPinLabel("Bus stops", mode: .bus)
                 }
@@ -67,6 +85,13 @@ struct SettingsView: View {
                 Toggle(isOn: $prefs.showTrainStations) {
                     mapPinLabel("Train stations", mode: .train)
                 }
+				Toggle(isOn: $prefs.showBikeShareStations) {
+					mapPinLabel("Bike share stations", mode: .bicycle)
+				}
+            } header: {
+                Text("Map pins")
+            } footer: {
+                Text("Choose which stops and stations appear on the map.")
             }
 
             Section("Reminders") {

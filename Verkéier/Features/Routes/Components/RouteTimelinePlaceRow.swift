@@ -257,7 +257,7 @@ struct TimelinePlaceRow: View {
     }
 
     private var nameFont: Font {
-        .headline
+		.body.weight(.medium)
     }
 
     /// Time shown for non-transfer roles: departure when leaving, arrival when landing.
