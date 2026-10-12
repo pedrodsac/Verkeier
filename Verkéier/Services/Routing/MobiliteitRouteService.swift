@@ -45,11 +45,13 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         let databaseURL = try await readyDatabaseURL()
         let readinessEnd = ContinuousClock.now
         let graphStarted = ContinuousClock.now
+        async let snapshotPreparation = prepareSnapshot(databaseURL: databaseURL)
         await graphPreparation?.value
         try Task.checkCancellation()
         do {
             try await walkingRouter.checkAvailability()
             let graphEnd = ContinuousClock.now
+            let snapshotDiagnostics = try await snapshotPreparation
             let result = try await sessions.calculate(databaseURL: databaseURL,
                 request: .init(origin: Self.journeyEndpoint(for: from),
                     destination: Self.journeyEndpoint(for: to), time: time.packageTime,
@@ -62,6 +64,7 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
             var calculation = await calculation(from: result.result, origin: from, destination: to, supplemental: result.supplemental)
             // The app operation includes router preparation and the concurrent bike branch.
             var diagnostics = result.diagnostics
+            diagnostics.include(snapshotDiagnostics)
             diagnostics.record(.adapterMapping, since: mappingStarted)
             diagnostics.rebase(to: started)
             diagnostics.record(.timetableReadiness, since: started, through: readinessEnd)
@@ -81,6 +84,14 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
     }
 
     nonisolated func waitForWalkingPreparation() async { await graphPreparation?.value }
+
+    private nonisolated func prepareSnapshot(databaseURL: URL) async throws -> RoutingDiagnostics {
+        var diagnostics = RoutingDiagnostics()
+        let started = ContinuousClock.now
+        _ = try await engine.router(for: databaseURL)
+        diagnostics.record(.snapshotPreparation, since: started)
+        return diagnostics
+    }
 
     nonisolated func prepareForRouting() {
         Task(priority: .utility) { _ = try? await engine.router(for: readyDatabaseURL()) }
