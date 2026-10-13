@@ -77,7 +77,7 @@ struct RouteEndpointsCard: View {
         let original = rowIDs
         rowIDs.move(fromOffsets: source, toOffset: destination)
         Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(250))
+            try? await Task.sleep(for: .milliseconds(750))
             withAnimation(.snappy) { rowIDs = original }
         }
     }

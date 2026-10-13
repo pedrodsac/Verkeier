@@ -13,6 +13,30 @@ struct RouteOptionCard: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
+        // Re-evaluates at each minute boundary so cards grey out on their own.
+        TimelineView(.everyMinute) { context in
+            cardLink(hasDeparted: Self.hasDeparted(option.departureTime, at: context.date))
+        }
+    }
+
+    /// Whether a route's departure has passed. Compared at minute granularity:
+    /// a route stays active through the minute after its departure minute
+    /// (17:59 is still active at 18:00) and greys out once that grace minute ends
+    /// (17:58 is greyed at 18:00).
+    static func hasDeparted(
+        _ departure: Date?,
+        at now: Date,
+        calendar: Calendar = .current
+    ) -> Bool {
+        guard let departure,
+              let departureMinute = calendar.dateInterval(of: .minute, for: departure)?.start,
+              let nowMinute = calendar.dateInterval(of: .minute, for: now)?.start,
+              let cutoff = calendar.date(byAdding: .minute, value: -1, to: nowMinute)
+        else { return false }
+        return departureMinute < cutoff
+    }
+
+    private func cardLink(hasDeparted: Bool) -> some View {
         NavigationLink(value: TransitSheetRoute.routeTimeline(option.id)) {
             VStack(alignment: .leading, spacing: 8) {
                 // ── Header: time range / duration / distance ──────────
@@ -51,12 +75,13 @@ struct RouteOptionCard: View {
                     .stroke(.separator.opacity(0.3), lineWidth: 0.5)
             }
             .contentShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
+            .opacity(hasDeparted ? 0.45 : 1)
         }
         .buttonStyle(.pressable)
         .animation(Animation.respectingReduceMotion(.snappy(duration: 0.22), reduceMotion), value: isSelected)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
         .accessibilityHint("Opens route step-by-step timeline")
-        .accessibilityLabel(accessibilityLabel)
+        .accessibilityLabel(accessibilityLabel(hasDeparted: hasDeparted))
     }
 
     // MARK: - Computed properties
@@ -107,7 +132,7 @@ struct RouteOptionCard: View {
 		}
     }
 
-    private var accessibilityLabel: String {
+    private func accessibilityLabel(hasDeparted: Bool) -> String {
         let heading = option.isVelohOnly || option.isWalkingOnly
             ? durationText
             : "\(timeRangeText), \(durationText)"
@@ -115,7 +140,8 @@ struct RouteOptionCard: View {
             RouteLineStatus.accessibilityDescription(for: $0)
         }.joined(separator: ", ")
         let warning = option.hasTightTransfer ? "Tight transfer" : ""
-        return [heading, warning, accessibilitySummary, lines].filter { !$0.isEmpty }.joined(separator: ". ")
+        let departed = hasDeparted ? "Already departed" : ""
+        return [heading, departed, warning, accessibilitySummary, lines].filter { !$0.isEmpty }.joined(separator: ". ")
     }
 }
 
