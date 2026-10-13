@@ -61,11 +61,25 @@ struct RouteEndpointsCard: View {
     }
 
     private func moveEndpoints(from source: IndexSet, to destination: Int) {
-        guard canSwap,
-              (source == IndexSet(integer: 0) && destination == 2)
+        guard (source == IndexSet(integer: 0) && destination == 2)
                 || (source == IndexSet(integer: 1) && destination == 0) else { return }
+        guard canSwap else {
+            revertRejectedMove(from: source, to: destination)
+            return
+        }
         rowIDs.move(fromOffsets: source, toOffset: destination)
         swapRouteEndpoints()
+    }
+
+    /// Without a destination the origin can't take its place, so let the rows
+    /// swap visibly and then animate them back to their original positions.
+    private func revertRejectedMove(from source: IndexSet, to destination: Int) {
+        let original = rowIDs
+        rowIDs.move(fromOffsets: source, toOffset: destination)
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(250))
+            withAnimation(.snappy) { rowIDs = original }
+        }
     }
 
     private func endpointRow(_ endpoint: RouteEndpoint) -> some View {

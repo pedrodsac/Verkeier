@@ -18,14 +18,14 @@ struct RouteOptionDeduplicationTests {
         #expect(!model.canLoadLaterRoutes)
     }
 
-    @Test("A package snapshot replaces the displayed result set")
-    func acceptsReplacementSnapshot() async {
+    @Test("A paged package snapshot only appends to the displayed result set")
+    func pagingAppendsToDisplayedRoutes() async {
         let model = configuredModel()
         await model.calculateRoute(using: PackageResultFixture(options: [option(id: "old", duration: 1_200)], recommended: "old"), from: nil)
         model.canLoadLaterRoutes = true
-        await model.loadLaterRoutes(using: PackageResultFixture(options: [option(id: "replacement", duration: 1_500)], recommended: "replacement"), from: nil)
-        #expect(model.routeOptions.map(\.id) == ["replacement"])
-        #expect(model.selectedRouteOptionID == "replacement")
+        await model.loadLaterRoutes(using: PackageResultFixture(options: [option(id: "added", departure: 900, duration: 1_500)], recommended: "added"), from: nil)
+        #expect(model.routeOptions.map(\.id) == ["old", "added"])
+        #expect(model.selectedRouteOptionID == "old")
     }
 
     @Test("A selectable manual choice survives a new package recommendation")
@@ -49,16 +49,16 @@ struct RouteOptionDeduplicationTests {
         #expect(model.unfilteredRouteOptions.map(\.id) == [slow.id, fast.id])
     }
 
-    @Test("Paging hides a dominated manual choice and selects its faster replacement")
-    func pagingReplacesDominatedManualSelection() async {
+    @Test("Paging keeps a listed manual choice that a new route dominates")
+    func pagingKeepsDominatedListedSelection() async {
         let slow = option(id: "slow", departure: 300, duration: 1_800)
         let fast = option(id: "fast", departure: 600, duration: 900)
         let model = configuredModel()
         await model.calculateRoute(using: PackageResultFixture(options: [slow], recommended: slow.id, canLoadLater: true), from: nil)
         model.selectRouteOption(id: slow.id)
         await model.loadLaterRoutes(using: PackageResultFixture(options: [slow, fast], recommended: fast.id), from: nil)
-        #expect(model.routeOptions.map(\.id) == [fast.id])
-        #expect(model.selectedRouteOptionID == fast.id)
+        #expect(model.routeOptions.map(\.id) == [slow.id, fast.id])
+        #expect(model.selectedRouteOptionID == slow.id)
     }
 
     private func configuredModel() -> TransitMapViewModel {

@@ -141,14 +141,24 @@ struct RouteWalkingVisibilityTests {
         #expect(model.routeOptions.map(\.id) == [bus.id])
     }
 
-    @Test("Paging applies the same walking visibility rule")
-    func pagedResultsUseVisibility() async {
+    @Test("Paging appends a faster walk without hiding listed transit")
+    func pagedFasterWalkIsAppended() async {
         let bus = option("bus", duration: 1_200)
         let model = await calculate([bus], recommended: bus.id)
         let walk = option("walk", mode: .walking, duration: 600)
+        await model.loadLaterRoutes(using: WalkingVisibilityFixture(options: [bus, walk], recommended: walk.id), from: nil)
+        #expect(model.routeOptions.map(\.id) == [bus.id, walk.id])
+        #expect(model.selectedRouteOptionID == bus.id)
+    }
+
+    @Test("Paged walks still follow the walking visibility rule")
+    func pagedSlowerWalkIsHidden() async {
+        let bus = option("bus", duration: 1_200)
+        let model = await calculate([bus], recommended: bus.id)
+        let walk = option("walk", mode: .walking, duration: 1_500)
         await model.loadLaterRoutes(using: WalkingVisibilityFixture(options: [bus, walk], recommended: bus.id), from: nil)
-        #expect(model.routeOptions.map(\.id) == [walk.id])
-        #expect(model.selectedRouteOptionID == walk.id)
+        #expect(model.routeOptions.map(\.id) == [bus.id])
+        #expect(model.routeStatusMessage == "No later routes were found.")
     }
 
     private func calculate(_ options: [RouteOption], recommended: String) async -> TransitMapViewModel {

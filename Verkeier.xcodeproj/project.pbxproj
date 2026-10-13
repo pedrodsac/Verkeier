@@ -743,8 +743,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pedrodsac/MobiliteitKit";
 			requirement = {
-				kind = revision;
-				revision = 00536fdf34edbc17f0a1da5dbd06aaca87090354;
+				branch = main;
+				kind = branch;
 			};
 		};
 		E8D57E30304F173F00F569AC /* XCRemoteSwiftPackageReference "valhalla-mobile" */ = {

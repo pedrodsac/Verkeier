@@ -77,6 +77,10 @@ final class TransitMapViewModel {
     var isLoadingLaterRoutes = false
     var canLoadEarlierRoutes = true
     var canLoadLaterRoutes = true
+    /// Set once the user pages with Earlier/Later; automatic reloads pause
+    /// until a full calculation (pull to refresh, new trip) clears it.
+    var routePagingBaseline: RoutePagingBaseline?
+    var isBrowsingRoutePages: Bool { routePagingBaseline != nil }
     var selectedRouteOptionID: String?
     var routeRecommendedOptionID: String? = nil
     var routeSelectionWasManual = false
@@ -185,6 +189,7 @@ final class TransitMapViewModel {
         isLoadingLaterRoutes = false
         canLoadEarlierRoutes = true
         canLoadLaterRoutes = true
+        routePagingBaseline = nil
     }
 
     func squaredDistance(from lhs: LocationPoint, to rhs: LocationPoint) -> Double {
