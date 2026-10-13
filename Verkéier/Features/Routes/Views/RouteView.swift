@@ -10,6 +10,7 @@ import SwiftUI
 struct RouteView: View {
     let viewModel: RoutePresentationModel
     let actions: RouteActions
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -148,10 +149,6 @@ struct RouteView: View {
             RouteStatusMessage(text: statusMessage)
         }
 
-        if viewModel.isStale {
-            RouteStatusMessage(text: "Routes may have changed. Pull to refresh for the latest information.")
-        }
-
         // Journey alerts
         if !viewModel.alerts.isEmpty {
             RouteAlertsSection(alerts: viewModel.alerts)
@@ -218,6 +215,7 @@ struct RouteView: View {
 						option: option,
 						isSelected: option.id == viewModel.selectedRouteOptionID,
 					)
+					.transition(routeCardTransition)
 				}
 			}
 
@@ -248,9 +246,20 @@ struct RouteView: View {
                         option: option,
                         isSelected: option.id == viewModel.selectedRouteOptionID
                     )
+                    .transition(routeCardTransition)
                 }
             }
         }
+        // Earlier/Later insert cards around the listed ones; a refresh
+        // crossfades to the replacement set.
+        .animation(
+            reduceMotion ? .easeInOut(duration: 0.2) : .snappy,
+            value: viewModel.routeOptions.map(\.id) + viewModel.supplementalRouteOptions.map(\.id)
+        )
+    }
+
+    private var routeCardTransition: AnyTransition {
+        reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.95))
     }
 
     private func routePageButton(

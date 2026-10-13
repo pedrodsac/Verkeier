@@ -519,7 +519,9 @@ extension TransitMapScreen {
         guard viewModel.effectiveRouteDestination != nil,
               viewModel.routeRefreshTask == nil,
               !viewModel.isCalculatingRoute,
-              !viewModel.isLoadingEarlierRoutes, !viewModel.isLoadingLaterRoutes else { return }
+              !viewModel.isLoadingEarlierRoutes, !viewModel.isLoadingLaterRoutes,
+              // Browsed pages stay until the user pulls to refresh.
+              !viewModel.isBrowsingRoutePages else { return }
         guard viewModel.routeOrigin != nil || locationService.currentLocation != nil else {
             calculateRoute()
             return

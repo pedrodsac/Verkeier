@@ -31,13 +31,17 @@ extension TransitMapViewModel {
             return
         }
 
-        let previousIDs = Set(unfilteredRouteOptions.map(\.id))
+        // Paging only appends: everything listed now stays exactly as shown,
+        // and automatic reloads pause until the user refreshes.
+        let baseline = RoutePagingBaseline(
+            primary: unfilteredRouteOptions, supplemental: unfilteredSupplementalRouteOptions,
+            visiblePrimary: routeOptions, visibleSupplemental: supplementalRouteOptions)
+        routePagingBaseline = baseline
         let selectedID = selectedRouteOptionID
         let page: RouteSearchPage = direction == .earlier ? .earlierAdjacent : .laterAdjacent
         let requestGeneration = startRouteRequest()
-        // Previous presentation tasks stop at the generation boundary. Resubmit
-        // any unfinished walking spans from the next authoritative snapshot.
-        walkingRefinementScheduledIDs = []
+        // Listed routes keep their scheduled walking refinements; only routes
+        // this page adds are refined.
         routeOperationStarted = ContinuousClock.now
         routeDiagnostics = nil
         routePublishedAt = nil
@@ -52,7 +56,7 @@ extension TransitMapViewModel {
                 try Task.checkCancellation()
                 guard requestGeneration == routeCalculationGeneration else { return }
                 receivedUpdate = true
-                invalidatedRouteOptionIDs.formUnion(calculation.invalidatedOptionIDs)
+                invalidatedRouteOptionIDs.formUnion(calculation.invalidatedOptionIDs.subtracting(baseline.ids))
                 routeRecommendedOptionID = calculation.selectedOptionID
                 routeBrowsingWindow = calculation.browsingWindow ?? routeBrowsingWindow
                 if calculation.isAuthoritativeSnapshot {
@@ -82,7 +86,7 @@ extension TransitMapViewModel {
             try Task.checkCancellation()
             guard requestGeneration == routeCalculationGeneration else { return }
             guard receivedUpdate else { throw RoutingError.noRouteFound }
-            if Set(unfilteredRouteOptions.map(\.id)).subtracting(previousIDs).isEmpty {
+            if Set((routeOptions + supplementalRouteOptions).map(\.id)).subtracting(baseline.ids).isEmpty {
                 routeStatusMessage = direction == .earlier
                     ? "No earlier routes were found." : "No later routes were found."
             }

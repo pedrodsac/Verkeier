@@ -24,7 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pedrodsac/MobiliteitKit",
       "state" : {
-        "revision" : "00536fdf34edbc17f0a1da5dbd06aaca87090354"
+        "branch" : "main",
+        "revision" : "49fad0bc8a17212b2a47485a4bdf80168c876f02"
       }
     },
     {

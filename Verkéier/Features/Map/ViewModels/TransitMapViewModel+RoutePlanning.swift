@@ -551,11 +551,25 @@ extension TransitMapViewModel {
     }
 
     func applyRouteOptions(preferredID: String?, announceFallback: Bool) {
+        if let baseline = routePagingBaseline {
+            // Restore listed routes as shown; only journeys a page added may
+            // change, and a new journey can never hide a listed one.
+            unfilteredRouteOptions = baseline.primary
+                + unfilteredRouteOptions.filter { !baseline.ids.contains($0.id) }
+            unfilteredSupplementalRouteOptions = baseline.supplemental
+                + unfilteredSupplementalRouteOptions.filter { !baseline.ids.contains($0.id) }
+        }
         let visible = RouteOptionVisibility.presentedOptions(
             primary: unfilteredRouteOptions, supplemental: unfilteredSupplementalRouteOptions, at: now()
         )
-        routeOptions = visible.primary
-        supplementalRouteOptions = visible.supplemental
+        if let baseline = routePagingBaseline {
+            routeOptions = baseline.visiblePrimary + visible.primary.filter { !baseline.ids.contains($0.id) }
+            supplementalRouteOptions = baseline.visibleSupplemental
+                + visible.supplemental.filter { !baseline.ids.contains($0.id) }
+        } else {
+            routeOptions = visible.primary
+            supplementalRouteOptions = visible.supplemental
+        }
         selectBestRouteOption(preferredID: preferredID, announceFallback: announceFallback)
     }
 

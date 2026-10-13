@@ -43,11 +43,6 @@ struct RouteOptionCard: View {
 
                 // ── Mode / line ribbon ────────────────────────────────────
                 RouteRibbon(legs: option.plan.legs)
-				
-				if option.hasTightTransfer {
-					RouteOptionStrip(status: .atRisk)
-						.padding([.horizontal, .bottom], -4)
-				}
             }
             .padding(14)
             .background(cardBackground, in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))

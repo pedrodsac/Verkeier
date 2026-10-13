@@ -39,6 +39,7 @@ extension TransitMapViewModel {
             unfilteredSupplementalRouteOptions = replacingSelected(in: unfilteredSupplementalRouteOptions)
             routeOptions = replacingSelected(in: routeOptions)
             supplementalRouteOptions = replacingSelected(in: supplementalRouteOptions)
+            routePagingBaseline = routePagingBaseline?.replacing(request.optionID, with: invalidated ? nil : updated)
             if invalidated {
                 invalidatedRouteOptionIDs.insert(request.optionID)
                 applyRouteOptions(preferredID: nil, announceFallback: true)
