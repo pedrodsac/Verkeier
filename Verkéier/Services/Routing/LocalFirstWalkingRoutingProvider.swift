@@ -63,8 +63,8 @@ nonisolated struct LocalFirstWalkingRoutingProvider: WalkingRoutingProvider {
     }
 
     func estimate(_ request: WalkingRequest) async throws -> WalkingEstimate {
-        let source = locationPoint(from: request.source)
-        let destination = locationPoint(from: request.destination)
+        let source = Self.walkingEndpoint(request.source)
+        let destination = Self.walkingEndpoint(request.destination)
         let estimate = try await walkingRouter.estimates(
             from: source,
             to: [.init(id: destination.id, location: destination)]
@@ -78,8 +78,8 @@ nonisolated struct LocalFirstWalkingRoutingProvider: WalkingRoutingProvider {
 
     func route(_ request: WalkingRequest) async throws -> MobiliteitKit.WalkingRoute {
         let route = try await walkingRouter.route(
-            from: locationPoint(from: request.source),
-            to: locationPoint(from: request.destination)
+            from: Self.walkingEndpoint(request.source),
+            to: Self.walkingEndpoint(request.destination)
         )
         return MobiliteitKit.WalkingRoute(
             durationSeconds: max(1, Int(route.duration.rounded())),
@@ -97,7 +97,7 @@ nonisolated struct LocalFirstWalkingRoutingProvider: WalkingRoutingProvider {
         maximumConcurrency: Int
     ) async -> [MobiliteitKit.WalkingRoute?] {
         let routes = await walkingRouter.routes(requests.map {
-            OfflineWalkingRequest(from: locationPoint(from: $0.source), to: locationPoint(from: $0.destination))
+            OfflineWalkingRequest(from: Self.walkingEndpoint($0.source), to: Self.walkingEndpoint($0.destination))
         }, maximumConcurrency: maximumConcurrency)
         return routes.map { route in
             route.map {
@@ -110,7 +110,10 @@ nonisolated struct LocalFirstWalkingRoutingProvider: WalkingRoutingProvider {
         }
     }
 
-    private func locationPoint(from coordinate: Coordinate) -> LocationPoint {
+    /// The single mapping from a package coordinate to a walking endpoint. It is
+    /// nameless on purpose: the stored transfer walk table is keyed and built
+    /// with exactly this mapping.
+    nonisolated static func walkingEndpoint(_ coordinate: Coordinate) -> LocationPoint {
         LocationPoint(latitude: coordinate.latitude, longitude: coordinate.longitude)
     }
 }
