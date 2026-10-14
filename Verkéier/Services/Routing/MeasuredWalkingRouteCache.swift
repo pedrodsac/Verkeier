@@ -26,11 +26,20 @@ actor MeasuredWalkingRouteCache {
         self.capacity = max(1, capacity)
     }
 
-    func route(from: LocationPoint, to: LocationPoint, revision: String,
-               calculate: @escaping @Sendable () async throws -> OfflineWalkingRoute) async throws -> OfflineWalkingRoute {
+    func route(
+        from: LocationPoint,
+        to: LocationPoint,
+        revision: String,
+        calculate: @escaping @Sendable () async throws -> OfflineWalkingRoute
+    ) async throws -> OfflineWalkingRoute {
         try Task.checkCancellation()
-        let key = Key(fromLatitude: from.latitude, fromLongitude: from.longitude,
-            toLatitude: to.latitude, toLongitude: to.longitude, revision: revision)
+        let key = Key(
+            fromLatitude: from.latitude,
+            fromLongitude: from.longitude,
+            toLatitude: to.latitude,
+            toLongitude: to.longitude,
+            revision: revision
+        )
         access &+= 1
         if let cached = entries[key] {
             entries[key] = Entry(route: cached.route, access: access)
@@ -75,7 +84,6 @@ actor MeasuredWalkingRouteCache {
     private func release(_ waiter: UUID, key: Key, id: UUID) {
         guard var flight = flights[key], flight.id == id else { return }
         flight.waiters.remove(waiter)
-        if flight.waiters.isEmpty { flight.task.cancel(); flights[key] = nil }
-        else { flights[key] = flight }
+        if flight.waiters.isEmpty { flight.task.cancel(); flights[key] = nil } else { flights[key] = flight }
     }
 }

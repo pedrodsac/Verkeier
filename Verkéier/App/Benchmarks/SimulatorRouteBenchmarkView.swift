@@ -11,9 +11,15 @@ struct SimulatorRouteBenchmarkView: View {
     var body: some View {
         Group {
             if benchmark.fullMap {
-                TransitMapLayer(viewModel: benchmark.viewModel, navigation: navigation,
-                    favouriteStopIds: [], bikeShareStations: [], selectStop: { _ in },
-                    selectStopGroup: { _, _ in }, regionDidChange: { _ in })
+                TransitMapLayer(
+                    viewModel: benchmark.viewModel,
+                    navigation: navigation,
+                    favouriteStopIds: [],
+                    bikeShareStations: [],
+                    selectStop: { _ in },
+                    selectStopGroup: { _, _ in },
+                    regionDidChange: { _ in }
+                )
                 .overlay {
                     if let request = benchmark.viewModel.routeDiagnostics?.requestID {
                         RouteRenderObserver(requestID: request) { id in benchmark.recordMapRendered(id) }

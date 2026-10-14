@@ -46,7 +46,9 @@ nonisolated enum TransferWalkTableCodec {
             let duration = try reader.readDouble()
             let source = try Self.source(for: try reader.readUInt8())
             let count = Int(try reader.readUInt32())
-            guard count >= 0, count <= reader.remaining / 16 else { throw TransferWalkTableError.malformed("coordinate count") }
+            guard count >= 0, count <= reader.remaining / 16 else {
+                throw TransferWalkTableError.malformed("coordinate count")
+            }
             var coordinates: [RouteMapCoordinate] = []
             coordinates.reserveCapacity(count)
             for _ in 0..<count {
@@ -55,8 +57,14 @@ nonisolated enum TransferWalkTableCodec {
             }
             guard try reader.readUInt32() == 0 else { throw TransferWalkTableError.unsupported("segments") }
             guard reader.remaining == 0 else { throw TransferWalkTableError.malformed("trailing bytes") }
-            return .route(OfflineWalkingRoute(distanceMeters: distance, duration: duration,
-                                              coordinates: coordinates, source: source))
+            return .route(
+                OfflineWalkingRoute(
+                    distanceMeters: distance,
+                    duration: duration,
+                    coordinates: coordinates,
+                    source: source
+                )
+            )
         default:
             throw TransferWalkTableError.malformed("payload kind")
         }
@@ -85,8 +93,11 @@ nonisolated enum TransferWalkTableCodec {
 
     /// `entries` must be strictly increasing by key. The same entries always
     /// produce the same bytes, so an incremental build equals a full build.
-    static func encodeTable(graphIdentity: String, timetableIdentity: String?,
-                            entries: [(key: TransferWalkKey, payload: Data)]) throws -> Data {
+    static func encodeTable(
+        graphIdentity: String,
+        timetableIdentity: String?,
+        entries: [(key: TransferWalkKey, payload: Data)]
+    ) throws -> Data {
         for index in entries.indices.dropFirst() where !(entries[index - 1].key < entries[index].key) {
             throw TransferWalkTableError.malformed("entries not strictly increasing")
         }

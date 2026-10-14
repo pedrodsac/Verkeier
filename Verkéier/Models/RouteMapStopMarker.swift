@@ -16,8 +16,16 @@ nonisolated struct RouteMapStopMarker: Codable, Hashable, Identifiable, Sendable
     let role: Role
     let emphasis: RouteMapEmphasis?
 
-    init(id: String, stopID: String? = nil, name: String, coordinate: RouteMapCoordinate,
-         segmentIDs: [String], mode: TransportMode, role: Role, emphasis: RouteMapEmphasis? = nil) {
+    init(
+        id: String,
+        stopID: String? = nil,
+        name: String,
+        coordinate: RouteMapCoordinate,
+        segmentIDs: [String],
+        mode: TransportMode,
+        role: Role,
+        emphasis: RouteMapEmphasis? = nil
+    ) {
         self.id = id
         self.stopID = stopID
         self.name = name

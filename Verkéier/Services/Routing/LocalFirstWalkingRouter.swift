@@ -22,8 +22,11 @@ actor LocalFirstWalkingRouter: WalkingRouting {
     private var transferWalkHits = 0
     private var transferWalkMisses = 0
 
-    init(datasetManager: RoutingDatasetManager, transferWalkStore: TransferWalkStore? = nil,
-         transferWalkMode: TransferWalkMode = TransferWalkSettings.mode) {
+    init(
+        datasetManager: RoutingDatasetManager,
+        transferWalkStore: TransferWalkStore? = nil,
+        transferWalkMode: TransferWalkMode = TransferWalkSettings.mode
+    ) {
         self.datasetManager = datasetManager
         self.transferWalkStore = transferWalkStore
         self.transferWalkMode = transferWalkMode
@@ -50,8 +53,14 @@ actor LocalFirstWalkingRouter: WalkingRouting {
             try Task.checkCancellation()
             do {
                 let path = try await route(from: origin, to: destination.location)
-                results.append(.init(destinationID: destination.id, distanceMeters: path.distanceMeters,
-                                     duration: path.duration, source: path.source))
+                results.append(
+                    .init(
+                        destinationID: destination.id,
+                        distanceMeters: path.distanceMeters,
+                        duration: path.duration,
+                        source: path.source
+                    )
+                )
             } catch WalkingRoutingError.noRoute { continue }
         }
         return results
@@ -67,15 +76,23 @@ actor LocalFirstWalkingRouter: WalkingRouting {
             try Task.checkCancellation()
             do {
                 let path = try await route(from: origin.location, to: destination)
-                results.append(.init(destinationID: origin.id, distanceMeters: path.distanceMeters,
-                                     duration: path.duration, source: path.source))
+                results.append(
+                    .init(
+                        destinationID: origin.id,
+                        distanceMeters: path.distanceMeters,
+                        duration: path.duration,
+                        source: path.source
+                    )
+                )
             } catch WalkingRoutingError.noRoute { continue }
         }
         return results
     }
 
     func route(from origin: LocationPoint, to destination: LocationPoint) async throws -> OfflineWalkingRoute {
-        guard let dataset = try await datasetManager.activeDataset() else { throw WalkingRoutingError.datasetUnavailable }
+        guard let dataset = try await datasetManager.activeDataset() else {
+            throw WalkingRoutingError.datasetUnavailable
+        }
         return try await route(from: origin, to: destination, dataset: dataset)
     }
 
@@ -93,22 +110,37 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         }
     }
 
-    private func route(from origin: LocationPoint, to destination: LocationPoint,
-                       dataset: RoutingDataset, preferShortSearch: Bool = false,
-                       table: TransferWalkTable? = nil) async throws -> OfflineWalkingRoute {
+    private func route(
+        from origin: LocationPoint,
+        to destination: LocationPoint,
+        dataset: RoutingDataset,
+        preferShortSearch: Bool = false,
+        table: TransferWalkTable? = nil
+    ) async throws -> OfflineWalkingRoute {
         return try await measuredRoutes.route(from: origin, to: destination, revision: Self.revision(dataset)) {
-            try await self.calculatedRoute(from: origin, to: destination, dataset: dataset,
-                                           preferShortSearch: preferShortSearch, table: table)
+            try await self.calculatedRoute(
+                from: origin,
+                to: destination,
+                dataset: dataset,
+                preferShortSearch: preferShortSearch,
+                table: table
+            )
         }
     }
 
     /// The deterministic computation behind the measured cache. A stored transfer
     /// walk replaces only this computation, so cache keys, ordering and the
     /// short/full-search race stay exactly as they are without the table.
-    private func calculatedRoute(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset,
-                                 preferShortSearch: Bool, table: TransferWalkTable?) async throws -> OfflineWalkingRoute {
+    private func calculatedRoute(
+        from: LocationPoint,
+        to: LocationPoint,
+        dataset: RoutingDataset,
+        preferShortSearch: Bool,
+        table: TransferWalkTable?
+    ) async throws -> OfflineWalkingRoute {
         guard preferShortSearch, let table, from.name == nil, to.name == nil,
-              let stored = table.outcome(for: TransferWalkKey(from: from, to: to)) else {
+            let stored = table.outcome(for: TransferWalkKey(from: from, to: to))
+        else {
             if preferShortSearch, table != nil { transferWalkMisses += 1 }
             return try await uncachedRoute(from: from, to: to, dataset: dataset, preferShortSearch: preferShortSearch)
         }
@@ -122,14 +154,21 @@ actor LocalFirstWalkingRouter: WalkingRouting {
     }
 
     /// Debug and benchmark builds only: recompute live and compare with the table.
-    private func verified(_ stored: TransferWalkOutcome, from: LocationPoint, to: LocationPoint,
-                          dataset: RoutingDataset) async throws -> OfflineWalkingRoute {
+    private func verified(
+        _ stored: TransferWalkOutcome,
+        from: LocationPoint,
+        to: LocationPoint,
+        dataset: RoutingDataset
+    ) async throws -> OfflineWalkingRoute {
         let live: TransferWalkOutcome
-        do { live = .route(try await uncachedRoute(from: from, to: to, dataset: dataset, preferShortSearch: true)) }
-        catch WalkingRoutingError.noRoute { live = .noRoute }
+        do {
+            live = .route(try await uncachedRoute(from: from, to: to, dataset: dataset, preferShortSearch: true))
+        } catch WalkingRoutingError.noRoute { live = .noRoute }
         if live != stored {
             Logger(subsystem: "dev.pedrocordeiro.Verkeier", category: "TransferWalks")
-                .fault("Stored transfer walk differs from the live computation for \(from.latitude),\(from.longitude) to \(to.latitude),\(to.longitude)")
+                .fault(
+                    "Stored transfer walk differs from the live computation for \(from.latitude),\(from.longitude) to \(to.latitude),\(to.longitude)"
+                )
             assertionFailure("Stored transfer walk differs from the live computation")
         }
         transferWalkHits += 1
@@ -171,21 +210,41 @@ actor LocalFirstWalkingRouter: WalkingRouting {
     /// `strict` is used only when building the stored table: it rethrows any
     /// failure that is not a deterministic routing failure instead of treating
     /// it as "no route". Without it the behaviour is the original `try?` flow.
-    private func uncachedRoute(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset,
-                               preferShortSearch: Bool = false, strict: Bool = false) async throws -> OfflineWalkingRoute {
+    private func uncachedRoute(
+        from: LocationPoint,
+        to: LocationPoint,
+        dataset: RoutingDataset,
+        preferShortSearch: Bool = false,
+        strict: Bool = false
+    ) async throws -> OfflineWalkingRoute {
         let direct: OfflineWalkingRoute?
-        do { direct = try await pedestrianRoute(from: from, to: to, dataset: dataset, preferShortSearch: preferShortSearch) }
-        catch let error where strict && !TransferWalkErrorClassifier.isDeterministic(error) { throw error }
-        catch { direct = nil }
+        do {
+            direct = try await pedestrianRoute(
+                from: from,
+                to: to,
+                dataset: dataset,
+                preferShortSearch: preferShortSearch
+            )
+        } catch let error where strict && !TransferWalkErrorClassifier.isDeterministic(error) {
+            throw error
+        } catch {
+            direct = nil
+        }
         try Task.checkCancellation()
         let connection: OfflineWalkingRoute?
         do {
-            connection = try await PafendallFunicularConnection.route(from: from, to: to, pedestrian: {
-                try await self.pedestrianRoute(from: $0, to: $1, dataset: dataset)
-            })
+            connection = try await PafendallFunicularConnection.route(
+                from: from,
+                to: to,
+                pedestrian: {
+                    try await self.pedestrianRoute(from: $0, to: $1, dataset: dataset)
+                }
+            )
+        } catch let error where strict && !TransferWalkErrorClassifier.isDeterministic(error) {
+            throw error
+        } catch {
+            connection = nil
         }
-        catch let error where strict && !TransferWalkErrorClassifier.isDeterministic(error) { throw error }
-        catch { connection = nil }
         if let connection, direct == nil || connection.duration < direct!.duration {
             return connection
         }
@@ -194,12 +253,18 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         return direct
     }
 
-    private func pedestrianRoute(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset,
-                                 preferShortSearch: Bool = false) async throws -> OfflineWalkingRoute {
-        calibrated(try await withLocalRouter(dataset: dataset) {
-            if preferShortSearch { return try await $0.shortRoute(from: from, to: to) }
-            return try await $0.route(from: from, to: to)
-        })
+    private func pedestrianRoute(
+        from: LocationPoint,
+        to: LocationPoint,
+        dataset: RoutingDataset,
+        preferShortSearch: Bool = false
+    ) async throws -> OfflineWalkingRoute {
+        calibrated(
+            try await withLocalRouter(dataset: dataset) {
+                if preferShortSearch { return try await $0.shortRoute(from: from, to: to) }
+                return try await $0.route(from: from, to: to)
+            }
+        )
     }
 
     private func withLocalRouter<Value: Sendable>(
@@ -208,8 +273,9 @@ actor LocalFirstWalkingRouter: WalkingRouting {
     ) async throws -> Value {
         try Task.checkCancellation()
         let dataset: RoutingDataset
-        if let selectedDataset { dataset = selectedDataset }
-        else {
+        if let selectedDataset {
+            dataset = selectedDataset
+        } else {
             guard let active = try await datasetManager.activeDataset() else {
                 throw WalkingRoutingError.datasetUnavailable
             }
@@ -230,11 +296,12 @@ actor LocalFirstWalkingRouter: WalkingRouting {
             pool.activeCounts.append(0)
             index = 0
         } else if pool.routers.count < maximumLocalRouters,
-                  (leastBusy?.element ?? 0) > 0,
-                  let router = try? ValhallaWalkingRouter(
-                    tileArchiveURL: dataset.tileArchiveURL,
-                    datasetVersion: "\(dataset.version)-pool-\(pool.routers.count)"
-                  ) {
+            (leastBusy?.element ?? 0) > 0,
+            let router = try? ValhallaWalkingRouter(
+                tileArchiveURL: dataset.tileArchiveURL,
+                datasetVersion: "\(dataset.version)-pool-\(pool.routers.count)"
+            )
+        {
             index = pool.routers.count
             pool.routers.append(router)
             pool.activeCounts.append(0)
@@ -246,7 +313,8 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         routerPool = pool
         defer {
             if routerPool?.version == dataset.revision,
-               routerPool?.activeCounts.indices.contains(index) == true {
+                routerPool?.activeCounts.indices.contains(index) == true
+            {
                 routerPool?.activeCounts[index] -= 1
             }
         }
@@ -266,15 +334,27 @@ actor LocalFirstWalkingRouter: WalkingRouting {
     // MARK: Transfer walk computation
 
     func prepareTransferWalkComputation() async throws -> RoutingDataset {
-        guard let dataset = try await datasetManager.activeDataset() else { throw WalkingRoutingError.datasetUnavailable }
+        guard let dataset = try await datasetManager.activeDataset() else {
+            throw WalkingRoutingError.datasetUnavailable
+        }
         // Open the first native router now, so later pool calls cannot fail on creation.
         _ = try await withLocalRouter(dataset: dataset) { _ in true }
         return dataset
     }
 
-    func transferWalkOutcome(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset) async throws -> TransferWalkOutcome {
+    func transferWalkOutcome(
+        from: LocationPoint,
+        to: LocationPoint,
+        dataset: RoutingDataset
+    ) async throws -> TransferWalkOutcome {
         do {
-            let route = try await uncachedRoute(from: from, to: to, dataset: dataset, preferShortSearch: true, strict: true)
+            let route = try await uncachedRoute(
+                from: from,
+                to: to,
+                dataset: dataset,
+                preferShortSearch: true,
+                strict: true
+            )
             guard route.segments.isEmpty, route.source == .localOSM else {
                 throw TransferWalkTableError.unsupported("station connection")
             }
@@ -291,7 +371,8 @@ actor LocalFirstWalkingRouter: WalkingRouting {
     /// Makes a freshly written table live for the running router.
     func adoptTransferWalks(_ table: TransferWalkTable) async {
         guard transferWalkMode != .off, let dataset = try? await datasetManager.activeDataset(),
-              table.graphIdentity == dataset.transferWalkIdentity.value else { return }
+            table.graphIdentity == dataset.transferWalkIdentity.value
+        else { return }
         transferWalks = (dataset.revision, table)
     }
 }

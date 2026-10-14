@@ -24,9 +24,13 @@ nonisolated enum RoutingOptimisationDecision {
         guard inputs.mode != .off, let graph = expectedGraph(inputs) else { return .notNeeded }
         let raw: RoutingOptimisationRequirement
         if let timetable = inputs.timetable {
-            if inputs.header?.graphIdentity != graph { raw = .needsFull }
-            else if inputs.header?.timetableIdentity != timetable { raw = .needsIncremental }
-            else { raw = .notNeeded }
+            if inputs.header?.graphIdentity != graph {
+                raw = .needsFull
+            } else if inputs.header?.timetableIdentity != timetable {
+                raw = .needsIncremental
+            } else {
+                raw = .notNeeded
+            }
         } else {
             // Nothing to wait for if walks for this graph already exist; the next
             // launch with a timetable will extend them.
@@ -47,10 +51,14 @@ nonisolated struct RoutingOptimisationEnvironment: Sendable {
     var appBuild: Int = Int(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "0") ?? 0
 
     static func production(store: TransferWalkStore, mode: TransferWalkMode = TransferWalkSettings.mode) -> Self {
-        Self(mode: mode, routingRootURL: RoutingDatasetManager.defaultRootURL,
-             gtfsDirectoryURL: MobiliteitGTFSService.defaultDirectoryURL,
-             bundledManifestURL: Bundle.main.url(forResource: "luxembourg-walking-manifest", withExtension: "json"),
-             store: store, ledger: RoutingOptimisationAttemptLedger())
+        Self(
+            mode: mode,
+            routingRootURL: RoutingDatasetManager.defaultRootURL,
+            gtfsDirectoryURL: MobiliteitGTFSService.defaultDirectoryURL,
+            bundledManifestURL: Bundle.main.url(forResource: "luxembourg-walking-manifest", withExtension: "json"),
+            store: store,
+            ledger: RoutingOptimisationAttemptLedger()
+        )
     }
 }
 
@@ -66,14 +74,19 @@ nonisolated enum RoutingOptimisationLaunchCheck {
         let active = RoutingDatasetManager.activeManifest(rootURL: environment.routingRootURL)
         var pending: String?
         if let bundled = bundledManifest(in: environment), bundled.datasetVersion != active?.datasetVersion,
-           environment.ledger.failedBundledInstall != bundledInstallIdentity(bundled) {
+            environment.ledger.failedBundledInstall != bundledInstallIdentity(bundled)
+        {
             pending = bundled.transferWalkIdentity.value
         }
         let timetable = MobiliteitGTFSService.installedTimetableIdentity(directory: environment.gtfsDirectoryURL)
         var inputs = RoutingOptimisationInputs(
-            mode: environment.mode, activeGraph: active?.transferWalkIdentity.value,
-            pendingBundledGraph: pending, timetable: timetable,
-            header: environment.store.header(), blockedByLedger: false)
+            mode: environment.mode,
+            activeGraph: active?.transferWalkIdentity.value,
+            pendingBundledGraph: pending,
+            timetable: timetable,
+            header: environment.store.header(),
+            blockedByLedger: false
+        )
         if let graph = RoutingOptimisationDecision.expectedGraph(inputs), let timetable {
             inputs.blockedByLedger = environment.ledger.isBlocked(target: target(graph: graph, timetable: timetable))
         }

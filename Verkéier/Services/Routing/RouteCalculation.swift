@@ -35,7 +35,8 @@ nonisolated struct RouteCalculation: Sendable {
     var selectedOption: RouteOption? {
         guard !allOptions.isEmpty else { return nil }
         if let selectedOptionID,
-           let match = allOptions.first(where: { $0.id == selectedOptionID }) {
+            let match = allOptions.first(where: { $0.id == selectedOptionID })
+        {
             return match
         }
         return allOptions.first

@@ -70,9 +70,11 @@ extension TransitMapViewModel {
     var routeAlerts: [AlertMessage] {
         guard let selectedRouteOption else { return [] }
         let routeIDs = Set(selectedRouteOption.plan.legs.compactMap(\.routeId))
-        let stopIDs = Set(selectedRouteOption.plan.legs.flatMap { leg in
-            [leg.originStopId, leg.destinationStopId].compactMap(\.self)
-        })
+        let stopIDs = Set(
+            selectedRouteOption.plan.legs.flatMap { leg in
+                [leg.originStopId, leg.destinationStopId].compactMap(\.self)
+            }
+        )
         return alerts.filter { alert in
             !routeIDs.isDisjoint(with: alert.affectedRouteIds)
                 || !stopIDs.isDisjoint(with: alert.affectedStopIds)

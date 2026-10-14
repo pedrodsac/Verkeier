@@ -23,7 +23,8 @@ extension TransitMapViewModel {
     static func mapKitStop(from item: MKMapItem) -> Stop? {
         let coordinate = item.location.coordinate
         guard CLLocationCoordinate2DIsValid(coordinate),
-              coordinate.latitude != 0 || coordinate.longitude != 0 else { return nil }
+            coordinate.latitude != 0 || coordinate.longitude != 0
+        else { return nil }
 
         return Stop(
             id: "mapkit:\(coordinate.latitude),\(coordinate.longitude)",

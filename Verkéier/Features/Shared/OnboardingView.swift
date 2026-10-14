@@ -62,7 +62,7 @@ private enum VerkeierOnboardingConfiguration {
                     iconTint: .systemRed,
                     title: "Know when to leave",
                     description: "Check upcoming departures, live updates, and service disruptions."
-                )
+                ),
             ],
             textViewConfiguration: UIOnboardingTextViewConfiguration(
                 icon: symbol("location.circle"),

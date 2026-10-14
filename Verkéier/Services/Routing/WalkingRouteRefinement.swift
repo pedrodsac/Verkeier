@@ -23,11 +23,13 @@ nonisolated struct WalkingLegSpan: Sendable {
             let start = index
             while index < legs.count, legs[index].transportKind == .walking { index += 1 }
             let last = legs[index - 1]
-            spans.append(Self(
-                range: start..<index,
-                request: WalkingGeometryRequest(origin: legs[start].origin, destination: last.destination),
-                needsRouting: index - start > 1 || legs[start].roadRoutingHint == .walking
-            ))
+            spans.append(
+                Self(
+                    range: start..<index,
+                    request: WalkingGeometryRequest(origin: legs[start].origin, destination: last.destination),
+                    needsRouting: index - start > 1 || legs[start].roadRoutingHint == .walking
+                )
+            )
         }
         return spans
     }
@@ -64,8 +66,8 @@ extension RouteOption {
         )
         let legs = plan.legs.map { leg in
             guard leg.transportKind == kind,
-                  let replacement = updatedByID[leg.id],
-                  replacement.transportKind == kind
+                let replacement = updatedByID[leg.id],
+                replacement.transportKind == kind
             else { return leg }
             return replacement
         }
@@ -82,19 +84,22 @@ extension RouteOption {
         let spans = WalkingLegSpan.spans(in: original)
         func usableDirectRoute(for span: WalkingLegSpan) -> RoadRoute? {
             guard span.range.count > 1,
-                  let route = routesByLeg[span.request.key],
-                  let seconds = route.expectedTravelTime,
-                  seconds.isFinite, seconds >= 0,
-                  route.distanceMeters.isFinite, route.distanceMeters >= 0,
-                  route.walkingEvidence == .routedPedestrian,
-                  route.coordinates.count >= 2 else { return nil }
+                let route = routesByLeg[span.request.key],
+                let seconds = route.expectedTravelTime,
+                seconds.isFinite, seconds >= 0,
+                route.distanceMeters.isFinite, route.distanceMeters >= 0,
+                route.walkingEvidence == .routedPedestrian,
+                route.coordinates.count >= 2
+            else { return nil }
             return route
         }
-        guard spans.contains(where: { span in
-            usableDirectRoute(for: span) != nil
-                || (span.range.count == 1 && span.needsRouting
-                    && routesByLeg[span.request.key] != nil)
-        }) else { return self }
+        guard
+            spans.contains(where: { span in
+                usableDirectRoute(for: span) != nil
+                    || (span.range.count == 1 && span.needsRouting
+                        && routesByLeg[span.request.key] != nil)
+            })
+        else { return self }
 
         var cursor = 0
         for span in spans {
@@ -103,11 +108,17 @@ extension RouteOption {
             let end = original[span.range.upperBound - 1]
             if let directRoute = usableDirectRoute(for: span) {
                 var merged = RoutePlan.Leg(
-                    id: source.id, mode: .walking, instruction: source.instruction,
-                    transportKind: .walking, origin: source.origin, destination: end.destination,
-                    departureTime: source.departureTime, arrivalTime: end.arrivalTime,
+                    id: source.id,
+                    mode: .walking,
+                    instruction: source.instruction,
+                    transportKind: .walking,
+                    origin: source.origin,
+                    destination: end.destination,
+                    departureTime: source.departureTime,
+                    arrivalTime: end.arrivalTime,
                     distanceMeters: directRoute.distanceMeters,
-                    mapCoordinates: directRoute.coordinates, roadRoutingHint: .walking
+                    mapCoordinates: directRoute.coordinates,
+                    roadRoutingHint: .walking
                 )
                 merged.departureTimingSource = source.departureTimingSource
                 merged.arrivalTimingSource = end.arrivalTimingSource
@@ -132,25 +143,40 @@ extension RouteOption {
             if let value = route(for: leg)?.expectedTravelTime, value.isFinite, value >= 0 {
                 return value
             }
-            return max(0, (leg.arrivalTime ?? .distantPast)
-                .timeIntervalSince(leg.departureTime ?? .distantPast))
+            return max(
+                0,
+                (leg.arrivalTime ?? .distantPast)
+                    .timeIntervalSince(leg.departureTime ?? .distantPast)
+            )
         }
         func replace(_ leg: RoutePlan.Leg, from departure: Date, through arrival: Date) -> RoutePlan.Leg {
             let geometry = route(for: leg)
             var updated = RoutePlan.Leg(
-                id: leg.id, mode: leg.mode, instruction: leg.instruction,
-                transportKind: leg.transportKind, routeName: leg.routeName,
-                headsign: leg.headsign, routeId: leg.routeId, tripId: leg.tripId,
-                originStopId: leg.originStopId, destinationStopId: leg.destinationStopId,
-                stopCount: leg.stopCount, origin: leg.origin, destination: leg.destination,
-                departureTime: departure, arrivalTime: arrival,
-                scheduledDepartureTime: departure, scheduledArrivalTime: arrival,
+                id: leg.id,
+                mode: leg.mode,
+                instruction: leg.instruction,
+                transportKind: leg.transportKind,
+                routeName: leg.routeName,
+                headsign: leg.headsign,
+                routeId: leg.routeId,
+                tripId: leg.tripId,
+                originStopId: leg.originStopId,
+                destinationStopId: leg.destinationStopId,
+                stopCount: leg.stopCount,
+                origin: leg.origin,
+                destination: leg.destination,
+                departureTime: departure,
+                arrivalTime: arrival,
+                scheduledDepartureTime: departure,
+                scheduledArrivalTime: arrival,
                 realtimeDepartureTime: leg.realtimeDepartureTime,
                 realtimeArrivalTime: leg.realtimeArrivalTime,
                 distanceMeters: geometry?.distanceMeters ?? leg.distanceMeters,
                 mapCoordinates: geometry?.coordinates ?? leg.mapCoordinates,
-                roadRoutingHint: leg.roadRoutingHint, platform: leg.platform,
-                delayMinutes: leg.delayMinutes, liveStatus: leg.liveStatus,
+                roadRoutingHint: leg.roadRoutingHint,
+                platform: leg.platform,
+                delayMinutes: leg.delayMinutes,
+                liveStatus: leg.liveStatus,
                 transferWarning: leg.transferWarning,
                 bikeShareDetails: leg.bikeShareDetails
             )
@@ -179,7 +205,8 @@ extension RouteOption {
             guard (start..<end).contains(where: { route(for: legs[$0]) != nil }) else { continue }
 
             if start == 0 && end < legs.count && legs[end].transportKind == .transit,
-               let boarding = legs[end].realtimeDepartureTime ?? legs[end].departureTime {
+                let boarding = legs[end].realtimeDepartureTime ?? legs[end].departureTime
+            {
                 var cursor = boarding
                 for position in (start..<end).reversed() {
                     let departure = cursor.addingTimeInterval(-duration(legs[position]))
@@ -188,7 +215,8 @@ extension RouteOption {
                 }
             } else if let firstDeparture = start == 0
                 ? legs[start].departureTime
-                : (legs[start - 1].realtimeArrivalTime ?? legs[start - 1].arrivalTime) {
+                : (legs[start - 1].realtimeArrivalTime ?? legs[start - 1].arrivalTime)
+            {
                 var cursor = firstDeparture
                 for position in start..<end {
                     let arrival = cursor.addingTimeInterval(duration(legs[position]))
@@ -206,16 +234,29 @@ extension RouteOption {
         var hasIncoming = false
         for index in legs.indices {
             if legs[index].transportKind == .walking, hasIncoming {
-                transferWalk += max(0, (legs[index].arrivalTime ?? .distantPast).timeIntervalSince(legs[index].departureTime ?? .distantPast))
+                transferWalk += max(
+                    0,
+                    (legs[index].arrivalTime ?? .distantPast).timeIntervalSince(
+                        legs[index].departureTime ?? .distantPast
+                    )
+                )
             } else if legs[index].transportKind == .transit {
-                if hasIncoming, legs[index].continuesInSeatFromTripID == nil, let total = legs[index].requiredTotalTransferSeconds {
-                    legs[index].requiredTransferSeconds = JourneyTransferArithmetic.requiredAfterWalking(totalMinimum: total, walkingSeconds: transferWalk)
+                if hasIncoming, legs[index].continuesInSeatFromTripID == nil,
+                    let total = legs[index].requiredTotalTransferSeconds
+                {
+                    legs[index].requiredTransferSeconds = JourneyTransferArithmetic.requiredAfterWalking(
+                        totalMinimum: total,
+                        walkingSeconds: transferWalk
+                    )
                 }
                 hasIncoming = true; transferWalk = 0
             }
         }
-        return replacingLegs(legs, expectedTravelTime: elapsed,
-                             distanceMeters: distance)
+        return replacingLegs(
+            legs,
+            expectedTravelTime: elapsed,
+            distanceMeters: distance
+        )
     }
 
     nonisolated func replacingLegs(
@@ -233,9 +274,15 @@ extension RouteOption {
             dataSource: plan.dataSource
         )
         let overlay = RouteMapOverlayBuilder.itinerary(legs: legs)
-        return RouteOption(id: id, plan: updatedPlan, mapOverlay: overlay.isEmpty ? nil : overlay,
-                           feasibility: feasibility, statusEvidence: statusEvidence,
-                           validationContext: validationContext, refinementToken: refinementToken)
+        return RouteOption(
+            id: id,
+            plan: updatedPlan,
+            mapOverlay: overlay.isEmpty ? nil : overlay,
+            feasibility: feasibility,
+            statusEvidence: statusEvidence,
+            validationContext: validationContext,
+            refinementToken: refinementToken
+        )
     }
 
 }

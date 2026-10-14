@@ -58,8 +58,10 @@ struct MarqueeCycle: Equatable {
     func animation(repeats: Bool) -> CAKeyframeAnimation {
         let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
         animation.values = [startOffset, startOffset, endOffset, endOffset]
-        animation.keyTimes = [0, NSNumber(value: startPause / duration),
-                             NSNumber(value: (startPause + movementDuration) / duration), 1]
+        animation.keyTimes = [
+            0, NSNumber(value: startPause / duration),
+            NSNumber(value: (startPause + movementDuration) / duration), 1,
+        ]
         animation.duration = duration
         animation.calculationMode = .linear
         animation.timingFunction = CAMediaTimingFunction(name: .linear)

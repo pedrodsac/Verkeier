@@ -11,7 +11,7 @@ final class RouteTraceLabel: UILabel {
         var attributes: [NSAttributedString.Key: Any] = [
             .font: font, .foregroundColor: foreground,
             .strokeColor: UIColor.systemBackground.resolvedColor(with: traitCollection),
-            .strokeWidth: 18, .paragraphStyle: paragraph
+            .strokeWidth: 18, .paragraphStyle: paragraph,
         ]
         let textRect = rect.insetBy(dx: 2, dy: 2)
         let options: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]

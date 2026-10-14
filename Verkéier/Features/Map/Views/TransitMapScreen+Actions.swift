@@ -268,7 +268,8 @@ extension TransitMapScreen {
     func applyCommutePreset(_ presetID: String) {
         viewModel.applyCommutePreset(presetID)
         if let destination = viewModel.routeDestination,
-           let stop = stopForRoutePlace(destination) {
+            let stop = stopForRoutePlace(destination)
+        {
             viewModel.selectedStop = stop
         }
     }
@@ -284,11 +285,13 @@ extension TransitMapScreen {
 
     func swapRouteEndpoints() {
         let currentLocation = locationService.currentLocation.map { location in
-            RoutePlace.currentLocation(LocationPoint(
-                name: "Current Location",
-                latitude: location.coordinate.latitude,
-                longitude: location.coordinate.longitude
-            ))
+            RoutePlace.currentLocation(
+                LocationPoint(
+                    name: "Current Location",
+                    latitude: location.coordinate.latitude,
+                    longitude: location.coordinate.longitude
+                )
+            )
         }
         animateSheetChange {
             viewModel.swapRouteEndpoints(currentLocation: currentLocation)
@@ -454,7 +457,8 @@ extension TransitMapScreen {
 
     func checkGTFSUpdate() {
         guard viewModel.gtfsFeedStatus.phase != .checking,
-              viewModel.gtfsFeedStatus.phase != .downloading else { return }
+            viewModel.gtfsFeedStatus.phase != .downloading
+        else { return }
         viewModel.gtfsFeedStatus.phase = .checking
         Task {
             viewModel.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: true)
@@ -501,7 +505,9 @@ extension TransitMapScreen {
         let refresh: RouteRealtimeRefreshPolicy = viewModel.routeOptions.isEmpty ? .useCache : .forceRefresh
         Task {
             await viewModel.calculateRoute(
-                using: routeService, from: locationService.currentLocation, realtimeRefreshPolicy: refresh
+                using: routeService,
+                from: locationService.currentLocation,
+                realtimeRefreshPolicy: refresh
             )
         }
     }
@@ -517,17 +523,19 @@ extension TransitMapScreen {
 
     private func refreshRoutesIfIdle() async {
         guard viewModel.effectiveRouteDestination != nil,
-              viewModel.routeRefreshTask == nil,
-              !viewModel.isCalculatingRoute,
-              !viewModel.isLoadingEarlierRoutes, !viewModel.isLoadingLaterRoutes,
-              // Browsed pages stay until the user pulls to refresh.
-              !viewModel.isBrowsingRoutePages else { return }
+            viewModel.routeRefreshTask == nil,
+            !viewModel.isCalculatingRoute,
+            !viewModel.isLoadingEarlierRoutes, !viewModel.isLoadingLaterRoutes,
+            // Browsed pages stay until the user pulls to refresh.
+            !viewModel.isBrowsingRoutePages
+        else { return }
         guard viewModel.routeOrigin != nil || locationService.currentLocation != nil else {
             calculateRoute()
             return
         }
         await viewModel.calculateRoute(
-            using: routeService, from: locationService.currentLocation,
+            using: routeService,
+            from: locationService.currentLocation,
             realtimeRefreshPolicy: .forceRefresh
         )
     }
@@ -538,8 +546,7 @@ extension TransitMapScreen {
             await refreshRoutesIfIdle()
         }
         while !Task.isCancelled {
-            do { try await Task.sleep(for: .seconds(45)) }
-            catch { return }
+            do { try await Task.sleep(for: .seconds(45)) } catch { return }
             guard !Task.isCancelled else { return }
             if scenePhase == .active {
                 await refreshRoutesIfIdle()
@@ -554,7 +561,8 @@ extension TransitMapScreen {
     func loadEarlierRoutes() {
         Task {
             await viewModel.loadEarlierRoutes(
-                using: routeService, from: locationService.currentLocation
+                using: routeService,
+                from: locationService.currentLocation
             )
         }
     }
@@ -562,7 +570,8 @@ extension TransitMapScreen {
     func loadLaterRoutes() {
         Task {
             await viewModel.loadLaterRoutes(
-                using: routeService, from: locationService.currentLocation
+                using: routeService,
+                from: locationService.currentLocation
             )
         }
     }
@@ -577,7 +586,8 @@ extension TransitMapScreen {
 
     func openRouteInAppleMaps() {
         viewModel.openSelectedRouteInAppleMaps(
-            using: routeService, from: locationService.currentLocation
+            using: routeService,
+            from: locationService.currentLocation
         )
     }
 

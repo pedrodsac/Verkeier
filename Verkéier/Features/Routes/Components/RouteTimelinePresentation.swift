@@ -12,7 +12,10 @@ enum RouteTimelinePresentation {
             if index > 0, leg.transportKind == .transit {
                 let incoming = displayLegs[index - 1]
                 if incoming.transportKind == .transit, let tripID = incoming.tripId,
-                   leg.continuesInSeatFromTripID == tripID { return nil }
+                    leg.continuesInSeatFromTripID == tripID
+                {
+                    return nil
+                }
             }
             return leg
         }
@@ -32,7 +35,8 @@ enum RouteTimelinePresentation {
             }
             var end = index + 1
             while end < legs.count,
-                  legs[end].transportKind == .walking || legs[end].mode == .funicular {
+                legs[end].transportKind == .walking || legs[end].mode == .funicular
+            {
                 end += 1
             }
             let connection = legs[index..<end]
@@ -45,12 +49,17 @@ enum RouteTimelinePresentation {
                 }
                 let departure = first.realtimeDepartureTime ?? first.scheduledDepartureTime ?? first.departureTime
                 let duration = durations.count == connection.count ? durations.reduce(0, +) : nil
-                result.append(RoutePlan.Leg(
-                    id: first.id, mode: .walking, transportKind: .walking,
-                    origin: first.origin, destination: legs[end - 1].destination,
-                    departureTime: departure,
-                    arrivalTime: departure.flatMap { start in duration.map { start.addingTimeInterval($0) } }
-                ))
+                result.append(
+                    RoutePlan.Leg(
+                        id: first.id,
+                        mode: .walking,
+                        transportKind: .walking,
+                        origin: first.origin,
+                        destination: legs[end - 1].destination,
+                        departureTime: departure,
+                        arrivalTime: departure.flatMap { start in duration.map { start.addingTimeInterval($0) } }
+                    )
+                )
             } else {
                 result.append(contentsOf: connection)
             }
@@ -74,8 +83,9 @@ enum RouteTimelinePresentation {
             var captions: [String] = []
             var cancelled = false
             while first.kind == .transit, index + 2 < original.count,
-                  case let .place(boundary) = original[index + 1], boundary.role == .stayAboard,
-                  case let .segment(onward) = original[index + 2], onward.kind == .transit {
+                case let .place(boundary) = original[index + 1], boundary.role == .stayAboard,
+                case let .segment(onward) = original[index + 2], onward.kind == .transit
+            {
                 segments.append(onward)
                 let line = onward.badgeText ?? onward.mode.displayName
                 if let headsign = onward.headsign, !headsign.isEmpty {
@@ -91,22 +101,33 @@ enum RouteTimelinePresentation {
             } else {
                 let lastLeg = legs[index / 2]
                 let firstLeg = legs[firstLegIndex]
-                let departure = firstLeg.realtimeDepartureTime ?? firstLeg.scheduledDepartureTime ?? firstLeg.departureTime
+                let departure =
+                    firstLeg.realtimeDepartureTime ?? firstLeg.scheduledDepartureTime ?? firstLeg.departureTime
                 let arrival = lastLeg.realtimeArrivalTime ?? lastLeg.scheduledArrivalTime ?? lastLeg.arrivalTime
                 let minutes = departure.flatMap { departure in
                     arrival.map { Int(($0.timeIntervalSince(departure) / 60).rounded()) }
                 }
                 let counts = segments.compactMap(\.stopCount)
-                result.append(.segment(SegmentNode(
-                    id: first.id, kind: first.kind, mode: first.mode,
-                    badgeText: first.badgeText, headsign: first.headsign,
-                    durationMinutes: minutes.flatMap { $0 > 0 ? $0 : nil },
-                    stopCount: counts.count == segments.count ? counts.reduce(0, +) : nil,
-                    distanceMeters: first.distanceMeters, rail: first.rail,
-                    bikeShareDetails: first.bikeShareDetails, tripSelection: first.tripSelection,
-                    continuationCaptions: captions, sourceSegmentIDs: segments.map(\.id),
-                    hasCancelledContinuation: cancelled
-                )))
+                result.append(
+                    .segment(
+                        SegmentNode(
+                            id: first.id,
+                            kind: first.kind,
+                            mode: first.mode,
+                            badgeText: first.badgeText,
+                            headsign: first.headsign,
+                            durationMinutes: minutes.flatMap { $0 > 0 ? $0 : nil },
+                            stopCount: counts.count == segments.count ? counts.reduce(0, +) : nil,
+                            distanceMeters: first.distanceMeters,
+                            rail: first.rail,
+                            bikeShareDetails: first.bikeShareDetails,
+                            tripSelection: first.tripSelection,
+                            continuationCaptions: captions,
+                            sourceSegmentIDs: segments.map(\.id),
+                            hasCancelledContinuation: cancelled
+                        )
+                    )
+                )
             }
             index += 1
         }

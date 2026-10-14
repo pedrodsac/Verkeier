@@ -15,7 +15,7 @@ enum FavouriteStopSpotlightIndexer {
             attrs.title = stop.displayName
             attrs.contentDescription = [
                 stop.locality,
-                stop.modes.map(\.displayName).joined(separator: ", ")
+                stop.modes.map(\.displayName).joined(separator: ", "),
             ]
             .compactMap(\.self)
             .filter { !$0.isEmpty }

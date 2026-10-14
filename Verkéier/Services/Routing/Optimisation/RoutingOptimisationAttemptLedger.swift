@@ -31,8 +31,11 @@ nonisolated struct RoutingOptimisationAttemptLedger: Sendable {
     /// A plain cancellation is not the build's fault and does not count.
     func recordAbandoned(for target: String) {
         let remaining = attempts(for: target) - 1
-        if remaining > 0 { defaults.set([target: remaining], forKey: Self.attemptsKey) }
-        else { defaults.removeObject(forKey: Self.attemptsKey) }
+        if remaining > 0 {
+            defaults.set([target: remaining], forKey: Self.attemptsKey)
+        } else {
+            defaults.removeObject(forKey: Self.attemptsKey)
+        }
     }
 
     var failedBundledInstall: String? { defaults.string(forKey: Self.failedInstallKey) }

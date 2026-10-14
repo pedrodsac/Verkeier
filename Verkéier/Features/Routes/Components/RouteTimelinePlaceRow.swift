@@ -57,7 +57,7 @@ struct TimelinePlaceRow: View {
                 .padding(.vertical, RouteTimelineLayout.placeRowPadding)
 
             Color.clear
-            .frame(width: RouteTimelineLayout.railColumnWidth)
+                .frame(width: RouteTimelineLayout.railColumnWidth)
 
             contentColumn
                 .padding(.vertical, RouteTimelineLayout.placeRowPadding)
@@ -143,8 +143,8 @@ struct TimelinePlaceRow: View {
 
     private func shouldShowScheduledDeparture(insteadOf effective: Date) -> Bool {
         guard node.liveStatus != .cancelled,
-              let delay = node.delayMinutes, delay > 0,
-              let scheduled = node.scheduledDepartureTime
+            let delay = node.delayMinutes, delay > 0,
+            let scheduled = node.scheduledDepartureTime
         else { return false }
         return effective.timeIntervalSince(scheduled) >= 30
     }
@@ -234,7 +234,7 @@ struct TimelinePlaceRow: View {
     private var bikeAvailabilityColor: Color {
         switch node.bikeShareStationRole {
         case .pickup where node.bikeShareStation?.bikesAvailable == 0,
-             .returnStation where node.bikeShareStation?.docksAvailable == 0:
+            .returnStation where node.bikeShareStation?.docksAvailable == 0:
             return .orange
         default:
             return .secondary
@@ -257,7 +257,7 @@ struct TimelinePlaceRow: View {
     }
 
     private var nameFont: Font {
-		.body.weight(.medium)
+        .body.weight(.medium)
     }
 
     /// Time shown for non-transfer roles: departure when leaving, arrival when landing.

@@ -178,7 +178,7 @@ private struct WalkingSegment: View {
             departureTime: Date().addingTimeInterval(18 * 60),
             arrivalTime: Date().addingTimeInterval(20 * 60),
             distanceMeters: 120
-        )
+        ),
     ])
     .padding()
 }

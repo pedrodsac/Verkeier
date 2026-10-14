@@ -8,18 +8,29 @@ import SwiftUI
 enum TripDetailPreviewData {
     static var enabled: Bool { CommandLine.arguments.contains("--trip-detail-preview") }
     static let now = Date()
-    static let names = ["Howald", "Gare Centrale", "Hamilius", "Fondation Pescatore", "Kirchberg", "Luxexpo", "Aéroport Luxembourg/Findel"]
+    static let names = [
+        "Howald", "Gare Centrale", "Hamilius", "Fondation Pescatore", "Kirchberg", "Luxexpo",
+        "Aéroport Luxembourg/Findel",
+    ]
     static let points: [RouteMapCoordinate] = [
         .init(latitude: 49.58, longitude: 6.13), .init(latitude: 49.599, longitude: 6.134),
         .init(latitude: 49.611, longitude: 6.128), .init(latitude: 49.617, longitude: 6.132),
         .init(latitude: 49.623, longitude: 6.155), .init(latitude: 49.636, longitude: 6.174),
-        .init(latitude: 49.634, longitude: 6.215)
+        .init(latitude: 49.634, longitude: 6.215),
     ]
     static var leg: RoutePlan.Leg {
-        var leg = RoutePlan.Leg(id: "preview-850", mode: .bus, transportKind: .transit,
-            routeName: "850", headsign: names.last, origin: location(1), destination: location(4),
-            departureTime: now.addingTimeInterval(-120), arrivalTime: now.addingTimeInterval(600),
-            mapCoordinates: Array(points[1...4]))
+        var leg = RoutePlan.Leg(
+            id: "preview-850",
+            mode: .bus,
+            transportKind: .transit,
+            routeName: "850",
+            headsign: names.last,
+            origin: location(1),
+            destination: location(4),
+            departureTime: now.addingTimeInterval(-120),
+            arrivalTime: now.addingTimeInterval(600),
+            mapCoordinates: Array(points[1...4])
+        )
         leg.tripInstance = .init(feedGeneration: 1, tripID: "preview-run", serviceDate: "20261009")
         leg.routeShortName = "850"
         leg.boardingStopSequence = 2
@@ -31,18 +42,59 @@ enum TripDetailPreviewData {
         let stops = names.enumerated().map { index, name in
             let planned = now.addingTimeInterval(Double(index - 2) * 240)
             let delay = index == 0 ? 60.0 : index == 1 ? 120 : 180
-            let timing = TripStopTiming(scheduled: planned,
+            let timing = TripStopTiming(
+                scheduled: planned,
                 realtime: index == 5 ? nil : planned.addingTimeInterval(delay),
-                isHistoricalReport: index < 2, observedAt: now, isCancelled: false)
-            return TripStopEntry(sequence: index + 1,
-                stop: .init(id: "sample-\(index)", name: name, location: location(index), modes: [.bus], dataSource: .mock),
-                arrival: timing, departure: timing, platform: index == 1 ? "3" : nil)
+                isHistoricalReport: index < 2,
+                observedAt: now,
+                isCancelled: false
+            )
+            return TripStopEntry(
+                sequence: index + 1,
+                stop: .init(
+                    id: "sample-\(index)",
+                    name: name,
+                    location: location(index),
+                    modes: [.bus],
+                    dataSource: .mock
+                ),
+                arrival: timing,
+                departure: timing,
+                platform: index == 1 ? "3" : nil
+            )
         }
-        return .init(instance: selection.instance, stops: stops,
-            mapOverlay: RouteMapOverlayBuilder.trip(segments: [
-                .init(id: "full-run", mode: .bus, routeId: "preview", coordinates: points, emphasis: .context, isApproximate: true, routeShortName: "850"),
-                .init(id: "your-ride", mode: .bus, routeId: "preview", coordinates: Array(points[1...4]), emphasis: .highlighted, isApproximate: true, routeShortName: "850")
-            ], stops: stops, selection: selection), isApproximateRoute: true, liveDataAvailable: true, isCancelled: false, fetchedAt: now)
+        return .init(
+            instance: selection.instance,
+            stops: stops,
+            mapOverlay: RouteMapOverlayBuilder.trip(
+                segments: [
+                    .init(
+                        id: "full-run",
+                        mode: .bus,
+                        routeId: "preview",
+                        coordinates: points,
+                        emphasis: .context,
+                        isApproximate: true,
+                        routeShortName: "850"
+                    ),
+                    .init(
+                        id: "your-ride",
+                        mode: .bus,
+                        routeId: "preview",
+                        coordinates: Array(points[1...4]),
+                        emphasis: .highlighted,
+                        isApproximate: true,
+                        routeShortName: "850"
+                    ),
+                ],
+                stops: stops,
+                selection: selection
+            ),
+            isApproximateRoute: true,
+            liveDataAvailable: true,
+            isCancelled: false,
+            fetchedAt: now
+        )
     }
     private static func location(_ index: Int) -> LocationPoint {
         .init(name: names[index], latitude: points[index].latitude, longitude: points[index].longitude)
@@ -57,12 +109,26 @@ struct TripDetailPreviewHost: View {
     private let service = FixtureTripDetailService(snapshot: TripDetailPreviewData.snapshot)
 
     var body: some View {
-        TransitMapView(state: .init(
-            region: MKCoordinateRegion(center: .init(latitude: 49.59, longitude: 6.17),
-                span: .init(latitudeDelta: 0.15, longitudeDelta: 0.15)), cameraUpdateToken: 1,
-            liveStops: [], gtfsStops: [], selectedStopId: nil, favouriteStopIds: [], alertStopIds: [],
-            bikeShareStations: [], routeOverlay: path.isEmpty ? nil : model.snapshot?.mapOverlay, hideMapPins: true),
-            selectStop: { _ in }, selectStopGroup: { _, _ in }, regionDidChange: { _ in })
+        TransitMapView(
+            state: .init(
+                region: MKCoordinateRegion(
+                    center: .init(latitude: 49.59, longitude: 6.17),
+                    span: .init(latitudeDelta: 0.15, longitudeDelta: 0.15)
+                ),
+                cameraUpdateToken: 1,
+                liveStops: [],
+                gtfsStops: [],
+                selectedStopId: nil,
+                favouriteStopIds: [],
+                alertStopIds: [],
+                bikeShareStations: [],
+                routeOverlay: path.isEmpty ? nil : model.snapshot?.mapOverlay,
+                hideMapPins: true
+            ),
+            selectStop: { _ in },
+            selectStopGroup: { _, _ in },
+            regionDidChange: { _ in }
+        )
         .ignoresSafeArea()
         .onAppear { presented = true }
         .sheet(isPresented: $presented) {

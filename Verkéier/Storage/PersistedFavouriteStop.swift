@@ -51,7 +51,8 @@ final class PersistedFavouriteStop {
             name: name,
             locality: locality,
             location: LocationPoint(id: stopId, name: name, latitude: latitude, longitude: longitude),
-            modes: modesRawValue
+            modes:
+                modesRawValue
                 .split(separator: ",")
                 .compactMap { TransportMode(rawValue: String($0)) },
             dataSource: gtfsStopID == nil ? (hafasStationIDs.isEmpty ? .local : .atpOpenAPI) : .gtfs,
@@ -63,7 +64,8 @@ final class PersistedFavouriteStop {
 
     private var platformIds: [String] {
         guard let platformIdsRawValue else { return [stopId] }
-        let ids = platformIdsRawValue
+        let ids =
+            platformIdsRawValue
             .split(separator: ",")
             .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
@@ -72,7 +74,8 @@ final class PersistedFavouriteStop {
 
     private var hafasStationIDs: [String] {
         guard let hafasStationIDsRawValue else { return [] }
-        return hafasStationIDsRawValue
+        return
+            hafasStationIDsRawValue
             .split(separator: ",")
             .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
@@ -88,7 +91,8 @@ final class PersistedFavouriteStop {
 
     var boardFilter: TransitBoardFilter {
         guard let boardFilterData,
-              let filter = try? JSONDecoder().decode(TransitBoardFilter.self, from: boardFilterData) else {
+            let filter = try? JSONDecoder().decode(TransitBoardFilter.self, from: boardFilterData)
+        else {
             return TransitBoardFilter()
         }
         return filter

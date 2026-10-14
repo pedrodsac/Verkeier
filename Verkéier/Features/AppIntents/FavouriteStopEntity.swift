@@ -32,7 +32,8 @@ struct FavouriteStopEntity: AppEntity, Identifiable {
 
     var boardFilter: TransitBoardFilter {
         guard let boardFilterData,
-              let filter = try? JSONDecoder().decode(TransitBoardFilter.self, from: boardFilterData) else {
+            let filter = try? JSONDecoder().decode(TransitBoardFilter.self, from: boardFilterData)
+        else {
             return TransitBoardFilter()
         }
         return filter

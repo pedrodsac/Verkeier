@@ -30,8 +30,10 @@ nonisolated struct TransferWalkStore: Sendable {
             return TransferWalkStore(directoryURL: override)
         }
         let root = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return TransferWalkStore(directoryURL: root.appendingPathComponent("Routing", isDirectory: true)
-            .appendingPathComponent("transfer-walks", isDirectory: true))
+        return TransferWalkStore(
+            directoryURL: root.appendingPathComponent("Routing", isDirectory: true)
+                .appendingPathComponent("transfer-walks", isDirectory: true)
+        )
     }
 
     /// Cheap check used at launch: the first few kilobytes, no hashing.
@@ -40,9 +42,9 @@ nonisolated struct TransferWalkStore: Sendable {
     func load() -> TransferWalkLoadResult {
         guard FileManager.default.fileExists(atPath: fileURL.path) else { return .missing }
         guard let data = try? Data(contentsOf: fileURL, options: .alwaysMapped) else { return .unreadable }
-        do { return .table(try TransferWalkTable(data: data)) }
-        catch is TransferWalkTableError { return stamp().map { .invalid($0) } ?? .unreadable }
-        catch { return .unreadable }
+        do { return .table(try TransferWalkTable(data: data)) } catch is TransferWalkTableError {
+            return stamp().map { .invalid($0) } ?? .unreadable
+        } catch { return .unreadable }
     }
 
     func write(_ data: Data) throws {
@@ -61,6 +63,7 @@ nonisolated struct TransferWalkStore: Sendable {
         guard let attributes = try? FileManager.default.attributesOfItem(atPath: fileURL.path) else { return nil }
         return TransferWalkFileStamp(
             inode: (attributes[.systemFileNumber] as? NSNumber)?.uint64Value ?? 0,
-            size: (attributes[.size] as? NSNumber)?.uint64Value ?? 0)
+            size: (attributes[.size] as? NSNumber)?.uint64Value ?? 0
+        )
     }
 }

@@ -9,8 +9,12 @@ nonisolated struct RoutePagingBaseline {
     private(set) var visibleSupplemental: [RouteOption]
     private(set) var ids: Set<String>
 
-    init(primary: [RouteOption], supplemental: [RouteOption],
-         visiblePrimary: [RouteOption], visibleSupplemental: [RouteOption]) {
+    init(
+        primary: [RouteOption],
+        supplemental: [RouteOption],
+        visiblePrimary: [RouteOption],
+        visibleSupplemental: [RouteOption]
+    ) {
         self.primary = primary
         self.supplemental = supplemental
         self.visiblePrimary = visiblePrimary
@@ -23,8 +27,11 @@ nonisolated struct RoutePagingBaseline {
         func replaced(in options: [RouteOption]) -> [RouteOption] {
             options.compactMap { $0.id == id ? option : $0 }
         }
-        return .init(primary: replaced(in: primary), supplemental: replaced(in: supplemental),
-                     visiblePrimary: replaced(in: visiblePrimary),
-                     visibleSupplemental: replaced(in: visibleSupplemental))
+        return .init(
+            primary: replaced(in: primary),
+            supplemental: replaced(in: supplemental),
+            visiblePrimary: replaced(in: visiblePrimary),
+            visibleSupplemental: replaced(in: visibleSupplemental)
+        )
     }
 }

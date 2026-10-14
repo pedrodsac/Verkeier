@@ -30,16 +30,20 @@ struct VerkéierApp: App {
         let gtfsService = MobiliteitGTFSService()
         self.gtfsService = gtfsService
         #if targetEnvironment(simulator) || ROUTING_BENCHMARK
-        let liveTransitService = MobiliteitLiveTransitService(proxyURL: configuration.apiProxyURL,
-            diagnostics: SimulatorRouteBenchmark.enabled ? BenchmarkNetworkRecorder.shared.observer : nil)
+        let liveTransitService = MobiliteitLiveTransitService(
+            proxyURL: configuration.apiProxyURL,
+            diagnostics: SimulatorRouteBenchmark.enabled ? BenchmarkNetworkRecorder.shared.observer : nil
+        )
         #else
         let liveTransitService = MobiliteitLiveTransitService(proxyURL: configuration.apiProxyURL)
         #endif
         self.liveTransitService = liveTransitService
         let routingDatasetManager = RoutingDatasetManager()
         let transferWalkStore = TransferWalkStore.makeDefault()
-        let walkingRouter = LocalFirstWalkingRouter(datasetManager: routingDatasetManager,
-                                                    transferWalkStore: transferWalkStore)
+        let walkingRouter = LocalFirstWalkingRouter(
+            datasetManager: routingDatasetManager,
+            transferWalkStore: transferWalkStore
+        )
         self.walkingRouter = walkingRouter
         let bundledRoutingDatasetInstaller = BundledRoutingDatasetInstaller(
             datasetManager: routingDatasetManager
@@ -68,19 +72,26 @@ struct VerkéierApp: App {
         self.routeService = routeService
         self.tripDetailService = routeService
         let optimisationEnvironment = RoutingOptimisationEnvironment.production(store: transferWalkStore)
-        routingOptimisationService = optimisationEnvironment.mode == .off
+        routingOptimisationService =
+            optimisationEnvironment.mode == .off
             ? UnavailableRoutingOptimisationService()
             : TransferWalkOptimisationService(
-                environment: optimisationEnvironment, computer: walkingRouter, timetable: gtfsService,
+                environment: optimisationEnvironment,
+                computer: walkingRouter,
+                timetable: gtfsService,
                 transferRequests: { [engine = routeService.engine] url in
                     try await engine.router(for: url).transferWalkingRequests()
                 },
-                graphInstall: graphInstall)
-        _launchModel = State(initialValue: LaunchOptimisationModel(
-            initialRequirement: optimisationEnvironment.mode == .off
-                ? .notNeeded : RoutingOptimisationLaunchCheck.requirement(in: optimisationEnvironment),
-            onboardingCompleted: UserDefaults.standard.bool(forKey: "hasCompletedOnboarding"),
-            background: UIKitBackgroundActivity()))
+                graphInstall: graphInstall
+            )
+        _launchModel = State(
+            initialValue: LaunchOptimisationModel(
+                initialRequirement: optimisationEnvironment.mode == .off
+                    ? .notNeeded : RoutingOptimisationLaunchCheck.requirement(in: optimisationEnvironment),
+                onboardingCompleted: UserDefaults.standard.bool(forKey: "hasCompletedOnboarding"),
+                background: UIKitBackgroundActivity()
+            )
+        )
         modelContainer = AppModelContainer.make()
     }
 
@@ -89,34 +100,43 @@ struct VerkéierApp: App {
             Group {
                 #if targetEnvironment(simulator) || ROUTING_BENCHMARK
                 #if DEBUG
-                if RouteTracePreviewData.enabled { RouteTracePreviewHost() }
-                else if TripDetailPreviewData.enabled { TripDetailPreviewHost() }
-                else if TripContinuationPreviewHost.enabled { TripContinuationPreviewHost() }
-                else if SimulatorRouteBenchmark.enabled { SimulatorRouteBenchmarkView() }
-                else { LaunchGateView(locationService: locationService, model: launchModel) }
+                if RouteTracePreviewData.enabled {
+                    RouteTracePreviewHost()
+                } else if TripDetailPreviewData.enabled {
+                    TripDetailPreviewHost()
+                } else if TripContinuationPreviewHost.enabled {
+                    TripContinuationPreviewHost()
+                } else if SimulatorRouteBenchmark.enabled {
+                    SimulatorRouteBenchmarkView()
+                } else {
+                    LaunchGateView(locationService: locationService, model: launchModel)
+                }
                 #else
-                if SimulatorRouteBenchmark.enabled { SimulatorRouteBenchmarkView() }
-                else { LaunchGateView(locationService: locationService, model: launchModel) }
+                if SimulatorRouteBenchmark.enabled {
+                    SimulatorRouteBenchmarkView()
+                } else {
+                    LaunchGateView(locationService: locationService, model: launchModel)
+                }
                 #endif
                 #else
                 LaunchGateView(locationService: locationService, model: launchModel)
                 #endif
             }
-                .environment(\.appConfiguration, configuration)
-                .environment(\.routeService, routeService)
-                .environment(\.tripDetailService, tripDetailService)
-                .environment(\.walkingRouter, walkingRouter)
-                .environment(\.routingOptimisationService, routingOptimisationService)
-                .environment(\.gtfsService, gtfsService)
-                .environment(\.liveTransitService, liveTransitService)
-                .environment(\.bikeShareService, bikeShareService)
-                .environment(\.avlClient, avlClient)
-                .environment(\.liveActivityManager, liveActivityManager)
-                .environment(\.departureReminderService, departureReminderService)
-                .environment(\.disruptionAlertService, disruptionAlertService)
-                .environment(preferences)
-                .modelContainer(modelContainer)
-                .preferredColorScheme(preferences.appearance.colorScheme)
+            .environment(\.appConfiguration, configuration)
+            .environment(\.routeService, routeService)
+            .environment(\.tripDetailService, tripDetailService)
+            .environment(\.walkingRouter, walkingRouter)
+            .environment(\.routingOptimisationService, routingOptimisationService)
+            .environment(\.gtfsService, gtfsService)
+            .environment(\.liveTransitService, liveTransitService)
+            .environment(\.bikeShareService, bikeShareService)
+            .environment(\.avlClient, avlClient)
+            .environment(\.liveActivityManager, liveActivityManager)
+            .environment(\.departureReminderService, departureReminderService)
+            .environment(\.disruptionAlertService, disruptionAlertService)
+            .environment(preferences)
+            .modelContainer(modelContainer)
+            .preferredColorScheme(preferences.appearance.colorScheme)
         }
     }
 

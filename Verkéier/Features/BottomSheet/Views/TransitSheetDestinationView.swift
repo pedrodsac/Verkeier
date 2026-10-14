@@ -13,17 +13,17 @@ struct TransitSheetDestinationView: View {
     var body: some View {
         switch route {
         case .search:
-			SearchResultsContent(
-				query: $searchQuery,
-				viewModel: viewModel.search,
-				actions: SearchActions(from: actions)
-			)
+            SearchResultsContent(
+                query: $searchQuery,
+                viewModel: viewModel.search,
+                actions: SearchActions(from: actions)
+            )
             .safeAreaPadding(.horizontal, 16)
             .padding(.top, searchContentTopPadding)
         case .stopGroup:
-			StopGroupView(viewModel: viewModel.stopGroup)
-            .navigationTitle(route.navigationTitle)
-            .toolbarTitleDisplayMode(.inline)
+            StopGroupView(viewModel: viewModel.stopGroup)
+                .navigationTitle(route.navigationTitle)
+                .toolbarTitleDisplayMode(.inline)
         case .stopDetail:
             StopDetailView(
                 viewModel: viewModel.stopDetail,
@@ -34,7 +34,8 @@ struct TransitSheetDestinationView: View {
             .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 if let stop = viewModel.stopDetail.stop,
-                   !viewModel.stopDetail.displayedDepartures.isEmpty {
+                    !viewModel.stopDetail.displayedDepartures.isEmpty
+                {
                     ToolbarTitleMenu {
                         ShareLink(
                             item: stopDeparturesShareText(
@@ -152,24 +153,26 @@ struct TransitSheetDestinationView: View {
                         Label("Refresh alerts", systemImage: "arrow.clockwise")
                     }
                     .disabled(viewModel.alerts.isLoading)
-                    }
                 }
             }
+        }
     }
 
     /// Formats the next five departures as a shareable plain-text message.
     private func stopDeparturesShareText(stop: Stop, departures: [Departure]) -> String {
         var lines = ["Next departures — \(stop.displayName)"]
         for departure in departures.prefix(5) {
-            let time = (departure.realtimeDeparture ?? departure.scheduledDeparture)?
+            let time =
+                (departure.realtimeDeparture ?? departure.scheduledDeparture)?
                 .formatted(date: .omitted, time: .shortened) ?? "--:--"
-            let status = if departure.isCancelled {
-                " (cancelled)"
-            } else if let delay = departure.delayMinutes, delay > 0 {
-                " (+\(delay) min)"
-            } else {
-                ""
-            }
+            let status =
+                if departure.isCancelled {
+                    " (cancelled)"
+                } else if let delay = departure.delayMinutes, delay > 0 {
+                    " (+\(delay) min)"
+                } else {
+                    ""
+                }
             lines.append("\(time)  \(departure.lineName) → \(departure.displayDestination)\(status)")
         }
         lines.append("via Verkéier")

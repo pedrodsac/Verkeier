@@ -7,7 +7,11 @@ nonisolated protocol TransferWalkComputing: Sendable {
     /// The active graph, with its first native router already open.
     func prepareTransferWalkComputation() async throws -> RoutingDataset
     /// Strict short-search computation: throws for anything but a deterministic failure.
-    func transferWalkOutcome(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset) async throws -> TransferWalkOutcome
+    func transferWalkOutcome(
+        from: LocationPoint,
+        to: LocationPoint,
+        dataset: RoutingDataset
+    ) async throws -> TransferWalkOutcome
     func isActiveDataset(_ dataset: RoutingDataset) async -> Bool
     /// Makes a freshly written table live for the running router.
     func adoptTransferWalks(_ table: TransferWalkTable) async
@@ -44,9 +48,13 @@ nonisolated struct TransferWalkTableBuilder: Sendable {
     }
 
     @concurrent
-    func build(requests: [WalkingRequest], dataset: RoutingDataset, reusing existing: TransferWalkTable?,
-               timetableIdentity: String?,
-               progress: @escaping @Sendable (_ completed: Int, _ total: Int) -> Void) async throws -> TransferWalkBuildResult {
+    func build(
+        requests: [WalkingRequest],
+        dataset: RoutingDataset,
+        reusing existing: TransferWalkTable?,
+        timetableIdentity: String?,
+        progress: @escaping @Sendable (_ completed: Int, _ total: Int) -> Void
+    ) async throws -> TransferWalkBuildResult {
         // Map exactly as the router's provider does, drop duplicates and Pafendall pairs.
         var pairsByKey: [TransferWalkKey: (from: LocationPoint, to: LocationPoint)] = [:]
         for request in requests {
@@ -78,7 +86,11 @@ nonisolated struct TransferWalkTableBuilder: Sendable {
                     let pair = pairsByKey[key]!
                     next += 1
                     group.addTask {
-                        let outcome = try await computer.transferWalkOutcome(from: pair.from, to: pair.to, dataset: dataset)
+                        let outcome = try await computer.transferWalkOutcome(
+                            from: pair.from,
+                            to: pair.to,
+                            dataset: dataset
+                        )
                         return (key, try TransferWalkTableCodec.encodePayload(outcome))
                     }
                 }
@@ -101,8 +113,16 @@ nonisolated struct TransferWalkTableBuilder: Sendable {
         try Task.checkCancellation()
 
         let data = try TransferWalkTableCodec.encodeTable(
-            graphIdentity: graph, timetableIdentity: timetableIdentity,
-            entries: keys.map { (key: $0, payload: payloads[$0]!) })
-        return TransferWalkBuildResult(data: data, pairs: keys.count, reused: reused, computed: missing.count, negatives: negatives)
+            graphIdentity: graph,
+            timetableIdentity: timetableIdentity,
+            entries: keys.map { (key: $0, payload: payloads[$0]!) }
+        )
+        return TransferWalkBuildResult(
+            data: data,
+            pairs: keys.count,
+            reused: reused,
+            computed: missing.count,
+            negatives: negatives
+        )
     }
 }

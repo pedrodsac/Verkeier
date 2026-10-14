@@ -96,16 +96,21 @@ nonisolated struct LocalFirstWalkingRoutingProvider: WalkingRoutingProvider {
         _ requests: [WalkingRequest],
         maximumConcurrency: Int
     ) async -> [MobiliteitKit.WalkingRoute?] {
-        let routes = await walkingRouter.routes(requests.map {
-            OfflineWalkingRequest(from: Self.walkingEndpoint($0.source), to: Self.walkingEndpoint($0.destination))
-        }, maximumConcurrency: maximumConcurrency)
+        let routes = await walkingRouter.routes(
+            requests.map {
+                OfflineWalkingRequest(from: Self.walkingEndpoint($0.source), to: Self.walkingEndpoint($0.destination))
+            },
+            maximumConcurrency: maximumConcurrency
+        )
         return routes.map { route in
             route.map {
-                MobiliteitKit.WalkingRoute(durationSeconds: max(1, Int($0.duration.rounded())),
+                MobiliteitKit.WalkingRoute(
+                    durationSeconds: max(1, Int($0.duration.rounded())),
                     distanceMeters: $0.distanceMeters,
                     polyline: $0.coordinates.map { Coordinate(latitude: $0.latitude, longitude: $0.longitude) },
                     evidence: $0.source == .straightLineEstimate ? .estimate : .routedPedestrian,
-                    segments: $0.segments)
+                    segments: $0.segments
+                )
             }
         }
     }

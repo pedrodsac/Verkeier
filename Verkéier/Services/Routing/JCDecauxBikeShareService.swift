@@ -91,7 +91,9 @@ actor JCDecauxBikeShareStore {
     func refreshStaticStations() async {
         loadCachedSnapshotIfNeeded()
         do {
-            let (data, response) = try await session.data(for: URLRequest(url: configuration.bikeShareStaticStationsURL, timeoutInterval: 1.5))
+            let (data, response) = try await session.data(
+                for: URLRequest(url: configuration.bikeShareStaticStationsURL, timeoutInterval: 1.5)
+            )
             try Self.validate(response: response, data: data)
             let parsed = try Self.parseCSV(data)
             guard !parsed.isEmpty else { throw BikeShareFeedError.emptyStaticFeed }
@@ -125,7 +127,7 @@ actor JCDecauxBikeShareStore {
                 var components = URLComponents(url: configuration.bikeShareAPIURL, resolvingAgainstBaseURL: false)
                 components?.queryItems = [
                     URLQueryItem(name: "contract", value: "luxembourg"),
-                    URLQueryItem(name: "apiKey", value: key)
+                    URLQueryItem(name: "apiKey", value: key),
                 ]
                 guard let directURL = components?.url else { return }
                 url = directURL
@@ -145,11 +147,19 @@ actor JCDecauxBikeShareStore {
             // download must not prevent first-launch bike routing.
             if staticStations.isEmpty {
                 staticStations = dynamic.filter {
-                    (-90 ... 90).contains($0.position.lat) && (-180 ... 180).contains($0.position.lng)
+                    (-90...90).contains($0.position.lat) && (-180...180).contains($0.position.lng)
                 }.map {
-                    BikeShareStation(id: String($0.number), name: $0.name,
-                        location: LocationPoint(id: "veloh-\($0.number)", name: $0.name,
-                            latitude: $0.position.lat, longitude: $0.position.lng), capacity: $0.bikeStands)
+                    BikeShareStation(
+                        id: String($0.number),
+                        name: $0.name,
+                        location: LocationPoint(
+                            id: "veloh-\($0.number)",
+                            name: $0.name,
+                            latitude: $0.position.lat,
+                            longitude: $0.position.lng
+                        ),
+                        capacity: $0.bikeStands
+                    )
                 }
             }
             let merged = staticStations.map { station -> BikeShareStation in
@@ -188,7 +198,7 @@ actor JCDecauxBikeShareStore {
     }
 
     private static func validate(response: URLResponse, data: Data) throws {
-        guard let http = response as? HTTPURLResponse, (200 ..< 300).contains(http.statusCode) else {
+        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
             throw BikeShareFeedError.invalidResponse
         }
         guard !data.isEmpty else { throw BikeShareFeedError.emptyStaticFeed }
@@ -200,7 +210,8 @@ actor JCDecauxBikeShareStore {
         }
         let rows = string.split(whereSeparator: \.isNewline).map(String.init)
         guard let header = rows.first.map(parseCSVRow),
-              header.map({ $0.lowercased() }) == ["number", "name", "address", "latitude", "longitude"] else {
+            header.map({ $0.lowercased() }) == ["number", "name", "address", "latitude", "longitude"]
+        else {
             throw BikeShareFeedError.invalidHeader
         }
 
@@ -209,19 +220,27 @@ actor JCDecauxBikeShareStore {
         for row in rows.dropFirst() {
             let fields = parseCSVRow(row)
             guard fields.count >= 5,
-                  let latitude = Double(fields[3]),
-                  let longitude = Double(fields[4]),
-                  (-90 ... 90).contains(latitude),
-                  (-180 ... 180).contains(longitude) else {
+                let latitude = Double(fields[3]),
+                let longitude = Double(fields[4]),
+                (-90...90).contains(latitude),
+                (-180...180).contains(longitude)
+            else {
                 continue
             }
             let id = fields[0].trimmingCharacters(in: .whitespacesAndNewlines)
             guard !id.isEmpty, ids.insert(id).inserted else { continue }
-            result.append(BikeShareStation(
-                id: id,
-                name: fields[1].trimmingCharacters(in: .whitespacesAndNewlines),
-                location: LocationPoint(id: "veloh-\(id)", name: fields[1], latitude: latitude, longitude: longitude)
-            ))
+            result.append(
+                BikeShareStation(
+                    id: id,
+                    name: fields[1].trimmingCharacters(in: .whitespacesAndNewlines),
+                    location: LocationPoint(
+                        id: "veloh-\(id)",
+                        name: fields[1],
+                        latitude: latitude,
+                        longitude: longitude
+                    )
+                )
+            )
         }
         return result
     }
@@ -235,7 +254,8 @@ actor JCDecauxBikeShareStore {
             let character = row[index]
             if character == "\"" {
                 if quoted, row.index(after: index) < row.endIndex,
-                   row[row.index(after: index)] == "\"" {
+                    row[row.index(after: index)] == "\""
+                {
                     field.append("\"")
                     index = row.index(after: index)
                 } else {

@@ -17,25 +17,37 @@ nonisolated struct TripStopRowModel: Identifiable, Equatable {
 nonisolated enum TripStopPresentation {
     static let maximumAge: TimeInterval = 120
 
-    static func rows(snapshot: TripDetailSnapshot, selection: TripDetailSelection,
-        now: Date, refreshFailed: Bool, highlightsRide: Bool = true) -> [TripStopRowModel] {
+    static func rows(
+        snapshot: TripDetailSnapshot,
+        selection: TripDetailSelection,
+        now: Date,
+        refreshFailed: Bool,
+        highlightsRide: Bool = true
+    ) -> [TripStopRowModel] {
         func fresh(_ timing: TripStopTiming) -> Bool {
-            timing.observedAt.map { now.timeIntervalSince($0) <= maximumAge && $0 <= now.addingTimeInterval(60) } ?? false
+            timing.observedAt.map { now.timeIntervalSince($0) <= maximumAge && $0 <= now.addingTimeInterval(60) }
+                ?? false
         }
-        let passedSequence: Int? = snapshot.isCancelled ? nil : snapshot.stops.enumerated().compactMap { index, entry in
-            // Arrival at an intermediate stop does not mean the bus has left it.
-            let timing = index == snapshot.stops.count - 1 ? entry.arrival ?? entry.departure : entry.departure
-            guard let timing, !timing.isCancelled else { return nil }
-            if let time = timing.realtime {
-                guard time <= now, timing.isHistoricalReport || (!refreshFailed && fresh(timing)) else { return nil }
-            } else {
-                // Without a live report, use the timetable to track progress.
-                guard timing.scheduled <= now else { return nil }
-            }
-            return entry.sequence
-        }.max()
+        let passedSequence: Int? =
+            snapshot.isCancelled
+            ? nil
+            : snapshot.stops.enumerated().compactMap { index, entry in
+                // Arrival at an intermediate stop does not mean the bus has left it.
+                let timing = index == snapshot.stops.count - 1 ? entry.arrival ?? entry.departure : entry.departure
+                guard let timing, !timing.isCancelled else { return nil }
+                if let time = timing.realtime {
+                    guard time <= now, timing.isHistoricalReport || (!refreshFailed && fresh(timing)) else {
+                        return nil
+                    }
+                } else {
+                    // Without a live report, use the timetable to track progress.
+                    guard timing.scheduled <= now else { return nil }
+                }
+                return entry.sequence
+            }.max()
         return snapshot.stops.enumerated().map { index, entry in
-            let timing = index == snapshot.stops.count - 1 ? entry.arrival ?? entry.departure : entry.departure ?? entry.arrival
+            let timing =
+                index == snapshot.stops.count - 1 ? entry.arrival ?? entry.departure : entry.departure ?? entry.arrival
             let cancelled = snapshot.isCancelled || timing?.isCancelled == true
             let isStale = refreshFailed || timing.map { !$0.isHistoricalReport && !fresh($0) } == true
             let status: String
@@ -52,7 +64,8 @@ nonisolated enum TripStopPresentation {
                 let delay = minutes == 0 ? "On time" : minutes > 0 ? "+\(minutes)" : "\(minutes)"
                 status = "\(delay)\(isStale ? " · Stale" : "")"
                 let unit = abs(minutes) == 1 ? "minute" : "minutes"
-                let spoken = minutes == 0 ? "On time" : minutes > 0 ? "\(minutes) \(unit) late" : "\(-minutes) \(unit) early"
+                let spoken =
+                    minutes == 0 ? "On time" : minutes > 0 ? "\(minutes) \(unit) late" : "\(-minutes) \(unit) early"
                 accessibilityStatus = "\(spoken)\(isStale ? ", stale" : "")"
                 tint = isStale ? .secondary : minutes == 0 ? .green : .orange
             } else {
@@ -60,11 +73,20 @@ nonisolated enum TripStopPresentation {
                 accessibilityStatus = status
                 tint = .secondary
             }
-            return TripStopRowModel(id: entry.sequence, name: entry.stop.fullName.stationDisplayName(hidingLocality: selection.mode == .tram || entry.stop.modes.contains(.tram)), platform: entry.platform,
-                scheduledTime: timing?.scheduled, liveTime: minutes == 0 ? nil : timing?.realtime,
-                status: status, accessibilityStatus: accessibilityStatus, statusTint: tint,
+            return TripStopRowModel(
+                id: entry.sequence,
+                name: entry.stop.fullName.stationDisplayName(
+                    hidingLocality: selection.mode == .tram || entry.stop.modes.contains(.tram)
+                ),
+                platform: entry.platform,
+                scheduledTime: timing?.scheduled,
+                liveTime: minutes == 0 ? nil : timing?.realtime,
+                status: status,
+                accessibilityStatus: accessibilityStatus,
+                statusTint: tint,
                 isPassed: passedSequence.map { entry.sequence <= $0 } ?? false,
-                isInRide: highlightsRide && selection.boardingSequence...selection.alightingSequence ~= entry.sequence)
+                isInRide: highlightsRide && selection.boardingSequence...selection.alightingSequence ~= entry.sequence
+            )
         }
     }
 

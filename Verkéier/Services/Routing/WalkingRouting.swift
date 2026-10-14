@@ -171,14 +171,17 @@ nonisolated struct NearbyStopPrefilter: Sendable {
 
     func destinations(from stops: [Stop], origin: LocationPoint) -> [WalkingDestination] {
         let originLocation = CLLocation(latitude: origin.latitude, longitude: origin.longitude)
-        return stops
+        return
+            stops
             .map { stop in
                 (
                     stop: stop,
-                    distance: originLocation.distance(from: CLLocation(
-                        latitude: stop.location.latitude,
-                        longitude: stop.location.longitude
-                    ))
+                    distance: originLocation.distance(
+                        from: CLLocation(
+                            latitude: stop.location.latitude,
+                            longitude: stop.location.longitude
+                        )
+                    )
                 )
             }
             .filter { $0.distance <= maximumStraightLineDistanceMeters }
@@ -195,8 +198,12 @@ nonisolated extension OfflineWalkingEstimate {
     }
 
     var formattedDuration: String {
-        Duration.seconds(duration).formatted(.units(
-            allowed: [.minutes], width: .abbreviated, fractionalPart: .hide(rounded: .up)
-        ))
+        Duration.seconds(duration).formatted(
+            .units(
+                allowed: [.minutes],
+                width: .abbreviated,
+                fractionalPart: .hide(rounded: .up)
+            )
+        )
     }
 }

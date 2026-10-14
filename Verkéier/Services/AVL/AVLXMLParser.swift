@@ -32,7 +32,13 @@ nonisolated final class AVLXMLParser: NSObject, XMLParserDelegate {
         return messages
     }
 
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String: String] = [:]) {
+    func parser(
+        _ parser: XMLParser,
+        didStartElement elementName: String,
+        namespaceURI: String?,
+        qualifiedName qName: String?,
+        attributes attributeDict: [String: String] = [:]
+    ) {
         currentElement = elementName.lowercased()
         buffer = ""
 
@@ -54,7 +60,12 @@ nonisolated final class AVLXMLParser: NSObject, XMLParserDelegate {
         buffer += string
     }
 
-    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+    func parser(
+        _ parser: XMLParser,
+        didEndElement elementName: String,
+        namespaceURI: String?,
+        qualifiedName qName: String?
+    ) {
         let element = elementName.lowercased()
         defer { buffer = "" }
 
@@ -91,7 +102,8 @@ nonisolated final class AVLXMLParser: NSObject, XMLParserDelegate {
 
     private func makeMessage(values: [String: String]) -> AlertMessage {
         let title = values["title"] ?? values["titre"] ?? values["titrefr"] ?? values["summary"] ?? "AVL alert"
-        let body = values["body"] ?? values["texte"] ?? values["message"] ?? values["description"] ?? values["text"] ?? ""
+        let body =
+            values["body"] ?? values["texte"] ?? values["message"] ?? values["description"] ?? values["text"] ?? ""
         let id = values["messageid"] ?? values["id"] ?? "\(title)-\(body)".normalizedForSearch
         let severity = severity(from: values)
 
@@ -100,8 +112,12 @@ nonisolated final class AVLXMLParser: NSObject, XMLParserDelegate {
             title: title,
             body: body,
             severity: severity,
-            affectedStopIds: unique(affectedStopIds + splitList(values["stop"] ?? values["stopid"] ?? values["stopids"])),
-            affectedRouteIds: unique(affectedRouteIds + splitList(values["line"] ?? values["route"] ?? values["routeids"])),
+            affectedStopIds: unique(
+                affectedStopIds + splitList(values["stop"] ?? values["stopid"] ?? values["stopids"])
+            ),
+            affectedRouteIds: unique(
+                affectedRouteIds + splitList(values["line"] ?? values["route"] ?? values["routeids"])
+            ),
             startsAt: parseAVLDate(values["datedebut"]),
             endsAt: parseAVLDate(values["datefin"]),
             dataSource: .avl
@@ -150,7 +166,8 @@ nonisolated final class AVLXMLParser: NSObject, XMLParserDelegate {
 
     private func splitList(_ value: String?) -> [String] {
         guard let value else { return [] }
-        return value
+        return
+            value
             .split { character in character == "," || character == ";" || character == " " }
             .map(String.init)
     }

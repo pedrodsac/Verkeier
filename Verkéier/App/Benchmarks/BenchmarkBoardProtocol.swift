@@ -14,15 +14,25 @@ nonisolated final class BenchmarkBoardProtocol: URLProtocol {
             let body: Data
             if let bodies = BenchmarkRecordedTransport.bodies {
                 guard let captured = bodies[BenchmarkRecordedTransport.key(request.url!)] else {
-                    print("ROUTING_BENCHMARK_ABORT missing-replay-query \(BenchmarkRecordedTransport.key(request.url!))"); fflush(stdout)
+                    print(
+                        "ROUTING_BENCHMARK_ABORT missing-replay-query \(BenchmarkRecordedTransport.key(request.url!))"
+                    ); fflush(stdout)
                     throw CocoaError(.fileReadNoSuchFile)
                 }
                 body = captured
-            } else if stop == "000220402034", let path = ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_FIXTURE"] {
+            } else if stop == "000220402034",
+                let path = ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_FIXTURE"]
+            {
                 body = try Data(contentsOf: SimulatorRouteBenchmark.inputURL(path))
-            } else { body = Data("{\"Departure\":[]}".utf8) }
-            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil,
-                                           headerFields: ["Content-Type": "application/json"])!
+            } else {
+                body = Data("{\"Departure\":[]}".utf8)
+            }
+            let response = HTTPURLResponse(
+                url: request.url!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: ["Content-Type": "application/json"]
+            )!
             client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
             client?.urlProtocol(self, didLoad: body)
             client?.urlProtocolDidFinishLoading(self)

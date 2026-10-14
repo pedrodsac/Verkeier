@@ -48,8 +48,8 @@ struct DepartureListRow: View {
                 HStack(spacing: 6) {
                     departureTimeView
                     if let platform = departure.platform, !platform.isEmpty {
-						Divider()
-							.frame(height: 10)
+                        Divider()
+                            .frame(height: 10)
                         Text("Platform \(platform)")
                     }
 
@@ -106,13 +106,13 @@ struct DepartureListRow: View {
                 reminderContextMenu
             }
         }
-		.swipeActions(edge: .trailing) {
-			if isTracked {
-				Button("Stop Tracking") {
-					stopTrackingDeparture()
-				}
-			}
-		}
+        .swipeActions(edge: .trailing) {
+            if isTracked {
+                Button("Stop Tracking") {
+                    stopTrackingDeparture()
+                }
+            }
+        }
         .accessibilityElement(children: .combine)
     }
 
@@ -149,8 +149,9 @@ struct DepartureListRow: View {
     @ViewBuilder
     private var departureTimeView: some View {
         if case .delayed = departure.status,
-           let scheduledDeparture = departure.scheduledDeparture,
-           let realtimeDeparture = departure.realtimeDeparture {
+            let scheduledDeparture = departure.scheduledDeparture,
+            let realtimeDeparture = departure.realtimeDeparture
+        {
             Text(formattedTime(scheduledDeparture))
                 .strikethrough()
                 .foregroundStyle(.secondary)

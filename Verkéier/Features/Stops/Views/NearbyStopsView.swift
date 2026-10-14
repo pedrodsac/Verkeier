@@ -53,7 +53,7 @@ struct NearbyStopsView: View {
     private var gridColumns: [GridItem] {
         [
             GridItem(.flexible(minimum: 0), spacing: 8),
-            GridItem(.flexible(minimum: 0), spacing: 8)
+            GridItem(.flexible(minimum: 0), spacing: 8),
         ]
     }
 }

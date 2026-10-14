@@ -58,7 +58,8 @@ struct RoutePresentationModel {
         let allOptions = routeOptions + supplementalRouteOptions
         guard !allOptions.isEmpty else { return nil }
         if let selectedRouteOptionID,
-           let match = allOptions.first(where: { $0.id == selectedRouteOptionID }) {
+            let match = allOptions.first(where: { $0.id == selectedRouteOptionID })
+        {
             return match
         }
         return allOptions.first
@@ -140,8 +141,8 @@ struct RoutePresentationModel {
 
     var isStale: Bool {
         guard planningTime.isNow,
-              let lastCalculatedAt,
-              !routeOptions.isEmpty
+            let lastCalculatedAt,
+            !routeOptions.isEmpty
         else {
             return false
         }

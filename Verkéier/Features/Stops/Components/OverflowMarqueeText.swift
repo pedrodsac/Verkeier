@@ -45,13 +45,22 @@ private struct MarqueeLabelRepresentable: UIViewRepresentable {
     func makeUIView(context: Context) -> MarqueeLabelView { MarqueeLabelView() }
 
     func updateUIView(_ view: MarqueeLabelView, context: Context) {
-        view.configure(text: text, font: font, color: color, leadingInset: leadingInset,
-                       forceScroll: forceScroll, reduceMotion: reduceMotion, isActive: isActive)
+        view.configure(
+            text: text,
+            font: font,
+            color: color,
+            leadingInset: leadingInset,
+            forceScroll: forceScroll,
+            reduceMotion: reduceMotion,
+            isActive: isActive
+        )
     }
 
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: MarqueeLabelView, context: Context) -> CGSize? {
-        CGSize(width: proposal.width ?? uiView.intrinsicContentSize.width,
-               height: max(proposal.height ?? 0, uiView.intrinsicContentSize.height))
+        CGSize(
+            width: proposal.width ?? uiView.intrinsicContentSize.width,
+            height: max(proposal.height ?? 0, uiView.intrinsicContentSize.height)
+        )
     }
 
     static func dismantleUIView(_ view: MarqueeLabelView, coordinator: Void) { view.stop() }
@@ -90,8 +99,15 @@ final class MarqueeLabelView: UIView, CAAnimationDelegate {
         return CGSize(width: max(0, size.width + leadingInset), height: max(20, size.height))
     }
 
-    func configure(text: String, font: UIFont, color: UIColor, leadingInset: CGFloat,
-                   forceScroll: Bool, reduceMotion: Bool, isActive: Bool) {
+    func configure(
+        text: String,
+        font: UIFont,
+        color: UIColor,
+        leadingInset: CGFloat,
+        forceScroll: Bool,
+        reduceMotion: Bool,
+        isActive: Bool
+    ) {
         let contentChanged = label.text != text || label.font != font || self.leadingInset != leadingInset
         let motionChanged = self.reduceMotion != reduceMotion
         label.text = text
@@ -115,9 +131,14 @@ final class MarqueeLabelView: UIView, CAAnimationDelegate {
         guard bounds.width > 0 else { updatePlayback(); return }
 
         let width = label.intrinsicContentSize.width
-        let distance = reduceMotion ? 0 : MarqueeCycle.distance(
-            contentWidth: width, viewportWidth: bounds.width, leadingInset: leadingInset
-        )
+        let distance =
+            reduceMotion
+            ? 0
+            : MarqueeCycle.distance(
+                contentWidth: width,
+                viewportWidth: bounds.width,
+                leadingInset: leadingInset
+            )
         let resized = abs(viewportWidth - bounds.width) > 0.5
         let oldCycle = cycle
         let elapsed = cycleElapsed
@@ -128,9 +149,12 @@ final class MarqueeLabelView: UIView, CAAnimationDelegate {
 
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        label.bounds = CGRect(x: 0, y: 0,
-                              width: distance > 0 || oldCycle != nil ? width : max(0, bounds.width - leadingInset),
-                              height: intrinsicContentSize.height)
+        label.bounds = CGRect(
+            x: 0,
+            y: 0,
+            width: distance > 0 || oldCycle != nil ? width : max(0, bounds.width - leadingInset),
+            height: intrinsicContentSize.height
+        )
         label.center = CGPoint(x: leadingInset + label.bounds.width / 2, y: bounds.height / 2)
         if resized, let oldCycle {
             let remainder = oldCycle.remainder(at: elapsed, distance: distance, displayedOffset: displayedOffset)

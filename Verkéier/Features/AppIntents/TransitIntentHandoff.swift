@@ -14,7 +14,8 @@ struct TransitIntentHandoffStore {
 
     nonisolated func consume<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
         guard let data = defaults.data(forKey: key),
-              let value = try? JSONDecoder().decode(type, from: data) else {
+            let value = try? JSONDecoder().decode(type, from: data)
+        else {
             return nil
         }
         defaults.removeObject(forKey: key)

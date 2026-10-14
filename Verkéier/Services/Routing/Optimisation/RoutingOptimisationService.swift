@@ -49,7 +49,7 @@ nonisolated struct FixtureRoutingOptimisationService: RoutingOptimisationService
     var requirementValue: RoutingOptimisationRequirement = .needsFull
     var steps: [RoutingOptimisationProgress] = [
         .init(phase: .preparing, fraction: 0.05), .init(phase: .calculating, fraction: 0.4),
-        .init(phase: .calculating, fraction: 0.8), .init(phase: .saving, fraction: 0.98)
+        .init(phase: .calculating, fraction: 0.8), .init(phase: .saving, fraction: 0.98),
     ]
     var stepDelay: Duration = .milliseconds(10)
     var timetableDelay: Duration = .milliseconds(10)

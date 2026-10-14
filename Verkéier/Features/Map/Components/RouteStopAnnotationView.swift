@@ -11,7 +11,7 @@ final class RouteStopAnnotationView: MKAnnotationView {
         clipsToBounds = false
         canShowCallout = false
         isEnabled = false
-        displayPriority = .required // Our screen-space layout performs decluttering.
+        displayPriority = .required  // Our screen-space layout performs decluttering.
         isAccessibilityElement = true
         accessibilityTraits = .staticText
         nameLabel.numberOfLines = 0
@@ -34,7 +34,8 @@ final class RouteStopAnnotationView: MKAnnotationView {
         circle.frame = CGRect(x: 10 - diameter / 2, y: 10 - diameter / 2, width: diameter, height: diameter)
         circle.layer.cornerRadius = diameter / 2
         circle.backgroundColor = marker.role == .terminus ? color : .systemBackground
-        circle.layer.borderColor = (marker.role == .terminus ? UIColor.systemBackground : color)
+        circle.layer.borderColor =
+            (marker.role == .terminus ? UIColor.systemBackground : color)
             .resolvedColor(with: mapView.traitCollection).cgColor
         circle.layer.borderWidth = marker.role == .intermediate ? 2 : 2.5
         alpha = marker.emphasis == .context ? 0.65 : 1
@@ -49,7 +50,8 @@ final class RouteStopAnnotationView: MKAnnotationView {
         } else {
             nameLabel.isHidden = true
         }
-        accessibilityLabel = "\(marker.displayName), \(RouteTraceStyle.roleDescription(marker.role)), \(marker.mode.displayName)"
+        accessibilityLabel =
+            "\(marker.displayName), \(RouteTraceStyle.roleDescription(marker.role)), \(marker.mode.displayName)"
     }
 
     override func prepareForReuse() {

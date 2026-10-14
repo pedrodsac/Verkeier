@@ -27,8 +27,8 @@ extension TransitMapViewModel {
 
     var areRouteResultsStale: Bool {
         guard routePlanningTime.isNow,
-              let routeLastCalculatedAt,
-              !routeOptions.isEmpty
+            let routeLastCalculatedAt,
+            !routeOptions.isEmpty
         else {
             return false
         }
@@ -39,7 +39,8 @@ extension TransitMapViewModel {
         let allOptions = routeOptions + supplementalRouteOptions
         guard !allOptions.isEmpty else { return nil }
         if let selectedRouteOptionID,
-           let match = allOptions.first(where: { $0.id == selectedRouteOptionID }) {
+            let match = allOptions.first(where: { $0.id == selectedRouteOptionID })
+        {
             return match
         }
         return allOptions.first
@@ -61,10 +62,10 @@ extension TransitMapViewModel {
         guard let hour = components.hour, let minute = components.minute else { return nil }
         let minutesOfDay = hour * 60 + minute
 
-        if (360 ... 630).contains(minutesOfDay) {
+        if (360...630).contains(minutesOfDay) {
             return commutePresets.first { titleHasOrder($0.title, "Home", "Work") }
         }
-        if (960 ... 1200).contains(minutesOfDay) {
+        if (960...1200).contains(minutesOfDay) {
             return commutePresets.last { titleHasOrder($0.title, "Work", "Home") }
         }
         return nil
@@ -74,7 +75,8 @@ extension TransitMapViewModel {
     private func titleHasOrder(_ title: String, _ first: String, _ second: String) -> Bool {
         let lower = title.lowercased()
         guard let firstRange = lower.range(of: first.lowercased()),
-              let secondRange = lower.range(of: second.lowercased()) else { return false }
+            let secondRange = lower.range(of: second.lowercased())
+        else { return false }
         return firstRange.lowerBound < secondRange.lowerBound
     }
 
@@ -93,7 +95,8 @@ extension TransitMapViewModel {
     }
 
     func applyCommutePreset(_ presetID: String, using store: RoutePlannerStore = .shared) {
-        let preset = commutePresets.first(where: { $0.id == presetID })
+        let preset =
+            commutePresets.first(where: { $0.id == presetID })
             ?? recentTrips.first(where: { $0.id == presetID })
         guard let preset else { return }
         routeOrigin = preset.origin
@@ -106,13 +109,14 @@ extension TransitMapViewModel {
         guard let destination = effectiveRouteDestination else { return }
 
         let trimmed = customTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-        let title: String = if !trimmed.isEmpty {
-            trimmed
-        } else if let routeOrigin {
-            "\(routeOrigin.title) to \(destination.title)"
-        } else {
-            "Current Location to \(destination.title)"
-        }
+        let title: String =
+            if !trimmed.isEmpty {
+                trimmed
+            } else if let routeOrigin {
+                "\(routeOrigin.title) to \(destination.title)"
+            } else {
+                "Current Location to \(destination.title)"
+            }
 
         let preset = RouteCommutePreset(
             title: title,
@@ -132,7 +136,8 @@ extension TransitMapViewModel {
 
     func swapRouteEndpoints(currentLocation: RoutePlace? = nil) {
         guard let destination = effectiveRouteDestination,
-              let previousOrigin = routeOrigin ?? currentLocation else { return }
+            let previousOrigin = routeOrigin ?? currentLocation
+        else { return }
         routeOrigin = destination.source == .currentLocation ? nil : destination
         routeDestination = previousOrigin
         clearRoute()
@@ -150,8 +155,11 @@ extension TransitMapViewModel {
         clearRoute()
     }
 
-    func calculateRoute(using routeService: any RouteService, from location: CLLocation?,
-                        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy = .useCache) async {
+    func calculateRoute(
+        using routeService: any RouteService,
+        from location: CLLocation?,
+        realtimeRefreshPolicy: RouteRealtimeRefreshPolicy = .useCache
+    ) async {
         guard !Task.isCancelled else { return }
         guard let destination = effectiveRouteDestination else {
             routeLoadingPhase = .idle
@@ -211,14 +219,20 @@ extension TransitMapViewModel {
             for try await calculation in updates {
                 guard requestGeneration == routeCalculationGeneration else { return }
                 invalidatedRouteOptionIDs.formUnion(calculation.invalidatedOptionIDs)
-                let incomingOptions = calculation.isAuthoritativeSnapshot ? calculation.options : preservingWalkingRefinements(
-                    in: calculation.options,
-                    existing: unfilteredRouteOptions
-                ).filter { !invalidatedRouteOptionIDs.contains($0.id) }
-                let incomingSupplementalOptions = calculation.isAuthoritativeSnapshot ? calculation.supplementalOptions : preservingWalkingRefinements(
-                    in: calculation.supplementalOptions,
-                    existing: unfilteredSupplementalRouteOptions
-                ).filter { !invalidatedRouteOptionIDs.contains($0.id) }
+                let incomingOptions =
+                    calculation.isAuthoritativeSnapshot
+                    ? calculation.options
+                    : preservingWalkingRefinements(
+                        in: calculation.options,
+                        existing: unfilteredRouteOptions
+                    ).filter { !invalidatedRouteOptionIDs.contains($0.id) }
+                let incomingSupplementalOptions =
+                    calculation.isAuthoritativeSnapshot
+                    ? calculation.supplementalOptions
+                    : preservingWalkingRefinements(
+                        in: calculation.supplementalOptions,
+                        existing: unfilteredSupplementalRouteOptions
+                    ).filter { !invalidatedRouteOptionIDs.contains($0.id) }
                 routeBrowsingWindow = calculation.browsingWindow
                 routeRecommendedOptionID = calculation.selectedOptionID
                 let preferredID = manualSelectionID ?? calculation.selectedOptionID
@@ -252,10 +266,12 @@ extension TransitMapViewModel {
                 if !receivedRouteUpdate, !calculation.allOptions.isEmpty {
                     routeLastCalculatedAt = now()
                     recentTrips = RoutePlannerStore.shared.recordRecentTrip(
-                        origin: routeOrigin, destination: destination
+                        origin: routeOrigin,
+                        destination: destination
                     )
                 }
-                let walkingOnly = calculation.options.count == 1
+                let walkingOnly =
+                    calculation.options.count == 1
                     && calculation.options.first?.isWalkingOnly == true
                 canLoadEarlierRoutes = calculation.canLoadEarlier ?? !walkingOnly
                 canLoadLaterRoutes = calculation.canLoadLater ?? !walkingOnly
@@ -275,7 +291,8 @@ extension TransitMapViewModel {
                 routeStatusMessage = nil
                 routeErrorMessage = nil
             } else if let routingError = error as? RoutingError,
-                      routingError == .noPublicTransportRoute {
+                routingError == .noPublicTransportRoute
+            {
                 // A completed search found no boardable service. Keeping an
                 // older itinerary can keep suggesting a newly cancelled trip.
                 clearRouteResult()
@@ -312,7 +329,8 @@ extension TransitMapViewModel {
     }
 
     func openSelectedRouteInAppleMaps(
-        using routeService: any RouteService, from location: CLLocation?
+        using routeService: any RouteService,
+        from location: CLLocation?
     ) {
         guard let destination = effectiveRouteDestination else { return }
 
@@ -347,7 +365,7 @@ extension TransitMapViewModel {
         let existingByID = Dictionary(existing.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         return incoming.map { option in
             guard walkingRefinedOptionIDs.contains(option.id),
-                  let previous = existingByID[option.id]
+                let previous = existingByID[option.id]
             else { return option }
             return option.replacingLegs(of: .walking, from: previous, preserveUpdatedTotals: true)
         }
@@ -416,19 +434,25 @@ extension TransitMapViewModel {
         let supplemental = calculation.supplementalOptions.filter { !walkingRefinementScheduledIDs.contains($0.id) }
         walkingRefinementScheduledIDs.formUnion((primary + supplemental).map(\.id))
         scheduleWalkingRouteRefinementUpdates(
-            from: refiner.refinementEvents(in: primary,
-                                           context: calculation.validationContext),
+            from: refiner.refinementEvents(
+                in: primary,
+                context: calculation.validationContext
+            ),
             supplemental: false,
             routeService: routeService,
-            origin: origin, destination: destination,
+            origin: origin,
+            destination: destination,
             requestGeneration: requestGeneration
         )
         scheduleWalkingRouteRefinementUpdates(
-            from: refiner.refinementEvents(in: supplemental,
-                                           context: calculation.validationContext),
+            from: refiner.refinementEvents(
+                in: supplemental,
+                context: calculation.validationContext
+            ),
             supplemental: true,
             routeService: routeService,
-            origin: origin, destination: destination,
+            origin: origin,
+            destination: destination,
             requestGeneration: requestGeneration
         )
     }
@@ -447,8 +471,11 @@ extension TransitMapViewModel {
             defer {
                 if let self {
                     let remaining = self.pendingWalkingRefinements[requestGeneration, default: 0] - 1
-                    if remaining > 0 { self.pendingWalkingRefinements[requestGeneration] = remaining }
-                    else { self.pendingWalkingRefinements.removeValue(forKey: requestGeneration) }
+                    if remaining > 0 {
+                        self.pendingWalkingRefinements[requestGeneration] = remaining
+                    } else {
+                        self.pendingWalkingRefinements.removeValue(forKey: requestGeneration)
+                    }
                     if requestGeneration == self.routeCalculationGeneration {
                         self.routeDiagnostics?.record(.refinement, since: refinementStarted)
                     }
@@ -456,8 +483,8 @@ extension TransitMapViewModel {
             }
             for await event in updates {
                 guard !Task.isCancelled,
-                      let self,
-                      requestGeneration == self.routeCalculationGeneration
+                    let self,
+                    requestGeneration == self.routeCalculationGeneration
                 else {
                     return
                 }
@@ -471,9 +498,17 @@ extension TransitMapViewModel {
                     self.invalidatedRouteOptionIDs.formUnion(calculation.invalidatedOptionIDs)
                     self.canLoadEarlierRoutes = calculation.canLoadEarlier ?? self.canLoadEarlierRoutes
                     self.canLoadLaterRoutes = calculation.canLoadLater ?? self.canLoadLaterRoutes
-                    self.applyRouteOptions(preferredID: selectedID ?? calculation.selectedOptionID, announceFallback: true)
-                    self.scheduleWalkingRouteRefinement(calculation, using: routeService,
-                        from: origin, to: destination, requestGeneration: requestGeneration)
+                    self.applyRouteOptions(
+                        preferredID: selectedID ?? calculation.selectedOptionID,
+                        announceFallback: true
+                    )
+                    self.scheduleWalkingRouteRefinement(
+                        calculation,
+                        using: routeService,
+                        from: origin,
+                        to: destination,
+                        requestGeneration: requestGeneration
+                    )
                     continue
                 }
                 if case let .invalidated(id) = event {
@@ -485,7 +520,8 @@ extension TransitMapViewModel {
                     continue
                 }
                 guard case let .option(option) = event,
-                      !self.invalidatedRouteOptionIDs.contains(option.id) else { continue }
+                    !self.invalidatedRouteOptionIDs.contains(option.id)
+                else { continue }
                 if supplemental {
                     let current = self.unfilteredSupplementalRouteOptions.first { $0.id == option.id }
                     let refined = current.map { option.replacingLegs(of: .transit, from: $0) } ?? option
@@ -539,12 +575,14 @@ extension TransitMapViewModel {
     private func selectBestRouteOption(preferredID: String?, announceFallback: Bool) {
         let allOptions = routeOptions + supplementalRouteOptions
         let previous = selectedRouteOptionID
-        selectedRouteOptionID = JourneySelectionPolicy.select(
-            preferred: preferredID.map(JourneySignature.init),
-            recommended: routeRecommendedOptionID.map(JourneySignature.init),
-            candidates: allOptions.map { option in
-                (.init(option.id), JourneyStatus(rawValue: option.status(at: now()).rawValue) ?? .scheduledOnly)
-            })?.value
+        selectedRouteOptionID =
+            JourneySelectionPolicy.select(
+                preferred: preferredID.map(JourneySignature.init),
+                recommended: routeRecommendedOptionID.map(JourneySignature.init),
+                candidates: allOptions.map { option in
+                    (.init(option.id), JourneyStatus(rawValue: option.status(at: now()).rawValue) ?? .scheduledOnly)
+                }
+            )?.value
         if announceFallback, previous != nil, previous != selectedRouteOptionID {
             routeStatusMessage = "Showing the next available route."
         }
@@ -554,17 +592,22 @@ extension TransitMapViewModel {
         if let baseline = routePagingBaseline {
             // Restore listed routes as shown; only journeys a page added may
             // change, and a new journey can never hide a listed one.
-            unfilteredRouteOptions = baseline.primary
+            unfilteredRouteOptions =
+                baseline.primary
                 + unfilteredRouteOptions.filter { !baseline.ids.contains($0.id) }
-            unfilteredSupplementalRouteOptions = baseline.supplemental
+            unfilteredSupplementalRouteOptions =
+                baseline.supplemental
                 + unfilteredSupplementalRouteOptions.filter { !baseline.ids.contains($0.id) }
         }
         let visible = RouteOptionVisibility.presentedOptions(
-            primary: unfilteredRouteOptions, supplemental: unfilteredSupplementalRouteOptions, at: now()
+            primary: unfilteredRouteOptions,
+            supplemental: unfilteredSupplementalRouteOptions,
+            at: now()
         )
         if let baseline = routePagingBaseline {
             routeOptions = baseline.visiblePrimary + visible.primary.filter { !baseline.ids.contains($0.id) }
-            supplementalRouteOptions = baseline.visibleSupplemental
+            supplementalRouteOptions =
+                baseline.visibleSupplemental
                 + visible.supplemental.filter { !baseline.ids.contains($0.id) }
         } else {
             routeOptions = visible.primary

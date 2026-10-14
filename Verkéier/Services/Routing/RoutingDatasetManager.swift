@@ -150,11 +150,13 @@ actor RoutingDatasetManager {
     nonisolated static func activeManifest(rootURL: URL? = nil) -> RoutingDatasetManifest? {
         let root = rootURL ?? defaultRootURL
         guard let currentData = try? Data(contentsOf: root.appendingPathComponent("current.json")),
-              let current = try? JSONDecoder().decode(CurrentDataset.self, from: currentData) else { return nil }
+            let current = try? JSONDecoder().decode(CurrentDataset.self, from: currentData)
+        else { return nil }
         let directory = root.appendingPathComponent("versions", isDirectory: true)
             .appendingPathComponent(current.version, isDirectory: true)
         guard FileManager.default.fileExists(atPath: directory.appendingPathComponent("tiles.tar").path),
-              let manifestData = try? Data(contentsOf: directory.appendingPathComponent("manifest.json")) else { return nil }
+            let manifestData = try? Data(contentsOf: directory.appendingPathComponent("manifest.json"))
+        else { return nil }
         return try? JSONDecoder.routing.decode(RoutingDatasetManifest.self, from: manifestData)
     }
 
@@ -166,7 +168,8 @@ actor RoutingDatasetManager {
         if let cached = activeCache, cached.current == currentStamp {
             let directory = versionDirectory(for: cached.dataset.version)
             guard let manifest = try? FileStamp(directory.appendingPathComponent("manifest.json")),
-                  let archive = try? FileStamp(cached.dataset.tileArchiveURL) else {
+                let archive = try? FileStamp(cached.dataset.tileArchiveURL)
+            else {
                 activeCache = nil; throw RoutingDatasetError.activeDatasetMissing
             }
             if cached.manifest == manifest, cached.archive == archive { return cached.dataset }
@@ -179,7 +182,8 @@ actor RoutingDatasetManager {
         let dataset = RoutingDataset(
             manifest: try JSONDecoder.routing.decode(RoutingDatasetManifest.self, from: Data(contentsOf: manifestURL)),
             tileArchiveURL: archiveURL,
-            storageRevision: "\(current.version):\(manifestStamp.revision):\(archiveStamp.revision)")
+            storageRevision: "\(current.version):\(manifestStamp.revision):\(archiveStamp.revision)"
+        )
         activeCache = (currentStamp, manifestStamp, archiveStamp, dataset)
         return dataset
     }
@@ -237,7 +241,10 @@ actor RoutingDatasetManager {
         try fileManager.moveItem(at: incomingDirectory, to: destinationDirectory)
         try JSONEncoder.routing.encode(CurrentDataset(version: manifest.datasetVersion))
             .write(to: currentURL, options: .atomic)
-        return RoutingDataset(manifest: manifest, tileArchiveURL: destinationDirectory.appendingPathComponent("tiles.tar"))
+        return RoutingDataset(
+            manifest: manifest,
+            tileArchiveURL: destinationDirectory.appendingPathComponent("tiles.tar")
+        )
     }
 
     private func versionDirectory(for version: String) -> URL {

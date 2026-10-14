@@ -61,8 +61,10 @@ struct RouteEndpointsCard: View {
     }
 
     private func moveEndpoints(from source: IndexSet, to destination: Int) {
-        guard (source == IndexSet(integer: 0) && destination == 2)
-                || (source == IndexSet(integer: 1) && destination == 0) else { return }
+        guard
+            (source == IndexSet(integer: 0) && destination == 2)
+                || (source == IndexSet(integer: 1) && destination == 0)
+        else { return }
         guard canSwap else {
             revertRejectedMove(from: source, to: destination)
             return
@@ -87,7 +89,8 @@ struct RouteEndpointsCard: View {
         let isCurrentLocation = place?.source == .currentLocation || (endpoint == .origin && place == nil)
         return RouteEndpointRow(
             endpoint: endpoint,
-            title: isCurrentLocation ? String(localized: "My Location")
+            title: isCurrentLocation
+                ? String(localized: "My Location")
                 : (endpoint == .origin ? viewModel.originTitle : viewModel.destinationTitle),
             place: place,
             canSwap: canSwap,
@@ -98,52 +101,52 @@ struct RouteEndpointsCard: View {
 }
 
 #if DEBUG
-    #Preview(traits: .sizeThatFitsLayout) {
-        RouteEndpointsCard(
-            viewModel: .previewForCard,
-            showRoutePlaceSearch: { _ in },
-            swapRouteEndpoints: {}
-        )
-        .padding()
-        .background(Color(uiColor: .systemGroupedBackground))
-    }
+#Preview(traits: .sizeThatFitsLayout) {
+    RouteEndpointsCard(
+        viewModel: .previewForCard,
+        showRoutePlaceSearch: { _ in },
+        swapRouteEndpoints: {}
+    )
+    .padding()
+    .background(Color(uiColor: .systemGroupedBackground))
+}
 
-    private extension RoutePresentationModel {
-        static var previewForCard: RoutePresentationModel {
-            RoutePresentationModel(
-                selectedStop: Stop(
-                    id: "stop-luxexpo",
-                    name: "Luxexpo",
-                    locality: "Kirchberg",
-                    location: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
-                    modes: [.tram, .bus],
-                    dataSource: .mock
-                ),
-                origin: nil,
-                destination: RoutePlace(
-                    title: "Luxexpo",
-                    subtitle: "Kirchberg",
-                    location: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
-                    stopId: "stop-luxexpo",
-                    modes: [.tram, .bus],
-                    source: .selectedStop
-                ),
-                currentLocation: .currentLocation(
-                    LocationPoint(name: "Current Location", latitude: 49.61, longitude: 6.13)
-                ),
-                favouritePlaces: [],
-                nearbyPlaces: [],
-                recentPlaces: [],
-                commutePresets: [],
-                filters: RoutePlannerFilters(),
-                planningTime: .leaveNow,
-                routeOptions: [],
-                alerts: [],
-                selectedRouteOptionID: nil,
-                loadingPhase: .idle,
-                errorMessage: nil,
-                statusMessage: nil
-            )
-        }
+private extension RoutePresentationModel {
+    static var previewForCard: RoutePresentationModel {
+        RoutePresentationModel(
+            selectedStop: Stop(
+                id: "stop-luxexpo",
+                name: "Luxexpo",
+                locality: "Kirchberg",
+                location: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
+                modes: [.tram, .bus],
+                dataSource: .mock
+            ),
+            origin: nil,
+            destination: RoutePlace(
+                title: "Luxexpo",
+                subtitle: "Kirchberg",
+                location: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
+                stopId: "stop-luxexpo",
+                modes: [.tram, .bus],
+                source: .selectedStop
+            ),
+            currentLocation: .currentLocation(
+                LocationPoint(name: "Current Location", latitude: 49.61, longitude: 6.13)
+            ),
+            favouritePlaces: [],
+            nearbyPlaces: [],
+            recentPlaces: [],
+            commutePresets: [],
+            filters: RoutePlannerFilters(),
+            planningTime: .leaveNow,
+            routeOptions: [],
+            alerts: [],
+            selectedRouteOptionID: nil,
+            loadingPhase: .idle,
+            errorMessage: nil,
+            statusMessage: nil
+        )
     }
+}
 #endif

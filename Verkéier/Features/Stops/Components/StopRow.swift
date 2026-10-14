@@ -14,7 +14,7 @@ struct StopRow: View {
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: iconName ?? stop.modes.primaryMode.symbolName)
-				.font(.subheadline)
+                .font(.subheadline)
                 .foregroundStyle(.white)
                 .frame(width: 32, height: 32)
                 .background(transitColor.gradient, in: Circle())
@@ -38,7 +38,7 @@ struct StopRow: View {
                             .accessibilityLabel("Night bus")
                     }
                 }
-				.font(.caption)
+                .font(.caption)
                 .foregroundStyle(.secondary)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
@@ -58,7 +58,8 @@ struct StopRow: View {
 
     private var subtitleLocation: String {
         if let locality = stop.displaySubtitle?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !locality.isEmpty {
+            !locality.isEmpty
+        {
             return locality
         }
 
@@ -66,7 +67,8 @@ struct StopRow: View {
             return commaSeparatedLocation ?? "Luxembourg"
         }
 
-        let nameWithoutQualifier = stop.name
+        let nameWithoutQualifier =
+            stop.name
             .components(separatedBy: "(")
             .first?
             .trimmingCharacters(in: .whitespacesAndNewlines) ?? stop.name
@@ -88,7 +90,8 @@ struct StopRow: View {
             .first?
             .trimmingCharacters(in: .whitespacesAndNewlines)
         guard let firstComponent, !firstComponent.isEmpty,
-              stop.name.contains(",") else { return nil }
+            stop.name.contains(",")
+        else { return nil }
         return firstComponent
     }
 
