@@ -173,6 +173,39 @@ struct TransferWalkEquivalenceTests {
         }
     }
 
+    @Test("A table built by the real builder is served identically and adopted live")
+    func builtTableMatchesLive() async throws {
+        let fixture = try await Fixture.make()
+        defer { fixture.cleanUp() }
+        let city = Array(Self.pairs.prefix(30)) + [(Self.pairs[Self.pairs.count - 2])]
+        let requests = city.map {
+            WalkingRequest(source: .init(latitude: $0.0.latitude, longitude: $0.0.longitude),
+                           destination: .init(latitude: $0.1.latitude, longitude: $0.1.longitude))
+        }
+        let computer = fixture.router(mode: .on)
+        let dataset = try await computer.prepareTransferWalkComputation()
+        let result = try await TransferWalkTableBuilder(computer: computer).build(
+            requests: requests, dataset: dataset, reusing: nil, timetableIdentity: "tt", progress: { _, _ in })
+        #expect(result.pairs == city.count)
+        #expect(result.negatives == 1)
+        try fixture.store.write(result.data)
+        guard case .table(let table) = fixture.store.load() else { Issue.record("table did not load"); return }
+
+        // The running router adopts the new table without a restart.
+        await computer.adoptTransferWalks(table)
+        let offline = city.map { OfflineWalkingRequest(from: $0.0, to: $0.1) }
+        let served = await computer.routes(offline, maximumConcurrency: 4)
+        #expect(await computer.transferWalkStatistics().hits == city.count)
+        let live = await fixture.router(mode: .off).routes(offline, maximumConcurrency: 4)
+        #expect(served == live)
+
+        // A second build against the stored table recomputes nothing.
+        let again = try await TransferWalkTableBuilder(computer: computer).build(
+            requests: requests, dataset: dataset, reusing: table, timetableIdentity: "tt", progress: { _, _ in })
+        #expect(again.computed == 0)
+        #expect(again.data == result.data)
+    }
+
     @Test("Only request-determined failures may be stored as no route")
     func classifier() {
         #expect(TransferWalkErrorClassifier.isDeterministic(WalkingRoutingError.noRoute))
