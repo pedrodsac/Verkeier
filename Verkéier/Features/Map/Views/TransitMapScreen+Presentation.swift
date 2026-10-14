@@ -8,15 +8,15 @@ import SwiftUI
 
 extension TransitMapScreen {
     var sheetPresentationModel: TransitSheetPresentationModel {
-        let nearbyStops = viewModel.nearbyStops.deduplicatedByExactName()
+        let nearbyStops = map.nearbyStops.deduplicatedByExactName()
 
         let nearby = NearbyStopsPresentationModel(
             stops: nearbyStops,
-            isLoading: viewModel.isLoadingNearbyStops,
-            errorMessage: viewModel.nearbyStopsErrorMessage,
+            isLoading: map.isLoadingNearbyStops,
+            errorMessage: map.nearbyStopsErrorMessage,
             referenceLocation: locationService.currentLocation,
-            routesByStopId: viewModel.nearbyStopRoutes,
-            walkingEstimatesByStopID: viewModel.nearbyWalkingEstimates
+            routesByStopId: map.nearbyStopRoutes,
+            walkingEstimatesByStopID: map.nearbyWalkingEstimates
         )
 
         return TransitSheetPresentationModel(
@@ -25,63 +25,62 @@ extension TransitMapScreen {
                     FavouriteStopPresentationModel(
                         stop: favourite.stop,
                         labels: favourite.labels,
-                        departures: viewModel.favouriteDepartureBoards[favourite.stopId]
+                        departures: favourites.favouriteDepartureBoards[favourite.stopId]
                             ?? FavouriteDepartureBoardSnapshot(),
                         displayLabel: favourite.displayLabel,
                         iconName: favourite.iconName,
                         colorHex: favourite.colorHex
                     )
                 },
-                isRefreshing: viewModel.isLoadingFavouriteDepartures,
+                isRefreshing: favourites.isLoadingFavouriteDepartures,
                 liveDeparturesAvailable: canLoadLiveFavouriteDepartures
             ),
             stopGroup: StopGroupPresentationModel(
-                stops: viewModel.selectedStopGroup.deduplicatedByExactName(),
-                bikeShareStations: viewModel.selectedBikeShareStations,
+                stops: map.selectedStopGroup.deduplicatedByExactName(),
+                bikeShareStations: map.selectedBikeShareStations,
                 referenceLocation: locationService.currentLocation,
-                routesByStopId: viewModel.nearbyStopRoutes
+                routesByStopId: map.nearbyStopRoutes
             ),
             commute: CommuteDashboardViewModel(
                 nearby: nearby,
-                recentStops: viewModel.recentStops.deduplicatedByExactName(),
-                activeAlertCount: viewModel.activeAlertCount,
-                suggestedCommutePreset: viewModel.suggestedCommutePreset,
+                recentStops: search.recentStops.deduplicatedByExactName(),
+                activeAlertCount: alerts.activeAlertCount,
+                suggestedCommutePreset: routePlanner.suggestedCommutePreset,
                 specialEvents: SpecialEventCatalog.activeEvents()
             ),
             search: SearchPresentationModel(
-                results: viewModel.searchResults,
+                results: search.searchResults,
                 nearbySuggestions: nearbyStops,
-                isLoadingNearbySuggestions: viewModel.isLoadingNearbyStops,
+                isLoadingNearbySuggestions: map.isLoadingNearbyStops,
                 referenceLocation: locationService.currentLocation,
-                recentStops: viewModel.recentStops.deduplicatedByExactName()
+                recentStops: search.recentStops.deduplicatedByExactName()
             ),
             stopDetail: StopDetailPresentationModel(
-                stop: viewModel.selectedStop,
-                routes: viewModel.selectedStopRoutes,
-                departures: viewModel.departures,
-                offlineScheduledDepartures: viewModel.offlineScheduledDepartures,
-                isUsingOfflineDepartures: viewModel.isUsingOfflineDepartures,
-                alerts: viewModel.stopDetailAlerts,
-                selectedLine: viewModel.selectedDepartureLine,
-                selectedPlatform: viewModel.selectedDeparturePlatform,
-                departureBoardFilter: viewModel.departureBoardFilter,
-                isLoadingDepartures: viewModel.isLoadingDepartures,
-                errorMessage: viewModel.departuresErrorMessage,
-                liveErrorMessage: viewModel.liveTransitErrorMessage,
-                lastUpdated: viewModel.departuresLastUpdated,
-                isStale: viewModel.areDeparturesStale,
-                isFavourite: viewModel.selectedStop.map(isFavourite) ?? false,
+                stop: stopDetail.selectedStop,
+                routes: stopDetail.selectedStopRoutes,
+                departures: stopDetail.departures,
+                offlineScheduledDepartures: stopDetail.offlineScheduledDepartures,
+                isUsingOfflineDepartures: stopDetail.isUsingOfflineDepartures,
+                alerts: alerts.alerts(forStop: stopDetail.selectedStop, routes: stopDetail.selectedStopRoutes),
+                selectedLine: stopDetail.selectedDepartureLine,
+                selectedPlatform: stopDetail.selectedDeparturePlatform,
+                departureBoardFilter: stopDetail.departureBoardFilter,
+                isLoadingDepartures: stopDetail.isLoadingDepartures,
+                errorMessage: stopDetail.departuresErrorMessage,
+                lastUpdated: stopDetail.departuresLastUpdated,
+                isStale: stopDetail.areDeparturesStale,
+                isFavourite: stopDetail.selectedStop.map(isFavourite) ?? false,
                 trackedDepartureId: liveActivityManager.trackedDepartureId,
                 liveActivityErrorMessage: liveActivityManager.lastErrorMessage,
                 liveActivityStaleMessage: liveActivityManager.staleExplanation,
                 activeReminder: departureReminderForSelectedStop,
                 departureReminderErrorMessage: departureReminderService.lastErrorMessage,
-                departureBoard: viewModel.departureBoardPresentation
+                departureBoard: stopDetail.departureBoardPresentation
             ),
             route: RoutePresentationModel(
-                selectedStop: viewModel.selectedStop,
-                origin: viewModel.routeOrigin,
-                destination: viewModel.routeDestination,
+                selectedStop: stopDetail.selectedStop,
+                origin: routePlanner.routeOrigin,
+                destination: routePlanner.routeDestination,
                 currentLocation: locationService.currentLocation.map { location in
                     RoutePlace.currentLocation(
                         LocationPoint(
@@ -93,47 +92,47 @@ extension TransitMapScreen {
                 },
                 favouritePlaces: favouriteStops.map { RoutePlace(stop: $0, source: .favourite) },
                 nearbyPlaces: nearbyStops.map { RoutePlace(stop: $0, source: .nearby) },
-                recentPlaces: viewModel.recentRoutePlaces,
-                commutePresets: viewModel.commutePresets,
-                recentTrips: viewModel.recentTrips,
-                filters: viewModel.routeFilters,
-                planningTime: viewModel.routePlanningTime,
-                routeOptions: viewModel.routeOptions,
-                browsingWindow: viewModel.routeBrowsingWindow,
-                supplementalRouteOptions: viewModel.supplementalRouteOptions,
-                isLoadingEarlierRoutes: viewModel.isLoadingEarlierRoutes,
-                isLoadingLaterRoutes: viewModel.isLoadingLaterRoutes,
-                canLoadEarlierRoutes: viewModel.canLoadEarlierRoutes,
-                canLoadLaterRoutes: viewModel.canLoadLaterRoutes,
-                alerts: viewModel.routeAlerts,
-                legAlerts: viewModel.routeLegAlerts,
-                selectedRouteOptionID: viewModel.selectedRouteOptionID,
-                loadingPhase: viewModel.routeLoadingPhase,
-                errorMessage: viewModel.routeErrorMessage,
-                statusMessage: viewModel.routeStatusMessage,
-                lastCalculatedAt: viewModel.routeLastCalculatedAt,
-                diagnosticRequestID: viewModel.routeDiagnostics?.requestID,
-                resultsRendered: viewModel.recordRouteResultsRendered
+                recentPlaces: routePlanner.recentRoutePlaces,
+                commutePresets: routePlanner.commutePresets,
+                recentTrips: routePlanner.recentTrips,
+                filters: routePlanner.routeFilters,
+                planningTime: routePlanner.routePlanningTime,
+                routeOptions: routePlanner.routeOptions,
+                browsingWindow: routePlanner.routeBrowsingWindow,
+                supplementalRouteOptions: routePlanner.supplementalRouteOptions,
+                isLoadingEarlierRoutes: routePlanner.isLoadingEarlierRoutes,
+                isLoadingLaterRoutes: routePlanner.isLoadingLaterRoutes,
+                canLoadEarlierRoutes: routePlanner.canLoadEarlierRoutes,
+                canLoadLaterRoutes: routePlanner.canLoadLaterRoutes,
+                alerts: alerts.alerts(forRoute: routePlanner.selectedRouteOption),
+                legAlerts: alerts.legAlerts(forRoute: routePlanner.selectedRouteOption),
+                selectedRouteOptionID: routePlanner.selectedRouteOptionID,
+                loadingPhase: routePlanner.routeLoadingPhase,
+                errorMessage: routePlanner.routeErrorMessage,
+                statusMessage: routePlanner.routeStatusMessage,
+                lastCalculatedAt: routePlanner.routeLastCalculatedAt,
+                diagnosticRequestID: routePlanner.routeDiagnostics?.requestID,
+                resultsRendered: routePlanner.recordRouteResultsRendered
             ),
             lineDetail: LineDetailPresentationModel(
-                route: viewModel.selectedLineDetailRoute,
-                detail: viewModel.selectedLineDetail,
-                alerts: viewModel.lineDetailAlerts,
-                errorMessage: viewModel.selectedLineDetailErrorMessage
+                route: lineDetail.selectedLineDetailRoute,
+                detail: lineDetail.selectedLineDetail,
+                alerts: alerts.alerts(forLine: lineDetail.selectedLineDetailRoute, detail: lineDetail.selectedLineDetail),
+                errorMessage: lineDetail.selectedLineDetailErrorMessage
             ),
             alerts: AlertsPresentationModel(
-                alerts: viewModel.alerts,
-                isLoading: viewModel.isLoadingAlerts,
-                errorMessage: viewModel.alertsErrorMessage,
-                lastUpdated: viewModel.alertsLastUpdated,
-                isStale: viewModel.areAlertsStale
+                alerts: alerts.alerts,
+                isLoading: alerts.isLoadingAlerts,
+                errorMessage: alerts.alertsErrorMessage,
+                lastUpdated: alerts.alertsLastUpdated,
+                isStale: alerts.areAlertsStale
             ),
             tripDetail: tripDetailViewModel
         )
     }
 
     var departureReminderForSelectedStop: SharedTrackedDepartureReminder? {
-        guard let selectedStopID = viewModel.selectedStop?.id else { return nil }
+        guard let selectedStopID = stopDetail.selectedStop?.id else { return nil }
         guard let reminder = departureReminderService.activeReminder, reminder.stopId == selectedStopID else {
             return nil
         }

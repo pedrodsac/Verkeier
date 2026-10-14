@@ -12,7 +12,6 @@ struct StopDetailPresentationModel {
     let departureBoardFilter: TransitBoardFilter
     let isLoadingDepartures: Bool
     let errorMessage: String?
-    let liveErrorMessage: String?
     let lastUpdated: Date?
     let isStale: Bool
     let isFavourite: Bool
@@ -35,7 +34,6 @@ struct StopDetailPresentationModel {
         departureBoardFilter: TransitBoardFilter = TransitBoardFilter(),
         isLoadingDepartures: Bool,
         errorMessage: String?,
-        liveErrorMessage: String? = nil,
         lastUpdated: Date?,
         isStale: Bool,
         isFavourite: Bool,
@@ -57,7 +55,6 @@ struct StopDetailPresentationModel {
         self.departureBoardFilter = departureBoardFilter
         self.isLoadingDepartures = isLoadingDepartures
         self.errorMessage = errorMessage
-        self.liveErrorMessage = liveErrorMessage
         self.lastUpdated = lastUpdated
         self.isStale = isStale
         self.isFavourite = isFavourite

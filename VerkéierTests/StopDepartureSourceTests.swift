@@ -31,7 +31,7 @@ struct StopDepartureSourceTests {
 
     @Test @MainActor func cachedEmptySnapshotRetainsOriginalFreshness() async {
         let fetchedAt = Date.now.addingTimeInterval(-45)
-        let viewModel = TransitMapViewModel()
+        let viewModel = StopDetailModel()
         viewModel.selectedStop = Stop(id: "cached-empty", name: "Origin",
             location: .init(latitude: 49.6, longitude: 6.1), dataSource: .mock,
             hafasStationIDs: ["a"])
@@ -39,7 +39,6 @@ struct StopDepartureSourceTests {
         #expect(viewModel.departures.isEmpty)
         #expect(!viewModel.isUsingOfflineDepartures)
         #expect(viewModel.departuresLastUpdated == fetchedAt)
-        #expect(viewModel.liveTransitLastUpdated == fetchedAt)
     }
 
     private let departureDate = Date(timeIntervalSince1970: 1_800_000_000)

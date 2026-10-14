@@ -61,8 +61,8 @@ struct RouteOptionDeduplicationTests {
         #expect(model.selectedRouteOptionID == slow.id)
     }
 
-    private func configuredModel() -> TransitMapViewModel {
-        let model = TransitMapViewModel(now: { anchor })
+    private func configuredModel() -> RoutePlannerModel {
+        let model = RoutePlannerModel(now: { anchor })
         model.routeOrigin = RoutePlace(title: "Origin", location: .init(latitude: 49.6, longitude: 6.1), source: .search)
         model.routeDestination = RoutePlace(title: "Destination", location: .init(latitude: 49.61, longitude: 6.1), source: .search)
         model.routePlanningTime = .departAt(anchor)

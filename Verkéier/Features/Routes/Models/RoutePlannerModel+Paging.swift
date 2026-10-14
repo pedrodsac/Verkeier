@@ -1,7 +1,7 @@
 import CoreLocation
 import Foundation
 
-extension TransitMapViewModel {
+extension RoutePlannerModel {
     func loadEarlierRoutes(using routeService: any RouteService, from location: CLLocation?) async {
         await loadRoutePage(.earlier, using: routeService, from: location)
     }
@@ -17,7 +17,7 @@ extension TransitMapViewModel {
     ) async {
         guard !isCalculatingRoute, !isLoadingEarlierRoutes, !isLoadingLaterRoutes else { return }
         guard direction == .earlier ? canLoadEarlierRoutes : canLoadLaterRoutes else { return }
-        guard let destination = effectiveRouteDestination else { return }
+        guard let destination = routeDestination else { return }
         // Keep the original coordinate endpoint stable while browsing. A GPS
         // update must not silently create a different package planning session.
         let origin: LocationPoint

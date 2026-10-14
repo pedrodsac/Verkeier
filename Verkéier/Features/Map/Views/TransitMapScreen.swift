@@ -23,8 +23,14 @@ struct TransitMapScreen: View {
     @Environment(AppPreferences.self) private var preferences
     @Environment(\.modelContext) var modelContext
     @Environment(\.horizontalSizeClass) var sizeClass
+    @Environment(MapModel.self) var map
+    @Environment(StopDetailModel.self) var stopDetail
+    @Environment(LineDetailModel.self) var lineDetail
+    @Environment(RoutePlannerModel.self) var routePlanner
+    @Environment(SearchModel.self) var search
+    @Environment(FavouritesModel.self) var favourites
+    @Environment(AlertsModel.self) var alerts
     @Query(sort: \PersistedFavouriteStop.createdAt) var favouriteEntities: [PersistedFavouriteStop]
-    @State var viewModel = TransitMapViewModel()
     @State var tripDetailViewModel = TripDetailViewModel()
     @State var tripDetailReturnRegion: MKCoordinateRegion?
     @State var tripDetailReturnDetent: BottomSheetDetent?
@@ -46,7 +52,6 @@ struct TransitMapScreen: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             TransitMapLayer(
-                viewModel: viewModel,
                 tripDetail: tripDetailViewModel,
                 navigation: sheetNavigation,
                 favouriteStopIds: favouriteStopIds,
@@ -72,7 +77,7 @@ struct TransitMapScreen: View {
         }
         .sheet(isPresented: $isMainSheetPresented) {
             TransitBottomSheet(
-                searchQuery: $viewModel.searchQuery,
+                searchQuery: Bindable(search).searchQuery,
                 detent: sheetDetent,
                 navigation: sheetNavigation,
                 viewModel: sheetPresentationModel,
@@ -123,8 +128,8 @@ struct TransitMapScreen: View {
             }
         }
         .onChange(of: preferences.includedRouteModes, initial: true) {
-            guard viewModel.routeFilters.includedModes != preferences.includedRouteModes else { return }
-            var filters = viewModel.routeFilters
+            guard routePlanner.routeFilters.includedModes != preferences.includedRouteModes else { return }
+            var filters = routePlanner.routeFilters
             filters.includedModes = preferences.includedRouteModes
             updateRouteFilters(filters)
         }
@@ -134,21 +139,22 @@ struct TransitMapScreen: View {
             }
         }
         .task {
-            viewModel.loadRoutePlanner()
+            routePlanner.loadRoutePlanner()
+            search.loadRecentStops()
             locationService.startUpdatingIfAllowed()
-            viewModel.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: false)
+            favourites.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: false)
             (routeService as? MobiliteitRouteService)?.prepareForRouting()
             await bikeShareService.refreshStaticStations()
             await bikeShareService.refreshAvailability()
             bikeShareStations = await bikeShareService.snapshot()?.stations ?? []
-            await viewModel.loadGTFSMapStops(location: locationService.currentLocation, using: gtfsService)
-            await viewModel.loadNearbyStops(
+            await map.loadGTFSMapStops(using: gtfsService)
+            await map.loadNearbyStops(
                 location: locationService.currentLocation,
                 using: liveTransitService,
                 gtfsService: gtfsService,
                 walkingRouter: walkingRouter
             )
-            await viewModel.loadNearbyStopRoutes(using: gtfsService)
+            await map.loadNearbyStopRoutes(using: gtfsService)
             await loadAlertsAndCheckDisruptions()
         }
         .task {
@@ -167,32 +173,32 @@ struct TransitMapScreen: View {
             }
             await tripDetailViewModel.observe(selection, using: tripDetailService)
         }
-        .sensoryFeedback(.selection, trigger: viewModel.selectedStop?.id)
+        .sensoryFeedback(.selection, trigger: stopDetail.selectedStop?.id)
         .sensoryFeedback(.impact(weight: .light), trigger: favouriteStopIds.count)
         .onChange(of: locationService.currentLocation) {
             if shouldCenterOnNextLocation, locationService.currentLocation != nil {
-                viewModel.centerOnUserLocation(locationService.currentLocation)
+                map.centerOnUserLocation(locationService.currentLocation)
                 shouldCenterOnNextLocation = false
             }
             Task {
-                await viewModel.loadGTFSMapStops(location: locationService.currentLocation, using: gtfsService)
+                await map.loadGTFSMapStops(using: gtfsService)
             }
             scheduleNearbyStopsRefresh()
             calculateWaitingRouteIfNeeded()
         }
         .task(id: departureRefreshKey) {
-            guard viewModel.selectedStop != nil, isShowingStopDetail else {
+            guard stopDetail.selectedStop != nil, isShowingStopDetail else {
                 return
             }
-            await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
-            await viewModel.updateSelectedStopRoutes(using: gtfsService)
+            await stopDetail.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
+            await stopDetail.updateSelectedStopRoutes(using: gtfsService)
             await updateTrackedDepartureIfNeeded()
 
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(45))
                 guard !Task.isCancelled else { return }
-                await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
-                await viewModel.updateSelectedStopRoutes(using: gtfsService)
+                await stopDetail.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
+                await stopDetail.updateSelectedStopRoutes(using: gtfsService)
                 await updateTrackedDepartureIfNeeded()
             }
         }
@@ -205,15 +211,12 @@ struct TransitMapScreen: View {
                 await refreshFavouriteStops()
             }
         }
-        .onChange(of: viewModel.searchQuery) {
+        .onChange(of: search.searchQuery) {
             scheduleSearchUpdate()
         }
         .onChange(of: favouriteEntities) {
             favouriteStopIds = Set(favouriteEntities.map(\.stopId))
-            let activeIDs = favouriteStopIds
-            viewModel.favouriteDepartureBoards = viewModel.favouriteDepartureBoards.filter {
-                activeIDs.contains($0.key)
-            }
+            favourites.retainBoards(forStopIDs: favouriteStopIds)
             mirrorFavouriteEntitiesForIntents()
         }
         .onAppear {
@@ -249,11 +252,11 @@ struct TransitMapScreen: View {
     var canLoadLiveFavouriteDepartures: Bool {
         // Favourites can always refresh a GTFS-only board; the live relay is
         // additive rather than a prerequisite for a useful widget snapshot.
-        liveTransitService.isConfigured || viewModel.gtfsFeedStatus.isReady
+        liveTransitService.isConfigured || favourites.gtfsFeedStatus.isReady
     }
 
     var departureRefreshKey: String {
-        "\(viewModel.selectedStop?.id ?? "none")|\(isShowingStopDetail)"
+        "\(stopDetail.selectedStop?.id ?? "none")|\(isShowingStopDetail)"
     }
 
     var isShowingStopDetail: Bool {
@@ -295,4 +298,5 @@ extension View {
 #Preview {
     TransitMapScreen(locationService: LocationService())
         .environment(AppPreferences())
+        .featureModels(FeatureModels())
 }

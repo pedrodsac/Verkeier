@@ -1,8 +1,38 @@
 import CoreLocation
-import Foundation
 import MapKit
+import Observation
 
-extension TransitMapViewModel {
+/// Stop and place search, plus the stops the rider opened recently.
+@MainActor @Observable
+final class SearchModel {
+    var searchQuery = ""
+    var searchResults: [Stop] = []
+    var recentStops: [Stop] = []
+
+    func loadRecentStops(using store: RoutePlannerStore = .shared) {
+        recentStops = store.recentStops()
+    }
+
+    func recordRecentStop(_ stop: Stop, using store: RoutePlannerStore = .shared) {
+        recentStops = store.recordRecentStop(stop)
+    }
+
+    func searchStops(using gtfsService: any GTFSService) async {
+        let query = searchQuery
+        async let mapKitLookup = Self.mapKitStops(matching: query)
+        async let gtfsLookup = gtfsService.searchStops(query: query)
+
+        // A newer keystroke may have superseded this query while MapKit ran.
+        guard query == searchQuery else { return }
+        let staticStops = await gtfsLookup
+        let mapStops = await mapKitLookup
+        searchResults = (staticStops + mapStops).deduplicatedByExactName()
+    }
+}
+
+// MARK: - MapKit places
+
+extension SearchModel {
     /// Runs an address/POI search bounded to Luxembourg and maps the hits to
     /// ``Stop`` values tagged ``DataSource/mapKit``.
     static func mapKitStops(matching query: String) async -> [Stop] {
@@ -34,10 +64,4 @@ extension TransitMapViewModel {
             dataSource: .mapKit
         )
     }
-
-    static func areWithin(_ meters: CLLocationDistance, _ lhs: Stop, _ rhs: Stop) -> Bool {
-        CLLocation(latitude: lhs.location.latitude, longitude: lhs.location.longitude)
-            .distance(from: CLLocation(latitude: rhs.location.latitude, longitude: rhs.location.longitude)) < meters
-    }
-
 }

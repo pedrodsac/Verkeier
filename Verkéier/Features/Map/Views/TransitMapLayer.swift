@@ -5,7 +5,11 @@ import SwiftUI
 /// Search text, departure refreshes, and sheet detents do not alter map content.
 struct TransitMapLayer: View {
     @Environment(AppPreferences.self) private var preferences
-    let viewModel: TransitMapViewModel
+    @Environment(MapModel.self) private var map
+    @Environment(StopDetailModel.self) private var stopDetail
+    @Environment(LineDetailModel.self) private var lineDetail
+    @Environment(RoutePlannerModel.self) private var routePlanner
+    @Environment(AlertsModel.self) private var alerts
     var tripDetail: TripDetailViewModel? = nil
     let navigation: TransitSheetNavigationState
     let favouriteStopIds: Set<String>
@@ -17,13 +21,13 @@ struct TransitMapLayer: View {
     var body: some View {
         TransitMapView(
             state: MapViewState(
-                region: viewModel.cameraRegion,
-                cameraUpdateToken: viewModel.cameraUpdateToken,
+                region: map.cameraRegion,
+                cameraUpdateToken: map.cameraUpdateToken,
                 liveStops: mapLiveStops,
                 gtfsStops: mapGTFSStops,
-                selectedStopId: viewModel.selectedStop?.id,
+                selectedStopId: stopDetail.selectedStop?.id,
                 favouriteStopIds: favouriteStopIds,
-                alertStopIds: Set(viewModel.alerts.flatMap(\.affectedStopIds)),
+                alertStopIds: Set(alerts.alerts.flatMap(\.affectedStopIds)),
                 bikeShareStations: mapBikeShareStations,
                 routeOverlay: mapRouteOverlay,
                 hideMapPins: shouldHideMapPins
@@ -37,7 +41,7 @@ struct TransitMapLayer: View {
     }
 
     var selectedBikeShareStations: [BikeShareStation] {
-        guard let option = viewModel.selectedRouteOption else { return [] }
+        guard let option = routePlanner.selectedRouteOption else { return [] }
         var seen = Set<String>()
         return option.plan.legs.compactMap { $0.bikeShareDetails }
             .flatMap { [$0.pickupStation, $0.returnStation] }
@@ -64,7 +68,7 @@ struct TransitMapLayer: View {
 
     var mapLiveStops: [Stop] {
         guard !shouldHideMapPins else { return [] }
-        return viewModel.nearbyStops
+        return map.nearbyStops
             .filter(shouldShowMapStop)
             .deduplicatedByExactName()
     }
@@ -72,7 +76,7 @@ struct TransitMapLayer: View {
     var mapGTFSStops: [Stop] {
         guard !shouldHideMapPins else { return [] }
         let liveStopNames = Set(mapLiveStops.map(\.name))
-        return viewModel.gtfsOnlyMapStops
+        return map.gtfsOnlyMapStops
             .filter(shouldShowMapStop)
             .filter { !liveStopNames.contains($0.name) }
             .deduplicatedByExactName()
@@ -96,11 +100,11 @@ struct TransitMapLayer: View {
     var mapRouteOverlay: RouteMapOverlay? {
         switch navigation.activePath.last {
         case .routeTimeline:
-            return viewModel.routeMapOverlay
+            return routePlanner.routeMapOverlay
         case let .tripDetail(selection):
             return tripDetail?.snapshot?.instance == selection.instance ? tripDetail?.snapshot?.mapOverlay : nil
         case .lineDetail:
-            return viewModel.selectedLineDetail?.mapOverlay
+            return lineDetail.selectedLineDetail?.mapOverlay
         default:
             return nil
         }

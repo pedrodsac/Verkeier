@@ -1,10 +1,10 @@
 import Foundation
 
-extension TransitMapViewModel {
+extension RoutePlannerModel {
     var routeRealtimeRequest: RouteRealtimeRequest? {
         guard !isCalculatingRoute, !isLoadingEarlierRoutes, !isLoadingLaterRoutes,
             let origin = routeRequestOrigin,
-            let destination = effectiveRouteDestination?.location,
+            let destination = routeDestination?.location,
             let option = selectedRouteOption, !option.transitLegs.isEmpty
         else { return nil }
         return .init(

@@ -161,14 +161,14 @@ struct RouteWalkingVisibilityTests {
         #expect(model.routeStatusMessage == "No later routes were found.")
     }
 
-    private func calculate(_ options: [RouteOption], recommended: String) async -> TransitMapViewModel {
+    private func calculate(_ options: [RouteOption], recommended: String) async -> RoutePlannerModel {
         let model = configuredModel()
         await model.calculateRoute(using: WalkingVisibilityFixture(options: options, recommended: recommended), from: nil)
         return model
     }
 
-    private func configuredModel() -> TransitMapViewModel {
-        let model = TransitMapViewModel(now: { anchor })
+    private func configuredModel() -> RoutePlannerModel {
+        let model = RoutePlannerModel(now: { anchor })
         model.routeOrigin = RoutePlace(title: "Origin", location: .init(latitude: 49.6, longitude: 6.1), source: .search)
         model.routeDestination = RoutePlace(title: "Destination", location: .init(latitude: 49.61, longitude: 6.1), source: .search)
         model.routePlanningTime = .departAt(anchor)

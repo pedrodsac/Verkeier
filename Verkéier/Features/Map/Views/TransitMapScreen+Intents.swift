@@ -8,31 +8,31 @@ import SwiftUI
 extension TransitMapScreen {
     func updateTrackedDepartureIfNeeded() async {
         if let trackedDeparture = DepartureTrackingSelection.trackedDeparture(
-            in: viewModel.departures,
+            in: stopDetail.departures,
             trackedDepartureId: liveActivityManager.trackedDepartureId
         ) {
             await liveActivityManager.updateTracking(departure: trackedDeparture)
         }
 
         if let reminderDepartureID = departureReminderService.activeReminder?.departureId,
-            let reminderDeparture = viewModel.departures.first(where: { $0.id == reminderDepartureID })
+            let reminderDeparture = stopDetail.departures.first(where: { $0.id == reminderDepartureID })
         {
             await departureReminderService.syncTrackedDeparture(
                 reminderDeparture,
-                stopName: viewModel.selectedStop?.name
+                stopName: stopDetail.selectedStop?.name
             )
         }
     }
 
     func trackNextDeparture(for stop: Stop) {
         Task {
-            await viewModel.loadDepartures(
+            await stopDetail.loadDepartures(
                 using: liveTransitService,
                 gtfsService: gtfsService
             )
             guard
                 let departure = DepartureTrackingSelection.nextTrackableDeparture(
-                    from: viewModel.departures
+                    from: stopDetail.departures
                 )
             else {
                 return
@@ -46,7 +46,7 @@ extension TransitMapScreen {
     }
 
     func toggleSelectedFavourite() {
-        guard let selectedStop = viewModel.selectedStop else { return }
+        guard let selectedStop = stopDetail.selectedStop else { return }
 
         if let existing = favouriteEntities.first(where: { $0.stopId == selectedStop.id }) {
             removeFavourite(stopID: existing.stopId)
@@ -61,7 +61,7 @@ extension TransitMapScreen {
     ) {
         let favourite =
             favouriteEntities.first(where: { $0.stopId == stop.id })
-            ?? PersistedFavouriteStop(stop: stop, boardFilter: viewModel.departureBoardFilter)
+            ?? PersistedFavouriteStop(stop: stop, boardFilter: stopDetail.departureBoardFilter)
         if !favouriteEntities.contains(where: { $0.stopId == stop.id }) {
             modelContext.insert(favourite)
         }
@@ -119,25 +119,25 @@ extension TransitMapScreen {
             showHome()
         case let .openFavouriteStop(stopId):
             if let favourite = favouriteEntities.first(where: { $0.stopId == stopId })?.stop {
-                viewModel.selectStop(favourite)
+                applyStopSelection(favourite)
                 navigateToSheet([.stopDetail(favourite)], detent: .expanded)
             } else {
                 showSearch()
             }
         case let .trackNextDeparture(stopId):
             if let favourite = favouriteEntities.first(where: { $0.stopId == stopId })?.stop {
-                viewModel.selectStop(favourite)
+                applyStopSelection(favourite)
                 navigateToSheet([.stopDetail(favourite)], detent: .expanded)
                 trackNextDeparture(for: favourite)
             } else {
                 showSearch()
             }
         case let .planRoute(destinationName):
-            viewModel.searchQuery = destinationName
+            search.searchQuery = destinationName
             Task {
-                await viewModel.searchStops(using: gtfsService)
+                await search.searchStops(using: gtfsService)
                 if let stop = confidentRouteDestinationMatch(for: destinationName) {
-                    viewModel.selectStop(stop)
+                    applyStopSelection(stop)
                     loadSelectedStopData()
                     showPlanTab()
                 } else {
@@ -149,7 +149,7 @@ extension TransitMapScreen {
 
     func confidentRouteDestinationMatch(for destinationName: String) -> Stop? {
         let normalizedDestination = destinationName.normalizedForSearch
-        let exactMatches = viewModel.searchResults.filter {
+        let exactMatches = search.searchResults.filter {
             $0.name.normalizedForSearch == normalizedDestination
         }
 
@@ -157,6 +157,6 @@ extension TransitMapScreen {
             return exactMatches[0]
         }
 
-        return viewModel.searchResults.count == 1 ? viewModel.searchResults[0] : nil
+        return search.searchResults.count == 1 ? search.searchResults[0] : nil
     }
 }

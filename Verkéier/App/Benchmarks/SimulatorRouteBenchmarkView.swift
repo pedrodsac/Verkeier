@@ -12,7 +12,6 @@ struct SimulatorRouteBenchmarkView: View {
         Group {
             if benchmark.fullMap {
                 TransitMapLayer(
-                    viewModel: benchmark.viewModel,
                     navigation: navigation,
                     favouriteStopIds: [],
                     bikeShareStations: [],
@@ -20,8 +19,9 @@ struct SimulatorRouteBenchmarkView: View {
                     selectStopGroup: { _, _ in },
                     regionDidChange: { _ in }
                 )
+                .featureModels(benchmark.featureModels)
                 .overlay {
-                    if let request = benchmark.viewModel.routeDiagnostics?.requestID {
+                    if let request = benchmark.routePlanner.routeDiagnostics?.requestID {
                         RouteRenderObserver(requestID: request) { id in benchmark.recordMapRendered(id) }
                             .frame(width: 0, height: 0)
                     }
@@ -29,7 +29,7 @@ struct SimulatorRouteBenchmarkView: View {
             } else {
                 Color.clear
             }
-        }.onChange(of: benchmark.viewModel.selectedRouteOptionID) { _, id in
+        }.onChange(of: benchmark.routePlanner.selectedRouteOptionID) { _, id in
             navigation.selectedTab = .plan
             navigation.planPath = id.map { [.routeTimeline($0)] } ?? []
         }.sheet(isPresented: .constant(true)) {

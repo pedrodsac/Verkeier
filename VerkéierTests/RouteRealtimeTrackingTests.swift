@@ -106,8 +106,8 @@ struct RouteRealtimeTrackingTests {
         #expect(model.unfilteredRouteOptions.map(\.id) == ["first", "later"])
     }
 
-    private func configuredModel() -> TransitMapViewModel {
-        let model = TransitMapViewModel(now: { anchor })
+    private func configuredModel() -> RoutePlannerModel {
+        let model = RoutePlannerModel(now: { anchor })
         model.routeOrigin = .init(title: "Origin", location: .init(latitude: 49.6, longitude: 6.1), source: .search)
         model.routeDestination = .init(title: "Destination", location: .init(latitude: 49.7, longitude: 6.2), source: .search)
         model.routePlanningTime = .departAt(anchor)

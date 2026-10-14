@@ -4,14 +4,14 @@ import Testing
 @MainActor
 struct MapStopPresentationTests {
     @Test func suppressesSameIDRegardlessOfNameAndDistance() {
-        let model = TransitMapViewModel()
+        let model = MapModel()
         model.nearbyStops = [stop("same", "Live name", latitude: 49.60)]
         model.gtfsMapStops = [stop("same", "Static name", latitude: 49.70)]
         #expect(model.gtfsOnlyMapStops.isEmpty)
     }
 
     @Test func matchesNormalizedNamesOnlyWhenClose() {
-        let model = TransitMapViewModel()
+        let model = MapModel()
         model.nearbyStops = [stop("live", " École Centrale ", latitude: 49.60)]
         model.gtfsMapStops = [
             stop("close", "ecole centrale", latitude: 49.6005),
@@ -22,7 +22,7 @@ struct MapStopPresentationTests {
     }
 
     @Test func checksEveryNearbyCandidateWithTheSameName() {
-        let model = TransitMapViewModel()
+        let model = MapModel()
         model.nearbyStops = [
             stop("distant", "Central", latitude: 49.70),
             stop("close", "Central", latitude: 49.60)
@@ -32,7 +32,7 @@ struct MapStopPresentationTests {
     }
 
     @Test func refreshesDerivedStopsWhenEitherSourceChanges() {
-        let model = TransitMapViewModel()
+        let model = MapModel()
         let staticStop = stop("static", "Central", latitude: 49.60)
         model.gtfsMapStops = [staticStop]
         #expect(model.gtfsOnlyMapStops == [staticStop])

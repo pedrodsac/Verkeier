@@ -1,25 +1,15 @@
-import CoreLocation
-import MapKit
+import Foundation
 import Observation
-import SwiftUI
 import WidgetKit
 
-extension TransitMapViewModel {
-    /// Cache only board inputs. Location fixes, route results, and loading-state
-    /// changes must not repeat departure normalization and sorting.
-    var departureBoardPresentation: StopDepartureBoardPresentation {
-        departureBoardCache.presentation(
-            for: .init(
-                stopID: selectedStop?.id ?? "",
-                routes: selectedStopRoutes,
-                liveDepartures: departures,
-                scheduledDepartures: offlineScheduledDepartures,
-                useScheduledFallback: isUsingOfflineDepartures,
-                selectedLine: selectedDepartureLine,
-                selectedPlatform: selectedDeparturePlatform
-            )
-        )
-    }
+/// Departure boards for the rider's favourite stops, mirrored to the widget.
+@MainActor @Observable
+final class FavouritesModel {
+    var favouriteDepartureBoards: [String: FavouriteDepartureBoardSnapshot] = [:]
+    var isLoadingFavouriteDepartures = false
+    /// Favourites can always fall back to a timetable board once the GTFS feed
+    /// is ready, even without the live relay.
+    var gtfsFeedStatus: GTFSFeedStatus = .unavailable
 
     func loadFavouriteDepartures(
         favourites: [Stop],
@@ -50,7 +40,6 @@ extension TransitMapViewModel {
                             departures: live.departures,
                             fetchedAt: live.fetchedAt,
                             didFail: false,
-                            usedLiveData: true,
                             index: index
                         )
                     } catch {
@@ -61,7 +50,6 @@ extension TransitMapViewModel {
                             departures: fallback,
                             fetchedAt: .now,
                             didFail: fallback.isEmpty,
-                            usedLiveData: false,
                             index: index
                         )
                     }
@@ -77,10 +65,6 @@ extension TransitMapViewModel {
                 snapshot.errorMessage = result.didFail ? "Departures could not be refreshed." : nil
                 favouriteDepartureBoards[result.stopId] = snapshot
                 saveFavouriteDepartureBoard(stopID: result.stopId, snapshot: snapshot)
-            }
-            if results.contains(where: \.usedLiveData) {
-                liveTransitLastUpdated = results.filter(\.usedLiveData).map(\.fetchedAt).min()
-                liveTransitErrorMessage = nil
             }
         }
         WidgetCenter.shared.reloadTimelines(ofKind: "DeparturesSummaryWidget")
@@ -103,151 +87,38 @@ extension TransitMapViewModel {
             snapshot.departures = board.departures
             snapshot.phase = .loaded
             snapshot.lastUpdated = board.fetchedAt
-            liveTransitLastUpdated = board.fetchedAt
-            liveTransitErrorMessage = nil
         } catch {
             let scheduled = await gtfsService.scheduledDepartures(for: boardStop, at: .now, limit: .max)
             snapshot.departures = scheduled.map { $0.asDeparture(stopID: stop.id) }
             snapshot.phase = snapshot.departures.isEmpty ? .failed : .loaded
             snapshot.lastUpdated = .now
             snapshot.errorMessage = snapshot.departures.isEmpty ? "Departures could not be refreshed." : nil
-            liveTransitErrorMessage = error.localizedDescription
         }
         favouriteDepartureBoards[stop.id] = snapshot
         saveFavouriteDepartureBoard(stopID: stop.id, snapshot: snapshot)
         WidgetCenter.shared.reloadTimelines(ofKind: "DeparturesSummaryWidget")
     }
 
-    /// Preserve the failed state when neither source has produced a board.
-    func markFavouriteDeparturesUnavailable(for favourites: [Stop]) {
-        isLoadingFavouriteDepartures = false
-        for stop in favourites {
-            var snapshot = favouriteDepartureBoards[stop.id] ?? FavouriteDepartureBoardSnapshot()
-            snapshot.phase = .failed
-            snapshot.errorMessage = "No live or scheduled departures could be refreshed."
-            favouriteDepartureBoards[stop.id] = snapshot
-        }
+    /// Drops boards for stops that are no longer favourites.
+    func retainBoards(forStopIDs stopIDs: Set<String>) {
+        favouriteDepartureBoards = favouriteDepartureBoards.filter { stopIDs.contains($0.key) }
     }
 
-    func loadDepartures(
-        using liveTransitService: any LiveTransitService,
-        gtfsService: any GTFSService
-    ) async {
-        guard let selectedStop else { return }
-        let selectedStopID = selectedStop.id
-        departureLoadGeneration &+= 1
-        let requestGeneration = departureLoadGeneration
-        isLoadingDepartures = true
-        departuresErrorMessage = nil
-        isUsingOfflineDepartures = false
-
-        let boardStop = await liveTransitService.resolvedStop(
-            for: selectedStop,
-            gtfsService: gtfsService
-        )
-        guard !Task.isCancelled else {
-            if isCurrentDepartureRequest(requestGeneration, for: selectedStopID) {
-                isLoadingDepartures = false
-            }
-            return
-        }
-        guard isCurrentDepartureRequest(requestGeneration, for: selectedStopID) else { return }
-        if boardStop != selectedStop {
-            self.selectedStop = boardStop
-        }
-
-        let liveDepartures: [Departure]
-        let fetchedAt: Date?
-        let scheduledDepartures: [OfflineScheduleDeparture]
-        let liveError: Error?
-        do {
-            let board = try await liveTransitService.departureBoardSnapshot(
-                for: boardStop,
-                filter: departureBoardFilter
-            )
-            liveDepartures = board.departures
-            fetchedAt = board.fetchedAt
-            scheduledDepartures = []
-            liveError = nil
-        } catch {
-            liveDepartures = []
-            fetchedAt = nil
-            scheduledDepartures = await gtfsService.scheduledDepartures(
-                for: boardStop,
-                at: now(),
-                limit: .max
-            )
-            liveError = error
-        }
-
-        guard !Task.isCancelled else {
-            if isCurrentDepartureRequest(requestGeneration, for: boardStop.id) {
-                isLoadingDepartures = false
-            }
-            return
-        }
-        guard isCurrentDepartureRequest(requestGeneration, for: boardStop.id) else { return }
-
-        departures = liveDepartures
-        offlineScheduledDepartures = scheduledDepartures
-        isUsingOfflineDepartures = liveError != nil
-        departuresLastUpdated = fetchedAt
-        liveTransitLastUpdated = fetchedAt ?? liveTransitLastUpdated
-        liveTransitErrorMessage = liveError?.localizedDescription
-        departuresErrorMessage =
-            liveError != nil && scheduledDepartures.isEmpty
-            ? "No live or offline departures are available for this stop."
-            : nil
-        isLoadingDepartures = false
+    func removeBoard(forStopID stopID: String) {
+        favouriteDepartureBoards.removeValue(forKey: stopID)
+        SharedTransitDataStore.removeFavouriteDepartureBoard(stopId: stopID)
     }
-
-    func toggleDepartureLine(_ route: TransitRoute) {
-        if selectedDepartureLine == route.id {
-            selectedDepartureLine = nil
-        } else {
-            selectedDepartureLine = route.id
-        }
-
-        selectedDeparturePlatform = nil
-    }
-
-    func selectDeparturePlatform(_ platform: String?) {
-        selectedDeparturePlatform = platform
-    }
-
-    func loadOfflineScheduledDepartures(
-        using gtfsService: any GTFSService,
-        now: Date = .now
-    ) async {
-        guard let selectedStop else {
-            offlineScheduledDepartures = []
-            return
-        }
-        let scheduledDepartures = await gtfsService.scheduledDepartures(
-            for: selectedStop,
-            at: now,
-            limit: .max
-        )
-        guard self.selectedStop?.id == selectedStop.id else { return }
-        offlineScheduledDepartures = scheduledDepartures
-    }
-
-    var areDeparturesStale: Bool {
-        guard let departuresLastUpdated else { return false }
-        return Date().timeIntervalSince(departuresLastUpdated) > 90
-    }
-
-    var areFavouriteDeparturesStale: Bool {
-        favouriteDepartureBoards.values.contains { $0.isStale() }
-    }
-
-    private func isCurrentDepartureRequest(_ generation: Int, for stopID: String) -> Bool {
-        departureLoadGeneration == generation && selectedStop?.id == stopID
-    }
-
 }
 
-private extension TransitMapViewModel {
+private extension FavouritesModel {
+    struct FavouriteDepartureBoardResult: Sendable {
+        let stopId: String
+        let departures: [Departure]
+        let fetchedAt: Date
+        let didFail: Bool
+        let index: Int
+    }
+
     func saveFavouriteDepartureBoard(
         stopID: String,
         snapshot: FavouriteDepartureBoardSnapshot

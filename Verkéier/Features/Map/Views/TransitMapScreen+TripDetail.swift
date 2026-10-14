@@ -14,7 +14,7 @@ extension TransitMapScreen {
     func tripDetailNavigationChanged(to selection: TripDetailSelection?) {
         if let selection {
             if tripDetailReturnRegion == nil {
-                tripDetailReturnRegion = viewModel.visibleMapRegion ?? viewModel.cameraRegion
+                tripDetailReturnRegion = map.visibleMapRegion ?? map.cameraRegion
                 tripDetailReturnDetent = sheetDetent
             }
             tripDetailCameraDidFit = false
@@ -22,7 +22,7 @@ extension TransitMapScreen {
             sheetDetent = .medium
         } else {
             tripDetailViewModel.deactivate()
-            if let region = tripDetailReturnRegion { viewModel.moveCamera(to: region) }
+            if let region = tripDetailReturnRegion { map.moveCamera(to: region) }
             if let detent = tripDetailReturnDetent { sheetDetent = detent }
             tripDetailReturnRegion = nil
             tripDetailReturnDetent = nil
@@ -47,6 +47,6 @@ extension TransitMapScreen {
         region.span.longitudeDelta = max(0.008, region.span.longitudeDelta * 1.25)
         region.center.latitude -= region.span.latitudeDelta * 0.25
         tripDetailCameraDidFit = true
-        viewModel.moveCamera(to: region)
+        map.moveCamera(to: region)
     }
 }
