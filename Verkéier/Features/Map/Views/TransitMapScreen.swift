@@ -72,32 +72,30 @@ struct TransitMapScreen: View {
             }
         }
         .sheet(isPresented: $isMainSheetPresented) {
-            TransitBottomSheet(
-                viewModel: sheetPresentationModel,
-                actions: sheetActions
-            )
-            .safePresentationPlacement()
-            .presentationDetents(
-                sizeClass == .compact ? BottomSheetDetent.presentationDetents : [Self.regularWidthPresentationDetent],
-                selection: sheetPresentationDetent
-            )
-            .presentationBackground(Color(uiColor: .systemBackground))
-            .presentationBackgroundInteraction(
-                sizeClass == .compact ? .enabled(upThrough: BottomSheetDetent.mediumPresentationDetent) : .enabled
-            )
-            .presentationCornerRadius(40)
-            .interactiveDismissDisabled()
-            // Keep the observation-based preference dependency explicit at
-            // this presentation boundary. Sheets have a separate hosting
-            // hierarchy, so relying on an inherited object can crash before
-            // the sheet's first body is rendered.
-            .environment(preferences)
-            .featureModels(router.models)
-            .environment(router)
-            .environment(router.locationService)
-            .scaledToFill()
-            .frame(maxWidth: 450)
-            .presentationSizing(.fitted)
+            TransitBottomSheet()
+                .safePresentationPlacement()
+                .presentationDetents(
+                    sizeClass == .compact
+                        ? BottomSheetDetent.presentationDetents : [Self.regularWidthPresentationDetent],
+                    selection: sheetPresentationDetent
+                )
+                .presentationBackground(Color(uiColor: .systemBackground))
+                .presentationBackgroundInteraction(
+                    sizeClass == .compact ? .enabled(upThrough: BottomSheetDetent.mediumPresentationDetent) : .enabled
+                )
+                .presentationCornerRadius(40)
+                .interactiveDismissDisabled()
+                // Keep the observation-based preference dependency explicit at
+                // this presentation boundary. Sheets have a separate hosting
+                // hierarchy, so relying on an inherited object can crash before
+                // the sheet's first body is rendered.
+                .environment(preferences)
+                .featureModels(router.models)
+                .environment(router)
+                .environment(router.locationService)
+                .scaledToFill()
+                .frame(maxWidth: 450)
+                .presentationSizing(.fitted)
         }
         .fullScreenCover(
             isPresented: onboardingPresentationBinding,

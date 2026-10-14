@@ -1,55 +1,41 @@
+import SwiftData
 import SwiftUI
 
+/// The Home tab: disruptions, special events, the commute suggestion, then
+/// favourite, nearby and recent stops.
 struct CommuteDashboardView: View {
-    enum DisplayStyle {
-        case regular
-        case mapsMedium
-    }
+    @Environment(MapModel.self) private var map
+    @Environment(SearchModel.self) private var search
+    @Environment(AlertsModel.self) private var alerts
+    @Environment(RoutePlannerModel.self) private var routePlanner
+    @Environment(FavouritesModel.self) private var favourites
+    @Environment(SheetRouter.self) private var router
+    @Environment(\.liveTransitService) private var liveTransitService
+    @Environment(\.gtfsService) private var gtfsService
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \PersistedFavouriteStop.createdAt) private var favouriteStops: [PersistedFavouriteStop]
 
-    let viewModel: CommuteDashboardViewModel
-    let favouritesViewModel: FavouritesPresentationModel
-    let favouritesActions: FavouritesActions
-    let openSpecialEvent: (SpecialEvent) -> Void
-    var displayStyle: DisplayStyle = .regular
-
-    @State private var editingFavourite: FavouriteStopPresentationModel?
+    @State private var editingFavourite: PersistedFavouriteStop?
     @State private var lastEditedFavouriteID: String?
     @AccessibilityFocusState private var focusedFavouriteID: String?
 
     var body: some View {
+        let specialEvents = SpecialEventCatalog.activeEvents()
+        let recentStops = search.distinctRecentStops
+
         List {
-            if hasDashboardCards {
-                if viewModel.activeAlertCount > 0 {
-                    Section {
-                        AlertsSummaryRow(alertCount: viewModel.activeAlertCount)
-                    }
-                    .listRowBackground(Color.orange.opacity(0.12))
-                }
-
-                Section {
-                    ForEach(viewModel.specialEvents) { event in
-                        SpecialEventRow(event: event) {
-                            openSpecialEvent(event)
-                        }
-                    }
-
-                    if let preset = viewModel.suggestedCommutePreset {
-                        CommuteSuggestionRow(preset: preset)
-                    }
-                }
-                .listRowBackground(Color.clear)
-                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                .listRowSeparator(.hidden)
+            if alerts.activeAlertCount > 0 || !specialEvents.isEmpty || routePlanner.suggestedCommutePreset != nil {
+                dashboardCards(specialEvents: specialEvents)
             }
 
-            if !favouritesViewModel.stops.isEmpty {
+            if !favouriteStops.isEmpty {
                 favouritesSection
             }
 
             nearbySection
 
-            if !viewModel.recentStops.isEmpty {
-                recentsSection
+            if !recentStops.isEmpty {
+                recentsSection(recentStops)
             }
         }
         .listStyle(.insetGrouped)
@@ -62,42 +48,73 @@ struct CommuteDashboardView: View {
                 initialColorHex: favourite.colorHex,
                 initialIconName: favourite.iconName
             ) { label, colorHex, iconName in
-                favouritesActions.updateAppearance(favourite.stop.id, label, colorHex, iconName)
+                favourites.updateAppearance(
+                    stopID: favourite.stopId,
+                    label: label,
+                    colorHex: colorHex,
+                    iconName: iconName,
+                    in: modelContext
+                )
             }
         }
     }
+}
 
-    private var favouritesSection: some View {
-        carouselSection("Favourites") {
-            pagedListSection(favouritesViewModel.stops, favorite: true) { favourite in
-                favouriteStopRow(favourite)
-            }
-        }
-    }
+// MARK: - Sections
 
+private extension CommuteDashboardView {
     @ViewBuilder
-    private var nearbySection: some View {
+    func dashboardCards(specialEvents: [SpecialEvent]) -> some View {
+        if alerts.activeAlertCount > 0 {
+            Section {
+                AlertsSummaryRow(alertCount: alerts.activeAlertCount)
+            }
+            .listRowBackground(Color.orange.opacity(0.12))
+        }
+
         Section {
-            if viewModel.nearby.isLoading, viewModel.nearby.stops.isEmpty {
+            ForEach(specialEvents) { event in
+                // TODO: Open the event's stop. The lookup was lost in a581393, so this does nothing yet.
+                SpecialEventRow(event: event) {}
+            }
+
+            if let preset = routePlanner.suggestedCommutePreset {
+                CommuteSuggestionRow(preset: preset)
+            }
+        }
+        .listRowBackground(Color.clear)
+        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+        .listRowSeparator(.hidden)
+    }
+
+    var favouritesSection: some View {
+        carouselSection("Favourites") {
+            pagedListSection(favouriteStops, favorite: true) { favourite in
+                favouriteRow(favourite)
+            }
+        }
+    }
+
+    var nearbySection: some View {
+        Section {
+            let nearbyStops = map.distinctNearbyStops
+            if map.isLoadingNearbyStops, nearbyStops.isEmpty {
                 DepartureLoadingCard(title: "Finding nearby stops")
-            } else if let errorMessage = viewModel.nearby.errorMessage {
+            } else if let errorMessage = map.nearbyStopsErrorMessage {
                 CompactUnavailableCard(
                     title: "Nearby stops unavailable",
                     message: errorMessage,
                     systemImage: "location.slash"
                 )
-            } else if viewModel.nearby.stops.isEmpty {
+            } else if nearbyStops.isEmpty {
                 CompactUnavailableCard(
                     title: "No nearby stops",
                     message: "Use search to find and save a stop.",
                     systemImage: "mappin.slash"
                 )
             } else {
-                pagedListSection(Array(viewModel.nearby.stops.prefix(6))) { stop in
-                    stopNavigationRow(
-                        stop,
-                        routes: viewModel.nearby.routesByStopId[stop.id] ?? []
-                    )
+                pagedListSection(Array(nearbyStops.prefix(6))) { stop in
+                    stopNavigationRow(stop, routes: map.nearbyStopRoutes[stop.id] ?? [])
                 }
             }
         } header: {
@@ -108,15 +125,15 @@ struct CommuteDashboardView: View {
         .listRowSeparator(.hidden)
     }
 
-    private var recentsSection: some View {
+    func recentsSection(_ recentStops: [Stop]) -> some View {
         carouselSection("Recents") {
-            pagedListSection(viewModel.recentStops) { stop in
+            pagedListSection(recentStops) { stop in
                 stopNavigationRow(stop)
             }
         }
     }
 
-    private func carouselSection<Content: View>(
+    func carouselSection<Content: View>(
         _ title: LocalizedStringKey,
         @ViewBuilder content: () -> Content
     ) -> some View {
@@ -129,7 +146,7 @@ struct CommuteDashboardView: View {
         .listSectionMargins(.horizontal, 0)
     }
 
-    private func pagedListSection<Item, Row: View>(
+    func pagedListSection<Item, Row: View>(
         _ items: [Item],
         favorite: Bool = false,
         @ViewBuilder row: @escaping (Item) -> Row
@@ -139,89 +156,100 @@ struct CommuteDashboardView: View {
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
     }
+}
 
-    private func stopNavigationRow(_ stop: Stop, routes: [TransitRoute] = []) -> some View {
+// MARK: - Rows
+
+private extension CommuteDashboardView {
+    func stopNavigationRow(_ stop: Stop, routes: [TransitRoute] = []) -> some View {
         NavigationLink(value: TransitSheetRoute.stopDetail(stop)) {
             StopRow(stop: stop, routes: routes)
         }
     }
 
-    private func favouriteStopRow(_ favourite: FavouriteStopPresentationModel) -> some View {
-        Button {
-            favouritesActions.openStop(favourite.stop)
+    func favouriteRow(_ favourite: PersistedFavouriteStop) -> some View {
+        let stop = favourite.stop
+        return Button {
+            openStop(stop)
         } label: {
             StopRow(
-                stop: favourite.stop,
-                markerColor: favourite.colorHex.map { Color(hex: $0) } ?? favourite.stop.modes.primaryMode.tint,
-                title: favourite.displayLabel ?? favourite.stop.displayName,
-                subtitle: favourite.stop.modes.contains(.train)
-                    ? favourite.stop.displaySubtitle : favourite.stop.fullName,
+                stop: stop,
+                markerColor: favourite.colorHex.map { Color(hex: $0) } ?? stop.modes.primaryMode.tint,
+                title: favourite.displayLabel ?? stop.displayName,
+                subtitle: stop.modes.contains(.train) ? stop.displaySubtitle : stop.fullName,
                 iconName: favourite.iconName
             )
         }
         .foregroundStyle(.primary)
-        .accessibilityFocused($focusedFavouriteID, equals: favourite.id)
+        .accessibilityFocused($focusedFavouriteID, equals: favourite.stopId)
         .accessibilityHint("Opens departures for this stop")
-        .accessibilityAction(named: "Plan to \(favourite.stop.displayName)") {
-            favouritesActions.planTo(favourite.stop)
+        .accessibilityAction(named: "Plan to \(stop.displayName)") {
+            router.planRoute(to: stop)
         }
-        .accessibilityAction(named: "Plan from \(favourite.stop.displayName)") {
-            favouritesActions.planFrom(favourite.stop)
+        .accessibilityAction(named: "Plan from \(stop.displayName)") {
+            router.planRoute(from: stop)
         }
         .contextMenu {
-            favouriteContextMenu(for: favourite)
-        }
-    }
-
-    private func restoreEditedFavouriteFocus() {
-        guard let lastEditedFavouriteID else { return }
-        Task { @MainActor in
-            focusedFavouriteID = lastEditedFavouriteID
-            self.lastEditedFavouriteID = nil
+            favouriteContextMenu(for: favourite, stop: stop)
         }
     }
 
     @ViewBuilder
-    private func favouriteContextMenu(for favourite: FavouriteStopPresentationModel) -> some View {
-        let stop = favourite.stop
+    func favouriteContextMenu(for favourite: PersistedFavouriteStop, stop: Stop) -> some View {
         Button {
-            favouritesActions.openStop(stop)
+            openStop(stop)
         } label: {
             Label("Open departures", systemImage: "clock")
         }
         Button {
-            favouritesActions.planTo(stop)
+            router.planRoute(to: stop)
         } label: {
             Label("Plan to this stop", systemImage: "arrow.right.circle")
         }
         Button {
-            favouritesActions.planFrom(stop)
+            router.planRoute(from: stop)
         } label: {
             Label("Plan from this stop", systemImage: "arrow.left.circle")
         }
         Button {
-            Task { await favouritesActions.refreshStop(stop) }
+            Task {
+                await favourites.refreshFavouriteDeparture(
+                    stop: stop,
+                    using: liveTransitService,
+                    gtfsService: gtfsService
+                )
+            }
         } label: {
             Label("Refresh departures", systemImage: "arrow.clockwise")
         }
         Button {
-            lastEditedFavouriteID = favourite.id
+            lastEditedFavouriteID = favourite.stopId
             editingFavourite = favourite
         } label: {
             Label("Customize favourite", systemImage: "paintpalette")
         }
         Divider()
         Button(role: .destructive) {
-            favouritesActions.removeFavourite(stop.id)
+            favourites.remove(stopID: stop.id, in: modelContext)
         } label: {
             Label("Remove favourite", systemImage: "star.slash")
         }
     }
+}
 
-    private var hasDashboardCards: Bool {
-        viewModel.activeAlertCount > 0
-            || !viewModel.specialEvents.isEmpty
-            || viewModel.suggestedCommutePreset != nil
+// MARK: - Helpers
+
+private extension CommuteDashboardView {
+    func openStop(_ stop: Stop) {
+        router.show([.stopDetail(stop)], detent: .medium)
+    }
+
+    func restoreEditedFavouriteFocus() {
+        guard let lastEditedFavouriteID else { return }
+        Task { @MainActor in
+            focusedFavouriteID = lastEditedFavouriteID
+            self.lastEditedFavouriteID = nil
+        }
     }
 }
 

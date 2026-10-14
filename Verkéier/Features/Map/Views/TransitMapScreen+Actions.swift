@@ -63,37 +63,6 @@ extension TransitMapScreen {
         }
     }
 
-    var sheetActions: TransitSheetActions {
-        TransitSheetActions(
-            openSpecialEvent: openSpecialEvent,
-            favourites: FavouritesActions(
-                openStop: { router.show([.stopDetail($0)], detent: .medium) },
-                planTo: router.planRoute(to:),
-                planFrom: router.planRoute(from:),
-                refreshStop: refreshFavouriteStop,
-                refreshAll: refreshFavouriteStops,
-                updateLabels: updateFavouriteLabels,
-                updateAppearance: updateFavouriteAppearance,
-                removeFavourite: removeFavourite,
-                findStop: router.showSearch
-            )
-        )
-    }
-
-    func openSpecialEvent(_ event: SpecialEvent) {
-        Task { @MainActor in
-            _ = event
-        }
-    }
-
-    func refreshFavouriteStop(_ stop: Stop) async {
-        await favourites.refreshFavouriteDeparture(
-            stop: stop,
-            using: liveTransitService,
-            gtfsService: gtfsService
-        )
-    }
-
     func refreshFavouriteStops() async {
         await favourites.loadFavouriteDepartures(
             favourites: favouriteStops,
@@ -101,23 +70,4 @@ extension TransitMapScreen {
             gtfsService: gtfsService
         )
     }
-
-    func updateFavouriteLabels(stopID: String, labels: [String]) {
-        favourites.updateLabels(stopID: stopID, labels: labels, in: modelContext)
-    }
-
-    func updateFavouriteAppearance(stopID: String, label: String, colorHex: String, iconName: String) {
-        favourites.updateAppearance(
-            stopID: stopID,
-            label: label,
-            colorHex: colorHex,
-            iconName: iconName,
-            in: modelContext
-        )
-    }
-
-    func removeFavourite(stopID: String) {
-        favourites.remove(stopID: stopID, in: modelContext)
-    }
-
 }

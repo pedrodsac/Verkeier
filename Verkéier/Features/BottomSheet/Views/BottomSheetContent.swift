@@ -1,28 +1,16 @@
 import SwiftUI
 
+/// The Home tab's root: search results while searching, the dashboard otherwise.
 struct BottomSheetContent: View {
-    @Binding var isSearchActive: Bool
-    let detent: BottomSheetDetent
+    let isSearchActive: Bool
     let contentTopPadding: CGFloat
-    let viewModel: CommuteDashboardViewModel
-    let favouritesViewModel: FavouritesPresentationModel
-    let favouritesActions: FavouritesActions
-    let openSpecialEvent: (SpecialEvent) -> Void
 
     var body: some View {
-        Group {
-            if isSearchActive {
-                SearchResultsContent()
-            } else {
-                CommuteDashboardView(
-                    viewModel: viewModel,
-                    favouritesViewModel: favouritesViewModel,
-                    favouritesActions: favouritesActions,
-                    openSpecialEvent: openSpecialEvent,
-                    displayStyle: detent == .medium ? .mapsMedium : .regular
-                )
+        if isSearchActive {
+            SearchResultsContent()
+        } else {
+            CommuteDashboardView()
                 .contentMargins(.top, contentTopPadding, for: .scrollContent)
-            }
         }
     }
 }
