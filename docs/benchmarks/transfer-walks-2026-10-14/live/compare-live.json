@@ -1,0 +1,168 @@
+{
+  "comparisons": [
+    {
+      "scenario": "live-now",
+      "process": "cold",
+      "samples": 1,
+      "before_ms": 8314.495916,
+      "after_ms": 4466.579666,
+      "change_percent": -46.27960959840347,
+      "before_memory_bytes": 931627008,
+      "after_memory_bytes": 809107456,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "matchingRejections",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ],
+      "unavailable_fields": [
+        "modePreference"
+      ]
+    },
+    {
+      "scenario": "live-now",
+      "process": "priming",
+      "samples": 1,
+      "before_ms": 7601.212417,
+      "after_ms": 5711.828333,
+      "change_percent": -24.856351596942872,
+      "before_memory_bytes": 935100416,
+      "after_memory_bytes": 809664512,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "matchingRejections",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ],
+      "unavailable_fields": [
+        "modePreference"
+      ]
+    },
+    {
+      "scenario": "live-now",
+      "process": "warm",
+      "samples": 1,
+      "before_ms": 3568.966208,
+      "after_ms": 3656.8477080000002,
+      "change_percent": 2.46237971665324,
+      "before_memory_bytes": 954171392,
+      "after_memory_bytes": 843481088,
+      "compared_fields": [
+        "planningTime",
+        "avoidTightTransfers",
+        "recommendedOption",
+        "options",
+        "unfilteredJourneys",
+        "journeys",
+        "displayedLegs",
+        "realtimeCoverage",
+        "refreshPolicy",
+        "canonicalPlans",
+        "canonicalSupplementalPlans",
+        "matchingRejections",
+        "canLoadEarlier",
+        "canLoadLater",
+        "supplementalOptions"
+      ],
+      "unavailable_fields": [
+        "modePreference"
+      ]
+    }
+  ],
+  "differences": [
+    {
+      "scenario": [
+        "live-now",
+        "cold"
+      ],
+      "sample": 0,
+      "field": "planningTime"
+    },
+    {
+      "scenario": [
+        "live-now",
+        "cold"
+      ],
+      "sample": 0,
+      "field": "canonicalSupplementalPlans"
+    },
+    {
+      "scenario": [
+        "live-now",
+        "cold"
+      ],
+      "sample": 0,
+      "field": "matchingRejections"
+    },
+    {
+      "scenario": [
+        "live-now",
+        "priming"
+      ],
+      "sample": 0,
+      "field": "planningTime"
+    },
+    {
+      "scenario": [
+        "live-now",
+        "priming"
+      ],
+      "sample": 0,
+      "field": "canonicalSupplementalPlans"
+    },
+    {
+      "scenario": [
+        "live-now",
+        "priming"
+      ],
+      "sample": 0,
+      "field": "matchingRejections"
+    },
+    {
+      "scenario": [
+        "live-now",
+        "warm"
+      ],
+      "sample": 0,
+      "field": "planningTime"
+    },
+    {
+      "scenario": [
+        "live-now",
+        "warm"
+      ],
+      "sample": 0,
+      "field": "canonicalSupplementalPlans"
+    },
+    {
+      "scenario": [
+        "live-now",
+        "warm"
+      ],
+      "sample": 0,
+      "field": "matchingRejections"
+    }
+  ]
+}

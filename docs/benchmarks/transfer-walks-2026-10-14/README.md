@@ -79,3 +79,27 @@ The table is built once per walking graph/timetable: **5.5-6.7 s** for 11,188 pa
 - Recorded transport answers instantly. Live ATP acquisition, which the earlier benchmarks showed was the other half of live search latency, is not measured here, so
   this is not a live-search result.
 - Simulator, not a physical device.
+
+## Live ATP check (run later the same day)
+
+Re-run because network conditions may have changed. Simulator, live ATP, departure "now" (Gromscheed → Konrad Adenauer), one interleaved pass per arm
+(`main` first, then the branch with stored walks on; the branch build is HEAD `26edc99`). One sample per cell, so treat these as indicative.
+
+| Search | Before (`main`, ms) | After (branch, ms) | Change |
+|---|---:|---:|---:|
+| Fresh process (cold) | 8,314 | 4,467 | −46% |
+| First search after launch (priming) | 7,601 | 5,712 | −25% |
+| Warm (same process) | 3,569 | 3,657 | +2% (noise) |
+
+The warm search gains nothing because the in-memory walk cache already holds those walks. The stored table helps a cold process start.
+
+**Identical inputs.** Live responses differ between runs (predicted events 3,538 vs 3,507), so the live pair cannot prove identity. The combined live captures
+of both runs were replayed through both builds with the same bike snapshot and planning time (no ATP requests). On identical data every route field matched,
+including canonical plans, journeys, displayed legs and realtime coverage. The one difference is `matchingRejections` (52 vs 53 predictions outside a board's
+time window) in the cold priming search, where the baseline's realtime acquisition took 3.9 s against 1.2 s on the branch, so the windows fell differently.
+Replay timings: priming 6,605 → 3,912 ms; warm 3,435 → 2,985 ms.
+
+**Attempts.** The first "before" attempt stopped on an ATP HTTP 503 (`provider-error-503`) and was rerun. The first "after" attempt stopped on this
+harness's request budget during arrive-by, which costs about 68 requests per search. Arrive-by was dropped from this pass. Each live run recorded 87–89 ATP
+responses. Raw captures (about 100 MB of third-party responses) are not committed; `samples-digest.json` holds timings and plan hashes, and
+`replay/compare-identical-capture.json` holds the comparison.
