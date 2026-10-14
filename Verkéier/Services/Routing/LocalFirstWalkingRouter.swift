@@ -1,5 +1,6 @@
 import Foundation
 import MobiliteitKit
+import OSLog
 
 /// Uses only the active immutable OSM pedestrian graph. A replacement is picked up on
 /// the next request without ever modifying an engine's open tile archive.
@@ -15,9 +16,17 @@ actor LocalFirstWalkingRouter: WalkingRouting {
     // Each native instance remains serialized. Independent instances allow
     // the bounded four-request transfer batch to use four cores.
     private let maximumLocalRouters = 4
+    private let transferWalkStore: TransferWalkStore?
+    private let transferWalkMode: TransferWalkMode
+    private var transferWalks: (revision: String, table: TransferWalkTable?)?
+    private var transferWalkHits = 0
+    private var transferWalkMisses = 0
 
-    init(datasetManager: RoutingDatasetManager) {
+    init(datasetManager: RoutingDatasetManager, transferWalkStore: TransferWalkStore? = nil,
+         transferWalkMode: TransferWalkMode = TransferWalkSettings.mode) {
         self.datasetManager = datasetManager
+        self.transferWalkStore = transferWalkStore
+        self.transferWalkMode = transferWalkMode
     }
 
     func checkAvailability() async throws {
@@ -28,6 +37,7 @@ actor LocalFirstWalkingRouter: WalkingRouting {
     /// local work, but doing it on the request path can exhaust the UI deadline.
     func prepareLocalGraph() async {
         _ = try? await withLocalRouter { _ in true }
+        if let dataset = try? await datasetManager.activeDataset() { _ = transferWalkTable(for: dataset) }
     }
 
     func estimates(
@@ -77,17 +87,77 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         // One immutable graph revision for the whole batch. Checking the
         // current/manifest/archive files for every pair repeated thousands of
         // filesystem operations inside each walking-transfer round.
+        let table = transferWalkTable(for: dataset)
         return await WalkingRouteBatch.resolve(requests, maximumConcurrency: maximumConcurrency) {
-            try await self.route(from: $0.from, to: $0.to, dataset: dataset, preferShortSearch: true)
+            try await self.route(from: $0.from, to: $0.to, dataset: dataset, preferShortSearch: true, table: table)
         }
     }
 
     private func route(from origin: LocationPoint, to destination: LocationPoint,
-                       dataset: RoutingDataset, preferShortSearch: Bool = false) async throws -> OfflineWalkingRoute {
+                       dataset: RoutingDataset, preferShortSearch: Bool = false,
+                       table: TransferWalkTable? = nil) async throws -> OfflineWalkingRoute {
         return try await measuredRoutes.route(from: origin, to: destination, revision: Self.revision(dataset)) {
-            try await self.uncachedRoute(from: origin, to: destination, dataset: dataset, preferShortSearch: preferShortSearch)
+            try await self.calculatedRoute(from: origin, to: destination, dataset: dataset,
+                                           preferShortSearch: preferShortSearch, table: table)
         }
     }
+
+    /// The deterministic computation behind the measured cache. A stored transfer
+    /// walk replaces only this computation, so cache keys, ordering and the
+    /// short/full-search race stay exactly as they are without the table.
+    private func calculatedRoute(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset,
+                                 preferShortSearch: Bool, table: TransferWalkTable?) async throws -> OfflineWalkingRoute {
+        guard preferShortSearch, let table, from.name == nil, to.name == nil,
+              let stored = table.outcome(for: TransferWalkKey(from: from, to: to)) else {
+            if preferShortSearch, table != nil { transferWalkMisses += 1 }
+            return try await uncachedRoute(from: from, to: to, dataset: dataset, preferShortSearch: preferShortSearch)
+        }
+        try Task.checkCancellation()
+        if transferWalkMode == .verify { return try await verified(stored, from: from, to: to, dataset: dataset) }
+        transferWalkHits += 1
+        switch stored {
+        case .route(let route): return route
+        case .noRoute: throw WalkingRoutingError.noRoute
+        }
+    }
+
+    /// Debug and benchmark builds only: recompute live and compare with the table.
+    private func verified(_ stored: TransferWalkOutcome, from: LocationPoint, to: LocationPoint,
+                          dataset: RoutingDataset) async throws -> OfflineWalkingRoute {
+        let live: TransferWalkOutcome
+        do { live = .route(try await uncachedRoute(from: from, to: to, dataset: dataset, preferShortSearch: true)) }
+        catch WalkingRoutingError.noRoute { live = .noRoute }
+        if live != stored {
+            Logger(subsystem: "dev.pedrocordeiro.Verkeier", category: "TransferWalks")
+                .fault("Stored transfer walk differs from the live computation for \(from.latitude),\(from.longitude) to \(to.latitude),\(to.longitude)")
+            assertionFailure("Stored transfer walk differs from the live computation")
+        }
+        transferWalkHits += 1
+        switch live {
+        case .route(let route): return route
+        case .noRoute: throw WalkingRoutingError.noRoute
+        }
+    }
+
+    // MARK: Stored transfer walks
+
+    /// Loads the stored table once per walking graph. A table built for another
+    /// graph is ignored but kept; a table that fails validation is removed, but
+    /// only if it is still the exact file that failed.
+    private func transferWalkTable(for dataset: RoutingDataset) -> TransferWalkTable? {
+        guard transferWalkMode != .off, let store = transferWalkStore else { return nil }
+        if let transferWalks, transferWalks.revision == dataset.revision { return transferWalks.table }
+        var table: TransferWalkTable?
+        switch store.load() {
+        case .table(let loaded) where loaded.graphIdentity == dataset.transferWalkIdentity.value: table = loaded
+        case .invalid(let stamp): store.discard(ifStillMatching: stamp)
+        case .table, .missing, .unreadable: break
+        }
+        transferWalks = (dataset.revision, table)
+        return table
+    }
+
+    func transferWalkStatistics() -> (hits: Int, misses: Int) { (transferWalkHits, transferWalkMisses) }
 
     func cacheRevision() async -> String? {
         guard let dataset = try? await datasetManager.activeDataset() else { return nil }
@@ -98,13 +168,25 @@ actor LocalFirstWalkingRouter: WalkingRouting {
         "\(dataset.revision)|\(PafendallFunicularConnection.revision)"
     }
 
+    /// `strict` is used only when building the stored table: it rethrows any
+    /// failure that is not a deterministic routing failure instead of treating
+    /// it as "no route". Without it the behaviour is the original `try?` flow.
     private func uncachedRoute(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset,
-                               preferShortSearch: Bool = false) async throws -> OfflineWalkingRoute {
-        let direct = try? await pedestrianRoute(from: from, to: to, dataset: dataset, preferShortSearch: preferShortSearch)
+                               preferShortSearch: Bool = false, strict: Bool = false) async throws -> OfflineWalkingRoute {
+        let direct: OfflineWalkingRoute?
+        do { direct = try await pedestrianRoute(from: from, to: to, dataset: dataset, preferShortSearch: preferShortSearch) }
+        catch let error where strict && !TransferWalkErrorClassifier.isDeterministic(error) { throw error }
+        catch { direct = nil }
         try Task.checkCancellation()
-        if let connection = try? await PafendallFunicularConnection.route(from: from, to: to, pedestrian: {
-            try await self.pedestrianRoute(from: $0, to: $1, dataset: dataset)
-        }), direct == nil || connection.duration < direct!.duration {
+        let connection: OfflineWalkingRoute?
+        do {
+            connection = try await PafendallFunicularConnection.route(from: from, to: to, pedestrian: {
+                try await self.pedestrianRoute(from: $0, to: $1, dataset: dataset)
+            })
+        }
+        catch let error where strict && !TransferWalkErrorClassifier.isDeterministic(error) { throw error }
+        catch { connection = nil }
+        if let connection, direct == nil || connection.duration < direct!.duration {
             return connection
         }
         try Task.checkCancellation()
@@ -179,5 +261,37 @@ actor LocalFirstWalkingRouter: WalkingRouting {
             coordinates: route.coordinates,
             source: route.source
         )
+    }
+
+    // MARK: Transfer walk computation
+
+    func prepareTransferWalkComputation() async throws -> RoutingDataset {
+        guard let dataset = try await datasetManager.activeDataset() else { throw WalkingRoutingError.datasetUnavailable }
+        // Open the first native router now, so later pool calls cannot fail on creation.
+        _ = try await withLocalRouter(dataset: dataset) { _ in true }
+        return dataset
+    }
+
+    func transferWalkOutcome(from: LocationPoint, to: LocationPoint, dataset: RoutingDataset) async throws -> TransferWalkOutcome {
+        do {
+            let route = try await uncachedRoute(from: from, to: to, dataset: dataset, preferShortSearch: true, strict: true)
+            guard route.segments.isEmpty, route.source == .localOSM else {
+                throw TransferWalkTableError.unsupported("station connection")
+            }
+            return .route(route)
+        } catch WalkingRoutingError.noRoute {
+            return .noRoute
+        }
+    }
+
+    func isActiveDataset(_ dataset: RoutingDataset) async -> Bool {
+        (try? await datasetManager.activeDataset())?.revision == dataset.revision
+    }
+
+    /// Makes a freshly written table live for the running router.
+    func adoptTransferWalks(_ table: TransferWalkTable) async {
+        guard transferWalkMode != .off, let dataset = try? await datasetManager.activeDataset(),
+              table.graphIdentity == dataset.transferWalkIdentity.value else { return }
+        transferWalks = (dataset.revision, table)
     }
 }
