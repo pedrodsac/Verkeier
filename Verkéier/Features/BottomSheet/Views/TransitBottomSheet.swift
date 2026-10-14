@@ -48,13 +48,9 @@ struct TransitBottomSheet: View {
 
             Tab("Settings", systemImage: "gear", value: TransitSheetTab.settings) {
                 NavigationStack {
-                    SettingsView(
-                        viewModel: viewModel.settings,
-                        checkGTFSUpdate: actions.checkGTFSUpdate,
-                        setDebugDataMode: actions.setDebugDataMode
-                    )
-                    .navigationTitle("Settings")
-                    .toolbarTitleDisplayMode(.inline)
+                    SettingsView()
+                        .navigationTitle("Settings")
+                        .toolbarTitleDisplayMode(.inline)
                 }
             }
         }

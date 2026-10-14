@@ -128,44 +128,8 @@ extension TransitMapScreen {
                 lastUpdated: viewModel.alertsLastUpdated,
                 isStale: viewModel.areAlertsStale
             ),
-            settings: SettingsPresentationModel(
-                configuration: appConfiguration,
-                readiness: settingsReadinessSnapshot,
-                gtfsStatus: viewModel.gtfsFeedStatus,
-                supportBundleText: settingsSupportBundleText,
-                debugDataMode: debugTransitDataMode
-            ),
             tripDetail: tripDetailViewModel
         )
-    }
-
-    var settingsReadinessSnapshot: DataReadinessSnapshot {
-        SettingsSupport.readinessSnapshot(
-            configuration: appConfiguration,
-            gtfsStatus: viewModel.gtfsFeedStatus,
-            liveTransitLastUpdated: viewModel.liveTransitLastUpdated,
-            liveTransitErrorMessage: viewModel.liveTransitErrorMessage
-        )
-    }
-
-    var settingsSupportBundleText: String {
-        SettingsSupport.supportBundleText(
-            appVersion: appVersion,
-            readiness: settingsReadinessSnapshot,
-            configuration: appConfiguration
-        )
-    }
-
-    var appVersion: String {
-        let version =
-            Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-            ?? "1.0"
-        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
-        return "\(version) (\(build))"
-    }
-
-    var debugTransitDataMode: DebugTransitDataMode {
-        DebugTransitDataMode(rawValue: debugTransitDataModeRawValue) ?? .normal
     }
 
     var departureReminderForSelectedStop: SharedTrackedDepartureReminder? {

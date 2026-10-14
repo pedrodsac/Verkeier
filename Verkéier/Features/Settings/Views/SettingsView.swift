@@ -1,10 +1,6 @@
 import SwiftUI
 
 struct SettingsView: View {
-    let viewModel: SettingsPresentationModel
-    let checkGTFSUpdate: () -> Void
-    let setDebugDataMode: (DebugTransitDataMode) -> Void
-
     @Environment(AppPreferences.self) private var preferences
 
     var body: some View {
@@ -59,27 +55,6 @@ struct SettingsView: View {
                 Text("Choose which transport modes route planning can use.")
             }
 
-            //            Section("Schedules") {
-            //                LabeledContent("Status", value: viewModel.gtfsStatus.statusText)
-            //                LabeledContent("Released") {
-            //                    timetableDate(viewModel.gtfsStatus.releasedAt)
-            //                }
-            //                LabeledContent("Last checked") {
-            //                    timetableDate(viewModel.gtfsStatus.lastCheckedAt, includesTime: true)
-            //                }
-            //
-            //				if viewModel.isRefreshingTimetable {
-            //					ProgressView()
-            //						.progressViewStyle(.linear)
-            //						.accessibilityLabel("Refreshing timetable")
-            //				}
-            //
-            //                Button(action: checkGTFSUpdate) {
-            //                    Label("Refresh", systemImage: "arrow.clockwise")
-            //                }
-            //                .disabled(viewModel.isRefreshingTimetable)
-            //            }
-
             Section {
                 Toggle(isOn: $prefs.showBusStops) {
                     mapPinLabel("Bus stops", mode: .bus)
@@ -129,47 +104,9 @@ struct SettingsView: View {
         }
     }
 
-    @ViewBuilder
-    private func timetableDate(_ date: Date?, includesTime: Bool = false) -> some View {
-        if let date {
-            Text(date.formatted(date: .abbreviated, time: includesTime ? .shortened : .omitted))
-                .foregroundStyle(.secondary)
-        } else {
-            Text("—")
-                .foregroundStyle(.secondary)
-        }
-    }
 }
 
 #Preview {
-    SettingsView(
-        viewModel: SettingsPresentationModel(
-            configuration: .current,
-            readiness: DataReadinessSnapshot(
-                summaryTitle: "Transit data is ready",
-                summaryMessage: "",
-                items: []
-            ),
-            gtfsStatus: .unavailable,
-            supportBundleText: "Preview",
-            debugDataMode: .normal
-        ),
-        checkGTFSUpdate: {},
-        setDebugDataMode: { _ in }
-    )
-    .environment(AppPreferences())
-}
-
-struct TimetablePreparationProgress: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            ProgressView()
-                .progressViewStyle(.linear)
-            Text("Downloading timetable…")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Preparing timetable data")
-    }
+    SettingsView()
+        .environment(AppPreferences())
 }

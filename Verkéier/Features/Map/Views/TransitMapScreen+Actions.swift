@@ -103,8 +103,6 @@ extension TransitMapScreen {
             updateSearch: updateSearch,
             selectLineDetailDirection: selectLineDetailDirection,
             refreshLineDetail: refreshLineDetail,
-            checkGTFSUpdate: checkGTFSUpdate,
-            setDebugDataMode: setDebugDataMode,
             favourites: FavouritesActions(
                 openStop: openFavouriteStop,
                 planTo: planToFavouriteStop,
@@ -447,40 +445,6 @@ extension TransitMapScreen {
     func refreshLineDetail() async {
         viewModel.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: true)
         await viewModel.loadLineDetail(using: gtfsService)
-    }
-
-    func checkGTFSUpdate() {
-        guard viewModel.gtfsFeedStatus.phase != .checking,
-            viewModel.gtfsFeedStatus.phase != .downloading
-        else { return }
-        viewModel.gtfsFeedStatus.phase = .checking
-        Task {
-            viewModel.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: true)
-            await viewModel.loadGTFSMapStops(location: locationService.currentLocation, using: gtfsService)
-            await viewModel.loadNearbyStops(
-                location: locationService.currentLocation,
-                using: liveTransitService,
-                gtfsService: gtfsService,
-                walkingRouter: walkingRouter,
-                force: true
-            )
-            await viewModel.loadNearbyStopRoutes(using: gtfsService)
-            if viewModel.selectedStop != nil {
-                await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
-                await viewModel.updateSelectedStopRoutes(using: gtfsService)
-            }
-        }
-    }
-
-    func setDebugDataMode(_ mode: DebugTransitDataMode) {
-        debugTransitDataModeRawValue = mode.rawValue
-        Task {
-            await loadAlertsAndCheckDisruptions()
-            await refreshFavouriteStops()
-            if viewModel.selectedStop != nil {
-                await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
-            }
-        }
     }
 
     func calculateRoute() {

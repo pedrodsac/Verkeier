@@ -6,8 +6,6 @@ import SwiftData
 import SwiftUI
 
 struct TransitMapScreen: View {
-    @AppStorage("debugTransitDataMode") var debugTransitDataModeRawValue =
-        DebugTransitDataMode.normal.rawValue
     @Environment(\.scenePhase) var scenePhase
     @Environment(\.tripDetailService) var tripDetailService
     @Environment(\.routeService) var routeService

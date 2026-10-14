@@ -5,10 +5,9 @@ import SwiftUI
 @main
 struct VerkéierApp: App {
     @State private var locationService = LocationService()
-    @AppStorage("debugTransitDataMode") private var debugTransitDataModeRawValue =
-        DebugTransitDataMode.normal.rawValue
     @State private var preferences = AppPreferences.shared
     private let configuration: AppConfiguration
+    private let avlClient: any AVLClient
     private let bikeShareService: any BikeShareService
     private let gtfsService: any GTFSService
     private let liveTransitService: any LiveTransitService
@@ -26,6 +25,7 @@ struct VerkéierApp: App {
     init() {
         let configuration = AppConfiguration.current
         self.configuration = configuration
+        avlClient = LiveAVLClient(feedURL: configuration.avlMessagesURL)
         bikeShareService = JCDecauxBikeShareService(configuration: configuration)
         let gtfsService = MobiliteitGTFSService()
         self.gtfsService = gtfsService
@@ -138,22 +138,5 @@ struct VerkéierApp: App {
             .modelContainer(modelContainer)
             .preferredColorScheme(preferences.appearance.colorScheme)
         }
-    }
-
-    private var avlClient: any AVLClient {
-        switch debugTransitDataMode {
-        case .normal, .sample:
-            LiveAVLClient(feedURL: configuration.avlMessagesURL)
-        case .empty:
-            EmptyAVLClient()
-        case .failure:
-            FailingAVLClient()
-        case .disruption:
-            SevereMockAVLClient()
-        }
-    }
-
-    private var debugTransitDataMode: DebugTransitDataMode {
-        DebugTransitDataMode(rawValue: debugTransitDataModeRawValue) ?? .normal
     }
 }

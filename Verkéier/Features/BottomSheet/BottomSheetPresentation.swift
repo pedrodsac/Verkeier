@@ -10,7 +10,6 @@ struct TransitSheetPresentationModel {
     let route: RoutePresentationModel
     let lineDetail: LineDetailPresentationModel
     let alerts: AlertsPresentationModel
-    let settings: SettingsPresentationModel
     var tripDetail: TripDetailViewModel? = nil
 }
 
@@ -46,8 +45,6 @@ struct TransitSheetActions {
     let updateSearch: () -> Void
     let selectLineDetailDirection: (String) -> Void
     let refreshLineDetail: () async -> Void
-    let checkGTFSUpdate: () -> Void
-    let setDebugDataMode: (DebugTransitDataMode) -> Void
     let favourites: FavouritesActions
     var openDepartureTrip: (Departure, Stop, TripDetailSelection) -> Void = { _, _, _ in }
     var refreshTripDetail: () async -> Void = {}
@@ -102,22 +99,4 @@ struct AlertsPresentationModel {
     let errorMessage: String?
     let lastUpdated: Date?
     let isStale: Bool
-}
-
-// MARK: - Settings
-
-struct SettingsPresentationModel {
-    let configuration: AppConfiguration
-    let readiness: DataReadinessSnapshot
-    let gtfsStatus: GTFSFeedStatus
-    let supportBundleText: String
-    let debugDataMode: DebugTransitDataMode
-
-    var isRefreshingTimetable: Bool {
-        gtfsStatus.phase == .checking || gtfsStatus.phase == .downloading
-    }
-
-    var isPreparingTimetable: Bool {
-        !gtfsStatus.isReady && gtfsStatus.phase != .failed
-    }
 }
