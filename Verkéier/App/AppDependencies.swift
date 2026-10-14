@@ -13,6 +13,7 @@ extension EnvironmentValues {
     @Entry var tripDetailService: any TripDetailService = UnavailableTripDetailService()
     @Entry var routeService: any RouteService = MapKitRouteService()
     @Entry var walkingRouter: any WalkingRouting = UnavailableWalkingRouter()
+    @Entry var routingOptimisationService: any RoutingOptimisationService = UnavailableRoutingOptimisationService()
     @Entry var avlClient: any AVLClient = LiveAVLClient(
         feedURL: AppConfiguration.current.avlMessagesURL
     )
