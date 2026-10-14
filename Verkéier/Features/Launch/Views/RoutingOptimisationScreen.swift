@@ -32,6 +32,9 @@ struct RoutingOptimisationScreen: View {
             Text(isFailed ? "Route preparation didn't finish" : "Getting routes ready")
                 .font(.title2.weight(.semibold))
                 .multilineTextAlignment(.center)
+            // The progress sits directly under the title so it stays on screen at
+            // the largest accessibility text sizes, where the text below scrolls.
+            if case .working(let progress) = state { progressView(progress) }
             Text(isFailed
                  ? "Route planning still works, but may be slower. Verkéier will try again the next time you open it."
                  : "Verkéier is measuring the walks between nearby stops so it can plan journeys faster. This only happens after a map or timetable update.")
@@ -39,8 +42,7 @@ struct RoutingOptimisationScreen: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             switch state {
-            case .working(let progress):
-                progressView(progress)
+            case .working:
                 Text("Keep Verkéier open until this finishes.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
