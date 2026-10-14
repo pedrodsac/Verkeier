@@ -297,7 +297,7 @@ struct WalkingRouteRefinementTests {
     func refinementStartsWithFirstVisibleUpdate() async throws {
         let probe = RefinementProbe()
         let service = StreamingRefiningRouteService(probe: probe)
-        let viewModel = TransitMapViewModel()
+        let viewModel = RoutePlannerModel()
         viewModel.routeOrigin = RoutePlace(
             title: "Origin",
             location: service.origin,

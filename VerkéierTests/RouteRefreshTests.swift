@@ -114,8 +114,8 @@ struct RouteRefreshTests {
         #expect(model.routeOptions.map(\.id) == ["recovered"])
     }
 
-    private func makeModel() -> TransitMapViewModel {
-        let model = TransitMapViewModel()
+    private func makeModel() -> RoutePlannerModel {
+        let model = RoutePlannerModel()
         model.routeOrigin = RoutePlace(title: "Origin", location: .init(latitude: 49.61, longitude: 6.12), source: .search)
         model.routeDestination = RoutePlace(title: "Destination", location: .init(latitude: 49.62, longitude: 6.13), source: .search)
         return model

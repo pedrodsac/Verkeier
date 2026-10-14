@@ -203,8 +203,8 @@ struct RouteTimePagingTests {
         #expect(published == [route.id])
     }
 
-    private func configuredModel(timeout: Duration = .seconds(15)) -> TransitMapViewModel {
-        let model = TransitMapViewModel(now: { anchor }, routeCalculationTimeout: timeout)
+    private func configuredModel(timeout: Duration = .seconds(15)) -> RoutePlannerModel {
+        let model = RoutePlannerModel(now: { anchor }, routeCalculationTimeout: timeout)
         model.routeOrigin = RoutePlace(title: "Origin", location: .init(latitude: 49.6, longitude: 6.1), source: .search)
         model.routeDestination = RoutePlace(title: "Destination", location: .init(latitude: 49.61, longitude: 6.1), source: .search)
         model.routePlanningTime = .departAt(anchor)

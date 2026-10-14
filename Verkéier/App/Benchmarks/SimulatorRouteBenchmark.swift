@@ -4,15 +4,23 @@ import MobiliteitKit
 import Observation
 import SwiftUI
 
-/// Explicit simulator harness. Uses the production view model, adapter, walking
+/// Explicit simulator harness. Uses the production route planner model, adapter, walking
 /// graph and RouteView; recorded ATP transport is the only substituted service.
 @Observable @MainActor
 final class SimulatorRouteBenchmark {
     static var enabled: Bool { CommandLine.arguments.contains("--routing-benchmark") }
-    let viewModel = TransitMapViewModel(routeCalculationTimeout: .seconds(120))
+    let routePlanner: RoutePlannerModel
+    /// The map layer reads the benchmark planner through the same models as the app.
+    @ObservationIgnored let featureModels: FeatureModels
     var status = "Simulator route benchmark — recorded realtime"
     private var service: (any RouteService)?
     var fullMap: Bool { ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_FULL_MAP"] == "1" }
+
+    init() {
+        let routePlanner = RoutePlannerModel(routeCalculationTimeout: .seconds(120))
+        self.routePlanner = routePlanner
+        featureModels = FeatureModels(routePlanner: routePlanner)
+    }
 
     func run(productionService: any RouteService, walkingRouter: any WalkingRouting, bikes: any BikeShareService) async
     {
@@ -128,7 +136,7 @@ final class SimulatorRouteBenchmark {
             try configure(scenario)
             let paging = ["paging", "earlier", "arrival-earlier", "arrival-later"].contains(scenario)
             if paging || scenario == "refresh" || scenario == "cached" {
-                await viewModel.calculateRoute(using: service, from: nil)
+                await routePlanner.calculateRoute(using: service, from: nil)
                 try await waitForWalkingRefinements()
             }
             var previousRequestID: UUID?
@@ -138,33 +146,33 @@ final class SimulatorRouteBenchmark {
                     // A finite timetable can legitimately exhaust a direction.
                     // Re-prime outside the measured operation rather than time
                     // a disabled button which performs no calculation.
-                    if earlier ? !viewModel.canLoadEarlierRoutes : !viewModel.canLoadLaterRoutes {
-                        await viewModel.calculateRoute(using: service, from: nil)
+                    if earlier ? !routePlanner.canLoadEarlierRoutes : !routePlanner.canLoadLaterRoutes {
+                        await routePlanner.calculateRoute(using: service, from: nil)
                         try await waitForWalkingRefinements()
                     }
                     if scenario == "earlier" || scenario == "arrival-earlier" {
-                        await viewModel.loadEarlierRoutes(using: service, from: nil)
+                        await routePlanner.loadEarlierRoutes(using: service, from: nil)
                     } else {
-                        await viewModel.loadLaterRoutes(using: service, from: nil)
+                        await routePlanner.loadLaterRoutes(using: service, from: nil)
                     }
                 } else {
-                    viewModel.routeOptions = []
-                    await viewModel.calculateRoute(
+                    routePlanner.routeOptions = []
+                    await routePlanner.calculateRoute(
                         using: service,
                         from: nil,
                         realtimeRefreshPolicy: scenario == "cached" ? .useCache : .forceRefresh
                     )
                 }
                 let deadline = ContinuousClock.now.advanced(by: .seconds(120))
-                while viewModel.routeDiagnostics?.milliseconds[.firstRender] == nil,
-                    viewModel.routeErrorMessage == nil, ContinuousClock.now < deadline
+                while routePlanner.routeDiagnostics?.milliseconds[.firstRender] == nil,
+                    routePlanner.routeErrorMessage == nil, ContinuousClock.now < deadline
                 {
                     try await Task.sleep(for: .milliseconds(10))
                 }
-                guard let diagnostics = viewModel.routeDiagnostics,
+                guard let diagnostics = routePlanner.routeDiagnostics,
                     diagnostics.requestID != previousRequestID,
                     diagnostics.milliseconds[.firstRender] != nil,
-                    !viewModel.isCalculatingRoute, !viewModel.routeOptions.isEmpty
+                    !routePlanner.isCalculatingRoute, !routePlanner.routeOptions.isEmpty
                 else {
                     throw RoutingError.noRouteFound
                 }
@@ -176,18 +184,18 @@ final class SimulatorRouteBenchmark {
                     throw RoutingError.noRouteFound
                 }
                 if fullMap {
-                    while viewModel.routeDiagnostics?.milliseconds[.mapRender] == nil, ContinuousClock.now < deadline {
+                    while routePlanner.routeDiagnostics?.milliseconds[.mapRender] == nil, ContinuousClock.now < deadline {
                         try await Task.sleep(for: .milliseconds(10))
                     }
                 }
                 // Keep first-render latency, but compare complete walking evidence.
                 try await waitForWalkingRefinements()
-                if scenario == "urban-bike", !viewModel.supplementalRouteOptions.contains(where: \.isVelohOnly) {
+                if scenario == "urban-bike", !routePlanner.supplementalRouteOptions.contains(where: \.isVelohOnly) {
                     throw RoutingError.noRouteFound
                 }
                 var usage = rusage()
                 getrusage(RUSAGE_SELF, &usage)
-                let measured = viewModel.routeDiagnostics ?? diagnostics
+                let measured = routePlanner.routeDiagnostics ?? diagnostics
                 var record: [String: Any] = [
                     "scenario": scenario, "sample": sample,
                     "composition": production ? "production" : "transit", "fullMap": fullMap, "bikeInput": bikeInput,
@@ -207,17 +215,17 @@ final class SimulatorRouteBenchmark {
                             "candidates": $0.candidates,
                         ]
                     },
-                    "supplementalOptions": viewModel.supplementalRouteOptions.map(\.id),
-                    "planningTime": viewModel.routePlanningTime.date?.timeIntervalSince1970 ?? 0,
-                    "avoidTightTransfers": viewModel.routeFilters.avoidTightTransfers,
-                    "includedModes": viewModel.routeFilters.includedModes.map(\.rawValue).sorted(),
-                    "recommendedOption": viewModel.selectedRouteOptionID ?? "",
+                    "supplementalOptions": routePlanner.supplementalRouteOptions.map(\.id),
+                    "planningTime": routePlanner.routePlanningTime.date?.timeIntervalSince1970 ?? 0,
+                    "avoidTightTransfers": routePlanner.routeFilters.avoidTightTransfers,
+                    "includedModes": routePlanner.routeFilters.includedModes.map(\.rawValue).sorted(),
+                    "recommendedOption": routePlanner.selectedRouteOptionID ?? "",
                     "requestID": diagnostics.requestID.uuidString, "total_ms": diagnostics.totalMilliseconds,
                     "stages_ms": Dictionary(
                         uniqueKeysWithValues: measured.milliseconds.map { ($0.key.rawValue, $0.value) }
                     ),
                     "transport": try JSONSerialization.jsonObject(with: JSONEncoder().encode(diagnostics.transport)),
-                    "canLoadEarlier": viewModel.canLoadEarlierRoutes, "canLoadLater": viewModel.canLoadLaterRoutes,
+                    "canLoadEarlier": routePlanner.canLoadEarlierRoutes, "canLoadLater": routePlanner.canLoadLaterRoutes,
                     "rounds": diagnostics.rounds.map {
                         [
                             "scan_ms": $0.patternScanMilliseconds, "merge_ms": $0.labelMergeMilliseconds,
@@ -225,8 +233,8 @@ final class SimulatorRouteBenchmark {
                             "retained": $0.retainedLabels,
                         ]
                     },
-                    "options": viewModel.routeOptions.map(\.id),
-                    "unfilteredJourneys": viewModel.unfilteredRouteOptions.map { option -> [String: Any] in
+                    "options": routePlanner.routeOptions.map(\.id),
+                    "unfilteredJourneys": routePlanner.unfilteredRouteOptions.map { option -> [String: Any] in
                         [
                             "id": option.id,
                             "departure": option.departureTime?.timeIntervalSince1970 ?? 0,
@@ -234,7 +242,7 @@ final class SimulatorRouteBenchmark {
                             "lines": option.transitLegs.map { $0.routeName ?? "" },
                         ]
                     },
-                    "journeys": viewModel.routeOptions.map { option -> [String: Any] in
+                    "journeys": routePlanner.routeOptions.map { option -> [String: Any] in
                         [
                             "id": option.id,
                             "departure": option.departureTime?.timeIntervalSince1970 ?? 0,
@@ -252,7 +260,7 @@ final class SimulatorRouteBenchmark {
                         ]
                     },
                     "refreshPolicy": scenario == "cached" || paging ? "useCache" : "forceRefresh",
-                    "displayedLegs": viewModel.routeOptions.flatMap { option in
+                    "displayedLegs": routePlanner.routeOptions.flatMap { option in
                         option.transitLegs.map { leg -> [String: Any] in
                             [
                                 "option": option.id, "trip": leg.tripId ?? "", "stop": leg.originStopId ?? "",
@@ -270,7 +278,7 @@ final class SimulatorRouteBenchmark {
                         uniqueKeysWithValues: diagnostics.realtimeMatchingRejections.map { ($0.key.rawValue, $0.value) }
                     ),
                     "realtimeCoverage": Dictionary(
-                        uniqueKeysWithValues: viewModel.routeOptions.map {
+                        uniqueKeysWithValues: routePlanner.routeOptions.map {
                             ($0.id, $0.realtimeCoverage.rawValue)
                         }
                     ),
@@ -281,11 +289,11 @@ final class SimulatorRouteBenchmark {
                 if env["ROUTING_BENCHMARK_FULL_EVIDENCE"] == "1" {
                     record["canonicalPlans"] = try JSONSerialization.jsonObject(
                         with:
-                            JSONEncoder().encode(viewModel.unfilteredRouteOptions.map(\.plan))
+                            JSONEncoder().encode(routePlanner.unfilteredRouteOptions.map(\.plan))
                     )
                     record["canonicalSupplementalPlans"] = try JSONSerialization.jsonObject(
                         with:
-                            JSONEncoder().encode(viewModel.unfilteredSupplementalRouteOptions.map(\.plan))
+                            JSONEncoder().encode(routePlanner.unfilteredSupplementalRouteOptions.map(\.plan))
                     )
                 }
                 let json = try JSONSerialization.data(withJSONObject: record, options: [.sortedKeys])
@@ -365,10 +373,10 @@ final class SimulatorRouteBenchmark {
 
     private func waitForWalkingRefinements() async throws {
         let deadline = ContinuousClock.now.advanced(by: .seconds(120))
-        while viewModel.hasPendingWalkingRefinements, ContinuousClock.now < deadline {
+        while routePlanner.hasPendingWalkingRefinements, ContinuousClock.now < deadline {
             try await Task.sleep(for: .milliseconds(10))
         }
-        guard !viewModel.hasPendingWalkingRefinements else { throw RoutingError.noRouteFound }
+        guard !routePlanner.hasPendingWalkingRefinements else { throw RoutingError.noRouteFound }
     }
 
     private func configure(_ scenario: String) throws {
@@ -446,12 +454,12 @@ final class SimulatorRouteBenchmark {
                 transitStopID: environment["ROUTING_BENCHMARK_DESTINATION_STOP"]
             )
         }
-        viewModel.routeFilters = RoutePlannerFilters()
-        viewModel.routeFilters.avoidTightTransfers =
+        routePlanner.routeFilters = RoutePlannerFilters()
+        routePlanner.routeFilters.avoidTightTransfers =
             ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_AVOID_TIGHT_TRANSFERS"] == "1"
-        viewModel.routeOrigin = .init(title: from.name ?? "Origin", location: from, source: .search)
-        viewModel.routeDestination = .init(title: to.name ?? "Destination", location: to, source: .search)
-        viewModel.routePlanningTime = time
+        routePlanner.routeOrigin = .init(title: from.name ?? "Origin", location: from, source: .search)
+        routePlanner.routeDestination = .init(title: to.name ?? "Destination", location: to, source: .search)
+        routePlanner.routePlanningTime = time
     }
 
     /// Opt-in live validation stays outside the displayed-result timing gate.
@@ -461,7 +469,7 @@ final class SimulatorRouteBenchmark {
             proxyURL: AppConfiguration.current.apiProxyURL,
             diagnostics: BenchmarkNetworkRecorder.shared.observer
         )
-        let legs = viewModel.routeOptions.flatMap(\.transitLegs)
+        let legs = routePlanner.routeOptions.flatMap(\.transitLegs)
         for stopID in Set(legs.compactMap(\.originStopId)).sorted() {
             guard let leg = legs.first(where: { $0.originStopId == stopID }) else { continue }
             let stop = Stop(
@@ -501,16 +509,16 @@ final class SimulatorRouteBenchmark {
     }
 
     private func checkBoardCache(using service: any RouteService) async throws {
-        viewModel.routeOptions = []
-        await viewModel.calculateRoute(using: service, from: nil, realtimeRefreshPolicy: .useCache)
+        routePlanner.routeOptions = []
+        await routePlanner.calculateRoute(using: service, from: nil, realtimeRefreshPolicy: .useCache)
         let deadline = ContinuousClock.now.advanced(by: .seconds(30))
-        while viewModel.routeDiagnostics?.milliseconds[.firstRender] == nil,
-            viewModel.routeErrorMessage == nil, ContinuousClock.now < deadline
+        while routePlanner.routeDiagnostics?.milliseconds[.firstRender] == nil,
+            routePlanner.routeErrorMessage == nil, ContinuousClock.now < deadline
         {
             try await Task.sleep(for: .milliseconds(10))
         }
-        guard let diagnostics = viewModel.routeDiagnostics,
-            diagnostics.milliseconds[.firstRender] != nil, !viewModel.routeOptions.isEmpty
+        guard let diagnostics = routePlanner.routeDiagnostics,
+            diagnostics.milliseconds[.firstRender] != nil, !routePlanner.routeOptions.isEmpty
         else {
             throw RoutingError.noRouteFound
         }
@@ -520,7 +528,7 @@ final class SimulatorRouteBenchmark {
             "matchingRejections": Dictionary(
                 uniqueKeysWithValues: diagnostics.realtimeMatchingRejections.map { ($0.key.rawValue, $0.value) }
             ),
-            "legs": viewModel.routeOptions.flatMap { option in
+            "legs": routePlanner.routeOptions.flatMap { option in
                 option.transitLegs.map { leg -> [String: Any] in
                     [
                         "option": option.id, "trip": leg.tripId ?? "", "stop": leg.originStopId ?? "",
@@ -540,40 +548,40 @@ final class SimulatorRouteBenchmark {
     }
 
     func recordMapRendered(_ id: UUID) {
-        guard viewModel.routeDiagnostics?.requestID == id,
-            viewModel.routeDiagnostics?.milliseconds[.mapRender] == nil,
-            let published = viewModel.routePublishedAt
+        guard routePlanner.routeDiagnostics?.requestID == id,
+            routePlanner.routeDiagnostics?.milliseconds[.mapRender] == nil,
+            let published = routePlanner.routePublishedAt
         else { return }
-        viewModel.routeDiagnostics?.record(.mapRender, since: published)
+        routePlanner.routeDiagnostics?.record(.mapRender, since: published)
     }
 
     var presentation: RoutePresentationModel {
         .init(
             selectedStop: nil,
-            origin: viewModel.routeOrigin,
-            destination: viewModel.routeDestination,
+            origin: routePlanner.routeOrigin,
+            destination: routePlanner.routeDestination,
             currentLocation: nil,
             favouritePlaces: [],
             nearbyPlaces: [],
             recentPlaces: [],
             commutePresets: [],
-            filters: viewModel.routeFilters,
-            planningTime: viewModel.routePlanningTime,
-            routeOptions: viewModel.routeOptions,
-            browsingWindow: viewModel.routeBrowsingWindow,
-            supplementalRouteOptions: viewModel.supplementalRouteOptions,
-            isLoadingEarlierRoutes: viewModel.isLoadingEarlierRoutes,
-            isLoadingLaterRoutes: viewModel.isLoadingLaterRoutes,
-            canLoadEarlierRoutes: viewModel.canLoadEarlierRoutes,
-            canLoadLaterRoutes: viewModel.canLoadLaterRoutes,
+            filters: routePlanner.routeFilters,
+            planningTime: routePlanner.routePlanningTime,
+            routeOptions: routePlanner.routeOptions,
+            browsingWindow: routePlanner.routeBrowsingWindow,
+            supplementalRouteOptions: routePlanner.supplementalRouteOptions,
+            isLoadingEarlierRoutes: routePlanner.isLoadingEarlierRoutes,
+            isLoadingLaterRoutes: routePlanner.isLoadingLaterRoutes,
+            canLoadEarlierRoutes: routePlanner.canLoadEarlierRoutes,
+            canLoadLaterRoutes: routePlanner.canLoadLaterRoutes,
             alerts: [],
-            selectedRouteOptionID: viewModel.selectedRouteOptionID,
-            loadingPhase: viewModel.routeLoadingPhase,
-            errorMessage: viewModel.routeErrorMessage,
-            statusMessage: viewModel.routeStatusMessage,
-            lastCalculatedAt: viewModel.routeLastCalculatedAt,
-            diagnosticRequestID: viewModel.routeDiagnostics?.requestID,
-            resultsRendered: viewModel.recordRouteResultsRendered
+            selectedRouteOptionID: routePlanner.selectedRouteOptionID,
+            loadingPhase: routePlanner.routeLoadingPhase,
+            errorMessage: routePlanner.routeErrorMessage,
+            statusMessage: routePlanner.routeStatusMessage,
+            lastCalculatedAt: routePlanner.routeLastCalculatedAt,
+            diagnosticRequestID: routePlanner.routeDiagnostics?.requestID,
+            resultsRendered: routePlanner.recordRouteResultsRendered
         )
     }
 }

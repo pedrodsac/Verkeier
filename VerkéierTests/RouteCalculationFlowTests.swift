@@ -8,7 +8,7 @@ import Testing
 struct RouteCalculationFlowTests {
     @Test("Swapping a device-location origin preserves it as the destination and restores live origin on reversal")
     func swapCurrentLocationEndpoints() {
-        let viewModel = TransitMapViewModel()
+        let viewModel = RoutePlannerModel()
         let currentLocation = RoutePlace.currentLocation(
             LocationPoint(name: "Device", latitude: 49.61, longitude: 6.12)
         )
@@ -32,7 +32,7 @@ struct RouteCalculationFlowTests {
 
     @Test("Swapping without an available device location leaves the journey unchanged")
     func swapWithoutCurrentLocation() {
-        let viewModel = TransitMapViewModel()
+        let viewModel = RoutePlannerModel()
         let destination = RoutePlace(
             title: "Lorentzweiler",
             location: LocationPoint(latitude: 49.7, longitude: 6.14),
@@ -122,7 +122,7 @@ struct RouteCalculationFlowTests {
         #expect(moreOptionsFlags == [false])
         #expect(await streamRecorder.policies == [.forceRefresh])
 
-        let viewModel = TransitMapViewModel(now: { anchor })
+        let viewModel = RoutePlannerModel(now: { anchor })
         viewModel.routeOrigin = RoutePlace(title: "Origin", location: origin, source: .search)
         viewModel.routeDestination = RoutePlace(title: "Destination", location: destination, source: .search)
         let recorder = RouteRequestRecorder()
@@ -212,7 +212,7 @@ struct RouteCalculationFlowTests {
         let defaults = try #require(UserDefaults(suiteName: defaultsName))
         defer { defaults.removePersistentDomain(forName: defaultsName) }
         let plannerStore = RoutePlannerStore(defaults: defaults)
-        let viewModel = TransitMapViewModel(now: { anchor })
+        let viewModel = RoutePlannerModel(now: { anchor })
 
         viewModel.selectRouteOrigin(
             RoutePlace(
@@ -446,7 +446,7 @@ struct RouteCalculationFlowTests {
     @Test("A stalled provider cannot leave the route sheet loading forever")
     func stalledProviderEndsInAnActionableError() async throws {
         let anchor = Date.now
-        let viewModel = TransitMapViewModel(
+        let viewModel = RoutePlannerModel(
             now: { anchor },
             routeCalculationTimeout: .milliseconds(50)
         )

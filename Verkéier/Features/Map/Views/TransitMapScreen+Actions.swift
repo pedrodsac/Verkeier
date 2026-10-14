@@ -15,15 +15,15 @@ extension TransitMapScreen {
                 return
             }
             guard !Task.isCancelled else { return }
-            await viewModel.updateVisibleMapRegion(region, using: gtfsService)
+            await map.updateVisibleMapRegion(region, using: gtfsService)
         }
     }
 
     func scheduleSearchUpdate() {
-        let query = viewModel.searchQuery
+        let query = search.searchQuery
         guard !query.isEmpty else {
             Task {
-                await viewModel.searchStops(using: gtfsService)
+                await search.searchStops(using: gtfsService)
             }
             return
         }
@@ -39,8 +39,8 @@ extension TransitMapScreen {
 
         for await query in stream.stream.debounce(for: .milliseconds(250)) {
             guard !Task.isCancelled else { return }
-            guard query == viewModel.searchQuery else { continue }
-            await viewModel.searchStops(using: gtfsService)
+            guard query == search.searchQuery else { continue }
+            await search.searchStops(using: gtfsService)
         }
     }
 
@@ -53,13 +53,13 @@ extension TransitMapScreen {
                 return
             }
             guard !Task.isCancelled else { return }
-            await viewModel.loadNearbyStops(
+            await map.loadNearbyStops(
                 location: locationService.currentLocation,
                 using: liveTransitService,
                 gtfsService: gtfsService,
                 walkingRouter: walkingRouter
             )
-            await viewModel.loadNearbyStopRoutes(using: gtfsService)
+            await map.loadNearbyStopRoutes(using: gtfsService)
         }
     }
 
@@ -166,7 +166,7 @@ extension TransitMapScreen {
     }
 
     func refreshFavouriteStop(_ stop: Stop) async {
-        await viewModel.refreshFavouriteDeparture(
+        await favourites.refreshFavouriteDeparture(
             stop: stop,
             using: liveTransitService,
             gtfsService: gtfsService
@@ -174,7 +174,7 @@ extension TransitMapScreen {
     }
 
     func refreshFavouriteStops() async {
-        await viewModel.loadFavouriteDepartures(
+        await favourites.loadFavouriteDepartures(
             favourites: favouriteStops,
             using: liveTransitService,
             gtfsService: gtfsService
@@ -200,15 +200,36 @@ extension TransitMapScreen {
     func removeFavourite(stopID: String) {
         guard let favourite = favouriteEntities.first(where: { $0.stopId == stopID }) else { return }
         modelContext.delete(favourite)
-        viewModel.favouriteDepartureBoards.removeValue(forKey: stopID)
-        SharedTransitDataStore.removeFavouriteDepartureBoard(stopId: stopID)
+        favourites.removeBoard(forStopID: stopID)
         try? modelContext.save()
         mirrorFavouriteEntitiesForIntents()
     }
 
+    /// Shows `stop` across the feature models: its departure board, a route to
+    /// it, and the map moved to it.
+    func applyStopSelection(_ stop: Stop, preservingLineDetail: Bool = false) {
+        map.clearStopGroup()
+        stopDetail.select(stop)
+        search.recordRecentStop(stop)
+        routePlanner.planToSelectedStop(stop)
+        if !preservingLineDetail {
+            lineDetail.clearLineDetail()
+        }
+        map.focus(on: stop.location.coordinate)
+    }
+
     func selectStopGroup(_ stops: [Stop], _ bikeShareStations: [BikeShareStation]) {
-        viewModel.selectStopGroup(stops, bikeShareStations: bikeShareStations)
-        if let selectedStop = viewModel.selectedStop {
+        switch map.selectStopGroup(stops, bikeShareStations: bikeShareStations) {
+        case .group:
+            stopDetail.clearSelection()
+            routePlanner.clearEndpoints()
+            lineDetail.clearLineDetail()
+        case let .singleStop(stop):
+            applyStopSelection(stop)
+        case .none:
+            break
+        }
+        if let selectedStop = stopDetail.selectedStop {
             navigateToSheet([.stopDetail(selectedStop)])
         } else {
             navigateToSheet([.stopGroup])
@@ -220,10 +241,9 @@ extension TransitMapScreen {
             sheetNavigation.selectedTab = .home
             sheetNavigation.homePath = []
             sheetDetent = .medium
-            viewModel.selectedStopGroup = []
-            viewModel.selectedBikeShareStations = []
-            viewModel.clearRoute()
-            viewModel.clearLineDetail()
+            map.clearStopGroup()
+            routePlanner.clearRoute()
+            lineDetail.clearLineDetail()
         }
     }
 
@@ -234,40 +254,40 @@ extension TransitMapScreen {
     }
 
     func showSearch() {
-        viewModel.clearRoute()
-        viewModel.clearLineDetail()
+        routePlanner.clearRoute()
+        lineDetail.clearLineDetail()
         navigateToSheet([.search], detent: .expanded)
     }
 
     func showAlerts() {
-        viewModel.clearRoute()
+        routePlanner.clearRoute()
         navigateToSheet([.alerts], detent: .expanded)
     }
 
     func selectLineDetailDirection(_ directionID: String) {
-        viewModel.selectLineDetailDirection(directionID)
+        lineDetail.selectLineDetailDirection(directionID)
         Task {
-            await viewModel.loadLineDetail(using: gtfsService)
+            await lineDetail.loadLineDetail(using: gtfsService)
         }
     }
 
     func selectRouteOrigin(_ place: RoutePlace?) {
-        viewModel.selectRouteOrigin(place)
+        routePlanner.selectRouteOrigin(place)
     }
 
     func selectRouteDestination(_ place: RoutePlace) {
-        viewModel.selectRouteDestination(place)
+        routePlanner.selectRouteDestination(place)
         if let stop = stopForRoutePlace(place) {
-            viewModel.selectedStop = stop
+            stopDetail.selectedStop = stop
         }
     }
 
     func applyCommutePreset(_ presetID: String) {
-        viewModel.applyCommutePreset(presetID)
-        if let destination = viewModel.routeDestination,
+        routePlanner.applyCommutePreset(presetID)
+        if let destination = routePlanner.routeDestination,
             let stop = stopForRoutePlace(destination)
         {
-            viewModel.selectedStop = stop
+            stopDetail.selectedStop = stop
         }
     }
 
@@ -277,7 +297,7 @@ extension TransitMapScreen {
     }
 
     func saveCurrentCommutePreset(_ title: String) {
-        viewModel.saveCurrentCommutePreset(title: title)
+        routePlanner.saveCurrentCommutePreset(title: title)
     }
 
     func swapRouteEndpoints() {
@@ -291,7 +311,7 @@ extension TransitMapScreen {
             )
         }
         animateSheetChange {
-            viewModel.swapRouteEndpoints(currentLocation: currentLocation)
+            routePlanner.swapRouteEndpoints(currentLocation: currentLocation)
         }
     }
 
@@ -304,30 +324,30 @@ extension TransitMapScreen {
     }
 
     func updateRouteFilters(_ filters: RoutePlannerFilters) {
-        viewModel.updateRouteFilters(filters)
-        if viewModel.routeDestination != nil || viewModel.selectedStop != nil {
+        routePlanner.updateRouteFilters(filters)
+        if routePlanner.routeDestination != nil || stopDetail.selectedStop != nil {
             calculateRoute()
         }
     }
 
     func setRoutePlanningTime(_ time: RoutePlanningTime) {
-        guard viewModel.routePlanningTime != time else { return }
-        viewModel.setRoutePlanningTime(time)
+        guard routePlanner.routePlanningTime != time else { return }
+        routePlanner.setRoutePlanningTime(time)
         // A future time can be picked before an endpoint exists. In that case
         // remember it without surfacing a destination error.
-        if viewModel.routeDestination != nil || viewModel.selectedStop != nil {
+        if routePlanner.routeDestination != nil || stopDetail.selectedStop != nil {
             calculateRoute()
         }
     }
 
     func toggleDepartureLine(_ route: TransitRoute) {
-        viewModel.toggleDepartureLine(route)
-        Task { await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService) }
+        stopDetail.toggleDepartureLine(route)
+        Task { await stopDetail.loadDepartures(using: liveTransitService, gtfsService: gtfsService) }
     }
 
     func selectDeparturePlatform(_ platform: String?) {
-        viewModel.selectDeparturePlatform(platform)
-        Task { await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService) }
+        stopDetail.selectDeparturePlatform(platform)
+        Task { await stopDetail.loadDepartures(using: liveTransitService, gtfsService: gtfsService) }
     }
 
     func stopForRoutePlace(_ place: RoutePlace) -> Stop? {
@@ -335,13 +355,13 @@ extension TransitMapScreen {
             if let favourite = favouriteStops.first(where: { $0.id == stopId }) {
                 return favourite
             }
-            if let nearby = viewModel.nearbyStops.first(where: { $0.id == stopId }) {
+            if let nearby = map.nearbyStops.first(where: { $0.id == stopId }) {
                 return nearby
             }
-            if let result = viewModel.searchResults.first(where: { $0.id == stopId }) {
+            if let result = search.searchResults.first(where: { $0.id == stopId }) {
                 return result
             }
-            if let selectedStop = viewModel.selectedStop, selectedStop.id == stopId {
+            if let selectedStop = stopDetail.selectedStop, selectedStop.id == stopId {
                 return selectedStop
             }
         }
@@ -383,18 +403,18 @@ extension TransitMapScreen {
     ) {
         TransitSheetRouteActivationCoordinator(
             selectStop: { stop, preservesLineDetail in
-                viewModel.selectStop(stop, preservingLineDetail: preservesLineDetail)
+                applyStopSelection(stop, preservingLineDetail: preservesLineDetail)
             },
             loadSelectedStopData: loadSelectedStopData,
             calculateRoute: calculateRoute,
             applyCommutePreset: applyCommutePreset,
             selectRouteOption: { optionID in
-                _ = viewModel.selectRouteOption(id: optionID)
+                _ = routePlanner.selectRouteOption(id: optionID)
             },
-            prepareLineDetail: { viewModel.prepareLineDetail($0) || viewModel.selectedLineDetail == nil },
+            prepareLineDetail: { lineDetail.prepareLineDetail($0) || lineDetail.selectedLineDetail == nil },
             loadLineDetail: {
                 Task {
-                    await viewModel.loadLineDetail(using: gtfsService)
+                    await lineDetail.loadLineDetail(using: gtfsService)
                 }
             }
         )
@@ -407,7 +427,7 @@ extension TransitMapScreen {
 
     func loadSelectedStopData() {
         Task {
-            await viewModel.loadGTFSMapStops(location: locationService.currentLocation, using: gtfsService)
+            await map.loadGTFSMapStops(using: gtfsService)
         }
     }
 
@@ -418,40 +438,40 @@ extension TransitMapScreen {
                 shouldCenterOnNextLocation = true
                 locationService.startUpdatingIfAllowed()
             } else {
-                viewModel.centerOnUserLocation(locationService.currentLocation)
+                map.centerOnUserLocation(locationService.currentLocation)
                 Task {
-                    await viewModel.loadGTFSMapStops(location: locationService.currentLocation, using: gtfsService)
+                    await map.loadGTFSMapStops(using: gtfsService)
                 }
             }
         case .notDetermined:
             shouldCenterOnNextLocation = true
-            viewModel.requestLocation(using: locationService)
+            locationService.requestWhenInUseAuthorization()
         default:
-            viewModel.requestLocation(using: locationService)
+            locationService.requestWhenInUseAuthorization()
         }
     }
 
     func refreshDepartures() async {
-        await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
+        await stopDetail.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
         await updateTrackedDepartureIfNeeded()
     }
 
     func updateSearch() {
         Task {
-            await viewModel.searchStops(using: gtfsService)
+            await search.searchStops(using: gtfsService)
         }
     }
 
     func refreshLineDetail() async {
-        viewModel.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: true)
-        await viewModel.loadLineDetail(using: gtfsService)
+        favourites.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: true)
+        await lineDetail.loadLineDetail(using: gtfsService)
     }
 
     func calculateRoute() {
-        if viewModel.routeOrigin == nil, locationService.currentLocation == nil {
+        if routePlanner.routeOrigin == nil, locationService.currentLocation == nil {
             switch locationService.authorizationStatus {
             case .denied, .restricted:
-                viewModel.failRouteLocationRequest()
+                routePlanner.failRouteLocationRequest()
                 return
             default:
                 break
@@ -460,9 +480,9 @@ extension TransitMapScreen {
             requestLocation()
         }
 
-        let refresh: RouteRealtimeRefreshPolicy = viewModel.routeOptions.isEmpty ? .useCache : .forceRefresh
+        let refresh: RouteRealtimeRefreshPolicy = routePlanner.routeOptions.isEmpty ? .useCache : .forceRefresh
         Task {
-            await viewModel.calculateRoute(
+            await routePlanner.calculateRoute(
                 using: routeService,
                 from: locationService.currentLocation,
                 realtimeRefreshPolicy: refresh
@@ -471,27 +491,27 @@ extension TransitMapScreen {
     }
 
     func refreshRoutes() async {
-        guard viewModel.effectiveRouteDestination != nil else { return }
-        guard viewModel.routeOrigin != nil || locationService.currentLocation != nil else {
+        guard routePlanner.routeDestination != nil else { return }
+        guard routePlanner.routeOrigin != nil || locationService.currentLocation != nil else {
             calculateRoute()
             return
         }
-        await viewModel.refreshRoutes(using: routeService, from: locationService.currentLocation)
+        await routePlanner.refreshRoutes(using: routeService, from: locationService.currentLocation)
     }
 
     private func refreshRoutesIfIdle() async {
-        guard viewModel.effectiveRouteDestination != nil,
-            viewModel.routeRefreshTask == nil,
-            !viewModel.isCalculatingRoute,
-            !viewModel.isLoadingEarlierRoutes, !viewModel.isLoadingLaterRoutes,
+        guard routePlanner.routeDestination != nil,
+            routePlanner.routeRefreshTask == nil,
+            !routePlanner.isCalculatingRoute,
+            !routePlanner.isLoadingEarlierRoutes, !routePlanner.isLoadingLaterRoutes,
             // Browsed pages stay until the user pulls to refresh.
-            !viewModel.isBrowsingRoutePages
+            !routePlanner.isBrowsingRoutePages
         else { return }
-        guard viewModel.routeOrigin != nil || locationService.currentLocation != nil else {
+        guard routePlanner.routeOrigin != nil || locationService.currentLocation != nil else {
             calculateRoute()
             return
         }
-        await viewModel.calculateRoute(
+        await routePlanner.calculateRoute(
             using: routeService,
             from: locationService.currentLocation,
             realtimeRefreshPolicy: .forceRefresh
@@ -499,8 +519,8 @@ extension TransitMapScreen {
     }
 
     func maintainRoutes() async {
-        guard viewModel.effectiveRouteDestination != nil else { return }
-        if viewModel.routeOptions.isEmpty {
+        guard routePlanner.routeDestination != nil else { return }
+        if routePlanner.routeOptions.isEmpty {
             await refreshRoutesIfIdle()
         }
         while !Task.isCancelled {
@@ -513,12 +533,12 @@ extension TransitMapScreen {
     }
 
     func refreshSelectedRouteRealtime() async {
-        await viewModel.refreshSelectedRouteRealtime(using: routeService)
+        await routePlanner.refreshSelectedRouteRealtime(using: routeService)
     }
 
     func loadEarlierRoutes() {
         Task {
-            await viewModel.loadEarlierRoutes(
+            await routePlanner.loadEarlierRoutes(
                 using: routeService,
                 from: locationService.currentLocation
             )
@@ -527,7 +547,7 @@ extension TransitMapScreen {
 
     func loadLaterRoutes() {
         Task {
-            await viewModel.loadLaterRoutes(
+            await routePlanner.loadLaterRoutes(
                 using: routeService,
                 from: locationService.currentLocation
             )
@@ -535,7 +555,7 @@ extension TransitMapScreen {
     }
 
     func calculateWaitingRouteIfNeeded() {
-        guard viewModel.isWaitingForRouteLocation, locationService.currentLocation != nil else {
+        guard routePlanner.isWaitingForRouteLocation, locationService.currentLocation != nil else {
             return
         }
 
@@ -543,7 +563,7 @@ extension TransitMapScreen {
     }
 
     func openRouteInAppleMaps() {
-        viewModel.openSelectedRouteInAppleMaps(
+        routePlanner.openSelectedRouteInAppleMaps(
             using: routeService,
             from: locationService.currentLocation
         )
@@ -556,15 +576,12 @@ extension TransitMapScreen {
     }
 
     func loadAlertsAndCheckDisruptions() async {
-        await viewModel.loadAlerts(using: avlClient)
-        await viewModel.checkDisruptionAlerts(
-            disruptionAlertService: disruptionAlertService,
-            favouriteStops: favouriteStops
-        )
+        await alerts.loadAlerts(using: avlClient)
+        await alerts.checkDisruptionAlerts(disruptionAlertService: disruptionAlertService)
     }
 
     func startTrackingDeparture(_ departure: Departure) {
-        guard let selectedStop = viewModel.selectedStop else { return }
+        guard let selectedStop = stopDetail.selectedStop else { return }
         Task {
             await liveActivityManager.startTracking(departure: departure, stop: selectedStop)
         }
@@ -577,7 +594,7 @@ extension TransitMapScreen {
     }
 
     func scheduleDepartureReminder(_ departure: Departure, _ leadTimeMinutes: Int) {
-        guard let selectedStop = viewModel.selectedStop else { return }
+        guard let selectedStop = stopDetail.selectedStop else { return }
         Task {
             await departureReminderService.scheduleReminder(
                 for: departure,

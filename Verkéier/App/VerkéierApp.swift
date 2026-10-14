@@ -6,6 +6,7 @@ import SwiftUI
 struct VerkéierApp: App {
     @State private var locationService = LocationService()
     @State private var preferences = AppPreferences.shared
+    @State private var featureModels = FeatureModels()
     private let configuration: AppConfiguration
     private let avlClient: any AVLClient
     private let bikeShareService: any BikeShareService
@@ -135,6 +136,7 @@ struct VerkéierApp: App {
             .environment(\.departureReminderService, departureReminderService)
             .environment(\.disruptionAlertService, disruptionAlertService)
             .environment(preferences)
+            .featureModels(featureModels)
             .modelContainer(modelContainer)
             .preferredColorScheme(preferences.appearance.colorScheme)
         }
