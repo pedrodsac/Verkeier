@@ -341,6 +341,11 @@ Suggested UX:
 
 Do not interrupt the user with update popups.
 
+One exception: after a timetable update (or a walking map update), the next launch
+prepares the stored transfer walks behind a short full-screen progress screen, so
+searches stay fast. It only appears when the stored walks are out of date; see
+[TRANSFER_WALKS.md](TRANSFER_WALKS.md). The update itself remains silent.
+
 ---
 
 ## Settings Diagnostics

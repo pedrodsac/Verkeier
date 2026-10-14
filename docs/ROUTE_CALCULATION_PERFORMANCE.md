@@ -1,5 +1,10 @@
 # Route calculation performance
 
+Transfer walks between nearby stops are now stored on disk and served without
+recomputing them in each process; results are unchanged. See
+[stored transfer walks](TRANSFER_WALKS.md). Measurements are recorded in
+`benchmarks/transfer-walks-2026-10-14/`.
+
 The bus continuation timeout correction restores destination and final-round
 pruning across stay-aboard links. The same Gromscheed → Konrad Adenauer Release
 spot check completed in 1.5 seconds warm and 2.0 seconds in a fresh process. See

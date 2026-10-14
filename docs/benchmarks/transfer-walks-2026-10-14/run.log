@@ -1,0 +1,81 @@
+== A-main: depart scenarios 14:28:16
+depart warm: 2 completed; maximum 8461 ms
+depart cold-1: 1 completed; maximum 9003 ms
+depart cold-2: 1 completed; maximum 8837 ms
+reverse warm: 2 completed; maximum 8571 ms
+reverse cold-1: 1 completed; maximum 7362 ms
+reverse cold-2: 1 completed; maximum 8319 ms
+coordinates warm: 2 completed; maximum 7117 ms
+coordinates cold-1: 1 completed; maximum 6259 ms
+coordinates cold-2: 1 completed; maximum 4917 ms
+exact warm: 2 completed; maximum 20312 ms
+exact cold-1: 1 completed; maximum 13109 ms
+exact cold-2: 1 completed; maximum 8793 ms
+rural warm: 2 completed; maximum 4778 ms
+rural cold-1: 1 completed; maximum 4507 ms
+rural cold-2: 1 completed; maximum 4659 ms
+paging warm: 2 completed; maximum 1219 ms
+paging cold-1: 1 completed; maximum 1284 ms
+paging cold-2: 1 completed; maximum 1263 ms
+refresh warm: 2 completed; maximum 1227 ms
+refresh cold-1: 1 completed; maximum 1191 ms
+refresh cold-2: 1 completed; maximum 1248 ms
+== A-main: arrive scenario 14:34:40
+arrive warm: 2 completed; maximum 10157 ms
+arrive cold-1: 1 completed; maximum 9112 ms
+arrive cold-2: 1 completed; maximum 9795 ms
+== B-branch-off: depart scenarios 14:35:30
+depart warm: 2 completed; maximum 8427 ms
+depart cold-1: 1 completed; maximum 6890 ms
+depart cold-2: 1 completed; maximum 6334 ms
+reverse warm: 2 completed; maximum 5936 ms
+reverse cold-1: 1 completed; maximum 5391 ms
+reverse cold-2: 1 completed; maximum 5252 ms
+coordinates warm: 2 completed; maximum 5093 ms
+coordinates cold-1: 1 completed; maximum 4886 ms
+coordinates cold-2: 1 completed; maximum 6117 ms
+exact warm: 2 completed; maximum 6387 ms
+exact cold-1: 1 completed; maximum 5983 ms
+exact cold-2: 1 completed; maximum 5904 ms
+rural warm: 2 completed; maximum 4740 ms
+rural cold-1: 1 completed; maximum 4734 ms
+rural cold-2: 1 completed; maximum 4372 ms
+paging warm: 2 completed; maximum 1298 ms
+paging cold-1: 1 completed; maximum 1257 ms
+paging cold-2: 1 completed; maximum 1130 ms
+refresh warm: 2 completed; maximum 1184 ms
+refresh cold-1: 1 completed; maximum 1141 ms
+refresh cold-2: 1 completed; maximum 1437 ms
+== B-branch-off: arrive scenario 14:39:25
+arrive warm: 2 completed; maximum 12100 ms
+arrive cold-1: 1 completed; maximum 11192 ms
+arrive cold-2: 1 completed; maximum 7897 ms
+== C-branch-on: depart scenarios 14:40:22
+transfer walks: {"build_ms":6022.6661249999997,"bytes":6235873,"computed":11188,"graph":"alg=1;dataset=20260921;sha256=0dd7dd3357e6962b251aaa494063f092cddc50c16e972f20a618e93df4f1600b;core=3.6.3;mobile=0.6.3\/0.6.3;pafendall=pafendall-funicular-v1;calibration=4608308318706860032","negatives":477,"pairs":11188,"preparation_ms":674.892833,"reused":0,"store":"\/private\/tmp\/claude-501\/-Users-pedoataidecordeiro-Developer-Verkeier\/1f40f6e7-cdb6-4b30-ad28-2438ce3048e0\/scratchpad\/ab\/out\/C-branch-on\/depart\/transfer-walks\/transfer-walks.bin","total_ms":6697.5589579999996}
+depart warm: 2 completed; maximum 2581 ms
+depart cold-1: 1 completed; maximum 3027 ms
+depart cold-2: 1 completed; maximum 2642 ms
+reverse warm: 2 completed; maximum 2771 ms
+reverse cold-1: 1 completed; maximum 2564 ms
+reverse cold-2: 1 completed; maximum 2654 ms
+coordinates warm: 2 completed; maximum 2754 ms
+coordinates cold-1: 1 completed; maximum 2658 ms
+coordinates cold-2: 1 completed; maximum 2886 ms
+exact warm: 2 completed; maximum 1971 ms
+exact cold-1: 1 completed; maximum 1965 ms
+exact cold-2: 1 completed; maximum 1851 ms
+rural warm: 2 completed; maximum 2225 ms
+rural cold-1: 1 completed; maximum 1913 ms
+rural cold-2: 1 completed; maximum 1992 ms
+paging warm: 2 completed; maximum 1055 ms
+paging cold-1: 1 completed; maximum 1039 ms
+paging cold-2: 1 completed; maximum 1038 ms
+refresh warm: 2 completed; maximum 1190 ms
+refresh cold-1: 1 completed; maximum 1070 ms
+refresh cold-2: 1 completed; maximum 1071 ms
+== C-branch-on: arrive scenario 14:43:18
+transfer walks: {"build_ms":4928.5972920000004,"bytes":6235873,"computed":11188,"graph":"alg=1;dataset=20260921;sha256=0dd7dd3357e6962b251aaa494063f092cddc50c16e972f20a618e93df4f1600b;core=3.6.3;mobile=0.6.3\/0.6.3;pafendall=pafendall-funicular-v1;calibration=4608308318706860032","negatives":477,"pairs":11188,"preparation_ms":576.66137500000002,"reused":0,"store":"\/private\/tmp\/claude-501\/-Users-pedoataidecordeiro-Developer-Verkeier\/1f40f6e7-cdb6-4b30-ad28-2438ce3048e0\/scratchpad\/ab\/out\/C-branch-on\/arrive\/transfer-walks\/transfer-walks.bin","total_ms":5505.2586670000001}
+arrive warm: 2 completed; maximum 6292 ms
+arrive cold-1: 1 completed; maximum 6553 ms
+arrive cold-2: 1 completed; maximum 5698 ms
+ALL DONE 14:44:07

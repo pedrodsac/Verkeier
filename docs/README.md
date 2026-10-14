@@ -22,6 +22,7 @@
 | Missing live updates on connecting trips | `ROUTING_LIVE_CONNECTIONS.md` |
 | Buses continuing under another line number (7 → 25) | `ROUTING_BLOCK_CONTINUATIONS.md` |
 | Router performance, simulator measurements and reproduction | `ROUTE_CALCULATION_PERFORMANCE.md` |
+| Stored transfer walks and the launch route-preparation screen | `TRANSFER_WALKS.md` |
 | UI lag, launch work and map update performance | `UI_PERFORMANCE.md` |
 | Route trace appearance, stop labels, and map shields | `MAP_TRACE_DESIGN.md` |
 

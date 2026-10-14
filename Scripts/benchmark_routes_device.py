@@ -16,6 +16,8 @@ parser.add_argument('--app', required=True, type=Path)
 parser.add_argument('--database', required=True, type=Path)
 parser.add_argument('--fixture', required=True, type=Path)
 parser.add_argument('--output', required=True, type=Path)
+parser.add_argument('--transfer-walks', choices=['on', 'off'], default='on',
+    help='on builds the stored transfer walk table in its own launch before the measured scenarios')
 parser.add_argument('--samples', type=int, default=4, help='Measured samples after priming; at most five operations total per case')
 args = parser.parse_args()
 if args.samples < 0 or args.samples + 1 > 5:
@@ -28,9 +30,12 @@ for source, name in [(args.database, 'benchmark-feed.sqlite'), (args.fixture, 'b
     subprocess.run(['xcrun', 'devicectl', 'device', 'copy', 'to', *domain,
         '--source', str(source), '--destination', 'tmp/' + name], check=True)
 records = []
-for scenario, anchor in [('depart', '2026-10-08T08:00:00+02:00'),
-                         ('arrive', '2026-10-08T09:00:00+02:00'),
-                         ('recorded-live', '2026-10-08T18:28:00+02:00')]:
+scenarios = [('depart', '2026-10-08T08:00:00+02:00'),
+             ('arrive', '2026-10-08T09:00:00+02:00'),
+             ('recorded-live', '2026-10-08T18:28:00+02:00')]
+if args.transfer_walks == 'on':
+    scenarios.insert(0, ('optimise-transfer-walks', '2026-10-08T08:00:00+02:00'))
+for scenario, anchor in scenarios:
     log = args.output / (scenario + '.log')
     env = os.environ | {'DEVICECTL_CHILD_ROUTING_BENCHMARK_SCENARIO': scenario,
         'DEVICECTL_CHILD_ROUTING_BENCHMARK_SAMPLES': str(args.samples + 1),
@@ -39,6 +44,8 @@ for scenario, anchor in [('depart', '2026-10-08T08:00:00+02:00'),
         'DEVICECTL_CHILD_ROUTING_BENCHMARK_FIXTURE': 'benchmark-board.json',
         'DEVICECTL_CHILD_ROUTING_BENCHMARK_COMPOSITION': 'transit',
         'DEVICECTL_CHILD_ROUTING_BENCHMARK_FULL_MAP': '1'}
+    if args.transfer_walks == 'off':
+        env['DEVICECTL_CHILD_ROUTING_TRANSFER_WALKS'] = '0'
     with log.open('w') as stream:
         process = subprocess.Popen(['xcrun', 'devicectl', 'device', 'process', 'launch', '--device', args.device,
             '--console', '--terminate-existing', bundle, '--routing-benchmark'], env=env,
@@ -63,6 +70,8 @@ for scenario, anchor in [('depart', '2026-10-08T08:00:00+02:00'),
                 try: process.wait(timeout=10)
                 except subprocess.TimeoutExpired: process.kill(); process.wait()
     for line in text.splitlines():
+        if line.startswith('ROUTING_BENCHMARK_OPTIMISATION '):
+            (args.output / 'optimisation.json').write_text(line.split(' ', 1)[1])
         if line.startswith('ROUTING_BENCHMARK_FILE '):
             name = Path(line.split(' ', 1)[1]).name
             destination = args.output / name
