@@ -111,7 +111,6 @@ struct StopDetailActions {
     var cancelDepartureReminder: () -> Void = {}
     var toggleDepartureLine: (TransitRoute) -> Void = { _ in }
     var selectDeparturePlatform: (String?) -> Void = { _ in }
-    var updateDepartureBoardFilter: (TransitBoardFilter) -> Void = { _ in }
 }
 
 extension StopDetailActions {
@@ -124,6 +123,5 @@ extension StopDetailActions {
         cancelDepartureReminder = actions.cancelDepartureReminder
         toggleDepartureLine = actions.toggleDepartureLine
         selectDeparturePlatform = actions.selectDeparturePlatform
-        updateDepartureBoardFilter = actions.updateDepartureBoardFilter
     }
 }

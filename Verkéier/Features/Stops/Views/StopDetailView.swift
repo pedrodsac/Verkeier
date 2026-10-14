@@ -197,32 +197,6 @@ struct StopDetailView: View {
 
 }
 
-private struct DepartureBoardAdvancedFilterMenu: View {
-    let filter: TransitBoardFilter
-    let update: (TransitBoardFilter) -> Void
-
-    var body: some View {
-        Menu {
-            Section("Data") {
-                Button(filter.realtimeMode == .full ? "✓ Live updates" : "Live updates") {
-                    var copy = filter
-                    copy.realtimeMode = .full
-                    update(copy)
-                }
-                Button(filter.realtimeMode == .off ? "✓ Timetable only" : "Timetable only") {
-                    var copy = filter
-                    copy.realtimeMode = .off
-                    update(copy)
-                }
-            }
-            Button("Reset filters", role: .destructive) { update(TransitBoardFilter()) }
-        } label: {
-            Label("Board filters", systemImage: "line.3.horizontal.decrease.circle")
-                .font(.callout.weight(.medium))
-        }
-    }
-}
-
 /// IDs of departures that are the last service of the day for their line.
 ///
 /// A departure qualifies when no later departure for the same line exists in

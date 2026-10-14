@@ -2,7 +2,6 @@ import CoreLocation
 import Foundation
 
 struct TransitSheetPresentationModel {
-    let nearby: NearbyStopsPresentationModel
     let favourites: FavouritesPresentationModel
     let stopGroup: StopGroupPresentationModel
     let commute: CommuteDashboardViewModel
@@ -44,7 +43,6 @@ struct TransitSheetActions {
     let cancelDepartureReminder: () -> Void
     let toggleDepartureLine: (TransitRoute) -> Void
     let selectDeparturePlatform: (String?) -> Void
-    let updateDepartureBoardFilter: (TransitBoardFilter) -> Void
     let updateSearch: () -> Void
     let selectLineDetailDirection: (String) -> Void
     let refreshLineDetail: () async -> Void

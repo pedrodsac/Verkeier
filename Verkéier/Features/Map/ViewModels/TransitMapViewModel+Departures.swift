@@ -215,14 +215,6 @@ extension TransitMapViewModel {
         selectedDeparturePlatform = platform
     }
 
-    func updateDepartureBoardFilter(_ filter: TransitBoardFilter) {
-        departureBoardFilter = filter
-    }
-
-    func resetDepartureBoardFilter() {
-        departureBoardFilter = TransitBoardFilter()
-    }
-
     func loadOfflineScheduledDepartures(
         using gtfsService: any GTFSService,
         now: Date = .now

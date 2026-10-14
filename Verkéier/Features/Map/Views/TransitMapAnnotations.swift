@@ -66,63 +66,6 @@ final class BikeShareMapAnnotation: NSObject, MKAnnotation {
     }
 }
 
-struct StopMapMarker: View {
-    enum Layer {
-        case liveNearby
-        case gtfs
-    }
-
-    let stop: Stop
-    var layer: Layer = .liveNearby
-    let isSelected: Bool
-    let isFavourite: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            ZStack {
-                Image(systemName: iconName)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.white)
-                    .frame(width: markerSize, height: markerSize)
-                    .background(markerColor.gradient, in: Circle())
-                    .overlay {
-                        if layer == .gtfs, !isSelected {
-                            Circle().stroke(.white.opacity(0.85), lineWidth: 2)
-                        }
-                        if isFavourite {
-                            Circle().stroke(.yellow, lineWidth: 3)
-                        }
-                    }
-                    .shadow(color: .black.opacity(0.25), radius: 6, y: 3)
-                    .accessibilityHidden(true)
-            }
-            .frame(width: 44, height: 44)
-            .contentShape(Circle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Stop \(stop.displayName)")
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-    }
-
-    private var markerColor: Color {
-        if isFavourite { return .yellow }
-        return stop.modes.primaryMode.tint
-    }
-
-    private var markerSize: CGFloat {
-        if isSelected { return 34 }
-        switch layer {
-        case .liveNearby: return 30
-        case .gtfs: return 24
-        }
-    }
-
-    private var iconName: String {
-        stop.modes.primaryMode.symbolName
-    }
-}
-
 struct LocationPermissionButton: View {
     let authorizationStatus: CLAuthorizationStatus
     let requestLocation: () -> Void
