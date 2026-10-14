@@ -17,6 +17,7 @@ struct VerkéierApp: App {
     private let walkingRouter: any WalkingRouting
     private let bundledRoutingDatasetInstaller: BundledRoutingDatasetInstaller
     private let routingOptimisationService: any RoutingOptimisationService
+    @State private var launchModel: LaunchOptimisationModel
     private let modelContainer: ModelContainer
     @State private var liveActivityManager = LiveActivityManager()
     @State private var departureReminderService = DepartureReminderService()
@@ -75,6 +76,11 @@ struct VerkéierApp: App {
                     try await engine.router(for: url).transferWalkingRequests()
                 },
                 graphInstall: graphInstall)
+        _launchModel = State(initialValue: LaunchOptimisationModel(
+            initialRequirement: optimisationEnvironment.mode == .off
+                ? .notNeeded : RoutingOptimisationLaunchCheck.requirement(in: optimisationEnvironment),
+            onboardingCompleted: UserDefaults.standard.bool(forKey: "hasCompletedOnboarding"),
+            background: UIKitBackgroundActivity()))
         modelContainer = AppModelContainer.make()
     }
 
@@ -87,13 +93,13 @@ struct VerkéierApp: App {
                 else if TripDetailPreviewData.enabled { TripDetailPreviewHost() }
                 else if TripContinuationPreviewHost.enabled { TripContinuationPreviewHost() }
                 else if SimulatorRouteBenchmark.enabled { SimulatorRouteBenchmarkView() }
-                else { TransitMapScreen(locationService: locationService) }
+                else { LaunchGateView(locationService: locationService, model: launchModel) }
                 #else
                 if SimulatorRouteBenchmark.enabled { SimulatorRouteBenchmarkView() }
-                else { TransitMapScreen(locationService: locationService) }
+                else { LaunchGateView(locationService: locationService, model: launchModel) }
                 #endif
                 #else
-                TransitMapScreen(locationService: locationService)
+                LaunchGateView(locationService: locationService, model: launchModel)
                 #endif
             }
                 .environment(\.appConfiguration, configuration)
