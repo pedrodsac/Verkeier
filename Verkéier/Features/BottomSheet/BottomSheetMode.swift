@@ -48,57 +48,10 @@ enum TransitSheetRoute: Hashable {
     }
 }
 
-@MainActor
-struct TransitSheetRouteActivationCoordinator {
-    let selectStop: (Stop, Bool) -> Void
-    let loadSelectedStopData: () -> Void
-    let calculateRoute: () -> Void
-    let applyCommutePreset: (String) -> Void
-    let selectRouteOption: (String) -> Void
-    let prepareLineDetail: (TransitRoute) -> Bool
-    let loadLineDetail: () -> Void
-
-    func activate(
-        _ route: TransitSheetRoute?,
-        previousRoute: TransitSheetRoute?,
-        isBackNavigation: Bool = false
-    ) {
-        guard let route else {
-            return
-        }
-
-        guard !isBackNavigation else { return }
-
-        switch route {
-        case .search, .stopGroup, .routePlaceSearch, .alerts, .tripDetail, .departureTrip:
-            break
-
-        case let .stopDetail(stop):
-            let preservesLineDetail: Bool
-            if case .lineDetail = previousRoute {
-                preservesLineDetail = true
-            } else {
-                preservesLineDetail = false
-            }
-            selectStop(stop, preservesLineDetail)
-            loadSelectedStopData()
-
-        case .directions:
-            calculateRoute()
-
-        case let .directionsForPreset(presetID):
-            applyCommutePreset(presetID)
-            calculateRoute()
-
-        case let .routeTimeline(optionID):
-            selectRouteOption(optionID)
-
-        case let .lineDetail(route):
-            if prepareLineDetail(route) {
-                loadLineDetail()
-            }
-        }
-    }
+enum TransitSheetTab: Hashable, CaseIterable {
+    case home
+    case plan
+    case settings
 }
 
 enum BottomSheetDetent: CaseIterable {

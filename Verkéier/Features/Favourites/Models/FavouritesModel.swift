@@ -5,6 +5,8 @@ import WidgetKit
 /// Departure boards for the rider's favourite stops, mirrored to the widget.
 @MainActor @Observable
 final class FavouritesModel {
+    /// The saved favourite stops, mirrored from SwiftData by the map screen.
+    var favouriteStops: [Stop] = []
     var favouriteDepartureBoards: [String: FavouriteDepartureBoardSnapshot] = [:]
     var isLoadingFavouriteDepartures = false
     /// Favourites can always fall back to a timetable board once the GTFS feed

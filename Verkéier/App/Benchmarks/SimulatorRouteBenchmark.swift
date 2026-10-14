@@ -12,6 +12,7 @@ final class SimulatorRouteBenchmark {
     let routePlanner: RoutePlannerModel
     /// The map layer reads the benchmark planner through the same models as the app.
     @ObservationIgnored let featureModels: FeatureModels
+    @ObservationIgnored let router: SheetRouter
     var status = "Simulator route benchmark — recorded realtime"
     private var service: (any RouteService)?
     var fullMap: Bool { ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_FULL_MAP"] == "1" }
@@ -19,7 +20,15 @@ final class SimulatorRouteBenchmark {
     init() {
         let routePlanner = RoutePlannerModel(routeCalculationTimeout: .seconds(120))
         self.routePlanner = routePlanner
-        featureModels = FeatureModels(routePlanner: routePlanner)
+        let featureModels = FeatureModels(routePlanner: routePlanner)
+        self.featureModels = featureModels
+        // The benchmark drives the planner directly; the router only feeds the map layer.
+        router = SheetRouter(
+            models: featureModels,
+            locationService: LocationService(),
+            routeService: MapKitRouteService(),
+            gtfsService: UnavailableGTFSService()
+        )
     }
 
     func run(productionService: any RouteService, walkingRouter: any WalkingRouting, bikes: any BikeShareService) async

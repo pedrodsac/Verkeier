@@ -3,7 +3,7 @@ import SwiftUI
 
 extension TransitMapScreen {
     var tripDetailSelection: TripDetailSelection? {
-        if case let .tripDetail(selection) = sheetNavigation.activePath.last { return selection }
+        if case let .tripDetail(selection) = router.activePath.last { return selection }
         return nil
     }
 
@@ -15,15 +15,15 @@ extension TransitMapScreen {
         if let selection {
             if tripDetailReturnRegion == nil {
                 tripDetailReturnRegion = map.visibleMapRegion ?? map.cameraRegion
-                tripDetailReturnDetent = sheetDetent
+                tripDetailReturnDetent = router.detent
             }
             tripDetailCameraDidFit = false
             tripDetailViewModel.select(selection)
-            sheetDetent = .medium
+            router.detent = .medium
         } else {
             tripDetailViewModel.deactivate()
             if let region = tripDetailReturnRegion { map.moveCamera(to: region) }
-            if let detent = tripDetailReturnDetent { sheetDetent = detent }
+            if let detent = tripDetailReturnDetent { router.detent = detent }
             tripDetailReturnRegion = nil
             tripDetailReturnDetent = nil
             tripDetailCameraDidFit = false

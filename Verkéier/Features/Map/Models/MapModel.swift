@@ -9,6 +9,8 @@ final class MapModel {
     var cameraRegion: MKCoordinateRegion
     var cameraUpdateToken = 0
     var visibleMapRegion: MKCoordinateRegion?
+    /// Set while waiting for a first location fix the camera should move to.
+    var centersOnNextLocation = false
 
     var selectedStopGroup: [Stop] = []
     var selectedBikeShareStations: [BikeShareStation] = []

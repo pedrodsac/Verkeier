@@ -30,6 +30,7 @@ struct TransitMapScreen: View {
     @Environment(SearchModel.self) var search
     @Environment(FavouritesModel.self) var favourites
     @Environment(AlertsModel.self) var alerts
+    @Environment(SheetRouter.self) var router
     @Query(sort: \PersistedFavouriteStop.createdAt) var favouriteEntities: [PersistedFavouriteStop]
     @State var tripDetailViewModel = TripDetailViewModel()
     @State var tripDetailReturnRegion: MKCoordinateRegion?
@@ -38,12 +39,9 @@ struct TransitMapScreen: View {
     @State var mapRegionUpdateTask: Task<Void, Never>?
     @State var searchUpdateContinuation: AsyncStream<String>.Continuation?
     @State var nearbyStopsUpdateTask: Task<Void, Never>?
-    @State var shouldCenterOnNextLocation = false
     @State var isMainSheetPresented = false
     @State var isOnboardingPresented = false
     @State var favouriteStopIds: Set<String> = []
-    @State var sheetNavigation = TransitSheetNavigationState()
-    @State var sheetDetent: BottomSheetDetent = .medium
     @State private var bikeShareStations: [BikeShareStation] = []
     @AppStorage("hasCompletedOnboarding") var hasCompletedOnboarding = false
 
@@ -53,11 +51,10 @@ struct TransitMapScreen: View {
         ZStack(alignment: .bottom) {
             TransitMapLayer(
                 tripDetail: tripDetailViewModel,
-                navigation: sheetNavigation,
                 favouriteStopIds: favouriteStopIds,
                 bikeShareStations: bikeShareStations,
-                selectStop: selectStop,
-                selectStopGroup: selectStopGroup,
+                selectStop: { router.show([.stopDetail($0)]) },
+                selectStopGroup: { router.openStopGroup($0, bikeShareStations: $1) },
                 regionDidChange: scheduleMapRegionUpdate
             )
 
@@ -66,7 +63,7 @@ struct TransitMapScreen: View {
                     Spacer()
                     LocationPermissionButton(
                         authorizationStatus: locationService.authorizationStatus,
-                        requestLocation: requestLocation
+                        requestLocation: router.requestLocation
                     )
                     .padding(.trailing, 16)
                     .padding(.top, 12)
@@ -78,11 +75,8 @@ struct TransitMapScreen: View {
         .sheet(isPresented: $isMainSheetPresented) {
             TransitBottomSheet(
                 searchQuery: Bindable(search).searchQuery,
-                detent: sheetDetent,
-                navigation: sheetNavigation,
                 viewModel: sheetPresentationModel,
-                actions: sheetActions,
-                activateRoute: activateSheetRoute
+                actions: sheetActions
             )
             .safePresentationPlacement()
             .presentationDetents(
@@ -100,6 +94,8 @@ struct TransitMapScreen: View {
             // hierarchy, so relying on an inherited object can crash before
             // the sheet's first body is rendered.
             .environment(preferences)
+            .featureModels(router.models)
+            .environment(router)
             .scaledToFill()
             .frame(maxWidth: 450)
             .presentationSizing(.fitted)
@@ -131,7 +127,7 @@ struct TransitMapScreen: View {
             guard routePlanner.routeFilters.includedModes != preferences.includedRouteModes else { return }
             var filters = routePlanner.routeFilters
             filters.includedModes = preferences.includedRouteModes
-            updateRouteFilters(filters)
+            router.updateRouteFilters(filters)
         }
         .onChange(of: isMainSheetPresented) {
             if !isMainSheetPresented, hasCompletedOnboarding, !isOnboardingPresented {
@@ -155,7 +151,7 @@ struct TransitMapScreen: View {
                 walkingRouter: walkingRouter
             )
             await map.loadNearbyStopRoutes(using: gtfsService)
-            await loadAlertsAndCheckDisruptions()
+            await alerts.refresh(using: avlClient, disruptionAlertService: disruptionAlertService)
         }
         .task {
             await observeSearchUpdates()
@@ -176,15 +172,15 @@ struct TransitMapScreen: View {
         .sensoryFeedback(.selection, trigger: stopDetail.selectedStop?.id)
         .sensoryFeedback(.impact(weight: .light), trigger: favouriteStopIds.count)
         .onChange(of: locationService.currentLocation) {
-            if shouldCenterOnNextLocation, locationService.currentLocation != nil {
+            if map.centersOnNextLocation, locationService.currentLocation != nil {
                 map.centerOnUserLocation(locationService.currentLocation)
-                shouldCenterOnNextLocation = false
+                map.centersOnNextLocation = false
             }
             Task {
                 await map.loadGTFSMapStops(using: gtfsService)
             }
             scheduleNearbyStopsRefresh()
-            calculateWaitingRouteIfNeeded()
+            router.calculateWaitingRouteIfNeeded()
         }
         .task(id: departureRefreshKey) {
             guard stopDetail.selectedStop != nil, isShowingStopDetail else {
@@ -203,11 +199,11 @@ struct TransitMapScreen: View {
             }
         }
         .task(id: favouriteRefreshTaskKey) {
-            guard sheetNavigation.selectedTab == .home else { return }
+            guard router.selectedTab == .home else { return }
             await refreshFavouriteStops()
-            while !Task.isCancelled, sheetNavigation.selectedTab == .home {
+            while !Task.isCancelled, router.selectedTab == .home {
                 try? await Task.sleep(for: .seconds(45))
-                guard !Task.isCancelled, sheetNavigation.selectedTab == .home else { return }
+                guard !Task.isCancelled, router.selectedTab == .home else { return }
                 await refreshFavouriteStops()
             }
         }
@@ -216,11 +212,16 @@ struct TransitMapScreen: View {
         }
         .onChange(of: favouriteEntities) {
             favouriteStopIds = Set(favouriteEntities.map(\.stopId))
+            favourites.favouriteStops = favouriteStops
             favourites.retainBoards(forStopIDs: favouriteStopIds)
             mirrorFavouriteEntitiesForIntents()
         }
+        .onChange(of: scenePhase, initial: true) {
+            router.isSceneActive = scenePhase == .active
+        }
         .onAppear {
             favouriteStopIds = Set(favouriteEntities.map(\.stopId))
+            favourites.favouriteStops = favouriteStops
             mirrorFavouriteEntitiesForIntents()
             handlePendingIntentHandoff()
         }
@@ -246,7 +247,7 @@ struct TransitMapScreen: View {
     }
 
     var favouriteRefreshTaskKey: String {
-        "\(favouriteRefreshKey)|\(sheetNavigation.selectedTab == .home)|\(canLoadLiveFavouriteDepartures)"
+        "\(favouriteRefreshKey)|\(router.selectedTab == .home)|\(canLoadLiveFavouriteDepartures)"
     }
 
     var canLoadLiveFavouriteDepartures: Bool {
@@ -260,12 +261,12 @@ struct TransitMapScreen: View {
     }
 
     var isShowingStopDetail: Bool {
-        if case .stopDetail = sheetNavigation.activePath.last { return true }
+        if case .stopDetail = router.activePath.last { return true }
         return false
     }
 
     var isShowingRouteDetail: Bool {
-        if case .routeTimeline = sheetNavigation.activePath.last { return true }
+        if case .routeTimeline = router.activePath.last { return true }
         return false
     }
 
@@ -297,6 +298,5 @@ extension View {
 
 #Preview {
     TransitMapScreen(locationService: LocationService())
-        .environment(AppPreferences())
-        .featureModels(FeatureModels())
+        .previewEnvironment()
 }

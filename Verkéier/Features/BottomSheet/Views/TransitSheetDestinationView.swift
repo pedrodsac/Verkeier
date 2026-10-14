@@ -141,20 +141,7 @@ struct TransitSheetDestinationView: View {
             .toolbarTitleDisplayMode(.inline)
 
         case .alerts:
-            ScrollView {
-                AlertsView(viewModel: viewModel.alerts)
-                    .padding(.horizontal, 16)
-            }
-            .navigationTitle(route.navigationTitle)
-            .toolbarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: actions.refreshAlerts) {
-                        Label("Refresh alerts", systemImage: "arrow.clockwise")
-                    }
-                    .disabled(viewModel.alerts.isLoading)
-                }
-            }
+            AlertsView()
         }
     }
 

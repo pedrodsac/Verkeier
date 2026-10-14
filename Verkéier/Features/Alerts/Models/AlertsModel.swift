@@ -34,6 +34,12 @@ final class AlertsModel {
         isLoadingAlerts = false
     }
 
+    /// Reloads the alerts, then notifies the rider about any new disruption.
+    func refresh(using avlClient: any AVLClient, disruptionAlertService: DisruptionAlertService) async {
+        await loadAlerts(using: avlClient)
+        await checkDisruptionAlerts(disruptionAlertService: disruptionAlertService)
+    }
+
     /// After an AVL refresh, notify the rider about any new disruption.
     /// ``DisruptionAlertService`` dedupes and delivers.
     func checkDisruptionAlerts(disruptionAlertService: DisruptionAlertService) async {

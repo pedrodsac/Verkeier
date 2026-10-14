@@ -9,7 +9,6 @@ struct TransitSheetPresentationModel {
     let stopDetail: StopDetailPresentationModel
     let route: RoutePresentationModel
     let lineDetail: LineDetailPresentationModel
-    let alerts: AlertsPresentationModel
     var tripDetail: TripDetailViewModel? = nil
 }
 
@@ -17,7 +16,6 @@ struct TransitSheetActions {
     let toggleFavourite: () -> Void
     let saveFavouriteCustomization: (Stop, String, String, String) -> Void
     let refreshDepartures: () async -> Void
-    let refreshAlerts: () -> Void
     let calculateRoute: () -> Void
     let refreshRouteRealtime: () async -> Void
     let showDirections: () -> Void
@@ -89,14 +87,4 @@ extension SearchActions {
         self.init()
         updateSearch = actions.updateSearch
     }
-}
-
-// MARK: - Alerts
-
-struct AlertsPresentationModel {
-    let alerts: [AlertMessage]
-    let isLoading: Bool
-    let errorMessage: String?
-    let lastUpdated: Date?
-    let isStale: Bool
 }

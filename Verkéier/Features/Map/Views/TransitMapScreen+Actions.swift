@@ -75,23 +75,22 @@ extension TransitMapScreen {
                 )
             },
             refreshDepartures: refreshDepartures,
-            refreshAlerts: refreshAlerts,
-            calculateRoute: calculateRoute,
+            calculateRoute: router.calculateRoute,
             refreshRouteRealtime: refreshSelectedRouteRealtime,
-            showDirections: showDirections,
-            showHome: showHome,
+            showDirections: router.showDirections,
+            showHome: router.showHome,
             openSpecialEvent: openSpecialEvent,
-            expandSheet: expandSheet,
+            expandSheet: router.expand,
             openRouteInAppleMaps: openRouteInAppleMaps,
-            selectRouteOrigin: selectRouteOrigin,
-            selectRouteDestination: selectRouteDestination,
-            applyCommutePreset: applyCommutePreset,
-            applyAndCalculatePreset: applyAndCalculatePreset,
+            selectRouteOrigin: router.selectRouteOrigin,
+            selectRouteDestination: router.selectRouteDestination,
+            applyCommutePreset: router.applyCommutePreset,
+            applyAndCalculatePreset: router.applyAndCalculatePreset,
             saveCurrentCommutePreset: saveCurrentCommutePreset,
-            swapRouteEndpoints: swapRouteEndpoints,
-            showRoutePlaceSearch: showRoutePlaceSearch,
-            updateRouteFilters: updateRouteFilters,
-            setRoutePlanningTime: setRoutePlanningTime,
+            swapRouteEndpoints: router.swapRouteEndpoints,
+            showRoutePlaceSearch: router.showRoutePlaceSearch,
+            updateRouteFilters: router.updateRouteFilters,
+            setRoutePlanningTime: router.setRoutePlanningTime,
             loadEarlierRoutes: loadEarlierRoutes,
             loadLaterRoutes: loadLaterRoutes,
             startTrackingDeparture: startTrackingDeparture,
@@ -104,65 +103,29 @@ extension TransitMapScreen {
             selectLineDetailDirection: selectLineDetailDirection,
             refreshLineDetail: refreshLineDetail,
             favourites: FavouritesActions(
-                openStop: openFavouriteStop,
-                planTo: planToFavouriteStop,
-                planFrom: planFromFavouriteStop,
+                openStop: { router.show([.stopDetail($0)], detent: .medium) },
+                planTo: router.planRoute(to:),
+                planFrom: router.planRoute(from:),
                 refreshStop: refreshFavouriteStop,
                 refreshAll: refreshFavouriteStops,
                 updateLabels: updateFavouriteLabels,
                 updateAppearance: updateFavouriteAppearance,
                 removeFavourite: removeFavourite,
-                findStop: showSearch
+                findStop: router.showSearch
             ),
             openDepartureTrip: { departure, stop, selection in
-                guard sheetNavigation.activePath.last == .departureTrip(departure, stop) else { return }
-                switch sheetNavigation.selectedTab {
-                case .home: sheetNavigation.homePath[sheetNavigation.homePath.count - 1] = .tripDetail(selection)
-                case .plan: sheetNavigation.planPath[sheetNavigation.planPath.count - 1] = .tripDetail(selection)
-                case .settings: break
-                }
+                router.openTrip(selection, replacing: departure, at: stop)
             },
             refreshTripDetail: { await tripDetailViewModel.refresh(using: tripDetailService) },
-            refreshRoutes: refreshRoutes,
-            maintainRoutes: maintainRoutes
+            refreshRoutes: router.refreshRoutes,
+            maintainRoutes: router.maintainRoutes
         )
-    }
-
-    func selectStop(_ stop: Stop) {
-        navigateToSheet([.stopDetail(stop)])
     }
 
     func openSpecialEvent(_ event: SpecialEvent) {
         Task { @MainActor in
             _ = event
         }
-    }
-
-    func openFavouriteStop(_ stop: Stop) {
-        navigateToSheet([.stopDetail(stop)], detent: .medium)
-    }
-
-    func planToFavouriteStop(_ stop: Stop) {
-        selectRouteDestination(RoutePlace(stop: stop, source: .favourite))
-        showPlanTab()
-    }
-
-    func planFromFavouriteStop(_ stop: Stop) {
-        selectRouteOrigin(RoutePlace(stop: stop, source: .favourite))
-        showPlanTab()
-    }
-
-    func showPlanTab() {
-        animateSheetChange {
-            sheetNavigation.selectedTab = .plan
-            sheetNavigation.planPath = []
-            sheetDetent = .medium
-        }
-    }
-
-    func showDirections() {
-        showPlanTab()
-        calculateRoute()
     }
 
     func refreshFavouriteStop(_ stop: Stop) async {
@@ -205,138 +168,14 @@ extension TransitMapScreen {
         mirrorFavouriteEntitiesForIntents()
     }
 
-    /// Shows `stop` across the feature models: its departure board, a route to
-    /// it, and the map moved to it.
-    func applyStopSelection(_ stop: Stop, preservingLineDetail: Bool = false) {
-        map.clearStopGroup()
-        stopDetail.select(stop)
-        search.recordRecentStop(stop)
-        routePlanner.planToSelectedStop(stop)
-        if !preservingLineDetail {
-            lineDetail.clearLineDetail()
-        }
-        map.focus(on: stop.location.coordinate)
-    }
-
-    func selectStopGroup(_ stops: [Stop], _ bikeShareStations: [BikeShareStation]) {
-        switch map.selectStopGroup(stops, bikeShareStations: bikeShareStations) {
-        case .group:
-            stopDetail.clearSelection()
-            routePlanner.clearEndpoints()
-            lineDetail.clearLineDetail()
-        case let .singleStop(stop):
-            applyStopSelection(stop)
-        case .none:
-            break
-        }
-        if let selectedStop = stopDetail.selectedStop {
-            navigateToSheet([.stopDetail(selectedStop)])
-        } else {
-            navigateToSheet([.stopGroup])
-        }
-    }
-
-    func showHome() {
-        animateSheetChange {
-            sheetNavigation.selectedTab = .home
-            sheetNavigation.homePath = []
-            sheetDetent = .medium
-            map.clearStopGroup()
-            routePlanner.clearRoute()
-            lineDetail.clearLineDetail()
-        }
-    }
-
-    func expandSheet() {
-        animateSheetChange {
-            sheetDetent = .expanded
-        }
-    }
-
-    func showSearch() {
-        routePlanner.clearRoute()
-        lineDetail.clearLineDetail()
-        navigateToSheet([.search], detent: .expanded)
-    }
-
-    func showAlerts() {
-        routePlanner.clearRoute()
-        navigateToSheet([.alerts], detent: .expanded)
+    func saveCurrentCommutePreset(_ title: String) {
+        routePlanner.saveCurrentCommutePreset(title: title)
     }
 
     func selectLineDetailDirection(_ directionID: String) {
         lineDetail.selectLineDetailDirection(directionID)
         Task {
             await lineDetail.loadLineDetail(using: gtfsService)
-        }
-    }
-
-    func selectRouteOrigin(_ place: RoutePlace?) {
-        routePlanner.selectRouteOrigin(place)
-    }
-
-    func selectRouteDestination(_ place: RoutePlace) {
-        routePlanner.selectRouteDestination(place)
-        if let stop = stopForRoutePlace(place) {
-            stopDetail.selectedStop = stop
-        }
-    }
-
-    func applyCommutePreset(_ presetID: String) {
-        routePlanner.applyCommutePreset(presetID)
-        if let destination = routePlanner.routeDestination,
-            let stop = stopForRoutePlace(destination)
-        {
-            stopDetail.selectedStop = stop
-        }
-    }
-
-    func applyAndCalculatePreset(_ presetID: String) {
-        applyCommutePreset(presetID)
-        calculateRoute()
-    }
-
-    func saveCurrentCommutePreset(_ title: String) {
-        routePlanner.saveCurrentCommutePreset(title: title)
-    }
-
-    func swapRouteEndpoints() {
-        let currentLocation = locationService.currentLocation.map { location in
-            RoutePlace.currentLocation(
-                LocationPoint(
-                    name: "Current Location",
-                    latitude: location.coordinate.latitude,
-                    longitude: location.coordinate.longitude
-                )
-            )
-        }
-        animateSheetChange {
-            routePlanner.swapRouteEndpoints(currentLocation: currentLocation)
-        }
-    }
-
-    func showRoutePlaceSearch(_ endpoint: RouteEndpoint) {
-        animateSheetChange {
-            sheetNavigation.selectedTab = .plan
-            sheetNavigation.planPath.append(.routePlaceSearch(endpoint))
-            sheetDetent = .expanded
-        }
-    }
-
-    func updateRouteFilters(_ filters: RoutePlannerFilters) {
-        routePlanner.updateRouteFilters(filters)
-        if routePlanner.routeDestination != nil || stopDetail.selectedStop != nil {
-            calculateRoute()
-        }
-    }
-
-    func setRoutePlanningTime(_ time: RoutePlanningTime) {
-        guard routePlanner.routePlanningTime != time else { return }
-        routePlanner.setRoutePlanningTime(time)
-        // A future time can be picked before an endpoint exists. In that case
-        // remember it without surfacing a destination error.
-        if routePlanner.routeDestination != nil || stopDetail.selectedStop != nil {
-            calculateRoute()
         }
     }
 
@@ -348,107 +187,6 @@ extension TransitMapScreen {
     func selectDeparturePlatform(_ platform: String?) {
         stopDetail.selectDeparturePlatform(platform)
         Task { await stopDetail.loadDepartures(using: liveTransitService, gtfsService: gtfsService) }
-    }
-
-    func stopForRoutePlace(_ place: RoutePlace) -> Stop? {
-        if let stopId = place.stopId {
-            if let favourite = favouriteStops.first(where: { $0.id == stopId }) {
-                return favourite
-            }
-            if let nearby = map.nearbyStops.first(where: { $0.id == stopId }) {
-                return nearby
-            }
-            if let result = search.searchResults.first(where: { $0.id == stopId }) {
-                return result
-            }
-            if let selectedStop = stopDetail.selectedStop, selectedStop.id == stopId {
-                return selectedStop
-            }
-        }
-        return nil
-    }
-
-    func animateSheetChange(_ changes: () -> Void) {
-        if let animation = Animation.respectingReduceMotion(.snappy(duration: 0.28), reduceMotion) {
-            withAnimation(animation) { changes() }
-        } else {
-            changes()
-        }
-    }
-
-    func navigateToSheet(
-        _ routes: [TransitSheetRoute],
-        detent: BottomSheetDetent? = nil
-    ) {
-        animateSheetChange {
-            sheetNavigation.selectedTab = .home
-            sheetNavigation.homePath = routes
-            sheetDetent = detent ?? routes.last?.defaultDetent ?? .medium
-        }
-    }
-
-    func navigateToSheet(
-        _ route: TransitSheetRoute,
-        reset: Bool = true,
-        detent: BottomSheetDetent? = nil
-    ) {
-        let routes = reset ? [route] : sheetNavigation.homePath + [route]
-        navigateToSheet(routes, detent: detent)
-    }
-
-    func activateSheetRoute(
-        _ route: TransitSheetRoute?,
-        _ previousRoute: TransitSheetRoute?,
-        _ isBackNavigation: Bool
-    ) {
-        TransitSheetRouteActivationCoordinator(
-            selectStop: { stop, preservesLineDetail in
-                applyStopSelection(stop, preservingLineDetail: preservesLineDetail)
-            },
-            loadSelectedStopData: loadSelectedStopData,
-            calculateRoute: calculateRoute,
-            applyCommutePreset: applyCommutePreset,
-            selectRouteOption: { optionID in
-                _ = routePlanner.selectRouteOption(id: optionID)
-            },
-            prepareLineDetail: { lineDetail.prepareLineDetail($0) || lineDetail.selectedLineDetail == nil },
-            loadLineDetail: {
-                Task {
-                    await lineDetail.loadLineDetail(using: gtfsService)
-                }
-            }
-        )
-        .activate(
-            route,
-            previousRoute: previousRoute,
-            isBackNavigation: isBackNavigation
-        )
-    }
-
-    func loadSelectedStopData() {
-        Task {
-            await map.loadGTFSMapStops(using: gtfsService)
-        }
-    }
-
-    func requestLocation() {
-        switch locationService.authorizationStatus {
-        case .authorizedAlways, .authorizedWhenInUse:
-            if locationService.currentLocation == nil {
-                shouldCenterOnNextLocation = true
-                locationService.startUpdatingIfAllowed()
-            } else {
-                map.centerOnUserLocation(locationService.currentLocation)
-                Task {
-                    await map.loadGTFSMapStops(using: gtfsService)
-                }
-            }
-        case .notDetermined:
-            shouldCenterOnNextLocation = true
-            locationService.requestWhenInUseAuthorization()
-        default:
-            locationService.requestWhenInUseAuthorization()
-        }
     }
 
     func refreshDepartures() async {
@@ -465,71 +203,6 @@ extension TransitMapScreen {
     func refreshLineDetail() async {
         favourites.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: true)
         await lineDetail.loadLineDetail(using: gtfsService)
-    }
-
-    func calculateRoute() {
-        if routePlanner.routeOrigin == nil, locationService.currentLocation == nil {
-            switch locationService.authorizationStatus {
-            case .denied, .restricted:
-                routePlanner.failRouteLocationRequest()
-                return
-            default:
-                break
-            }
-
-            requestLocation()
-        }
-
-        let refresh: RouteRealtimeRefreshPolicy = routePlanner.routeOptions.isEmpty ? .useCache : .forceRefresh
-        Task {
-            await routePlanner.calculateRoute(
-                using: routeService,
-                from: locationService.currentLocation,
-                realtimeRefreshPolicy: refresh
-            )
-        }
-    }
-
-    func refreshRoutes() async {
-        guard routePlanner.routeDestination != nil else { return }
-        guard routePlanner.routeOrigin != nil || locationService.currentLocation != nil else {
-            calculateRoute()
-            return
-        }
-        await routePlanner.refreshRoutes(using: routeService, from: locationService.currentLocation)
-    }
-
-    private func refreshRoutesIfIdle() async {
-        guard routePlanner.routeDestination != nil,
-            routePlanner.routeRefreshTask == nil,
-            !routePlanner.isCalculatingRoute,
-            !routePlanner.isLoadingEarlierRoutes, !routePlanner.isLoadingLaterRoutes,
-            // Browsed pages stay until the user pulls to refresh.
-            !routePlanner.isBrowsingRoutePages
-        else { return }
-        guard routePlanner.routeOrigin != nil || locationService.currentLocation != nil else {
-            calculateRoute()
-            return
-        }
-        await routePlanner.calculateRoute(
-            using: routeService,
-            from: locationService.currentLocation,
-            realtimeRefreshPolicy: .forceRefresh
-        )
-    }
-
-    func maintainRoutes() async {
-        guard routePlanner.routeDestination != nil else { return }
-        if routePlanner.routeOptions.isEmpty {
-            await refreshRoutesIfIdle()
-        }
-        while !Task.isCancelled {
-            do { try await Task.sleep(for: .seconds(45)) } catch { return }
-            guard !Task.isCancelled else { return }
-            if scenePhase == .active {
-                await refreshRoutesIfIdle()
-            }
-        }
     }
 
     func refreshSelectedRouteRealtime() async {
@@ -554,30 +227,11 @@ extension TransitMapScreen {
         }
     }
 
-    func calculateWaitingRouteIfNeeded() {
-        guard routePlanner.isWaitingForRouteLocation, locationService.currentLocation != nil else {
-            return
-        }
-
-        calculateRoute()
-    }
-
     func openRouteInAppleMaps() {
         routePlanner.openSelectedRouteInAppleMaps(
             using: routeService,
             from: locationService.currentLocation
         )
-    }
-
-    func refreshAlerts() {
-        Task {
-            await loadAlertsAndCheckDisruptions()
-        }
-    }
-
-    func loadAlertsAndCheckDisruptions() async {
-        await alerts.loadAlerts(using: avlClient)
-        await alerts.checkDisruptionAlerts(disruptionAlertService: disruptionAlertService)
     }
 
     func startTrackingDeparture(_ departure: Departure) {
@@ -607,5 +261,4 @@ extension TransitMapScreen {
     func cancelDepartureReminder() {
         departureReminderService.cancelReminder()
     }
-
 }
