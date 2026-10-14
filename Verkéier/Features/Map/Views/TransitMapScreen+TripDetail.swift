@@ -18,10 +18,10 @@ extension TransitMapScreen {
                 tripDetailReturnDetent = router.detent
             }
             tripDetailCameraDidFit = false
-            tripDetailViewModel.select(selection)
+            tripDetail.select(selection)
             router.detent = .medium
         } else {
-            tripDetailViewModel.deactivate()
+            tripDetail.deactivate()
             if let region = tripDetailReturnRegion { map.moveCamera(to: region) }
             if let detent = tripDetailReturnDetent { router.detent = detent }
             tripDetailReturnRegion = nil
@@ -32,7 +32,7 @@ extension TransitMapScreen {
 
     func fitTripDetailMapIfNeeded() {
         guard tripDetailSelection != nil, !tripDetailCameraDidFit,
-            let snapshot = tripDetailViewModel.snapshot,
+            let snapshot = tripDetail.snapshot,
             snapshot.instance == tripDetailSelection?.instance
         else { return }
         let coordinates = snapshot.mapOverlay.segments.flatMap(\.coordinates)

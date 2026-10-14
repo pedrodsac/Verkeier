@@ -29,6 +29,7 @@ final class SimulatorRouteBenchmark {
             routeService: MapKitRouteService(),
             gtfsService: UnavailableGTFSService()
         )
+        router.keepsRoutesCurrent = false
     }
 
     func run(productionService: any RouteService, walkingRouter: any WalkingRouting, bikes: any BikeShareService) async
@@ -193,7 +194,8 @@ final class SimulatorRouteBenchmark {
                     throw RoutingError.noRouteFound
                 }
                 if fullMap {
-                    while routePlanner.routeDiagnostics?.milliseconds[.mapRender] == nil, ContinuousClock.now < deadline {
+                    while routePlanner.routeDiagnostics?.milliseconds[.mapRender] == nil, ContinuousClock.now < deadline
+                    {
                         try await Task.sleep(for: .milliseconds(10))
                     }
                 }
@@ -234,7 +236,8 @@ final class SimulatorRouteBenchmark {
                         uniqueKeysWithValues: measured.milliseconds.map { ($0.key.rawValue, $0.value) }
                     ),
                     "transport": try JSONSerialization.jsonObject(with: JSONEncoder().encode(diagnostics.transport)),
-                    "canLoadEarlier": routePlanner.canLoadEarlierRoutes, "canLoadLater": routePlanner.canLoadLaterRoutes,
+                    "canLoadEarlier": routePlanner.canLoadEarlierRoutes,
+                    "canLoadLater": routePlanner.canLoadLaterRoutes,
                     "rounds": diagnostics.rounds.map {
                         [
                             "scan_ms": $0.patternScanMilliseconds, "merge_ms": $0.labelMergeMilliseconds,
@@ -564,35 +567,6 @@ final class SimulatorRouteBenchmark {
         routePlanner.routeDiagnostics?.record(.mapRender, since: published)
     }
 
-    var presentation: RoutePresentationModel {
-        .init(
-            selectedStop: nil,
-            origin: routePlanner.routeOrigin,
-            destination: routePlanner.routeDestination,
-            currentLocation: nil,
-            favouritePlaces: [],
-            nearbyPlaces: [],
-            recentPlaces: [],
-            commutePresets: [],
-            filters: routePlanner.routeFilters,
-            planningTime: routePlanner.routePlanningTime,
-            routeOptions: routePlanner.routeOptions,
-            browsingWindow: routePlanner.routeBrowsingWindow,
-            supplementalRouteOptions: routePlanner.supplementalRouteOptions,
-            isLoadingEarlierRoutes: routePlanner.isLoadingEarlierRoutes,
-            isLoadingLaterRoutes: routePlanner.isLoadingLaterRoutes,
-            canLoadEarlierRoutes: routePlanner.canLoadEarlierRoutes,
-            canLoadLaterRoutes: routePlanner.canLoadLaterRoutes,
-            alerts: [],
-            selectedRouteOptionID: routePlanner.selectedRouteOptionID,
-            loadingPhase: routePlanner.routeLoadingPhase,
-            errorMessage: routePlanner.routeErrorMessage,
-            statusMessage: routePlanner.routeStatusMessage,
-            lastCalculatedAt: routePlanner.routeLastCalculatedAt,
-            diagnosticRequestID: routePlanner.routeDiagnostics?.requestID,
-            resultsRendered: routePlanner.recordRouteResultsRendered
-        )
-    }
 }
 
 #endif

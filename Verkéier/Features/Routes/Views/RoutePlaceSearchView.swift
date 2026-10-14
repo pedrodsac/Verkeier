@@ -3,13 +3,15 @@ import SwiftUI
 /// Search destination pushed from a Plan endpoint. The endpoint's current
 /// value and the device location stay above the reusable recent places list.
 struct RoutePlaceSearchView: View {
-    let endpoint: RouteEndpoint
-    let viewModel: RoutePresentationModel
-    let onSelect: (RoutePlace?) -> Void
-
+    @Environment(RoutePlannerModel.self) private var model
+    @Environment(SheetRouter.self) private var router
+    @Environment(LocationService.self) private var locationService
     @Environment(\.dismiss) private var dismiss
     @Environment(\.gtfsService) private var gtfsService
     @Environment(\.placeSearchService) private var placeSearchService
+
+    let endpoint: RouteEndpoint
+
     @State private var query = ""
     @State private var results: [RoutePlace] = []
     @State private var isSearching = false
@@ -21,7 +23,11 @@ struct RoutePlaceSearchView: View {
     }
 
     private var selectedPlace: RoutePlace? {
-        viewModel.selectedPlace(for: endpoint)
+        model.selectedPlace(for: endpoint)
+    }
+
+    private var currentLocation: RoutePlace? {
+        locationService.currentRoutePlace
     }
 
     var body: some View {
@@ -64,13 +70,13 @@ struct RoutePlaceSearchView: View {
                     currentLocationButton
 
                     if let selectedPlace,
-                        selectedPlace.id != viewModel.currentLocation?.id
+                        selectedPlace.id != currentLocation?.id
                     {
                         placeButton(selectedPlace)
                     }
                 }
 
-                let recents = viewModel.recentPlacesExcludingPinned(for: endpoint)
+                let recents = model.recentPlaces(excludingPinnedFor: endpoint, currentLocation: currentLocation)
                 if !recents.isEmpty {
                     Section("Recent") {
                         ForEach(recents) { place in
@@ -105,18 +111,18 @@ struct RoutePlaceSearchView: View {
         Button(action: selectCurrentLocation) {
             RoutePlaceRow(
                 title: "Current Location",
-                subtitle: viewModel.currentLocation?.subtitle ?? "Live device location",
+                subtitle: currentLocation?.subtitle ?? "Live device location",
                 systemImage: "location.fill",
                 tint: .blue
             )
         }
         .buttonStyle(.plain)
-        .disabled(endpoint == .destination && viewModel.currentLocation == nil)
+        .disabled(endpoint == .destination && currentLocation == nil)
     }
 
     private func placeButton(_ place: RoutePlace) -> some View {
         Button {
-            onSelect(place)
+            select(place)
             dismiss()
         } label: {
             RoutePlaceRow(
@@ -130,9 +136,19 @@ struct RoutePlaceSearchView: View {
     }
 
     private func selectCurrentLocation() {
-        guard endpoint == .origin || viewModel.currentLocation != nil else { return }
-        onSelect(endpoint == .origin ? nil : viewModel.currentLocation)
+        guard endpoint == .origin || currentLocation != nil else { return }
+        select(endpoint == .origin ? nil : currentLocation)
         dismiss()
+    }
+
+    private func select(_ place: RoutePlace?) {
+        switch endpoint {
+        case .origin:
+            router.selectRouteOrigin(place)
+        case .destination:
+            guard let place else { return }
+            router.selectRouteDestination(place)
+        }
     }
 
     private func updateResults() async {
@@ -154,7 +170,7 @@ struct RoutePlaceSearchView: View {
         async let stopMatches = gtfsService.searchStops(query: current)
         async let placeMatches = placeSearchService.searchPlaces(
             query: current,
-            near: viewModel.currentLocation?.location
+            near: currentLocation?.location
         )
         let stops = await stopMatches
         guard !Task.isCancelled else { return }

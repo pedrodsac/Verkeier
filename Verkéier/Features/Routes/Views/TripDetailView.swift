@@ -1,9 +1,12 @@
 import SwiftUI
 
+/// Every stop of one vehicle run, scrolled to where the rider boards.
 struct TripDetailView: View {
+    @Environment(TripDetailViewModel.self) private var viewModel
+    @Environment(\.tripDetailService) private var tripDetailService
+
     let selection: TripDetailSelection
-    let viewModel: TripDetailViewModel
-    let refresh: () async -> Void
+
     @State private var scrolledSelection: TripDetailSelection?
 
     var body: some View {
@@ -101,12 +104,12 @@ struct TripDetailView: View {
                 } description: {
                     Text(viewModel.errorMessage ?? "This run has no available stop details.")
                 } actions: {
-                    Button("Try again") { Task { await refresh() } }
+                    Button("Try again") { Task { await viewModel.refresh(using: tripDetailService) } }
                 }
             }
         }
         .listStyle(.insetGrouped)
-        .refreshable { await refresh() }
+        .refreshable { await viewModel.refresh(using: tripDetailService) }
         .navigationTitle(
             "\(selection.lineName): \(selection.headsign?.stationDisplayName(hidingLocality: selection.mode == .tram) ?? "Destination unknown")"
         )

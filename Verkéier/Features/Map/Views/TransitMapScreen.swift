@@ -26,13 +26,13 @@ struct TransitMapScreen: View {
     @Environment(MapModel.self) var map
     @Environment(StopDetailModel.self) var stopDetail
     @Environment(LineDetailModel.self) var lineDetail
+    @Environment(TripDetailViewModel.self) var tripDetail
     @Environment(RoutePlannerModel.self) var routePlanner
     @Environment(SearchModel.self) var search
     @Environment(FavouritesModel.self) var favourites
     @Environment(AlertsModel.self) var alerts
     @Environment(SheetRouter.self) var router
     @Query(sort: \PersistedFavouriteStop.createdAt) var favouriteEntities: [PersistedFavouriteStop]
-    @State var tripDetailViewModel = TripDetailViewModel()
     @State var tripDetailReturnRegion: MKCoordinateRegion?
     @State var tripDetailReturnDetent: BottomSheetDetent?
     @State var tripDetailCameraDidFit = false
@@ -50,7 +50,6 @@ struct TransitMapScreen: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             TransitMapLayer(
-                tripDetail: tripDetailViewModel,
                 favouriteStopIds: favouriteStopIds,
                 bikeShareStations: bikeShareStations,
                 selectStop: { router.show([.stopDetail($0)]) },
@@ -95,6 +94,7 @@ struct TransitMapScreen: View {
             .environment(preferences)
             .featureModels(router.models)
             .environment(router)
+            .environment(router.locationService)
             .scaledToFill()
             .frame(maxWidth: 450)
             .presentationSizing(.fitted)
@@ -158,15 +158,15 @@ struct TransitMapScreen: View {
         .onChange(of: tripDetailSelection) { _, selection in
             tripDetailNavigationChanged(to: selection)
         }
-        .onChange(of: tripDetailViewModel.snapshot?.instance) {
+        .onChange(of: tripDetail.snapshot?.instance) {
             fitTripDetailMapIfNeeded()
         }
         .task(id: activeTripDetailSelection) {
             guard let selection = activeTripDetailSelection else {
-                tripDetailViewModel.deactivate()
+                tripDetail.deactivate()
                 return
             }
-            await tripDetailViewModel.observe(selection, using: tripDetailService)
+            await tripDetail.observe(selection, using: tripDetailService)
         }
         .sensoryFeedback(.selection, trigger: stopDetail.selectedStop?.id)
         .sensoryFeedback(.impact(weight: .light), trigger: favouriteStopIds.count)

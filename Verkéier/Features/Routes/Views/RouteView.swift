@@ -1,33 +1,36 @@
+import MobiliteitKit
 import SwiftUI
 
-// MARK: - RouteView
-
-/// The route-planner navigation destination.
-///
-/// Composes a unified endpoints card, state-driven middle section (loading
-/// skeletons, error/empty cards, results list). All business logic lives upstream — this view is fully stateless,
-/// driven by ``RoutePresentationModel`` and closure callbacks.
+/// The route planner: endpoints, saved commutes, and the route options found
+/// for them. ``PlanView`` hosts it on the Plan tab and for a commute preset.
 struct RouteView: View {
-    let viewModel: RoutePresentationModel
-    let actions: RouteActions
+    @Environment(RoutePlannerModel.self) private var model
+    @Environment(AlertsModel.self) private var alerts
+    @Environment(FavouritesModel.self) private var favourites
+    @Environment(MapModel.self) private var map
+    @Environment(SheetRouter.self) private var router
+    @Environment(LocationService.self) private var locationService
+    @Environment(\.routeService) private var routeService
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             // ── From / To unified card ────────────────────────────────────
             RouteEndpointsCard(
-                viewModel: viewModel,
-                showRoutePlaceSearch: actions.showRoutePlaceSearch,
-                swapRouteEndpoints: actions.swapRouteEndpoints
+                origin: model.routeOrigin,
+                destination: model.routeDestination,
+                hasCurrentLocation: locationService.currentLocation != nil,
+                showRoutePlaceSearch: router.showRoutePlaceSearch,
+                swapRouteEndpoints: router.swapRouteEndpoints
             )
 
             // ── Commute presets ───────────────────────────────────────────
-            if !viewModel.commutePresets.isEmpty {
+            if !model.commutePresets.isEmpty {
                 commutePresetsRow
             }
 
             // ── Recent trips ──────────────────────────────────────────────
-            if !viewModel.recentTrips.isEmpty {
+            if !model.recentTrips.isEmpty {
                 recentTripsRow
             }
 
@@ -35,8 +38,8 @@ struct RouteView: View {
             stateBody
 
             // ── Apple Maps handoff ────────────────────────────────────────
-            if viewModel.hasDestination {
-                Button(action: actions.openInAppleMaps) {
+            if model.hasDestination {
+                Button(action: openInAppleMaps) {
                     Label("Open in Apple Maps", systemImage: "map")
                         .frame(maxWidth: .infinity)
                 }
@@ -49,22 +52,22 @@ struct RouteView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .task(id: [
-            viewModel.origin?.id, viewModel.selectedPlace(for: .destination)?.id,
-            viewModel.currentLocation == nil ? nil : "location-available",
+            model.routeOrigin?.id, model.routeDestination?.id,
+            locationService.currentLocation == nil ? nil : "location-available",
         ]) {
-            await actions.maintainRoutes()
+            await router.maintainRoutes()
         }
         // Haptic when a route plan is found.
-        .sensoryFeedback(.success, trigger: viewModel.routeOptions.count)
-        .onChange(of: viewModel.statusMessage) { _, message in
+        .sensoryFeedback(.success, trigger: model.routeOptions.count)
+        .onChange(of: model.routeStatusMessage) { _, message in
             if let message { AccessibilityNotification.Announcement(message).post() }
         }
         .background {
-            if !viewModel.isCalculating, !viewModel.isLoadingEarlierRoutes, !viewModel.isLoadingLaterRoutes,
-                !viewModel.routeOptions.isEmpty,
-                let requestID = viewModel.diagnosticRequestID
+            if !model.isCalculatingRoute, !model.isLoadingEarlierRoutes, !model.isLoadingLaterRoutes,
+                !model.routeOptions.isEmpty,
+                let requestID = model.routeDiagnostics?.requestID
             {
-                RouteRenderObserver(requestID: requestID, rendered: viewModel.resultsRendered)
+                RouteRenderObserver(requestID: requestID, rendered: model.recordRouteResultsRendered)
                     .frame(width: 0, height: 0).accessibilityHidden(true)
             }
         }
@@ -75,9 +78,9 @@ struct RouteView: View {
     private var commutePresetsRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                ForEach(viewModel.commutePresets) { preset in
+                ForEach(model.commutePresets) { preset in
                     Button {
-                        actions.applyAndCalculatePreset(preset.id)
+                        router.applyAndCalculatePreset(preset.id)
                     } label: {
                         Label(preset.title, systemImage: "bookmark.fill")
                     }
@@ -95,9 +98,9 @@ struct RouteView: View {
     private var recentTripsRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                ForEach(viewModel.recentTrips) { trip in
+                ForEach(model.recentTrips) { trip in
                     Button {
-                        actions.applyAndCalculatePreset(trip.id)
+                        router.applyAndCalculatePreset(trip.id)
                     } label: {
                         Label(trip.title, systemImage: "clock.arrow.circlepath")
                             .lineLimit(1)
@@ -116,13 +119,13 @@ struct RouteView: View {
     @ViewBuilder
     private var stateBody: some View {
 
-        if viewModel.isWaitingForLocation {
+        if model.isWaitingForRouteLocation {
             ProgressView("Waiting for Location…")
                 .frame(maxWidth: .infinity)
         }
 
         // Initial load: show skeleton cards instead of a lone spinner
-        if viewModel.isCalculating, viewModel.routeOptions.isEmpty {
+        if model.isCalculatingRoute, model.routeOptions.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
                 RouteOptionSkeletonRow()
                 RouteOptionSkeletonRow()
@@ -131,7 +134,7 @@ struct RouteView: View {
         }
 
         // Error
-        if let errorMessage = viewModel.errorMessage, viewModel.routeOptions.isEmpty {
+        if let errorMessage = model.routeErrorMessage, model.routeOptions.isEmpty {
             CompactUnavailableCard(
                 title: "Route unavailable",
                 message: errorMessage,
@@ -140,26 +143,27 @@ struct RouteView: View {
         }
 
         // Empty — no route selected yet; offer quick destination picks
-        if !viewModel.isCalculating,
-            !viewModel.isWaitingForLocation,
-            viewModel.routeOptions.isEmpty,
-            viewModel.errorMessage == nil
+        if !model.isCalculatingRoute,
+            !model.isWaitingForRouteLocation,
+            model.routeOptions.isEmpty,
+            model.routeErrorMessage == nil
         {
             emptyState
         }
 
         // Status note
-        if let statusMessage = viewModel.statusMessage {
+        if let statusMessage = model.routeStatusMessage {
             RouteStatusMessage(text: statusMessage)
         }
 
         // Journey alerts
-        if !viewModel.alerts.isEmpty {
-            RouteAlertsSection(alerts: viewModel.alerts)
+        let routeAlerts = alerts.alerts(forRoute: model.selectedRouteOption)
+        if !routeAlerts.isEmpty {
+            RouteAlertsSection(alerts: routeAlerts)
         }
 
         // Cross-border hint
-        if viewModel.selectedRouteOption?.crossesBorder == true {
+        if model.selectedRouteOption?.crossesBorder == true {
             RouteInfoBanner(
                 title: "Crosses a border — CFL / SNCF / DB live data may be incomplete",
                 systemImage: "flag.checkered"
@@ -167,7 +171,7 @@ struct RouteView: View {
         }
 
         // Results
-        if !viewModel.routeOptions.isEmpty || !viewModel.supplementalRouteOptions.isEmpty {
+        if !model.routeOptions.isEmpty || !model.supplementalRouteOptions.isEmpty {
             routeResultsSection
         }
     }
@@ -183,7 +187,7 @@ struct RouteView: View {
             )
 
             // Quick-pick chips from favourites + nearby
-            let quickPicks = (viewModel.favouritePlaces + viewModel.nearbyPlaces).prefix(6)
+            let quickPicks = quickDestinations
             if !quickPicks.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Quick destinations")
@@ -193,7 +197,7 @@ struct RouteView: View {
                     FlexibleWrappingRow(spacing: 8) {
                         ForEach(Array(quickPicks)) { place in
                             Button {
-                                actions.selectRouteDestination(place)
+                                router.selectRouteDestination(place)
                             } label: {
                                 Label(
                                     place.title,
@@ -214,41 +218,41 @@ struct RouteView: View {
     private var routeResultsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 10) {
-                ForEach(viewModel.chronologicallyOrderedRouteOptions) { option in
+                ForEach(model.chronologicallyOrderedRouteOptions) { option in
                     RouteOptionCard(
                         option: option,
-                        isSelected: option.id == viewModel.selectedRouteOptionID,
+                        isSelected: option.id == model.selectedRouteOptionID,
                     )
                     .transition(routeCardTransition)
                 }
             }
 
-            if viewModel.routeOptions.contains(where: { !$0.transitLegs.isEmpty }) {
+            if model.routeOptions.contains(where: { !$0.transitLegs.isEmpty }) {
                 HStack(spacing: 10) {
                     routePageButton(
                         title: "Earlier",
                         systemImage: "chevron.left",
-                        isLoading: viewModel.isLoadingEarlierRoutes,
-                        isEnabled: viewModel.canLoadEarlierRoutes,
+                        isLoading: model.isLoadingEarlierRoutes,
+                        isEnabled: model.canLoadEarlierRoutes,
                         icon: .leading,
-                        action: actions.loadEarlierRoutes
+                        action: loadEarlierRoutes
                     )
                     routePageButton(
                         title: "Later",
                         systemImage: "chevron.right",
-                        isLoading: viewModel.isLoadingLaterRoutes,
-                        isEnabled: viewModel.canLoadLaterRoutes,
+                        isLoading: model.isLoadingLaterRoutes,
+                        isEnabled: model.canLoadLaterRoutes,
                         icon: .trailing,
-                        action: actions.loadLaterRoutes
+                        action: loadLaterRoutes
                     )
                 }
             }
 
-            if !viewModel.supplementalRouteOptions.isEmpty {
-                ForEach(viewModel.supplementalRouteOptions) { option in
+            if !model.supplementalRouteOptions.isEmpty {
+                ForEach(model.supplementalRouteOptions) { option in
                     RouteOptionCard(
                         option: option,
-                        isSelected: option.id == viewModel.selectedRouteOptionID
+                        isSelected: option.id == model.selectedRouteOptionID
                     )
                     .transition(routeCardTransition)
                 }
@@ -258,7 +262,7 @@ struct RouteView: View {
         // crossfades to the replacement set.
         .animation(
             reduceMotion ? .easeInOut(duration: 0.2) : .snappy,
-            value: viewModel.routeOptions.map(\.id) + viewModel.supplementalRouteOptions.map(\.id)
+            value: model.routeOptions.map(\.id) + model.supplementalRouteOptions.map(\.id)
         )
     }
 
@@ -300,6 +304,27 @@ struct RouteView: View {
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.bordered)
-        .disabled(!isEnabled || viewModel.isLoadingEarlierRoutes || viewModel.isLoadingLaterRoutes)
+        .disabled(!isEnabled || model.isLoadingEarlierRoutes || model.isLoadingLaterRoutes)
+    }
+
+    // MARK: - Actions
+
+    /// Favourites first, then nearby stops, as one-tap destinations.
+    private var quickDestinations: ArraySlice<RoutePlace> {
+        let favouritePlaces = favourites.favouriteStops.map { RoutePlace(stop: $0, source: .favourite) }
+        let nearbyPlaces = map.distinctNearbyStops.map { RoutePlace(stop: $0, source: .nearby) }
+        return (favouritePlaces + nearbyPlaces).prefix(6)
+    }
+
+    private func openInAppleMaps() {
+        model.openSelectedRouteInAppleMaps(using: routeService, from: locationService.currentLocation)
+    }
+
+    private func loadEarlierRoutes() {
+        Task { await model.loadEarlierRoutes(using: routeService, from: locationService.currentLocation) }
+    }
+
+    private func loadLaterRoutes() {
+        Task { await model.loadLaterRoutes(using: routeService, from: locationService.currentLocation) }
     }
 }

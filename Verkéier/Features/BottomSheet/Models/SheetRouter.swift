@@ -15,6 +15,9 @@ final class SheetRouter {
     var detent: BottomSheetDetent = .medium
     /// Mirrors the scene phase so background work pauses while the app is inactive.
     var isSceneActive = true
+    /// Whether the route screens refresh their results on their own. The routing
+    /// benchmark turns this off because it drives the planner itself.
+    @ObservationIgnored var keepsRoutesCurrent = true
 
     @ObservationIgnored let models: FeatureModels
     @ObservationIgnored let locationService: LocationService
@@ -142,9 +145,6 @@ extension SheetRouter {
             selectStop(stop, preservingLineDetail: cameFromLineDetail)
             Task { await models.map.loadGTFSMapStops(using: gtfsService) }
 
-        case .directions:
-            calculateRoute()
-
         case let .directionsForPreset(presetID):
             applyCommutePreset(presetID)
             calculateRoute()
@@ -241,15 +241,7 @@ extension SheetRouter {
     }
 
     func swapRouteEndpoints() {
-        let currentLocation = locationService.currentLocation.map { location in
-            RoutePlace.currentLocation(
-                LocationPoint(
-                    name: "Current Location",
-                    latitude: location.coordinate.latitude,
-                    longitude: location.coordinate.longitude
-                )
-            )
-        }
+        let currentLocation = locationService.currentRoutePlace
         animate {
             models.routePlanner.swapRouteEndpoints(currentLocation: currentLocation)
         }
@@ -311,7 +303,7 @@ extension SheetRouter {
 
     /// Keeps "leave now" results current while the route screen is visible.
     func maintainRoutes() async {
-        guard models.routePlanner.routeDestination != nil else { return }
+        guard keepsRoutesCurrent, models.routePlanner.routeDestination != nil else { return }
         if models.routePlanner.routeOptions.isEmpty {
             await refreshRoutesIfIdle()
         }
@@ -372,6 +364,17 @@ extension SheetRouter {
             return selectedStop
         }
         return nil
+    }
+}
+
+// MARK: - Lines
+
+extension SheetRouter {
+    /// Re-checks the timetable before reloading the line, so a pull to refresh can
+    /// pick up a newer feed.
+    func refreshLineDetail() async {
+        models.favourites.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: true)
+        await models.lineDetail.loadLineDetail(using: gtfsService)
     }
 }
 

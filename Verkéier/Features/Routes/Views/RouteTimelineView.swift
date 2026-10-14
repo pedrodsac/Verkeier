@@ -1,35 +1,45 @@
 import SwiftUI
 
-/// The route step-by-step timeline navigation destination.
-///
-/// Shows a summary card for the selected option (ribbon + times) followed by
-/// the vertical-rail leg list. Falls back to an unavailable card if no option
-/// is selected.
+/// The step-by-step timeline of the selected route option: a summary card for
+/// the option, then the vertical leg list.
 struct RouteTimelineView: View {
-    let viewModel: RoutePresentationModel
+    @Environment(RoutePlannerModel.self) private var model
+    @Environment(AlertsModel.self) private var alerts
+    @Environment(\.routeService) private var routeService
 
     var body: some View {
+        ScrollView {
+            content
+                .safeAreaPadding(.horizontal, 16)
+        }
+        .refreshable { await model.refreshSelectedRouteRealtime(using: routeService) }
+        .navigationTitle("Selected route")
+        .toolbarTitleDisplayMode(.inline)
+    }
+
+    private var content: some View {
         VStack(alignment: .leading, spacing: 16) {
-            if let selectedOption = viewModel.selectedRouteOption {
-                // Summary card matching the chosen option card
+            if let selectedOption = model.selectedRouteOption {
                 RouteTimelineSummaryCard(option: selectedOption)
 
-                // Vertical leg-by-leg timeline
-                RouteLegList(legs: selectedOption.plan.legs, legAlerts: viewModel.legAlerts)
+                RouteLegList(
+                    legs: selectedOption.plan.legs,
+                    legAlerts: alerts.legAlerts(forRoute: selectedOption)
+                )
 
-                if let message = viewModel.statusMessage {
+                if let message = model.routeStatusMessage {
                     RouteStatusMessage(text: message)
                 }
 
-                // Journey alerts
-                if !viewModel.alerts.isEmpty {
-                    RouteAlertsSection(alerts: viewModel.alerts)
+                let routeAlerts = alerts.alerts(forRoute: selectedOption)
+                if !routeAlerts.isEmpty {
+                    RouteAlertsSection(alerts: routeAlerts)
                 }
 
                 ShareLink(
                     item: selectedOption.shareText(
-                        originTitle: viewModel.originTitle,
-                        destinationTitle: viewModel.destinationTitle
+                        originTitle: model.originTitle,
+                        destinationTitle: model.destinationTitle
                     )
                 ) {
                     Label("Share route", systemImage: "square.and.arrow.up")

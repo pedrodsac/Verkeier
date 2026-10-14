@@ -1,33 +1,44 @@
 import SwiftUI
 
-/// Root content for the Plan tab. The existing route view intentionally keeps
-/// planning inputs and results together so alternatives remain in context.
+/// The route planner screen. It is the Plan tab's root, and is also pushed to
+/// show directions for a saved commute.
 struct PlanView: View {
-    let viewModel: RoutePresentationModel
-    let actions: RouteActions
+    enum Context {
+        /// The Plan tab's root, with route options in the toolbar.
+        case tab
+        /// Pushed from Home to plan a saved commute.
+        case commute
+    }
+
+    @Environment(RoutePlannerModel.self) private var model
+    @Environment(SheetRouter.self) private var router
+
+    var context: Context = .tab
 
     var body: some View {
         ScrollView {
-            RouteView(viewModel: viewModel, actions: actions)
+            RouteView()
                 .safeAreaPadding(.horizontal, 16)
-                .padding(.bottom, 12)
+                .padding(.bottom, context == .tab ? 12 : 0)
         }
-        .refreshable { await actions.refreshRoutes() }
-        .navigationTitle("Plan")
+        .refreshable { await router.refreshRoutes() }
+        .navigationTitle(context == .tab ? "Plan" : "Directions")
         .toolbarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                RouteOptionsBar(
-                    filters: viewModel.filters,
-                    hasDestination: viewModel.hasDestination,
-                    updateRouteFilters: actions.updateRouteFilters,
-                    saveCurrentCommutePreset: actions.saveCurrentCommutePreset
-                )
+            if context == .tab {
+                ToolbarItem(placement: .topBarLeading) {
+                    RouteOptionsBar(
+                        filters: model.routeFilters,
+                        hasDestination: model.hasDestination,
+                        updateRouteFilters: router.updateRouteFilters,
+                        saveCurrentCommutePreset: { model.saveCurrentCommutePreset(title: $0) }
+                    )
+                }
             }
             ToolbarItem(placement: .topBarTrailing) {
                 RoutePlanningTimeButton(
-                    current: viewModel.planningTime,
-                    onChange: actions.setRoutePlanningTime
+                    current: model.routePlanningTime,
+                    onChange: router.setRoutePlanningTime
                 )
             }
         }

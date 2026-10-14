@@ -4,203 +4,85 @@ import SwiftUI
 
 #if DEBUG
 #Preview("Route Options") {
-    ScrollView {
-        RouteView(
-            viewModel: .previewWithRoutes,
-            actions: RouteActions()
-        )
-        .padding()
+    routePreview { models in
+        let planner = models.routePlanner
+        planner.routeDestination = RoutePlace(stop: .previewDestinationStop, source: .selectedStop)
+        planner.commutePresets = [
+            RouteCommutePreset(
+                title: "Kirchberg",
+                origin: nil,
+                destination: RoutePlace(stop: .previewDestinationStop, source: .preset)
+            )
+        ]
+        planner.routeOptions = [.previewTramRoute, .previewBusRoute]
+        planner.selectedRouteOptionID = "tram-route"
+        planner.routeStatusMessage = "Fastest option from your current location."
+        models.favourites.favouriteStops = [.previewDestinationStop]
     }
-    .background(Color(uiColor: .systemGroupedBackground))
 }
 
 #Preview("Calculating (skeleton)") {
-    ScrollView {
-        RouteView(
-            viewModel: .previewCalculating,
-            actions: RouteActions()
-        )
-        .padding()
+    routePreview { models in
+        models.routePlanner.routeDestination = RoutePlace(stop: .previewDestinationStop, source: .selectedStop)
+        models.routePlanner.routeLoadingPhase = .calculating
     }
-    .background(Color(uiColor: .systemGroupedBackground))
 }
 
 #Preview("Waiting For Location") {
-    ScrollView {
-        RouteView(
-            viewModel: .previewWaitingForLocation,
-            actions: RouteActions()
-        )
-        .padding()
+    routePreview { models in
+        models.routePlanner.routeDestination = RoutePlace(stop: .previewDestinationStop, source: .selectedStop)
+        models.routePlanner.routeLoadingPhase = .waitingForLocation
     }
-    .background(Color(uiColor: .systemGroupedBackground))
 }
 
 #Preview("Empty state") {
-    ScrollView {
-        RouteView(
-            viewModel: .previewEmpty,
-            actions: RouteActions()
-        )
-        .padding()
+    routePreview { models in
+        models.favourites.favouriteStops = [.previewDestinationStop]
+        models.map.nearbyStops = [
+            .previewDestinationStop,
+            Stop(
+                id: "stop-clausen",
+                name: "Clausen",
+                locality: "Clausen",
+                location: LocationPoint(id: "clausen", name: "Clausen", latitude: 49.6116, longitude: 6.132),
+                modes: [.bus],
+                dataSource: .mock
+            ),
+        ]
     }
-    .background(Color(uiColor: .systemGroupedBackground))
 }
 
 #Preview("Error state") {
-    ScrollView {
-        RouteView(
-            viewModel: .previewError,
-            actions: RouteActions()
-        )
-        .padding()
+    routePreview { models in
+        models.routePlanner.routeDestination = RoutePlace(stop: .previewDestinationStop, source: .selectedStop)
+        models.routePlanner.routeErrorMessage =
+            "No public transport routes found between these locations. Try adjusting your destination."
     }
-    .background(Color(uiColor: .systemGroupedBackground))
 }
 
 #Preview("Route Timeline") {
-    ScrollView {
-        RouteTimelineView(
-            viewModel: .previewWithRoutes
-        )
-        .padding()
+    let models = FeatureModels()
+    models.routePlanner.routeDestination = RoutePlace(stop: .previewDestinationStop, source: .selectedStop)
+    models.routePlanner.routeOptions = [.previewTramRoute, .previewBusRoute]
+    models.routePlanner.selectedRouteOptionID = "tram-route"
+    return NavigationStack {
+        RouteTimelineView()
     }
-    .background(Color(uiColor: .systemGroupedBackground))
+    .previewEnvironment(models)
 }
 
 // MARK: Preview data
 
-private extension RoutePresentationModel {
-    static var previewWithRoutes: RoutePresentationModel {
-        RoutePresentationModel(
-            selectedStop: .previewDestinationStop,
-            origin: nil,
-            destination: RoutePlace(stop: .previewDestinationStop, source: .selectedStop),
-            currentLocation: nil,
-            favouritePlaces: [RoutePlace(stop: .previewDestinationStop, source: .favourite)],
-            nearbyPlaces: [RoutePlace(stop: .previewDestinationStop, source: .nearby)],
-            recentPlaces: [],
-            commutePresets: [
-                RouteCommutePreset(
-                    title: "Kirchberg",
-                    origin: nil,
-                    destination: RoutePlace(stop: .previewDestinationStop, source: .preset)
-                )
-            ],
-            filters: RoutePlannerFilters(),
-            planningTime: .leaveNow,
-            routeOptions: [.previewTramRoute, .previewBusRoute],
-            alerts: [
-                AlertMessage(
-                    id: "alert-1",
-                    title: "T1 line disruption",
-                    body: "Expect longer boarding times between Hamilius and Philharmonie.",
-                    severity: .warning,
-                    affectedStopIds: [],
-                    affectedRouteIds: ["T1"],
-                    startsAt: .now,
-                    endsAt: nil,
-                    dataSource: .mock
-                )
-            ],
-            selectedRouteOptionID: "tram-route",
-            loadingPhase: .idle,
-            errorMessage: nil,
-            statusMessage: "Fastest option from your current location."
-        )
+@MainActor
+private func routePreview(_ configure: (FeatureModels) -> Void) -> some View {
+    let models = FeatureModels()
+    configure(models)
+    return ScrollView {
+        RouteView()
+            .padding()
     }
-
-    static var previewCalculating: RoutePresentationModel {
-        RoutePresentationModel(
-            selectedStop: .previewDestinationStop,
-            origin: nil,
-            destination: RoutePlace(stop: .previewDestinationStop, source: .selectedStop),
-            currentLocation: nil,
-            favouritePlaces: [],
-            nearbyPlaces: [],
-            recentPlaces: [],
-            commutePresets: [],
-            filters: RoutePlannerFilters(),
-            planningTime: .leaveNow,
-            routeOptions: [],
-            alerts: [],
-            selectedRouteOptionID: nil,
-            loadingPhase: .calculating,
-            errorMessage: nil,
-            statusMessage: nil
-        )
-    }
-
-    static var previewWaitingForLocation: RoutePresentationModel {
-        RoutePresentationModel(
-            selectedStop: .previewDestinationStop,
-            origin: nil,
-            destination: RoutePlace(stop: .previewDestinationStop, source: .selectedStop),
-            currentLocation: nil,
-            favouritePlaces: [],
-            nearbyPlaces: [],
-            recentPlaces: [],
-            commutePresets: [],
-            filters: RoutePlannerFilters(),
-            planningTime: .leaveNow,
-            routeOptions: [],
-            alerts: [],
-            selectedRouteOptionID: nil,
-            loadingPhase: .waitingForLocation,
-            errorMessage: nil,
-            statusMessage: nil
-        )
-    }
-
-    static var previewEmpty: RoutePresentationModel {
-        RoutePresentationModel(
-            selectedStop: nil,
-            origin: nil,
-            destination: nil,
-            currentLocation: nil,
-            favouritePlaces: [RoutePlace(stop: .previewDestinationStop, source: .favourite)],
-            nearbyPlaces: [
-                RoutePlace(stop: .previewDestinationStop, source: .nearby),
-                RoutePlace(
-                    title: "Clausen",
-                    subtitle: "Clausen",
-                    location: LocationPoint(id: "clausen", name: "Clausen", latitude: 49.6116, longitude: 6.132),
-                    source: .nearby
-                ),
-            ],
-            recentPlaces: [],
-            commutePresets: [],
-            filters: RoutePlannerFilters(),
-            planningTime: .leaveNow,
-            routeOptions: [],
-            alerts: [],
-            selectedRouteOptionID: nil,
-            loadingPhase: .idle,
-            errorMessage: nil,
-            statusMessage: nil
-        )
-    }
-
-    static var previewError: RoutePresentationModel {
-        RoutePresentationModel(
-            selectedStop: .previewDestinationStop,
-            origin: nil,
-            destination: RoutePlace(stop: .previewDestinationStop, source: .selectedStop),
-            currentLocation: nil,
-            favouritePlaces: [],
-            nearbyPlaces: [],
-            recentPlaces: [],
-            commutePresets: [],
-            filters: RoutePlannerFilters(),
-            planningTime: .leaveNow,
-            routeOptions: [],
-            alerts: [],
-            selectedRouteOptionID: nil,
-            loadingPhase: .idle,
-            errorMessage: "No public transport routes found between these locations. Try adjusting your destination.",
-            statusMessage: nil
-        )
-    }
+    .background(Color(uiColor: .systemGroupedBackground))
+    .previewEnvironment(models)
 }
 
 private extension Stop {

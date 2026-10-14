@@ -143,10 +143,10 @@ struct TripDetailPreviewHost: View {
                 .toolbarTitleDisplayMode(.inline)
                 .navigationDestination(for: TransitSheetRoute.self) { route in
                     if case let .tripDetail(selection) = route {
-                        TripDetailView(selection: selection, viewModel: model) {
-                            await model.refresh(using: service)
-                        }
-                        .task { await model.observe(selection, using: service) }
+                        TripDetailView(selection: selection)
+                            .environment(model)
+                            .environment(\.tripDetailService, service)
+                            .task { await model.observe(selection, using: service) }
                     }
                 }
             }

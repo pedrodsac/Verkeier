@@ -67,12 +67,7 @@ struct TransitBottomSheet: View {
                 openSpecialEvent: actions.openSpecialEvent
             )
             .navigationDestination(for: TransitSheetRoute.self) { route in
-                TransitSheetDestinationView(
-                    route: route,
-                    searchContentTopPadding: searchBarContentTopPadding,
-                    viewModel: viewModel,
-                    actions: actions
-                )
+                TransitSheetDestinationView(route: route, searchContentTopPadding: searchBarContentTopPadding)
             }
         }
         .toolbarVisibility(navigationBarVisibility, for: .navigationBar)
@@ -94,13 +89,9 @@ struct TransitBottomSheet: View {
 
     private var planTab: some View {
         NavigationStack(path: Bindable(router).planPath) {
-            PlanView(viewModel: viewModel.route, actions: RouteActions(from: actions))
+            PlanView()
                 .navigationDestination(for: TransitSheetRoute.self) { route in
-                    TransitSheetDestinationView(
-                        route: route,
-                            viewModel: viewModel,
-                        actions: actions
-                    )
+                    TransitSheetDestinationView(route: route)
                 }
         }
     }

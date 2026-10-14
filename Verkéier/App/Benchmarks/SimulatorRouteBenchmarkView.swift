@@ -34,8 +34,13 @@ struct SimulatorRouteBenchmarkView: View {
         }.sheet(isPresented: .constant(true)) {
             ScrollView {
                 Text(benchmark.status).font(.caption).padding()
-                RouteView(viewModel: benchmark.presentation, actions: RouteActions()).padding()
-            }.presentationDetents([.large]).interactiveDismissDisabled()
+                RouteView().padding()
+            }
+            .presentationDetents([.large])
+            .interactiveDismissDisabled()
+            .featureModels(benchmark.featureModels)
+            .environment(benchmark.router)
+            .environment(benchmark.router.locationService)
         }.task { await benchmark.run(productionService: service, walkingRouter: walking, bikes: bikes) }
     }
 }

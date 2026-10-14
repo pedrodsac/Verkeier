@@ -2,7 +2,10 @@ import SwiftUI
 
 /// Editable route endpoints with native drag handles for reversing the journey.
 struct RouteEndpointsCard: View {
-    let viewModel: RoutePresentationModel
+    let origin: RoutePlace?
+    let destination: RoutePlace?
+    /// Whether the rider's location can stand in for a missing origin.
+    let hasCurrentLocation: Bool
     let showRoutePlaceSearch: (RouteEndpoint) -> Void
     let swapRouteEndpoints: () -> Void
 
@@ -49,7 +52,7 @@ struct RouteEndpointsCard: View {
     }
 
     private var canSwap: Bool {
-        viewModel.hasDestination && (viewModel.origin != nil || viewModel.currentLocation != nil)
+        destination != nil && (origin != nil || hasCurrentLocation)
     }
 
     private var originRowHeight: CGFloat {
@@ -85,13 +88,19 @@ struct RouteEndpointsCard: View {
     }
 
     private func endpointRow(_ endpoint: RouteEndpoint) -> some View {
-        let place = viewModel.selectedPlace(for: endpoint)
+        let place = endpoint == .origin ? origin : destination
         let isCurrentLocation = place?.source == .currentLocation || (endpoint == .origin && place == nil)
+        let title =
+            if isCurrentLocation {
+                String(localized: "My Location")
+            } else if let place {
+                place.displayTitle
+            } else {
+                endpoint == .origin ? "Current Location" : "Choose Destination"
+            }
         return RouteEndpointRow(
             endpoint: endpoint,
-            title: isCurrentLocation
-                ? String(localized: "My Location")
-                : (endpoint == .origin ? viewModel.originTitle : viewModel.destinationTitle),
+            title: title,
             place: place,
             canSwap: canSwap,
             select: { showRoutePlaceSearch(endpoint) },
@@ -100,53 +109,21 @@ struct RouteEndpointsCard: View {
     }
 }
 
-#if DEBUG
 #Preview(traits: .sizeThatFitsLayout) {
     RouteEndpointsCard(
-        viewModel: .previewForCard,
+        origin: nil,
+        destination: RoutePlace(
+            title: "Luxexpo",
+            subtitle: "Kirchberg",
+            location: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
+            stopId: "stop-luxexpo",
+            modes: [.tram, .bus],
+            source: .selectedStop
+        ),
+        hasCurrentLocation: true,
         showRoutePlaceSearch: { _ in },
         swapRouteEndpoints: {}
     )
     .padding()
     .background(Color(uiColor: .systemGroupedBackground))
 }
-
-private extension RoutePresentationModel {
-    static var previewForCard: RoutePresentationModel {
-        RoutePresentationModel(
-            selectedStop: Stop(
-                id: "stop-luxexpo",
-                name: "Luxexpo",
-                locality: "Kirchberg",
-                location: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
-                modes: [.tram, .bus],
-                dataSource: .mock
-            ),
-            origin: nil,
-            destination: RoutePlace(
-                title: "Luxexpo",
-                subtitle: "Kirchberg",
-                location: LocationPoint(id: "luxexpo", name: "Luxexpo", latitude: 49.6329, longitude: 6.1746),
-                stopId: "stop-luxexpo",
-                modes: [.tram, .bus],
-                source: .selectedStop
-            ),
-            currentLocation: .currentLocation(
-                LocationPoint(name: "Current Location", latitude: 49.61, longitude: 6.13)
-            ),
-            favouritePlaces: [],
-            nearbyPlaces: [],
-            recentPlaces: [],
-            commutePresets: [],
-            filters: RoutePlannerFilters(),
-            planningTime: .leaveNow,
-            routeOptions: [],
-            alerts: [],
-            selectedRouteOptionID: nil,
-            loadingPhase: .idle,
-            errorMessage: nil,
-            statusMessage: nil
-        )
-    }
-}
-#endif

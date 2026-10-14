@@ -8,6 +8,7 @@ struct FeatureModels {
     let map: MapModel
     let stopDetail: StopDetailModel
     let lineDetail: LineDetailModel
+    let tripDetail: TripDetailViewModel
     let routePlanner: RoutePlannerModel
     let search: SearchModel
     let favourites: FavouritesModel
@@ -17,6 +18,7 @@ struct FeatureModels {
         map = MapModel()
         stopDetail = StopDetailModel()
         lineDetail = LineDetailModel()
+        tripDetail = TripDetailViewModel()
         self.routePlanner = routePlanner ?? RoutePlannerModel()
         search = SearchModel()
         favourites = FavouritesModel()
@@ -30,6 +32,7 @@ extension View {
         environment(models.map)
             .environment(models.stopDetail)
             .environment(models.lineDetail)
+            .environment(models.tripDetail)
             .environment(models.routePlanner)
             .environment(models.search)
             .environment(models.favourites)
