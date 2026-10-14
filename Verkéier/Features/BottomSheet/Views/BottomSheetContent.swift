@@ -1,25 +1,18 @@
 import SwiftUI
 
 struct BottomSheetContent: View {
-    @Binding var query: String
     @Binding var isSearchActive: Bool
     let detent: BottomSheetDetent
     let contentTopPadding: CGFloat
     let viewModel: CommuteDashboardViewModel
     let favouritesViewModel: FavouritesPresentationModel
     let favouritesActions: FavouritesActions
-    let searchViewModel: SearchPresentationModel
-    let searchActions: SearchActions
     let openSpecialEvent: (SpecialEvent) -> Void
 
     var body: some View {
         Group {
             if isSearchActive {
-                SearchResultsContent(
-                    query: $query,
-                    viewModel: searchViewModel,
-                    actions: searchActions
-                )
+                SearchResultsContent()
             } else {
                 CommuteDashboardView(
                     viewModel: viewModel,

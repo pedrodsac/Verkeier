@@ -65,22 +65,9 @@ extension TransitMapScreen {
 
     var sheetActions: TransitSheetActions {
         TransitSheetActions(
-            toggleFavourite: toggleSelectedFavourite,
-            saveFavouriteCustomization: { stop, label, colorHex, iconName in
-                saveFavouriteCustomization(
-                    stop: stop,
-                    label: label,
-                    colorHex: colorHex,
-                    iconName: iconName
-                )
-            },
-            refreshDepartures: refreshDepartures,
             calculateRoute: router.calculateRoute,
             refreshRouteRealtime: refreshSelectedRouteRealtime,
-            showDirections: router.showDirections,
-            showHome: router.showHome,
             openSpecialEvent: openSpecialEvent,
-            expandSheet: router.expand,
             openRouteInAppleMaps: openRouteInAppleMaps,
             selectRouteOrigin: router.selectRouteOrigin,
             selectRouteDestination: router.selectRouteDestination,
@@ -93,13 +80,6 @@ extension TransitMapScreen {
             setRoutePlanningTime: router.setRoutePlanningTime,
             loadEarlierRoutes: loadEarlierRoutes,
             loadLaterRoutes: loadLaterRoutes,
-            startTrackingDeparture: startTrackingDeparture,
-            stopTrackingDeparture: stopTrackingDeparture,
-            scheduleDepartureReminder: scheduleDepartureReminder,
-            cancelDepartureReminder: cancelDepartureReminder,
-            toggleDepartureLine: toggleDepartureLine,
-            selectDeparturePlatform: selectDeparturePlatform,
-            updateSearch: updateSearch,
             selectLineDetailDirection: selectLineDetailDirection,
             refreshLineDetail: refreshLineDetail,
             favourites: FavouritesActions(
@@ -113,9 +93,6 @@ extension TransitMapScreen {
                 removeFavourite: removeFavourite,
                 findStop: router.showSearch
             ),
-            openDepartureTrip: { departure, stop, selection in
-                router.openTrip(selection, replacing: departure, at: stop)
-            },
             refreshTripDetail: { await tripDetailViewModel.refresh(using: tripDetailService) },
             refreshRoutes: router.refreshRoutes,
             maintainRoutes: router.maintainRoutes
@@ -145,27 +122,15 @@ extension TransitMapScreen {
     }
 
     func updateFavouriteLabels(stopID: String, labels: [String]) {
-        guard let favourite = favouriteEntities.first(where: { $0.stopId == stopID }) else { return }
-        favourite.replaceLabels(with: labels)
-        try? modelContext.save()
-        mirrorFavouriteEntitiesForIntents()
+        favourites.updateLabels(stopID: stopID, labels: labels, in: modelContext)
     }
 
     func updateFavouriteAppearance(stopID: String, label: String, colorHex: String, iconName: String) {
-        guard let favourite = favouriteEntities.first(where: { $0.stopId == stopID }) else { return }
-        favourite.displayLabel = label
-        favourite.colorHex = colorHex
-        favourite.iconName = iconName
-        try? modelContext.save()
-        mirrorFavouriteEntitiesForIntents()
+        favourites.updateAppearance(stopID: stopID, label: label, colorHex: colorHex, iconName: iconName, in: modelContext)
     }
 
     func removeFavourite(stopID: String) {
-        guard let favourite = favouriteEntities.first(where: { $0.stopId == stopID }) else { return }
-        modelContext.delete(favourite)
-        favourites.removeBoard(forStopID: stopID)
-        try? modelContext.save()
-        mirrorFavouriteEntitiesForIntents()
+        favourites.remove(stopID: stopID, in: modelContext)
     }
 
     func saveCurrentCommutePreset(_ title: String) {
@@ -176,27 +141,6 @@ extension TransitMapScreen {
         lineDetail.selectLineDetailDirection(directionID)
         Task {
             await lineDetail.loadLineDetail(using: gtfsService)
-        }
-    }
-
-    func toggleDepartureLine(_ route: TransitRoute) {
-        stopDetail.toggleDepartureLine(route)
-        Task { await stopDetail.loadDepartures(using: liveTransitService, gtfsService: gtfsService) }
-    }
-
-    func selectDeparturePlatform(_ platform: String?) {
-        stopDetail.selectDeparturePlatform(platform)
-        Task { await stopDetail.loadDepartures(using: liveTransitService, gtfsService: gtfsService) }
-    }
-
-    func refreshDepartures() async {
-        await stopDetail.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
-        await updateTrackedDepartureIfNeeded()
-    }
-
-    func updateSearch() {
-        Task {
-            await search.searchStops(using: gtfsService)
         }
     }
 
@@ -234,31 +178,4 @@ extension TransitMapScreen {
         )
     }
 
-    func startTrackingDeparture(_ departure: Departure) {
-        guard let selectedStop = stopDetail.selectedStop else { return }
-        Task {
-            await liveActivityManager.startTracking(departure: departure, stop: selectedStop)
-        }
-    }
-
-    func stopTrackingDeparture() {
-        Task {
-            await liveActivityManager.endTracking()
-        }
-    }
-
-    func scheduleDepartureReminder(_ departure: Departure, _ leadTimeMinutes: Int) {
-        guard let selectedStop = stopDetail.selectedStop else { return }
-        Task {
-            await departureReminderService.scheduleReminder(
-                for: departure,
-                stop: selectedStop,
-                leadTimeMinutes: leadTimeMinutes
-            )
-        }
-    }
-
-    func cancelDepartureReminder() {
-        departureReminderService.cancelReminder()
-    }
 }

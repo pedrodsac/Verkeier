@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SwiftData
 import WidgetKit
 
 /// Departure boards for the rider's favourite stops, mirrored to the widget.
@@ -109,6 +110,79 @@ final class FavouritesModel {
     func removeBoard(forStopID stopID: String) {
         favouriteDepartureBoards.removeValue(forKey: stopID)
         SharedTransitDataStore.removeFavouriteDepartureBoard(stopId: stopID)
+    }
+}
+
+// MARK: - Saved favourites
+
+extension FavouritesModel {
+    func isFavourite(_ stop: Stop) -> Bool {
+        favouriteStops.contains { $0.id == stop.id }
+    }
+
+    /// Saves `stop` as a favourite, or updates the label and look of an existing one.
+    func save(
+        _ stop: Stop,
+        label: String,
+        colorHex: String,
+        iconName: String,
+        boardFilter: TransitBoardFilter,
+        in context: ModelContext
+    ) {
+        let favourite =
+            Self.favourite(stopID: stop.id, in: context)
+            ?? {
+                let favourite = PersistedFavouriteStop(stop: stop, boardFilter: boardFilter)
+                context.insert(favourite)
+                return favourite
+            }()
+        favourite.displayLabel = label
+        favourite.colorHex = colorHex
+        favourite.iconName = iconName
+        saveChanges(in: context)
+    }
+
+    func updateLabels(stopID: String, labels: [String], in context: ModelContext) {
+        guard let favourite = Self.favourite(stopID: stopID, in: context) else { return }
+        favourite.replaceLabels(with: labels)
+        saveChanges(in: context)
+    }
+
+    func updateAppearance(stopID: String, label: String, colorHex: String, iconName: String, in context: ModelContext) {
+        guard let favourite = Self.favourite(stopID: stopID, in: context) else { return }
+        favourite.displayLabel = label
+        favourite.colorHex = colorHex
+        favourite.iconName = iconName
+        saveChanges(in: context)
+    }
+
+    func remove(stopID: String, in context: ModelContext) {
+        guard let favourite = Self.favourite(stopID: stopID, in: context) else { return }
+        context.delete(favourite)
+        removeBoard(forStopID: stopID)
+        saveChanges(in: context)
+    }
+
+    /// Mirrors the saved favourites to App Intents and Spotlight.
+    func mirrorForIntents(in context: ModelContext) {
+        let descriptor = FetchDescriptor<PersistedFavouriteStop>(sortBy: [SortDescriptor(\.createdAt)])
+        let favourites = (try? context.fetch(descriptor)) ?? []
+        FavouriteStopEntityStore.save(favourites: favourites)
+        if favourites.isEmpty {
+            FavouriteStopSpotlightIndexer.removeAll()
+        } else {
+            FavouriteStopSpotlightIndexer.index(favourites.map(\.stop))
+        }
+    }
+
+    private func saveChanges(in context: ModelContext) {
+        try? context.save()
+        mirrorForIntents(in: context)
+    }
+
+    private static func favourite(stopID: String, in context: ModelContext) -> PersistedFavouriteStop? {
+        let descriptor = FetchDescriptor<PersistedFavouriteStop>(predicate: #Predicate { $0.stopId == stopID })
+        return try? context.fetch(descriptor).first
     }
 }
 

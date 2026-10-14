@@ -1,46 +1,46 @@
 import SwiftUI
 
+/// The stops in a tapped map cluster.
 struct StopGroupView: View {
-    let viewModel: StopGroupPresentationModel
+    @Environment(MapModel.self) private var map
 
     var body: some View {
-        List(viewModel.stops) { stop in
+        List(map.selectedStopGroup.deduplicatedByExactName()) { stop in
             NavigationLink(value: TransitSheetRoute.stopDetail(stop)) {
                 StopRow(
                     stop: stop,
-                    routes: viewModel.routesByStopId[stop.id] ?? []
+                    routes: map.nearbyStopRoutes[stop.id] ?? []
                 )
             }
         }
         .listStyle(.plain)
+        .navigationTitle("Stops at this location")
+        .toolbarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
-    StopGroupView(
-        viewModel: StopGroupPresentationModel(
-            stops: [
-                Stop(
-                    id: "stop-1",
-                    name: "Hamilius-Centre (Tram)",
-                    locality: "Luxembourg",
-                    location: LocationPoint(latitude: 49.6107, longitude: 6.1268),
-                    modes: [.tram],
-                    dataSource: .mock
-                ),
-                Stop(
-                    id: "stop-2",
-                    name: "Hamilius-Centre (Bus)",
-                    locality: "Luxembourg",
-                    location: LocationPoint(latitude: 49.6107, longitude: 6.1268),
-                    modes: [.bus],
-                    dataSource: .mock
-                ),
-            ],
-            bikeShareStations: [],
-            referenceLocation: nil,
-            routesByStopId: [:]
+    let models = FeatureModels()
+    models.map.selectedStopGroup = [
+        Stop(
+            id: "stop-1",
+            name: "Hamilius-Centre (Tram)",
+            locality: "Luxembourg",
+            location: LocationPoint(latitude: 49.6107, longitude: 6.1268),
+            modes: [.tram],
+            dataSource: .mock
         ),
-    )
-    .padding(.horizontal, 16)
+        Stop(
+            id: "stop-2",
+            name: "Hamilius-Centre (Bus)",
+            locality: "Luxembourg",
+            location: LocationPoint(latitude: 49.6107, longitude: 6.1268),
+            modes: [.bus],
+            dataSource: .mock
+        ),
+    ]
+    return NavigationStack {
+        StopGroupView()
+    }
+    .previewEnvironment(models)
 }
