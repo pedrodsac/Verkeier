@@ -177,12 +177,17 @@ extension TransitMapScreen {
         return reminder
     }
 
+    static let regularWidthPresentationDetent = PresentationDetent.fraction(1)
+
     var sheetPresentationDetent: Binding<PresentationDetent> {
         Binding(
             get: {
-                sheetDetent.presentationDetent
+                // Regular width (iPad) only supports a single detent, so the
+                // selection must match it or UIKit throws.
+                sizeClass == .compact ? sheetDetent.presentationDetent : Self.regularWidthPresentationDetent
             },
             set: { presentationDetent in
+                guard sizeClass == .compact else { return }
                 sheetDetent = BottomSheetDetent(presentationDetent: presentationDetent)
             }
         )

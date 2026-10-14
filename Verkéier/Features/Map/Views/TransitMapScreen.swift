@@ -24,6 +24,7 @@ struct TransitMapScreen: View {
     @Environment(\.appConfiguration) var appConfiguration
     @Environment(AppPreferences.self) private var preferences
     @Environment(\.modelContext) var modelContext
+	@Environment(\.horizontalSizeClass) var sizeClass
     @Query(sort: \PersistedFavouriteStop.createdAt) var favouriteEntities:
         [PersistedFavouriteStop]
     @State var viewModel = TransitMapViewModel()
@@ -81,13 +82,14 @@ struct TransitMapScreen: View {
                 actions: sheetActions,
                 activateRoute: activateSheetRoute
             )
+			.safePresentationPlacement()
             .presentationDetents(
-                BottomSheetDetent.presentationDetents,
+				sizeClass == .compact ? BottomSheetDetent.presentationDetents : [Self.regularWidthPresentationDetent],
                 selection: sheetPresentationDetent
             )
 			.presentationBackground(Color(uiColor: .systemBackground))
             .presentationBackgroundInteraction(
-                .enabled(upThrough: BottomSheetDetent.mediumPresentationDetent)
+				sizeClass == .compact ? .enabled(upThrough: BottomSheetDetent.mediumPresentationDetent) : .enabled
             )
             .presentationCornerRadius(40)
             .interactiveDismissDisabled()
@@ -96,6 +98,9 @@ struct TransitMapScreen: View {
             // hierarchy, so relying on an inherited object can crash before
             // the sheet's first body is rendered.
             .environment(preferences)
+			.scaledToFill()
+			.frame(maxWidth: 450)
+			.presentationSizing(.fitted)
         }
         .fullScreenCover(
             isPresented: onboardingPresentationBinding,
@@ -278,6 +283,16 @@ struct TransitMapScreen: View {
             }
         )
     }
+}
+
+extension View {
+	func safePresentationPlacement() -> some View {
+		if #available(anyAppleOS 27.0, *) {
+			return self.presentationPlacement(.leading)
+		} else {
+			return self
+		}
+	}
 }
 
 #Preview {
