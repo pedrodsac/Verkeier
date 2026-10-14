@@ -181,7 +181,7 @@ final class ProgressLog: @unchecked Sendable {
 }
 
 actor FakeComputer: TransferWalkComputing {
-    enum Behavior { case normal, noRouteFor(every: Int), cancelled, datasetUnavailable, other, slow }
+    enum Behavior { case normal, noRouteFor(every: Int), cancelled, datasetUnavailable, other, slow, hang }
     private let behavior: Behavior
     private let active: Bool
     private(set) var calls: [TransferWalkKey] = []
@@ -207,6 +207,8 @@ actor FakeComputer: TransferWalkComputing {
         case .other: throw Fault()
         case .slow:
             try await Task.sleep(for: .milliseconds(25))
+        case .hang:
+            try await Task.sleep(for: .seconds(100))
         case .noRouteFor(let every):
             if calls.count % every == 0 { return .noRoute }
         case .normal: break
