@@ -14,6 +14,8 @@ extension EnvironmentValues {
     @Entry var routeService: any RouteService = MapKitRouteService()
     @Entry var walkingRouter: any WalkingRouting = UnavailableWalkingRouter()
     @Entry var routingOptimisationService: any RoutingOptimisationService = UnavailableRoutingOptimisationService()
+    /// Called by the map once its onboarding cover has finished dismissing.
+    @Entry var launchOnboardingDidFinish: () -> Void = {}
     @Entry var avlClient: any AVLClient = LiveAVLClient(
         feedURL: AppConfiguration.current.avlMessagesURL
     )
