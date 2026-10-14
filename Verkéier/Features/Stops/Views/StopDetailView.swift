@@ -118,7 +118,8 @@ private extension StopDetailView {
             CompactUnavailableCard(
                 title: model.departuresErrorMessage == nil ? "No departures" : "Departures unavailable",
                 message: model.departuresErrorMessage ?? "No live departures are available for this stop.",
-                systemImage: model.departuresErrorMessage == nil ? "clock.badge.exclamationmark" : "wifi.exclamationmark"
+                systemImage: model.departuresErrorMessage == nil
+                    ? "clock.badge.exclamationmark" : "wifi.exclamationmark"
             )
             .listRowInsets(cardRowInsets)
             .listRowBackground(Color.clear)

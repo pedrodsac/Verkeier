@@ -173,15 +173,10 @@ struct RouteTimePagingTests {
     @Test func arrivalPresentationOrdersByDestinationTime() {
         let late = option("late", departure: 300, duration: 3600)
         let early = option("early", departure: 1200, duration: 600)
-        var presentation = RoutePresentationModel(selectedStop: nil, origin: nil, destination: nil,
-            currentLocation: nil, favouritePlaces: [], nearbyPlaces: [], recentPlaces: [],
-            commutePresets: [], filters: .init(), planningTime: .arriveBy(anchor.addingTimeInterval(7200)),
-            routeOptions: [late, early], alerts: [], selectedRouteOptionID: nil,
-            loadingPhase: .idle, errorMessage: nil, statusMessage: nil)
-        presentation.browsingWindow = .init(axis: .arrival,
-            range: .init(start: anchor, duration: 7200))
-        #expect(presentation.chronologicallyOrderedRouteOptions.map(\.id) == [early.id, late.id])
-        #expect(presentation.browsedTimeRange != nil)
+        let model = RoutePlannerModel(now: { anchor })
+        model.routePlanningTime = .arriveBy(anchor.addingTimeInterval(7200))
+        model.routeOptions = [late, early]
+        #expect(model.chronologicallyOrderedRouteOptions.map(\.id) == [early.id, late.id])
     }
 
     @Test func refinementUsesJourneyDeadlineInsteadOfOriginalDeadline() async {

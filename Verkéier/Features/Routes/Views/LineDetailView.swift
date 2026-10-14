@@ -1,19 +1,24 @@
 import SwiftUI
 
+/// A line's stop sequence and upcoming timetable, in one direction.
 struct LineDetailView: View {
-    let viewModel: LineDetailPresentationModel
-    let actions: LineDetailActions
+    @Environment(LineDetailModel.self) private var model
+    @Environment(AlertsModel.self) private var alerts
+    @Environment(SheetRouter.self) private var router
+    @Environment(\.gtfsService) private var gtfsService
+
+    let route: TransitRoute
 
     var body: some View {
         Group {
-            if let detail = viewModel.detail {
+            if let detail = model.selectedLineDetail {
                 List {
                     if detail.directions.count > 1 {
                         Picker(
                             "Direction",
                             selection: Binding(
                                 get: { detail.selectedDirectionID },
-                                set: actions.selectDirection
+                                set: selectDirection
                             )
                         ) {
                             ForEach(detail.directions) { direction in
@@ -56,9 +61,10 @@ struct LineDetailView: View {
                         }
                     }
 
-                    if !viewModel.alerts.isEmpty {
+                    let lineAlerts = alerts.alerts(forLine: model.selectedLineDetailRoute, detail: detail)
+                    if !lineAlerts.isEmpty {
                         Section("Disruption Impact") {
-                            ForEach(viewModel.alerts.prefix(3)) { alert in
+                            ForEach(lineAlerts.prefix(3)) { alert in
                                 LineAlertRow(alert: alert)
                             }
                         }
@@ -90,10 +96,10 @@ struct LineDetailView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
-            } else if let route = viewModel.route {
+            } else if let route = model.selectedLineDetailRoute {
                 CompactUnavailableCard(
                     title: "Line details unavailable",
-                    message: viewModel.errorMessage
+                    message: model.selectedLineDetailErrorMessage
                         ?? "No GTFS timetable details are available for \(route.shortName).",
                     systemImage: "tram.fill"
                 )
@@ -105,7 +111,14 @@ struct LineDetailView: View {
                 )
             }
         }
-        .refreshable { await actions.refresh() }
+        .refreshable { await router.refreshLineDetail() }
+        .navigationTitle(route.shortName.isEmpty ? "Line details" : route.shortName)
+        .toolbarTitleDisplayMode(.inline)
+    }
+
+    private func selectDirection(_ directionID: String) {
+        model.selectLineDetailDirection(directionID)
+        Task { await model.loadLineDetail(using: gtfsService) }
     }
 }
 

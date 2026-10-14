@@ -8,10 +8,10 @@ struct TransitMapLayer: View {
     @Environment(MapModel.self) private var map
     @Environment(StopDetailModel.self) private var stopDetail
     @Environment(LineDetailModel.self) private var lineDetail
+    @Environment(TripDetailViewModel.self) private var tripDetail
     @Environment(RoutePlannerModel.self) private var routePlanner
     @Environment(AlertsModel.self) private var alerts
     @Environment(SheetRouter.self) private var router
-    var tripDetail: TripDetailViewModel? = nil
     let favouriteStopIds: Set<String>
     let bikeShareStations: [BikeShareStation]
     let selectStop: (Stop) -> Void
@@ -102,7 +102,7 @@ struct TransitMapLayer: View {
         case .routeTimeline:
             return routePlanner.routeMapOverlay
         case let .tripDetail(selection):
-            return tripDetail?.snapshot?.instance == selection.instance ? tripDetail?.snapshot?.mapOverlay : nil
+            return tripDetail.snapshot?.instance == selection.instance ? tripDetail.snapshot?.mapOverlay : nil
         case .lineDetail:
             return lineDetail.selectedLineDetail?.mapOverlay
         default:

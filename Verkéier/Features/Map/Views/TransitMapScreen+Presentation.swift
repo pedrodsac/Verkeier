@@ -41,51 +41,7 @@ extension TransitMapScreen {
                 activeAlertCount: alerts.activeAlertCount,
                 suggestedCommutePreset: routePlanner.suggestedCommutePreset,
                 specialEvents: SpecialEventCatalog.activeEvents()
-            ),
-            route: RoutePresentationModel(
-                selectedStop: stopDetail.selectedStop,
-                origin: routePlanner.routeOrigin,
-                destination: routePlanner.routeDestination,
-                currentLocation: locationService.currentLocation.map { location in
-                    RoutePlace.currentLocation(
-                        LocationPoint(
-                            name: "Current Location",
-                            latitude: location.coordinate.latitude,
-                            longitude: location.coordinate.longitude
-                        )
-                    )
-                },
-                favouritePlaces: favouriteStops.map { RoutePlace(stop: $0, source: .favourite) },
-                nearbyPlaces: nearbyStops.map { RoutePlace(stop: $0, source: .nearby) },
-                recentPlaces: routePlanner.recentRoutePlaces,
-                commutePresets: routePlanner.commutePresets,
-                recentTrips: routePlanner.recentTrips,
-                filters: routePlanner.routeFilters,
-                planningTime: routePlanner.routePlanningTime,
-                routeOptions: routePlanner.routeOptions,
-                browsingWindow: routePlanner.routeBrowsingWindow,
-                supplementalRouteOptions: routePlanner.supplementalRouteOptions,
-                isLoadingEarlierRoutes: routePlanner.isLoadingEarlierRoutes,
-                isLoadingLaterRoutes: routePlanner.isLoadingLaterRoutes,
-                canLoadEarlierRoutes: routePlanner.canLoadEarlierRoutes,
-                canLoadLaterRoutes: routePlanner.canLoadLaterRoutes,
-                alerts: alerts.alerts(forRoute: routePlanner.selectedRouteOption),
-                legAlerts: alerts.legAlerts(forRoute: routePlanner.selectedRouteOption),
-                selectedRouteOptionID: routePlanner.selectedRouteOptionID,
-                loadingPhase: routePlanner.routeLoadingPhase,
-                errorMessage: routePlanner.routeErrorMessage,
-                statusMessage: routePlanner.routeStatusMessage,
-                lastCalculatedAt: routePlanner.routeLastCalculatedAt,
-                diagnosticRequestID: routePlanner.routeDiagnostics?.requestID,
-                resultsRendered: routePlanner.recordRouteResultsRendered
-            ),
-            lineDetail: LineDetailPresentationModel(
-                route: lineDetail.selectedLineDetailRoute,
-                detail: lineDetail.selectedLineDetail,
-                alerts: alerts.alerts(forLine: lineDetail.selectedLineDetailRoute, detail: lineDetail.selectedLineDetail),
-                errorMessage: lineDetail.selectedLineDetailErrorMessage
-            ),
-            tripDetail: tripDetailViewModel
+            )
         )
     }
 

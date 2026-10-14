@@ -151,6 +151,7 @@ struct VerkéierApp: App {
             .environment(preferences)
             .featureModels(featureModels)
             .environment(router)
+            .environment(locationService)
             .modelContainer(modelContainer)
             .preferredColorScheme(preferences.appearance.colorScheme)
         }

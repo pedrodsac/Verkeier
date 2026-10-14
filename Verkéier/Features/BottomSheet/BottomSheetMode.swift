@@ -4,7 +4,6 @@ enum TransitSheetRoute: Hashable {
     case search
     case stopGroup
     case stopDetail(Stop)
-    case directions
     case directionsForPreset(String)
     case routePlaceSearch(RouteEndpoint)
     case routeTimeline(String)
@@ -17,7 +16,7 @@ enum TransitSheetRoute: Hashable {
         switch self {
         case .search, .routePlaceSearch, .routeTimeline, .lineDetail, .alerts:
             .expanded
-        case .stopGroup, .stopDetail, .directions, .directionsForPreset, .tripDetail, .departureTrip:
+        case .stopGroup, .stopDetail, .directionsForPreset, .tripDetail, .departureTrip:
             .medium
         }
     }
@@ -30,7 +29,7 @@ enum TransitSheetRoute: Hashable {
             "Stops at this location"
         case let .stopDetail(stop):
             stop.displayName
-        case .directions, .directionsForPreset:
+        case .directionsForPreset:
             "Directions"
         case let .routePlaceSearch(endpoint):
             endpoint.searchTitle

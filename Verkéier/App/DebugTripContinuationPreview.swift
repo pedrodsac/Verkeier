@@ -85,11 +85,13 @@ struct TripContinuationPreviewHost: View {
 
     var body: some View {
         NavigationStack {
-            TripDetailView(selection: selection, viewModel: model) {
-                await model.refresh(using: service)
-            }
-            .safeAreaInset(edge: .top) { Text("Sample data").font(.caption).foregroundStyle(.secondary) }
-            .dynamicTypeSize(CommandLine.arguments.contains("--trip-detail-accessibility") ? .accessibility3 : .large)
+            TripDetailView(selection: selection)
+                .environment(model)
+                .environment(\.tripDetailService, service)
+                .safeAreaInset(edge: .top) { Text("Sample data").font(.caption).foregroundStyle(.secondary) }
+                .dynamicTypeSize(
+                    CommandLine.arguments.contains("--trip-detail-accessibility") ? .accessibility3 : .large
+                )
         }
         .task { await model.observe(selection, using: service) }
     }

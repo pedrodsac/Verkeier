@@ -65,23 +65,7 @@ extension TransitMapScreen {
 
     var sheetActions: TransitSheetActions {
         TransitSheetActions(
-            calculateRoute: router.calculateRoute,
-            refreshRouteRealtime: refreshSelectedRouteRealtime,
             openSpecialEvent: openSpecialEvent,
-            openRouteInAppleMaps: openRouteInAppleMaps,
-            selectRouteOrigin: router.selectRouteOrigin,
-            selectRouteDestination: router.selectRouteDestination,
-            applyCommutePreset: router.applyCommutePreset,
-            applyAndCalculatePreset: router.applyAndCalculatePreset,
-            saveCurrentCommutePreset: saveCurrentCommutePreset,
-            swapRouteEndpoints: router.swapRouteEndpoints,
-            showRoutePlaceSearch: router.showRoutePlaceSearch,
-            updateRouteFilters: router.updateRouteFilters,
-            setRoutePlanningTime: router.setRoutePlanningTime,
-            loadEarlierRoutes: loadEarlierRoutes,
-            loadLaterRoutes: loadLaterRoutes,
-            selectLineDetailDirection: selectLineDetailDirection,
-            refreshLineDetail: refreshLineDetail,
             favourites: FavouritesActions(
                 openStop: { router.show([.stopDetail($0)], detent: .medium) },
                 planTo: router.planRoute(to:),
@@ -92,10 +76,7 @@ extension TransitMapScreen {
                 updateAppearance: updateFavouriteAppearance,
                 removeFavourite: removeFavourite,
                 findStop: router.showSearch
-            ),
-            refreshTripDetail: { await tripDetailViewModel.refresh(using: tripDetailService) },
-            refreshRoutes: router.refreshRoutes,
-            maintainRoutes: router.maintainRoutes
+            )
         )
     }
 
@@ -126,56 +107,17 @@ extension TransitMapScreen {
     }
 
     func updateFavouriteAppearance(stopID: String, label: String, colorHex: String, iconName: String) {
-        favourites.updateAppearance(stopID: stopID, label: label, colorHex: colorHex, iconName: iconName, in: modelContext)
+        favourites.updateAppearance(
+            stopID: stopID,
+            label: label,
+            colorHex: colorHex,
+            iconName: iconName,
+            in: modelContext
+        )
     }
 
     func removeFavourite(stopID: String) {
         favourites.remove(stopID: stopID, in: modelContext)
-    }
-
-    func saveCurrentCommutePreset(_ title: String) {
-        routePlanner.saveCurrentCommutePreset(title: title)
-    }
-
-    func selectLineDetailDirection(_ directionID: String) {
-        lineDetail.selectLineDetailDirection(directionID)
-        Task {
-            await lineDetail.loadLineDetail(using: gtfsService)
-        }
-    }
-
-    func refreshLineDetail() async {
-        favourites.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: true)
-        await lineDetail.loadLineDetail(using: gtfsService)
-    }
-
-    func refreshSelectedRouteRealtime() async {
-        await routePlanner.refreshSelectedRouteRealtime(using: routeService)
-    }
-
-    func loadEarlierRoutes() {
-        Task {
-            await routePlanner.loadEarlierRoutes(
-                using: routeService,
-                from: locationService.currentLocation
-            )
-        }
-    }
-
-    func loadLaterRoutes() {
-        Task {
-            await routePlanner.loadLaterRoutes(
-                using: routeService,
-                from: locationService.currentLocation
-            )
-        }
-    }
-
-    func openRouteInAppleMaps() {
-        routePlanner.openSelectedRouteInAppleMaps(
-            using: routeService,
-            from: locationService.currentLocation
-        )
     }
 
 }
