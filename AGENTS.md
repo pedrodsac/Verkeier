@@ -49,7 +49,7 @@ SwiftUI View → ViewModel/Observable State → Service Protocol → API Client/
 ### Module layout
 
 - `Verkéier/App/` — entry point (`VerkéierApp`), config (`AppConfiguration`), DI (`AppDependencies`), SwiftData container, debug data fixtures/modes.
-- `Verkéier/Features/<Domain>/` — feature UI grouped as `Views/`, `ViewModels/`, `Components/`. Domains: `Map`, `BottomSheet`, `Stops`, `Departures`, `Search`, `Routes`, `Favourites`, `Alerts`, `Settings`, `LiveActivities`, `AppIntents`.
+- `Verkéier/Features/<Domain>/` — feature UI grouped as `Views/`, `ViewModels/`, `Components/`. Domains: `Map`, `BottomSheet`, `Stops`, `Departures`, `Search`, `Routes`, `Favourites`, `Alerts`, `Settings`, `LiveActivities`, `AppIntents`, `Launch`.
 - `Verkéier/Services/` — `Transit/` (mobiliteit.lu live data and GTFS download, validation, and offline schedules), `AVL/` (Ville de Luxembourg alerts XML), `Location/`, `Routing/` (MapKit and on-device public-transport routing), `Notifications/`.
 - `Verkéier/Models/` — typed domain models (`Stop`, `Departure`, `RoutePlan`, `AlertMessage`, etc.).
 - `Verkéier/Storage/` — SwiftData persistence (e.g. favourites).
