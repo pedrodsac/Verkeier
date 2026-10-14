@@ -52,6 +52,71 @@ final class StopDetailModel {
     }
 }
 
+// MARK: - Board
+
+extension StopDetailModel {
+    var availablePlatforms: [String] {
+        departureBoardPresentation.availablePlatforms
+    }
+
+    /// A successful live response owns the board, even when it contains no rows.
+    var displayedDepartures: [Departure] {
+        departureBoardPresentation.visibleDepartures
+    }
+
+    /// Timetable rows are available only when the live request failed.
+    var scheduledDepartures: [Departure] {
+        departureBoardPresentation.visibleScheduledDepartures
+    }
+
+    var isShowingScheduledFallback: Bool {
+        isUsingOfflineDepartures && !displayedDepartures.isEmpty
+    }
+
+    /// The last few departures that have already left, kept for context.
+    var departedDepartures: [Departure] {
+        let now = now()
+        return Array(
+            displayedDepartures.filter {
+                ($0.realtimeDeparture ?? $0.scheduledDeparture)
+                    .map { !SharedDepartureTiming.isVisible($0, at: now) } ?? false
+            }
+            .suffix(3)
+        )
+    }
+
+    var upcomingDepartures: [Departure] {
+        let now = now()
+        return displayedDepartures.filter {
+            ($0.realtimeDeparture ?? $0.scheduledDeparture)
+                .map { SharedDepartureTiming.isVisible($0, at: now) } ?? true
+        }
+    }
+
+    /// The next five departures as a shareable plain-text message, or `nil`
+    /// when there is nothing to share.
+    var departuresShareText: String? {
+        guard let selectedStop, !displayedDepartures.isEmpty else { return nil }
+        var lines = ["Next departures — \(selectedStop.displayName)"]
+        for departure in displayedDepartures.prefix(5) {
+            let time =
+                (departure.realtimeDeparture ?? departure.scheduledDeparture)?
+                .formatted(date: .omitted, time: .shortened) ?? "--:--"
+            let status =
+                if departure.isCancelled {
+                    " (cancelled)"
+                } else if let delay = departure.delayMinutes, delay > 0 {
+                    " (+\(delay) min)"
+                } else {
+                    ""
+                }
+            lines.append("\(time)  \(departure.lineName) → \(departure.displayDestination)\(status)")
+        }
+        lines.append("via Verkéier")
+        return lines.joined(separator: "\n")
+    }
+}
+
 // MARK: - Selection
 
 extension StopDetailModel {
@@ -164,6 +229,43 @@ extension StopDetailModel {
             ? "No live or offline departures are available for this stop."
             : nil
         isLoadingDepartures = false
+    }
+
+    /// Reloads the board and the lines serving the stop, then keeps a tracked
+    /// departure's Live Activity and reminder in step with the new times.
+    func refresh(
+        using liveTransitService: any LiveTransitService,
+        gtfsService: any GTFSService,
+        liveActivityManager: LiveActivityManager,
+        departureReminderService: DepartureReminderService
+    ) async {
+        await loadDepartures(using: liveTransitService, gtfsService: gtfsService)
+        await updateSelectedStopRoutes(using: gtfsService)
+        await syncTrackedDeparture(
+            liveActivityManager: liveActivityManager,
+            departureReminderService: departureReminderService
+        )
+    }
+
+    func syncTrackedDeparture(
+        liveActivityManager: LiveActivityManager,
+        departureReminderService: DepartureReminderService
+    ) async {
+        if let trackedDeparture = DepartureTrackingSelection.trackedDeparture(
+            in: departures,
+            trackedDepartureId: liveActivityManager.trackedDepartureId
+        ) {
+            await liveActivityManager.updateTracking(departure: trackedDeparture)
+        }
+
+        if let reminderDepartureID = departureReminderService.activeReminder?.departureId,
+            let reminderDeparture = departures.first(where: { $0.id == reminderDepartureID })
+        {
+            await departureReminderService.syncTrackedDeparture(
+                reminderDeparture,
+                stopName: selectedStop?.name
+            )
+        }
     }
 
     func updateSelectedStopRoutes(using gtfsService: any GTFSService) async {

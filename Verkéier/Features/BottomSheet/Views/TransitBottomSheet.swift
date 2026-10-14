@@ -3,9 +3,9 @@ import SwiftUI
 struct TransitBottomSheet: View {
     private let searchBarContentTopPadding: CGFloat = 80
 
-    @Binding var searchQuery: String
     @Environment(AppPreferences.self) private var preferences
     @Environment(SheetRouter.self) private var router
+    @Environment(SearchModel.self) private var search
     let viewModel: TransitSheetPresentationModel
     let actions: TransitSheetActions
 
@@ -58,21 +58,17 @@ struct TransitBottomSheet: View {
     private var homeTab: some View {
         NavigationStack(path: Bindable(router).homePath) {
             BottomSheetContent(
-                query: $searchQuery,
                 isSearchActive: $isSearchActive,
                 detent: router.detent,
                 contentTopPadding: shouldShowSearchBar ? searchBarContentTopPadding : 0,
                 viewModel: viewModel.commute,
                 favouritesViewModel: viewModel.favourites,
                 favouritesActions: actions.favourites,
-                searchViewModel: viewModel.search,
-                searchActions: SearchActions(from: actions),
                 openSpecialEvent: actions.openSpecialEvent
             )
             .navigationDestination(for: TransitSheetRoute.self) { route in
                 TransitSheetDestinationView(
                     route: route,
-                    searchQuery: $searchQuery,
                     searchContentTopPadding: searchBarContentTopPadding,
                     viewModel: viewModel,
                     actions: actions
@@ -83,7 +79,7 @@ struct TransitBottomSheet: View {
         .safeAreaInset(edge: .top, spacing: 0) {
             if shouldShowSearchBar {
                 StopSearchBar(
-                    text: $searchQuery,
+                    text: Bindable(search).searchQuery,
                     isActive: $isSearchActive,
                     focusRequested: $focusSearch,
                     onActivate: activateSearch,
@@ -102,8 +98,7 @@ struct TransitBottomSheet: View {
                 .navigationDestination(for: TransitSheetRoute.self) { route in
                     TransitSheetDestinationView(
                         route: route,
-                        searchQuery: $searchQuery,
-                        viewModel: viewModel,
+                            viewModel: viewModel,
                         actions: actions
                     )
                 }
@@ -131,7 +126,7 @@ struct TransitBottomSheet: View {
     }
 
     private func cancelSearch() {
-        searchQuery = ""
+        search.searchQuery = ""
         isSearchActive = false
         focusSearch = false
         router.showHome()

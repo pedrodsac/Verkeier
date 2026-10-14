@@ -75,31 +75,28 @@ struct StopSearchBar: UIViewRepresentable {
     }
 }
 
+/// Stop search results, or recent and nearby stops before the rider types.
 struct SearchResultsContent: View {
+    @Environment(SearchModel.self) private var search
+    @Environment(MapModel.self) private var map
+    @Environment(\.gtfsService) private var gtfsService
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Binding var query: String
-    let viewModel: SearchPresentationModel
-    let actions: SearchActions
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            if search.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 Group {
-                    if viewModel.recentStops.isEmpty {
+                    if search.distinctRecentStops.isEmpty {
                         NearbySearchSuggestions(
-                            stops: viewModel.nearbySuggestions,
-                            isLoading: viewModel.isLoadingNearbySuggestions,
-                            referenceLocation: viewModel.referenceLocation,
+                            stops: map.distinctNearbyStops,
+                            isLoading: map.isLoadingNearbyStops
                         )
                     } else {
-                        RecentSearchStops(
-                            stops: viewModel.recentStops,
-                            referenceLocation: viewModel.referenceLocation
-                        )
+                        RecentSearchStops(stops: search.distinctRecentStops)
                     }
                 }
                 .transition(.move(edge: .bottom).combined(with: .opacity))
-            } else if viewModel.results.isEmpty {
+            } else if search.searchResults.isEmpty {
                 ContentUnavailableView(
                     "No matches",
                     systemImage: "magnifyingglass",
@@ -112,20 +109,23 @@ struct SearchResultsContent: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .animation(Animation.respectingReduceMotion(.snappy(duration: 0.24), reduceMotion), value: query.isEmpty)
         .animation(
             Animation.respectingReduceMotion(.snappy(duration: 0.24), reduceMotion),
-            value: viewModel.results.count
+            value: search.searchQuery.isEmpty
+        )
+        .animation(
+            Animation.respectingReduceMotion(.snappy(duration: 0.24), reduceMotion),
+            value: search.searchResults.count
         )
         .onAppear {
-            actions.updateSearch()
+            Task { await search.searchStops(using: gtfsService) }
         }
     }
 
     private var resultsList: some View {
         nativeStopList {
             Section {
-                ForEach(viewModel.results) { stop in
+                ForEach(search.searchResults) { stop in
                     NavigationLink(value: TransitSheetRoute.stopDetail(stop)) {
                         StopRow(stop: stop)
                     }
@@ -147,7 +147,6 @@ struct SearchResultsContent: View {
 
 private struct RecentSearchStops: View {
     let stops: [Stop]
-    let referenceLocation: CLLocation?
 
     var body: some View {
         List {
@@ -167,7 +166,6 @@ private struct RecentSearchStops: View {
 private struct NearbySearchSuggestions: View {
     let stops: [Stop]
     let isLoading: Bool
-    let referenceLocation: CLLocation?
 
     var body: some View {
         VStack(spacing: 12) {

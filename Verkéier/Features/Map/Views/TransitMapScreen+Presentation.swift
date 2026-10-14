@@ -35,47 +35,12 @@ extension TransitMapScreen {
                 isRefreshing: favourites.isLoadingFavouriteDepartures,
                 liveDeparturesAvailable: canLoadLiveFavouriteDepartures
             ),
-            stopGroup: StopGroupPresentationModel(
-                stops: map.selectedStopGroup.deduplicatedByExactName(),
-                bikeShareStations: map.selectedBikeShareStations,
-                referenceLocation: locationService.currentLocation,
-                routesByStopId: map.nearbyStopRoutes
-            ),
             commute: CommuteDashboardViewModel(
                 nearby: nearby,
                 recentStops: search.recentStops.deduplicatedByExactName(),
                 activeAlertCount: alerts.activeAlertCount,
                 suggestedCommutePreset: routePlanner.suggestedCommutePreset,
                 specialEvents: SpecialEventCatalog.activeEvents()
-            ),
-            search: SearchPresentationModel(
-                results: search.searchResults,
-                nearbySuggestions: nearbyStops,
-                isLoadingNearbySuggestions: map.isLoadingNearbyStops,
-                referenceLocation: locationService.currentLocation,
-                recentStops: search.recentStops.deduplicatedByExactName()
-            ),
-            stopDetail: StopDetailPresentationModel(
-                stop: stopDetail.selectedStop,
-                routes: stopDetail.selectedStopRoutes,
-                departures: stopDetail.departures,
-                offlineScheduledDepartures: stopDetail.offlineScheduledDepartures,
-                isUsingOfflineDepartures: stopDetail.isUsingOfflineDepartures,
-                alerts: alerts.alerts(forStop: stopDetail.selectedStop, routes: stopDetail.selectedStopRoutes),
-                selectedLine: stopDetail.selectedDepartureLine,
-                selectedPlatform: stopDetail.selectedDeparturePlatform,
-                departureBoardFilter: stopDetail.departureBoardFilter,
-                isLoadingDepartures: stopDetail.isLoadingDepartures,
-                errorMessage: stopDetail.departuresErrorMessage,
-                lastUpdated: stopDetail.departuresLastUpdated,
-                isStale: stopDetail.areDeparturesStale,
-                isFavourite: stopDetail.selectedStop.map(isFavourite) ?? false,
-                trackedDepartureId: liveActivityManager.trackedDepartureId,
-                liveActivityErrorMessage: liveActivityManager.lastErrorMessage,
-                liveActivityStaleMessage: liveActivityManager.staleExplanation,
-                activeReminder: departureReminderForSelectedStop,
-                departureReminderErrorMessage: departureReminderService.lastErrorMessage,
-                departureBoard: stopDetail.departureBoardPresentation
             ),
             route: RoutePresentationModel(
                 selectedStop: stopDetail.selectedStop,
@@ -122,14 +87,6 @@ extension TransitMapScreen {
             ),
             tripDetail: tripDetailViewModel
         )
-    }
-
-    var departureReminderForSelectedStop: SharedTrackedDepartureReminder? {
-        guard let selectedStopID = stopDetail.selectedStop?.id else { return nil }
-        guard let reminder = departureReminderService.activeReminder, reminder.stopId == selectedStopID else {
-            return nil
-        }
-        return reminder
     }
 
     static let regularWidthPresentationDetent = PresentationDetent.fraction(1)

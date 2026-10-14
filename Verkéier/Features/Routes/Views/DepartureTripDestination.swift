@@ -1,10 +1,13 @@
 import SwiftUI
 
+/// Resolves a tapped departure to its trip, then replaces itself with the trip detail.
 struct DepartureTripDestination: View {
+    @Environment(SheetRouter.self) private var router
+    @Environment(\.tripDetailService) private var service
+
     let departure: Departure
     let stop: Stop
-    let open: (TripDetailSelection) -> Void
-    @Environment(\.tripDetailService) private var service
+
     @State private var model = DepartureTripViewModel()
 
     var body: some View {
@@ -18,7 +21,9 @@ struct DepartureTripDestination: View {
         .navigationTitle(departure.lineName)
         .toolbarTitleDisplayMode(.inline)
         .task(id: departure) {
-            if let selection = await model.resolve(departure, stop: stop, service: service) { open(selection) }
+            if let selection = await model.resolve(departure, stop: stop, service: service) {
+                router.openTrip(selection, replacing: departure, at: stop)
+            }
         }
     }
 }

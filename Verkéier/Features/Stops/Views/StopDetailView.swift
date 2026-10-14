@@ -1,159 +1,26 @@
+import SwiftData
 import SwiftUI
 
+/// The live departure board for one stop.
 struct StopDetailView: View {
-    let viewModel: StopDetailPresentationModel
-    let actions: StopDetailActions
+    @Environment(StopDetailModel.self) private var model
+    @Environment(AlertsModel.self) private var alerts
+    @Environment(FavouritesModel.self) private var favourites
+    @Environment(SheetRouter.self) private var router
+    @Environment(\.liveTransitService) private var liveTransitService
+    @Environment(\.gtfsService) private var gtfsService
+    @Environment(\.liveActivityManager) private var liveActivityManager
+    @Environment(\.departureReminderService) private var departureReminderService
+    @Environment(\.modelContext) private var modelContext
 
-    private var departures: [Departure] { viewModel.displayedDepartures }
+    let stop: Stop
 
-    private var departed: [Departure] {
-        let now = Date()
-        return Array(
-            departures.filter {
-                ($0.realtimeDeparture ?? $0.scheduledDeparture)
-                    .map { !SharedDepartureTiming.isVisible($0, at: now) } ?? false
-            }.suffix(3)
-        )
-    }
-
-    private var upcoming: [Departure] {
-        let now = Date()
-        return departures.filter {
-            ($0.realtimeDeparture ?? $0.scheduledDeparture)
-                .map { SharedDepartureTiming.isVisible($0, at: now) } ?? true
-        }
-    }
+    @State private var favouriteCustomization: FavouriteCustomizationDraft?
 
     var body: some View {
         List {
-            if let stop = viewModel.stop {
-                StopDetailHeader(
-                    stop: stop,
-                    routes: viewModel.routes,
-                    selectedLine: viewModel.selectedLine,
-                    showDirections: actions.showDirections,
-                    toggleDepartureLine: actions.toggleDepartureLine,
-                    availablePlatforms: viewModel.availablePlatforms,
-                    selectedPlatform: viewModel.selectedPlatform,
-                    selectDeparturePlatform: actions.selectDeparturePlatform
-                )
-                .listRowInsets(chipsRowInsets)
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-                .safeAreaPadding(.horizontal, 16)
-
-                if let liveActivityErrorMessage = viewModel.liveActivityErrorMessage {
-                    Label(liveActivityErrorMessage, systemImage: "exclamationmark.triangle.fill")
-                        .font(.footnote)
-                        .foregroundStyle(.orange)
-                        .listRowInsets(actionRowInsets)
-                        .listRowBackground(Color.orange.opacity(0.12))
-                        .listRowSeparator(.hidden)
-                }
-
-                if let departureReminderErrorMessage = viewModel.departureReminderErrorMessage {
-                    Label(departureReminderErrorMessage, systemImage: "bell.badge.fill")
-                        .font(.footnote)
-                        .foregroundStyle(.orange)
-                        .listRowInsets(actionRowInsets)
-                        .listRowBackground(Color.orange.opacity(0.12))
-                        .listRowSeparator(.hidden)
-                }
-
-                if viewModel.isLoadingDepartures, departures.isEmpty {
-                    DepartureLoadingCard(title: "Loading departures")
-                        .listRowInsets(cardRowInsets)
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                } else if departures.isEmpty {
-                    if let errorMessage = viewModel.errorMessage {
-                        CompactUnavailableCard(
-                            title: "Departures unavailable",
-                            message: errorMessage,
-                            systemImage: "wifi.exclamationmark"
-                        )
-                        .listRowInsets(cardRowInsets)
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                    } else {
-                        CompactUnavailableCard(
-                            title: "No departures",
-                            message: "No live departures are available for this stop.",
-                            systemImage: "clock.badge.exclamationmark"
-                        )
-                        .listRowInsets(cardRowInsets)
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                    }
-                } else {
-                    let lastOfDayIDs = lastServiceDepartureIDs(in: departures)
-                    let trackedDeparture = departures.first { $0.id == viewModel.trackedDepartureId }
-
-                    if viewModel.isShowingScheduledFallback {
-                        Label("Live updates unavailable · showing timetable", systemImage: "wifi.exclamationmark")
-                            .font(.footnote.weight(.medium))
-                            .foregroundStyle(.orange)
-                            .listRowInsets(actionRowInsets)
-                            .listRowBackground(Color.orange.opacity(0.12))
-                            .listRowSeparator(.hidden)
-                    }
-
-                    if trackedDeparture != nil || viewModel.activeReminder != nil {
-                        DepartureTrackingStatusCard(
-                            trackedDeparture: trackedDeparture,
-                            activeReminder: viewModel.activeReminder,
-                            stopTrackingDeparture: actions.stopTrackingDeparture,
-                            cancelDepartureReminder: actions.cancelDepartureReminder
-                        )
-                        .listRowInsets(cardRowInsets)
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                    }
-
-                    ForEach(departed, id: \.id) { departure in
-                        DepartureListRow(departure: departure, showsControls: false)
-                            .background {
-                                NavigationLink(value: TransitSheetRoute.departureTrip(departure, stop)) { EmptyView() }
-                                    .opacity(0)
-                                    .accessibilityLabel(
-                                        "View full course for \(departure.lineName) to \(departure.displayDestination)"
-                                    )
-                            }
-                            .opacity(0.55)
-                            .listRowInsets(departureRowInsets)
-                    }
-
-                    ForEach(upcoming, id: \.id) { departure in
-                        DepartureListRow(
-                            departure: departure,
-                            isTracked: departure.id == viewModel.trackedDepartureId,
-                            isLastOfDay: lastOfDayIDs.contains(departure.id),
-                            showsControls: departure.dataSource != .gtfs,
-                            activeReminder: viewModel.activeReminder,
-                            startTrackingDeparture: { actions.startTrackingDeparture(departure) },
-                            stopTrackingDeparture: actions.stopTrackingDeparture,
-                            scheduleReminder: { minutes in
-                                actions.scheduleDepartureReminder(departure, minutes)
-                            },
-                            cancelReminder: actions.cancelDepartureReminder
-                        )
-                        .background {
-                            NavigationLink(value: TransitSheetRoute.departureTrip(departure, stop)) { EmptyView() }
-                                .opacity(0)
-                                .accessibilityLabel(
-                                    "View full course for \(departure.lineName) to \(departure.displayDestination)"
-                                )
-                        }
-                        .listRowInsets(departureRowInsets)
-                    }
-                }
-
-                if !viewModel.alerts.isEmpty {
-                    StopDisruptionSection(alerts: viewModel.alerts)
-                        .listRowInsets(cardRowInsets)
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                }
+            if let selectedStop = model.selectedStop {
+                board(for: selectedStop)
             } else {
                 CompactUnavailableCard(
                     title: "No stop selected",
@@ -166,35 +33,259 @@ struct StopDetailView: View {
             }
         }
         .listStyle(.plain)
+        .navigationTitle(stop.displayName)
+        .toolbarTitleDisplayMode(.inline)
+        .toolbar { toolbarContent }
+        .sheet(item: $favouriteCustomization) { draft in
+            FavouriteCustomizerView(
+                stop: draft.stop,
+                initialLabel: draft.label,
+                initialColorHex: draft.colorHex,
+                initialIconName: draft.iconName
+            ) { label, colorHex, iconName in
+                favourites.save(
+                    draft.stop,
+                    label: label,
+                    colorHex: colorHex,
+                    iconName: iconName,
+                    boardFilter: model.departureBoardFilter,
+                    in: modelContext
+                )
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
+        .refreshable { await refresh() }
+        .task(id: model.selectedStop?.id) { await keepBoardCurrent() }
         // Haptic + VoiceOver feedback when the board refreshes with new data.
-        .sensoryFeedback(.impact(weight: .light), trigger: viewModel.lastUpdated)
-        .onChange(of: viewModel.lastUpdated) { _, newValue in
+        .sensoryFeedback(.impact(weight: .light), trigger: model.departuresLastUpdated)
+        .onChange(of: model.departuresLastUpdated) { _, newValue in
             if newValue != nil {
                 AccessibilityNotification.Announcement("Departures updated").post()
             }
         }
     }
+}
 
-    private var chipsRowInsets: EdgeInsets {
-        EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0)
+// MARK: - Subviews
+
+private extension StopDetailView {
+    @ViewBuilder
+    func board(for selectedStop: Stop) -> some View {
+        StopDetailHeader(
+            stop: selectedStop,
+            routes: model.selectedStopRoutes,
+            selectedLine: model.selectedDepartureLine,
+            showDirections: router.showDirections,
+            toggleDepartureLine: toggleDepartureLine,
+            availablePlatforms: model.availablePlatforms,
+            selectedPlatform: model.selectedDeparturePlatform,
+            selectDeparturePlatform: selectDeparturePlatform
+        )
+        .listRowInsets(chipsRowInsets)
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+        .safeAreaPadding(.horizontal, 16)
+
+        if let liveActivityErrorMessage = liveActivityManager.lastErrorMessage {
+            warningRow(liveActivityErrorMessage, systemImage: "exclamationmark.triangle.fill")
+        }
+
+        if let departureReminderErrorMessage = departureReminderService.lastErrorMessage {
+            warningRow(departureReminderErrorMessage, systemImage: "bell.badge.fill")
+        }
+
+        departures(at: selectedStop)
+
+        let stopAlerts = alerts.alerts(forStop: selectedStop, routes: model.selectedStopRoutes)
+        if !stopAlerts.isEmpty {
+            StopDisruptionSection(alerts: stopAlerts)
+                .listRowInsets(cardRowInsets)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+        }
     }
 
-    private var chromeRowInsets: EdgeInsets {
-        EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
+    @ViewBuilder
+    func departures(at selectedStop: Stop) -> some View {
+        let departures = model.displayedDepartures
+        if model.isLoadingDepartures, departures.isEmpty {
+            DepartureLoadingCard(title: "Loading departures")
+                .listRowInsets(cardRowInsets)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+        } else if departures.isEmpty {
+            CompactUnavailableCard(
+                title: model.departuresErrorMessage == nil ? "No departures" : "Departures unavailable",
+                message: model.departuresErrorMessage ?? "No live departures are available for this stop.",
+                systemImage: model.departuresErrorMessage == nil ? "clock.badge.exclamationmark" : "wifi.exclamationmark"
+            )
+            .listRowInsets(cardRowInsets)
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+        } else {
+            let lastOfDayIDs = lastServiceDepartureIDs(in: departures)
+            let trackedDepartureId = liveActivityManager.trackedDepartureId
+            let trackedDeparture = departures.first { $0.id == trackedDepartureId }
+
+            if model.isShowingScheduledFallback {
+                Label("Live updates unavailable · showing timetable", systemImage: "wifi.exclamationmark")
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(.orange)
+                    .listRowInsets(actionRowInsets)
+                    .listRowBackground(Color.orange.opacity(0.12))
+                    .listRowSeparator(.hidden)
+            }
+
+            if trackedDeparture != nil || activeReminder != nil {
+                DepartureTrackingStatusCard(
+                    trackedDeparture: trackedDeparture,
+                    activeReminder: activeReminder,
+                    stopTrackingDeparture: stopTrackingDeparture,
+                    cancelDepartureReminder: departureReminderService.cancelReminder
+                )
+                .listRowInsets(cardRowInsets)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+            }
+
+            ForEach(model.departedDepartures, id: \.id) { departure in
+                DepartureListRow(departure: departure, showsControls: false)
+                    .background { courseLink(for: departure, at: selectedStop) }
+                    .opacity(0.55)
+                    .listRowInsets(departureRowInsets)
+            }
+
+            ForEach(model.upcomingDepartures, id: \.id) { departure in
+                DepartureListRow(
+                    departure: departure,
+                    isTracked: departure.id == trackedDepartureId,
+                    isLastOfDay: lastOfDayIDs.contains(departure.id),
+                    showsControls: departure.dataSource != .gtfs,
+                    activeReminder: activeReminder,
+                    startTrackingDeparture: { startTracking(departure) },
+                    stopTrackingDeparture: stopTrackingDeparture,
+                    scheduleReminder: { minutes in scheduleReminder(for: departure, leadTimeMinutes: minutes) },
+                    cancelReminder: departureReminderService.cancelReminder
+                )
+                .background { courseLink(for: departure, at: selectedStop) }
+                .listRowInsets(departureRowInsets)
+            }
+        }
     }
 
-    private var actionRowInsets: EdgeInsets {
-        EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16)
+    func courseLink(for departure: Departure, at selectedStop: Stop) -> some View {
+        NavigationLink(value: TransitSheetRoute.departureTrip(departure, selectedStop)) { EmptyView() }
+            .opacity(0)
+            .accessibilityLabel("View full course for \(departure.lineName) to \(departure.displayDestination)")
     }
 
-    private var cardRowInsets: EdgeInsets {
-        EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
+    func warningRow(_ message: String, systemImage: String) -> some View {
+        Label(message, systemImage: systemImage)
+            .font(.footnote)
+            .foregroundStyle(.orange)
+            .listRowInsets(actionRowInsets)
+            .listRowBackground(Color.orange.opacity(0.12))
+            .listRowSeparator(.hidden)
     }
 
-    private var departureRowInsets: EdgeInsets {
-        EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16)
+    @ToolbarContentBuilder
+    var toolbarContent: some ToolbarContent {
+        if let shareText = model.departuresShareText {
+            ToolbarTitleMenu {
+                ShareLink(item: shareText) {
+                    Label("Share next departures", systemImage: "square.and.arrow.up")
+                }
+            }
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            let isFavourite = model.selectedStop.map(favourites.isFavourite) ?? false
+            Button {
+                toggleFavourite(isFavourite: isFavourite)
+            } label: {
+                Label(
+                    isFavourite ? "Remove favourite" : "Save favourite",
+                    systemImage: isFavourite ? "star.fill" : "star"
+                )
+            }
+            .tint(isFavourite ? .yellow : nil)
+        }
     }
 
+    var chipsRowInsets: EdgeInsets { EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0) }
+    var actionRowInsets: EdgeInsets { EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16) }
+    var cardRowInsets: EdgeInsets { EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16) }
+    var departureRowInsets: EdgeInsets { EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16) }
+}
+
+// MARK: - Actions
+
+private extension StopDetailView {
+    var activeReminder: SharedTrackedDepartureReminder? {
+        guard let reminder = departureReminderService.activeReminder,
+            reminder.stopId == model.selectedStop?.id
+        else { return nil }
+        return reminder
+    }
+
+    func refresh() async {
+        await model.refresh(
+            using: liveTransitService,
+            gtfsService: gtfsService,
+            liveActivityManager: liveActivityManager,
+            departureReminderService: departureReminderService
+        )
+    }
+
+    /// Refreshes the board now and every 45 seconds while it is on screen.
+    func keepBoardCurrent() async {
+        guard model.selectedStop != nil else { return }
+        await refresh()
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(45))
+            guard !Task.isCancelled else { return }
+            await refresh()
+        }
+    }
+
+    func toggleDepartureLine(_ route: TransitRoute) {
+        model.toggleDepartureLine(route)
+        Task { await model.loadDepartures(using: liveTransitService, gtfsService: gtfsService) }
+    }
+
+    func selectDeparturePlatform(_ platform: String?) {
+        model.selectDeparturePlatform(platform)
+        Task { await model.loadDepartures(using: liveTransitService, gtfsService: gtfsService) }
+    }
+
+    func toggleFavourite(isFavourite: Bool) {
+        guard let selectedStop = model.selectedStop else { return }
+        if isFavourite {
+            favourites.remove(stopID: selectedStop.id, in: modelContext)
+        } else {
+            favouriteCustomization = FavouriteCustomizationDraft(stop: selectedStop)
+        }
+    }
+
+    func startTracking(_ departure: Departure) {
+        guard let selectedStop = model.selectedStop else { return }
+        Task { await liveActivityManager.startTracking(departure: departure, stop: selectedStop) }
+    }
+
+    func stopTrackingDeparture() {
+        Task { await liveActivityManager.endTracking() }
+    }
+
+    func scheduleReminder(for departure: Departure, leadTimeMinutes: Int) {
+        guard let selectedStop = model.selectedStop else { return }
+        Task {
+            await departureReminderService.scheduleReminder(
+                for: departure,
+                stop: selectedStop,
+                leadTimeMinutes: leadTimeMinutes
+            )
+        }
+    }
 }
 
 /// IDs of departures that are the last service of the day for their line.

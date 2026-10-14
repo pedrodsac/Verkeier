@@ -74,7 +74,6 @@ struct TransitMapScreen: View {
         }
         .sheet(isPresented: $isMainSheetPresented) {
             TransitBottomSheet(
-                searchQuery: Bindable(search).searchQuery,
                 viewModel: sheetPresentationModel,
                 actions: sheetActions
             )
@@ -182,22 +181,6 @@ struct TransitMapScreen: View {
             scheduleNearbyStopsRefresh()
             router.calculateWaitingRouteIfNeeded()
         }
-        .task(id: departureRefreshKey) {
-            guard stopDetail.selectedStop != nil, isShowingStopDetail else {
-                return
-            }
-            await stopDetail.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
-            await stopDetail.updateSelectedStopRoutes(using: gtfsService)
-            await updateTrackedDepartureIfNeeded()
-
-            while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(45))
-                guard !Task.isCancelled else { return }
-                await stopDetail.loadDepartures(using: liveTransitService, gtfsService: gtfsService)
-                await stopDetail.updateSelectedStopRoutes(using: gtfsService)
-                await updateTrackedDepartureIfNeeded()
-            }
-        }
         .task(id: favouriteRefreshTaskKey) {
             guard router.selectedTab == .home else { return }
             await refreshFavouriteStops()
@@ -214,7 +197,7 @@ struct TransitMapScreen: View {
             favouriteStopIds = Set(favouriteEntities.map(\.stopId))
             favourites.favouriteStops = favouriteStops
             favourites.retainBoards(forStopIDs: favouriteStopIds)
-            mirrorFavouriteEntitiesForIntents()
+            favourites.mirrorForIntents(in: modelContext)
         }
         .onChange(of: scenePhase, initial: true) {
             router.isSceneActive = scenePhase == .active
@@ -222,7 +205,7 @@ struct TransitMapScreen: View {
         .onAppear {
             favouriteStopIds = Set(favouriteEntities.map(\.stopId))
             favourites.favouriteStops = favouriteStops
-            mirrorFavouriteEntitiesForIntents()
+            favourites.mirrorForIntents(in: modelContext)
             handlePendingIntentHandoff()
         }
         .onReceive(
@@ -254,15 +237,6 @@ struct TransitMapScreen: View {
         // Favourites can always refresh a GTFS-only board; the live relay is
         // additive rather than a prerequisite for a useful widget snapshot.
         liveTransitService.isConfigured || favourites.gtfsFeedStatus.isReady
-    }
-
-    var departureRefreshKey: String {
-        "\(stopDetail.selectedStop?.id ?? "none")|\(isShowingStopDetail)"
-    }
-
-    var isShowingStopDetail: Bool {
-        if case .stopDetail = router.activePath.last { return true }
-        return false
     }
 
     var isShowingRouteDetail: Bool {

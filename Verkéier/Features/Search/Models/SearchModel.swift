@@ -9,6 +9,11 @@ final class SearchModel {
     var searchResults: [Stop] = []
     var recentStops: [Stop] = []
 
+    /// Recent stops with same-named platforms collapsed, for display.
+    var distinctRecentStops: [Stop] {
+        recentStops.deduplicatedByExactName()
+    }
+
     func loadRecentStops(using store: RoutePlannerStore = .shared) {
         recentStops = store.recentStops()
     }

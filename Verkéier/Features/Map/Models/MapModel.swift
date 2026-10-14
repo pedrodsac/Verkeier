@@ -23,6 +23,10 @@ final class MapModel {
     var nearbyWalkingEstimates: [String: OfflineWalkingEstimate] = [:]
     var isLoadingNearbyStops = false
     var nearbyStopsErrorMessage: String?
+    /// Nearby stops with same-named platforms collapsed, for display.
+    var distinctNearbyStops: [Stop] {
+        nearbyStops.deduplicatedByExactName()
+    }
 
     var gtfsMapStops: [Stop] = [] {
         didSet { rebuildGTFSOnlyMapStops() }

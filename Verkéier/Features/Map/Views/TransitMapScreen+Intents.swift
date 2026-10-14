@@ -6,24 +6,6 @@ import SwiftData
 import SwiftUI
 
 extension TransitMapScreen {
-    func updateTrackedDepartureIfNeeded() async {
-        if let trackedDeparture = DepartureTrackingSelection.trackedDeparture(
-            in: stopDetail.departures,
-            trackedDepartureId: liveActivityManager.trackedDepartureId
-        ) {
-            await liveActivityManager.updateTracking(departure: trackedDeparture)
-        }
-
-        if let reminderDepartureID = departureReminderService.activeReminder?.departureId,
-            let reminderDeparture = stopDetail.departures.first(where: { $0.id == reminderDepartureID })
-        {
-            await departureReminderService.syncTrackedDeparture(
-                reminderDeparture,
-                stopName: stopDetail.selectedStop?.name
-            )
-        }
-    }
-
     func trackNextDeparture(for stop: Stop) {
         Task {
             await stopDetail.loadDepartures(
@@ -38,47 +20,6 @@ extension TransitMapScreen {
                 return
             }
             await liveActivityManager.startTracking(departure: departure, stop: stop)
-        }
-    }
-
-    func isFavourite(_ stop: Stop) -> Bool {
-        favouriteEntities.contains { $0.stopId == stop.id }
-    }
-
-    func toggleSelectedFavourite() {
-        guard let selectedStop = stopDetail.selectedStop else { return }
-
-        if let existing = favouriteEntities.first(where: { $0.stopId == selectedStop.id }) {
-            removeFavourite(stopID: existing.stopId)
-        }
-    }
-
-    func saveFavouriteCustomization(
-        stop: Stop,
-        label: String,
-        colorHex: String,
-        iconName: String
-    ) {
-        let favourite =
-            favouriteEntities.first(where: { $0.stopId == stop.id })
-            ?? PersistedFavouriteStop(stop: stop, boardFilter: stopDetail.departureBoardFilter)
-        if !favouriteEntities.contains(where: { $0.stopId == stop.id }) {
-            modelContext.insert(favourite)
-        }
-        favourite.displayLabel = label
-        favourite.colorHex = colorHex
-        favourite.iconName = iconName
-        try? modelContext.save()
-        mirrorFavouriteEntitiesForIntents()
-    }
-
-    func mirrorFavouriteEntitiesForIntents() {
-        let favourites = favouriteEntities
-        FavouriteStopEntityStore.save(favourites: favourites)
-        if favourites.isEmpty {
-            FavouriteStopSpotlightIndexer.removeAll()
-        } else {
-            FavouriteStopSpotlightIndexer.index(favourites.map(\.stop))
         }
     }
 
