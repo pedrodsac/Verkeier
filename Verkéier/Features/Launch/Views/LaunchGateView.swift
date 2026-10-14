@@ -27,11 +27,18 @@ struct LaunchGateView: View {
         .task { await model.run(using: optimisationService) }
     }
 
-    /// The launch screen's icon on the system background.
+    /// The launch screen's icon on the system background. The storyboard lays the
+    /// icon out at 200 pt on a 414 pt screen and scales it with the width.
     private var placeholder: some View {
-        Color(.systemBackground)
-            .ignoresSafeArea()
-            .overlay { Image("Icon").resizable().scaledToFit().frame(width: 200, height: 200).accessibilityHidden(true) }
+        GeometryReader { proxy in
+            Color(.systemBackground)
+                .overlay {
+                    Image("Icon").resizable().scaledToFit()
+                        .frame(width: 200 * proxy.size.width / 414, height: 200 * proxy.size.width / 414)
+                        .accessibilityHidden(true)
+                }
+        }
+        .ignoresSafeArea()
     }
 }
 
