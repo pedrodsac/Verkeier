@@ -96,11 +96,11 @@ extension TransitMapScreen {
 
         let stopId = String(identifier.dropFirst("stop.".count))
         guard let stop = favouriteEntities.first(where: { $0.stopId == stopId })?.stop else {
-            showSearch()
+            router.showSearch()
             return
         }
 
-        navigateToSheet([.stopDetail(stop)], detent: .expanded)
+        router.show([.stopDetail(stop)], detent: .expanded)
     }
 
     func handleDeepLink(_ url: URL) {
@@ -116,32 +116,32 @@ extension TransitMapScreen {
     func handle(_ handoff: TransitIntentHandoff) {
         switch handoff {
         case .showNearbyStops:
-            showHome()
+            router.showHome()
         case let .openFavouriteStop(stopId):
             if let favourite = favouriteEntities.first(where: { $0.stopId == stopId })?.stop {
-                applyStopSelection(favourite)
-                navigateToSheet([.stopDetail(favourite)], detent: .expanded)
+                router.selectStop(favourite)
+                router.show([.stopDetail(favourite)], detent: .expanded)
             } else {
-                showSearch()
+                router.showSearch()
             }
         case let .trackNextDeparture(stopId):
             if let favourite = favouriteEntities.first(where: { $0.stopId == stopId })?.stop {
-                applyStopSelection(favourite)
-                navigateToSheet([.stopDetail(favourite)], detent: .expanded)
+                router.selectStop(favourite)
+                router.show([.stopDetail(favourite)], detent: .expanded)
                 trackNextDeparture(for: favourite)
             } else {
-                showSearch()
+                router.showSearch()
             }
         case let .planRoute(destinationName):
             search.searchQuery = destinationName
             Task {
                 await search.searchStops(using: gtfsService)
                 if let stop = confidentRouteDestinationMatch(for: destinationName) {
-                    applyStopSelection(stop)
-                    loadSelectedStopData()
-                    showPlanTab()
+                    router.selectStop(stop)
+                    Task { await map.loadGTFSMapStops(using: gtfsService) }
+                    router.showPlanTab()
                 } else {
-                    showSearch()
+                    router.showSearch()
                 }
             }
         }

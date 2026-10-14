@@ -5,11 +5,9 @@ struct TransitBottomSheet: View {
 
     @Binding var searchQuery: String
     @Environment(AppPreferences.self) private var preferences
-    let detent: BottomSheetDetent
-    @Bindable var navigation: TransitSheetNavigationState
+    @Environment(SheetRouter.self) private var router
     let viewModel: TransitSheetPresentationModel
     let actions: TransitSheetActions
-    let activateRoute: (TransitSheetRoute?, TransitSheetRoute?, Bool) -> Void
 
     @State private var isSearchActive = false
     @State private var focusSearch = false
@@ -22,13 +20,13 @@ struct TransitBottomSheet: View {
             .preferredColorScheme(preferences.appearance.colorScheme)
             .toolbarBackground(.visible, for: .tabBar)
             .toolbarBackground(tabBarBackground, for: .tabBar)
-            .onChange(of: navigation.homePath) { oldPath, newPath in
+            .onChange(of: router.homePath) { oldPath, newPath in
                 isSearchActive = newPath.last == .search
                 focusSearch = newPath.last == .search
-                activatePath(newPath, previous: oldPath)
+                router.pathDidChange(from: oldPath, to: newPath)
             }
-            .onChange(of: navigation.planPath) { oldPath, newPath in
-                activatePath(newPath, previous: oldPath)
+            .onChange(of: router.planPath) { oldPath, newPath in
+                router.pathDidChange(from: oldPath, to: newPath)
             }
             .onAppear {
                 isSearchActive = isSearchRoute
@@ -37,7 +35,7 @@ struct TransitBottomSheet: View {
     }
 
     private var tabView: some View {
-        TabView(selection: $navigation.selectedTab) {
+        TabView(selection: Bindable(router).selectedTab) {
             Tab("Home", systemImage: "train.side.front.car", value: TransitSheetTab.home) {
                 homeTab
             }
@@ -58,11 +56,11 @@ struct TransitBottomSheet: View {
     }
 
     private var homeTab: some View {
-        NavigationStack(path: $navigation.homePath) {
+        NavigationStack(path: Bindable(router).homePath) {
             BottomSheetContent(
                 query: $searchQuery,
                 isSearchActive: $isSearchActive,
-                detent: detent,
+                detent: router.detent,
                 contentTopPadding: shouldShowSearchBar ? searchBarContentTopPadding : 0,
                 viewModel: viewModel.commute,
                 favouritesViewModel: viewModel.favourites,
@@ -99,7 +97,7 @@ struct TransitBottomSheet: View {
     }
 
     private var planTab: some View {
-        NavigationStack(path: $navigation.planPath) {
+        NavigationStack(path: Bindable(router).planPath) {
             PlanView(viewModel: viewModel.route, actions: RouteActions(from: actions))
                 .navigationDestination(for: TransitSheetRoute.self) { route in
                     TransitSheetDestinationView(
@@ -117,11 +115,11 @@ struct TransitBottomSheet: View {
     }
 
     private var isSearchRoute: Bool {
-        navigation.homePath.last == .search
+        router.homePath.last == .search
     }
 
     private var shouldShowSearchBar: Bool {
-        navigation.selectedTab == .home && (navigation.homePath.isEmpty || isSearchRoute)
+        router.selectedTab == .home && (router.homePath.isEmpty || isSearchRoute)
     }
 
     private var navigationBarVisibility: Visibility {
@@ -132,23 +130,15 @@ struct TransitBottomSheet: View {
         }
     }
 
-    private func activatePath(_ path: [TransitSheetRoute], previous: [TransitSheetRoute]) {
-        guard path != previous else { return }
-        let isBackNavigation =
-            path.count < previous.count
-            && Array(previous.prefix(path.count)) == path
-        activateRoute(path.last, previous.last, isBackNavigation)
-    }
-
     private func cancelSearch() {
         searchQuery = ""
         isSearchActive = false
         focusSearch = false
-        actions.showHome()
+        router.showHome()
     }
 
     private func activateSearch() {
-        guard detent != .expanded else { return }
-        actions.expandSheet()
+        guard router.detent != .expanded else { return }
+        router.expand()
     }
 }

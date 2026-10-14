@@ -120,13 +120,6 @@ extension TransitMapScreen {
                 alerts: alerts.alerts(forLine: lineDetail.selectedLineDetailRoute, detail: lineDetail.selectedLineDetail),
                 errorMessage: lineDetail.selectedLineDetailErrorMessage
             ),
-            alerts: AlertsPresentationModel(
-                alerts: alerts.alerts,
-                isLoading: alerts.isLoadingAlerts,
-                errorMessage: alerts.alertsErrorMessage,
-                lastUpdated: alerts.alertsLastUpdated,
-                isStale: alerts.areAlertsStale
-            ),
             tripDetail: tripDetailViewModel
         )
     }
@@ -146,11 +139,11 @@ extension TransitMapScreen {
             get: {
                 // Regular width (iPad) only supports a single detent, so the
                 // selection must match it or UIKit throws.
-                sizeClass == .compact ? sheetDetent.presentationDetent : Self.regularWidthPresentationDetent
+                sizeClass == .compact ? router.detent.presentationDetent : Self.regularWidthPresentationDetent
             },
             set: { presentationDetent in
                 guard sizeClass == .compact else { return }
-                sheetDetent = BottomSheetDetent(presentationDetent: presentationDetent)
+                router.detent = BottomSheetDetent(presentationDetent: presentationDetent)
             }
         )
     }

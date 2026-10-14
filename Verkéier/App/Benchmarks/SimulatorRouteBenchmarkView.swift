@@ -4,7 +4,6 @@ import MobiliteitKit
 
 struct SimulatorRouteBenchmarkView: View {
     @State private var benchmark = SimulatorRouteBenchmark()
-    @State private var navigation = TransitSheetNavigationState()
     @Environment(\.routeService) private var service
     @Environment(\.walkingRouter) private var walking
     @Environment(\.bikeShareService) private var bikes
@@ -12,7 +11,6 @@ struct SimulatorRouteBenchmarkView: View {
         Group {
             if benchmark.fullMap {
                 TransitMapLayer(
-                    navigation: navigation,
                     favouriteStopIds: [],
                     bikeShareStations: [],
                     selectStop: { _ in },
@@ -20,6 +18,7 @@ struct SimulatorRouteBenchmarkView: View {
                     regionDidChange: { _ in }
                 )
                 .featureModels(benchmark.featureModels)
+                .environment(benchmark.router)
                 .overlay {
                     if let request = benchmark.routePlanner.routeDiagnostics?.requestID {
                         RouteRenderObserver(requestID: request) { id in benchmark.recordMapRendered(id) }
@@ -30,8 +29,8 @@ struct SimulatorRouteBenchmarkView: View {
                 Color.clear
             }
         }.onChange(of: benchmark.routePlanner.selectedRouteOptionID) { _, id in
-            navigation.selectedTab = .plan
-            navigation.planPath = id.map { [.routeTimeline($0)] } ?? []
+            benchmark.router.selectedTab = .plan
+            benchmark.router.planPath = id.map { [.routeTimeline($0)] } ?? []
         }.sheet(isPresented: .constant(true)) {
             ScrollView {
                 Text(benchmark.status).font(.caption).padding()

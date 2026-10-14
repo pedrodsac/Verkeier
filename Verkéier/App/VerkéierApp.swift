@@ -4,9 +4,10 @@ import SwiftUI
 
 @main
 struct VerkéierApp: App {
-    @State private var locationService = LocationService()
+    @State private var locationService: LocationService
     @State private var preferences = AppPreferences.shared
-    @State private var featureModels = FeatureModels()
+    @State private var featureModels: FeatureModels
+    @State private var router: SheetRouter
     private let configuration: AppConfiguration
     private let avlClient: any AVLClient
     private let bikeShareService: any BikeShareService
@@ -94,6 +95,18 @@ struct VerkéierApp: App {
             )
         )
         modelContainer = AppModelContainer.make()
+        let locationService = LocationService()
+        let featureModels = FeatureModels()
+        _locationService = State(initialValue: locationService)
+        _featureModels = State(initialValue: featureModels)
+        _router = State(
+            initialValue: SheetRouter(
+                models: featureModels,
+                locationService: locationService,
+                routeService: routeService,
+                gtfsService: gtfsService
+            )
+        )
     }
 
     var body: some Scene {
@@ -137,6 +150,7 @@ struct VerkéierApp: App {
             .environment(\.disruptionAlertService, disruptionAlertService)
             .environment(preferences)
             .featureModels(featureModels)
+            .environment(router)
             .modelContainer(modelContainer)
             .preferredColorScheme(preferences.appearance.colorScheme)
         }

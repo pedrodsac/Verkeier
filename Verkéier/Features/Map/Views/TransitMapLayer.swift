@@ -10,8 +10,8 @@ struct TransitMapLayer: View {
     @Environment(LineDetailModel.self) private var lineDetail
     @Environment(RoutePlannerModel.self) private var routePlanner
     @Environment(AlertsModel.self) private var alerts
+    @Environment(SheetRouter.self) private var router
     var tripDetail: TripDetailViewModel? = nil
-    let navigation: TransitSheetNavigationState
     let favouriteStopIds: Set<String>
     let bikeShareStations: [BikeShareStation]
     let selectStop: (Stop) -> Void
@@ -98,7 +98,7 @@ struct TransitMapLayer: View {
     }
 
     var mapRouteOverlay: RouteMapOverlay? {
-        switch navigation.activePath.last {
+        switch router.activePath.last {
         case .routeTimeline:
             return routePlanner.routeMapOverlay
         case let .tripDetail(selection):
@@ -111,7 +111,7 @@ struct TransitMapLayer: View {
     }
 
     private var isShowingRouteDetail: Bool {
-        if case .routeTimeline = navigation.activePath.last { return true }
+        if case .routeTimeline = router.activePath.last { return true }
         return false
     }
 }
