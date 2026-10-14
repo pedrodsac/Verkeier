@@ -107,3 +107,17 @@ and holds a background-task assertion that never cancels the run.
 
 `Scripts/benchmark_routes.py --transfer-walks on|off|verify` builds the table in
 its own process before the measured fresh-process samples.
+
+## Verification
+
+- `TransferWalkEquivalenceTests`: real bundled tiles, about 30 pairs including the funicular, no-route and identical-endpoint cases; hit counts asserted.
+- `TransferWalkAlgorithmRevisionTests`: golden digest tripwire (see Identity).
+- `TransferWalkRealFeedEquivalenceTests`: all ~11,200 pairs of an installed timetable (opt-in via `ROUTING_TEST_FEED_DIR`).
+- Three-arm Release benchmark: [benchmarks/transfer-walks-2026-10-14](benchmarks/transfer-walks-2026-10-14/README.md).
+
+## Known limitation: funicular ride length
+
+The Pafendall ride length comes from `CLLocation.distance`, and that value shifts by a few centimetres once native Valhalla routing has run in the
+process, with or without the table. It is a pre-existing history dependence in the live computation. Funicular pairs are never stored, so the table does
+not touch it, but two runs can differ in that one distance. Tests therefore compare funicular pairs with a 0.1 m tolerance on that distance and require
+everything else to be equal.

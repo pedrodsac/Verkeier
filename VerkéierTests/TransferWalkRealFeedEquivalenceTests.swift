@@ -41,9 +41,37 @@ struct TransferWalkRealFeedEquivalenceTests {
         let stored = fixture.router(mode: .on)
         let served = await stored.routes(offline, maximumConcurrency: 4)
         #expect(served.count == expected.count)
-        var differences = 0
-        for index in expected.indices where served[index] != expected[index] { differences += 1 }
-        #expect(differences == 0)
+        // The table's domain: every pair except the funicular interchange must be bit-identical.
+        var tableDifferences = 0
+        var funicularPairs: [Int] = []
+        for index in expected.indices {
+            if PafendallFunicularConnection.terminals(from: offline[index].from, to: offline[index].to) != nil {
+                funicularPairs.append(index)
+            } else if served[index] != expected[index] {
+                tableDifferences += 1
+            }
+        }
+        #expect(tableDifferences == 0)
+
+        // Funicular pairs are never stored and are computed live on both sides. Their ride
+        // length comes from `CLLocation.distance`, whose result shifts by a few centimetres
+        // once native routing has run in the process (also without the table). Everything
+        // else about them must still be identical.
+        #expect(!funicularPairs.isEmpty)
+        for index in funicularPairs {
+            guard let left = expected[index], let right = served[index] else {
+                #expect(expected[index] == nil && served[index] == nil)
+                continue
+            }
+            #expect(left.duration == right.duration && left.source == right.source && left.coordinates == right.coordinates)
+            #expect(abs(left.distanceMeters - right.distanceMeters) < 0.1)
+            #expect(left.segments.count == right.segments.count)
+            for (a, b) in zip(left.segments, right.segments) {
+                #expect(a.mode == b.mode && a.name == b.name && a.originLabel == b.originLabel
+                        && a.destinationLabel == b.destinationLabel && a.durationSeconds == b.durationSeconds
+                        && a.polyline == b.polyline && abs(a.distanceMeters - b.distanceMeters) < 0.1)
+            }
+        }
 
         // Everything but the funicular pairs came from the table.
         let statistics = await stored.transferWalkStatistics()
