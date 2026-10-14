@@ -20,7 +20,6 @@ extension TransitMapScreen {
         )
 
         return TransitSheetPresentationModel(
-            nearby: nearby,
             favourites: FavouritesPresentationModel(
                 stops: favouriteEntities.map { favourite in
                     FavouriteStopPresentationModel(

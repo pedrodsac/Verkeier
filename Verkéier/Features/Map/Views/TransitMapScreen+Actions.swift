@@ -100,7 +100,6 @@ extension TransitMapScreen {
             cancelDepartureReminder: cancelDepartureReminder,
             toggleDepartureLine: toggleDepartureLine,
             selectDeparturePlatform: selectDeparturePlatform,
-            updateDepartureBoardFilter: updateDepartureBoardFilter,
             updateSearch: updateSearch,
             selectLineDetailDirection: selectLineDetailDirection,
             refreshLineDetail: refreshLineDetail,
@@ -330,11 +329,6 @@ extension TransitMapScreen {
 
     func selectDeparturePlatform(_ platform: String?) {
         viewModel.selectDeparturePlatform(platform)
-        Task { await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService) }
-    }
-
-    func updateDepartureBoardFilter(_ filter: TransitBoardFilter) {
-        viewModel.updateDepartureBoardFilter(filter)
         Task { await viewModel.loadDepartures(using: liveTransitService, gtfsService: gtfsService) }
     }
 
