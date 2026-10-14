@@ -9,7 +9,6 @@ final class FavouritesModel {
     /// The saved favourite stops, mirrored from SwiftData by the map screen.
     var favouriteStops: [Stop] = []
     var favouriteDepartureBoards: [String: FavouriteDepartureBoardSnapshot] = [:]
-    var isLoadingFavouriteDepartures = false
     /// Favourites can always fall back to a timetable board once the GTFS feed
     /// is ready, even without the live relay.
     var gtfsFeedStatus: GTFSFeedStatus = .unavailable
@@ -21,11 +20,9 @@ final class FavouritesModel {
     ) async {
         guard !favourites.isEmpty else {
             favouriteDepartureBoards = [:]
-            isLoadingFavouriteDepartures = false
             return
         }
 
-        isLoadingFavouriteDepartures = true
         await withTaskGroup(of: FavouriteDepartureBoardResult.self) { group in
             for (index, stop) in favourites.enumerated() {
                 group.addTask {
@@ -71,7 +68,6 @@ final class FavouritesModel {
             }
         }
         WidgetCenter.shared.reloadTimelines(ofKind: "DeparturesSummaryWidget")
-        isLoadingFavouriteDepartures = false
     }
 
     func refreshFavouriteDeparture(
@@ -139,12 +135,6 @@ extension FavouritesModel {
         favourite.displayLabel = label
         favourite.colorHex = colorHex
         favourite.iconName = iconName
-        saveChanges(in: context)
-    }
-
-    func updateLabels(stopID: String, labels: [String], in context: ModelContext) {
-        guard let favourite = Self.favourite(stopID: stopID, in: context) else { return }
-        favourite.replaceLabels(with: labels)
         saveChanges(in: context)
     }
 

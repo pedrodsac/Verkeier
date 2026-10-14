@@ -6,8 +6,6 @@ struct TransitBottomSheet: View {
     @Environment(AppPreferences.self) private var preferences
     @Environment(SheetRouter.self) private var router
     @Environment(SearchModel.self) private var search
-    let viewModel: TransitSheetPresentationModel
-    let actions: TransitSheetActions
 
     @State private var isSearchActive = false
     @State private var focusSearch = false
@@ -58,13 +56,8 @@ struct TransitBottomSheet: View {
     private var homeTab: some View {
         NavigationStack(path: Bindable(router).homePath) {
             BottomSheetContent(
-                isSearchActive: $isSearchActive,
-                detent: router.detent,
-                contentTopPadding: shouldShowSearchBar ? searchBarContentTopPadding : 0,
-                viewModel: viewModel.commute,
-                favouritesViewModel: viewModel.favourites,
-                favouritesActions: actions.favourites,
-                openSpecialEvent: actions.openSpecialEvent
+                isSearchActive: isSearchActive,
+                contentTopPadding: shouldShowSearchBar ? searchBarContentTopPadding : 0
             )
             .navigationDestination(for: TransitSheetRoute.self) { route in
                 TransitSheetDestinationView(route: route, searchContentTopPadding: searchBarContentTopPadding)
