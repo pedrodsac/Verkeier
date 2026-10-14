@@ -1,0 +1,24 @@
+== BEFORE main@30fc1fc live 18:26:30
+Traceback (most recent call last):
+  File "/Users/pedoataidecordeiro/Developer/Verkeier/Scripts/benchmark_routes.py", line 202, in <module>
+    run(scenario, args.warm + 1, 'warm')
+  File "/Users/pedoataidecordeiro/Developer/Verkeier/Scripts/benchmark_routes.py", line 171, in run
+    raise failure
+  File "/Users/pedoataidecordeiro/Developer/Verkeier/Scripts/benchmark_routes.py", line 126, in run
+    raise RuntimeError(f'Live benchmark stopped (quota, budget or capture failure); see {log}')
+RuntimeError: Live benchmark stopped (quota, budget or capture failure); see /private/tmp/claude-501/-Users-pedoataidecordeiro-Developer-Verkeier/1f40f6e7-cdb6-4b30-ad28-2438ce3048e0/scratchpad/live/out/before/live-now-warm.log
+== BEFORE exit 1 18:26:47
+== AFTER branch HEAD, stored walks on 18:26:47
+transfer walks: {"build_ms":5321.9313330000004,"bytes":6235873,"computed":11188,"graph":"alg=1;dataset=20260921;sha256=0dd7dd3357e6962b251aaa494063f092cddc50c16e972f20a618e93df4f1600b;core=3.6.3;mobile=0.6.3\/0.6.3;pafendall=pafendall-funicular-v1;calibration=4608308318706860032","negatives":477,"pairs":11188,"preparation_ms":458.76933400000001,"reused":0,"store":"\/private\/tmp\/claude-501\/-Users-pedoataidecordeiro-Developer-Verkeier\/1f40f6e7-cdb6-4b30-ad28-2438ce3048e0\/scratchpad\/live\/out\/after\/transfer-walks\/transfer-walks.bin","total_ms":5780.7006670000001}
+live-now warm: 2 completed; maximum 4551 ms
+live-now cold-1: 1 completed; maximum 5425 ms
+Traceback (most recent call last):
+  File "/Users/pedoataidecordeiro/Developer/Verkeier/Scripts/benchmark_routes.py", line 202, in <module>
+    run(scenario, args.warm + 1, 'warm')
+  File "/Users/pedoataidecordeiro/Developer/Verkeier/Scripts/benchmark_routes.py", line 171, in run
+    raise failure
+  File "/Users/pedoataidecordeiro/Developer/Verkeier/Scripts/benchmark_routes.py", line 126, in run
+    raise RuntimeError(f'Live benchmark stopped (quota, budget or capture failure); see {log}')
+RuntimeError: Live benchmark stopped (quota, budget or capture failure); see /private/tmp/claude-501/-Users-pedoataidecordeiro-Developer-Verkeier/1f40f6e7-cdb6-4b30-ad28-2438ce3048e0/scratchpad/live/out/after/live-arrive-warm.log
+== AFTER exit 1 18:27:41
+LIVE DONE 18:27:41

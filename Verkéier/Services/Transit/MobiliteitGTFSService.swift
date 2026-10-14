@@ -22,6 +22,18 @@ actor MobiliteitGTFSService: GTFSService {
         defaultDirectory().appendingPathComponent("gtfs.sqlite")
     }
 
+    nonisolated static var defaultDirectoryURL: URL { defaultDirectory() }
+
+    /// Launch-time identity of the installed, unexpired timetable: its generation
+    /// database filename, unique per install. Plain file reads only; nothing is opened.
+    nonisolated static func installedTimetableIdentity(directory: URL = defaultDirectory()) -> String? {
+        guard let metadata = loadMetadata(at: directory.appendingPathComponent("metadata.json")),
+              !isExpired(metadata.validThrough) else { return nil }
+        let filename = metadata.databaseFilename ?? legacyDatabaseFilename
+        guard FileManager.default.fileExists(atPath: directory.appendingPathComponent(filename).path) else { return nil }
+        return filename
+    }
+
     init(session: URLSession = .shared, directory: URL? = nil) {
         let base = directory ?? Self.defaultDirectory()
         let metadataURL = base.appendingPathComponent("metadata.json")

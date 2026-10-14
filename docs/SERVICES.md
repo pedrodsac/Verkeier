@@ -138,6 +138,19 @@ and map annotations can show the same snapshot.
 
 ---
 
+## Stored transfer walks — `Verkéier/Services/Routing/TransferWalks/`, `Optimisation/`
+
+The walks between nearby stops that RAPTOR measures are computed once per walking
+graph and stored in a small validated file (`TransferWalkTable`, `TransferWalkStore`).
+`LocalFirstWalkingRouter` serves a stored walk inside the calculation behind
+`MeasuredWalkingRouteCache`, so results are identical to computing them live.
+`TransferWalkTableBuilder` builds the table (incrementally across timetables),
+`TransferWalkOptimisationService` runs it behind the launch screen, and
+`RoutingOptimisationLaunchCheck` decides at launch whether that is needed. Protocols:
+`TransferWalkComputing`, `RoutingTimetableProviding`, `RoutingOptimisationService`
+(with `Unavailable…` and `Fixture…` implementations). See
+[TRANSFER_WALKS.md](TRANSFER_WALKS.md).
+
 ## GTFSUpdateError — `Verkéier/Services/GTFS/GTFSUpdateError.swift`
 
 ```swift

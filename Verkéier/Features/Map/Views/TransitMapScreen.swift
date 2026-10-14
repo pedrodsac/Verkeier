@@ -16,6 +16,7 @@ struct TransitMapScreen: View {
     @Environment(\.liveTransitService) var liveTransitService
     @Environment(\.bikeShareService) private var bikeShareService
     @Environment(\.accessibilityReduceMotion) var reduceMotion
+    @Environment(\.launchOnboardingDidFinish) var launchOnboardingDidFinish
     @Environment(\.avlClient) var avlClient
     @Environment(\.liveActivityManager) var liveActivityManager
     @Environment(\.departureReminderService) var departureReminderService
@@ -101,6 +102,7 @@ struct TransitMapScreen: View {
             onDismiss: {
                 if hasCompletedOnboarding {
                     isMainSheetPresented = true
+                    launchOnboardingDidFinish()
                 }
             }
         ) {

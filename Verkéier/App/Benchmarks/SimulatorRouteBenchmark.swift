@@ -29,6 +29,14 @@ final class SimulatorRouteBenchmark {
             if env["ROUTING_BENCHMARK_DATABASE"] != nil {
                 await (productionService as? MobiliteitRouteService)?.waitForWalkingPreparation()
             }
+            if scenario == "optimise-transfer-walks" {
+                await (productionService as? MobiliteitRouteService)?.waitForWalkingPreparation()
+                try await optimiseTransferWalks(walkingRouter: walkingRouter, database: database,
+                    rebuild: env["ROUTING_BENCHMARK_REBUILD"] == "1")
+                print("ROUTING_BENCHMARK_DONE")
+                fflush(stdout)
+                return
+            }
             let config = URLSessionConfiguration.ephemeral
             config.protocolClasses = [BenchmarkBoardProtocol.self]
             let recordedClient = MobiliteitAPIClient(apiKey: "fixture", baseURL: URL(string: "https://recorded-atp.invalid")!,
@@ -59,7 +67,8 @@ final class SimulatorRouteBenchmark {
                env["ROUTING_BENCHMARK_DATABASE"] == nil,
                env["ROUTING_BENCHMARK_LIVE_CONCURRENCY"] == nil { service = productionService }
             else {
-                let walking: any WalkingRouting = production ? walkingRouter : LocalFirstWalkingRouter(datasetManager: RoutingDatasetManager())
+                let walking: any WalkingRouting = production ? walkingRouter : LocalFirstWalkingRouter(datasetManager: RoutingDatasetManager(),
+                    transferWalkStore: TransferWalkStore.makeDefault())
                 let planner: JourneyPlanner?
                 if let value = env["ROUTING_BENCHMARK_LIVE_CONCURRENCY"], let limit = Int(value) {
                     await (productionService as? MobiliteitRouteService)?.waitForWalkingPreparation()
@@ -218,6 +227,35 @@ final class SimulatorRouteBenchmark {
             } else { print("ROUTING_BENCHMARK_FAILED \(String(reflecting: type(of: error)))") }
             fflush(stdout)
         }
+    }
+
+    /// Builds the stored transfer walk table headlessly and reports its size and timing.
+    /// `ROUTING_TRANSFER_WALKS_DIRECTORY` keeps the result out of the app's own table.
+    private func optimiseTransferWalks(walkingRouter: any WalkingRouting, database: URL, rebuild: Bool) async throws {
+        guard let computer = walkingRouter as? LocalFirstWalkingRouter else { throw RoutingError.noRouteFound }
+        let planner = JourneyPlanner(walkingProvider: LocalFirstWalkingRoutingProvider(walkingRouter: computer))
+        let store = TransferWalkStore.makeDefault()
+        let started = ContinuousClock.now
+        let dataset = try await computer.prepareTransferWalkComputation()
+        let requests = try await planner.router(for: database).transferWalkingRequests()
+        let prepared = ContinuousClock.now
+        var existing: TransferWalkTable?
+        if !rebuild, case .table(let table) = store.load() { existing = table }
+        let result = try await TransferWalkTableBuilder(computer: computer).build(
+            requests: requests, dataset: dataset, reusing: existing,
+            timetableIdentity: database.lastPathComponent, progress: { _, _ in })
+        try store.write(result.data)
+        let finished = ContinuousClock.now
+        func milliseconds(_ from: ContinuousClock.Instant, _ to: ContinuousClock.Instant) -> Double {
+            let parts = (to - from).components
+            return Double(parts.seconds) * 1_000 + Double(parts.attoseconds) / 1e15
+        }
+        let record: [String: Any] = ["pairs": result.pairs, "reused": result.reused, "computed": result.computed,
+            "negatives": result.negatives, "bytes": result.data.count, "preparation_ms": milliseconds(started, prepared),
+            "build_ms": milliseconds(prepared, finished), "total_ms": milliseconds(started, finished),
+            "store": store.fileURL.path, "graph": dataset.transferWalkIdentity.value]
+        let json = try JSONSerialization.data(withJSONObject: record, options: [.sortedKeys])
+        print("ROUTING_BENCHMARK_OPTIMISATION " + String(decoding: json, as: UTF8.self))
     }
 
     nonisolated static func inputURL(_ path: String) -> URL {

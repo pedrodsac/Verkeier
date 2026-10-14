@@ -1,3 +1,4 @@
+import MobiliteitKit
 import SwiftData
 import SwiftUI
 
@@ -15,6 +16,8 @@ struct VerkéierApp: App {
     private let tripDetailService: any TripDetailService
     private let walkingRouter: any WalkingRouting
     private let bundledRoutingDatasetInstaller: BundledRoutingDatasetInstaller
+    private let routingOptimisationService: any RoutingOptimisationService
+    @State private var launchModel: LaunchOptimisationModel
     private let modelContainer: ModelContainer
     @State private var liveActivityManager = LiveActivityManager()
     @State private var departureReminderService = DepartureReminderService()
@@ -34,14 +37,19 @@ struct VerkéierApp: App {
         #endif
         self.liveTransitService = liveTransitService
         let routingDatasetManager = RoutingDatasetManager()
-        let walkingRouter = LocalFirstWalkingRouter(datasetManager: routingDatasetManager)
+        let transferWalkStore = TransferWalkStore.makeDefault()
+        let walkingRouter = LocalFirstWalkingRouter(datasetManager: routingDatasetManager,
+                                                    transferWalkStore: transferWalkStore)
         self.walkingRouter = walkingRouter
         let bundledRoutingDatasetInstaller = BundledRoutingDatasetInstaller(
             datasetManager: routingDatasetManager
         )
         self.bundledRoutingDatasetInstaller = bundledRoutingDatasetInstaller
+        let graphInstall = Task(priority: .utility) {
+            await bundledRoutingDatasetInstaller.installIfNeeded()
+        }
         let graphPreparation = Task(priority: .utility) {
-            _ = await bundledRoutingDatasetInstaller.installIfNeeded()
+            _ = await graphInstall.value
             await walkingRouter.prepareLocalGraph()
         }
         let routeService = MobiliteitRouteService(
@@ -59,6 +67,20 @@ struct VerkéierApp: App {
         #endif
         self.routeService = routeService
         self.tripDetailService = routeService
+        let optimisationEnvironment = RoutingOptimisationEnvironment.production(store: transferWalkStore)
+        routingOptimisationService = optimisationEnvironment.mode == .off
+            ? UnavailableRoutingOptimisationService()
+            : TransferWalkOptimisationService(
+                environment: optimisationEnvironment, computer: walkingRouter, timetable: gtfsService,
+                transferRequests: { [engine = routeService.engine] url in
+                    try await engine.router(for: url).transferWalkingRequests()
+                },
+                graphInstall: graphInstall)
+        _launchModel = State(initialValue: LaunchOptimisationModel(
+            initialRequirement: optimisationEnvironment.mode == .off
+                ? .notNeeded : RoutingOptimisationLaunchCheck.requirement(in: optimisationEnvironment),
+            onboardingCompleted: UserDefaults.standard.bool(forKey: "hasCompletedOnboarding"),
+            background: UIKitBackgroundActivity()))
         modelContainer = AppModelContainer.make()
     }
 
@@ -71,19 +93,20 @@ struct VerkéierApp: App {
                 else if TripDetailPreviewData.enabled { TripDetailPreviewHost() }
                 else if TripContinuationPreviewHost.enabled { TripContinuationPreviewHost() }
                 else if SimulatorRouteBenchmark.enabled { SimulatorRouteBenchmarkView() }
-                else { TransitMapScreen(locationService: locationService) }
+                else { LaunchGateView(locationService: locationService, model: launchModel) }
                 #else
                 if SimulatorRouteBenchmark.enabled { SimulatorRouteBenchmarkView() }
-                else { TransitMapScreen(locationService: locationService) }
+                else { LaunchGateView(locationService: locationService, model: launchModel) }
                 #endif
                 #else
-                TransitMapScreen(locationService: locationService)
+                LaunchGateView(locationService: locationService, model: launchModel)
                 #endif
             }
                 .environment(\.appConfiguration, configuration)
                 .environment(\.routeService, routeService)
                 .environment(\.tripDetailService, tripDetailService)
                 .environment(\.walkingRouter, walkingRouter)
+                .environment(\.routingOptimisationService, routingOptimisationService)
                 .environment(\.gtfsService, gtfsService)
                 .environment(\.liveTransitService, liveTransitService)
                 .environment(\.bikeShareService, bikeShareService)

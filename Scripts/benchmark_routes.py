@@ -37,6 +37,10 @@ parser.add_argument('--origin-name', help='Origin label for a custom comparison'
 parser.add_argument('--origin-coordinate', nargs=2, type=float, metavar=('LATITUDE', 'LONGITUDE'))
 parser.add_argument('--origin-stop', help='GTFS stop ID at the custom origin')
 parser.add_argument('--avoid-tight-transfers', action='store_true', help='Avoid transfers with less than three minutes available')
+parser.add_argument('--transfer-walks', choices=['on', 'off', 'verify'], default='on',
+    help='Stored transfer walks: on builds a table in a separate process first, off ignores the table, '
+         'verify also recomputes every stored walk live and fails on any difference')
+parser.add_argument('--rebuild-transfer-walks', action='store_true', help='Ignore an existing table when building it')
 parser.add_argument('--maximum-limit-ms', '--p95-limit-ms', dest='maximum_limit_ms', type=float,
     default=5000, help='Every operation must be below this threshold, including priming; use 0 for a separate Debug audit')
 args = parser.parse_args()
@@ -78,6 +82,15 @@ def run(scenario, samples, label):
         'SIMCTL_CHILD_ROUTING_BENCHMARK_REQUEST_BUDGET': str(max(0, args.request_budget - network_requests))}
     if args.live_concurrency is not None:
         env["SIMCTL_CHILD_ROUTING_BENCHMARK_LIVE_CONCURRENCY"] = str(args.live_concurrency)
+    if args.transfer_walks == 'off':
+        env['SIMCTL_CHILD_ROUTING_TRANSFER_WALKS'] = '0'
+    else:
+        # A separate directory keeps benchmark tables out of the app's own container data.
+        env['SIMCTL_CHILD_ROUTING_TRANSFER_WALKS_DIRECTORY'] = str((args.output / 'transfer-walks').resolve())
+        if args.transfer_walks == 'verify':
+            env['SIMCTL_CHILD_ROUTING_TRANSFER_WALKS'] = 'verify'
+    if args.rebuild_transfer_walks:
+        env['SIMCTL_CHILD_ROUTING_BENCHMARK_REBUILD'] = '1'
     if args.capture_directory:
         env["SIMCTL_CHILD_ROUTING_BENCHMARK_CAPTURE_DIRECTORY"] = str(args.capture_directory.resolve())
     if args.bike_fixture:
@@ -126,6 +139,14 @@ def run(scenario, samples, label):
         finally:
             subprocess.run(['xcrun', 'simctl', 'terminate', args.device, 'dev.pedrocordeiro.Verkeier'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             process.wait(timeout=10)
+    if scenario == 'optimise-transfer-walks':
+        if failure is not None:
+            raise failure
+        for line in text.splitlines():
+            if line.startswith('ROUTING_BENCHMARK_OPTIMISATION '):
+                (args.output / 'optimisation.json').write_text(line.split(' ', 1)[1])
+                print('transfer walks:', line.split(' ', 1)[1], flush=True)
+        return
     network_requests += sum(line.startswith("ROUTING_NETWORK_REQUEST ") for line in text.splitlines())
     for line in text.splitlines():
         if line.startswith("ROUTING_BIKE_FILE "):
@@ -174,6 +195,9 @@ def run(scenario, samples, label):
     (args.output / 'samples.json').write_text(json.dumps(records, indent=2))
     print(f'{scenario} {label}: {len(values)} completed; maximum {max(v["total_ms"] for v in values):.0f} ms', flush=True)
 
+if args.transfer_walks != 'off':
+    # Built once in its own process, so measured fresh-process samples start from the stored table.
+    run('optimise-transfer-walks', 1, 'optimise')
 for scenario in args.scenarios:
     run(scenario, args.warm + 1, 'warm')
     for sample in range(args.cold):

@@ -71,6 +71,10 @@ route status and replacement planning after walking corrections. Verkéier rende
 selectable manual choice or uses the package recommendation.
 
 Verkéier retains GTFS installation, pedestrian routing exclusively with the local Valhalla graph, walking calibration, refinement requests and walking timing adjustments.
+The stored transfer walk table spans both: MobiliteitKit lists the stop pairs RAPTOR
+can request (`TransitRouter.transferWalkingRequests()`), and Verkéier measures them with
+its Valhalla router, stores them, and serves them inside the walking router. See
+[TRANSFER_WALKS.md](TRANSFER_WALKS.md).
 `AppJourneySessionStore` bridges refined native walking spans back to the package
 session. UI loading deadlines, reveal timing, labels, overlays and Apple Maps handoff
 remain in the app. Package refinement tokens prevent old queries from changing newer

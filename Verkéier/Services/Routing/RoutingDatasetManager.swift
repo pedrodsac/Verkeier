@@ -131,14 +131,31 @@ actor RoutingDatasetManager {
         appBuild: Int = Int(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "0") ?? 0,
         mobileVersion: String = RoutingDatasetManager.valhallaMobileVersion
     ) {
-        let defaultRoot = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Routing", isDirectory: true)
+        let defaultRoot = Self.defaultRootURL
         self.rootURL = rootURL ?? defaultRoot
         versionsURL = (rootURL ?? defaultRoot).appendingPathComponent("versions", isDirectory: true)
         stagingURL = (rootURL ?? defaultRoot).appendingPathComponent("staging", isDirectory: true)
         currentURL = (rootURL ?? defaultRoot).appendingPathComponent("current.json")
         self.appBuild = appBuild
         self.mobileVersion = mobileVersion
+    }
+
+    nonisolated static var defaultRootURL: URL {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("Routing", isDirectory: true)
+    }
+
+    /// Reads the active manifest with plain file reads, for the synchronous launch check.
+    /// Returns `nil` unless `current.json`, the manifest and the tile archive all exist.
+    nonisolated static func activeManifest(rootURL: URL? = nil) -> RoutingDatasetManifest? {
+        let root = rootURL ?? defaultRootURL
+        guard let currentData = try? Data(contentsOf: root.appendingPathComponent("current.json")),
+              let current = try? JSONDecoder().decode(CurrentDataset.self, from: currentData) else { return nil }
+        let directory = root.appendingPathComponent("versions", isDirectory: true)
+            .appendingPathComponent(current.version, isDirectory: true)
+        guard FileManager.default.fileExists(atPath: directory.appendingPathComponent("tiles.tar").path),
+              let manifestData = try? Data(contentsOf: directory.appendingPathComponent("manifest.json")) else { return nil }
+        return try? JSONDecoder.routing.decode(RoutingDatasetManifest.self, from: manifestData)
     }
 
     func activeDataset() throws -> RoutingDataset? {
