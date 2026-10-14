@@ -27,22 +27,27 @@ extension RoadRouteProviding {
         to destination: LocationPoint,
         transport: RoadRouteTransport
     ) async -> RoadRoute? {
-        guard let coordinates = await roadRouteCoordinates(
-            from: origin,
-            to: destination,
-            transport: transport
-        ), coordinates.count >= 2 else {
+        guard
+            let coordinates = await roadRouteCoordinates(
+                from: origin,
+                to: destination,
+                transport: transport
+            ), coordinates.count >= 2
+        else {
             return nil
         }
 
         let distanceMeters = zip(coordinates, coordinates.dropFirst()).reduce(0) { total, pair in
-            total + CLLocation(
-                latitude: pair.0.latitude,
-                longitude: pair.0.longitude
-            ).distance(from: CLLocation(
-                latitude: pair.1.latitude,
-                longitude: pair.1.longitude
-            ))
+            total
+                + CLLocation(
+                    latitude: pair.0.latitude,
+                    longitude: pair.0.longitude
+                ).distance(
+                    from: CLLocation(
+                        latitude: pair.1.latitude,
+                        longitude: pair.1.longitude
+                    )
+                )
         }
         guard distanceMeters.isFinite, distanceMeters >= 0 else { return nil }
         return RoadRoute(coordinates: coordinates, distanceMeters: distanceMeters)
@@ -104,7 +109,8 @@ nonisolated struct MapKitRoadRouteProvider: RoadRouteProviding {
         request.requestsAlternateRoutes = false
 
         guard let route = try? await MKDirections(request: request).calculate().routes.first,
-              route.polyline.pointCount >= 2 else {
+            route.polyline.pointCount >= 2
+        else {
             return nil
         }
 

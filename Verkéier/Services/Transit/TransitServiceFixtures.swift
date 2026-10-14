@@ -79,7 +79,12 @@ actor FixtureGTFSService: GTFSService {
         Array(stops.prefix(max(0, limit)))
     }
 
-    func journeyDepartures(from stop: Stop, after _: Date, horizon _: TimeInterval, limit: Int) async -> [GTFSJourneyDeparture] {
+    func journeyDepartures(
+        from stop: Stop,
+        after _: Date,
+        horizon _: TimeInterval,
+        limit: Int
+    ) async -> [GTFSJourneyDeparture] {
         Array((departuresByStopID[stop.id] ?? []).prefix(max(0, limit)))
     }
 

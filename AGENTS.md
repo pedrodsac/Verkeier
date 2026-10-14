@@ -24,6 +24,12 @@ Run a single test class or method (Swift Testing):
 xcodebuild -project Verkeier.xcodeproj -scheme Verkeier -destination 'platform=iOS Simulator,name=iPhone 17' test -only-testing:VerkeierTests/StopDeduplicationTests
 ```
 
+Format app sources with Xcode's built-in swift-format (config in `.swift-format`; Live Activities and widgets are excluded for now):
+
+```sh
+find Verkéier -name '*.swift' -not -path 'Verkéier/Features/LiveActivities/*' -print0 | xargs -0 xcrun swift-format format --configuration .swift-format --in-place --parallel
+```
+
 The app downloads and installs the current GTFS feed at runtime. No GTFS
 archive is bundled with the repository.
 

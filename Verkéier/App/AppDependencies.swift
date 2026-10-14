@@ -20,7 +20,8 @@ extension EnvironmentValues {
         feedURL: AppConfiguration.current.avlMessagesURL
     )
     @Entry var liveActivityManager: LiveActivityManager = EnvironmentDependencyDefaults.liveActivityManager
-    @Entry var departureReminderService: DepartureReminderService = EnvironmentDependencyDefaults.departureReminderService
+    @Entry var departureReminderService: DepartureReminderService = EnvironmentDependencyDefaults
+        .departureReminderService
     @Entry var disruptionAlertService: DisruptionAlertService = EnvironmentDependencyDefaults.disruptionAlertService
     // ponytail: stubbed — wire when the respective feed/dataset is confirmed.
     @Entry var routeReliabilityService: any RouteReliabilityService = UnavailableRouteReliabilityService()

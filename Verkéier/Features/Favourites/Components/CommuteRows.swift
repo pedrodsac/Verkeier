@@ -32,7 +32,8 @@ struct CommuteSuggestionRow: View {
             .padding(.horizontal, 12)
             .frame(minHeight: 52)
             .background(
-                .tint.opacity(0.1), in: RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
+                .tint.opacity(0.1),
+                in: RoundedRectangle(cornerRadius: Radius.row, style: .continuous)
             )
         }
         .buttonStyle(.pressable)
@@ -45,16 +46,16 @@ struct AlertsSummaryRow: View {
 
     var body: some View {
         NavigationLink(value: TransitSheetRoute.alerts) {
-			Label {
-				Text(alertText)
-			} icon: {
-				Image(systemName: "exclamationmark.triangle.fill")
-					.symbolRenderingMode(.hierarchical)
-					.foregroundStyle(.orange)
-					.accessibilityHidden(true)
-			}
+            Label {
+                Text(alertText)
+            } icon: {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(.orange)
+                    .accessibilityHidden(true)
+            }
         }
-		.accessibilityLabel(alertText)
+        .accessibilityLabel(alertText)
     }
 
     private var alertText: String {

@@ -121,7 +121,7 @@ struct PublicTransportMapLink: Identifiable, Hashable, Sendable {
             id: "german",
             language: "Deutsch",
             url: URL(string: "https://www.mobiliteit.lu/de/ubersichtsplane/")!
-        )
+        ),
     ]
 }
 

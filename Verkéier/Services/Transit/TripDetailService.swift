@@ -2,8 +2,10 @@ import Foundation
 
 protocol TripDetailService: Sendable {
     nonisolated func selection(for departure: Departure, at stop: Stop) async throws -> TripDetailSelection
-    nonisolated func tripDetail(for selection: TripDetailSelection,
-        refreshPolicy: RouteRealtimeRefreshPolicy) async throws -> TripDetailSnapshot
+    nonisolated func tripDetail(
+        for selection: TripDetailSelection,
+        refreshPolicy: RouteRealtimeRefreshPolicy
+    ) async throws -> TripDetailSnapshot
 }
 
 nonisolated enum TripDetailError: Error, LocalizedError {
@@ -17,16 +19,20 @@ nonisolated enum TripDetailError: Error, LocalizedError {
 }
 
 struct UnavailableTripDetailService: TripDetailService {
-    nonisolated func tripDetail(for _: TripDetailSelection,
-        refreshPolicy _: RouteRealtimeRefreshPolicy) async throws -> TripDetailSnapshot {
+    nonisolated func tripDetail(
+        for _: TripDetailSelection,
+        refreshPolicy _: RouteRealtimeRefreshPolicy
+    ) async throws -> TripDetailSnapshot {
         throw TripDetailError.unavailable
     }
 }
 
 struct FixtureTripDetailService: TripDetailService {
     let snapshot: TripDetailSnapshot
-    nonisolated func tripDetail(for selection: TripDetailSelection,
-        refreshPolicy _: RouteRealtimeRefreshPolicy) async throws -> TripDetailSnapshot {
+    nonisolated func tripDetail(
+        for selection: TripDetailSelection,
+        refreshPolicy _: RouteRealtimeRefreshPolicy
+    ) async throws -> TripDetailSnapshot {
         guard snapshot.instance == selection.instance else { throw TripDetailError.unavailable }
         return snapshot
     }

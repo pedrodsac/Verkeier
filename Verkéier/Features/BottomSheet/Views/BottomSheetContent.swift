@@ -21,13 +21,13 @@ struct BottomSheetContent: View {
                     actions: searchActions
                 )
             } else {
-				CommuteDashboardView(
-					viewModel: viewModel,
-					favouritesViewModel: favouritesViewModel,
-					favouritesActions: favouritesActions,
-					openSpecialEvent: openSpecialEvent,
-					displayStyle: detent == .medium ? .mapsMedium : .regular
-				)
+                CommuteDashboardView(
+                    viewModel: viewModel,
+                    favouritesViewModel: favouritesViewModel,
+                    favouritesActions: favouritesActions,
+                    openSpecialEvent: openSpecialEvent,
+                    displayStyle: detent == .medium ? .mapsMedium : .regular
+                )
                 .contentMargins(.top, contentTopPadding, for: .scrollContent)
             }
         }

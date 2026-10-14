@@ -3,7 +3,8 @@ import Foundation
 /// Keeps each result at its request index, including failures and cancellation.
 nonisolated enum WalkingRouteBatch {
     static func resolve(
-        _ requests: [OfflineWalkingRequest], maximumConcurrency: Int,
+        _ requests: [OfflineWalkingRequest],
+        maximumConcurrency: Int,
         calculate: @escaping @Sendable (OfflineWalkingRequest) async throws -> OfflineWalkingRoute
     ) async -> [OfflineWalkingRoute?] {
         guard !requests.isEmpty else { return [] }

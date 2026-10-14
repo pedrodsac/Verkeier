@@ -51,8 +51,13 @@ private extension View {
 }
 
 #Preview("Preparing") {
-    LaunchGateView(locationService: LocationService(),
-                   model: LaunchOptimisationModel(initialRequirement: .needsFull, onboardingCompleted: true,
-                                                  presentationDelay: .zero))
-        .environment(\.routingOptimisationService, FixtureRoutingOptimisationService(stepDelay: .seconds(1)))
+    LaunchGateView(
+        locationService: LocationService(),
+        model: LaunchOptimisationModel(
+            initialRequirement: .needsFull,
+            onboardingCompleted: true,
+            presentationDelay: .zero
+        )
+    )
+    .environment(\.routingOptimisationService, FixtureRoutingOptimisationService(stepDelay: .seconds(1)))
 }

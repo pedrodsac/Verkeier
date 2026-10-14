@@ -148,23 +148,41 @@ enum RouteTimelineBuilder {
             let prev = index > 0 ? legs[index - 1] : nil
             let next = index + 1 < legs.count ? legs[index + 1] : nil
 
-            items.append(.place(placeNode(
-                id: "place-\(index)",
-                point: leg.origin,
-                incoming: prev,
-                outgoing: leg
-            )))
-            items.append(.segment(segmentNode(id: "segment-\(index)", leg: leg, prev: prev, next: next, followingLegs: Array(legs.dropFirst(index + 1)))))
+            items.append(
+                .place(
+                    placeNode(
+                        id: "place-\(index)",
+                        point: leg.origin,
+                        incoming: prev,
+                        outgoing: leg
+                    )
+                )
+            )
+            items.append(
+                .segment(
+                    segmentNode(
+                        id: "segment-\(index)",
+                        leg: leg,
+                        prev: prev,
+                        next: next,
+                        followingLegs: Array(legs.dropFirst(index + 1))
+                    )
+                )
+            )
         }
 
         // Final place: the last leg's destination, arrival only.
         let last = legs[legs.count - 1]
-        items.append(.place(placeNode(
-            id: "place-\(legs.count)",
-            point: last.destination,
-            incoming: last,
-            outgoing: nil
-        )))
+        items.append(
+            .place(
+                placeNode(
+                    id: "place-\(legs.count)",
+                    point: last.destination,
+                    incoming: last,
+                    outgoing: nil
+                )
+            )
+        )
 
         return items
     }
@@ -198,20 +216,23 @@ enum RouteTimelineBuilder {
         let status = outgoingTransit?.liveStatus ?? .scheduled
         let delay = outgoingTransit?.delayMinutes ?? 0
         let announcesDelay = status == .cancelled || (status != .scheduled && delay != 0)
-        let pickupStation = outgoing?.transportKind == .bikeShare
+        let pickupStation =
+            outgoing?.transportKind == .bikeShare
             ? outgoing?.bikeShareDetails?.pickupStation
             : nil
-        let returnStation = incoming?.transportKind == .bikeShare
+        let returnStation =
+            incoming?.transportKind == .bikeShare
             ? incoming?.bikeShareDetails?.returnStation
             : nil
         let bikeShareStation = pickupStation ?? returnStation
-        let bikeShareStationRole: BikeSharePlaceRole? = if pickupStation != nil {
-            .pickup
-        } else if returnStation != nil {
-            .returnStation
-        } else {
-            nil
-        }
+        let bikeShareStationRole: BikeSharePlaceRole? =
+            if pickupStation != nil {
+                .pickup
+            } else if returnStation != nil {
+                .returnStation
+            } else {
+                nil
+            }
 
         let isInternalFunicularTerminal =
             (incoming?.transportKind == .walking && outgoing?.mode == .funicular)
@@ -219,8 +240,11 @@ enum RouteTimelineBuilder {
 
         return PlaceNode(
             id: id,
-            name: isInternalFunicularTerminal ? ""
-                : (point.name ?? "Stop").stationDisplayName(hidingLocality: incoming?.mode == .tram || outgoing?.mode == .tram),
+            name: isInternalFunicularTerminal
+                ? ""
+                : (point.name ?? "Stop").stationDisplayName(
+                    hidingLocality: incoming?.mode == .tram || outgoing?.mode == .tram
+                ),
             role: placeRole,
             arrivalTime: arrival,
             departureTime: departure,
@@ -250,9 +274,13 @@ enum RouteTimelineBuilder {
     private static func role(incoming: RoutePlan.Leg?, outgoing: RoutePlan.Leg?) -> PlaceNode.Role {
         guard let incoming else { return .origin }
         guard let outgoing else { return .destination }
-        if outgoing.continuesInSeatFromTripID == incoming.tripId, outgoing.continuesInSeatFromTripID != nil { return .stayAboard }
-        switch (incoming.transportKind == .transit && incoming.mode != .funicular,
-                outgoing.transportKind == .transit && outgoing.mode != .funicular) {
+        if outgoing.continuesInSeatFromTripID == incoming.tripId, outgoing.continuesInSeatFromTripID != nil {
+            return .stayAboard
+        }
+        switch (
+            incoming.transportKind == .transit && incoming.mode != .funicular,
+            outgoing.transportKind == .transit && outgoing.mode != .funicular
+        ) {
         case (true, true): return .transfer
         case (true, false): return .alight
         default: return .board
@@ -268,19 +296,21 @@ enum RouteTimelineBuilder {
         next: RoutePlan.Leg?,
         followingLegs: [RoutePlan.Leg]
     ) -> SegmentNode {
-        let kind: SegmentNode.Kind = if leg.mode == .funicular {
-            .funicular
-        } else if leg.transportKind == .transit {
-            .transit
-        } else if leg.transportKind == .bikeShare {
-            .bikeShare
-        } else if leg.transportKind == .walking,
-                  prev?.transportKind == .transit, next?.transportKind == .transit {
-            // A walk wedged between two rides is a transfer, not an access walk.
-            .transfer
-        } else {
-            .walk
-        }
+        let kind: SegmentNode.Kind =
+            if leg.mode == .funicular {
+                .funicular
+            } else if leg.transportKind == .transit {
+                .transit
+            } else if leg.transportKind == .bikeShare {
+                .bikeShare
+            } else if leg.transportKind == .walking,
+                prev?.transportKind == .transit, next?.transportKind == .transit
+            {
+                // A walk wedged between two rides is a transfer, not an access walk.
+                .transfer
+            } else {
+                .walk
+            }
 
         return SegmentNode(
             id: id,
@@ -315,7 +345,8 @@ enum RouteTimelineBuilder {
 
     private static func durationMinutes(of leg: RoutePlan.Leg) -> Int? {
         guard let dep = departureTime(of: leg), let arr = arrivalTime(of: leg) else { return nil }
-        let rounding: FloatingPointRoundingRule = leg.transportKind == .walking || leg.mode == .funicular
+        let rounding: FloatingPointRoundingRule =
+            leg.transportKind == .walking || leg.mode == .funicular
             ? .up : .toNearestOrAwayFromZero
         return DurationDisplay.minutes(arr.timeIntervalSince(dep), rounding: rounding)
     }

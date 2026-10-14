@@ -2,24 +2,39 @@ import Foundation
 import MobiliteitKit
 
 extension MobiliteitRouteService: TripDetailService {
-    nonisolated func tripDetail(for selection: TripDetailSelection,
-        refreshPolicy: RouteRealtimeRefreshPolicy) async throws -> TripDetailSnapshot {
+    nonisolated func tripDetail(
+        for selection: TripDetailSelection,
+        refreshPolicy: RouteRealtimeRefreshPolicy
+    ) async throws -> TripDetailSnapshot {
         var detail = try await singleTripDetail(for: selection, refreshPolicy: refreshPolicy)
         let database = try await readyDatabaseURL()
         let router = try await engine.router(for: database)
-        let instance = TransitInstanceIdentity(feedGeneration: selection.instance.feedGeneration,
-            tripID: selection.instance.tripID, serviceDate: try GTFSDate(parsing: selection.instance.serviceDate))
+        let instance = TransitInstanceIdentity(
+            feedGeneration: selection.instance.feedGeneration,
+            tripID: selection.instance.tripID,
+            serviceDate: try GTFSDate(parsing: selection.instance.serviceDate)
+        )
         let continuations: [TransitContinuingTrip]
-        do { continuations = try await router.continuingTrips(for: instance) }
-        catch TransitTripSnapshotError.obsoleteFeed { throw TripDetailError.obsoleteFeed }
+        do { continuations = try await router.continuingTrips(for: instance) } catch TransitTripSnapshotError
+            .obsoleteFeed
+        { throw TripDetailError.obsoleteFeed }
         for continuation in continuations {
             try Task.checkCancellation()
             let route = MobiliteitGTFSService.route(continuation.route, agency: nil)
-            let contextualNext = TripDetailSelection(instance: .init(feedGeneration: continuation.instance.feedGeneration,
-                tripID: continuation.instance.tripID, serviceDate: continuation.instance.serviceDate.compactString),
-                boardingSequence: continuation.boardingSequence, alightingSequence: continuation.alightingSequence,
-                lineName: route.shortName, routeShortName: route.shortName, headsign: continuation.headsign,
-                mode: route.mode, routeID: route.id)
+            let contextualNext = TripDetailSelection(
+                instance: .init(
+                    feedGeneration: continuation.instance.feedGeneration,
+                    tripID: continuation.instance.tripID,
+                    serviceDate: continuation.instance.serviceDate.compactString
+                ),
+                boardingSequence: continuation.boardingSequence,
+                alightingSequence: continuation.alightingSequence,
+                lineName: route.shortName,
+                routeShortName: route.shortName,
+                headsign: continuation.headsign,
+                mode: route.mode,
+                routeID: route.id
+            )
             let next = selection.continuingRides.first { $0.instance == contextualNext.instance } ?? contextualNext
             let snapshot = try await singleTripDetail(for: next, refreshPolicy: refreshPolicy)
             detail.continuations.append(.init(selection: next, snapshot: snapshot))
@@ -29,52 +44,100 @@ extension MobiliteitRouteService: TripDetailService {
         return detail.includingContinuationOverlays(highlighting: selection.continuingRides)
     }
 
-    private nonisolated func singleTripDetail(for selection: TripDetailSelection,
-        refreshPolicy: RouteRealtimeRefreshPolicy) async throws -> TripDetailSnapshot {
+    private nonisolated func singleTripDetail(
+        for selection: TripDetailSelection,
+        refreshPolicy: RouteRealtimeRefreshPolicy
+    ) async throws -> TripDetailSnapshot {
         let databaseURL = try await readyDatabaseURL()
         let router = try await engine.router(for: databaseURL)
-        let instance = TransitInstanceIdentity(feedGeneration: selection.instance.feedGeneration,
-            tripID: selection.instance.tripID, serviceDate: try GTFSDate(parsing: selection.instance.serviceDate))
+        let instance = TransitInstanceIdentity(
+            feedGeneration: selection.instance.feedGeneration,
+            tripID: selection.instance.tripID,
+            serviceDate: try GTFSDate(parsing: selection.instance.serviceDate)
+        )
         let native: TransitTripSnapshot
         do {
-            native = try await router.tripSnapshot(for: instance,
-                boardingSequence: selection.boardingSequence, refreshPolicy: refreshPolicy == .forceRefresh ? .forceRefresh : .useCache)
+            native = try await router.tripSnapshot(
+                for: instance,
+                boardingSequence: selection.boardingSequence,
+                refreshPolicy: refreshPolicy == .forceRefresh ? .forceRefresh : .useCache
+            )
         } catch TransitTripSnapshotError.obsoleteFeed { throw TripDetailError.obsoleteFeed }
-        let baseTripID = instance.tripID.range(of: "#frequency-").map { String(instance.tripID[..<$0.lowerBound]) } ?? instance.tripID
+        let baseTripID =
+            instance.tripID.range(of: "#frequency-").map { String(instance.tripID[..<$0.lowerBound]) }
+            ?? instance.tripID
         let shape = await gtfsService?.routeShape(for: baseTripID) ?? []
         try Task.checkCancellation()
         let currentRouter = try await engine.router(for: readyDatabaseURL())
         guard router === currentRouter else { throw TripDetailError.obsoleteFeed }
         let stops = native.stops.map { entry in
             func timing(_ value: TransitTripTiming?) -> TripStopTiming? {
-                value.map { .init(scheduled: $0.scheduled, realtime: $0.realtime,
-                    isHistoricalReport: $0.prognosisType?.uppercased() == "REPORTED",
-                    observedAt: $0.observedAt, isCancelled: $0.isCancelled) }
+                value.map {
+                    .init(
+                        scheduled: $0.scheduled,
+                        realtime: $0.realtime,
+                        isHistoricalReport: $0.prognosisType?.uppercased() == "REPORTED",
+                        observedAt: $0.observedAt,
+                        isCancelled: $0.isCancelled
+                    )
+                }
             }
-            return TripStopEntry(sequence: entry.sequence,
+            return TripStopEntry(
+                sequence: entry.sequence,
                 stop: MobiliteitGTFSService.stop(entry.stop, liveModes: [selection.mode]),
-                arrival: timing(entry.arrival), departure: timing(entry.departure), platform: entry.platform)
+                arrival: timing(entry.arrival),
+                departure: timing(entry.departure),
+                platform: entry.platform
+            )
         }
         let approximate = shape.count < 2
         let coordinates = approximate ? stops.map { RouteMapCoordinate($0.stop.location) } : shape
-        var segments = [RouteMapSegment(id: "full-run", mode: selection.mode,
-            routeName: selection.lineName, routeId: selection.routeID, coordinates: coordinates,
-            emphasis: .context, isApproximate: approximate, routeShortName: selection.routeShortName)]
+        var segments = [
+            RouteMapSegment(
+                id: "full-run",
+                mode: selection.mode,
+                routeName: selection.lineName,
+                routeId: selection.routeID,
+                coordinates: coordinates,
+                emphasis: .context,
+                isApproximate: approximate,
+                routeShortName: selection.routeShortName
+            )
+        ]
         let rideStops = stops.filter { selection.boardingSequence...selection.alightingSequence ~= $0.sequence }
         let rideCoordinates: [RouteMapCoordinate]
         if !approximate, let first = rideStops.first, let last = rideStops.last {
-            rideCoordinates = JourneyGeometry.segment(of: shape.map { .init(latitude: $0.latitude, longitude: $0.longitude) },
+            rideCoordinates = JourneyGeometry.segment(
+                of: shape.map { .init(latitude: $0.latitude, longitude: $0.longitude) },
                 from: .init(latitude: first.stop.location.latitude, longitude: first.stop.location.longitude),
-                to: .init(latitude: last.stop.location.latitude, longitude: last.stop.location.longitude))
-                .map { .init(latitude: $0.latitude, longitude: $0.longitude) }
-        } else { rideCoordinates = rideStops.map { RouteMapCoordinate($0.stop.location) } }
-        if rideCoordinates.count >= 2 {
-            segments.append(.init(id: "your-ride", mode: selection.mode,
-                routeName: selection.lineName, routeId: selection.routeID, coordinates: rideCoordinates,
-                emphasis: .highlighted, isApproximate: approximate, routeShortName: selection.routeShortName))
+                to: .init(latitude: last.stop.location.latitude, longitude: last.stop.location.longitude)
+            )
+            .map { .init(latitude: $0.latitude, longitude: $0.longitude) }
+        } else {
+            rideCoordinates = rideStops.map { RouteMapCoordinate($0.stop.location) }
         }
-        return TripDetailSnapshot(instance: selection.instance, stops: stops,
-            mapOverlay: RouteMapOverlayBuilder.trip(segments: segments, stops: stops, selection: selection), isApproximateRoute: approximate,
-            liveDataAvailable: native.liveDataAvailable, isCancelled: native.isCancelled, fetchedAt: native.fetchedAt)
+        if rideCoordinates.count >= 2 {
+            segments.append(
+                .init(
+                    id: "your-ride",
+                    mode: selection.mode,
+                    routeName: selection.lineName,
+                    routeId: selection.routeID,
+                    coordinates: rideCoordinates,
+                    emphasis: .highlighted,
+                    isApproximate: approximate,
+                    routeShortName: selection.routeShortName
+                )
+            )
+        }
+        return TripDetailSnapshot(
+            instance: selection.instance,
+            stops: stops,
+            mapOverlay: RouteMapOverlayBuilder.trip(segments: segments, stops: stops, selection: selection),
+            isApproximateRoute: approximate,
+            liveDataAvailable: native.liveDataAvailable,
+            isCancelled: native.isCancelled,
+            fetchedAt: native.fetchedAt
+        )
     }
 }

@@ -8,10 +8,12 @@ struct StopDetailView: View {
 
     private var departed: [Departure] {
         let now = Date()
-        return Array(departures.filter {
-            ($0.realtimeDeparture ?? $0.scheduledDeparture)
-                .map { !SharedDepartureTiming.isVisible($0, at: now) } ?? false
-        }.suffix(3))
+        return Array(
+            departures.filter {
+                ($0.realtimeDeparture ?? $0.scheduledDeparture)
+                    .map { !SharedDepartureTiming.isVisible($0, at: now) } ?? false
+            }.suffix(3)
+        )
     }
 
     private var upcoming: [Departure] {
@@ -31,14 +33,14 @@ struct StopDetailView: View {
                     selectedLine: viewModel.selectedLine,
                     showDirections: actions.showDirections,
                     toggleDepartureLine: actions.toggleDepartureLine,
-					availablePlatforms: viewModel.availablePlatforms,
-					selectedPlatform: viewModel.selectedPlatform,
-					selectDeparturePlatform: actions.selectDeparturePlatform
+                    availablePlatforms: viewModel.availablePlatforms,
+                    selectedPlatform: viewModel.selectedPlatform,
+                    selectDeparturePlatform: actions.selectDeparturePlatform
                 )
                 .listRowInsets(chipsRowInsets)
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
-				.safeAreaPadding(.horizontal, 16)
+                .safeAreaPadding(.horizontal, 16)
 
                 if let liveActivityErrorMessage = viewModel.liveActivityErrorMessage {
                     Label(liveActivityErrorMessage, systemImage: "exclamationmark.triangle.fill")
@@ -113,7 +115,9 @@ struct StopDetailView: View {
                             .background {
                                 NavigationLink(value: TransitSheetRoute.departureTrip(departure, stop)) { EmptyView() }
                                     .opacity(0)
-                                    .accessibilityLabel("View full course for \(departure.lineName) to \(departure.displayDestination)")
+                                    .accessibilityLabel(
+                                        "View full course for \(departure.lineName) to \(departure.displayDestination)"
+                                    )
                             }
                             .opacity(0.55)
                             .listRowInsets(departureRowInsets)
@@ -136,7 +140,9 @@ struct StopDetailView: View {
                         .background {
                             NavigationLink(value: TransitSheetRoute.departureTrip(departure, stop)) { EmptyView() }
                                 .opacity(0)
-                                    .accessibilityLabel("View full course for \(departure.lineName) to \(departure.displayDestination)")
+                                .accessibilityLabel(
+                                    "View full course for \(departure.lineName) to \(departure.displayDestination)"
+                                )
                         }
                         .listRowInsets(departureRowInsets)
                     }
@@ -168,10 +174,10 @@ struct StopDetailView: View {
             }
         }
     }
-	
-	private var chipsRowInsets: EdgeInsets {
-		EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0)
-	}
+
+    private var chipsRowInsets: EdgeInsets {
+        EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0)
+    }
 
     private var chromeRowInsets: EdgeInsets {
         EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
@@ -234,18 +240,22 @@ nonisolated func lastServiceDepartureIDs(
     for departure in departures where !departure.isCancelled {
         guard let departureTime = time(departure) else { continue }
         if let existing = latestByLine[departure.lineName],
-           let existingTime = time(existing),
-           existingTime >= departureTime {
+            let existingTime = time(existing),
+            existingTime >= departureTime
+        {
             continue
         }
         latestByLine[departure.lineName] = departure
     }
 
-    return Set(latestByLine.values.compactMap { departure in
-        guard let departureTime = time(departure),
-              calendar.component(.hour, from: departureTime) >= 18 else { return nil }
-        return departure.id
-    })
+    return Set(
+        latestByLine.values.compactMap { departure in
+            guard let departureTime = time(departure),
+                calendar.component(.hour, from: departureTime) >= 18
+            else { return nil }
+            return departure.id
+        }
+    )
 }
 
 private struct DepartureTrackingStatusCard: View {

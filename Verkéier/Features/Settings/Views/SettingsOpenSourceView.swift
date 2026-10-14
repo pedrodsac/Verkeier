@@ -17,7 +17,7 @@ struct SettingsOpenSourceView: View {
         OpenSourceLibrary(
             name: "UIOnboarding",
             url: URL(string: "https://github.com/lascic/UIOnboarding")!
-        )
+        ),
     ]
 
     var body: some View {

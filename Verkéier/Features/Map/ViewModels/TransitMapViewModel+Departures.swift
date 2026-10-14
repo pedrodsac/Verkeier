@@ -8,15 +8,17 @@ extension TransitMapViewModel {
     /// Cache only board inputs. Location fixes, route results, and loading-state
     /// changes must not repeat departure normalization and sorting.
     var departureBoardPresentation: StopDepartureBoardPresentation {
-        departureBoardCache.presentation(for: .init(
-            stopID: selectedStop?.id ?? "",
-            routes: selectedStopRoutes,
-            liveDepartures: departures,
-            scheduledDepartures: offlineScheduledDepartures,
-            useScheduledFallback: isUsingOfflineDepartures,
-            selectedLine: selectedDepartureLine,
-            selectedPlatform: selectedDeparturePlatform
-        ))
+        departureBoardCache.presentation(
+            for: .init(
+                stopID: selectedStop?.id ?? "",
+                routes: selectedStopRoutes,
+                liveDepartures: departures,
+                scheduledDepartures: offlineScheduledDepartures,
+                useScheduledFallback: isUsingOfflineDepartures,
+                selectedLine: selectedDepartureLine,
+                selectedPlatform: selectedDeparturePlatform
+            )
+        )
     }
 
     func loadFavouriteDepartures(
@@ -39,7 +41,10 @@ extension TransitMapViewModel {
                         gtfsService: gtfsService
                     )
                     do {
-                        let live = try await liveTransitService.departureBoardSnapshot(for: boardStop, filter: TransitBoardFilter())
+                        let live = try await liveTransitService.departureBoardSnapshot(
+                            for: boardStop,
+                            filter: TransitBoardFilter()
+                        )
                         return FavouriteDepartureBoardResult(
                             stopId: stop.id,
                             departures: live.departures,
@@ -73,7 +78,7 @@ extension TransitMapViewModel {
                 favouriteDepartureBoards[result.stopId] = snapshot
                 saveFavouriteDepartureBoard(stopID: result.stopId, snapshot: snapshot)
             }
-            if results.contains(where: \ .usedLiveData) {
+            if results.contains(where: \.usedLiveData) {
                 liveTransitLastUpdated = results.filter(\.usedLiveData).map(\.fetchedAt).min()
                 liveTransitErrorMessage = nil
             }
@@ -189,7 +194,8 @@ extension TransitMapViewModel {
         departuresLastUpdated = fetchedAt
         liveTransitLastUpdated = fetchedAt ?? liveTransitLastUpdated
         liveTransitErrorMessage = liveError?.localizedDescription
-        departuresErrorMessage = liveError != nil && scheduledDepartures.isEmpty
+        departuresErrorMessage =
+            liveError != nil && scheduledDepartures.isEmpty
             ? "No live or offline departures are available for this stop."
             : nil
         isLoadingDepartures = false

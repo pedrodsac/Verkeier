@@ -64,7 +64,8 @@ struct RoutePlaceSearchView: View {
                     currentLocationButton
 
                     if let selectedPlace,
-                       selectedPlace.id != viewModel.currentLocation?.id {
+                        selectedPlace.id != viewModel.currentLocation?.id
+                    {
                         placeButton(selectedPlace)
                     }
                 }
@@ -167,7 +168,8 @@ struct RoutePlaceSearchView: View {
 
     private func mergedResults(stops: [Stop], places: [RoutePlace]) -> [RoutePlace] {
         var seenIDs = Set<String>()
-        let stopResults = stops
+        let stopResults =
+            stops
             .deduplicatedByExactName()
             .prefix(30)
             .map { RoutePlace(stop: $0, source: .search) }

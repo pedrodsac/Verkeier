@@ -6,29 +6,35 @@ import MobiliteitKit
 nonisolated enum RouteOptionVisibility {
     /// Publish every useful choice; paging state is maintained independently.
     static func presentedOptions(
-        primary: [RouteOption], supplemental: [RouteOption], at now: Date
+        primary: [RouteOption],
+        supplemental: [RouteOption],
+        at now: Date
     ) -> (primary: [RouteOption], supplemental: [RouteOption]) {
         visibleOptions(primary: primary, supplemental: supplemental, at: now)
     }
 
     static func visibleOptions(
-        primary: [RouteOption], supplemental: [RouteOption], at now: Date
+        primary: [RouteOption],
+        supplemental: [RouteOption],
+        at now: Date
     ) -> (primary: [RouteOption], supplemental: [RouteOption]) {
         let all = primary + supplemental
         let candidates = all.filter { $0.status(at: now).isSelectable }
-        let dominatedIDs = Set(all.filter { option in
-            candidates.contains { other in
-                // Bike share is a separate mode choice, even when transit is faster.
-                guard other.usesBikeShare == option.usesBikeShare,
-                      other.id != option.id,
-                      let departure = option.departureTime, let arrival = option.arrivalTime,
-                      let otherDeparture = other.departureTime, let otherArrival = other.arrivalTime
-                else { return false }
-                guard !other.hasTightTransfer || option.hasTightTransfer else { return false }
-                return otherDeparture >= departure && otherArrival <= arrival
-                    && (otherDeparture > departure || otherArrival < arrival)
-            }
-        }.map(\.id))
+        let dominatedIDs = Set(
+            all.filter { option in
+                candidates.contains { other in
+                    // Bike share is a separate mode choice, even when transit is faster.
+                    guard other.usesBikeShare == option.usesBikeShare,
+                        other.id != option.id,
+                        let departure = option.departureTime, let arrival = option.arrivalTime,
+                        let otherDeparture = other.departureTime, let otherArrival = other.arrivalTime
+                    else { return false }
+                    guard !other.hasTightTransfer || option.hasTightTransfer else { return false }
+                    return otherDeparture >= departure && otherArrival <= arrival
+                        && (otherDeparture > departure || otherArrival < arrival)
+                }
+            }.map(\.id)
+        )
         return walkingVisibleOptions(
             primary: primary.filter { !dominatedIDs.contains($0.id) },
             supplemental: supplemental.filter { !dominatedIDs.contains($0.id) },
@@ -37,7 +43,9 @@ nonisolated enum RouteOptionVisibility {
     }
 
     private static func walkingVisibleOptions(
-        primary: [RouteOption], supplemental: [RouteOption], at now: Date
+        primary: [RouteOption],
+        supplemental: [RouteOption],
+        at now: Date
     ) -> (primary: [RouteOption], supplemental: [RouteOption]) {
         let all = primary + supplemental
         let transit = all.filter { !$0.transitLegs.isEmpty && $0.status(at: now).isSelectable }
@@ -45,18 +53,20 @@ nonisolated enum RouteOptionVisibility {
 
         let eligibleWalking = all.filter { walk in
             guard walk.isWalkingOnly, walk.status(at: now).isSelectable,
-                  let arrival = walk.arrivalTime else { return false }
+                let arrival = walk.arrivalTime
+            else { return false }
             return transit.allSatisfy { ride in
                 guard let transitArrival = ride.arrivalTime else { return false }
                 return arrival < transitArrival
             }
         }
         if let fastestWalk = eligibleWalking.min(by: { (duration($0) ?? .infinity) < (duration($1) ?? .infinity) }),
-           let walkingDuration = duration(fastestWalk),
-           transit.allSatisfy({ ride in
-               guard let transitDuration = duration(ride) else { return false }
-               return walkingDuration < transitDuration
-           }) {
+            let walkingDuration = duration(fastestWalk),
+            transit.allSatisfy({ ride in
+                guard let transitDuration = duration(ride) else { return false }
+                return walkingDuration < transitDuration
+            })
+        {
             return ([fastestWalk], supplemental.filter { !$0.isWalkingOnly })
         }
 

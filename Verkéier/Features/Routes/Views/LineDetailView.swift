@@ -8,85 +8,93 @@ struct LineDetailView: View {
         Group {
             if let detail = viewModel.detail {
                 List {
-                	if detail.directions.count > 1 {
-                	    Picker(
-                	        "Direction",
-                	        selection: Binding(
-                	            get: { detail.selectedDirectionID },
-                	            set: actions.selectDirection
-                	        )
-                	    ) {
-                	        ForEach(detail.directions) { direction in
-                            Text(direction.title.stationDisplayName(hidingLocality: detail.route.mode == .tram)).tag(direction.id)
-                	        }
-                	    }
-                	    .pickerStyle(.inline)
-                	}
+                    if detail.directions.count > 1 {
+                        Picker(
+                            "Direction",
+                            selection: Binding(
+                                get: { detail.selectedDirectionID },
+                                set: actions.selectDirection
+                            )
+                        ) {
+                            ForEach(detail.directions) { direction in
+                                Text(direction.title.stationDisplayName(hidingLocality: detail.route.mode == .tram))
+                                    .tag(direction.id)
+                            }
+                        }
+                        .pickerStyle(.inline)
+                    }
 
                     Section("Stop Sequence") {
                         ForEach(Array(detail.stopSequence.enumerated()), id: \.element.id) { index, stop in
-                        let destinationStop = Stop(
-                            id: stop.id,
-                            name: stop.name,
-                            location: stop.location,
-                            modes: [detail.route.mode],
-                            dataSource: .gtfs
-                        )
-                        NavigationLink(value: TransitSheetRoute.stopDetail(destinationStop)) {
-                            HStack(alignment: .center, spacing: 10) {
-                                Text("\(index + 1)")
-                                    .font(.caption.weight(.bold))
-                                    .foregroundStyle(.secondary)
-                                    .frame(width: 18)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(stop.name.stationDisplayName(hidingLocality: detail.route.mode == .tram))
-                                        .font(.subheadline.weight(.semibold))
-                                        .foregroundStyle(.primary)
-                                    if let platform = stop.platform {
-                                        Text("Platform \(platform)")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
+                            let destinationStop = Stop(
+                                id: stop.id,
+                                name: stop.name,
+                                location: stop.location,
+                                modes: [detail.route.mode],
+                                dataSource: .gtfs
+                            )
+                            NavigationLink(value: TransitSheetRoute.stopDetail(destinationStop)) {
+                                HStack(alignment: .center, spacing: 10) {
+                                    Text("\(index + 1)")
+                                        .font(.caption.weight(.bold))
+                                        .foregroundStyle(.secondary)
+                                        .frame(width: 18)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(stop.name.stationDisplayName(hidingLocality: detail.route.mode == .tram))
+                                            .font(.subheadline.weight(.semibold))
+                                            .foregroundStyle(.primary)
+                                        if let platform = stop.platform {
+                                            Text("Platform \(platform)")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
                                     }
+                                    Spacer()
                                 }
-                                Spacer()
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+
+                    if !viewModel.alerts.isEmpty {
+                        Section("Disruption Impact") {
+                            ForEach(viewModel.alerts.prefix(3)) { alert in
+                                LineAlertRow(alert: alert)
                             }
                         }
-                        .buttonStyle(.plain)
                     }
-                }
 
-                if !viewModel.alerts.isEmpty {
-                    Section("Disruption Impact") {
-                        ForEach(viewModel.alerts.prefix(3)) { alert in
-                            LineAlertRow(alert: alert)
-                        }
-                    }
-                }
-
-                if !detail.upcomingDepartures.isEmpty {
-                    Section("Upcoming Timetable") {
-                        ForEach(detail.upcomingDepartures) { departure in
-                            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                                Text(departure.departureTime, style: .time)
-                                    .font(.subheadline.monospacedDigit().weight(.semibold))
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(departure.destinationName.stationDisplayName(hidingLocality: detail.route.mode == .tram))
+                    if !detail.upcomingDepartures.isEmpty {
+                        Section("Upcoming Timetable") {
+                            ForEach(detail.upcomingDepartures) { departure in
+                                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                                    Text(departure.departureTime, style: .time)
+                                        .font(.subheadline.monospacedDigit().weight(.semibold))
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(
+                                            departure.destinationName.stationDisplayName(
+                                                hidingLocality: detail.route.mode == .tram
+                                            )
+                                        )
                                         .font(.subheadline.weight(.semibold))
-                                    Text("From \(departure.originName.stationDisplayName(hidingLocality: detail.route.mode == .tram))")
+                                        Text(
+                                            "From \(departure.originName.stationDisplayName(hidingLocality: detail.route.mode == .tram))"
+                                        )
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
                                 }
-                                Spacer()
                             }
                         }
                     }
                 }
-            }
                 .listStyle(.insetGrouped)
             } else if let route = viewModel.route {
                 CompactUnavailableCard(
                     title: "Line details unavailable",
-                    message: viewModel.errorMessage ?? "No GTFS timetable details are available for \(route.shortName).",
+                    message: viewModel.errorMessage
+                        ?? "No GTFS timetable details are available for \(route.shortName).",
                     systemImage: "tram.fill"
                 )
             } else {

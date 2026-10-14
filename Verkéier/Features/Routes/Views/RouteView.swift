@@ -48,8 +48,10 @@ struct RouteView: View {
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .task(id: [viewModel.origin?.id, viewModel.selectedPlace(for: .destination)?.id,
-                   viewModel.currentLocation == nil ? nil : "location-available"]) {
+        .task(id: [
+            viewModel.origin?.id, viewModel.selectedPlace(for: .destination)?.id,
+            viewModel.currentLocation == nil ? nil : "location-available",
+        ]) {
             await actions.maintainRoutes()
         }
         // Haptic when a route plan is found.
@@ -59,8 +61,9 @@ struct RouteView: View {
         }
         .background {
             if !viewModel.isCalculating, !viewModel.isLoadingEarlierRoutes, !viewModel.isLoadingLaterRoutes,
-               !viewModel.routeOptions.isEmpty,
-               let requestID = viewModel.diagnosticRequestID {
+                !viewModel.routeOptions.isEmpty,
+                let requestID = viewModel.diagnosticRequestID
+            {
                 RouteRenderObserver(requestID: requestID, rendered: viewModel.resultsRendered)
                     .frame(width: 0, height: 0).accessibilityHidden(true)
             }
@@ -83,7 +86,7 @@ struct RouteView: View {
                     .tint(.blue)
                 }
             }
-            .safeAreaPadding(.horizontal, 1) // avoid clipping focus rings
+            .safeAreaPadding(.horizontal, 1)  // avoid clipping focus rings
         }
     }
 
@@ -138,9 +141,10 @@ struct RouteView: View {
 
         // Empty — no route selected yet; offer quick destination picks
         if !viewModel.isCalculating,
-           !viewModel.isWaitingForLocation,
-           viewModel.routeOptions.isEmpty,
-           viewModel.errorMessage == nil {
+            !viewModel.isWaitingForLocation,
+            viewModel.routeOptions.isEmpty,
+            viewModel.errorMessage == nil
+        {
             emptyState
         }
 
@@ -209,15 +213,15 @@ struct RouteView: View {
 
     private var routeResultsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-			VStack(alignment: .leading, spacing: 10) {
-				ForEach(viewModel.chronologicallyOrderedRouteOptions) { option in
-					RouteOptionCard(
-						option: option,
-						isSelected: option.id == viewModel.selectedRouteOptionID,
-					)
-					.transition(routeCardTransition)
-				}
-			}
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(viewModel.chronologicallyOrderedRouteOptions) { option in
+                    RouteOptionCard(
+                        option: option,
+                        isSelected: option.id == viewModel.selectedRouteOptionID,
+                    )
+                    .transition(routeCardTransition)
+                }
+            }
 
             if viewModel.routeOptions.contains(where: { !$0.transitLegs.isEmpty }) {
                 HStack(spacing: 10) {
@@ -226,7 +230,7 @@ struct RouteView: View {
                         systemImage: "chevron.left",
                         isLoading: viewModel.isLoadingEarlierRoutes,
                         isEnabled: viewModel.canLoadEarlierRoutes,
-						icon: .leading,
+                        icon: .leading,
                         action: actions.loadEarlierRoutes
                     )
                     routePageButton(
@@ -234,7 +238,7 @@ struct RouteView: View {
                         systemImage: "chevron.right",
                         isLoading: viewModel.isLoadingLaterRoutes,
                         isEnabled: viewModel.canLoadLaterRoutes,
-						icon: .trailing,
+                        icon: .trailing,
                         action: actions.loadLaterRoutes
                     )
                 }
@@ -267,31 +271,31 @@ struct RouteView: View {
         systemImage: String,
         isLoading: Bool,
         isEnabled: Bool,
-		icon: HorizontalAlignment,
+        icon: HorizontalAlignment,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
             HStack(spacing: 7) {
-				switch icon {
-					case .leading:
-						if isLoading {
-							ProgressView()
-								.controlSize(.small)
-						} else {
-							Image(systemName: systemImage)
-						}
-						Text(title)
-					case .trailing:
-						Text(title)
-						if isLoading {
-							ProgressView()
-								.controlSize(.small)
-						} else {
-							Image(systemName: systemImage)
-						}
-					default: EmptyView()
-				}
-                
+                switch icon {
+                case .leading:
+                    if isLoading {
+                        ProgressView()
+                            .controlSize(.small)
+                    } else {
+                        Image(systemName: systemImage)
+                    }
+                    Text(title)
+                case .trailing:
+                    Text(title)
+                    if isLoading {
+                        ProgressView()
+                            .controlSize(.small)
+                    } else {
+                        Image(systemName: systemImage)
+                    }
+                default: EmptyView()
+                }
+
             }
             .frame(maxWidth: .infinity)
         }

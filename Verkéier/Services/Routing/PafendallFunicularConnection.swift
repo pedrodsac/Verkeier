@@ -11,10 +11,16 @@ nonisolated enum PafendallFunicularConnection {
     // Product allowance for reaching a cabin and boarding, separate from the
     // walking calibration and the transit router's train boarding buffer.
     static let boardingSeconds = 60
-    static let upper = LocationPoint(name: "Rout Bréck-Pafendall, Funicular",
-                                    latitude: 49.6189108, longitude: 6.1358874)
-    static let lower = LocationPoint(name: "Pfaffenthal-Kirchberg, Funicular",
-                                    latitude: 49.6189879, longitude: 6.1327721)
+    static let upper = LocationPoint(
+        name: "Rout Bréck-Pafendall, Funicular",
+        latitude: 49.6189108,
+        longitude: 6.1358874
+    )
+    static let lower = LocationPoint(
+        name: "Pfaffenthal-Kirchberg, Funicular",
+        latitude: 49.6189879,
+        longitude: 6.1327721
+    )
     private static let tram = LocationPoint(latitude: 49.618697, longitude: 6.136686)
     private static let rail = LocationPoint(latitude: 49.618936, longitude: 6.132919)
     private static let track: [Coordinate] = [
@@ -26,7 +32,7 @@ nonisolated enum PafendallFunicularConnection {
         .init(latitude: 49.6189830, longitude: 6.1341615),
         .init(latitude: 49.6189679, longitude: 6.1337268),
         .init(latitude: 49.6189785, longitude: 6.1332098),
-        .init(latitude: 49.6189879, longitude: 6.1327721)
+        .init(latitude: 49.6189879, longitude: 6.1327721),
     ]
 
     /// Only cross-level journeys within this interchange qualify. Nearby streets
@@ -38,7 +44,8 @@ nonisolated enum PafendallFunicularConnection {
     }
 
     static func route(
-        from: LocationPoint, to: LocationPoint,
+        from: LocationPoint,
+        to: LocationPoint,
         pedestrian: @Sendable (LocationPoint, LocationPoint) async throws -> OfflineWalkingRoute
     ) async throws -> OfflineWalkingRoute? {
         guard let (board, alight) = terminals(from: from, to: to) else { return nil }
@@ -47,28 +54,44 @@ nonisolated enum PafendallFunicularConnection {
         guard access.source == .localOSM, egress.source == .localOSM else { return nil }
         let ridePath = board == upper ? track : Array(track.reversed())
         let rideDistance = zip(ridePath, ridePath.dropFirst()).reduce(0.0) {
-            $0 + CLLocation(latitude: $1.0.latitude, longitude: $1.0.longitude)
+            $0
+                + CLLocation(latitude: $1.0.latitude, longitude: $1.0.longitude)
                 .distance(from: CLLocation(latitude: $1.1.latitude, longitude: $1.1.longitude))
         }
         func walking(_ route: OfflineWalkingRoute, from: LocationPoint, to: LocationPoint) -> WalkingRouteSegment {
-            .init(mode: .walking, originLabel: from.name, destinationLabel: to.name,
-                  durationSeconds: max(1, Int(route.duration.rounded())),
-                  distanceMeters: route.distanceMeters,
-                  polyline: [Coordinate(latitude: from.latitude, longitude: from.longitude)]
+            .init(
+                mode: .walking,
+                originLabel: from.name,
+                destinationLabel: to.name,
+                durationSeconds: max(1, Int(route.duration.rounded())),
+                distanceMeters: route.distanceMeters,
+                polyline: [Coordinate(latitude: from.latitude, longitude: from.longitude)]
                     + route.coordinates.map { .init(latitude: $0.latitude, longitude: $0.longitude) }
-                    + [Coordinate(latitude: to.latitude, longitude: to.longitude)])
+                    + [Coordinate(latitude: to.latitude, longitude: to.longitude)]
+            )
         }
-        let segments = [walking(access, from: from, to: board),
-            WalkingRouteSegment(mode: .funicular, name: "Funicular",
-                originLabel: board.name, destinationLabel: alight.name,
+        let segments = [
+            walking(access, from: from, to: board),
+            WalkingRouteSegment(
+                mode: .funicular,
+                name: "Funicular",
+                originLabel: board.name,
+                destinationLabel: alight.name,
                 durationSeconds: rideSeconds + boardingSeconds,
-                distanceMeters: rideDistance, polyline: ridePath),
-            walking(egress, from: alight, to: to)]
-        return .init(distanceMeters: segments.reduce(0) { $0 + $1.distanceMeters },
-                     duration: Double(segments.reduce(0) { $0 + $1.durationSeconds }),
-                     coordinates: segments.flatMap(\.polyline).map {
-                         .init(latitude: $0.latitude, longitude: $0.longitude)
-                     }, source: .stationConnection, segments: segments)
+                distanceMeters: rideDistance,
+                polyline: ridePath
+            ),
+            walking(egress, from: alight, to: to),
+        ]
+        return .init(
+            distanceMeters: segments.reduce(0) { $0 + $1.distanceMeters },
+            duration: Double(segments.reduce(0) { $0 + $1.durationSeconds }),
+            coordinates: segments.flatMap(\.polyline).map {
+                .init(latitude: $0.latitude, longitude: $0.longitude)
+            },
+            source: .stationConnection,
+            segments: segments
+        )
     }
 
     private static func distance(_ a: LocationPoint, _ b: LocationPoint) -> Double {

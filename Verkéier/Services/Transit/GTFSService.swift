@@ -13,7 +13,12 @@ protocol GTFSService: Sendable {
     func scheduledDepartures(for stop: Stop, at date: Date, limit: Int) async -> [OfflineScheduleDeparture]
     func lineDetail(for route: TransitRoute, directionID: String?, at date: Date) async -> LineDetail?
     func routingStops(near location: LocationPoint, radiusMeters: Double, limit: Int) async -> [Stop]
-    func journeyDepartures(from stop: Stop, after date: Date, horizon: TimeInterval, limit: Int) async -> [GTFSJourneyDeparture]
+    func journeyDepartures(
+        from stop: Stop,
+        after date: Date,
+        horizon: TimeInterval,
+        limit: Int
+    ) async -> [GTFSJourneyDeparture]
     func journeyStops(for tripID: String) async -> [GTFSJourneyStopTime]
     func transferRules(from stop: Stop) async -> [GTFSTransferRule]
     func routeShape(for tripID: String) async -> [RouteMapCoordinate]
@@ -100,7 +105,12 @@ struct UnavailableGTFSService: GTFSService {
     func scheduledDepartures(for _: Stop, at _: Date, limit _: Int) async -> [OfflineScheduleDeparture] { [] }
     func lineDetail(for _: TransitRoute, directionID _: String?, at _: Date) async -> LineDetail? { nil }
     func routingStops(near _: LocationPoint, radiusMeters _: Double, limit _: Int) async -> [Stop] { [] }
-    func journeyDepartures(from _: Stop, after _: Date, horizon _: TimeInterval, limit _: Int) async -> [GTFSJourneyDeparture] { [] }
+    func journeyDepartures(
+        from _: Stop,
+        after _: Date,
+        horizon _: TimeInterval,
+        limit _: Int
+    ) async -> [GTFSJourneyDeparture] { [] }
     func journeyStops(for _: String) async -> [GTFSJourneyStopTime] { [] }
     func transferRules(from _: Stop) async -> [GTFSTransferRule] { [] }
     func routeShape(for _: String) async -> [RouteMapCoordinate] { [] }

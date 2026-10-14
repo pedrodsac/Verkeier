@@ -28,14 +28,16 @@ struct Stop: Codable, Hashable, Identifiable {
     nonisolated var fullName: String {
         let cleanedName = name.stationDisplayName
         guard let locality = locality?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !locality.isEmpty else {
+            !locality.isEmpty
+        else {
             return cleanedName
         }
 
         let trimmedName = cleanedName.trimmingCharacters(in: .whitespacesAndNewlines)
         let localityPrefix = "\(locality),"
         if trimmedName.prefix(localityPrefix.count).caseInsensitiveCompare(localityPrefix) == .orderedSame
-            || trimmedName.caseInsensitiveCompare(locality) == .orderedSame {
+            || trimmedName.caseInsensitiveCompare(locality) == .orderedSame
+        {
             return trimmedName
         }
 
@@ -140,7 +142,8 @@ struct Stop: Codable, Hashable, Identifiable {
 
     private nonisolated static func normalizedIdentifiers(_ ids: [String]) -> [String] {
         var seen: Set<String> = []
-        return ids
+        return
+            ids
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty && seen.insert($0).inserted }
     }
@@ -170,8 +173,9 @@ struct Stop: Codable, Hashable, Identifiable {
         let cleanedName = name.stationDisplayName
         let trimmedName = cleanedName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let locality,
-              !locality.isEmpty,
-              trimmedName.count > locality.count + 1 else {
+            !locality.isEmpty,
+            trimmedName.count > locality.count + 1
+        else {
             return cleanedName
         }
 
@@ -187,11 +191,13 @@ struct Stop: Codable, Hashable, Identifiable {
 
     private nonisolated static func normalizedLocality(_ locality: String?, from name: String) -> String? {
         if let locality = locality?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !locality.isEmpty {
+            !locality.isEmpty
+        {
             return locality
         }
 
-        let firstComponent = name
+        let firstComponent =
+            name
             .components(separatedBy: ",")
             .first?
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -200,7 +206,8 @@ struct Stop: Codable, Hashable, Identifiable {
         }
 
         guard name.contains("(") else { return nil }
-        let nameWithoutQualifier = name
+        let nameWithoutQualifier =
+            name
             .components(separatedBy: "(")
             .first?
             .trimmingCharacters(in: .whitespacesAndNewlines) ?? name

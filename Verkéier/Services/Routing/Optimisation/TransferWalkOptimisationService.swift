@@ -29,11 +29,15 @@ actor TransferWalkOptimisationService: RoutingOptimisationService {
     private var lastActivity = ContinuousClock.now
     private var watchdogArmed = false
 
-    init(environment: RoutingOptimisationEnvironment, computer: any TransferWalkComputing,
-         timetable: any RoutingTimetableProviding,
-         transferRequests: @escaping @Sendable (URL) async throws -> [WalkingRequest],
-         graphInstall: Task<RoutingDataState, Never>? = nil,
-         stallTimeout: Duration = .seconds(60), pollInterval: Duration = .seconds(2)) {
+    init(
+        environment: RoutingOptimisationEnvironment,
+        computer: any TransferWalkComputing,
+        timetable: any RoutingTimetableProviding,
+        transferRequests: @escaping @Sendable (URL) async throws -> [WalkingRequest],
+        graphInstall: Task<RoutingDataState, Never>? = nil,
+        stallTimeout: Duration = .seconds(60),
+        pollInterval: Duration = .seconds(2)
+    ) {
         self.environment = environment
         self.computer = computer
         self.timetable = timetable
@@ -65,7 +69,9 @@ actor TransferWalkOptimisationService: RoutingOptimisationService {
         observers[id] = progress
         if let latest { progress(latest) }
         let current: (id: UUID, task: Task<Void, Error>)
-        if let run { current = run } else {
+        if let run {
+            current = run
+        } else {
             latest = nil
             lastWholePercent = -1
             current = (UUID(), Task(priority: .utility) { [self] in try await self.runWithWatchdog() })
@@ -95,7 +101,10 @@ actor TransferWalkOptimisationService: RoutingOptimisationService {
         guard let graphInstall else { return }
         let state = await graphInstall.value
         let bundled = RoutingOptimisationLaunchCheck.bundledManifest(in: environment)
-        environment.ledger.recordBundledInstall(state, identity: bundled.map(RoutingOptimisationLaunchCheck.bundledInstallIdentity))
+        environment.ledger.recordBundledInstall(
+            state,
+            identity: bundled.map(RoutingOptimisationLaunchCheck.bundledInstallIdentity)
+        )
     }
 
     private func runWithWatchdog() async throws {
@@ -111,7 +120,11 @@ actor TransferWalkOptimisationService: RoutingOptimisationService {
         }
         defer { watchdog.cancel() }
         do {
-            try await withTaskCancellationHandler { try await work.value } onCancel: { work.cancel() }
+            try await withTaskCancellationHandler {
+                try await work.value
+            } onCancel: {
+                work.cancel()
+            }
         } catch is CancellationError {
             if hasStalledFlag { throw RoutingOptimisationError.stalled }
             throw CancellationError()
@@ -157,7 +170,9 @@ actor TransferWalkOptimisationService: RoutingOptimisationService {
 
         let dataset = try await computer.prepareTransferWalkComputation()
         emit(.preparing, 0.08)
-        guard let databaseURL = await timetable.routingDatabaseURL() else { throw RoutingOptimisationError.timetableUnavailable }
+        guard let databaseURL = await timetable.routingDatabaseURL() else {
+            throw RoutingOptimisationError.timetableUnavailable
+        }
         let timetableIdentity = databaseURL.lastPathComponent
         let requests = try await transferRequests(databaseURL)
         try Task.checkCancellation()
@@ -177,17 +192,24 @@ actor TransferWalkOptimisationService: RoutingOptimisationService {
             defer { watchdogArmed = false }
             let started = ContinuousClock.now
             let result = try await TransferWalkTableBuilder(computer: computer).build(
-                requests: requests, dataset: dataset, reusing: existing, timetableIdentity: timetableIdentity
+                requests: requests,
+                dataset: dataset,
+                reusing: existing,
+                timetableIdentity: timetableIdentity
             ) { completed, total in
                 Task { await self.reportBuild(completed: completed, total: total) }
             }
             emit(.saving, 0.97)
             try environment.store.write(result.data)
-            guard case .table(let written) = environment.store.load() else { throw TransferWalkTableError.malformed("written table") }
+            guard case .table(let written) = environment.store.load() else {
+                throw TransferWalkTableError.malformed("written table")
+            }
             await computer.adoptTransferWalks(written)
             environment.ledger.recordFinish(for: target)
             emit(.saving, 1)
-            logger.info("Transfer walks ready: \(result.pairs) pairs, \(result.reused) reused, \(result.computed) computed, \(result.negatives) without route, \(Int(RoutingDiagnostics.elapsed(since: started))) ms")
+            logger.info(
+                "Transfer walks ready: \(result.pairs) pairs, \(result.reused) reused, \(result.computed) computed, \(result.negatives) without route, \(Int(RoutingDiagnostics.elapsed(since: started))) ms"
+            )
         } catch is CancellationError {
             // A stall counts as a failed attempt; any other cancellation does not.
             if !hasStalledFlag { environment.ledger.recordAbandoned(for: target) }

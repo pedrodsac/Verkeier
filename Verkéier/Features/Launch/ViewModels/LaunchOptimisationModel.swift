@@ -48,10 +48,13 @@ final class LaunchOptimisationModel {
     private var didStart = false
     private var delayTask: Task<Void, Never>?
 
-    init(initialRequirement: RoutingOptimisationRequirement, onboardingCompleted: Bool,
-         presentationDelay: Duration = .milliseconds(400),
-         background: any BackgroundActivityAsserting = NoBackgroundActivity(),
-         handoffStore: TransitIntentHandoffStore = .shared) {
+    init(
+        initialRequirement: RoutingOptimisationRequirement,
+        onboardingCompleted: Bool,
+        presentationDelay: Duration = .milliseconds(400),
+        background: any BackgroundActivityAsserting = NoBackgroundActivity(),
+        handoffStore: TransitIntentHandoffStore = .shared
+    ) {
         self.initialRequirement = initialRequirement
         self.onboardingDismissed = onboardingCompleted
         self.presentationDelay = presentationDelay
@@ -150,7 +153,11 @@ final class LaunchOptimisationModel {
 
     func forwardSpotlight(_ activity: NSUserActivity) {
         guard let identifier = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String,
-              identifier.hasPrefix("stop.") else { return }
-        TransitIntentHandoff.save(.openFavouriteStop(stopId: String(identifier.dropFirst("stop.".count))), store: handoffStore)
+            identifier.hasPrefix("stop.")
+        else { return }
+        TransitIntentHandoff.save(
+            .openFavouriteStop(stopId: String(identifier.dropFirst("stop.".count))),
+            store: handoffStore
+        )
     }
 }

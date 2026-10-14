@@ -18,7 +18,8 @@ enum SettingsSupport {
             liveDetail = "Relay configured. \(liveTransitErrorMessage)"
         } else if let liveTransitLastUpdated {
             liveStatus = "Available"
-            liveDetail = "Relay configured. Last successful departure board: \(liveTransitLastUpdated.formatted(date: .abbreviated, time: .shortened))."
+            liveDetail =
+                "Relay configured. Last successful departure board: \(liveTransitLastUpdated.formatted(date: .abbreviated, time: .shortened))."
         } else {
             liveStatus = "Configured"
             liveDetail = "Relay configured; it will be verified with the next live departure-board request."
@@ -45,7 +46,7 @@ enum SettingsSupport {
                 status: "Available",
                 detail: "AVL disruption alerts are configured separately from the timetable and live-departure feeds.",
                 iconName: "exclamationmark.triangle.fill"
-            )
+            ),
         ]
 
         let summaryTitle: String
@@ -55,16 +56,20 @@ enum SettingsSupport {
             summaryMessage = "The current GTFS timetable and a recently verified ATP relay are available."
         } else if gtfsStatus.isReady {
             summaryTitle = "Timetable ready"
-            summaryMessage = "Static GTFS schedules are available. Live departure availability is shown separately below."
+            summaryMessage =
+                "Static GTFS schedules are available. Live departure availability is shown separately below."
         } else if gtfsStatus.phase == .stale {
             summaryTitle = "Using a cached timetable"
-            summaryMessage = "The installed GTFS feed remains usable, but its latest update failed. Review the error below before relying on future dates."
+            summaryMessage =
+                "The installed GTFS feed remains usable, but its latest update failed. Review the error below before relying on future dates."
         } else if gtfsStatus.phase == .failed {
             summaryTitle = "Using no timetable feed"
-            summaryMessage = "The feed update failed before a valid timetable could be installed. Check the update details below."
+            summaryMessage =
+                "The feed update failed before a valid timetable could be installed. Check the update details below."
         } else {
             summaryTitle = "Preparing timetable data"
-            summaryMessage = "Verkéier will download the official Luxembourg GTFS archive before schedule-based transit features become available."
+            summaryMessage =
+                "Verkéier will download the official Luxembourg GTFS archive before schedule-based transit features become available."
         }
 
         return DataReadinessSnapshot(
@@ -99,19 +104,19 @@ enum SettingsSupport {
         }.joined(separator: "\n\n")
 
         return """
-        Verkéier Support Bundle
-        Generated: \(generatedAt.formatted(date: .abbreviated, time: .standard))
-        App version: \(appVersion)
+            Verkéier Support Bundle
+            Generated: \(generatedAt.formatted(date: .abbreviated, time: .standard))
+            App version: \(appVersion)
 
-        Data readiness
-        \(readiness.summaryTitle)
-        \(readiness.summaryMessage)
+            Data readiness
+            \(readiness.summaryTitle)
+            \(readiness.summaryMessage)
 
-        \(readinessLines)
+            \(readinessLines)
 
-        Endpoints
-        AVL: \(configuration.avlMessagesURL.absoluteString)
-        ATP relay: \(configuration.apiProxyURL?.absoluteString ?? "Not configured")
-        """
+            Endpoints
+            AVL: \(configuration.avlMessagesURL.absoluteString)
+            ATP relay: \(configuration.apiProxyURL?.absoluteString ?? "Not configured")
+            """
     }
 }

@@ -1,5 +1,5 @@
-import Observation
 import Foundation
+import Observation
 
 @MainActor @Observable
 final class DepartureTripViewModel {
@@ -12,8 +12,11 @@ final class DepartureTripViewModel {
             try Task.checkCancellation()
             selection.highlightsRide = false
             return selection
-        } catch is CancellationError { return nil }
-        catch { errorMessage = error.localizedDescription; return nil }
+        } catch is CancellationError {
+            return nil
+        } catch {
+            errorMessage = error.localizedDescription
+            return nil
+        }
     }
 }
-

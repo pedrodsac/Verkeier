@@ -13,7 +13,8 @@ enum AVLPreviewFixtures {
         AlertMessage(
             id: "avl-general-1",
             title: "AVL network message",
-            body: "Sample disruption message for development. Replace with live AVL emergency messages once the exact feed is confirmed.",
+            body:
+                "Sample disruption message for development. Replace with live AVL emergency messages once the exact feed is confirmed.",
             severity: .warning,
             affectedStopIds: [],
             affectedRouteIds: ["16"],

@@ -20,7 +20,7 @@ nonisolated struct TransferWalkGraphIdentity: Hashable, Sendable {
             "core=\(manifest.routingEngine.valhallaCoreCommit)",
             "mobile=\(manifest.routingEngine.valhallaMobileVersion)/\(runtimeMobileVersion)",
             "pafendall=\(PafendallFunicularConnection.revision)",
-            "calibration=\(WalkingDurationCalibration.multiplier.bitPattern)"
+            "calibration=\(WalkingDurationCalibration.multiplier.bitPattern)",
         ].joined(separator: ";")
     }
 }

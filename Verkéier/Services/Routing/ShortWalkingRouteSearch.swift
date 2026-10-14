@@ -13,11 +13,15 @@ nonisolated enum ShortWalkingRouteSearch {
             let route = try await calculate(0)
             try Task.checkCancellation()
             if route.distanceMeters.isFinite, route.distanceMeters >= 0,
-               route.duration.isFinite, route.duration >= 0,
-               route.distanceMeters <= 1_500,
-               WalkingDurationCalibration.adjusted(route.duration) <= 900 { return route }
-        } catch is CancellationError { throw CancellationError() }
-        catch { }
+                route.duration.isFinite, route.duration >= 0,
+                route.distanceMeters <= 1_500,
+                WalkingDurationCalibration.adjusted(route.duration) <= 900
+            {
+                return route
+            }
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {}
         try Task.checkCancellation()
         return try await calculate(50)
     }

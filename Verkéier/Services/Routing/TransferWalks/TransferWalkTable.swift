@@ -38,12 +38,18 @@ nonisolated final class TransferWalkTable: Sendable {
         var expectedOffset = parsed.indexStart + indexBytes
         var previous: TransferWalkKey?
         for _ in 0..<count {
-            let key = TransferWalkKey(fromLatitudeBits: try reader.readUInt64(), fromLongitudeBits: try reader.readUInt64(),
-                                      toLatitudeBits: try reader.readUInt64(), toLongitudeBits: try reader.readUInt64())
+            let key = TransferWalkKey(
+                fromLatitudeBits: try reader.readUInt64(),
+                fromLongitudeBits: try reader.readUInt64(),
+                toLatitudeBits: try reader.readUInt64(),
+                toLongitudeBits: try reader.readUInt64()
+            )
             let offset = try reader.readUInt64(), length = try reader.readUInt32()
             _ = try reader.readUInt32()
             if let previous, !(previous < key) { throw TransferWalkTableError.malformed("index order") }
-            guard offset == UInt64(expectedOffset), length >= 1 else { throw TransferWalkTableError.malformed("payload range") }
+            guard offset == UInt64(expectedOffset), length >= 1 else {
+                throw TransferWalkTableError.malformed("payload range")
+            }
             expectedOffset += Int(length)
             guard expectedOffset <= body else { throw TransferWalkTableError.malformed("payload bounds") }
             previous = key
@@ -67,8 +73,10 @@ nonisolated final class TransferWalkTable: Sendable {
         let graphLength = Int(try reader.readUInt32()), timetableLength = Int(try reader.readUInt32())
         let graph = try reader.readUTF8(count: graphLength)
         let timetable = try reader.readUTF8(count: timetableLength)
-        return (Header(graphIdentity: graph, timetableIdentity: timetable.isEmpty ? nil : timetable, entryCount: count),
-                reader.offset)
+        return (
+            Header(graphIdentity: graph, timetableIdentity: timetable.isEmpty ? nil : timetable, entryCount: count),
+            reader.offset
+        )
     }
 
     /// Reads only the header of a table file, without hashing or mapping it.
@@ -76,7 +84,8 @@ nonisolated final class TransferWalkTable: Sendable {
         guard let handle = try? FileHandle(forReadingFrom: url) else { return nil }
         defer { try? handle.close() }
         guard let prefix = try? handle.read(upToCount: 4_096), prefix.count >= TransferWalkTableCodec.headerFixedSize,
-              let parsed = try? parseHeader(prefix, limit: prefix.count) else { return nil }
+            let parsed = try? parseHeader(prefix, limit: prefix.count)
+        else { return nil }
         return parsed.header
     }
 
@@ -111,10 +120,17 @@ nonisolated final class TransferWalkTable: Sendable {
     }
 
     private func entry(at index: Int) -> (key: TransferWalkKey, offset: UInt64, length: UInt32)? {
-        var reader = TransferWalkBinaryReader(data: data, offset: indexStart + index * TransferWalkTableCodec.indexEntrySize)
+        var reader = TransferWalkBinaryReader(
+            data: data,
+            offset: indexStart + index * TransferWalkTableCodec.indexEntrySize
+        )
         guard let a = try? reader.readUInt64(), let b = try? reader.readUInt64(),
-              let c = try? reader.readUInt64(), let d = try? reader.readUInt64(),
-              let offset = try? reader.readUInt64(), let length = try? reader.readUInt32() else { return nil }
-        return (TransferWalkKey(fromLatitudeBits: a, fromLongitudeBits: b, toLatitudeBits: c, toLongitudeBits: d), offset, length)
+            let c = try? reader.readUInt64(), let d = try? reader.readUInt64(),
+            let offset = try? reader.readUInt64(), let length = try? reader.readUInt32()
+        else { return nil }
+        return (
+            TransferWalkKey(fromLatitudeBits: a, fromLongitudeBits: b, toLatitudeBits: c, toLongitudeBits: d), offset,
+            length
+        )
     }
 }

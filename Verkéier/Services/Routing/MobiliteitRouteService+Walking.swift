@@ -59,11 +59,12 @@ extension MobiliteitRouteService {
                         }
                         for await (key, route) in group {
                             guard !Task.isCancelled,
-                                  let route
+                                let route
                             else { continue }
 
                             routesByLeg[key] = route
-                            for option in options where WalkingLegSpan.spans(in: option.plan.legs).contains(where: { span in
+                            for option in options
+                            where WalkingLegSpan.spans(in: option.plan.legs).contains(where: { span in
                                 span.needsRouting && span.request.key == key
                             }) {
                                 let refined = option.replacingWalkingRoutes(routesByLeg: routesByLeg)
@@ -80,7 +81,8 @@ extension MobiliteitRouteService {
     }
 
     nonisolated func refinementEvents(
-        in options: [RouteOption], context: RouteValidationContext?
+        in options: [RouteOption],
+        context: RouteValidationContext?
     ) -> AsyncStream<WalkingRefinementEvent> {
         let originals = Dictionary(options.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         return AsyncStream { continuation in
@@ -89,21 +91,36 @@ extension MobiliteitRouteService {
                     guard !Task.isCancelled else { break }
                     do {
                         if let original = originals[option.id],
-                           let result = try await sessions.submit(option, replacing: original) {
-                            continuation.yield(.calculation(await calculation(from: result.result,
-                                origin: option.plan.origin, destination: option.plan.destination,
-                                supplemental: result.supplemental)))
+                            let result = try await sessions.submit(option, replacing: original)
+                        {
+                            continuation.yield(
+                                .calculation(
+                                    await calculation(
+                                        from: result.result,
+                                        origin: option.plan.origin,
+                                        destination: option.plan.destination,
+                                        supplemental: result.supplemental
+                                    )
+                                )
+                            )
                         } else if let context = option.validationContext ?? context {
                             let feasibility = RouteItineraryValidator.assess(option, context: context)
-                            if feasibility.isInvalid { continuation.yield(.invalidated(option.id)) }
-                            else {
+                            if feasibility.isInvalid {
+                                continuation.yield(.invalidated(option.id))
+                            } else {
                                 var assessed = option; assessed.feasibility = feasibility
                                 continuation.yield(.option(assessed))
                             }
-                        } else { continuation.yield(.option(option)) }
-                    } catch is CancellationError { break }
-                    catch JourneyPlanningError.staleRefinement { continue }
-                    catch { continue }
+                        } else {
+                            continuation.yield(.option(option))
+                        }
+                    } catch is CancellationError {
+                        break
+                    } catch JourneyPlanningError.staleRefinement {
+                        continue
+                    } catch {
+                        continue
+                    }
                 }
                 continuation.finish()
             }

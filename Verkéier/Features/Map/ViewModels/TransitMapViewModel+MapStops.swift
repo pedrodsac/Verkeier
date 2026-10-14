@@ -17,10 +17,12 @@ extension TransitMapViewModel {
         walkingRouter: any WalkingRouting,
         force: Bool = false
     ) async {
-        let requestLocation = location ?? CLLocation(
-            latitude: defaultRegion.center.latitude,
-            longitude: defaultRegion.center.longitude
-        )
+        let requestLocation =
+            location
+            ?? CLLocation(
+                latitude: defaultRegion.center.latitude,
+                longitude: defaultRegion.center.longitude
+            )
         guard force || shouldRefreshNearbyStops(for: requestLocation) else { return }
         lastNearbyStopsRequestLocation = requestLocation
         isLoadingNearbyStops = true
@@ -47,14 +49,15 @@ extension TransitMapViewModel {
                     }
                 } else {
                     nearbyStops = await liveStops.asyncMap { liveStop in
-                        await gtfsService.matchLiveStop(liveStop) ?? Stop(
-                            id: "hafas:\(liveStop.stationID)",
-                            name: liveStop.name,
-                            location: liveStop.location,
-                            modes: liveStop.modes,
-                            dataSource: .atpOpenAPI,
-                            hafasStationIDs: [liveStop.stationID]
-                        )
+                        await gtfsService.matchLiveStop(liveStop)
+                            ?? Stop(
+                                id: "hafas:\(liveStop.stationID)",
+                                name: liveStop.name,
+                                location: liveStop.location,
+                                modes: liveStop.modes,
+                                dataSource: .atpOpenAPI,
+                                hafasStationIDs: [liveStop.stationID]
+                            )
                     }
                 }
             } catch {
@@ -92,7 +95,7 @@ extension TransitMapViewModel {
     ) async {
         let candidates = NearbyStopPrefilter().destinations(from: nearbyStops, origin: origin)
         guard !candidates.isEmpty,
-              let estimates = try? await walkingRouter.estimates(from: origin, to: candidates)
+            let estimates = try? await walkingRouter.estimates(from: origin, to: candidates)
         else { return }
 
         let estimatesByStopID = Dictionary(
@@ -105,12 +108,18 @@ extension TransitMapViewModel {
             let lhsDuration = estimatesByStopID[lhs.id]?.duration ?? .greatestFiniteMagnitude
             let rhsDuration = estimatesByStopID[rhs.id]?.duration ?? .greatestFiniteMagnitude
             if lhsDuration != rhsDuration { return lhsDuration < rhsDuration }
-            let lhsDistance = originLocation.distance(from: CLLocation(
-                latitude: lhs.location.latitude, longitude: lhs.location.longitude
-            ))
-            let rhsDistance = originLocation.distance(from: CLLocation(
-                latitude: rhs.location.latitude, longitude: rhs.location.longitude
-            ))
+            let lhsDistance = originLocation.distance(
+                from: CLLocation(
+                    latitude: lhs.location.latitude,
+                    longitude: lhs.location.longitude
+                )
+            )
+            let rhsDistance = originLocation.distance(
+                from: CLLocation(
+                    latitude: rhs.location.latitude,
+                    longitude: rhs.location.longitude
+                )
+            )
             return lhsDistance < rhsDistance
         }
     }
@@ -179,10 +188,12 @@ extension TransitMapViewModel {
         departuresLastUpdated = nil
         routeErrorMessage = nil
         clearRoute()
-        moveCamera(to: anchoredRegion(
-            for: stop.location.coordinate,
-            span: MKCoordinateSpan(latitudeDelta: 0.012, longitudeDelta: 0.012)
-        ))
+        moveCamera(
+            to: anchoredRegion(
+                for: stop.location.coordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.012, longitudeDelta: 0.012)
+            )
+        )
     }
 
     func selectStopGroup(
@@ -211,11 +222,14 @@ extension TransitMapViewModel {
         clearLineDetail()
         clearRoute()
         if let coordinate = uniqueStops.first?.location.coordinate
-            ?? uniqueBikeShareStations.first?.location.coordinate {
-            moveCamera(to: anchoredRegion(
-                for: coordinate,
-                span: MKCoordinateSpan(latitudeDelta: 0.012, longitudeDelta: 0.012)
-            ))
+            ?? uniqueBikeShareStations.first?.location.coordinate
+        {
+            moveCamera(
+                to: anchoredRegion(
+                    for: coordinate,
+                    span: MKCoordinateSpan(latitudeDelta: 0.012, longitudeDelta: 0.012)
+                )
+            )
         }
     }
 
@@ -250,7 +264,8 @@ extension TransitMapViewModel {
         return departures.compactMap { departure in
             let shortName = departure.lineName.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !shortName.isEmpty else { return nil }
-            let id = departure.routeId?.isEmpty == false
+            let id =
+                departure.routeId?.isEmpty == false
                 ? departure.routeId!
                 : "atp:\(shortName.normalizedForSearch)"
             guard seen.insert(id).inserted else { return nil }
@@ -266,10 +281,12 @@ extension TransitMapViewModel {
 
     func centerOnUserLocation(_ location: CLLocation?) {
         guard let coordinate = location?.coordinate else { return }
-        moveCamera(to: anchoredRegion(
-            for: coordinate,
-            span: MKCoordinateSpan(latitudeDelta: 0.018, longitudeDelta: 0.018)
-        ))
+        moveCamera(
+            to: anchoredRegion(
+                for: coordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.018, longitudeDelta: 0.018)
+            )
+        )
     }
 }
 

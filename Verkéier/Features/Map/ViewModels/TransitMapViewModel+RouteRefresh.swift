@@ -14,8 +14,7 @@ extension TransitMapViewModel {
         let task = Task {
             defer { routeRefreshTask = nil }
             while isCalculatingRoute || isLoadingEarlierRoutes || isLoadingLaterRoutes {
-                do { try await Task.sleep(for: .milliseconds(100)) }
-                catch { return }
+                do { try await Task.sleep(for: .milliseconds(100)) } catch { return }
                 guard generation == routeCalculationGeneration else { return }
             }
             // Endpoint, filter, or time changes invalidate a queued retry.

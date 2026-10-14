@@ -108,7 +108,7 @@ struct SearchResultsContent: View {
                 .transition(.opacity)
             } else {
                 resultsList
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

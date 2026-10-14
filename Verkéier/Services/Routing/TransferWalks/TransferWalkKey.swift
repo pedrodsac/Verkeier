@@ -17,8 +17,12 @@ nonisolated struct TransferWalkKey: Hashable, Comparable, Sendable {
     }
 
     init(from: LocationPoint, to: LocationPoint) {
-        self.init(fromLatitudeBits: from.latitude.bitPattern, fromLongitudeBits: from.longitude.bitPattern,
-                  toLatitudeBits: to.latitude.bitPattern, toLongitudeBits: to.longitude.bitPattern)
+        self.init(
+            fromLatitudeBits: from.latitude.bitPattern,
+            fromLongitudeBits: from.longitude.bitPattern,
+            toLatitudeBits: to.latitude.bitPattern,
+            toLongitudeBits: to.longitude.bitPattern
+        )
     }
 
     /// One comparator serves sorting on write and binary search on read.

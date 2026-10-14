@@ -32,7 +32,7 @@ struct FavouriteCustomizerView: View {
 
     private let colors = [
         "#FF453A", "#FF9F0A", "#FFD60A", "#30D158", "#64D2FF", "#007AFF",
-        "#5E5CE6", "#FF375F", "#BF5AF2", "#AC8E68", "#8E8E93", "#F2B8B5"
+        "#5E5CE6", "#FF375F", "#BF5AF2", "#AC8E68", "#8E8E93", "#F2B8B5",
     ]
 
     private let icons = [
@@ -40,7 +40,7 @@ struct FavouriteCustomizerView: View {
         "fork.knife", "cart.fill", "bag.fill", "person.fill", "heart.fill", "pawprint.fill",
         "airplane", "tram.fill", "bus.fill", "bicycle", "cup.and.saucer.fill",
         "dumbbell.fill", "book.fill", "leaf.fill", "tent.fill", "fuelpump.fill",
-        "building.columns.fill", "briefcase.fill", "star.fill"
+        "building.columns.fill", "briefcase.fill", "star.fill",
     ]
 
     init(
@@ -66,9 +66,9 @@ struct FavouriteCustomizerView: View {
     var body: some View {
         NavigationStack {
             List {
-				preview
-				colorPicker
-				iconPicker
+                preview
+                colorPicker
+                iconPicker
             }
             .navigationTitle("New Favourite")
             .navigationBarTitleDisplayMode(.inline)
@@ -77,14 +77,14 @@ struct FavouriteCustomizerView: View {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-					Button("Done", systemImage: "checkmark") {
+                    Button("Done", systemImage: "checkmark") {
                         let cleanedLabel = label.trimmingCharacters(in: .whitespacesAndNewlines)
                         guard !cleanedLabel.isEmpty else { return }
                         save(cleanedLabel, colorHex, iconName)
                         dismiss()
                     }
                     .disabled(label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-					.labelStyle(.iconOnly)
+                    .labelStyle(.iconOnly)
                     .accessibilityLabel("Save favourite")
                 }
             }
@@ -92,82 +92,85 @@ struct FavouriteCustomizerView: View {
     }
 
     private var preview: some View {
-		Section {
-			VStack(spacing: 18) {
-				Image(systemName: iconName)
-					.font(.system(size: 48, weight: .medium))
-					.foregroundStyle(.white)
-					.frame(width: 118, height: 118)
-					.background(Color(hex: colorHex), in: Circle())
-					.accessibilityHidden(true)
-				
-				TextField("Favourite Name", text: $label)
-					.font(.title3.weight(.semibold))
-					.multilineTextAlignment(.center)
-					.textFieldStyle(.roundedBorder)
-					.submitLabel(.done)
-					.padding(.horizontal, 14)
-					.padding(.vertical, 14)
-			}
-			.padding(.horizontal, 18)
-			.padding(.vertical, 22)
-			.frame(maxWidth: .infinity)
-		}
-		.listSectionMargins(.top, 0)
+        Section {
+            VStack(spacing: 18) {
+                Image(systemName: iconName)
+                    .font(.system(size: 48, weight: .medium))
+                    .foregroundStyle(.white)
+                    .frame(width: 118, height: 118)
+                    .background(Color(hex: colorHex), in: Circle())
+                    .accessibilityHidden(true)
+
+                TextField("Favourite Name", text: $label)
+                    .font(.title3.weight(.semibold))
+                    .multilineTextAlignment(.center)
+                    .textFieldStyle(.roundedBorder)
+                    .submitLabel(.done)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 14)
+            }
+            .padding(.horizontal, 18)
+            .padding(.vertical, 22)
+            .frame(maxWidth: .infinity)
+        }
+        .listSectionMargins(.top, 0)
     }
 
     private var colorPicker: some View {
-		Section("Colour") {
-			LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 15), count: 6), spacing: 15) {
-				ForEach(colors, id: \.self) { color in
-					Button {
-						colorHex = color
-					} label: {
-						Circle()
-							.fill(Color(hex: color))
-							.frame(width: 42, height: 42)
-							.overlay {
-								if colorHex == color {
-									Circle().stroke(Color.primary.opacity(0.8), lineWidth: 2).padding(-5)
-									Image(systemName: "checkmark")
-										.font(.caption.weight(.bold))
-										.foregroundStyle(.white)
-								}
-							}
-					}
-					.buttonStyle(.plain)
-					.accessibilityLabel("Color \(color)")
-					.accessibilityAddTraits(colorHex == color ? .isSelected : [])
-				}
-			}
-			.frame(maxWidth: .infinity, alignment: .leading)
-		}
+        Section("Colour") {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 15), count: 6), spacing: 15) {
+                ForEach(colors, id: \.self) { color in
+                    Button {
+                        colorHex = color
+                    } label: {
+                        Circle()
+                            .fill(Color(hex: color))
+                            .frame(width: 42, height: 42)
+                            .overlay {
+                                if colorHex == color {
+                                    Circle().stroke(Color.primary.opacity(0.8), lineWidth: 2).padding(-5)
+                                    Image(systemName: "checkmark")
+                                        .font(.caption.weight(.bold))
+                                        .foregroundStyle(.white)
+                                }
+                            }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Color \(color)")
+                    .accessibilityAddTraits(colorHex == color ? .isSelected : [])
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 
     private var iconPicker: some View {
-		Section("Icon") {
-			LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5), spacing: 10) {
-				ForEach(icons, id: \.self) { icon in
-					Button {
-						iconName = icon
-					} label: {
-						Image(systemName: icon)
-							.font(.system(size: 18, weight: .medium))
-							.foregroundStyle(iconName == icon ? .white : Color(hex: colorHex))
-							.frame(maxWidth: .infinity)
-							.frame(width: 53, height: 53)
-							.background(
-								iconName == icon ? Color(hex: colorHex) : Color(uiColor: .tertiarySystemGroupedBackground),
-								in: Circle()
-							)
-					}
-					.buttonStyle(.plain)
-					.accessibilityLabel(icon.replacingOccurrences(of: ".fill", with: "").replacingOccurrences(of: ".", with: " "))
-					.accessibilityAddTraits(iconName == icon ? .isSelected : [])
-				}
-			}
-			.frame(maxWidth: .infinity, alignment: .leading)
-		}
+        Section("Icon") {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5), spacing: 10) {
+                ForEach(icons, id: \.self) { icon in
+                    Button {
+                        iconName = icon
+                    } label: {
+                        Image(systemName: icon)
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundStyle(iconName == icon ? .white : Color(hex: colorHex))
+                            .frame(maxWidth: .infinity)
+                            .frame(width: 53, height: 53)
+                            .background(
+                                iconName == icon
+                                    ? Color(hex: colorHex) : Color(uiColor: .tertiarySystemGroupedBackground),
+                                in: Circle()
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(
+                        icon.replacingOccurrences(of: ".fill", with: "").replacingOccurrences(of: ".", with: " ")
+                    )
+                    .accessibilityAddTraits(iconName == icon ? .isSelected : [])
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 }
 

@@ -30,12 +30,14 @@ actor ValhallaWalkingRouter: WalkingRouting {
             try Task.checkCancellation()
             do {
                 let path = try await route(from: origin, to: destination.location)
-                estimates.append(.init(
-                    destinationID: destination.id,
-                    distanceMeters: path.distanceMeters,
-                    duration: path.duration,
-                    source: .localOSM
-                ))
+                estimates.append(
+                    .init(
+                        destinationID: destination.id,
+                        distanceMeters: path.distanceMeters,
+                        duration: path.duration,
+                        source: .localOSM
+                    )
+                )
             } catch WalkingRoutingError.noRoute {
                 continue
             }
@@ -53,12 +55,14 @@ actor ValhallaWalkingRouter: WalkingRouting {
             try Task.checkCancellation()
             do {
                 let path = try await route(from: origin.location, to: destination)
-                estimates.append(.init(
-                    destinationID: origin.id,
-                    distanceMeters: path.distanceMeters,
-                    duration: path.duration,
-                    source: .localOSM
-                ))
+                estimates.append(
+                    .init(
+                        destinationID: origin.id,
+                        distanceMeters: path.distanceMeters,
+                        duration: path.duration,
+                        source: .localOSM
+                    )
+                )
             } catch WalkingRoutingError.noRoute {
                 continue
             }
@@ -117,10 +121,12 @@ actor ValhallaWalkingRouter: WalkingRouting {
         while index < shape.endIndex {
             latitude += try component()
             longitude += try component()
-            coordinates.append(RouteMapCoordinate(
-                latitude: Double(latitude) / 1_000_000,
-                longitude: Double(longitude) / 1_000_000
-            ))
+            coordinates.append(
+                RouteMapCoordinate(
+                    latitude: Double(latitude) / 1_000_000,
+                    longitude: Double(longitude) / 1_000_000
+                )
+            )
         }
         return coordinates
     }

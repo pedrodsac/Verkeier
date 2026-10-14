@@ -18,15 +18,15 @@ struct CommuteDashboardView: View {
 
     var body: some View {
         List {
-			if hasDashboardCards {
-				if viewModel.activeAlertCount > 0 {
-					Section {
-						AlertsSummaryRow(alertCount: viewModel.activeAlertCount)
-					}
-					.listRowBackground(Color.orange.opacity(0.12))
-				}
+            if hasDashboardCards {
+                if viewModel.activeAlertCount > 0 {
+                    Section {
+                        AlertsSummaryRow(alertCount: viewModel.activeAlertCount)
+                    }
+                    .listRowBackground(Color.orange.opacity(0.12))
+                }
 
-				Section {
+                Section {
                     ForEach(viewModel.specialEvents) { event in
                         SpecialEventRow(event: event) {
                             openSpecialEvent(event)
@@ -53,8 +53,8 @@ struct CommuteDashboardView: View {
             }
         }
         .listStyle(.insetGrouped)
-		.listSectionSpacing(16)
-		.scrollIndicators(.hidden)
+        .listSectionSpacing(16)
+        .scrollIndicators(.hidden)
         .sheet(item: $editingFavourite, onDismiss: restoreEditedFavouriteFocus) { favourite in
             FavouriteCustomizerView(
                 stop: favourite.stop,
@@ -69,7 +69,7 @@ struct CommuteDashboardView: View {
 
     private var favouritesSection: some View {
         carouselSection("Favourites") {
-			pagedListSection(favouritesViewModel.stops, favorite: true) { favourite in
+            pagedListSection(favouritesViewModel.stops, favorite: true) { favourite in
                 favouriteStopRow(favourite)
             }
         }
@@ -82,12 +82,14 @@ struct CommuteDashboardView: View {
                 DepartureLoadingCard(title: "Finding nearby stops")
             } else if let errorMessage = viewModel.nearby.errorMessage {
                 CompactUnavailableCard(
-                    title: "Nearby stops unavailable", message: errorMessage,
+                    title: "Nearby stops unavailable",
+                    message: errorMessage,
                     systemImage: "location.slash"
                 )
             } else if viewModel.nearby.stops.isEmpty {
                 CompactUnavailableCard(
-                    title: "No nearby stops", message: "Use search to find and save a stop.",
+                    title: "No nearby stops",
+                    message: "Use search to find and save a stop.",
                     systemImage: "mappin.slash"
                 )
             } else {
@@ -103,7 +105,7 @@ struct CommuteDashboardView: View {
                 .safeAreaPadding(.horizontal, 16)
         }
         .listSectionMargins(.horizontal, 0)
-		.listRowSeparator(.hidden)
+        .listRowSeparator(.hidden)
     }
 
     private var recentsSection: some View {
@@ -129,12 +131,12 @@ struct CommuteDashboardView: View {
 
     private func pagedListSection<Item, Row: View>(
         _ items: [Item],
-		favorite: Bool = false,
+        favorite: Bool = false,
         @ViewBuilder row: @escaping (Item) -> Row
     ) -> some View {
-		PagedListSection(items: items, row: row, favorite: favorite)
+        PagedListSection(items: items, row: row, favorite: favorite)
             .listRowInsets(EdgeInsets())
-			.listRowBackground(Color.clear)
+            .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
     }
 
@@ -157,7 +159,7 @@ struct CommuteDashboardView: View {
                 iconName: favourite.iconName
             )
         }
-		.foregroundStyle(.primary)
+        .foregroundStyle(.primary)
         .accessibilityFocused($focusedFavouriteID, equals: favourite.id)
         .accessibilityHint("Opens departures for this stop")
         .accessibilityAction(named: "Plan to \(favourite.stop.displayName)") {
@@ -234,15 +236,15 @@ private struct PagedListSection<Item, Row: View>: View {
     /// for that list's own 16pt leading margin.
     private let pagePeekWidth: CGFloat = 16
 
-	@ScaledMetric(relativeTo: .body) private var standardRowHeight: CGFloat = 50
-	@ScaledMetric(relativeTo: .body) private var sectionVerticalMargins: CGFloat = 50
-	
-	let favorite: Bool
+    @ScaledMetric(relativeTo: .body) private var standardRowHeight: CGFloat = 50
+    @ScaledMetric(relativeTo: .body) private var sectionVerticalMargins: CGFloat = 50
 
-	init(items: [Item], @ViewBuilder row: @escaping (Item) -> Row, favorite: Bool = false) {
+    let favorite: Bool
+
+    init(items: [Item], @ViewBuilder row: @escaping (Item) -> Row, favorite: Bool = false) {
         self.items = items
         self.row = row
-		self.favorite = favorite
+        self.favorite = favorite
     }
 
     private var pages: [[Item]] {
@@ -282,7 +284,7 @@ private struct PagedListSection<Item, Row: View>: View {
                                 row(pages[index][itemIndex])
                             }
                         }
-						.listRowBackground(favorite ? Color.yellow.opacity(0.12) : nil)
+                        .listRowBackground(favorite ? Color.yellow.opacity(0.12) : nil)
                     }
                     .listStyle(.insetGrouped)
                     .scrollDisabled(true)

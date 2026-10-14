@@ -29,9 +29,9 @@ struct RouteOptionCard: View {
         calendar: Calendar = .current
     ) -> Bool {
         guard let departure,
-              let departureMinute = calendar.dateInterval(of: .minute, for: departure)?.start,
-              let nowMinute = calendar.dateInterval(of: .minute, for: now)?.start,
-              let cutoff = calendar.date(byAdding: .minute, value: -1, to: nowMinute)
+            let departureMinute = calendar.dateInterval(of: .minute, for: departure)?.start,
+            let nowMinute = calendar.dateInterval(of: .minute, for: now)?.start,
+            let cutoff = calendar.date(byAdding: .minute, value: -1, to: nowMinute)
         else { return false }
         return departureMinute < cutoff
     }
@@ -94,7 +94,8 @@ struct RouteOptionCard: View {
 
         switch (departure, arrival) {
         case let (.some(dep), .some(arr)):
-            return "\(dep.formatted(date: .omitted, time: .shortened)) – \(arr.formatted(date: .omitted, time: .shortened))"
+            return
+                "\(dep.formatted(date: .omitted, time: .shortened)) – \(arr.formatted(date: .omitted, time: .shortened))"
         case let (.some(dep), .none):
             return dep.formatted(date: .omitted, time: .shortened)
         default:
@@ -104,8 +105,11 @@ struct RouteOptionCard: View {
 
     private var durationText: String {
         let duration = option.plan.expectedTravelTime ?? 0
-        let minutes = DurationDisplay.minutes(duration,
-            rounding: option.isWalkingOnly ? .up : .toNearestOrAwayFromZero) ?? 1
+        let minutes =
+            DurationDisplay.minutes(
+                duration,
+                rounding: option.isWalkingOnly ? .up : .toNearestOrAwayFromZero
+            ) ?? 1
         return "\(minutes) min"
     }
 
@@ -119,21 +123,23 @@ struct RouteOptionCard: View {
         }
 
         guard option.usesBikeShare else { return distanceText }
-        let bikeNote = option.hasBikeAvailabilityWarning
+        let bikeNote =
+            option.hasBikeAvailabilityWarning
             ? "Bike availability uncertain" : "Bike availability live"
         return "\(distanceText)  ·  \(bikeNote)"
     }
 
     private var cardBackground: AnyShapeStyle {
-		if option.hasTightTransfer {
-			AnyShapeStyle(Color.orange.opacity(0.14))
-		} else {
-			AnyShapeStyle(.thinMaterial)
-		}
+        if option.hasTightTransfer {
+            AnyShapeStyle(Color.orange.opacity(0.14))
+        } else {
+            AnyShapeStyle(.thinMaterial)
+        }
     }
 
     private func accessibilityLabel(hasDeparted: Bool) -> String {
-        let heading = option.isVelohOnly || option.isWalkingOnly
+        let heading =
+            option.isVelohOnly || option.isWalkingOnly
             ? durationText
             : "\(timeRangeText), \(durationText)"
         let lines = option.transitLegs.filter { $0.mode != .funicular }.map {
@@ -146,109 +152,121 @@ struct RouteOptionCard: View {
 }
 
 #if DEBUG
-    #Preview(traits: .sizeThatFitsLayout) {
-        VStack(spacing: 10) {
-            RouteOptionCard(
-                option: .previewTramOption,
-                isSelected: true
-            )
-            RouteOptionCard(
-                option: .previewBusOption,
-                isSelected: false
-            )
-            RouteOptionCard(
-                option: .previewTightTransferOption,
-                isSelected: false
-            )
-        }
-        .padding()
-        .background(Color(uiColor: .systemGroupedBackground))
-        .environment(AppPreferences())
+#Preview(traits: .sizeThatFitsLayout) {
+    VStack(spacing: 10) {
+        RouteOptionCard(
+            option: .previewTramOption,
+            isSelected: true
+        )
+        RouteOptionCard(
+            option: .previewBusOption,
+            isSelected: false
+        )
+        RouteOptionCard(
+            option: .previewTightTransferOption,
+            isSelected: false
+        )
+    }
+    .padding()
+    .background(Color(uiColor: .systemGroupedBackground))
+    .environment(AppPreferences())
+}
+
+private extension RouteOption {
+    static var previewTightTransferOption: RouteOption {
+        let option = previewBusOption
+        let original = option.plan.legs[0]
+        let incoming = RoutePlan.Leg(
+            id: "bus1",
+            mode: .bus,
+            transportKind: .transit,
+            routeName: "16",
+            origin: original.origin,
+            destination: original.destination,
+            departureTime: original.departureTime,
+            arrivalTime: original.departureTime?.addingTimeInterval(5 * 60)
+        )
+        let outgoing = RoutePlan.Leg(
+            id: "bus2",
+            mode: .bus,
+            transportKind: .transit,
+            routeName: "6",
+            origin: incoming.destination,
+            destination: incoming.destination,
+            departureTime: incoming.arrivalTime?.addingTimeInterval(119),
+            arrivalTime: incoming.arrivalTime?.addingTimeInterval(10 * 60)
+        )
+        return option.replacingLegs([incoming, outgoing])
     }
 
-    private extension RouteOption {
-        static var previewTightTransferOption: RouteOption {
-            let option = previewBusOption
-            let original = option.plan.legs[0]
-            let incoming = RoutePlan.Leg(id: "bus1", mode: .bus, transportKind: .transit,
-                routeName: "16", origin: original.origin, destination: original.destination,
-                departureTime: original.departureTime,
-                arrivalTime: original.departureTime?.addingTimeInterval(5 * 60))
-            let outgoing = RoutePlan.Leg(id: "bus2", mode: .bus, transportKind: .transit,
-                routeName: "6", origin: incoming.destination, destination: incoming.destination,
-                departureTime: incoming.arrivalTime?.addingTimeInterval(119),
-                arrivalTime: incoming.arrivalTime?.addingTimeInterval(10 * 60))
-            return option.replacingLegs([incoming, outgoing])
-        }
-
-        static var previewTramOption: RouteOption {
-            RouteOption(
-                id: "tram-route",
-                plan: RoutePlan(
-                    id: "tram-plan",
-                    origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
-                    destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
-                    expectedTravelTime: 18 * 60,
-                    distanceMeters: 4300,
-                    legs: [
-                        RoutePlan.Leg(
-                            id: "walk1",
-                            mode: .walking,
-                            transportKind: .walking,
-                            origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
-                            destination: LocationPoint(id: "h", name: "Hamilius", latitude: 49.6111, longitude: 6.1275),
-                            departureTime: Date(),
-                            arrivalTime: Date().addingTimeInterval(4 * 60),
-                            distanceMeters: 350
-                        ),
-                        RoutePlan.Leg(
-                            id: "tram1",
-                            mode: .tram,
-                            transportKind: .transit,
-                            routeName: "T1",
-                            origin: LocationPoint(id: "h", name: "Hamilius", latitude: 49.6111, longitude: 6.1275),
-                            destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
-                            departureTime: Date().addingTimeInterval(6 * 60),
-                            arrivalTime: Date().addingTimeInterval(18 * 60),
-                            realtimeDepartureTime: Date().addingTimeInterval(7 * 60),
-                            realtimeArrivalTime: Date().addingTimeInterval(19 * 60),
-                            distanceMeters: 3950,
-                            delayMinutes: 1,
-                            liveStatus: .live
-                        )
-                    ],
-                    dataSource: .mock
-                ),
-                mapOverlay: nil
-            )
-        }
-
-        static var previewBusOption: RouteOption {
-            RouteOption(
-                id: "bus-route",
-                plan: RoutePlan(
-                    id: "bus-plan",
-                    origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
-                    destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
-                    expectedTravelTime: 24 * 60,
-                    distanceMeters: 4800,
-                    legs: [
-                        RoutePlan.Leg(
-                            id: "bus1",
-                            mode: .bus,
-                            transportKind: .transit,
-                            routeName: "16",
-                            origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
-                            destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
-                            departureTime: Date().addingTimeInterval(9 * 60),
-                            arrivalTime: Date().addingTimeInterval(24 * 60),
-                            distanceMeters: 4800
-                        )
-                    ],
-                    dataSource: .mock
-                ),
-                mapOverlay: nil
-            )
-        }
+    static var previewTramOption: RouteOption {
+        RouteOption(
+            id: "tram-route",
+            plan: RoutePlan(
+                id: "tram-plan",
+                origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
+                destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
+                expectedTravelTime: 18 * 60,
+                distanceMeters: 4300,
+                legs: [
+                    RoutePlan.Leg(
+                        id: "walk1",
+                        mode: .walking,
+                        transportKind: .walking,
+                        origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
+                        destination: LocationPoint(id: "h", name: "Hamilius", latitude: 49.6111, longitude: 6.1275),
+                        departureTime: Date(),
+                        arrivalTime: Date().addingTimeInterval(4 * 60),
+                        distanceMeters: 350
+                    ),
+                    RoutePlan.Leg(
+                        id: "tram1",
+                        mode: .tram,
+                        transportKind: .transit,
+                        routeName: "T1",
+                        origin: LocationPoint(id: "h", name: "Hamilius", latitude: 49.6111, longitude: 6.1275),
+                        destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
+                        departureTime: Date().addingTimeInterval(6 * 60),
+                        arrivalTime: Date().addingTimeInterval(18 * 60),
+                        realtimeDepartureTime: Date().addingTimeInterval(7 * 60),
+                        realtimeArrivalTime: Date().addingTimeInterval(19 * 60),
+                        distanceMeters: 3950,
+                        delayMinutes: 1,
+                        liveStatus: .live
+                    ),
+                ],
+                dataSource: .mock
+            ),
+            mapOverlay: nil
+        )
     }
+
+    static var previewBusOption: RouteOption {
+        RouteOption(
+            id: "bus-route",
+            plan: RoutePlan(
+                id: "bus-plan",
+                origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
+                destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
+                expectedTravelTime: 24 * 60,
+                distanceMeters: 4800,
+                legs: [
+                    RoutePlan.Leg(
+                        id: "bus1",
+                        mode: .bus,
+                        transportKind: .transit,
+                        routeName: "16",
+                        origin: LocationPoint(id: "o", name: "Origin", latitude: 49.6116, longitude: 6.1319),
+                        destination: LocationPoint(id: "d", name: "Dest", latitude: 49.6329, longitude: 6.1746),
+                        departureTime: Date().addingTimeInterval(9 * 60),
+                        arrivalTime: Date().addingTimeInterval(24 * 60),
+                        distanceMeters: 4800
+                    )
+                ],
+                dataSource: .mock
+            ),
+            mapOverlay: nil
+        )
+    }
+}
 #endif

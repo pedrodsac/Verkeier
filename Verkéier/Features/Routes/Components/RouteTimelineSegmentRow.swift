@@ -18,7 +18,7 @@ struct TimelineSegmentRow: View {
                 .frame(width: timeColumnWidth)
 
             Color.clear
-            .frame(width: RouteTimelineLayout.railColumnWidth)
+                .frame(width: RouteTimelineLayout.railColumnWidth)
 
             content
                 .padding(.vertical, RouteTimelineLayout.segmentRowPadding)
@@ -99,8 +99,11 @@ struct TimelineSegmentRow: View {
     }
 
     private var transitBadge: some View {
-        TimelineTransitBadge(routeText: node.badgeText ?? node.mode.displayName,
-            mode: node.mode, direction: node.headsign)
+        TimelineTransitBadge(
+            routeText: node.badgeText ?? node.mode.displayName,
+            mode: node.mode,
+            direction: node.headsign
+        )
     }
 
     private var walkText: String {
@@ -197,14 +200,14 @@ private struct TimelineLineBadge: View {
                 Text(text)
             }
         }
-            .font(.callout.weight(.bold))
-            .foregroundStyle(.white)
-            .padding(.horizontal, horizontalInset)
-            .padding(.vertical, verticalInset)
-            .background(
-                mode.tint.gradient,
-                in: RoundedRectangle(cornerRadius: 7, style: .continuous)
-            )
+        .font(.callout.weight(.bold))
+        .foregroundStyle(.white)
+        .padding(.horizontal, horizontalInset)
+        .padding(.vertical, verticalInset)
+        .background(
+            mode.tint.gradient,
+            in: RoundedRectangle(cornerRadius: 7, style: .continuous)
+        )
     }
 }
 

@@ -15,9 +15,15 @@ actor AppJourneySessionStore {
         self.planner = planner; self.bikePlanner = bikePlanner
     }
 
-    func calculate(databaseURL: URL, request: JourneyPlanningRequest,
-                   page: JourneyPlanningPage, refresh: JourneyRefreshPolicy,
-                   origin: LocationPoint, destination: LocationPoint, time: RoutePlanningTime, includeBike: Bool
+    func calculate(
+        databaseURL: URL,
+        request: JourneyPlanningRequest,
+        page: JourneyPlanningPage,
+        refresh: JourneyRefreshPolicy,
+        origin: LocationPoint,
+        destination: LocationPoint,
+        time: RoutePlanningTime,
+        includeBike: Bool
     ) async throws -> (result: JourneyPlanningResult?, supplemental: [RouteOption], diagnostics: RoutingDiagnostics) {
         generation += 1
         let current = generation
@@ -26,7 +32,8 @@ actor AppJourneySessionStore {
         let router = try await planner.router(for: databaseURL)
         preparation.record(.snapshotPreparation, since: snapshotStarted)
         guard current == generation else { throw JourneyPlanningError.supersededRequest }
-        let isNewRequest = self.request != request || self.databaseURL != databaseURL || session == nil || preparedRouter !== router
+        let isNewRequest =
+            self.request != request || self.databaseURL != databaseURL || session == nil || preparedRouter !== router
         if isNewRequest {
             supplementalOptions = []
             let created = try await planner.makePlanningSession(databaseURL: databaseURL, request: request)
@@ -36,9 +43,15 @@ actor AppJourneySessionStore {
         guard let session else { throw JourneyPlanningError.supersededRequest }
         let isInitialPage: Bool
         if case .initial = page { isInitialPage = true } else { isInitialPage = false }
-        async let bike = Self.measuredBike(planner: bikePlanner,
-            calculate: isNewRequest || isInitialPage || refresh == .forceRefresh, included: includeBike,
-            cached: supplementalOptions.first, origin: origin, destination: destination, time: time)
+        async let bike = Self.measuredBike(
+            planner: bikePlanner,
+            calculate: isNewRequest || isInitialPage || refresh == .forceRefresh,
+            included: includeBike,
+            cached: supplementalOptions.first,
+            origin: origin,
+            destination: destination,
+            time: time
+        )
         let result: JourneyPlanningResult?
         do {
             result = try await session.calculate(page: page, refresh: refresh, now: .now)
@@ -56,8 +69,14 @@ actor AppJourneySessionStore {
         return (result, supplementalOptions, diagnostics)
     }
 
-    private nonisolated static func measuredBike(planner: BikeShareRoutePlanner, calculate: Bool,
-        included: Bool, cached: RouteOption?, origin: LocationPoint, destination: LocationPoint, time: RoutePlanningTime
+    private nonisolated static func measuredBike(
+        planner: BikeShareRoutePlanner,
+        calculate: Bool,
+        included: Bool,
+        cached: RouteOption?,
+        origin: LocationPoint,
+        destination: LocationPoint,
+        time: RoutePlanningTime
     ) async -> (RouteOption?, RoutingDiagnostics) {
         var diagnostics = RoutingDiagnostics()
         guard included else { return (nil, diagnostics) }
@@ -68,7 +87,10 @@ actor AppJourneySessionStore {
         return (option, diagnostics)
     }
 
-    func submit(_ option: RouteOption, replacing original: RouteOption) async throws -> (result: JourneyPlanningResult, supplemental: [RouteOption])? {
+    func submit(
+        _ option: RouteOption,
+        replacing original: RouteOption
+    ) async throws -> (result: JourneyPlanningResult, supplemental: [RouteOption])? {
         guard let session, let token = option.refinementToken else { return nil }
         let current = generation
         var result: JourneyPlanningResult?
@@ -76,28 +98,49 @@ actor AppJourneySessionStore {
             // Submit only measured spans or walks whose timing changed with them.
             // Unchanged presentation legs must not rewrite the native walking cache.
             if let previous = original.plan.legs.first(where: { $0.nativeWalkingRange == leg.nativeWalkingRange }),
-               previous == leg { continue }
+                previous == leg
+            {
+                continue
+            }
             guard let range = leg.nativeWalkingRange,
-                  let departure = leg.departureTime, let arrival = leg.arrivalTime else { continue }
+                let departure = leg.departureTime, let arrival = leg.arrivalTime
+            else { continue }
             let seconds = arrival.timeIntervalSince(departure)
             guard seconds.isFinite, seconds >= 0, seconds <= Double(Int.max) else { continue }
-            result = try await session.submitWalkingRefinement(.init(token: token, range: range,
-                route: .init(durationSeconds: Int(seconds.rounded()), distanceMeters: leg.distanceMeters ?? 0,
-                    polyline: leg.mapCoordinates.map { .init(latitude: $0.latitude, longitude: $0.longitude) },
-                    evidence: leg.walkingEvidence == .estimate ? .estimate : .routedPedestrian),
-                departure: departure, arrival: arrival))
+            result = try await session.submitWalkingRefinement(
+                .init(
+                    token: token,
+                    range: range,
+                    route: .init(
+                        durationSeconds: Int(seconds.rounded()),
+                        distanceMeters: leg.distanceMeters ?? 0,
+                        polyline: leg.mapCoordinates.map { .init(latitude: $0.latitude, longitude: $0.longitude) },
+                        evidence: leg.walkingEvidence == .estimate ? .estimate : .routedPedestrian
+                    ),
+                    departure: departure,
+                    arrival: arrival
+                )
+            )
             guard current == generation else { throw JourneyPlanningError.staleRefinement }
             if result?.invalidatedIDs.contains(token.journeyID) == true { break }
         }
         return result.map { ($0, supplementalOptions) }
     }
 
-    func refreshRealtime(optionID: String, origin: JourneyEndpoint, destination: JourneyEndpoint, force: Bool) async throws
-        -> (result: JourneyPlanningResult, supplemental: [RouteOption])? {
+    func refreshRealtime(
+        optionID: String,
+        origin: JourneyEndpoint,
+        destination: JourneyEndpoint,
+        force: Bool
+    ) async throws
+        -> (result: JourneyPlanningResult, supplemental: [RouteOption])?
+    {
         guard let session, request?.origin == origin, request?.destination == destination else { return nil }
         let current = generation
-        let result = try await session.refreshDisplayedRealtime(journeyID: .init(optionID),
-            refresh: force ? .forceRefresh : .useCache)
+        let result = try await session.refreshDisplayedRealtime(
+            journeyID: .init(optionID),
+            refresh: force ? .forceRefresh : .useCache
+        )
         guard current == generation else { throw JourneyPlanningError.supersededRequest }
         return (result, supplementalOptions)
     }

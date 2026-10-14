@@ -36,8 +36,9 @@ final class RouteMapContent {
             let old = polylinesByID[segment.id]
             if let old { remove(old, from: mapView) }
             let polylines: [MKPolyline]
-            if segmentsByID[segment.id]?.coordinates == segment.coordinates, let old { polylines = old }
-            else {
+            if segmentsByID[segment.id]?.coordinates == segment.coordinates, let old {
+                polylines = old
+            } else {
                 let coordinates = segment.coordinates.map(\.coordinate)
                 // Native vector renderers each draw one stroke. Keep the wider
                 // casing directly below its foreground, sharing source geometry.
@@ -61,7 +62,8 @@ final class RouteMapContent {
         }
         for (position, polyline) in ordered.enumerated() {
             guard position < routeIndices.count,
-                  let current = mapView.overlays.firstIndex(where: { $0 === polyline }) else { continue }
+                let current = mapView.overlays.firstIndex(where: { $0 === polyline })
+            else { continue }
             let target = routeIndices[position]
             if current != target { mapView.exchangeOverlay(at: current, withOverlayAt: target) }
         }
@@ -79,10 +81,17 @@ final class RouteMapContent {
     private func markers(for overlay: RouteMapOverlay?) -> [RouteMapStopMarker] {
         guard let overlay else { return [] }
         // Retain old transfer payloads, rendering them with the new small circles.
-        return overlay.stopMarkers + overlay.transferMarkers.map { transfer in
-            RouteMapStopMarker(id: "legacy:\(transfer.id)", name: transfer.title,
-                coordinate: transfer.coordinate, segmentIDs: [], mode: .unknown, role: .transfer)
-        }
+        return overlay.stopMarkers
+            + overlay.transferMarkers.map { transfer in
+                RouteMapStopMarker(
+                    id: "legacy:\(transfer.id)",
+                    name: transfer.title,
+                    coordinate: transfer.coordinate,
+                    segmentIDs: [],
+                    mode: .unknown,
+                    role: .transfer
+                )
+            }
     }
 
     private func syncStops(_ markers: [RouteMapStopMarker], in mapView: MKMapView) {
@@ -91,8 +100,9 @@ final class RouteMapContent {
             if let annotation = stopsByID.removeValue(forKey: id) { mapView.removeAnnotation(annotation) }
         }
         for marker in markers {
-            if let existing = stopsByID[marker.id] { existing.update(marker) }
-            else {
+            if let existing = stopsByID[marker.id] {
+                existing.update(marker)
+            } else {
                 let annotation = RouteStopAnnotation(marker: marker)
                 stopsByID[marker.id] = annotation
                 mapView.addAnnotation(annotation)
@@ -101,20 +111,25 @@ final class RouteMapContent {
     }
 
     private func syncShields(_ segments: [RouteMapSegment], in mapView: MKMapView) {
-        let highlightedRoutes = Set(segments.filter { $0.emphasis == .highlighted }.map { $0.routeId ?? $0.routeShortName ?? $0.id })
+        let highlightedRoutes = Set(
+            segments.filter { $0.emphasis == .highlighted }.map { $0.routeId ?? $0.routeShortName ?? $0.id }
+        )
         let labeled = segments.filter { segment in
             guard segment.mode != .walking, segment.mode != .bicycle,
-                  let name = segment.routeShortName?.trimmingCharacters(in: .whitespacesAndNewlines),
-                  !name.isEmpty, segment.coordinates.count >= 2 else { return false }
-            return segment.emphasis != .context || !highlightedRoutes.contains(segment.routeId ?? segment.routeShortName ?? segment.id)
+                let name = segment.routeShortName?.trimmingCharacters(in: .whitespacesAndNewlines),
+                !name.isEmpty, segment.coordinates.count >= 2
+            else { return false }
+            return segment.emphasis != .context
+                || !highlightedRoutes.contains(segment.routeId ?? segment.routeShortName ?? segment.id)
         }
         let nextIDs = Set(labeled.map(\.id))
         for id in Set(shieldsByID.keys).subtracting(nextIDs) {
             if let annotation = shieldsByID.removeValue(forKey: id) { mapView.removeAnnotation(annotation) }
         }
         for segment in labeled {
-            if let existing = shieldsByID[segment.id] { existing.update(segment) }
-            else {
+            if let existing = shieldsByID[segment.id] {
+                existing.update(segment)
+            } else {
                 let annotation = RouteShieldAnnotation(segment: segment)
                 shieldsByID[segment.id] = annotation
                 mapView.addAnnotation(annotation)
@@ -124,20 +139,28 @@ final class RouteMapContent {
 
     func renderer(for polyline: MKPolyline, traits: UITraitCollection) -> MKOverlayRenderer? {
         guard let segment = segmentsByPolyline[ObjectIdentifier(polyline)] else { return nil }
-        return RouteTraceRenderer(polyline: polyline, segment: segment, traits: traits,
-            isCasing: casingPolylines.contains(ObjectIdentifier(polyline)))
+        return RouteTraceRenderer(
+            polyline: polyline,
+            segment: segment,
+            traits: traits,
+            isCasing: casingPolylines.contains(ObjectIdentifier(polyline))
+        )
     }
 
     func view(for annotation: any MKAnnotation, in mapView: MKMapView) -> MKAnnotationView? {
         if let stop = annotation as? RouteStopAnnotation {
-            let view = mapView.dequeueReusableAnnotationView(withIdentifier: RouteStopAnnotationView.reuseID)
-                as? RouteStopAnnotationView ?? RouteStopAnnotationView(annotation: stop, reuseIdentifier: RouteStopAnnotationView.reuseID)
+            let view =
+                mapView.dequeueReusableAnnotationView(withIdentifier: RouteStopAnnotationView.reuseID)
+                as? RouteStopAnnotationView
+                ?? RouteStopAnnotationView(annotation: stop, reuseIdentifier: RouteStopAnnotationView.reuseID)
             view.configure(stop, in: mapView)
             return view
         }
         if let shield = annotation as? RouteShieldAnnotation {
-            let view = mapView.dequeueReusableAnnotationView(withIdentifier: RouteShieldAnnotationView.reuseID)
-                as? RouteShieldAnnotationView ?? RouteShieldAnnotationView(annotation: shield, reuseIdentifier: RouteShieldAnnotationView.reuseID)
+            let view =
+                mapView.dequeueReusableAnnotationView(withIdentifier: RouteShieldAnnotationView.reuseID)
+                as? RouteShieldAnnotationView
+                ?? RouteShieldAnnotationView(annotation: shield, reuseIdentifier: RouteShieldAnnotationView.reuseID)
             view.configure(shield, traits: mapView.traitCollection)
             return view
         }
@@ -169,20 +192,34 @@ final class RouteMapContent {
         let traits = mapView.traitCollection
         let stops = markers(for: overlay).compactMap { marker -> RouteTraceLayout.StopInput? in
             guard let annotation = stopsByID[marker.id] else { return nil }
-            return .init(id: marker.id, point: mapView.convert(annotation.coordinate, toPointTo: mapView),
-                diameter: RouteTraceStyle.diameter(for: marker.role), labelSize: RouteTraceStyle.labelSize(marker.displayName, in: traits),
-                isKey: marker.role != .intermediate)
+            return .init(
+                id: marker.id,
+                point: mapView.convert(annotation.coordinate, toPointTo: mapView),
+                diameter: RouteTraceStyle.diameter(for: marker.role),
+                labelSize: RouteTraceStyle.labelSize(marker.displayName, in: traits),
+                isKey: marker.role != .intermediate
+            )
         }
         let shields = shieldsByID.values.sorted { $0.segment.id < $1.segment.id }.map { annotation in
             let points = annotation.segment.coordinates.map { mapView.convert($0.coordinate, toPointTo: mapView) }
-            return RouteTraceLayout.ShieldInput(id: annotation.segment.id,
-                candidates: RouteTraceLayout.shieldCandidates(points: points, bounds: mapView.bounds.insetBy(dx: 20, dy: 20)),
-                size: RouteTraceStyle.shieldSize(annotation.segment.routeShortName ?? "", in: traits))
+            return RouteTraceLayout.ShieldInput(
+                id: annotation.segment.id,
+                candidates: RouteTraceLayout.shieldCandidates(
+                    points: points,
+                    bounds: mapView.bounds.insetBy(dx: 20, dy: 20)
+                ),
+                size: RouteTraceStyle.shieldSize(annotation.segment.routeShortName ?? "", in: traits)
+            )
         }
-        let metersPerPoint = mapView.visibleMapRect.width * MKMetersPerMapPointAtLatitude(mapView.centerCoordinate.latitude)
+        let metersPerPoint =
+            mapView.visibleMapRect.width * MKMetersPerMapPointAtLatitude(mapView.centerCoordinate.latitude)
             / mapView.bounds.width
-        let result = RouteTraceLayout.layout(bounds: mapView.bounds, stops: stops, shields: shields,
-            showsIntermediate: metersPerPoint <= 4)
+        let result = RouteTraceLayout.layout(
+            bounds: mapView.bounds,
+            stops: stops,
+            shields: shields,
+            showsIntermediate: metersPerPoint <= 4
+        )
         for (id, annotation) in stopsByID {
             annotation.placement = result.stops[id]
             (mapView.view(for: annotation) as? RouteStopAnnotationView)?.configure(annotation, in: mapView)

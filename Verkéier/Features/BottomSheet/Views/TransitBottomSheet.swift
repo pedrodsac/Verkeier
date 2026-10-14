@@ -38,24 +38,24 @@ struct TransitBottomSheet: View {
 
     private var tabView: some View {
         TabView(selection: $navigation.selectedTab) {
-			Tab("Home", systemImage: "train.side.front.car", value: TransitSheetTab.home) {
-				homeTab
+            Tab("Home", systemImage: "train.side.front.car", value: TransitSheetTab.home) {
+                homeTab
             }
 
             Tab("Plan", systemImage: "arrow.triangle.turn.up.right.diamond", value: TransitSheetTab.plan) {
-				planTab
+                planTab
             }
 
             Tab("Settings", systemImage: "gear", value: TransitSheetTab.settings) {
-				NavigationStack {
-					SettingsView(
-						viewModel: viewModel.settings,
-						checkGTFSUpdate: actions.checkGTFSUpdate,
-						setDebugDataMode: actions.setDebugDataMode
-					)
-					.navigationTitle("Settings")
-					.toolbarTitleDisplayMode(.inline)
-				}
+                NavigationStack {
+                    SettingsView(
+                        viewModel: viewModel.settings,
+                        checkGTFSUpdate: actions.checkGTFSUpdate,
+                        setDebugDataMode: actions.setDebugDataMode
+                    )
+                    .navigationTitle("Settings")
+                    .toolbarTitleDisplayMode(.inline)
+                }
             }
         }
         .tabBarMinimizeBehavior(.never)
@@ -138,7 +138,8 @@ struct TransitBottomSheet: View {
 
     private func activatePath(_ path: [TransitSheetRoute], previous: [TransitSheetRoute]) {
         guard path != previous else { return }
-        let isBackNavigation = path.count < previous.count
+        let isBackNavigation =
+            path.count < previous.count
             && Array(previous.prefix(path.count)) == path
         activateRoute(path.last, previous.last, isBackNavigation)
     }

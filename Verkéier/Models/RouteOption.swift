@@ -33,9 +33,10 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
         let transitDeparture = transitLegs.compactMap {
             $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime
         }.min()
-        return transitDeparture ?? plan.legs.first.flatMap {
-            $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime
-        }
+        return transitDeparture
+            ?? plan.legs.first.flatMap {
+                $0.realtimeDepartureTime ?? $0.scheduledDepartureTime ?? $0.departureTime
+            }
     }
 
     /// Door-to-door departure of the whole journey — the effective departure of
@@ -79,7 +80,7 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
         for (arrivingLeg, departingLeg) in zip(legs, legs.dropFirst()) {
             if departingLeg.continuesInSeatFromTripID != nil { continue }
             guard let arrival = Self.effectiveArrivalTime(for: arrivingLeg),
-                  let departure = Self.effectiveDepartureTime(for: departingLeg)
+                let departure = Self.effectiveDepartureTime(for: departingLeg)
             else {
                 return nil
             }
@@ -159,9 +160,10 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     /// needed to reach its stations. Transit-bike combinations remain regular
     /// transit options for time-range and missed-departure presentation.
     var isVelohOnly: Bool {
-        usesBikeShare && plan.legs.allSatisfy {
-            $0.transportKind == .bikeShare || $0.transportKind == .walking
-        }
+        usesBikeShare
+            && plan.legs.allSatisfy {
+                $0.transportKind == .bikeShare || $0.transportKind == .walking
+            }
     }
 
     var hasBikeAvailabilityWarning: Bool {
@@ -183,7 +185,7 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
     var crossesBorder: Bool {
         if let journeySummary { return journeySummary.crossesBorder }
         func insideLuxembourg(_ point: LocationPoint) -> Bool {
-            (49.44 ... 50.19).contains(point.latitude) && (5.73 ... 6.54).contains(point.longitude)
+            (49.44...50.19).contains(point.latitude) && (5.73...6.54).contains(point.longitude)
         }
         return plan.legs.contains { !insideLuxembourg($0.origin) || !insideLuxembourg($0.destination) }
     }
@@ -212,7 +214,8 @@ nonisolated struct RouteOption: Codable, Hashable, Identifiable, Sendable {
             delayed: stored?.delayed ?? transitLegs.contains { ($0.delayMinutes ?? 0) > 0 },
             tightTransfer: hasTightTransfer,
             connectionMiss: stored?.connectionMiss ?? transitLegs.contains { $0.transferWarning == "Connection miss" },
-            coverage: stored?.coverage ?? JourneyRealtimeCoverage(rawValue: realtimeCoverage.rawValue) ?? .scheduleOnly)
+            coverage: stored?.coverage ?? JourneyRealtimeCoverage(rawValue: realtimeCoverage.rawValue) ?? .scheduleOnly
+        )
         return RouteOptionStatus(rawValue: evidence.status(at: now, feasibility: feasibility).rawValue)
             ?? .scheduledOnly
     }

@@ -4,15 +4,15 @@ struct StopGroupView: View {
     let viewModel: StopGroupPresentationModel
 
     var body: some View {
-		List(viewModel.stops) { stop in
-			NavigationLink(value: TransitSheetRoute.stopDetail(stop)) {
-				StopRow(
-					stop: stop,
-					routes: viewModel.routesByStopId[stop.id] ?? []
-				)
-			}
-		}
-		.listStyle(.plain)
+        List(viewModel.stops) { stop in
+            NavigationLink(value: TransitSheetRoute.stopDetail(stop)) {
+                StopRow(
+                    stop: stop,
+                    routes: viewModel.routesByStopId[stop.id] ?? []
+                )
+            }
+        }
+        .listStyle(.plain)
     }
 }
 
@@ -54,7 +54,10 @@ private struct BikeShareStationListRow: View {
                 .font(.headline.weight(.semibold))
                 .foregroundStyle(.white)
                 .frame(width: 38, height: 38)
-                .background(TransportMode.bicycle.tint.gradient, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .background(
+                    TransportMode.bicycle.tint.gradient,
+                    in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+                )
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 4) {

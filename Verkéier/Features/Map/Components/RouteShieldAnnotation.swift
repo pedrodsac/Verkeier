@@ -13,7 +13,8 @@ final class RouteShieldAnnotation: NSObject, MKAnnotation {
     func update(_ segment: RouteMapSegment) { self.segment = segment }
 
     func move(to coordinate: CLLocationCoordinate2D) {
-        guard self.coordinate.latitude != coordinate.latitude || self.coordinate.longitude != coordinate.longitude else { return }
+        guard self.coordinate.latitude != coordinate.latitude || self.coordinate.longitude != coordinate.longitude
+        else { return }
         self.coordinate = coordinate
     }
 }

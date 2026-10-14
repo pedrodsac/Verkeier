@@ -11,7 +11,9 @@ nonisolated struct AppConfiguration: Sendable {
     init(
         apiProxyURL: URL? = nil,
         avlMessagesURL: URL,
-        bikeShareStaticStationsURL: URL = URL(string: "https://developer.jcdecaux.com/rest/vls/stations/luxembourg.csv")!,
+        bikeShareStaticStationsURL: URL = URL(
+            string: "https://developer.jcdecaux.com/rest/vls/stations/luxembourg.csv"
+        )!,
         bikeShareAPIURL: URL = URL(string: "https://api.jcdecaux.com/vls/v1/stations")!,
         bikeShareAPIKey: String? = nil
     ) {
@@ -41,7 +43,8 @@ nonisolated struct AppConfiguration: Sendable {
 
         let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedValue.isEmpty, let url = URL(string: trimmedValue),
-              url.scheme == "https" || url.scheme == "http" else {
+            url.scheme == "https" || url.scheme == "http"
+        else {
             return nil
         }
 

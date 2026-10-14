@@ -102,7 +102,8 @@ struct TransitMapView: UIViewRepresentable {
             let showsRoute = state.routeOverlay != nil
             if previous == nil || (previous?.routeOverlay != nil) != showsRoute {
                 let configuration = MKStandardMapConfiguration(elevationStyle: .flat)
-                configuration.pointOfInterestFilter = showsRoute
+                configuration.pointOfInterestFilter =
+                    showsRoute
                     ? .excludingAll
                     : MKPointOfInterestFilter(excluding: [.publicTransport])
                 mapView.preferredConfiguration = configuration
@@ -121,8 +122,10 @@ struct TransitMapView: UIViewRepresentable {
                 || previous?.gtfsStops != state.gtfsStops
                 || previous?.selectedStopId != state.selectedStopId
                 || previous?.favouriteStopIds != state.favouriteStopIds
-                || previous?.alertStopIds != state.alertStopIds {
-                let annotations = showsPins
+                || previous?.alertStopIds != state.alertStopIds
+            {
+                let annotations =
+                    showsPins
                     ? state.liveStops.map { StopMapAnnotation(stop: $0, layer: .liveNearby) }
                         + state.gtfsStops.map { StopMapAnnotation(stop: $0, layer: .gtfs) }
                     : []
@@ -262,7 +265,8 @@ struct TransitMapView: UIViewRepresentable {
 
             if let annotation = annotation as? BikeShareMapAnnotation {
                 let identifier = "BikeShareMapAnnotation"
-                let view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+                let view =
+                    mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
                     as? MKMarkerAnnotationView
                     ?? MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
                 view.annotation = annotation
@@ -338,7 +342,8 @@ struct TransitMapView: UIViewRepresentable {
             // unique non-nil identifier for the latter instead of assigning
             // `nil`: on iOS 27's MapKit simulator, clearing this property on a
             // reused marker can throw an Objective-C dictionary exception.
-            view.clusteringIdentifier = (isSelected || isFavourite || hasAlert)
+            view.clusteringIdentifier =
+                (isSelected || isFavourite || hasAlert)
                 ? "stop-single-\(annotation.key)"
                 : Self.transitStopClusteringIdentifier
         }

@@ -49,7 +49,8 @@ protocol WalkingRouteRefining: Sendable {
     /// support all-at-once refinement get a compatibility default below.
     nonisolated func refineWalkingRouteUpdates(in options: [RouteOption]) -> AsyncStream<RouteOption>
     nonisolated func refinementEvents(
-        in options: [RouteOption], context: RouteValidationContext?
+        in options: [RouteOption],
+        context: RouteValidationContext?
     ) -> AsyncStream<WalkingRefinementEvent>
 }
 
@@ -61,7 +62,8 @@ nonisolated enum WalkingRefinementEvent: Sendable {
 
 extension WalkingRouteRefining {
     nonisolated func refinementEvents(
-        in options: [RouteOption], context: RouteValidationContext?
+        in options: [RouteOption],
+        context: RouteValidationContext?
     ) -> AsyncStream<WalkingRefinementEvent> {
         AsyncStream { continuation in
             let task = Task {
@@ -174,7 +176,9 @@ extension RouteService {
 
     /// Convenience that plans for the given time with default filters.
     nonisolated func calculateRoute(
-        from: LocationPoint, to: LocationPoint, time: RoutePlanningTime
+        from: LocationPoint,
+        to: LocationPoint,
+        time: RoutePlanningTime
     ) async throws -> RouteCalculation {
         try await calculateRoute(from: from, to: to, time: time, filters: RoutePlannerFilters())
     }

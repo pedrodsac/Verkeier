@@ -32,11 +32,14 @@ extension TransitMapScreen {
 
     func fitTripDetailMapIfNeeded() {
         guard tripDetailSelection != nil, !tripDetailCameraDidFit,
-              let snapshot = tripDetailViewModel.snapshot,
-              snapshot.instance == tripDetailSelection?.instance else { return }
+            let snapshot = tripDetailViewModel.snapshot,
+            snapshot.instance == tripDetailSelection?.instance
+        else { return }
         let coordinates = snapshot.mapOverlay.segments.flatMap(\.coordinates)
         guard let first = coordinates.first else { return }
-        let rect = coordinates.dropFirst().reduce(MKMapRect(origin: MKMapPoint(first.coordinate), size: .init(width: 0, height: 0))) {
+        let rect = coordinates.dropFirst().reduce(
+            MKMapRect(origin: MKMapPoint(first.coordinate), size: .init(width: 0, height: 0))
+        ) {
             $0.union(MKMapRect(origin: MKMapPoint($1.coordinate), size: .init(width: 0, height: 0)))
         }
         var region = MKCoordinateRegion(rect)

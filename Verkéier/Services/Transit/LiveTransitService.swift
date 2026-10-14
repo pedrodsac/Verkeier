@@ -30,7 +30,8 @@ extension LiveTransitService {
                     && Self.distanceMeters(from: stop.location, to: $0.location) <= 75
             }
             guard named.count == 1,
-                  let resolved = await gtfsService.matchLiveStop(named[0]) else { return stop }
+                let resolved = await gtfsService.matchLiveStop(named[0])
+            else { return stop }
             return resolved
         } catch {
             return stop
@@ -41,7 +42,8 @@ extension LiveTransitService {
         let latitudeRadians = lhs.latitude * .pi / 180
         let latitudeDelta = (rhs.latitude - lhs.latitude) * .pi / 180
         let longitudeDelta = (rhs.longitude - lhs.longitude) * .pi / 180
-        let a = sin(latitudeDelta / 2) * sin(latitudeDelta / 2)
+        let a =
+            sin(latitudeDelta / 2) * sin(latitudeDelta / 2)
             + cos(latitudeRadians) * cos(rhs.latitude * .pi / 180)
             * sin(longitudeDelta / 2) * sin(longitudeDelta / 2)
         return 6_371_000 * 2 * atan2(sqrt(a), sqrt(1 - a))
@@ -110,7 +112,9 @@ struct MobiliteitLiveTransitService: LiveTransitService {
         return MobiliteitAPIClient(
             apiKey: "",
             baseURL: proxyURL.appendingPathComponent("atp"),
-            session: session, language: language, diagnostics: diagnostics
+            session: session,
+            language: language,
+            diagnostics: diagnostics
         )
     }
 
@@ -133,8 +137,10 @@ struct MobiliteitLiveTransitService: LiveTransitService {
                 externalID: stop.externalID,
                 name: stop.name,
                 location: LocationPoint(
-                    id: "hafas:\(stop.id)", name: stop.name,
-                    latitude: latitude, longitude: longitude
+                    id: "hafas:\(stop.id)",
+                    name: stop.name,
+                    latitude: latitude,
+                    longitude: longitude
                 ),
                 distanceMeters: stop.distanceMeters,
                 modes: modes(productClass: stop.products)
@@ -218,8 +224,10 @@ struct MobiliteitLiveTransitService: LiveTransitService {
             note.textLong ?? note.textNormal ?? note.textShort ?? note.value
         }
         let journeyID = source.journeyReference?.reference
-        let generatedID = [stop.id, journeyID ?? "", lineName, destination, source.plannedDate ?? "", source.plannedTime ?? ""]
-            .joined(separator: "|")
+        let generatedID = [
+            stop.id, journeyID ?? "", lineName, destination, source.plannedDate ?? "", source.plannedTime ?? "",
+        ]
+        .joined(separator: "|")
 
         return Departure(
             id: journeyID ?? generatedID,
@@ -249,9 +257,11 @@ struct MobiliteitLiveTransitService: LiveTransitService {
         var result: [TransportMode] = []
         if productClass & HafasProductClass.bus.rawValue != 0 { result.append(.bus) }
         if productClass & HafasProductClass.tram.rawValue != 0 { result.append(.tram) }
-        if productClass & (HafasProductClass.expressTrain.rawValue
-            | HafasProductClass.nationalTrain.rawValue
-            | HafasProductClass.localTrain.rawValue) != 0 {
+        if productClass
+            & (HafasProductClass.expressTrain.rawValue
+                | HafasProductClass.nationalTrain.rawValue
+                | HafasProductClass.localTrain.rawValue) != 0
+        {
             result.append(.train)
         }
         return result

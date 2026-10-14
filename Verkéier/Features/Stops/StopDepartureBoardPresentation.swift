@@ -21,18 +21,22 @@ struct StopDepartureBoardPresentation {
     init(inputs: Inputs) {
         let locale = Locale(identifier: inputs.localeIdentifier)
         let live = Self.unique(inputs.liveDepartures, locale: locale)
-        let scheduled = inputs.useScheduledFallback
-            ? Self.unique(inputs.scheduledDepartures.map { departure in
-                Departure(
-                    id: departure.id,
-                    stopId: inputs.stopID,
-                    lineName: departure.lineName,
-                    destination: departure.destination,
-                    scheduledDeparture: departure.departureDate,
-                    platform: departure.platform,
-                    dataSource: .gtfs
-                )
-            }, locale: locale)
+        let scheduled =
+            inputs.useScheduledFallback
+            ? Self.unique(
+                inputs.scheduledDepartures.map { departure in
+                    Departure(
+                        id: departure.id,
+                        stopId: inputs.stopID,
+                        lineName: departure.lineName,
+                        destination: departure.destination,
+                        scheduledDeparture: departure.departureDate,
+                        platform: departure.platform,
+                        dataSource: .gtfs
+                    )
+                },
+                locale: locale
+            )
             : []
         let route = inputs.routes.first { $0.id == inputs.selectedLine }
         let lineFilteredLive = Self.lineFiltered(live, route: route)
@@ -42,7 +46,8 @@ struct StopDepartureBoardPresentation {
         var platforms = Set<String>()
         availablePlatforms = active.compactMap { departure in
             guard let platform = departure.platform?.trimmingCharacters(in: .whitespacesAndNewlines),
-                  !platform.isEmpty, platforms.insert(platform).inserted else { return nil }
+                !platform.isEmpty, platforms.insert(platform).inserted
+            else { return nil }
             return platform
         }.sorted { $0.localizedStandardCompare($1) == .orderedAscending }
 
@@ -87,7 +92,8 @@ struct StopDepartureBoardPresentation {
         for departure in departures {
             guard !ids.contains(departure.id) else { continue }
             if let time = departure.scheduledDeparture,
-               time.timeIntervalSinceReferenceDate.isFinite {
+                time.timeIntervalSinceReferenceDate.isFinite
+            {
                 let key = JourneyKey(
                     line: normalized(departure.lineName, locale: locale),
                     destination: normalized(departure.destination, locale: locale)

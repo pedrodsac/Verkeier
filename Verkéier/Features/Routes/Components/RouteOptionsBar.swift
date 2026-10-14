@@ -14,32 +14,34 @@ struct RouteOptionsBar: View {
 
     var body: some View {
         optionsMenu
-        .alert("Save commute", isPresented: $showingSaveAlert) {
-            TextField("Label (e.g. Home → Work)", text: $presetLabel)
-            Button("Save") {
-                saveCurrentCommutePreset(presetLabel)
-                presetLabel = ""
+            .alert("Save commute", isPresented: $showingSaveAlert) {
+                TextField("Label (e.g. Home → Work)", text: $presetLabel)
+                Button("Save") {
+                    saveCurrentCommutePreset(presetLabel)
+                    presetLabel = ""
+                }
+                Button("Cancel", role: .cancel) { presetLabel = "" }
+            } message: {
+                Text(
+                    "Name this trip so you can re-plan it in one tap. Use “Home → Work” for time-of-day commute suggestions."
+                )
             }
-            Button("Cancel", role: .cancel) { presetLabel = "" }
-        } message: {
-            Text(
-                "Name this trip so you can re-plan it in one tap. Use “Home → Work” for time-of-day commute suggestions."
-            )
-        }
     }
 
     private var optionsMenu: some View {
-		Menu("Route options", systemImage: "slider.horizontal.3") {
+        Menu("Route options", systemImage: "slider.horizontal.3") {
             Section("Transport in routes") {
                 ForEach(RoutePlannerFilters.selectableModes) { mode in
-                    Toggle(isOn: Binding(
-                        get: { filters.includedModes.contains(mode) },
-                        set: { included in
-                            var modes = filters.includedModes
-                            if included { modes.insert(mode) } else { modes.remove(mode) }
-                            apply(\.includedModes, value: modes)
-                        }
-                    )) {
+                    Toggle(
+                        isOn: Binding(
+                            get: { filters.includedModes.contains(mode) },
+                            set: { included in
+                                var modes = filters.includedModes
+                                if included { modes.insert(mode) } else { modes.remove(mode) }
+                                apply(\.includedModes, value: modes)
+                            }
+                        )
+                    ) {
                         Label(LocalizedStringKey(mode.displayName), systemImage: mode.symbolName)
                     }
                 }
@@ -74,13 +76,13 @@ struct RouteOptionsBar: View {
 }
 
 #if DEBUG
-    #Preview(traits: .sizeThatFitsLayout) {
-        RouteOptionsBar(
-            filters: RoutePlannerFilters(),
-            hasDestination: true,
-            updateRouteFilters: { _ in },
-            saveCurrentCommutePreset: { _ in }
-        )
-        .padding()
-    }
+#Preview(traits: .sizeThatFitsLayout) {
+    RouteOptionsBar(
+        filters: RoutePlannerFilters(),
+        hasDestination: true,
+        updateRouteFilters: { _ in },
+        saveCurrentCommutePreset: { _ in }
+    )
+    .padding()
+}
 #endif

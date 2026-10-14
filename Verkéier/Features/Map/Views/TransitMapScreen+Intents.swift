@@ -15,7 +15,8 @@ extension TransitMapScreen {
         }
 
         if let reminderDepartureID = departureReminderService.activeReminder?.departureId,
-           let reminderDeparture = viewModel.departures.first(where: { $0.id == reminderDepartureID }) {
+            let reminderDeparture = viewModel.departures.first(where: { $0.id == reminderDepartureID })
+        {
             await departureReminderService.syncTrackedDeparture(
                 reminderDeparture,
                 stopName: viewModel.selectedStop?.name
@@ -29,9 +30,11 @@ extension TransitMapScreen {
                 using: liveTransitService,
                 gtfsService: gtfsService
             )
-            guard let departure = DepartureTrackingSelection.nextTrackableDeparture(
-                from: viewModel.departures
-            ) else {
+            guard
+                let departure = DepartureTrackingSelection.nextTrackableDeparture(
+                    from: viewModel.departures
+                )
+            else {
                 return
             }
             await liveActivityManager.startTracking(departure: departure, stop: stop)
@@ -56,7 +59,8 @@ extension TransitMapScreen {
         colorHex: String,
         iconName: String
     ) {
-        let favourite = favouriteEntities.first(where: { $0.stopId == stop.id })
+        let favourite =
+            favouriteEntities.first(where: { $0.stopId == stop.id })
             ?? PersistedFavouriteStop(stop: stop, boardFilter: viewModel.departureBoardFilter)
         if !favouriteEntities.contains(where: { $0.stopId == stop.id }) {
             modelContext.insert(favourite)
@@ -85,7 +89,7 @@ extension TransitMapScreen {
 
     func handleSpotlightActivity(_ activity: NSUserActivity) {
         guard let identifier = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String,
-              identifier.hasPrefix("stop.")
+            identifier.hasPrefix("stop.")
         else {
             return
         }
@@ -101,7 +105,7 @@ extension TransitMapScreen {
 
     func handleDeepLink(_ url: URL) {
         guard let deepLink = TransitDeepLink(url: url),
-              let handoff = TransitIntentHandoff(deepLink)
+            let handoff = TransitIntentHandoff(deepLink)
         else {
             return
         }

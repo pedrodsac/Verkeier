@@ -27,8 +27,12 @@ nonisolated enum RouteTraceLayout {
         var shields: [String: CGPoint] = [:]
     }
 
-    static func layout(bounds: CGRect, stops: [StopInput], shields: [ShieldInput],
-                       showsIntermediate: Bool) -> Result {
+    static func layout(
+        bounds: CGRect,
+        stops: [StopInput],
+        shields: [ShieldInput],
+        showsIntermediate: Bool
+    ) -> Result {
         let bounds = bounds.insetBy(dx: 8, dy: 8)
         var result = Result()
         var occupied: [CGRect] = []
@@ -92,8 +96,7 @@ nonisolated enum RouteTraceLayout {
         var paths: [[CGPoint]] = []
         for index in 1..<points.count {
             guard let (a, b) = clipped(points[index - 1], points[index], to: bounds) else { continue }
-            if paths.last?.last == a { paths[paths.count - 1].append(b) }
-            else { paths.append([a, b]) }
+            if paths.last?.last == a { paths[paths.count - 1].append(b) } else { paths.append([a, b]) }
         }
         let measured = paths.map { path in
             (path, zip(path, path.dropFirst()).map { hypot($1.x - $0.x, $1.y - $0.y) })
@@ -106,8 +109,10 @@ nonisolated enum RouteTraceLayout {
                 for (index, length) in lengths.enumerated() where length > 0 {
                     if remaining <= length {
                         let a = path[index], b = path[index + 1]
-                        return CGPoint(x: a.x + (b.x - a.x) * remaining / length,
-                            y: a.y + (b.y - a.y) * remaining / length)
+                        return CGPoint(
+                            x: a.x + (b.x - a.x) * remaining / length,
+                            y: a.y + (b.y - a.y) * remaining / length
+                        )
                     }
                     remaining -= length
                 }
@@ -120,14 +125,18 @@ nonisolated enum RouteTraceLayout {
         guard a.x.isFinite, a.y.isFinite, b.x.isFinite, b.y.isFinite else { return nil }
         let dx = b.x - a.x, dy = b.y - a.y
         var start: CGFloat = 0, end: CGFloat = 1
-        for (p, q) in [(-dx, a.x - bounds.minX), (dx, bounds.maxX - a.x),
-                       (-dy, a.y - bounds.minY), (dy, bounds.maxY - a.y)] {
+        for (p, q) in [
+            (-dx, a.x - bounds.minX), (dx, bounds.maxX - a.x),
+            (-dy, a.y - bounds.minY), (dy, bounds.maxY - a.y),
+        ] {
             if p == 0 { if q < 0 { return nil }; continue }
             let ratio = q / p
             if p < 0 { start = max(start, ratio) } else { end = min(end, ratio) }
             if start > end { return nil }
         }
-        return (CGPoint(x: a.x + start * dx, y: a.y + start * dy),
-                CGPoint(x: a.x + end * dx, y: a.y + end * dy))
+        return (
+            CGPoint(x: a.x + start * dx, y: a.y + start * dy),
+            CGPoint(x: a.x + end * dx, y: a.y + end * dy)
+        )
     }
 }

@@ -1,7 +1,7 @@
 import CoreLocation
 import MapKit
-import Observation
 import MobiliteitKit
+import Observation
 import SwiftUI
 
 @Observable
@@ -132,13 +132,13 @@ final class TransitMapViewModel {
         let longitudeDelta = region.span.longitudeDelta
 
         guard latitude.isFinite,
-              longitude.isFinite,
-              latitudeDelta.isFinite,
-              longitudeDelta.isFinite,
-              (-90 ... 90).contains(latitude),
-              (-180 ... 180).contains(longitude),
-              latitudeDelta > 0,
-              longitudeDelta > 0
+            longitude.isFinite,
+            latitudeDelta.isFinite,
+            longitudeDelta.isFinite,
+            (-90...90).contains(latitude),
+            (-180...180).contains(longitude),
+            latitudeDelta > 0,
+            longitudeDelta > 0
         else {
             return nil
         }

@@ -4,7 +4,8 @@ import Foundation
 nonisolated struct UnavailableWalkingRouter: WalkingRouting {
     func checkAvailability() async throws { throw WalkingRoutingError.datasetUnavailable }
 
-    func estimates(from: LocationPoint, to destinations: [WalkingDestination]) async throws -> [OfflineWalkingEstimate] {
+    func estimates(from: LocationPoint, to destinations: [WalkingDestination]) async throws -> [OfflineWalkingEstimate]
+    {
         guard !destinations.isEmpty else { return [] }
         throw WalkingRoutingError.datasetUnavailable
     }

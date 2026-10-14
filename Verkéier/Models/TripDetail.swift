@@ -22,8 +22,16 @@ nonisolated struct TripDetailSelection: Hashable, Sendable {
     /// Only verified onward legs included in the selected itinerary.
     var continuingRides: [TripDetailSelection] = []
 
-    init(instance: TripRunIdentity, boardingSequence: Int, alightingSequence: Int,
-         lineName: String, routeShortName: String?, headsign: String?, mode: TransportMode, routeID: String?) {
+    init(
+        instance: TripRunIdentity,
+        boardingSequence: Int,
+        alightingSequence: Int,
+        lineName: String,
+        routeShortName: String?,
+        headsign: String?,
+        mode: TransportMode,
+        routeID: String?
+    ) {
         self.instance = instance
         self.boardingSequence = boardingSequence
         self.alightingSequence = alightingSequence
@@ -37,7 +45,8 @@ nonisolated struct TripDetailSelection: Hashable, Sendable {
 
     init?(leg: RoutePlan.Leg, followingLegs: [RoutePlan.Leg] = []) {
         guard leg.transportKind == .transit, let instance = leg.tripInstance,
-              let boarding = leg.boardingStopSequence, let alighting = leg.alightingStopSequence, boarding <= alighting else { return nil }
+            let boarding = leg.boardingStopSequence, let alighting = leg.alightingStopSequence, boarding <= alighting
+        else { return nil }
         self.instance = instance
         boardingSequence = boarding
         alightingSequence = alighting
@@ -50,8 +59,9 @@ nonisolated struct TripDetailSelection: Hashable, Sendable {
         var previous = leg
         for onward in followingLegs {
             guard let previousID = previous.tripId,
-                  onward.continuesInSeatFromTripID == previousID,
-                  let ride = TripDetailSelection(leg: onward) else { break }
+                onward.continuesInSeatFromTripID == previousID,
+                let ride = TripDetailSelection(leg: onward)
+            else { break }
             continuingRides.append(ride)
             previous = onward
         }

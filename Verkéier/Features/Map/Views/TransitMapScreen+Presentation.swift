@@ -1,8 +1,8 @@
-import MobiliteitKit
 import AsyncAlgorithms
 import CoreLocation
 import CoreSpotlight
 import MapKit
+import MobiliteitKit
 import SwiftData
 import SwiftUI
 
@@ -160,7 +160,7 @@ extension TransitMapScreen {
     var appVersion: String {
         let version =
             Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-                ?? "1.0"
+            ?? "1.0"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
         return "\(version) (\(build))"
     }

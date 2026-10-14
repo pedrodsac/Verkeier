@@ -21,14 +21,19 @@ enum RouteTraceStyle {
     static func font(in traits: UITraitCollection, shield: Bool = false) -> UIFont {
         UIFontMetrics(forTextStyle: .caption1).scaledFont(
             for: .systemFont(ofSize: shield ? 10 : 12, weight: shield ? .bold : .semibold),
-            compatibleWith: traits)
+            compatibleWith: traits
+        )
     }
 
     static func labelSize(_ text: String, in traits: UITraitCollection) -> CGSize {
         let width = UIFontMetrics(forTextStyle: .caption1).scaledValue(for: 110, compatibleWith: traits)
         let font = font(in: traits)
-        let rect = (text as NSString).boundingRect(with: CGSize(width: width, height: .greatestFiniteMagnitude),
-            options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: [.font: font], context: nil)
+        let rect = (text as NSString).boundingRect(
+            with: CGSize(width: width, height: .greatestFiniteMagnitude),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: [.font: font],
+            context: nil
+        )
         return CGSize(width: ceil(rect.width) + 4, height: ceil(rect.height) + 4)
     }
 

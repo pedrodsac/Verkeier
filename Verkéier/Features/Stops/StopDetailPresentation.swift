@@ -66,15 +66,19 @@ struct StopDetailPresentationModel {
         self.liveActivityStaleMessage = liveActivityStaleMessage
         self.activeReminder = activeReminder
         self.departureReminderErrorMessage = departureReminderErrorMessage
-        self.board = departureBoard ?? StopDepartureBoardPresentation(inputs: .init(
-            stopID: stop?.id ?? "",
-            routes: routes,
-            liveDepartures: departures,
-            scheduledDepartures: offlineScheduledDepartures,
-            useScheduledFallback: isUsingOfflineDepartures,
-            selectedLine: selectedLine,
-            selectedPlatform: selectedPlatform
-        ))
+        self.board =
+            departureBoard
+            ?? StopDepartureBoardPresentation(
+                inputs: .init(
+                    stopID: stop?.id ?? "",
+                    routes: routes,
+                    liveDepartures: departures,
+                    scheduledDepartures: offlineScheduledDepartures,
+                    useScheduledFallback: isUsingOfflineDepartures,
+                    selectedLine: selectedLine,
+                    selectedPlatform: selectedPlatform
+                )
+            )
     }
 
     var availablePlatforms: [String] { board.availablePlatforms }

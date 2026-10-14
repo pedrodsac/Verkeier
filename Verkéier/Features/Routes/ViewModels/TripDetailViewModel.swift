@@ -59,7 +59,8 @@ final class TripDetailViewModel {
         do {
             var loaded = try await service.tripDetail(for: selection, refreshPolicy: policy)
             guard !Task.isCancelled, expected == generation, revision == refreshRevision,
-                  loaded.instance == selection.instance else { return }
+                loaded.instance == selection.instance
+            else { return }
             guard !loaded.stops.isEmpty else { throw TripDetailError.unavailable }
             if let previous = snapshot {
                 loaded = retainingHistoricalReports(in: loaded, from: previous)
@@ -67,10 +68,13 @@ final class TripDetailViewModel {
             requestFailed = false
             snapshot = loaded
             refreshFailed = !loaded.liveDataAvailable
-            errorMessage = loaded.liveDataAvailable && loaded.continuations.allSatisfy { $0.snapshot.liveDataAvailable } ? nil : "Live data is unavailable. Showing the last available information."
+            errorMessage =
+                loaded.liveDataAvailable && loaded.continuations.allSatisfy { $0.snapshot.liveDataAvailable }
+                ? nil : "Live data is unavailable. Showing the last available information."
             updateProgress()
-        } catch is CancellationError { return }
-        catch TripDetailError.obsoleteFeed {
+        } catch is CancellationError {
+            return
+        } catch TripDetailError.obsoleteFeed {
             guard !Task.isCancelled, expected == generation, revision == refreshRevision else { return }
             snapshot = nil
             rows = []
@@ -80,7 +84,9 @@ final class TripDetailViewModel {
             guard !Task.isCancelled, expected == generation, revision == refreshRevision else { return }
             refreshFailed = true
             requestFailed = true
-            errorMessage = snapshot == nil ? error.localizedDescription
+            errorMessage =
+                snapshot == nil
+                ? error.localizedDescription
                 : "Live data could not be refreshed. Showing the last available information."
             updateProgress()
         }
@@ -88,42 +94,75 @@ final class TripDetailViewModel {
 
     func updateProgress() {
         guard let snapshot, let selection else { rows = []; continuations = []; return }
-        rows = TripStopPresentation.rows(snapshot: snapshot, selection: selection,
-            now: now(), refreshFailed: requestFailed || !snapshot.liveDataAvailable,
-            highlightsRide: selection.highlightsRide)
+        rows = TripStopPresentation.rows(
+            snapshot: snapshot,
+            selection: selection,
+            now: now(),
+            refreshFailed: requestFailed || !snapshot.liveDataAvailable,
+            highlightsRide: selection.highlightsRide
+        )
         continuations = snapshot.continuations.map { continuation in
             let ride = selection.continuingRides.first { $0.instance == continuation.selection.instance }
-            return .init(id: continuation.selection.instance,
+            return .init(
+                id: continuation.selection.instance,
                 stopName: continuation.snapshot.stops.first?.stop.fullName ?? "",
-                lineName: continuation.selection.lineName, headsign: continuation.selection.headsign,
+                lineName: continuation.selection.lineName,
+                headsign: continuation.selection.headsign,
                 mode: continuation.selection.mode,
-                rows: TripStopPresentation.rows(snapshot: continuation.snapshot, selection: ride ?? continuation.selection,
-                    now: now(), refreshFailed: requestFailed || !continuation.snapshot.liveDataAvailable, highlightsRide: selection.highlightsRide && ride != nil))
+                rows: TripStopPresentation.rows(
+                    snapshot: continuation.snapshot,
+                    selection: ride ?? continuation.selection,
+                    now: now(),
+                    refreshFailed: requestFailed || !continuation.snapshot.liveDataAvailable,
+                    highlightsRide: selection.highlightsRide && ride != nil
+                )
+            )
         }
     }
 
-    private func retainingHistoricalReports(in latest: TripDetailSnapshot,
-        from previous: TripDetailSnapshot) -> TripDetailSnapshot {
+    private func retainingHistoricalReports(
+        in latest: TripDetailSnapshot,
+        from previous: TripDetailSnapshot
+    ) -> TripDetailSnapshot {
         let old = Dictionary(uniqueKeysWithValues: previous.stops.map { ($0.sequence, $0) })
-        let stops = latest.liveDataAvailable ? latest.stops.map { entry in
-            func retain(_ timing: TripStopTiming?, previous: TripStopTiming?) -> TripStopTiming? {
-                guard timing?.realtime == nil, let previous, previous.isHistoricalReport,
-                      let realtime = previous.realtime, realtime <= now() else { return timing }
-                return previous
+        let stops =
+            latest.liveDataAvailable
+            ? latest.stops.map { entry in
+                func retain(_ timing: TripStopTiming?, previous: TripStopTiming?) -> TripStopTiming? {
+                    guard timing?.realtime == nil, let previous, previous.isHistoricalReport,
+                        let realtime = previous.realtime, realtime <= now()
+                    else { return timing }
+                    return previous
+                }
+                return TripStopEntry(
+                    sequence: entry.sequence,
+                    stop: entry.stop,
+                    arrival: retain(entry.arrival, previous: old[entry.sequence]?.arrival),
+                    departure: retain(entry.departure, previous: old[entry.sequence]?.departure),
+                    platform: entry.platform
+                )
             }
-            return TripStopEntry(sequence: entry.sequence, stop: entry.stop,
-                arrival: retain(entry.arrival, previous: old[entry.sequence]?.arrival),
-                departure: retain(entry.departure, previous: old[entry.sequence]?.departure), platform: entry.platform)
-        }
-        : previous.stops
+            : previous.stops
         let continuations = latest.continuations.map { continuation in
-            guard let old = previous.continuations.first(where: { $0.selection.instance == continuation.selection.instance }) else { return continuation }
-            return TripDetailContinuation(selection: continuation.selection,
-                snapshot: retainingHistoricalReports(in: continuation.snapshot, from: old.snapshot))
+            guard
+                let old = previous.continuations.first(where: {
+                    $0.selection.instance == continuation.selection.instance
+                })
+            else { return continuation }
+            return TripDetailContinuation(
+                selection: continuation.selection,
+                snapshot: retainingHistoricalReports(in: continuation.snapshot, from: old.snapshot)
+            )
         }
-        return TripDetailSnapshot(instance: latest.instance, stops: stops, mapOverlay: latest.mapOverlay,
-            isApproximateRoute: latest.isApproximateRoute, liveDataAvailable: latest.liveDataAvailable,
+        return TripDetailSnapshot(
+            instance: latest.instance,
+            stops: stops,
+            mapOverlay: latest.mapOverlay,
+            isApproximateRoute: latest.isApproximateRoute,
+            liveDataAvailable: latest.liveDataAvailable,
             isCancelled: latest.liveDataAvailable ? latest.isCancelled : previous.isCancelled,
-            fetchedAt: latest.liveDataAvailable ? latest.fetchedAt : previous.fetchedAt, continuations: continuations)
+            fetchedAt: latest.liveDataAvailable ? latest.fetchedAt : previous.fetchedAt,
+            continuations: continuations
+        )
     }
 }

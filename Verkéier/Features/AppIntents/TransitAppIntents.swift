@@ -64,7 +64,12 @@ struct GetNextDeparturesIntent: AppIntent {
     func perform() async throws -> some IntentResult & ProvidesDialog {
         let now = Date.now
         guard let board = SharedTransitDataStore.favouriteDepartureBoards()[stop.id] else {
-            return .result(dialog: IntentDialog(stringLiteral: "No saved departure board is available for \(stop.displayName) yet. Open Verkéier to refresh it."))
+            return .result(
+                dialog: IntentDialog(
+                    stringLiteral:
+                        "No saved departure board is available for \(stop.displayName) yet. Open Verkéier to refresh it."
+                )
+            )
         }
 
         let freshness = boardFreshness(board, now: now)
@@ -79,17 +84,28 @@ struct GetNextDeparturesIntent: AppIntent {
             .first
 
         guard let next, let date = next.displayDepartureDate else {
-            return .result(dialog: IntentDialog(stringLiteral: "There are no upcoming departures in the latest saved board for \(stop.displayName). \(freshness)"))
+            return .result(
+                dialog: IntentDialog(
+                    stringLiteral:
+                        "There are no upcoming departures in the latest saved board for \(stop.displayName). \(freshness)"
+                )
+            )
         }
         let departureTime = date.formatted(date: .omitted, time: .shortened)
-        return .result(dialog: IntentDialog(stringLiteral: "Next from \(stop.displayName): \(next.lineName) to \(next.displayDestination) at \(departureTime). \(freshness)"))
+        return .result(
+            dialog: IntentDialog(
+                stringLiteral:
+                    "Next from \(stop.displayName): \(next.lineName) to \(next.displayDestination) at \(departureTime). \(freshness)"
+            )
+        )
     }
 
     private func boardFreshness(_ board: SharedDepartureBoard, now: Date) -> String {
         let source = board.sourceSummary ?? "Transit data"
         let age = now.timeIntervalSince(board.updatedAt)
         if age > 15 * 60 {
-            return "This \(source) board is stale; it was saved at \(board.updatedAt.formatted(date: .omitted, time: .shortened))."
+            return
+                "This \(source) board is stale; it was saved at \(board.updatedAt.formatted(date: .omitted, time: .shortened))."
         }
         return "Source: \(source), refreshed at \(board.updatedAt.formatted(date: .omitted, time: .shortened))."
     }
@@ -101,7 +117,7 @@ struct VerkéierShortcuts: AppShortcutsProvider {
             intent: ShowNearbyStopsIntent(),
             phrases: [
                 "Show nearby stops in \(.applicationName)",
-                "Open nearby stops in \(.applicationName)"
+                "Open nearby stops in \(.applicationName)",
             ],
             shortTitle: "Nearby Stops",
             systemImageName: "location.fill"
@@ -120,7 +136,7 @@ struct VerkéierShortcuts: AppShortcutsProvider {
             intent: OpenFavouriteStopIntent(),
             phrases: [
                 "Open a favourite stop in \(.applicationName)",
-                "Show my favourite stop in \(.applicationName)"
+                "Show my favourite stop in \(.applicationName)",
             ],
             shortTitle: "Open Stop",
             systemImageName: "star.fill"
@@ -130,7 +146,7 @@ struct VerkéierShortcuts: AppShortcutsProvider {
             intent: TrackNextDepartureIntent(),
             phrases: [
                 "Track the next departure with \(.applicationName)",
-                "Start departure tracking in \(.applicationName)"
+                "Start departure tracking in \(.applicationName)",
             ],
             shortTitle: "Track Departure",
             systemImageName: "livephoto"

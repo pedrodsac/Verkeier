@@ -56,7 +56,8 @@ struct FavouritesPresentationModel {
                 groups[label, default: []].append(favourite)
             }
         }
-        return groups
+        return
+            groups
             .map { FavouriteLabelSection(title: $0.key, stops: $0.value) }
             .sorted {
                 if $0.title == String(localized: "Saved Stops") { return false }

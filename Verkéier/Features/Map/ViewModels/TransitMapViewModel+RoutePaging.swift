@@ -24,8 +24,11 @@ extension TransitMapViewModel {
         if let fixedOrigin = routeRequestOrigin ?? routeOrigin?.location {
             origin = fixedOrigin
         } else if let location {
-            origin = LocationPoint(name: "Current Location",
-                latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+            origin = LocationPoint(
+                name: "Current Location",
+                latitude: location.coordinate.latitude,
+                longitude: location.coordinate.longitude
+            )
         } else {
             routeStatusMessage = "Current location is required to load more routes."
             return
@@ -34,8 +37,11 @@ extension TransitMapViewModel {
         // Paging only appends: everything listed now stays exactly as shown,
         // and automatic reloads pause until the user refreshes.
         let baseline = RoutePagingBaseline(
-            primary: unfilteredRouteOptions, supplemental: unfilteredSupplementalRouteOptions,
-            visiblePrimary: routeOptions, visibleSupplemental: supplementalRouteOptions)
+            primary: unfilteredRouteOptions,
+            supplemental: unfilteredSupplementalRouteOptions,
+            visiblePrimary: routeOptions,
+            visibleSupplemental: supplementalRouteOptions
+        )
         routePagingBaseline = baseline
         let selectedID = selectedRouteOptionID
         let page: RouteSearchPage = direction == .earlier ? .earlierAdjacent : .laterAdjacent
@@ -49,9 +55,15 @@ extension TransitMapViewModel {
         routeStatusMessage = nil
         var receivedUpdate = false
         do {
-            let updates = routeCalculationUpdatesWithDeadline(using: routeService,
-                from: origin, to: destination.location, time: routePlanningTime,
-                filters: routeFilters, realtimeRefreshPolicy: .useCache, page: page)
+            let updates = routeCalculationUpdatesWithDeadline(
+                using: routeService,
+                from: origin,
+                to: destination.location,
+                time: routePlanningTime,
+                filters: routeFilters,
+                realtimeRefreshPolicy: .useCache,
+                page: page
+            )
             for try await calculation in updates {
                 try Task.checkCancellation()
                 guard requestGeneration == routeCalculationGeneration else { return }
@@ -64,11 +76,15 @@ extension TransitMapViewModel {
                     unfilteredSupplementalRouteOptions = calculation.supplementalOptions
                 } else {
                     unfilteredRouteOptions = Self.mergingAccumulatedOptions(
-                        existing: unfilteredRouteOptions, incoming: calculation.options,
-                        invalidatedOptionIDs: invalidatedRouteOptionIDs)
+                        existing: unfilteredRouteOptions,
+                        incoming: calculation.options,
+                        invalidatedOptionIDs: invalidatedRouteOptionIDs
+                    )
                     unfilteredSupplementalRouteOptions = Self.mergingAccumulatedOptions(
-                        existing: unfilteredSupplementalRouteOptions, incoming: calculation.supplementalOptions,
-                        invalidatedOptionIDs: invalidatedRouteOptionIDs)
+                        existing: unfilteredSupplementalRouteOptions,
+                        incoming: calculation.supplementalOptions,
+                        invalidatedOptionIDs: invalidatedRouteOptionIDs
+                    )
                 }
                 applyRouteOptions(preferredID: selectedID ?? calculation.selectedOptionID, announceFallback: true)
                 canLoadEarlierRoutes = calculation.canLoadEarlier ?? canLoadEarlierRoutes
@@ -77,8 +93,13 @@ extension TransitMapViewModel {
                     setRoutePageAvailable(!calculation.options.isEmpty, direction: direction)
                 }
                 if !calculation.hasMoreOptions {
-                    scheduleWalkingRouteRefinement(calculation, using: routeService, from: origin,
-                        to: destination.location, requestGeneration: requestGeneration)
+                    scheduleWalkingRouteRefinement(
+                        calculation,
+                        using: routeService,
+                        from: origin,
+                        to: destination.location,
+                        requestGeneration: requestGeneration
+                    )
                     routeLastCalculatedAt = now()
                     recordRoutePublication(calculation)
                 }
@@ -87,7 +108,8 @@ extension TransitMapViewModel {
             guard requestGeneration == routeCalculationGeneration else { return }
             guard receivedUpdate else { throw RoutingError.noRouteFound }
             if Set((routeOptions + supplementalRouteOptions).map(\.id)).subtracting(baseline.ids).isEmpty {
-                routeStatusMessage = direction == .earlier
+                routeStatusMessage =
+                    direction == .earlier
                     ? "No earlier routes were found." : "No later routes were found."
             }
         } catch is CancellationError {
@@ -95,11 +117,13 @@ extension TransitMapViewModel {
         } catch let error as RoutingError where error == .noPublicTransportRoute || error == .noRouteFound {
             guard requestGeneration == routeCalculationGeneration else { return }
             setRoutePageAvailable(false, direction: direction)
-            routeStatusMessage = direction == .earlier
+            routeStatusMessage =
+                direction == .earlier
                 ? "No earlier routes were found." : "No later routes were found."
         } catch {
             guard requestGeneration == routeCalculationGeneration else { return }
-            routeStatusMessage = direction == .earlier
+            routeStatusMessage =
+                direction == .earlier
                 ? "Earlier routes could not be loaded. Try again."
                 : "Later routes could not be loaded. Try again."
         }
