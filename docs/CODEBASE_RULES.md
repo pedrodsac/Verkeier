@@ -11,9 +11,10 @@ Do not dump files into the root project folder.
 Preferred structure:
 
 ```text
-Features/<FeatureName>/Views
-Features/<FeatureName>/ViewModels
+Features/<FeatureName>/Screens
 Features/<FeatureName>/Components
+Features/<FeatureName>/Models
+Features/Shared
 Services/<ServiceName>
 Models
 Storage

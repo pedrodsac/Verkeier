@@ -44,18 +44,21 @@ cp Config/LocalConfig.xcconfig.example Config/LocalConfig.xcconfig
 Strict layering, enforced top-to-bottom — never short-circuit it:
 
 ```
-SwiftUI View → ViewModel/Observable State → Service Protocol → API Client/Storage → Decoder/Mapper → Domain Model
+Screen → Feature Model → Service Protocol → API Client/Storage → Decoder/Mapper → Domain Model
 ```
 
-- **No networking or business logic in views or view bodies.** Route everything through view models and injected services.
+- **No networking or business logic in views or view bodies.** Route everything through feature models and injected services.
 - **Services use protocols** with production and unavailable or fixture implementations. For example, `LiveTransitService` has `MobiliteitLiveTransitService`, `UnavailableLiveTransitService`, and `FixtureLiveTransitService`.
-- **Dependency injection is via SwiftUI `EnvironmentValues`** using `@Entry` (see `Verkéier/App/AppDependencies.swift`). Each service has a default value there; views read it with `@Environment(\.serviceName)`. Override the environment to inject mocks in previews/tests.
-- UI must be previewable with mock data; API/parsing code must be testable without UI.
+- **Services are injected via SwiftUI `EnvironmentValues`** using `@Entry` (see `Verkéier/App/AppDependencies.swift`). Each service has a default value there; views read it with `@Environment(\.serviceName)` and pass it into the model method that needs it (`model.refresh(using: liveTransitService)`). Models don't store services. Override the environment to inject mocks in previews/tests.
+- **Each feature has one model**: a `@MainActor @Observable final class` named `<Feature>Model` (`MapModel`, `StopDetailModel`, `LineDetailModel`, `TripDetailModel`, `RoutePlannerModel`, `SearchModel`, `FavouritesModel`, `AlertsModel`). `FeatureModels` (`Verkéier/App/FeatureModels.swift`) creates them once; `.featureModels(_:)` puts them in the environment and screens read theirs with `@Environment(StopDetailModel.self) private var model`. Feature models never reference each other.
+- **`SheetRouter`** (`Features/Sheet/Models/`) owns the main sheet's navigation (tab, Home and Plan paths, detent) and every flow that changes more than one model: selecting a stop, planning a route, links and intents, and the trip detail camera. Screens call the router; they don't receive action closures from their parents.
+- **Sheets have their own environment.** Anything presented with `.sheet` or `.fullScreenCover` must be re-injected: `.featureModels(router.models).environment(router).environment(router.locationService)` (see `MapScreen`).
+- UI must be previewable with mock data; API/parsing code must be testable without UI. `previewEnvironment(_:)` supplies the models, router and services for previews.
 
 ### Module layout
 
-- `Verkéier/App/` — entry point (`VerkéierApp`), config (`AppConfiguration`), DI (`AppDependencies`), SwiftData container, simulator-only debug preview hosts and the routing benchmark.
-- `Verkéier/Features/<Domain>/` — feature UI grouped as `Views/`, `ViewModels/`, `Components/`. Domains: `Map`, `BottomSheet`, `Stops`, `Departures`, `Search`, `Routes`, `Favourites`, `Alerts`, `Settings`, `LiveActivities`, `AppIntents`, `Launch`.
+- `Verkéier/App/` — entry point (`VerkéierApp`), config (`AppConfiguration`), DI (`AppDependencies`, `FeatureModels`, `PreviewEnvironment`), SwiftData container, simulator-only debug preview hosts and the routing benchmark.
+- `Verkéier/Features/<Domain>/` — feature UI grouped as `Screens/`, `Components/` and `Models/`, with no files at the feature's root. Domains: `Root` (root screen, route preparation, onboarding), `Map`, `Sheet` (main sheet and `SheetRouter`), `Home`, `Stops`, `Routes`, `Search`, `Alerts`, `Settings`. `Shared/` holds components used by more than one feature. `AppIntents/` and `LiveActivities/` keep their own layout.
 - `Verkéier/Services/` — `Transit/` (mobiliteit.lu live data and GTFS download, validation, and offline schedules), `AVL/` (Ville de Luxembourg alerts XML), `Location/`, `Routing/` (MapKit and on-device public-transport routing), `Notifications/`.
 - `Verkéier/Models/` — typed domain models (`Stop`, `Departure`, `RoutePlan`, `AlertMessage`, etc.).
 - `Verkéier/Storage/` — SwiftData persistence (e.g. favourites).
