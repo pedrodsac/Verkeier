@@ -6,12 +6,39 @@ import WidgetKit
 /// Departure boards for the rider's favourite stops, mirrored to the widget.
 @MainActor @Observable
 final class FavouritesModel {
-    /// The saved favourite stops, mirrored from SwiftData by the map screen.
+    /// The saved favourite stops, mirrored from SwiftData by the map screen
+    /// through ``savedFavouritesDidChange(_:in:)``.
     var favouriteStops: [Stop] = []
     var favouriteDepartureBoards: [String: FavouriteDepartureBoardSnapshot] = [:]
     /// Favourites can always fall back to a timetable board once the GTFS feed
     /// is ready, even without the live relay.
     var gtfsFeedStatus: GTFSFeedStatus = .unavailable
+
+    var favouriteStopIDs: Set<String> {
+        Set(favouriteStops.map(\.id))
+    }
+
+    /// Re-checks the timetable feed, downloading a newer one when needed or forced.
+    func refreshFeedStatus(using gtfsService: any GTFSService, force: Bool = false) async {
+        gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: force)
+    }
+
+    /// Refreshes the boards now and every 45 seconds until the task is cancelled.
+    func keepBoardsCurrent(
+        using liveTransitService: any LiveTransitService,
+        gtfsService: any GTFSService
+    ) async {
+        await loadFavouriteDepartures(favourites: favouriteStops, using: liveTransitService, gtfsService: gtfsService)
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(45))
+            guard !Task.isCancelled else { return }
+            await loadFavouriteDepartures(
+                favourites: favouriteStops,
+                using: liveTransitService,
+                gtfsService: gtfsService
+            )
+        }
+    }
 
     func loadFavouriteDepartures(
         favourites: [Stop],
@@ -99,7 +126,7 @@ final class FavouritesModel {
     }
 
     /// Drops boards for stops that are no longer favourites.
-    func retainBoards(forStopIDs stopIDs: Set<String>) {
+    private func retainBoards(forStopIDs stopIDs: Set<String>) {
         favouriteDepartureBoards = favouriteDepartureBoards.filter { stopIDs.contains($0.key) }
     }
 
@@ -112,6 +139,14 @@ final class FavouritesModel {
 // MARK: - Saved favourites
 
 extension FavouritesModel {
+    /// Takes the saved favourites from SwiftData, drops boards for removed
+    /// ones, and mirrors them to App Intents and Spotlight.
+    func savedFavouritesDidChange(_ stops: [Stop], in context: ModelContext) {
+        favouriteStops = stops
+        retainBoards(forStopIDs: favouriteStopIDs)
+        mirrorForIntents(in: context)
+    }
+
     func isFavourite(_ stop: Stop) -> Bool {
         favouriteStops.contains { $0.id == stop.id }
     }
@@ -154,7 +189,7 @@ extension FavouritesModel {
     }
 
     /// Mirrors the saved favourites to App Intents and Spotlight.
-    func mirrorForIntents(in context: ModelContext) {
+    private func mirrorForIntents(in context: ModelContext) {
         let descriptor = FetchDescriptor<PersistedFavouriteStop>(sortBy: [SortDescriptor(\.createdAt)])
         let favourites = (try? context.fetch(descriptor)) ?? []
         FavouriteStopEntityStore.save(favourites: favourites)

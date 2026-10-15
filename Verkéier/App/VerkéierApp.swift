@@ -123,17 +123,17 @@ struct VerkéierApp: App {
                 } else if SimulatorRouteBenchmark.enabled {
                     SimulatorRouteBenchmarkView()
                 } else {
-                    LaunchGateView(locationService: locationService, model: launchModel)
+                    LaunchGateView(model: launchModel)
                 }
                 #else
                 if SimulatorRouteBenchmark.enabled {
                     SimulatorRouteBenchmarkView()
                 } else {
-                    LaunchGateView(locationService: locationService, model: launchModel)
+                    LaunchGateView(model: launchModel)
                 }
                 #endif
                 #else
-                LaunchGateView(locationService: locationService, model: launchModel)
+                LaunchGateView(model: launchModel)
                 #endif
             }
             .environment(\.appConfiguration, configuration)

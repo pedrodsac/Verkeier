@@ -18,11 +18,14 @@ final class SheetRouter {
     /// Whether the route screens refresh their results on their own. The routing
     /// benchmark turns this off because it drives the planner itself.
     @ObservationIgnored var keepsRoutesCurrent = true
+    /// Set while a trip detail is open (see `SheetRouter+TripDetail.swift`).
+    @ObservationIgnored var tripDetailReturn: TripDetailReturn?
+    @ObservationIgnored var tripDetailMapDidFit = false
 
     @ObservationIgnored let models: FeatureModels
     @ObservationIgnored let locationService: LocationService
     @ObservationIgnored private let routeService: any RouteService
-    @ObservationIgnored private let gtfsService: any GTFSService
+    @ObservationIgnored let gtfsService: any GTFSService
 
     init(
         models: FeatureModels,
@@ -247,6 +250,14 @@ extension SheetRouter {
         }
     }
 
+    /// Applies the transport modes chosen in Settings to route planning.
+    func includeRouteModes(_ modes: Set<TransportMode>) {
+        guard models.routePlanner.routeFilters.includedModes != modes else { return }
+        var filters = models.routePlanner.routeFilters
+        filters.includedModes = modes
+        updateRouteFilters(filters)
+    }
+
     func updateRouteFilters(_ filters: RoutePlannerFilters) {
         models.routePlanner.updateRouteFilters(filters)
         if hasRouteEndpoint {
@@ -373,7 +384,7 @@ extension SheetRouter {
     /// Re-checks the timetable before reloading the line, so a pull to refresh can
     /// pick up a newer feed.
     func refreshLineDetail() async {
-        models.favourites.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: true)
+        await models.favourites.refreshFeedStatus(using: gtfsService, force: true)
         await models.lineDetail.loadLineDetail(using: gtfsService)
     }
 }

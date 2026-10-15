@@ -10,21 +10,17 @@ struct SimulatorRouteBenchmarkView: View {
     var body: some View {
         Group {
             if benchmark.fullMap {
-                TransitMapLayer(
-                    favouriteStopIds: [],
-                    bikeShareStations: [],
-                    selectStop: { _ in },
-                    selectStopGroup: { _, _ in },
-                    regionDidChange: { _ in }
-                )
-                .featureModels(benchmark.featureModels)
-                .environment(benchmark.router)
-                .overlay {
-                    if let request = benchmark.routePlanner.routeDiagnostics?.requestID {
-                        RouteRenderObserver(requestID: request) { id in benchmark.recordMapRendered(id) }
-                            .frame(width: 0, height: 0)
+                TransitMapLayer()
+                    .featureModels(benchmark.featureModels)
+                    .environment(benchmark.router)
+                    // Panning must not load timetable stops while the benchmark runs.
+                    .environment(\.gtfsService, UnavailableGTFSService())
+                    .overlay {
+                        if let request = benchmark.routePlanner.routeDiagnostics?.requestID {
+                            RouteRenderObserver(requestID: request) { id in benchmark.recordMapRendered(id) }
+                                .frame(width: 0, height: 0)
+                        }
                     }
-                }
             } else {
                 Color.clear
             }

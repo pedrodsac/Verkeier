@@ -1,4 +1,3 @@
-import CoreSpotlight
 import Foundation
 import Observation
 
@@ -147,17 +146,12 @@ final class LaunchOptimisationModel {
 
     /// Stores the link as an intent handoff, which the map replays when it appears.
     func forward(_ url: URL) {
-        guard let deepLink = TransitDeepLink(url: url), let handoff = TransitIntentHandoff(deepLink) else { return }
+        guard let handoff = TransitIntentHandoff(url: url) else { return }
         TransitIntentHandoff.save(handoff, store: handoffStore)
     }
 
     func forwardSpotlight(_ activity: NSUserActivity) {
-        guard let identifier = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String,
-            identifier.hasPrefix("stop.")
-        else { return }
-        TransitIntentHandoff.save(
-            .openFavouriteStop(stopId: String(identifier.dropFirst("stop.".count))),
-            store: handoffStore
-        )
+        guard let handoff = TransitIntentHandoff(spotlightActivity: activity) else { return }
+        TransitIntentHandoff.save(handoff, store: handoffStore)
     }
 }

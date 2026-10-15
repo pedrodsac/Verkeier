@@ -1,3 +1,4 @@
+import CoreSpotlight
 import Foundation
 
 struct TransitIntentHandoffStore {
@@ -55,5 +56,18 @@ nonisolated enum TransitIntentHandoff: Codable, Equatable, Sendable {
         case .planRoute(let destinationName):
             self = .planRoute(destinationName: destinationName)
         }
+    }
+
+    nonisolated init?(url: URL) {
+        guard let deepLink = TransitDeepLink(url: url) else { return nil }
+        self.init(deepLink)
+    }
+
+    /// The favourite stop a Spotlight result opens.
+    nonisolated init?(spotlightActivity activity: NSUserActivity) {
+        guard let identifier = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String,
+            identifier.hasPrefix("stop.")
+        else { return nil }
+        self = .openFavouriteStop(stopId: String(identifier.dropFirst("stop.".count)))
     }
 }
