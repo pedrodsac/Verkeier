@@ -1,5 +1,6 @@
 import SwiftUI
 
+/// Offers directions for the saved commute that fits this time of day.
 struct CommuteSuggestionRow: View {
     let preset: RouteCommutePreset
 
@@ -38,27 +39,5 @@ struct CommuteSuggestionRow: View {
         }
         .buttonStyle(.pressable)
         .accessibilityLabel("Commute suggestion, \(preset.title), leave now")
-    }
-}
-
-struct AlertsSummaryRow: View {
-    let alertCount: Int
-
-    var body: some View {
-        NavigationLink(value: SheetRoute.alerts) {
-            Label {
-                Text(alertText)
-            } icon: {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(.orange)
-                    .accessibilityHidden(true)
-            }
-        }
-        .accessibilityLabel(alertText)
-    }
-
-    private var alertText: String {
-        alertCount == 1 ? "1 active disruption" : "\(alertCount) active disruptions"
     }
 }

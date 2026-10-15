@@ -41,13 +41,13 @@ struct RouteRibbon: View {
     private func ribbonSegment(for leg: RoutePlan.Leg) -> some View {
         switch leg.transportKind {
         case .transit:
-            TransitBadge(
-                routeName: leg.routeName ?? leg.mode.displayName,
+            LineBadge(
+                name: leg.routeName ?? leg.mode.displayName,
                 mode: leg.mode,
                 status: RouteLineStatus(leg: leg)
             )
         case .bikeShare:
-            TransitBadge(routeName: "vel’OH!", mode: .bicycle)
+            LineBadge(name: "vel’OH!", mode: .bicycle)
         case .walking:
             WalkingSegment(minutes: walkMinutes(for: leg))
         default:
@@ -81,43 +81,6 @@ struct RouteRibbon: View {
 
 // MARK: - Subviews
 
-private struct TransitBadge: View {
-    let routeName: String
-    let mode: TransportMode
-    var status: RouteLineStatus? = nil
-
-    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
-
-    var body: some View {
-        HStack(spacing: 4) {
-            if mode == .funicular {
-                Image(systemName: "cablecar")
-                    .accessibilityLabel(mode.displayName)
-            } else {
-                Text(routeName)
-            }
-            if differentiateWithoutColor, let status {
-                Image(systemName: status.symbol)
-            }
-        }
-        .font(.callout.weight(.bold))
-        .foregroundStyle(.white)
-        .padding(.horizontal, 9)
-        .padding(.vertical, 4)
-        .background(
-            mode.tint.gradient,
-            in: RoundedRectangle(cornerRadius: 8, style: .continuous)
-        )
-        .padding(3)
-        .overlay {
-            if let status {
-                RoundedRectangle(cornerRadius: 11, style: .continuous)
-                    .strokeBorder(status.color, lineWidth: 3)
-            }
-        }
-    }
-}
-
 private struct WalkingSegment: View {
     let minutes: Int?
 
@@ -135,18 +98,6 @@ private struct WalkingSegment: View {
 }
 
 #if DEBUG
-#Preview("Line status rings", traits: .sizeThatFitsLayout) {
-    VStack(alignment: .leading, spacing: 12) {
-        HStack {
-            TransitBadge(routeName: "16", mode: .bus, status: .onTime)
-            TransitBadge(routeName: "850", mode: .bus, status: .delayed)
-            TransitBadge(routeName: "T1", mode: .tram, status: .cancelled)
-            TransitBadge(routeName: "18", mode: .bus)
-        }
-    }
-    .padding()
-}
-
 #Preview(traits: .sizeThatFitsLayout) {
     RouteRibbon(legs: [
         RoutePlan.Leg(
