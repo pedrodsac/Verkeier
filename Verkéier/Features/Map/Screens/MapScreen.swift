@@ -109,9 +109,6 @@ private extension MapScreen {
             .featureModels(router.models)
             .environment(router)
             .environment(router.locationService)
-            .scaledToFill()
-            .frame(maxWidth: 450)
-            .presentationSizing(.fitted)
     }
 
     var onboarding: some View {
