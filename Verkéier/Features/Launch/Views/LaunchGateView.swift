@@ -4,7 +4,6 @@ import SwiftUI
 /// Root of the app: shows the map, or the blocking route preparation screen
 /// while stored transfer walks are built after a map or timetable update.
 struct LaunchGateView: View {
-    let locationService: LocationService
     let model: LaunchOptimisationModel
 
     @Environment(\.routingOptimisationService) private var optimisationService
@@ -14,7 +13,7 @@ struct LaunchGateView: View {
         Group {
             switch model.presentation() {
             case .map:
-                TransitMapScreen(locationService: locationService)
+                TransitMapScreen()
                     .environment(\.launchOnboardingDidFinish, { model.onboardingDidFinish() })
             case .placeholder:
                 placeholder.handlingLinks(model)
@@ -52,7 +51,6 @@ private extension View {
 
 #Preview("Preparing") {
     LaunchGateView(
-        locationService: LocationService(),
         model: LaunchOptimisationModel(
             initialRequirement: .needsFull,
             onboardingCompleted: true,

@@ -6,6 +6,7 @@ struct TransitBottomSheet: View {
     @Environment(AppPreferences.self) private var preferences
     @Environment(SheetRouter.self) private var router
     @Environment(SearchModel.self) private var search
+    @Environment(\.gtfsService) private var gtfsService
 
     @State private var isSearchActive = false
     @State private var focusSearch = false
@@ -26,9 +27,15 @@ struct TransitBottomSheet: View {
             .onChange(of: router.planPath) { oldPath, newPath in
                 router.pathDidChange(from: oldPath, to: newPath)
             }
+            .onChange(of: search.searchQuery) {
+                search.queryDidChange(using: gtfsService)
+            }
             .onAppear {
                 isSearchActive = isSearchRoute
                 focusSearch = isSearchRoute
+            }
+            .task {
+                await search.searchTypedQueries(using: gtfsService)
             }
     }
 

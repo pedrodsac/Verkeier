@@ -11,12 +11,9 @@ struct TransitMapLayer: View {
     @Environment(TripDetailViewModel.self) private var tripDetail
     @Environment(RoutePlannerModel.self) private var routePlanner
     @Environment(AlertsModel.self) private var alerts
+    @Environment(FavouritesModel.self) private var favourites
     @Environment(SheetRouter.self) private var router
-    let favouriteStopIds: Set<String>
-    let bikeShareStations: [BikeShareStation]
-    let selectStop: (Stop) -> Void
-    let selectStopGroup: ([Stop], [BikeShareStation]) -> Void
-    let regionDidChange: (MKCoordinateRegion) -> Void
+    @Environment(\.gtfsService) private var gtfsService
 
     var body: some View {
         TransitMapView(
@@ -26,15 +23,15 @@ struct TransitMapLayer: View {
                 liveStops: mapLiveStops,
                 gtfsStops: mapGTFSStops,
                 selectedStopId: stopDetail.selectedStop?.id,
-                favouriteStopIds: favouriteStopIds,
+                favouriteStopIds: favourites.favouriteStopIDs,
                 alertStopIds: Set(alerts.alerts.flatMap(\.affectedStopIds)),
                 bikeShareStations: mapBikeShareStations,
                 routeOverlay: mapRouteOverlay,
                 hideMapPins: shouldHideMapPins
             ),
-            selectStop: selectStop,
-            selectStopGroup: selectStopGroup,
-            regionDidChange: regionDidChange
+            selectStop: { router.show([.stopDetail($0)]) },
+            selectStopGroup: { router.openStopGroup($0, bikeShareStations: $1) },
+            regionDidChange: { map.regionDidChange($0, using: gtfsService) }
         )
         .ignoresSafeArea()
         .accessibilityLabel("Luxembourg transit map")
@@ -51,7 +48,7 @@ struct TransitMapLayer: View {
     var mapBikeShareStations: [BikeShareStation] {
         guard preferences.showBikeShareStations, !shouldHideMapPins else { return [] }
 
-        var stations = bikeShareStations
+        var stations = map.bikeShareStations
         var indexByID = Dictionary(uniqueKeysWithValues: stations.enumerated().map { ($1.id, $0) })
 
         for station in selectedBikeShareStations {

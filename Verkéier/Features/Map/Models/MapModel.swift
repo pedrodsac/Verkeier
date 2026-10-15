@@ -32,6 +32,7 @@ final class MapModel {
         didSet { rebuildGTFSOnlyMapStops() }
     }
     private(set) var gtfsOnlyMapStops: [Stop] = []
+    private(set) var bikeShareStations: [BikeShareStation] = []
 
     let defaultRegion = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 49.6116, longitude: 6.1319),
@@ -39,12 +40,85 @@ final class MapModel {
     )
 
     @ObservationIgnored private var lastNearbyStopsRequestLocation: CLLocation?
+    @ObservationIgnored private var regionUpdateTask: Task<Void, Never>?
+    @ObservationIgnored private var nearbyStopsUpdateTask: Task<Void, Never>?
     private let minimumMapSpan = 0.001
     private let nearbyStopsRefreshDistance: CLLocationDistance = 100
     private static let nearbyGTFSFallbackLimit = 6
 
     init() {
         cameraRegion = defaultRegion
+    }
+}
+
+// MARK: - Loading
+
+extension MapModel {
+    /// Loads the timetable stops in view and the stops around `location`.
+    func loadStops(
+        near location: CLLocation?,
+        using liveTransitService: any LiveTransitService,
+        gtfsService: any GTFSService,
+        walkingRouter: any WalkingRouting
+    ) async {
+        await loadGTFSMapStops(using: gtfsService)
+        await loadNearbyStops(
+            location: location,
+            using: liveTransitService,
+            gtfsService: gtfsService,
+            walkingRouter: walkingRouter
+        )
+        await loadNearbyStopRoutes(using: gtfsService)
+    }
+
+    func loadBikeShareStations(using bikeShareService: any BikeShareService) async {
+        await bikeShareService.refreshStaticStations()
+        await bikeShareService.refreshAvailability()
+        bikeShareStations = await bikeShareService.snapshot()?.stations ?? []
+    }
+
+    /// Loads the timetable stops for the region the map came to rest on.
+    func regionDidChange(_ region: MKCoordinateRegion, using gtfsService: any GTFSService) {
+        regionUpdateTask?.cancel()
+        regionUpdateTask = Task {
+            do {
+                try await Task.sleep(for: .milliseconds(120))
+            } catch {
+                return
+            }
+            await updateVisibleMapRegion(region, using: gtfsService)
+        }
+    }
+
+    /// Follows the rider: centres the camera on a first fix when that was
+    /// asked for, and reloads the stops around them once the fix settles.
+    func locationDidChange(
+        to location: CLLocation?,
+        using liveTransitService: any LiveTransitService,
+        gtfsService: any GTFSService,
+        walkingRouter: any WalkingRouting
+    ) {
+        if centersOnNextLocation, location != nil {
+            centerOnUserLocation(location)
+            centersOnNextLocation = false
+        }
+        Task { await loadGTFSMapStops(using: gtfsService) }
+
+        nearbyStopsUpdateTask?.cancel()
+        nearbyStopsUpdateTask = Task {
+            do {
+                try await Task.sleep(for: .milliseconds(350))
+            } catch {
+                return
+            }
+            await loadNearbyStops(
+                location: location,
+                using: liveTransitService,
+                gtfsService: gtfsService,
+                walkingRouter: walkingRouter
+            )
+            await loadNearbyStopRoutes(using: gtfsService)
+        }
     }
 }
 
@@ -74,6 +148,21 @@ extension MapModel {
     func centerOnUserLocation(_ location: CLLocation?) {
         guard let coordinate = location?.coordinate else { return }
         focus(on: coordinate, span: 0.018)
+    }
+
+    /// Fits the camera to a trip's route, leaving room for the sheet below it.
+    func fit(trip coordinates: [RouteMapCoordinate]) {
+        guard let first = coordinates.first else { return }
+        let rect = coordinates.dropFirst().reduce(
+            MKMapRect(origin: MKMapPoint(first.coordinate), size: .init(width: 0, height: 0))
+        ) {
+            $0.union(MKMapRect(origin: MKMapPoint($1.coordinate), size: .init(width: 0, height: 0)))
+        }
+        var region = MKCoordinateRegion(rect)
+        region.span.latitudeDelta = max(0.008, region.span.latitudeDelta * 2.5)
+        region.span.longitudeDelta = max(0.008, region.span.longitudeDelta * 1.25)
+        region.center.latitude -= region.span.latitudeDelta * 0.25
+        moveCamera(to: region)
     }
 
     func sanitized(_ region: MKCoordinateRegion) -> MKCoordinateRegion? {

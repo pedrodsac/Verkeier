@@ -1,245 +1,139 @@
-import AsyncAlgorithms
-import CoreLocation
 import CoreSpotlight
-import MapKit
 import SwiftData
 import SwiftUI
 
+/// The full-screen map with the main sheet on top. It starts the app's data
+/// loading and passes location updates and incoming links to the models.
 struct TransitMapScreen: View {
-    @Environment(\.scenePhase) var scenePhase
-    @Environment(\.tripDetailService) var tripDetailService
-    @Environment(\.routeService) var routeService
-    @Environment(\.walkingRouter) var walkingRouter
-    @Environment(\.gtfsService) var gtfsService
-    @Environment(\.liveTransitService) var liveTransitService
-    @Environment(\.bikeShareService) private var bikeShareService
-    @Environment(\.accessibilityReduceMotion) var reduceMotion
-    @Environment(\.launchOnboardingDidFinish) var launchOnboardingDidFinish
-    @Environment(\.avlClient) var avlClient
-    @Environment(\.liveActivityManager) var liveActivityManager
-    @Environment(\.departureReminderService) var departureReminderService
-    @Environment(\.disruptionAlertService) var disruptionAlertService
-    @Environment(\.appConfiguration) var appConfiguration
     @Environment(AppPreferences.self) private var preferences
-    @Environment(\.modelContext) var modelContext
-    @Environment(\.horizontalSizeClass) var sizeClass
-    @Environment(MapModel.self) var map
-    @Environment(StopDetailModel.self) var stopDetail
-    @Environment(LineDetailModel.self) var lineDetail
-    @Environment(TripDetailViewModel.self) var tripDetail
-    @Environment(RoutePlannerModel.self) var routePlanner
-    @Environment(SearchModel.self) var search
-    @Environment(FavouritesModel.self) var favourites
-    @Environment(AlertsModel.self) var alerts
-    @Environment(SheetRouter.self) var router
-    @Query(sort: \PersistedFavouriteStop.createdAt) var favouriteEntities: [PersistedFavouriteStop]
-    @State var tripDetailReturnRegion: MKCoordinateRegion?
-    @State var tripDetailReturnDetent: BottomSheetDetent?
-    @State var tripDetailCameraDidFit = false
-    @State var mapRegionUpdateTask: Task<Void, Never>?
-    @State var searchUpdateContinuation: AsyncStream<String>.Continuation?
-    @State var nearbyStopsUpdateTask: Task<Void, Never>?
-    @State var isMainSheetPresented = false
-    @State var isOnboardingPresented = false
-    @State var favouriteStopIds: Set<String> = []
-    @State private var bikeShareStations: [BikeShareStation] = []
-    @AppStorage("hasCompletedOnboarding") var hasCompletedOnboarding = false
+    @Environment(MapModel.self) private var map
+    @Environment(StopDetailModel.self) private var stopDetail
+    @Environment(TripDetailViewModel.self) private var tripDetail
+    @Environment(RoutePlannerModel.self) private var routePlanner
+    @Environment(SearchModel.self) private var search
+    @Environment(FavouritesModel.self) private var favourites
+    @Environment(AlertsModel.self) private var alerts
+    @Environment(SheetRouter.self) private var router
+    @Environment(LocationService.self) private var locationService
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.launchOnboardingDidFinish) private var launchOnboardingDidFinish
+    @Environment(\.gtfsService) private var gtfsService
+    @Environment(\.liveTransitService) private var liveTransitService
+    @Environment(\.routeService) private var routeService
+    @Environment(\.tripDetailService) private var tripDetailService
+    @Environment(\.walkingRouter) private var walkingRouter
+    @Environment(\.bikeShareService) private var bikeShareService
+    @Environment(\.avlClient) private var avlClient
+    @Environment(\.disruptionAlertService) private var disruptionAlertService
+    @Environment(\.liveActivityManager) private var liveActivityManager
+    @Query(sort: \PersistedFavouriteStop.createdAt) private var savedFavourites: [PersistedFavouriteStop]
 
-    let locationService: LocationService
+    @State private var isMainSheetPresented = false
+    @State private var isOnboardingPresented = false
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            TransitMapLayer(
-                favouriteStopIds: favouriteStopIds,
-                bikeShareStations: bikeShareStations,
-                selectStop: { router.show([.stopDetail($0)]) },
-                selectStopGroup: { router.openStopGroup($0, bikeShareStations: $1) },
-                regionDidChange: scheduleMapRegionUpdate
-            )
-
-            VStack {
-                HStack {
-                    Spacer()
-                    LocationPermissionButton(
-                        authorizationStatus: locationService.authorizationStatus,
-                        requestLocation: router.requestLocation
-                    )
-                    .padding(.trailing, 16)
-                    .padding(.top, 12)
-                }
-
-                Spacer()
-            }
-        }
-        .sheet(isPresented: $isMainSheetPresented) {
-            TransitBottomSheet()
-                .safePresentationPlacement()
-                .presentationDetents(
-                    sizeClass == .compact
-                        ? BottomSheetDetent.presentationDetents : [Self.regularWidthPresentationDetent],
-                    selection: sheetPresentationDetent
-                )
-                .presentationBackground(Color(uiColor: .systemBackground))
-                .presentationBackgroundInteraction(
-                    sizeClass == .compact ? .enabled(upThrough: BottomSheetDetent.mediumPresentationDetent) : .enabled
-                )
-                .presentationCornerRadius(40)
-                .interactiveDismissDisabled()
-                // Keep the observation-based preference dependency explicit at
-                // this presentation boundary. Sheets have a separate hosting
-                // hierarchy, so relying on an inherited object can crash before
-                // the sheet's first body is rendered.
-                .environment(preferences)
-                .featureModels(router.models)
-                .environment(router)
-                .environment(router.locationService)
-                .scaledToFill()
-                .frame(maxWidth: 450)
-                .presentationSizing(.fitted)
-        }
-        .fullScreenCover(
-            isPresented: onboardingPresentationBinding,
-            onDismiss: {
-                if hasCompletedOnboarding {
-                    isMainSheetPresented = true
-                    launchOnboardingDidFinish()
-                }
-            }
-        ) {
-            OnboardingView {
-                hasCompletedOnboarding = true
-                isOnboardingPresented = false
-            }
-            .ignoresSafeArea()
-        }
-        .onAppear {
-            guard !isMainSheetPresented, !isOnboardingPresented else { return }
-            if hasCompletedOnboarding {
-                isMainSheetPresented = true
-            } else {
-                isOnboardingPresented = true
-            }
-        }
-        .onChange(of: preferences.includedRouteModes, initial: true) {
-            guard routePlanner.routeFilters.includedModes != preferences.includedRouteModes else { return }
-            var filters = routePlanner.routeFilters
-            filters.includedModes = preferences.includedRouteModes
-            router.updateRouteFilters(filters)
-        }
-        .onChange(of: isMainSheetPresented) {
-            if !isMainSheetPresented, hasCompletedOnboarding, !isOnboardingPresented {
-                isMainSheetPresented = true
-            }
-        }
-        .task {
-            routePlanner.loadRoutePlanner()
-            search.loadRecentStops()
-            locationService.startUpdatingIfAllowed()
-            favourites.gtfsFeedStatus = await gtfsService.refreshIfNeeded(force: false)
-            (routeService as? MobiliteitRouteService)?.prepareForRouting()
-            await bikeShareService.refreshStaticStations()
-            await bikeShareService.refreshAvailability()
-            bikeShareStations = await bikeShareService.snapshot()?.stations ?? []
-            await map.loadGTFSMapStops(using: gtfsService)
-            await map.loadNearbyStops(
-                location: locationService.currentLocation,
-                using: liveTransitService,
-                gtfsService: gtfsService,
-                walkingRouter: walkingRouter
-            )
-            await map.loadNearbyStopRoutes(using: gtfsService)
-            await alerts.refresh(using: avlClient, disruptionAlertService: disruptionAlertService)
-        }
-        .task {
-            await observeSearchUpdates()
-        }
-        .onChange(of: tripDetailSelection) { _, selection in
-            tripDetailNavigationChanged(to: selection)
-        }
-        .onChange(of: tripDetail.snapshot?.instance) {
-            fitTripDetailMapIfNeeded()
-        }
-        .task(id: activeTripDetailSelection) {
-            guard let selection = activeTripDetailSelection else {
-                tripDetail.deactivate()
-                return
-            }
-            await tripDetail.observe(selection, using: tripDetailService)
+            TransitMapLayer()
+            locationButton
         }
         .sensoryFeedback(.selection, trigger: stopDetail.selectedStop?.id)
-        .sensoryFeedback(.impact(weight: .light), trigger: favouriteStopIds.count)
-        .onChange(of: locationService.currentLocation) {
-            if map.centersOnNextLocation, locationService.currentLocation != nil {
-                map.centerOnUserLocation(locationService.currentLocation)
-                map.centersOnNextLocation = false
+        .sensoryFeedback(.impact(weight: .light), trigger: favourites.favouriteStops.count)
+        .sheet(isPresented: $isMainSheetPresented) { mainSheet }
+        .fullScreenCover(isPresented: onboardingPresentationBinding, onDismiss: onboardingDidDismiss) {
+            onboarding
+        }
+        .task { await loadAppData() }
+        .task(id: router.liveTripDetailSelection) { await followTripDetail() }
+        .task(id: favouriteBoardsRefreshID) { await keepFavouriteBoardsCurrent() }
+        .onAppear(perform: appear)
+        .onChange(of: isMainSheetPresented) { keepMainSheetPresented() }
+        .onChange(of: savedFavourites) { syncSavedFavourites() }
+        .onChange(of: locationService.currentLocation) { locationDidChange() }
+        .onChange(of: router.tripDetailSelection) { _, selection in router.tripDetailSelectionDidChange(to: selection) }
+        .onChange(of: tripDetail.snapshot?.instance) { router.fitMapToTripIfNeeded() }
+        .onChange(of: preferences.includedRouteModes, initial: true) {
+            router.includeRouteModes(preferences.includedRouteModes)
+        }
+        .onChange(of: scenePhase, initial: true) { router.isSceneActive = scenePhase == .active }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            openPendingHandoff()
+        }
+        .onOpenURL { open(TransitIntentHandoff(url: $0)) }
+        .onContinueUserActivity(CSSearchableItemActionType) { open(TransitIntentHandoff(spotlightActivity: $0)) }
+    }
+}
+
+// MARK: - Subviews
+
+private extension TransitMapScreen {
+    static let regularWidthPresentationDetent = PresentationDetent.fraction(1)
+
+    var locationButton: some View {
+        VStack {
+            HStack {
+                Spacer()
+                LocationPermissionButton(
+                    authorizationStatus: locationService.authorizationStatus,
+                    requestLocation: router.requestLocation
+                )
+                .padding(.trailing, 16)
+                .padding(.top, 12)
             }
-            Task {
-                await map.loadGTFSMapStops(using: gtfsService)
+
+            Spacer()
+        }
+    }
+
+    var mainSheet: some View {
+        TransitBottomSheet()
+            .safePresentationPlacement()
+            .presentationDetents(
+                sizeClass == .compact
+                    ? BottomSheetDetent.presentationDetents : [Self.regularWidthPresentationDetent],
+                selection: sheetPresentationDetent
+            )
+            .presentationBackground(Color(uiColor: .systemBackground))
+            .presentationBackgroundInteraction(
+                sizeClass == .compact ? .enabled(upThrough: BottomSheetDetent.mediumPresentationDetent) : .enabled
+            )
+            .presentationCornerRadius(40)
+            .interactiveDismissDisabled()
+            // Keep the observation-based preference dependency explicit at
+            // this presentation boundary. Sheets have a separate hosting
+            // hierarchy, so relying on an inherited object can crash before
+            // the sheet's first body is rendered.
+            .environment(preferences)
+            .featureModels(router.models)
+            .environment(router)
+            .environment(router.locationService)
+            .scaledToFill()
+            .frame(maxWidth: 450)
+            .presentationSizing(.fitted)
+    }
+
+    var onboarding: some View {
+        OnboardingView {
+            hasCompletedOnboarding = true
+            isOnboardingPresented = false
+        }
+        .ignoresSafeArea()
+    }
+
+    var sheetPresentationDetent: Binding<PresentationDetent> {
+        Binding(
+            get: {
+                // Regular width (iPad) only supports a single detent, so the
+                // selection must match it or UIKit throws.
+                sizeClass == .compact ? router.detent.presentationDetent : Self.regularWidthPresentationDetent
+            },
+            set: { presentationDetent in
+                guard sizeClass == .compact else { return }
+                router.detent = BottomSheetDetent(presentationDetent: presentationDetent)
             }
-            scheduleNearbyStopsRefresh()
-            router.calculateWaitingRouteIfNeeded()
-        }
-        .task(id: favouriteRefreshTaskKey) {
-            guard router.selectedTab == .home else { return }
-            await refreshFavouriteStops()
-            while !Task.isCancelled, router.selectedTab == .home {
-                try? await Task.sleep(for: .seconds(45))
-                guard !Task.isCancelled, router.selectedTab == .home else { return }
-                await refreshFavouriteStops()
-            }
-        }
-        .onChange(of: search.searchQuery) {
-            scheduleSearchUpdate()
-        }
-        .onChange(of: favouriteEntities) {
-            favouriteStopIds = Set(favouriteEntities.map(\.stopId))
-            favourites.favouriteStops = favouriteStops
-            favourites.retainBoards(forStopIDs: favouriteStopIds)
-            favourites.mirrorForIntents(in: modelContext)
-        }
-        .onChange(of: scenePhase, initial: true) {
-            router.isSceneActive = scenePhase == .active
-        }
-        .onAppear {
-            favouriteStopIds = Set(favouriteEntities.map(\.stopId))
-            favourites.favouriteStops = favouriteStops
-            favourites.mirrorForIntents(in: modelContext)
-            handlePendingIntentHandoff()
-        }
-        .onReceive(
-            NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
-        ) { _ in
-            handlePendingIntentHandoff()
-        }
-        .onOpenURL { url in
-            handleDeepLink(url)
-        }
-        .onContinueUserActivity(CSSearchableItemActionType) { activity in
-            handleSpotlightActivity(activity)
-        }
-    }
-
-    var favouriteStops: [Stop] {
-        favouriteEntities.map(\.stop)
-    }
-
-    var favouriteRefreshKey: String {
-        favouriteEntities.map(\.stopId).joined(separator: "|")
-    }
-
-    var favouriteRefreshTaskKey: String {
-        "\(favouriteRefreshKey)|\(router.selectedTab == .home)|\(canLoadLiveFavouriteDepartures)"
-    }
-
-    var canLoadLiveFavouriteDepartures: Bool {
-        // Favourites can always refresh a GTFS-only board; the live relay is
-        // additive rather than a prerequisite for a useful widget snapshot.
-        liveTransitService.isConfigured || favourites.gtfsFeedStatus.isReady
-    }
-
-    var isShowingRouteDetail: Bool {
-        if case .routeTimeline = router.activePath.last { return true }
-        return false
+        )
     }
 
     var onboardingPresentationBinding: Binding<Bool> {
@@ -258,6 +152,96 @@ struct TransitMapScreen: View {
     }
 }
 
+// MARK: - Lifecycle
+
+private extension TransitMapScreen {
+    /// Restarts the favourite board refresh when the favourites change, Home is
+    /// shown or hidden, or boards become loadable.
+    var favouriteBoardsRefreshID: String {
+        let canLoadBoards = liveTransitService.isConfigured || favourites.gtfsFeedStatus.isReady
+        let stopIDs = favourites.favouriteStops.map(\.id).joined(separator: "|")
+        return "\(stopIDs)|\(router.selectedTab == .home)|\(canLoadBoards)"
+    }
+
+    func appear() {
+        if !isMainSheetPresented, !isOnboardingPresented {
+            if hasCompletedOnboarding {
+                isMainSheetPresented = true
+            } else {
+                isOnboardingPresented = true
+            }
+        }
+        syncSavedFavourites()
+        openPendingHandoff()
+    }
+
+    /// Loads what the map and Home show once the map is on screen.
+    func loadAppData() async {
+        routePlanner.loadRoutePlanner()
+        search.loadRecentStops()
+        locationService.startUpdatingIfAllowed()
+        await favourites.refreshFeedStatus(using: gtfsService)
+        (routeService as? MobiliteitRouteService)?.prepareForRouting()
+        await map.loadBikeShareStations(using: bikeShareService)
+        await map.loadStops(
+            near: locationService.currentLocation,
+            using: liveTransitService,
+            gtfsService: gtfsService,
+            walkingRouter: walkingRouter
+        )
+        await alerts.refresh(using: avlClient, disruptionAlertService: disruptionAlertService)
+    }
+
+    func followTripDetail() async {
+        guard let selection = router.liveTripDetailSelection else {
+            tripDetail.deactivate()
+            return
+        }
+        await tripDetail.observe(selection, using: tripDetailService)
+    }
+
+    func keepFavouriteBoardsCurrent() async {
+        guard router.selectedTab == .home else { return }
+        await favourites.keepBoardsCurrent(using: liveTransitService, gtfsService: gtfsService)
+    }
+
+    func syncSavedFavourites() {
+        favourites.savedFavouritesDidChange(savedFavourites.map(\.stop), in: modelContext)
+    }
+
+    func locationDidChange() {
+        map.locationDidChange(
+            to: locationService.currentLocation,
+            using: liveTransitService,
+            gtfsService: gtfsService,
+            walkingRouter: walkingRouter
+        )
+        router.calculateWaitingRouteIfNeeded()
+    }
+
+    func keepMainSheetPresented() {
+        if !isMainSheetPresented, hasCompletedOnboarding, !isOnboardingPresented {
+            isMainSheetPresented = true
+        }
+    }
+
+    func onboardingDidDismiss() {
+        if hasCompletedOnboarding {
+            isMainSheetPresented = true
+            launchOnboardingDidFinish()
+        }
+    }
+
+    func openPendingHandoff() {
+        open(TransitIntentHandoff.consumePending())
+    }
+
+    func open(_ handoff: TransitIntentHandoff?) {
+        guard let handoff else { return }
+        router.handle(handoff, liveTransitService: liveTransitService, liveActivityManager: liveActivityManager)
+    }
+}
+
 extension View {
     func safePresentationPlacement() -> some View {
         if #available(anyAppleOS 27.0, *) {
@@ -269,6 +253,6 @@ extension View {
 }
 
 #Preview {
-    TransitMapScreen(locationService: LocationService())
+    TransitMapScreen()
         .previewEnvironment()
 }

@@ -268,6 +268,19 @@ extension StopDetailModel {
         }
     }
 
+    /// Loads the board and starts a Live Activity for the next departure from
+    /// `stop` that can be tracked, as the "track next departure" intent asks.
+    func trackNextDeparture(
+        from stop: Stop,
+        using liveTransitService: any LiveTransitService,
+        gtfsService: any GTFSService,
+        liveActivityManager: LiveActivityManager
+    ) async {
+        await loadDepartures(using: liveTransitService, gtfsService: gtfsService)
+        guard let departure = DepartureTrackingSelection.nextTrackableDeparture(from: departures) else { return }
+        await liveActivityManager.startTracking(departure: departure, stop: stop)
+    }
+
     func updateSelectedStopRoutes(using gtfsService: any GTFSService) async {
         guard let selectedStop else {
             selectedStopRoutes = []
