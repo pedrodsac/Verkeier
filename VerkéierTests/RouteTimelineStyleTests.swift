@@ -5,11 +5,11 @@ import Testing
 struct RouteTimelineStyleTests {
     @Test("Walking rails never take precedence for a place marker")
     func markerPrefersAdjacentTransitRail() {
-        #expect(TimelineRail.preferredDotRail(
+        #expect(RouteTimelineRail.preferredDotRail(
             above: .walk,
             below: .transit(.train)
         ) == .transit(.train))
-        #expect(TimelineRail.preferredDotRail(
+        #expect(RouteTimelineRail.preferredDotRail(
             above: .transit(.bus),
             below: .walk
         ) == .transit(.bus))

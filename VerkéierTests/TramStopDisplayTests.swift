@@ -35,7 +35,7 @@ struct TramStopDisplayTests {
             isApproximateRoute: true, liveDataAvailable: false, isCancelled: false, fetchedAt: .now)
         let selection = TripDetailSelection(instance: instance, boardingSequence: 1, alightingSequence: 1,
             lineName: "T1", routeShortName: "T1", headsign: "Luxembourg, Stadion", mode: .tram, routeID: nil)
-        let rows = TripStopPresentation.rows(snapshot: snapshot, selection: selection, now: .now, refreshFailed: false)
+        let rows = TripStopItemBuilder.items(snapshot: snapshot, selection: selection, now: .now, refreshFailed: false)
         #expect(rows.first?.name == "Hamilius")
         #expect(snapshot.stops.first?.stop.fullName == "Luxembourg, Hamilius")
         #expect(selection.headsign == "Luxembourg, Stadion")

@@ -1,0 +1,207 @@
+import SwiftUI
+
+/// Current service alerts from the AVL feed.
+struct AlertsScreen: View {
+    @Environment(AlertsModel.self) private var model
+    @Environment(\.avlClient) private var avlClient
+    @Environment(\.disruptionAlertService) private var disruptionAlertService
+
+    var body: some View {
+        ScrollView {
+            content
+                .padding(.horizontal, 16)
+        }
+        .navigationTitle("Service Alerts")
+        .toolbarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: refresh) {
+                    Label("Refresh alerts", systemImage: "arrow.clockwise")
+                }
+                .disabled(model.isLoadingAlerts)
+            }
+        }
+    }
+}
+
+// MARK: - Subviews
+
+private extension AlertsScreen {
+    var content: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if model.isLoadingAlerts, model.alerts.isEmpty {
+                DepartureLoadingCard(title: "Loading alerts")
+            } else if let errorMessage = model.alertsErrorMessage {
+                CompactUnavailableCard(
+                    title: "Alerts unavailable",
+                    message: errorMessage,
+                    systemImage: "wifi.exclamationmark"
+                )
+            } else if model.alerts.isEmpty {
+                CompactUnavailableCard(
+                    title: "No current alerts",
+                    message: "No AVL messages are available.",
+                    systemImage: "checkmark.circle"
+                )
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(model.alerts) { alert in
+                            AlertCard(alert: alert)
+                        }
+                    }
+                    .padding(.bottom, 72)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+        }
+    }
+
+    func refresh() {
+        Task {
+            await model.refresh(using: avlClient, disruptionAlertService: disruptionAlertService)
+        }
+    }
+}
+
+#Preview {
+    let models = FeatureModels()
+    models.alerts.alerts = [
+        AlertMessage(
+            id: "alert-1",
+            title: "Line 16 diverted",
+            body:
+                "Due to roadworks on Avenue de la Gare, buses are diverting via Rue du Fort Rheinsheim until further notice.",
+            severity: .warning,
+            affectedStopIds: ["stop-1", "stop-2"],
+            affectedRouteIds: ["16"],
+            startsAt: .now,
+            endsAt: nil,
+            dataSource: .mock
+        ),
+        AlertMessage(
+            id: "alert-2",
+            title: "T1 service restored",
+            body: "Tram service between Rout Bréck–Pafendall and Luxexpo has resumed normal operation.",
+            severity: .info,
+            affectedStopIds: ["stop-3"],
+            affectedRouteIds: ["T1"],
+            startsAt: .now,
+            endsAt: nil,
+            dataSource: .mock
+        ),
+    ]
+    return NavigationStack {
+        AlertsScreen()
+    }
+    .previewEnvironment(models)
+}
+
+private struct AlertCard: View {
+    let alert: AlertMessage
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: iconName)
+                    .font(.headline.weight(.semibold))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(iconColor)
+                    .frame(width: 36, height: 36)
+                    .background(iconColor.opacity(0.14), in: Circle())
+                    .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 8) {
+                        Text(severityTitle)
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(iconColor)
+                            .textCase(.uppercase)
+                        Spacer(minLength: 0)
+                    }
+
+                    Text(alert.title)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(.primary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            if !alert.body.isEmpty {
+                Text(alert.body)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .lineSpacing(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if !alert.affectedRouteIds.isEmpty {
+                FlowLineChips(lines: alert.affectedRouteIds)
+            }
+        }
+        .padding(14)
+        .background(
+            .background.opacity(0.78),
+            in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
+                .stroke(iconColor.opacity(0.20), lineWidth: 1)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var severityTitle: String {
+        switch alert.severity {
+        case .info: "Info"
+        case .warning: "Disruption"
+        case .severe: "Severe"
+        case .unknown: "Notice"
+        }
+    }
+
+    private var iconName: String {
+        switch alert.severity {
+        case .info: "info.circle.fill"
+        case .warning: "exclamationmark.triangle.fill"
+        case .severe: "xmark.octagon.fill"
+        case .unknown: "questionmark.circle.fill"
+        }
+    }
+
+    private var iconColor: Color {
+        switch alert.severity {
+        case .info: .blue
+        case .warning: .orange
+        case .severe: .red
+        case .unknown: .secondary
+        }
+    }
+}
+
+private struct FlowLineChips: View {
+    let lines: [String]
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 6) {
+                chips
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                chips
+            }
+        }
+    }
+
+    private var chips: some View {
+        ForEach(lines.prefix(8), id: \.self) { line in
+            Text(line)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 5)
+                .background(.secondary.opacity(0.12), in: Capsule())
+        }
+    }
+}

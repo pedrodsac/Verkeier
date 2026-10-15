@@ -4,7 +4,7 @@ import SwiftUI
 /// lower half (`below`), each drawn as a continuous line, plus a marker
 /// centred on the junction. With `VStack(spacing: 0)` the per-row slices join
 /// into one continuous rail.
-struct TimelineRail: View {
+struct RouteTimelineRail: View {
     @Environment(\.colorScheme) private var colorScheme
 
     let above: RailStyle?

@@ -108,7 +108,7 @@ struct RouteContinuationTests {
         #expect(continuation.snapshot.stops.first?.stop.fullName == "B")
         #expect(detail.mapOverlay.segments.contains { $0.routeShortName == "18" && $0.emphasis == .highlighted })
         #expect(detail.mapOverlay.stopMarkers.contains { $0.id.hasPrefix("continuation:") && $0.emphasis == .highlighted })
-        let model = TripDetailViewModel(now: { anchor })
+        let model = TripDetailModel(now: { anchor })
         model.select(selection)
         await model.refresh(using: FixtureTripDetailService(snapshot: detail))
         #expect(model.continuations.first?.rows.allSatisfy(\.isInRide) == true)

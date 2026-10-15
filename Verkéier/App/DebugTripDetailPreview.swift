@@ -102,14 +102,14 @@ enum TripDetailPreviewData {
 }
 
 struct TripDetailPreviewHost: View {
-    @State private var model = TripDetailViewModel()
-    @State private var path: [TransitSheetRoute] = []
+    @State private var model = TripDetailModel()
+    @State private var path: [SheetRoute] = []
     @State private var presented = false
-    @State private var detent = BottomSheetDetent.mediumPresentationDetent
+    @State private var detent = SheetDetent.mediumPresentationDetent
     private let service = FixtureTripDetailService(snapshot: TripDetailPreviewData.snapshot)
 
     var body: some View {
-        TransitMapView(
+        StopsMapView(
             state: .init(
                 region: MKCoordinateRegion(
                     center: .init(latitude: 49.59, longitude: 6.17),
@@ -141,9 +141,9 @@ struct TripDetailPreviewHost: View {
                 .padding(16)
                 .navigationTitle("Selected route")
                 .toolbarTitleDisplayMode(.inline)
-                .navigationDestination(for: TransitSheetRoute.self) { route in
+                .navigationDestination(for: SheetRoute.self) { route in
                     if case let .tripDetail(selection) = route {
-                        TripDetailView(selection: selection)
+                        TripDetailScreen(selection: selection)
                             .environment(model)
                             .environment(\.tripDetailService, service)
                             .task { await model.observe(selection, using: service) }
@@ -151,8 +151,8 @@ struct TripDetailPreviewHost: View {
                 }
             }
             .dynamicTypeSize(CommandLine.arguments.contains("--trip-detail-accessibility") ? .accessibility3 : .large)
-            .presentationDetents(BottomSheetDetent.presentationDetents, selection: $detent)
-            .presentationBackgroundInteraction(.enabled(upThrough: BottomSheetDetent.mediumPresentationDetent))
+            .presentationDetents(SheetDetent.presentationDetents, selection: $detent)
+            .presentationBackgroundInteraction(.enabled(upThrough: SheetDetent.mediumPresentationDetent))
             .interactiveDismissDisabled()
         }
     }

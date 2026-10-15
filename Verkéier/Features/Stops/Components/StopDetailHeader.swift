@@ -78,7 +78,7 @@ private struct RouteLineCard: View {
 
     var body: some View {
         Menu {
-            NavigationLink(value: TransitSheetRoute.lineDetail(route)) {
+            NavigationLink(value: SheetRoute.lineDetail(route)) {
                 Label("Information", systemImage: "info.circle")
             }
         } label: {

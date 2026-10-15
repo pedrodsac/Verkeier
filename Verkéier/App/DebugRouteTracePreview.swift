@@ -185,7 +185,7 @@ struct RouteTracePreviewHost: View {
     @State private var detent = PresentationDetent.fraction(0.22)
 
     var body: some View {
-        TransitMapView(
+        StopsMapView(
             state: .init(
                 region: RouteTracePreviewData.region(for: scenario),
                 cameraUpdateToken: cameraToken,

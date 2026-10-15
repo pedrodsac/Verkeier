@@ -37,7 +37,7 @@ struct RouteOptionCard: View {
     }
 
     private func cardLink(hasDeparted: Bool) -> some View {
-        NavigationLink(value: TransitSheetRoute.routeTimeline(option.id)) {
+        NavigationLink(value: SheetRoute.routeTimeline(option.id)) {
             VStack(alignment: .leading, spacing: 8) {
                 // ── Header: time range / duration / distance ──────────
                 HStack(alignment: .firstTextBaseline, spacing: 0) {
