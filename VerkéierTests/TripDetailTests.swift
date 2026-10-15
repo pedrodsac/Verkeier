@@ -10,7 +10,7 @@ struct TripDetailTests {
     @Test func passedStatusAndRideHighlightAreIndependent() throws {
         let selection = try selection()
         let entries = (1...5).map { stop($0, scheduledOffset: Double($0 - 3) * 60, delay: 0) }
-        let rows = TripStopPresentation.rows(snapshot: snapshot(entries), selection: selection, now: anchor, refreshFailed: false)
+        let rows = TripStopItemBuilder.items(snapshot: snapshot(entries), selection: selection, now: anchor, refreshFailed: false)
         #expect(rows.map(\.isPassed) == [true, true, true, false, false])
         #expect(rows.map(\.isInRide) == [false, true, true, true, false])
         #expect(rows[4].statusTint == .green)
@@ -21,7 +21,7 @@ struct TripDetailTests {
     @Test func departureBoardBrowsingDoesNotHighlightRideStops() async throws {
         var selected = try selection()
         selected.highlightsRide = false
-        let model = TripDetailViewModel(now: { anchor })
+        let model = TripDetailModel(now: { anchor })
         model.select(selected)
         let entries = (1...5).map { stop($0, scheduledOffset: Double($0 - 3) * 60, delay: 0) }
         await model.refresh(using: FixtureTripDetailService(snapshot: snapshot(entries)))
@@ -35,7 +35,7 @@ struct TripDetailTests {
         let entries = [stop(1, scheduledOffset: -600, delay: 2, historical: true),
                        stop(2, scheduledOffset: 60, delay: 5), stop(3, scheduledOffset: 600, delay: nil),
                        stop(4, scheduledOffset: 900, delay: -1)]
-        let rows = TripStopPresentation.rows(snapshot: snapshot(entries), selection: try selection(), now: anchor, refreshFailed: false)
+        let rows = TripStopItemBuilder.items(snapshot: snapshot(entries), selection: try selection(), now: anchor, refreshFailed: false)
         #expect(rows[0].status == "+2")
         #expect(rows[1].status == "+5")
         #expect(rows[2].liveTime == nil)
@@ -53,7 +53,7 @@ struct TripDetailTests {
             return TripStopEntry(sequence: index + 1, stop: stop(index + 1).stop,
                 arrival: value, departure: value, platform: "\(index + 1)")
         }
-        let rows = TripStopPresentation.rows(snapshot: snapshot(entries), selection: try selection(), now: anchor, refreshFailed: false)
+        let rows = TripStopItemBuilder.items(snapshot: snapshot(entries), selection: try selection(), now: anchor, refreshFailed: false)
         #expect(rows.allSatisfy { $0.status == "On time" && $0.statusTint == .green && $0.liveTime == nil })
         #expect(rows.map(\.platform) == ["1", "2", "3"])
     }
@@ -63,7 +63,7 @@ struct TripDetailTests {
             realtime: anchor.addingTimeInterval(660), isHistoricalReport: false,
             observedAt: anchor, isCancelled: false)
         let entry = TripStopEntry(sequence: 1, stop: stop(1).stop, arrival: value, departure: value, platform: nil)
-        let row = try #require(TripStopPresentation.rows(snapshot: snapshot([entry]), selection: try selection(),
+        let row = try #require(TripStopItemBuilder.items(snapshot: snapshot([entry]), selection: try selection(),
             now: anchor, refreshFailed: false).first)
         #expect(row.status == "+1")
         #expect(row.liveTime == value.realtime)
@@ -75,7 +75,7 @@ struct TripDetailTests {
         let entries = [stop(1, scheduledOffset: -600, delay: nil),
             TripStopEntry(sequence: 2, stop: stop(2).stop, arrival: arrival,
                 departure: timing(60, delay: 0), platform: nil), stop(3, scheduledOffset: 600, delay: nil)]
-        let rows = TripStopPresentation.rows(snapshot: snapshot(entries), selection: try selection(), now: anchor, refreshFailed: false)
+        let rows = TripStopItemBuilder.items(snapshot: snapshot(entries), selection: try selection(), now: anchor, refreshFailed: false)
         #expect(rows.map(\.isPassed) == [true, false, false])
     }
 
@@ -83,7 +83,7 @@ struct TripDetailTests {
         let entries = [-60.0, 0, 60].enumerated().map { index, offset in
             stop(index + 1, scheduledOffset: offset, delay: nil)
         }
-        let rows = TripStopPresentation.rows(snapshot: snapshot(entries, liveDataAvailable: false),
+        let rows = TripStopItemBuilder.items(snapshot: snapshot(entries, liveDataAvailable: false),
             selection: try selection(), now: anchor, refreshFailed: true)
         #expect(rows.map(\.isPassed) == [true, true, false])
         #expect(rows.allSatisfy { $0.status == "Live time unavailable" && $0.liveTime == nil })
@@ -91,7 +91,7 @@ struct TripDetailTests {
 
     @Test func liveDelayTakesPrecedenceOverPastScheduledDeparture() throws {
         let entries = [stop(1, scheduledOffset: -60, delay: 5), stop(2, scheduledOffset: 600, delay: nil)]
-        let rows = TripStopPresentation.rows(snapshot: snapshot(entries), selection: try selection(), now: anchor, refreshFailed: false)
+        let rows = TripStopItemBuilder.items(snapshot: snapshot(entries), selection: try selection(), now: anchor, refreshFailed: false)
         #expect(rows.allSatisfy { !$0.isPassed })
     }
 
@@ -100,9 +100,9 @@ struct TripDetailTests {
                 arrival: timing(-60, delay: nil), departure: timing(60, delay: nil), platform: nil),
             TripStopEntry(sequence: 2, stop: stop(2).stop,
                 arrival: timing(120, delay: nil), departure: nil, platform: nil)]
-        let initial = TripStopPresentation.rows(snapshot: snapshot(entries), selection: try selection(), now: anchor, refreshFailed: false)
+        let initial = TripStopItemBuilder.items(snapshot: snapshot(entries), selection: try selection(), now: anchor, refreshFailed: false)
         #expect(initial.allSatisfy { !$0.isPassed })
-        let later = TripStopPresentation.rows(snapshot: snapshot(entries), selection: try selection(),
+        let later = TripStopItemBuilder.items(snapshot: snapshot(entries), selection: try selection(),
             now: anchor.addingTimeInterval(120), refreshFailed: false)
         #expect(later.allSatisfy { $0.isPassed })
     }
@@ -110,7 +110,7 @@ struct TripDetailTests {
     @Test func stalePredictionsDoNotAdvanceProgressButHistoricalReportsDo() throws {
         let entries = [stop(1, scheduledOffset: -600, delay: 1, historical: true, age: 300),
                        stop(2, scheduledOffset: -300, delay: 0, age: 300), stop(3, scheduledOffset: 600, delay: 1)]
-        let rows = TripStopPresentation.rows(snapshot: snapshot(entries), selection: try selection(), now: anchor, refreshFailed: false)
+        let rows = TripStopItemBuilder.items(snapshot: snapshot(entries), selection: try selection(), now: anchor, refreshFailed: false)
         #expect(rows.map(\.isPassed) == [true, false, false])
         #expect(rows[1].statusTint == .secondary)
         #expect(rows[1].status.contains("Stale"))
@@ -119,12 +119,12 @@ struct TripDetailTests {
 
     @Test func cancelledRunDoesNotAppearToHavePassedByItsTimetable() throws {
         let entries = [stop(1, scheduledOffset: -600, delay: nil), stop(2, scheduledOffset: -300, delay: nil)]
-        let rows = TripStopPresentation.rows(snapshot: snapshot(entries, cancelled: true), selection: try selection(), now: anchor, refreshFailed: false)
+        let rows = TripStopItemBuilder.items(snapshot: snapshot(entries, cancelled: true), selection: try selection(), now: anchor, refreshFailed: false)
         #expect(rows.allSatisfy { !$0.isPassed && $0.status == "Cancelled" && $0.statusTint == .red })
     }
 
     @Test func failedRefreshKeepsRowsAndMarksLiveDataStale() async throws {
-        let model = TripDetailViewModel(now: { anchor })
+        let model = TripDetailModel(now: { anchor })
         model.select(try selection())
         await model.refresh(using: FixtureTripDetailService(snapshot: snapshot([stop(2, scheduledOffset: 600, delay: 3)])))
         let first = model.snapshot
@@ -138,7 +138,7 @@ struct TripDetailTests {
 
     @Test func changingSelectionOrLeavingRejectsInFlightResponse() async throws {
         for leave in [false, true] {
-            let model = TripDetailViewModel(now: { anchor })
+            let model = TripDetailModel(now: { anchor })
             model.select(try selection())
             let gate = TripDetailGate()
             let service = DelayedTripDetailService(snapshot: snapshot([stop(2)]), gate: gate)
@@ -153,7 +153,7 @@ struct TripDetailTests {
     }
 
     @Test func missingHistoricalReportsAreRetainedOnSuccessfulRefresh() async throws {
-        let model = TripDetailViewModel(now: { anchor })
+        let model = TripDetailModel(now: { anchor })
         model.select(try selection())
         await model.refresh(using: FixtureTripDetailService(snapshot: snapshot([stop(1, scheduledOffset: -600, delay: 2, historical: true)])))
         await model.refresh(using: FixtureTripDetailService(snapshot: snapshot([stop(1, scheduledOffset: -600, delay: nil)])))
@@ -164,7 +164,7 @@ struct TripDetailTests {
     @Test func nativeNavigationSelectionIncludesServiceDayAndOccurrences() throws {
         let selection = try selection()
         #expect(selection.instance.serviceDate == "20261009")
-        #expect(TransitSheetRoute.tripDetail(selection).defaultDetent == .medium)
+        #expect(SheetRoute.tripDetail(selection).defaultDetent == .medium)
         let leg = leg()
         let item = try #require(RouteTimelineBuilder.items(from: [leg]).compactMap { item -> SegmentNode? in
             if case let .segment(segment) = item { return segment }; return nil
@@ -182,7 +182,7 @@ struct TripDetailTests {
             isApproximateRoute: false, liveDataAvailable: true, isCancelled: false, fetchedAt: anchor)
         var root = snapshot([stop(1, delay: 0), stop(2, delay: 0)])
         root.continuations = [.init(selection: next, snapshot: child)]
-        let model = TripDetailViewModel(now: { anchor })
+        let model = TripDetailModel(now: { anchor })
         model.select(selected)
         await model.refresh(using: FixtureTripDetailService(snapshot: root))
         #expect(model.rows.allSatisfy { $0.status == "On time" })
@@ -207,7 +207,7 @@ struct TripDetailTests {
                 mapOverlay: .init(segments: []), isApproximateRoute: false,
                 liveDataAvailable: true, isCancelled: false, fetchedAt: anchor))
         }
-        let model = TripDetailViewModel(now: { anchor })
+        let model = TripDetailModel(now: { anchor })
         model.select(selected)
         let service = FixtureTripDetailService(snapshot: root)
         await model.refresh(using: service)
@@ -242,7 +242,7 @@ struct TripDetailTests {
             liveDataAvailable: true, isCancelled: false, fetchedAt: anchor)
         var root = snapshot([stop(1, delay: 0)])
         root.continuations = [.init(selection: next, snapshot: child)]
-        let model = TripDetailViewModel(now: { anchor })
+        let model = TripDetailModel(now: { anchor })
         model.select(selected)
         await model.refresh(using: FixtureTripDetailService(snapshot: root))
         let unavailable = TripDetailSnapshot(instance: next.instance, stops: [stop(1, delay: nil)], mapOverlay: child.mapOverlay,

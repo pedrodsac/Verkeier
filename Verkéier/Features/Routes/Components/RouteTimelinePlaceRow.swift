@@ -3,7 +3,7 @@ import SwiftUI
 /// One station / address in the route timeline. The role drives everything:
 /// which time(s) show in the gutter, the marker on the rail, and the detail
 /// lines (platform, wait, tight-transfer warning) beneath it.
-struct TimelinePlaceRow: View {
+struct RouteTimelinePlaceRow: View {
     let node: PlaceNode
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -43,7 +43,7 @@ struct TimelinePlaceRow: View {
             .padding(.vertical, 4)
         }
         .overlay(alignment: .leading) {
-            TimelineRail(above: node.railAbove, below: node.railBelow, marker: .continuation)
+            RouteTimelineRail(above: node.railAbove, below: node.railBelow, marker: .continuation)
                 .frame(width: RouteTimelineLayout.railColumnWidth)
                 .offset(x: timeColumnWidth + RouteTimelineLayout.columnSpacing)
         }
@@ -63,7 +63,7 @@ struct TimelinePlaceRow: View {
                 .padding(.vertical, RouteTimelineLayout.placeRowPadding)
         }
         .overlay(alignment: .leading) {
-            TimelineRail(
+            RouteTimelineRail(
                 above: node.railAbove,
                 below: node.railBelow,
                 marker: marker,
@@ -247,7 +247,7 @@ struct TimelinePlaceRow: View {
 
     // MARK: - Role styling
 
-    private var marker: TimelineRail.Marker {
+    private var marker: RouteTimelineRail.Marker {
         switch node.role {
         case .origin: .ring
         case .board, .transfer, .alight: .dot

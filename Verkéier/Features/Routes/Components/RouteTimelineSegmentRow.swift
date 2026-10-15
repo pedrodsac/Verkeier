@@ -3,11 +3,11 @@ import SwiftUI
 /// The movement between two places: a ride (line badge + destination direction +
 /// duration) or a walk/transfer (a single detail line, with the walking glyph
 /// carried on the rail rather than beside the text).
-struct TimelineSegmentRow: View {
+struct RouteTimelineSegmentRow: View {
     let node: SegmentNode
     var alerts: [AlertMessage] = []
 
-    /// Matches ``TimelinePlaceRow``'s gutter (same base + trait) so the rail stays
+    /// Matches ``RouteTimelinePlaceRow``'s gutter (same base + trait) so the rail stays
     /// aligned as Dynamic Type scales.
     @ScaledMetric(relativeTo: .subheadline) private var timeColumnWidth = RouteTimelineLayout.timeColumnWidth
 
@@ -25,7 +25,7 @@ struct TimelineSegmentRow: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .overlay(alignment: .leading) {
-            TimelineRail(
+            RouteTimelineRail(
                 above: node.rail,
                 below: node.rail,
                 marker: railMarker
@@ -43,7 +43,7 @@ struct TimelineSegmentRow: View {
         case .transit:
             VStack(alignment: .leading, spacing: RouteTimelineLayout.blockLineSpacing) {
                 if let selection = node.tripSelection {
-                    NavigationLink(value: TransitSheetRoute.tripDetail(selection)) {
+                    NavigationLink(value: SheetRoute.tripDetail(selection)) {
                         transitBadge
                     }
                     .buttonStyle(.plain)
@@ -126,7 +126,7 @@ struct TimelineSegmentRow: View {
         return "\(minutes) min · \(stopCount) \(stopLabel)"
     }
 
-    private var railMarker: TimelineRail.Marker {
+    private var railMarker: RouteTimelineRail.Marker {
         switch node.kind {
         case .transit: .none
         case .bikeShare: .bicycle

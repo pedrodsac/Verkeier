@@ -68,7 +68,7 @@ struct PafendallFunicularTests {
             Issue.record("Expected funicular segment between its terminals")
             return
         }
-        let presentedTimeline = RouteTimelinePresentation.items(from: legs)
+        let presentedTimeline = RouteLegDisplay.timelineItems(from: legs)
         #expect(presentedTimeline.map(\.id) == ["place-0", "segment-0", "place-1", "segment-1", "place-2", "segment-2", "place-3"])
         #expect(board.name == "")
         #expect(alight.name == "")
@@ -85,7 +85,7 @@ struct PafendallFunicularTests {
         #expect(alight.arrivalTime == nil)
         #expect(alight.departureTime == nil)
         #expect(alight.scheduledArrivalTime == nil)
-        let ribbon = RouteTimelinePresentation.ribbonLegs(from: legs)
+        let ribbon = RouteLegDisplay.ribbonLegs(from: legs)
         #expect(ribbon.map(\.mode) == [.walking])
         let combined = try #require(ribbon.first)
         let departure = try #require(combined.departureTime)

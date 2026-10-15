@@ -32,8 +32,8 @@ final class StopDetailModel {
 
     /// Cache only board inputs. Location fixes, route results, and loading-state
     /// changes must not repeat departure normalization and sorting.
-    var departureBoardPresentation: StopDepartureBoardPresentation {
-        departureBoardCache.presentation(
+    var departureBoard: StopDepartureBoard {
+        departureBoardCache.board(
             for: .init(
                 stopID: selectedStop?.id ?? "",
                 routes: selectedStopRoutes,
@@ -56,17 +56,17 @@ final class StopDetailModel {
 
 extension StopDetailModel {
     var availablePlatforms: [String] {
-        departureBoardPresentation.availablePlatforms
+        departureBoard.availablePlatforms
     }
 
     /// A successful live response owns the board, even when it contains no rows.
     var displayedDepartures: [Departure] {
-        departureBoardPresentation.visibleDepartures
+        departureBoard.visibleDepartures
     }
 
     /// Timetable rows are available only when the live request failed.
     var scheduledDepartures: [Departure] {
-        departureBoardPresentation.visibleScheduledDepartures
+        departureBoard.visibleScheduledDepartures
     }
 
     var isShowingScheduledFallback: Bool {

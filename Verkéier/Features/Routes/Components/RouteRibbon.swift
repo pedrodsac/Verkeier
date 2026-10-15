@@ -13,7 +13,7 @@ struct RouteRibbon: View {
     let legs: [RoutePlan.Leg]
 
     private var displayLegs: [RoutePlan.Leg] {
-        RouteTimelinePresentation.ribbonLegs(from: legs)
+        RouteLegDisplay.ribbonLegs(from: legs)
     }
 
     var body: some View {

@@ -8,7 +8,7 @@ struct FeatureModels {
     let map: MapModel
     let stopDetail: StopDetailModel
     let lineDetail: LineDetailModel
-    let tripDetail: TripDetailViewModel
+    let tripDetail: TripDetailModel
     let routePlanner: RoutePlannerModel
     let search: SearchModel
     let favourites: FavouritesModel
@@ -18,7 +18,7 @@ struct FeatureModels {
         map = MapModel()
         stopDetail = StopDetailModel()
         lineDetail = LineDetailModel()
-        tripDetail = TripDetailViewModel()
+        tripDetail = TripDetailModel()
         self.routePlanner = routePlanner ?? RoutePlannerModel()
         search = SearchModel()
         favourites = FavouritesModel()

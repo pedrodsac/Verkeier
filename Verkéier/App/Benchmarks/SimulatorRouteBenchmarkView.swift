@@ -10,7 +10,7 @@ struct SimulatorRouteBenchmarkView: View {
     var body: some View {
         Group {
             if benchmark.fullMap {
-                TransitMapLayer()
+                StopsMap()
                     .featureModels(benchmark.featureModels)
                     .environment(benchmark.router)
                     // Panning must not load timetable stops while the benchmark runs.

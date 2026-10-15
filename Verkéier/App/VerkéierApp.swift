@@ -18,7 +18,7 @@ struct VerkéierApp: App {
     private let walkingRouter: any WalkingRouting
     private let bundledRoutingDatasetInstaller: BundledRoutingDatasetInstaller
     private let routingOptimisationService: any RoutingOptimisationService
-    @State private var launchModel: LaunchOptimisationModel
+    @State private var rootModel: RootModel
     private let modelContainer: ModelContainer
     @State private var liveActivityManager = LiveActivityManager()
     @State private var departureReminderService = DepartureReminderService()
@@ -86,8 +86,8 @@ struct VerkéierApp: App {
                 },
                 graphInstall: graphInstall
             )
-        _launchModel = State(
-            initialValue: LaunchOptimisationModel(
+        _rootModel = State(
+            initialValue: RootModel(
                 initialRequirement: optimisationEnvironment.mode == .off
                     ? .notNeeded : RoutingOptimisationLaunchCheck.requirement(in: optimisationEnvironment),
                 onboardingCompleted: UserDefaults.standard.bool(forKey: "hasCompletedOnboarding"),
@@ -123,17 +123,17 @@ struct VerkéierApp: App {
                 } else if SimulatorRouteBenchmark.enabled {
                     SimulatorRouteBenchmarkView()
                 } else {
-                    LaunchGateView(model: launchModel)
+                    RootScreen(model: rootModel)
                 }
                 #else
                 if SimulatorRouteBenchmark.enabled {
                     SimulatorRouteBenchmarkView()
                 } else {
-                    LaunchGateView(model: launchModel)
+                    RootScreen(model: rootModel)
                 }
                 #endif
                 #else
-                LaunchGateView(model: launchModel)
+                RootScreen(model: rootModel)
                 #endif
             }
             .environment(\.appConfiguration, configuration)

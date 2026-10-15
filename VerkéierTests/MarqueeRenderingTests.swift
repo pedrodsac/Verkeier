@@ -59,14 +59,14 @@ private struct MarqueeRenderingBoard: View {
             Spacer()
             List {
                 ForEach(Array(destinations.enumerated()), id: \.offset) { index, destination in
-                    DepartureListRow(departure: Departure(
+                    DepartureRow(departure: Departure(
                         id: "fixture-\(index)", stopId: "fixture-stop", lineName: index == 0 ? "T1" : "16",
                         destination: destination,
                         scheduledDeparture: state.anchor.addingTimeInterval(Double(20 + index + state.revision) * 60),
                         platform: "\(index + 1)", dataSource: .mock
                     ), showsControls: false)
                 }
-                TimelineSegmentRow(node: SegmentNode(
+                RouteTimelineSegmentRow(node: SegmentNode(
                     id: "fixture-route", kind: .transit, mode: .bus, badgeText: "16",
                     headsign: destinations[1], durationMinutes: 15, stopCount: 8,
                     distanceMeters: nil, rail: .transit(.bus), bikeShareDetails: nil

@@ -5,7 +5,7 @@ import SwiftUI
 @MainActor
 struct TripContinuationPreviewHost: View {
     static var enabled: Bool { CommandLine.arguments.contains("--trip-continuation-preview") }
-    @State private var model = TripDetailViewModel()
+    @State private var model = TripDetailModel()
     private let selection: TripDetailSelection
     private let service: FixtureTripDetailService
 
@@ -85,7 +85,7 @@ struct TripContinuationPreviewHost: View {
 
     var body: some View {
         NavigationStack {
-            TripDetailView(selection: selection)
+            TripDetailScreen(selection: selection)
                 .environment(model)
                 .environment(\.tripDetailService, service)
                 .safeAreaInset(edge: .top) { Text("Sample data").font(.caption).foregroundStyle(.secondary) }
