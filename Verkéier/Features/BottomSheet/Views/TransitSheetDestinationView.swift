@@ -17,7 +17,7 @@ struct TransitSheetDestinationView: View {
         case let .stopDetail(stop):
             StopDetailView(stop: stop)
         case .directionsForPreset:
-            PlanView(context: .commute)
+            RoutePlannerScreen(context: .commute)
         case let .routePlaceSearch(endpoint):
             RoutePlaceSearchView(endpoint: endpoint)
         case .routeTimeline:

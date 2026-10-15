@@ -62,13 +62,10 @@ struct TransitBottomSheet: View {
 
     private var homeTab: some View {
         NavigationStack(path: Bindable(router).homePath) {
-            BottomSheetContent(
-                isSearchActive: isSearchActive,
-                contentTopPadding: shouldShowSearchBar ? searchBarContentTopPadding : 0
-            )
-            .navigationDestination(for: TransitSheetRoute.self) { route in
-                TransitSheetDestinationView(route: route, searchContentTopPadding: searchBarContentTopPadding)
-            }
+            homeRoot
+                .navigationDestination(for: TransitSheetRoute.self) { route in
+                    TransitSheetDestinationView(route: route, searchContentTopPadding: searchBarContentTopPadding)
+                }
         }
         .toolbarVisibility(navigationBarVisibility, for: .navigationBar)
         .safeAreaInset(edge: .top, spacing: 0) {
@@ -87,9 +84,20 @@ struct TransitBottomSheet: View {
         }
     }
 
+    /// Search results while searching, the dashboard otherwise.
+    @ViewBuilder
+    private var homeRoot: some View {
+        if isSearchActive {
+            SearchResultsContent()
+        } else {
+            CommuteDashboardView()
+                .contentMargins(.top, shouldShowSearchBar ? searchBarContentTopPadding : 0, for: .scrollContent)
+        }
+    }
+
     private var planTab: some View {
         NavigationStack(path: Bindable(router).planPath) {
-            PlanView()
+            RoutePlannerScreen()
                 .navigationDestination(for: TransitSheetRoute.self) { route in
                     TransitSheetDestinationView(route: route)
                 }

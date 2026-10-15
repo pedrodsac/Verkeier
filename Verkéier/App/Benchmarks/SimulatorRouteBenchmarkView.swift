@@ -28,15 +28,13 @@ struct SimulatorRouteBenchmarkView: View {
             benchmark.router.selectedTab = .plan
             benchmark.router.planPath = id.map { [.routeTimeline($0)] } ?? []
         }.sheet(isPresented: .constant(true)) {
-            ScrollView {
-                Text(benchmark.status).font(.caption).padding()
-                RouteView().padding()
-            }
-            .presentationDetents([.large])
-            .interactiveDismissDisabled()
-            .featureModels(benchmark.featureModels)
-            .environment(benchmark.router)
-            .environment(benchmark.router.locationService)
+            RoutePlannerScreen()
+                .safeAreaInset(edge: .top) { Text(benchmark.status).font(.caption).padding() }
+                .presentationDetents([.large])
+                .interactiveDismissDisabled()
+                .featureModels(benchmark.featureModels)
+                .environment(benchmark.router)
+                .environment(benchmark.router.locationService)
         }.task { await benchmark.run(productionService: service, walkingRouter: walking, bikes: bikes) }
     }
 }
