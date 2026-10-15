@@ -5,7 +5,7 @@ persistent bottom sheet. Features use observable state and injected services;
 networking and feed parsing stay out of view bodies.
 
 ```text
-SwiftUI View → Observable State → Service Protocol → API Client or Storage
+SwiftUI Screen → Feature Model → Service Protocol → API Client or Storage
              → Decoder / Mapper → Domain Model
 ```
 
@@ -16,8 +16,9 @@ SwiftUI View → Observable State → Service Protocol → API Client or Storage
   accent (`Verkéier/`, `VerkéierWidgets/`, `VerkéierShared/`).
 - `Verkéier/App/` wires runtime configuration, service defaults, persistence,
   and the app entry point.
-- `Verkéier/Features/` groups SwiftUI views, view models, and components by
-  feature.
+- `Verkéier/Features/` groups each feature into `Screens/`, `Components/` and
+  `Models/`; `Shared/` holds components used by several features. The main sheet
+  and its `SheetRouter` live in `Sheet/`.
 - `Verkéier/Services/Transit/` owns GTFS installation and offline queries,
   plus the app adapter around MobiliteitKit's typed HAFAS client.
 - `Verkéier/Services/Routing/` plans transit journeys and walking routes.
@@ -56,7 +57,7 @@ Current protocol signatures and implementations are summarized in
 
 ## Rules
 
-- Keep business logic and networking in injected services or view models.
+- Keep business logic and networking in injected services or feature models.
 - Use typed domain models and async/await.
 - Make loading, empty, error, stale, and offline states visible to users.
 - Never ship provider credentials or fake production data in the app bundle.
