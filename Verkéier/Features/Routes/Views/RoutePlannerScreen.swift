@@ -2,8 +2,16 @@ import MobiliteitKit
 import SwiftUI
 
 /// The route planner: endpoints, saved commutes, and the route options found
-/// for them. ``PlanView`` hosts it on the Plan tab and for a commute preset.
-struct RouteView: View {
+/// for them. It is the Plan tab's root, and is also pushed to show directions
+/// for a saved commute.
+struct RoutePlannerScreen: View {
+    enum Context {
+        /// The Plan tab's root, with route options in the toolbar.
+        case tab
+        /// Pushed from Home to plan a saved commute.
+        case commute
+    }
+
     @Environment(RoutePlannerModel.self) private var model
     @Environment(AlertsModel.self) private var alerts
     @Environment(FavouritesModel.self) private var favourites
@@ -13,7 +21,45 @@ struct RouteView: View {
     @Environment(\.routeService) private var routeService
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    var context: Context = .tab
+
     var body: some View {
+        ScrollView {
+            content
+                .safeAreaPadding(.horizontal, 16)
+                .padding(.bottom, context == .tab ? 12 : 0)
+        }
+        .refreshable { await router.refreshRoutes() }
+        .navigationTitle(context == .tab ? "Plan" : "Directions")
+        .toolbarTitleDisplayMode(.inline)
+        .toolbar { toolbarContent }
+    }
+
+    // MARK: - Toolbar
+
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        if context == .tab {
+            ToolbarItem(placement: .topBarLeading) {
+                RouteOptionsBar(
+                    filters: model.routeFilters,
+                    hasDestination: model.hasDestination,
+                    updateRouteFilters: router.updateRouteFilters,
+                    saveCurrentCommutePreset: { model.saveCurrentCommutePreset(title: $0) }
+                )
+            }
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            RoutePlanningTimeButton(
+                current: model.routePlanningTime,
+                onChange: router.setRoutePlanningTime
+            )
+        }
+    }
+
+    // MARK: - Content
+
+    private var content: some View {
         VStack(alignment: .leading, spacing: 14) {
             // ── From / To unified card ────────────────────────────────────
             RouteEndpointsCard(

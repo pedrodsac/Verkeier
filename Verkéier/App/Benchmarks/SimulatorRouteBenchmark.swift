@@ -5,7 +5,7 @@ import Observation
 import SwiftUI
 
 /// Explicit simulator harness. Uses the production route planner model, adapter, walking
-/// graph and RouteView; recorded ATP transport is the only substituted service.
+/// graph and RoutePlannerScreen; recorded ATP transport is the only substituted service.
 @Observable @MainActor
 final class SimulatorRouteBenchmark {
     static var enabled: Bool { CommandLine.arguments.contains("--routing-benchmark") }

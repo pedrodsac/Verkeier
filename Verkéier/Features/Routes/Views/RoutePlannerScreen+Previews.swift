@@ -77,9 +77,8 @@ import SwiftUI
 private func routePreview(_ configure: (FeatureModels) -> Void) -> some View {
     let models = FeatureModels()
     configure(models)
-    return ScrollView {
-        RouteView()
-            .padding()
+    return NavigationStack {
+        RoutePlannerScreen()
     }
     .background(Color(uiColor: .systemGroupedBackground))
     .previewEnvironment(models)
