@@ -11,11 +11,20 @@ struct BenchmarkBikeShareService: BikeShareService {
 
 /// Replay requires the same board query as the capture; missing evidence is an error.
 nonisolated enum BenchmarkRecordedTransport {
-    static let bodies: [String: Data]? = {
+    struct Recorded {
+        let body: Data
+        /// Server wait plus transfer of the original request. Client-side time is not replayed:
+        /// decoding and CPU contention happen for real.
+        let networkMilliseconds: Double
+    }
+    /// `ROUTING_BENCHMARK_REPLAY_LATENCY=1` answers each board after its recorded network time, so
+    /// boards arrive in the original order and the original acquisition overlaps other work.
+    static let replaysLatency = ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_REPLAY_LATENCY"] == "1"
+    static let bodies: [String: Recorded]? = {
         guard let path = ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_CAPTURE_DIRECTORY"] else { return nil }
         let folder = SimulatorRouteBenchmark.inputURL(path)
         do {
-            var result: [String: Data] = [:]
+            var result: [String: Recorded] = [:]
             let files = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)
             for file in files.sorted(by: { $0.lastPathComponent < $1.lastPathComponent })
             where !file.lastPathComponent.contains(".body.") {
@@ -28,7 +37,11 @@ nonisolated enum BenchmarkRecordedTransport {
                 )
                 // Repeated queries resolve deterministically in capture-file order.
                 let key = key(url)
-                if result[key] == nil { result[key] = bytes }
+                let transaction = ((item["transport"] as? [String: Any])?["transactions"] as? [[String: Any]])?.first
+                let network = ["responseWaitMilliseconds", "transferMilliseconds"].reduce(0.0) {
+                    $0 + max(0, (transaction?[$1] as? Double) ?? 0)
+                }
+                if result[key] == nil { result[key] = Recorded(body: bytes, networkMilliseconds: network) }
             }
             return result
         } catch { return [:] }

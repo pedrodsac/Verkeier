@@ -219,13 +219,14 @@ final class SimulatorRouteBenchmark {
                             "duration_ms": $0.durationMilliseconds,
                         ]
                     },
-                    "passes": diagnostics.searchPasses.map {
-                        [
-                            "start_ms": $0.startMilliseconds, "duration_ms": $0.durationMilliseconds,
-                            "horizon_s": $0.horizonSeconds, "wave": $0.realtimeWave, "rounds": $0.rounds.count,
-                            "candidates": $0.candidates,
-                        ]
+                    "passes": diagnostics.searchPasses.map { BenchmarkDiagnosticsExport.pass($0) },
+                    // Schedule-only scans that run while boards are acquired; not part of `passes`.
+                    "warmUpPasses": diagnostics.warmUpPasses.map {
+                        BenchmarkDiagnosticsExport.pass($0, includingRounds: true)
                     },
+                    "realtimeBoards": BenchmarkDiagnosticsExport.boards(diagnostics.realtimeBoards),
+                    // Absolute timestamps in `transport` use seconds since the Cocoa reference date.
+                    "operationStartReferenceSeconds": diagnostics.originDate.timeIntervalSinceReferenceDate,
                     "supplementalOptions": routePlanner.supplementalRouteOptions.map(\.id),
                     "planningTime": routePlanner.routePlanningTime.date?.timeIntervalSince1970 ?? 0,
                     "avoidTightTransfers": routePlanner.routeFilters.avoidTightTransfers,
@@ -238,13 +239,7 @@ final class SimulatorRouteBenchmark {
                     "transport": try JSONSerialization.jsonObject(with: JSONEncoder().encode(diagnostics.transport)),
                     "canLoadEarlier": routePlanner.canLoadEarlierRoutes,
                     "canLoadLater": routePlanner.canLoadLaterRoutes,
-                    "rounds": diagnostics.rounds.map {
-                        [
-                            "scan_ms": $0.patternScanMilliseconds, "merge_ms": $0.labelMergeMilliseconds,
-                            "prepare_ms": $0.tripPreparationMilliseconds, "alights": $0.alightingChecks,
-                            "retained": $0.retainedLabels,
-                        ]
-                    },
+                    "rounds": diagnostics.rounds.map(BenchmarkDiagnosticsExport.round),
                     "options": routePlanner.routeOptions.map(\.id),
                     "unfilteredJourneys": routePlanner.unfilteredRouteOptions.map { option -> [String: Any] in
                         [

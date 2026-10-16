@@ -18,6 +18,8 @@ parser.add_argument('--output', required=True, type=Path)
 parser.add_argument('--scenarios', nargs='+', default=['depart', 'reverse', 'coordinates', 'arrive', 'exact', 'rural', 'paging', 'refresh', 'recorded-live', 'deadline-arrive', 'cached'])
 parser.add_argument('--fixture', type=Path, help='Recorded ATP board, with dates matching --time')
 parser.add_argument('--capture-directory', type=Path, help='Replay successful transport capture for identical board queries')
+parser.add_argument('--replay-latency', action='store_true',
+    help='With --capture-directory: answer each board after its recorded server wait and transfer, so arrival order and overlap with other work match the capture')
 parser.add_argument('--bike-fixture', type=Path, help='Recorded bike availability snapshot')
 parser.add_argument('--composition', choices=['transit', 'production'], default='production')
 parser.add_argument('--full-map', action='store_true')
@@ -93,6 +95,8 @@ def run(scenario, samples, label):
         env['SIMCTL_CHILD_ROUTING_BENCHMARK_REBUILD'] = '1'
     if args.capture_directory:
         env["SIMCTL_CHILD_ROUTING_BENCHMARK_CAPTURE_DIRECTORY"] = str(args.capture_directory.resolve())
+    if args.replay_latency:
+        env["SIMCTL_CHILD_ROUTING_BENCHMARK_REPLAY_LATENCY"] = "1"
     if args.bike_fixture:
         env["SIMCTL_CHILD_ROUTING_BENCHMARK_BIKE_FIXTURE"] = str(args.bike_fixture.resolve())
     if args.epoch is not None:
