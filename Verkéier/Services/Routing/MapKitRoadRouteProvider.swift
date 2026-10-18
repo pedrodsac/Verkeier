@@ -3,8 +3,7 @@ import Foundation
 import MapKit
 
 func routeSearchDistanceMeters(from origin: LocationPoint, to destination: LocationPoint) -> Double {
-    CLLocation(latitude: origin.latitude, longitude: origin.longitude)
-        .distance(from: CLLocation(latitude: destination.latitude, longitude: destination.longitude))
+    GeodesicDistance.meters(from: origin, to: destination)
 }
 
 protocol RoadRouteProviding: Sendable {

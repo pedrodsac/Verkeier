@@ -125,6 +125,35 @@ struct PafendallFunicularTests {
         #expect(await roads.roadRoute(from: tram, to: train, transport: .walking) == nil)
     }
 
+    /// Identical replays of one search returned funicular connections whose distances differed by up to 9 mm, because
+    /// the ride was summed from `CLLocation.distance(from:)`, whose result depends on the calls made before it.
+    @Test func connectionDistanceDoesNotDependOnEarlierDistanceCalculations() async throws {
+        let router = FunicularPedestrianFixture()
+        let reference = try #require(await PafendallFunicularConnection.route(from: tram, to: train) {
+            try await router.route(from: $0, to: $1)
+        })
+        var generator = SplitMix64(seed: 0xF011_1CE)
+        var differing = 0
+        for _ in 0..<200 {
+            // Unrelated lookups, as the concurrent transfer-walk tasks make between two funicular routes.
+            for _ in 0..<25 {
+                _ = PafendallFunicularConnection.terminals(
+                    from: GeodesicDistanceTests.point(&generator),
+                    to: GeodesicDistanceTests.point(&generator)
+                )
+            }
+            let route = try #require(await PafendallFunicularConnection.route(from: tram, to: train) {
+                try await router.route(from: $0, to: $1)
+            })
+            if route.distanceMeters.bitPattern != reference.distanceMeters.bitPattern
+                || route.segments[1].distanceMeters.bitPattern != reference.segments[1].distanceMeters.bitPattern
+            {
+                differing += 1
+            }
+        }
+        #expect(differing == 0)
+    }
+
     @Test func mapsStandardAndExtendedFunicularTypes() {
         #expect(MobiliteitRouteService.mode(forGTFSRouteType: 7) == .funicular)
         #expect(MobiliteitRouteService.mode(forGTFSRouteType: 1400) == .funicular)

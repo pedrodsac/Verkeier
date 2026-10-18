@@ -1,4 +1,3 @@
-import CoreLocation
 import Foundation
 import MobiliteitKit
 
@@ -55,8 +54,12 @@ nonisolated enum PafendallFunicularConnection {
         let ridePath = board == upper ? track : Array(track.reversed())
         let rideDistance = zip(ridePath, ridePath.dropFirst()).reduce(0.0) {
             $0
-                + CLLocation(latitude: $1.0.latitude, longitude: $1.0.longitude)
-                .distance(from: CLLocation(latitude: $1.1.latitude, longitude: $1.1.longitude))
+                + GeodesicDistance.meters(
+                    fromLatitude: $1.0.latitude,
+                    fromLongitude: $1.0.longitude,
+                    toLatitude: $1.1.latitude,
+                    toLongitude: $1.1.longitude
+                )
         }
         func walking(_ route: OfflineWalkingRoute, from: LocationPoint, to: LocationPoint) -> WalkingRouteSegment {
             .init(
@@ -95,7 +98,6 @@ nonisolated enum PafendallFunicularConnection {
     }
 
     private static func distance(_ a: LocationPoint, _ b: LocationPoint) -> Double {
-        CLLocation(latitude: a.latitude, longitude: a.longitude)
-            .distance(from: CLLocation(latitude: b.latitude, longitude: b.longitude))
+        GeodesicDistance.meters(from: a, to: b)
     }
 }

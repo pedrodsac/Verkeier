@@ -170,19 +170,10 @@ nonisolated struct NearbyStopPrefilter: Sendable {
     }
 
     func destinations(from stops: [Stop], origin: LocationPoint) -> [WalkingDestination] {
-        let originLocation = CLLocation(latitude: origin.latitude, longitude: origin.longitude)
         return
             stops
             .map { stop in
-                (
-                    stop: stop,
-                    distance: originLocation.distance(
-                        from: CLLocation(
-                            latitude: stop.location.latitude,
-                            longitude: stop.location.longitude
-                        )
-                    )
-                )
+                (stop: stop, distance: GeodesicDistance.meters(from: origin, to: stop.location))
             }
             .filter { $0.distance <= maximumStraightLineDistanceMeters }
             .sorted { $0.distance < $1.distance }
