@@ -20,6 +20,9 @@ nonisolated enum BenchmarkRecordedTransport {
     /// `ROUTING_BENCHMARK_REPLAY_LATENCY=1` answers each board after its recorded network time, so
     /// boards arrive in the original order and the original acquisition overlaps other work.
     static let replaysLatency = ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_REPLAY_LATENCY"] == "1"
+    /// `ROUTING_BENCHMARK_REPLAY_ONLY=1` (device replays): a launch without capture bodies fails
+    /// before its first search instead of using live transport.
+    static let replayOnly = ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_REPLAY_ONLY"] == "1"
     static let bodies: [String: Recorded]? = {
         guard let path = ProcessInfo.processInfo.environment["ROUTING_BENCHMARK_CAPTURE_DIRECTORY"] else { return nil }
         let folder = SimulatorRouteBenchmark.inputURL(path)

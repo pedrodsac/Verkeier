@@ -30,6 +30,17 @@ nonisolated enum BenchmarkDiagnosticsExport {
         return record
     }
 
+    /// `ProcessInfo.thermalState` by name; on the simulator it follows the host Mac.
+    static func thermalState() -> String {
+        switch ProcessInfo.processInfo.thermalState {
+        case .nominal: "nominal"
+        case .fair: "fair"
+        case .serious: "serious"
+        case .critical: "critical"
+        @unknown default: "unknown"
+        }
+    }
+
     /// Per-stop arrival and matching times, relative to the operation start.
     static func boards(_ boards: [RoutingDiagnostics.BoardTiming]) -> [[String: Any]] {
         boards.map { board in

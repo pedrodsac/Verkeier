@@ -38,6 +38,15 @@ final class SimulatorRouteBenchmark {
         do {
             let env = ProcessInfo.processInfo.environment
             let scenario = env["ROUTING_BENCHMARK_SCENARIO"] ?? "arrive"
+            if scenario == "probe-container" {
+                // Device runs need the container path for ROUTING_TRANSFER_WALKS_DIRECTORY, which is
+                // read at launch. Waiting also keeps a first graph install out of measured launches.
+                await (productionService as? MobiliteitRouteService)?.waitForWalkingPreparation()
+                print("ROUTING_BENCHMARK_HOME " + NSHomeDirectory())
+                print("ROUTING_BENCHMARK_DONE")
+                fflush(stdout)
+                return
+            }
             let gtfs = MobiliteitGTFSService()
             let database: URL
             if let path = env["ROUTING_BENCHMARK_DATABASE"] {
@@ -46,7 +55,9 @@ final class SimulatorRouteBenchmark {
                 guard let installed = await gtfs.routingDatabaseURL() else { throw RoutingError.timetableUnavailable }
                 database = installed
             }
-            if env["ROUTING_BENCHMARK_DATABASE"] != nil {
+            // Capture replays keep the simulator runs' timing, where graph preparation can overlap
+            // the priming search.
+            if env["ROUTING_BENCHMARK_DATABASE"] != nil, env["ROUTING_BENCHMARK_CAPTURE_DIRECTORY"] == nil {
                 await (productionService as? MobiliteitRouteService)?.waitForWalkingPreparation()
             }
             if scenario == "optimise-transfer-walks" {
@@ -69,6 +80,15 @@ final class SimulatorRouteBenchmark {
             )
             let client: MobiliteitAPIClient
             let liveTransport = scenario.hasPrefix("live-") && env["ROUTING_BENCHMARK_CAPTURE_DIRECTORY"] == nil
+            if BenchmarkRecordedTransport.replayOnly {
+                guard !liveTransport, let queries = BenchmarkRecordedTransport.bodies?.count, queries > 0 else {
+                    print("ROUTING_BENCHMARK_ABORT replay-capture-unavailable")
+                    fflush(stdout)
+                    throw RoutingError.noRouteFound
+                }
+                print("ROUTING_BENCHMARK_REPLAY_QUERIES \(queries)")
+                fflush(stdout)
+            }
             if liveTransport {
                 guard
                     let live = MobiliteitLiveTransitService(
@@ -151,6 +171,8 @@ final class SimulatorRouteBenchmark {
             }
             var previousRequestID: UUID?
             for sample in 0..<samples {
+                let thermalStateAtStart = BenchmarkDiagnosticsExport.thermalState()
+                let lowPowerModeAtStart = ProcessInfo.processInfo.isLowPowerModeEnabled
                 if paging {
                     let earlier = scenario == "earlier" || scenario == "arrival-earlier"
                     // A finite timetable can legitimately exhaust a direction.
@@ -292,6 +314,10 @@ final class SimulatorRouteBenchmark {
                     "counters": Dictionary(
                         uniqueKeysWithValues: diagnostics.counters.map { ($0.key.rawValue, $0.value) }
                     ), "peak_memory_bytes": usage.ru_maxrss,
+                    // CPU canary: a sample that starts or ends in the serious or critical state is dropped.
+                    "thermalStateAtStart": thermalStateAtStart,
+                    "thermalStateAtEnd": BenchmarkDiagnosticsExport.thermalState(),
+                    "lowPowerMode": lowPowerModeAtStart || ProcessInfo.processInfo.isLowPowerModeEnabled,
                 ]
                 if env["ROUTING_BENCHMARK_FULL_EVIDENCE"] == "1" {
                     record["canonicalPlans"] = try JSONSerialization.jsonObject(
