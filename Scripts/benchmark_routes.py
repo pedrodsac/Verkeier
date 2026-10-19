@@ -20,6 +20,9 @@ parser.add_argument('--fixture', type=Path, help='Recorded ATP board, with dates
 parser.add_argument('--capture-directory', type=Path, help='Replay successful transport capture for identical board queries')
 parser.add_argument('--replay-latency', action='store_true',
     help='With --capture-directory: answer each board after its recorded server wait and transfer, so arrival order and overlap with other work match the capture')
+parser.add_argument('--replay-approximate', action='store_true',
+    help='With --capture-directory: assemble a board query that was never recorded from recorded boards of the same stop and window (APPROXIMATE; every such query is listed in approximate-queries.json)')
+parser.add_argument('--replay-approximate-latency', help='With --replay-approximate: network ms of an approximated board, as STOP=MS,... or *=MS (default: the slowest source board)')
 parser.add_argument('--bike-fixture', type=Path, help='Recorded bike availability snapshot')
 parser.add_argument('--composition', choices=['transit', 'production'], default='production')
 parser.add_argument('--full-map', action='store_true')
@@ -50,6 +53,10 @@ if (args.destination_name or args.destination_stop) and not args.destination_coo
     parser.error('Custom destination requires --destination-coordinate LATITUDE LONGITUDE')
 if (args.origin_name or args.origin_stop) and not args.origin_coordinate:
     parser.error('Custom origin requires --origin-coordinate LATITUDE LONGITUDE')
+if args.replay_approximate and not args.capture_directory:
+    parser.error('--replay-approximate requires --capture-directory')
+if args.replay_approximate_latency and not args.replay_approximate:
+    parser.error('--replay-approximate-latency requires --replay-approximate')
 if args.warm < 0 or args.cold < 0 or args.warm + args.cold + 1 > 5:
     parser.error('Each case permits at most five operations, including one priming operation')
 if args.device is None:
@@ -70,6 +77,8 @@ network_records = []
 subprocess.run(['xcrun', 'simctl', 'install', args.device, str(args.app)], check=True)
 records = []
 cached_records = []
+approximate_queries = {}
+replay_queries = {}
 
 def run(scenario, samples, label):
     global network_requests
@@ -97,6 +106,10 @@ def run(scenario, samples, label):
         env["SIMCTL_CHILD_ROUTING_BENCHMARK_CAPTURE_DIRECTORY"] = str(args.capture_directory.resolve())
     if args.replay_latency:
         env["SIMCTL_CHILD_ROUTING_BENCHMARK_REPLAY_LATENCY"] = "1"
+    if args.replay_approximate:
+        env["SIMCTL_CHILD_ROUTING_BENCHMARK_REPLAY_APPROXIMATE"] = "1"
+        if args.replay_approximate_latency:
+            env["SIMCTL_CHILD_ROUTING_BENCHMARK_REPLAY_APPROXIMATE_LATENCY"] = args.replay_approximate_latency
     if args.bike_fixture:
         env["SIMCTL_CHILD_ROUTING_BENCHMARK_BIKE_FIXTURE"] = str(args.bike_fixture.resolve())
     if args.epoch is not None:
@@ -173,6 +186,14 @@ def run(scenario, samples, label):
     if failure is not None:
         (args.output / "aborted.json").write_text(json.dumps({"scenario": scenario, "reason": str(failure), "requests": network_requests}, indent=2))
         raise failure
+    queried = [line.split(' ', 1)[1] for line in text.splitlines() if line.startswith('ROUTING_BENCHMARK_REPLAY_QUERY ')]
+    if queried:
+        replay_queries[label] = queried
+        (args.output / 'replay-queries.json').write_text(json.dumps(replay_queries, indent=2, sort_keys=True))
+    approximate = [json.loads(line.split(' ', 1)[1]) for line in text.splitlines() if line.startswith('ROUTING_BENCHMARK_REPLAY_APPROXIMATE ')]
+    if approximate:
+        approximate_queries[label] = approximate
+        (args.output / 'approximate-queries.json').write_text(json.dumps(approximate_queries, indent=2, sort_keys=True))
     values = [json.loads(line.split('ROUTING_BENCHMARK ', 1)[1]) for line in text.splitlines() if line.startswith('ROUTING_BENCHMARK {')]
     for line in text.splitlines():
         if line.startswith('ROUTING_BENCHMARK_FILE '):
@@ -195,6 +216,8 @@ def run(scenario, samples, label):
             raise RuntimeError('Fully cached search issued a board request')
         # The first calculation in a warm series is a priming operation.
         value['process'] = 'cold' if label.startswith('cold') else ('priming' if value['sample'] == 0 else 'warm')
+        if args.replay_approximate:
+            value['replayApproximate'] = True
         records.append(value)
     (args.output / 'samples.json').write_text(json.dumps(records, indent=2))
     print(f'{scenario} {label}: {len(values)} completed; maximum {max(v["total_ms"] for v in values):.0f} ms', flush=True)

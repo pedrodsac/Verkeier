@@ -16,12 +16,16 @@ nonisolated final class BenchmarkBoardProtocol: URLProtocol {
             let body: Data
             var delay = 0.0
             if let bodies = BenchmarkRecordedTransport.bodies {
-                guard let captured = bodies[BenchmarkRecordedTransport.key(request.url!)] else {
+                guard
+                    let captured = bodies[BenchmarkRecordedTransport.key(request.url!)]
+                        ?? BenchmarkRecordedTransport.approximation(for: request.url!)
+                else {
                     print(
                         "ROUTING_BENCHMARK_ABORT missing-replay-query \(BenchmarkRecordedTransport.key(request.url!))"
                     ); fflush(stdout)
                     throw CocoaError(.fileReadNoSuchFile)
                 }
+                print("ROUTING_BENCHMARK_REPLAY_QUERY " + BenchmarkRecordedTransport.key(request.url!)); fflush(stdout)
                 body = captured.body
                 if BenchmarkRecordedTransport.replaysLatency { delay = captured.networkMilliseconds }
             } else if stop == "000220402034",
