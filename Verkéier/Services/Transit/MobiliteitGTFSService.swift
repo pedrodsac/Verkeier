@@ -12,6 +12,9 @@ actor MobiliteitGTFSService: GTFSService {
     private nonisolated static let timeZone = TimeZone(identifier: "Europe/Luxembourg")!
 
     private let directoryURL: URL
+    /// Where the routing snapshot built from the installed feed is stored. Cleared when a new feed is installed.
+    /// Services created with a custom directory (tests, previews) never touch the app's cache.
+    private let snapshotCacheDirectory: URL?
     private var databaseURL: URL
     private let metadataURL: URL
     private let session: URLSession
@@ -25,6 +28,14 @@ actor MobiliteitGTFSService: GTFSService {
     }
 
     nonisolated static var defaultDirectoryURL: URL { defaultDirectory() }
+
+    /// Derived data the system may purge: the prepared routing snapshot, rebuilt from the feed when it is missing.
+    nonisolated static var routingSnapshotCacheDirectory: URL {
+        let manager = FileManager.default
+        let root = manager.urls(for: .cachesDirectory, in: .userDomainMask).first ?? manager.temporaryDirectory
+        return root.appendingPathComponent("Mobiliteit", isDirectory: true)
+            .appendingPathComponent("RoutingSnapshot", isDirectory: true)
+    }
 
     /// Launch-time identity of the installed, unexpired timetable: its generation
     /// database filename, unique per install. Plain file reads only; nothing is opened.
@@ -43,6 +54,7 @@ actor MobiliteitGTFSService: GTFSService {
         let base = directory ?? Self.defaultDirectory()
         let metadataURL = base.appendingPathComponent("metadata.json")
         directoryURL = base
+        snapshotCacheDirectory = directory == nil ? Self.routingSnapshotCacheDirectory : nil
         databaseURL = base.appendingPathComponent(Self.legacyDatabaseFilename)
         self.metadataURL = metadataURL
         self.session = session
@@ -190,6 +202,8 @@ actor MobiliteitGTFSService: GTFSService {
                 databaseFilename: installedDatabaseURL.lastPathComponent
             )
             persistMetadata()
+            // The stored snapshot belongs to the previous feed; the engine would ignore it, but there is no reason to keep it.
+            if let snapshotCacheDirectory { JourneyPlanner.removeSnapshotCache(in: snapshotCacheDirectory) }
             currentStatus = GTFSFeedStatus(
                 phase: .ready,
                 resourceTitle: remote.title,

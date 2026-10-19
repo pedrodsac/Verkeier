@@ -24,14 +24,16 @@ struct MobiliteitRouteService: RouteService, WalkingRouteRefining {
         walkingRouter: any WalkingRouting = UnavailableWalkingRouter(),
         roadRouteProvider: (any RoadRouteProviding)? = nil,
         graphPreparation: Task<Void, Never>? = nil,
-        realtimeConcurrency: Int = 32
+        realtimeConcurrency: Int = 32,
+        snapshotCacheDirectory: URL? = nil
     ) {
         self.databaseURL = databaseURL; self.gtfsService = gtfsService
         let planner =
             engine
             ?? JourneyPlanner(
                 walkingProvider: LocalFirstWalkingRoutingProvider(walkingRouter: walkingRouter),
-                realtimeClient: realtimeClient
+                realtimeClient: realtimeClient,
+                snapshotCacheDirectory: snapshotCacheDirectory
             )
         let roads = roadRouteProvider ?? LocalFirstRoadRouteProvider(walkingRouter: walkingRouter)
         self.engine = planner

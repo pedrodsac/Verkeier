@@ -64,7 +64,8 @@ struct VerkéierApp: App {
             bikeShareService: bikeShareService,
             walkingRouter: walkingRouter,
             roadRouteProvider: LocalFirstRoadRouteProvider(walkingRouter: walkingRouter),
-            graphPreparation: graphPreparation
+            graphPreparation: graphPreparation,
+            snapshotCacheDirectory: MobiliteitGTFSService.routingSnapshotCacheDirectory
         )
         #if targetEnvironment(simulator) || ROUTING_BENCHMARK
         if !SimulatorRouteBenchmark.enabled { routeService.prepareForRouting() }

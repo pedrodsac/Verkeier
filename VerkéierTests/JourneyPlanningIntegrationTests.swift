@@ -27,6 +27,36 @@ struct JourneyPlanningIntegrationTests {
         #expect(trip.mapOverlay.segments.allSatisfy { $0.isApproximate == true })
     }
 
+    @Test("A restart loads the stored routing snapshot and plans the same route")
+    func storedSnapshotPlansTheSameRoute() async throws {
+        let fixture = try await JourneyIntegrationFixture(withIntermediate: true)
+        defer { fixture.remove() }
+        let cache = fixture.directory.appendingPathComponent("snapshot-cache", isDirectory: true)
+        func makeService() -> MobiliteitRouteService {
+            MobiliteitRouteService(databaseURL: fixture.database, walkingRouter: IntegrationWalkingRouter(),
+                roadRouteProvider: IntegrationRoadProvider(), snapshotCacheDirectory: cache)
+        }
+        func stops(_ service: MobiliteitRouteService) async throws -> [String?]? {
+            let result = try await service.calculateRoute(from: fixture.origin, to: fixture.destination,
+                time: .departAt(fixture.anchor), filters: .init(), realtimeRefreshPolicy: .scheduleOnly)
+            return try #require(result.options.first?.transitLegs.first).mapStops?.map(\.stopID)
+        }
+        let first = makeService()
+        let built = try await stops(first)
+        #expect(try await first.engine.router(for: fixture.database).snapshotSource == .database)
+
+        // The first start stores the snapshot in the background; a later start loads it.
+        var restarted = makeService()
+        for _ in 0..<100 {
+            if try await restarted.engine.router(for: fixture.database).snapshotSource == .cache { break }
+            try await Task.sleep(for: .milliseconds(50))
+            restarted = makeService()
+        }
+        #expect(try await restarted.engine.router(for: fixture.database).snapshotSource == .cache)
+        #expect(try await stops(restarted) == built)
+        #expect(built == ["origin", "middle", "destination"])
+    }
+
     @Test("A reachable bike remains available when the timetable has no journey")
     func bikeWithoutTransit() async throws {
         let fixture = try await JourneyIntegrationFixture()

@@ -135,6 +135,8 @@ final class SimulatorRouteBenchmark {
                         datasetManager: RoutingDatasetManager(),
                         transferWalkStore: TransferWalkStore.makeDefault()
                     )
+                // Like production, keep the prepared routing snapshot between launches; a benchmark database is never cached.
+                let snapshotCache = env["ROUTING_BENCHMARK_DATABASE"] == nil ? MobiliteitGTFSService.routingSnapshotCacheDirectory : nil
                 let planner: JourneyPlanner?
                 if let value = env["ROUTING_BENCHMARK_LIVE_CONCURRENCY"], let limit = Int(value) {
                     await (productionService as? MobiliteitRouteService)?.waitForWalkingPreparation()
@@ -146,7 +148,8 @@ final class SimulatorRouteBenchmark {
                             maximumConcurrentBoardRequests: limit,
                             cacheLifetime: 60,
                             requestTimeout: .seconds(4)
-                        )
+                        ),
+                        snapshotCacheDirectory: snapshotCache
                     )
                 } else {
                     planner = nil
@@ -158,7 +161,8 @@ final class SimulatorRouteBenchmark {
                     engine: planner,
                     bikeShareService: production ? benchmarkBikes : UnavailableBikeShareService(),
                     walkingRouter: walking,
-                    realtimeConcurrency: Int(env["ROUTING_BENCHMARK_LIVE_CONCURRENCY"] ?? "32") ?? 32
+                    realtimeConcurrency: Int(env["ROUTING_BENCHMARK_LIVE_CONCURRENCY"] ?? "32") ?? 32,
+                    snapshotCacheDirectory: snapshotCache
                 )
             }
             self.service = service
