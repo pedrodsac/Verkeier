@@ -1,0 +1,21 @@
+=== c28-esch: control passes 1, discovery 24 stops; speculative-completion boards outside discovery: []; boards asked after pass 0: [] (outside discovery: [])
+  c29    : discovery 24 stops; shared with control 14; recorded queries 12 of 24; missing queries 12 at 12 stops; post0: 0/0 []; speculative: 0/0; Heienhaff position [('2', '1', 'not'), ('2', '1', '1065')]
+  c29arr : discovery 24 stops; shared with control 8; recorded queries 8 of 24; missing queries 16 at 16 stops; post0: 0/0 []; speculative: 0/0; Heienhaff position [('2', '1', 'not'), ('2', '1', '1077')]
+=== c28-now: control passes 1, discovery 24 stops; speculative-completion boards outside discovery: ['000200508016', '000200417050']; boards asked after pass 0: [] (outside discovery: [])
+  c29    : discovery 24 stops; shared with control 8; recorded queries 8 of 24; missing queries 16 at 16 stops; post0: 0/0 []; speculative: 1/2; Heienhaff position [('1', '0', '103'), ('1', '0', '223')]
+  c29arr : discovery 24 stops; shared with control 6; recorded queries 6 of 24; missing queries 18 at 18 stops; post0: 0/0 []; speculative: 1/2; Heienhaff position [('1', '0', '103'), ('1', '0', 'not')]
+=== c28-rev: control passes 1, discovery 24 stops; speculative-completion boards outside discovery: ['000200417050']; boards asked after pass 0: [] (outside discovery: [])
+  c29    : discovery 24 stops; shared with control 12; recorded queries 12 of 24; missing queries 12 at 12 stops; post0: 0/0 []; speculative: 0/1; Heienhaff position [('1000', '0', '566'), ('1000', '0', '1775')]
+  c29arr : discovery 24 stops; shared with control 8; recorded queries 8 of 24; missing queries 16 at 16 stops; post0: 0/0 []; speculative: 0/1; Heienhaff position [('1000', '0', '566'), ('1000', '0', '1783')]
+=== s7-L1: control passes 1, discovery 24 stops; speculative-completion boards outside discovery: ['000200417050', '000200508016']; boards asked after pass 0: [] (outside discovery: [])
+  c29    : discovery 24 stops; shared with control 8; recorded queries 8 of 24; missing queries 16 at 16 stops; post0: 0/0 []; speculative: 1/2; Heienhaff position [('1', '0', '103'), ('1', '0', '221')]
+  c29arr : discovery 24 stops; shared with control 6; recorded queries 6 of 24; missing queries 18 at 18 stops; post0: 0/0 []; speculative: 1/2; Heienhaff position [('1', '0', '103'), ('1', '0', '237')]
+=== s7-L2: control passes 1, discovery 24 stops; speculative-completion boards outside discovery: ['000200417050', '000200417012', '000200508016']; boards asked after pass 0: [] (outside discovery: [])
+  c29    : discovery 24 stops; shared with control 8; recorded queries 8 of 24; missing queries 16 at 16 stops; post0: 0/0 []; speculative: 1/3; Heienhaff position [('1', '0', '99'), ('1', '0', '217')]
+  c29arr : discovery 24 stops; shared with control 6; recorded queries 8 of 26; missing queries 18 at 18 stops; post0: 0/0 []; speculative: 0/3; Heienhaff position [('1', '0', '99'), ('1', '0', '237')]
+=== s7-L3: control passes 1, discovery 24 stops; speculative-completion boards outside discovery: ['000200417050', '000200417012', '000200508016']; boards asked after pass 0: [] (outside discovery: [])
+  c29    : discovery 24 stops; shared with control 8; recorded queries 8 of 24; missing queries 16 at 16 stops; post0: 0/0 []; speculative: 1/3; Heienhaff position [('1', '0', '99'), ('1', '0', '217')]
+  c29arr : discovery 24 stops; shared with control 6; recorded queries 6 of 24; missing queries 18 at 18 stops; post0: 0/0 []; speculative: 0/3; Heienhaff position [('1', '0', '99'), ('1', '0', '237')]
+=== st-L1: control passes 2, discovery 24 stops; speculative-completion boards outside discovery: ['000200417050']; boards asked after pass 0: ['000200508005', '000200508004'] (outside discovery: ['000200508005'])
+  c29    : discovery 24 stops; shared with control 8; recorded queries 8 of 24; missing queries 16 at 16 stops; post0: 0/1 []; speculative: 1/1; Heienhaff position [('1', '0', '102'), ('1', '0', '196')]
+  c29arr : discovery 24 stops; shared with control 6; recorded queries 6 of 24; missing queries 18 at 18 stops; post0: 1/1 ['000200508005']; speculative: 0/1; Heienhaff position [('1', '0', '102'), ('1', '0', 'not')]

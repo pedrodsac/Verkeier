@@ -1,0 +1,105 @@
+cand29 reachability built in 0.000587958 seconds active=true cap=-
+discovery access 000200508004=1 000200508002=1 000200508006=1 000200508003=1 000200503002=1 000200503013=1 000200508009=1 000200503001=1
+discovery wave 0 boards 000200508004(Senningerberg, Gromscheed)=1 000200508002(Senningerberg, Breedewues)=1 000200508006(Senningerberg, Kapell)=1 000200508003(Senningerberg, Charlys Statioun)=1 000200503002(Hostert (Niederanven), Kierfecht)=1 000200503013(Hostert (Niederanven), Stade Jos Becker)=1 000200508009(Senningerberg, Rue des Pins)=1 000200503001(Hostert (Niederanven), Charlys Gare)=1
+frontier candidates=337 byTightRank=[(key: 1, value: 283), (key: 2, value: 45), (key: 1000, value: 9)]
+  cand[0] 000200417025 Kirchberg, Mathias Tresch tight=1 optimistic=0 dist=1174m
+  cand[1] 000200426004 Weimerskirch, Biechelchen tight=1 optimistic=0 dist=1239m
+  cand[2] 000200409011 Dommeldange, Van der Meulen tight=1 optimistic=0 dist=1250m
+  cand[3] 000200422011 Neudorf, Laangegronn tight=1 optimistic=0 dist=1260m
+  cand[4] 000200406002 Cents, Arthur Knaff tight=1 optimistic=0 dist=1300m
+  cand[5] 000200409005 Dommeldange, Contournement tight=1 optimistic=0 dist=1366m
+  cand[6] 000200417040 Kirchberg, Hugo Gernsback tight=1 optimistic=0 dist=1369m
+  cand[7] 000200409010 Dommeldange, Parc de l'Europe tight=1 optimistic=0 dist=1398m
+  cand[8] 000200417050 Kirchberg, Gare routière Luxexpo tight=1 optimistic=0 dist=1401m
+  cand[9] 000200417052 Kirchberg, Luxexpo tight=1 optimistic=0 dist=1423m
+  cand[10] 000200409012 Dommeldange, Sidney Thomas tight=1 optimistic=0 dist=1427m
+  cand[11] 000200426011 Weimerskirch, Tommys Bruch tight=1 optimistic=0 dist=1449m
+  cand[12] 000200409003 Dommeldange, Château tight=1 optimistic=0 dist=1493m
+  cand[13] 000200409009 Dommeldange, Jean Engling tight=1 optimistic=0 dist=1501m
+  cand[14] 000200406014 Cents, Paul Albrecht tight=1 optimistic=0 dist=1554m
+  cand[15] 000200409008 Dommeldange, Gare routière tight=1 optimistic=0 dist=1560m
+  cand[16] 000200406016 Cents, Robert Bruch tight=1 optimistic=0 dist=1563m
+  cand[17] 000200422003 Neudorf/Weimershof, Fierschterhaus tight=1 optimistic=0 dist=1566m
+  cand[18] 000200409015 Dommeldange, Gare tight=1 optimistic=0 dist=1582m
+  cand[19] 000200426005 Weimerskirch, Duerf tight=1 optimistic=0 dist=1591m
+  cand[20] 000200406018 Cents, Trèves tight=1 optimistic=0 dist=1601m
+  cand[21] 000200406012 Cents, Kierch tight=1 optimistic=0 dist=1619m
+  cand[22] 000200426006 Weimerskirch, Knupp tight=1 optimistic=0 dist=1619m
+  cand[23] 000200406004 Cents, Carmel tight=1 optimistic=0 dist=1657m
+  cand[24] 000200410004 Eich, Eecher Klinick tight=1 optimistic=0 dist=1696m
+  cand[25] 000200406025 Cents-Hamm, Gare tight=1 optimistic=0 dist=1756m
+  cand[26] 000200406003 Cents, Camille Polfer tight=1 optimistic=0 dist=1767m
+  cand[27] 000200414010 Cents, Fetschebuer tight=1 optimistic=0 dist=1792m
+  cand[28] 000200409014 Dommeldange, Chingiz Aitmatov tight=1 optimistic=0 dist=1795m
+  cand[29] 000200406024 Cents-Hamm, Halte CFL tight=1 optimistic=0 dist=1801m
+  cand[30] 000200409007 Dommeldange, Emile Metz tight=1 optimistic=0 dist=1804m
+  cand[31] 000200410001 Eich, Centre Culturel tight=1 optimistic=0 dist=1851m
+  cand[32] 000200414011 Hamm, Peupliers tight=1 optimistic=0 dist=2042m
+  cand[33] 000200414006 Hamm, Rue de Bitbourg tight=1 optimistic=0 dist=2047m
+  cand[34] 000200414009 Hamm, Ronndréisch tight=1 optimistic=0 dist=2056m
+  cand[35] 000200406019 Cents, Waassertuerm tight=1 optimistic=0 dist=2057m
+  cand[36] 000200402005 Beggen, Henri Heymanns tight=1 optimistic=0 dist=2065m
+  cand[37] 000200406007 Cents, Fort Dumoulin tight=1 optimistic=0 dist=2081m
+  cand[38] 000200406013 Cents, Nic Rollinger tight=1 optimistic=0 dist=2092m
+  cand[39] 000200422007 Neudorf, Kalchesbruck tight=1 optimistic=0 dist=2117m
+  Heienhaff P+R T1 000200508005 tight=1 optimistic=0 position=103
+discovery wave 1 boards 000200417025(Kirchberg, Mathias Tresch)=1 000200426004(Weimerskirch, Biechelchen)=1 000200409011(Dommeldange, Van der Meulen)=1 000200422011(Neudorf, Laangegronn)=1 000200406002(Cents, Arthur Knaff)=1 000200409005(Dommeldange, Contournement)=1 000200417040(Kirchberg, Hugo Gernsback)=1 000200409010(Dommeldange, Parc de l'Europe)=1
+frontier candidates=1630 byTightRank=[(key: 1, value: 1090), (key: 2, value: 496), (key: 1000, value: 44)]
+  cand[0] 000200417022 Kirchberg, Léon Thyes tight=1 optimistic=0 dist=958m
+  cand[1] 000200417034 Kirchberg, Rehazenter tight=1 optimistic=0 dist=1178m
+  cand[2] 000200417029 Kirchberg, Europaparlament / Parlement Européen tight=1 optimistic=0 dist=1235m
+  cand[3] 000200417049 Kirchberg, Niedergrünewald tight=1 optimistic=0 dist=1309m
+  cand[4] 000200426008 Weimerskirch, Mäertesbuer tight=1 optimistic=0 dist=1371m
+  cand[5] 000200417050 Kirchberg, Gare routière Luxexpo tight=1 optimistic=0 dist=1401m
+  cand[6] 000200417001 Kirchberg, Prince Félix tight=1 optimistic=0 dist=1402m
+  cand[7] 000200417052 Kirchberg, Luxexpo tight=1 optimistic=0 dist=1423m
+  cand[8] 000200417032 Kirchberg, Pierre Werner tight=1 optimistic=0 dist=1426m
+  cand[9] 000200426010 Weimerskirch, St.Vith tight=1 optimistic=0 dist=1446m
+  cand[10] 000200426011 Weimerskirch, Tommys Bruch tight=1 optimistic=0 dist=1449m
+  cand[11] 000200406010 Cents, Jules Salentiny tight=1 optimistic=0 dist=1492m
+  cand[12] 000200409003 Dommeldange, Château tight=1 optimistic=0 dist=1493m
+  cand[13] 000200409009 Dommeldange, Jean Engling tight=1 optimistic=0 dist=1501m
+  cand[14] 000200422005 Neudorf/Weimershof, Hierzekrëpp tight=1 optimistic=0 dist=1502m
+  cand[15] 000200406014 Cents, Paul Albrecht tight=1 optimistic=0 dist=1554m
+  cand[16] 000200406016 Cents, Robert Bruch tight=1 optimistic=0 dist=1563m
+  cand[17] 000200422003 Neudorf/Weimershof, Fierschterhaus tight=1 optimistic=0 dist=1566m
+  cand[18] 000200426009 Weimerskirch, Pierre-Eloi Schoué tight=1 optimistic=0 dist=1567m
+  cand[19] 000200409015 Dommeldange, Gare tight=1 optimistic=0 dist=1582m
+  cand[20] 000200426005 Weimerskirch, Duerf tight=1 optimistic=0 dist=1591m
+  cand[21] 000200406018 Cents, Trèves tight=1 optimistic=0 dist=1601m
+  cand[22] 000200406012 Cents, Kierch tight=1 optimistic=0 dist=1619m
+  cand[23] 000200417061 Kirchberg, Philharmonie / Mudam (Bus) tight=1 optimistic=0 dist=1636m
+  cand[24] 000200417031 Kirchberg, Philharmonie / Mudam (Tram) tight=1 optimistic=0 dist=1637m
+  cand[25] 000200406004 Cents, Carmel tight=1 optimistic=0 dist=1657m
+  cand[26] 000200417007 Kirchberg, B.E.I. tight=1 optimistic=0 dist=1677m
+  cand[27] 000200410004 Eich, Eecher Klinick tight=1 optimistic=0 dist=1696m
+  cand[28] 000200406025 Cents-Hamm, Gare tight=1 optimistic=0 dist=1756m
+  cand[29] 000200406003 Cents, Camille Polfer tight=1 optimistic=0 dist=1767m
+  cand[30] 000200414010 Cents, Fetschebuer tight=1 optimistic=0 dist=1792m
+  cand[31] 000200406024 Cents-Hamm, Halte CFL tight=1 optimistic=0 dist=1801m
+  cand[32] 000200409007 Dommeldange, Emile Metz tight=1 optimistic=0 dist=1804m
+  cand[33] 000200406017 Cents, Tawioun tight=1 optimistic=0 dist=1811m
+  cand[34] 000200426007 Weimerskirch, Laval's Park tight=1 optimistic=0 dist=1827m
+  cand[35] 000200408003 Clausen, Malakoff tight=1 optimistic=0 dist=1838m
+  cand[36] 000200410001 Eich, Centre Culturel tight=1 optimistic=0 dist=1851m
+  cand[37] 000200406015 Cents, Pommiers tight=1 optimistic=0 dist=1909m
+  cand[38] 000200417058 Kirchberg, Rout Bréck - Pafendall (Tram) tight=1 optimistic=0 dist=1982m
+  cand[39] 000200410003 Eich, Eecher Plaz tight=1 optimistic=0 dist=2040m
+  Heienhaff P+R T1 000200508005 tight=1 optimistic=0 position=223
+discovery wave 2 boards 000200417022(Kirchberg, Léon Thyes)=1 000200417034(Kirchberg, Rehazenter)=1 000200417029(Kirchberg, Europaparlament / Parlement Européen)=1 000200417049(Kirchberg, Niedergrünewald)=1 000200426008(Weimerskirch, Mäertesbuer)=1 000200417050(Kirchberg, Gare routière Luxexpo)=1 000200417001(Kirchberg, Prince Félix)=1 000200417052(Kirchberg, Luxexpo)=1
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200503001&lang=en&lines=223,321&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200409011&lang=en&lines=23,25,32,4&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200508009&lang=en&lines=322,326&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200422011&lang=en&lines=25,7,9&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200409010&lang=en&lines=32,4&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200417040&lang=en&lines=21&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200406002&lang=en&lines=14&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=120&format=json&id=000200417029&lang=en&lines=T1&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200417049&lang=en&lines=12,16,21&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200417034&lang=en&lines=12,26&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=30&format=json&id=000200417022&lang=en&lines=18,6&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=20:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200409005&lang=en&lines=221,23,32,850&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200426008&lang=en&lines=30&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=120&format=json&id=000200417052&lang=en&lines=T1&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200417001&lang=en&lines=30,32&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=120&format=json&id=000200417050&lang=en&lines=201,21,211,212,222,301,303,304,305,309,311,323,324,325,327,401,403,405,406,407,455,456,501,502,507,6,7,811,812&max

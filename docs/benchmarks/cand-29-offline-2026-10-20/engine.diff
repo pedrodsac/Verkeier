@@ -1,0 +1,354 @@
+diff --git "a/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift" "b/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift"
+index 839a45b..1a1d011 100644
+--- "a/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift"
++++ "b/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift"
+@@ -16,6 +16,7 @@ extension JourneyPlanningSession {
+         guard case let .bestEffort(configuration, refresh) = query.realtimePolicy,
+               let realtimeProvider, budgetMilliseconds > 0 else { return false }
+         let deadline = ContinuousClock.now.advanced(by: .milliseconds(budgetMilliseconds))
++        if !journeys.isEmpty { debugDescribe(journeys, label: "completion selected includeDiscovery=\(includeDiscovery)") }
+         let lower = query.direction == .arriveBy ? anchor.addingTimeInterval(-searchHorizon) : anchor
+         let upper = query.direction == .arriveBy ? anchor : anchor.addingTimeInterval(searchHorizon)
+         var targets: [RealtimeBoardTarget] = []
+@@ -47,8 +48,9 @@ extension JourneyPlanningSession {
+                 let patch = latestPatchesByInstance[key]
+                 let board = ride.boardSequence.flatMap { patch?.event(stopID: ride.board.stop.id, sequence: $0) }
+                 let alight = ride.alightSequence.flatMap { patch?.event(stopID: ride.alight.stop.id, sequence: $0) }
+-                if freshBoardingReport(board), freshArrivalReport(alight) { continue }
+-                guard attempted.insert(boarding).inserted else { continue }
++                if freshBoardingReport(board), freshArrivalReport(alight) { PassDebug.log("  ride \(ride.route.shortName ?? "?")[\(ride.tripID)] at \(ride.board.stop.id) fresh, skipped"); continue }
++                guard attempted.insert(boarding).inserted else { PassDebug.log("  ride \(ride.route.shortName ?? "?")[\(ride.tripID)] at \(ride.board.stop.id) already attempted"); continue }
++                PassDebug.log("  ride \(ride.route.shortName ?? "?")[\(ride.tripID)] at \(ride.board.stop.id) needs board: board=\(board?.departureSource.rawValue ?? "nopatch") observed=\(PassDebug.t(board?.departureObservedAt)) alight=\(alight?.arrivalSource.rawValue ?? "nopatch") transfer=\(transferArrival != nil)")
+                 // Include the permitted delay range: an unobserved connecting
+                 // vehicle may depart much later than its scheduled boarding.
+                 // The board supplies that vehicle's downstream passlist.
+@@ -82,6 +84,7 @@ extension JourneyPlanningSession {
+                     }
+                 }
+                 targets.append(.init(stopID: ride.board.stop.id, from: start, through: end, lines: lines))
++                PassDebug.log("    target \(ride.board.stop.id) \(PassDebug.t(start))-\(PassDebug.t(end)) lines=\(lines)")
+                 if seenStops.insert(ride.board.stop.id).inserted { stopIDs.append(ride.board.stop.id) }
+             }
+         }
+@@ -94,6 +97,7 @@ extension JourneyPlanningSession {
+                 preferredStops: stopIDs, anchor: anchor, searchHorizon: searchHorizon, deadline: planningDeadline,
+                 requestedInstances: requestedInstances, reachability: reachability)
+             targets += discovered.targets
++            PassDebug.log("discovery targets=\(discovered.targets.count) stops=\(discovered.targets.map { $0.stopID + ":" + $0.lines.joined(separator: ",") })")
+             matchingTripIDs.formUnion(discovered.tripIDs)
+             for target in discovered.targets where seenStops.insert(target.stopID).inserted { stopIDs.append(target.stopID) }
+             diagnostics.record(.realtimeDiscovery, since: discoveryStarted)
+@@ -136,8 +140,12 @@ extension JourneyPlanningSession {
+             if state == .unavailable { state = .partial }
+             let effectStarted = ContinuousClock.now
+             defer { diagnostics.record(.sessionRoutingEffect, since: effectStarted) }
+-            return routingEffectChanged(from: before)
++            debugRoutingEffect(from: before)
++            let effect = routingEffectChanged(from: before)
++            PassDebug.log("completion result changed=\(effect) stops=\(stopIDs) patches=\(batch.patches.count)")
++            return effect
+         }
++        PassDebug.log("completion result overlay unchanged stops=\(stopIDs) patches=\(batch.patches.count)")
+         return false
+     }
+ 
+diff --git "a/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+Realtime.swift" "b/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+Realtime.swift"
+index d99cc79..e24e00c 100644
+--- "a/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+Realtime.swift"
++++ "b/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+Realtime.swift"
+@@ -36,11 +36,30 @@ extension JourneyPlanningSession {
+                 }
+             }
+         }
+-        let accessStops = access.sorted { left, right in
+-            let a = reachability.stopsByRemainingRides.firstIndex { $0[left.stop] } ?? Int.max
+-            let b = reachability.stopsByRemainingRides.firstIndex { $0[right.stop] } ?? Int.max
++        let ordering = TransferFirstOrdering(snapshot: snapshot, egress: egress, maxRides: maxRides)
++        let transferFirst = ordering?.active == true ? ordering : nil
++        var zeroBudget = transferFirst?.zeroCap
++        func accessRank(_ stop: Int) -> Int {
++            if let transferFirst { return transferFirst.rank(stop) }
++            return reachability.stopsByRemainingRides.firstIndex { $0[stop] } ?? Int.max
++        }
++        let sortedAccess = access.sorted { left, right in
++            let a = accessRank(left.stop)
++            let b = accessRank(right.stop)
+             return a != b ? a < b : (left.seconds != right.seconds ? left.seconds < right.seconds : left.stop < right.stop)
+-        }.prefix(8).map { snapshot.stops[$0.stop].id }
++        }
++        var accessStops: [String] = []
++        for edge in sortedAccess where accessStops.count < 8 {
++            if let transferFirst, let budget = zeroBudget, transferFirst.isZeroRide(edge.stop) {
++                guard budget > 0 else { continue }
++                zeroBudget = budget - 1
++            }
++            accessStops.append(snapshot.stops[edge.stop].id)
++        }
++        if let ordering {
++            PassDebug.log("discovery access " + accessStops.map { id in
++                "\(id)=\(snapshot.stopByID[id].map { ordering.rank($0) } ?? -1)" }.joined(separator: " "))
++        }
+         let preferred = Set(preferredStops)
+         var seen: Set<String> = []
+         var frontier = (preferredStops + accessStops).filter { seen.insert($0).inserted }
+@@ -55,6 +74,19 @@ extension JourneyPlanningSession {
+             let additional = Set(frontier.filter { !preferred.contains($0) }.prefix(available))
+             frontier = frontier.filter { preferred.contains($0) || additional.contains($0) }
+             guard !frontier.isEmpty else { break }
++            if let ordering {
++                PassDebug.log("discovery wave \(ride) boards " + frontier.map { id in
++                    let stop = snapshot.stopByID[id]
++                    return "\(id)(\(stop.map { snapshot.stops[$0].model.name } ?? "?"))=\(stop.map { ordering.rank($0) } ?? -1)"
++                        + (preferred.contains(id) ? "P" : "") }.joined(separator: " "))
++            }
++            if let transferFirst, let budget = zeroBudget {
++                // Access stops were counted when chosen; only count the later waves here.
++                if ride > 0 {
++                    zeroBudget = max(0, budget - frontier.filter { id in
++                        !preferred.contains(id) && (snapshot.stopByID[id].map { transferFirst.isZeroRide($0) } ?? false) }.count)
++                }
++            }
+             targets += realtimeTargets(stopIDs: frontier, arrivalByStop: arrivals,
+                 from: from, through: through, configuration: configuration, deadline: deadline,
+                 patches: latestPatchesByInstance, reachability: reachability, excludingInstances: plannedInstances,
+@@ -68,7 +100,7 @@ extension JourneyPlanningSession {
+             frontier = realtimeFrontier(arrivalByStop: &arrivals, egress: egress, from: from, through: through,
+                 lookback: configuration.scheduledLookbackSeconds, deadline: deadline,
+                 patches: latestPatchesByInstance, excluding: queried, excludingInstances: plannedInstances,
+-                reachability: reachability)
++                reachability: reachability, ordering: transferFirst, zeroBudget: zeroBudget)
+         }
+         return (targets, matchingTripIDs)
+     }
+@@ -80,7 +112,8 @@ extension JourneyPlanningSession {
+                                   lookback: Int, deadline: ContinuousClock.Instant,
+                                   patches: [RealtimePatchKey: RealtimeTripPatch],
+                                   excluding: Set<String>, excludingInstances: Set<RealtimePatchKey>,
+-                                  reachability: Raptor.DestinationReachability) -> [String] {
++                                  reachability: Raptor.DestinationReachability,
++                                  ordering: TransferFirstOrdering? = nil, zeroBudget: Int? = nil) -> [String] {
+         let serviceDays = snapshot.serviceDays.filter {
+             $0.start <= through && $0.start.addingTimeInterval(Double(snapshot.info.maximumServiceTime.rawValue))
+                 >= from.addingTimeInterval(-Double(lookback))
+@@ -96,7 +129,8 @@ extension JourneyPlanningSession {
+             reachability.stopsByRemainingRides.firstIndex { $0[stop] } ?? Int.max
+         }
+         let target = egress.first.map { snapshot.stops[$0.stop].model.coordinate }
+-        return arrivalByStop.keys.filter { stop in
++        var zeroTaken = 0
++        let candidates = arrivalByStop.keys.filter { stop in
+             !excluding.contains(snapshot.stops[stop].id) && snapshot.boardableStops.contains(stop)
+                 && snapshot.tripIndicesByDepartureStop[stop].contains { tripIndex in
+                     let trip = snapshot.trips[tripIndex]
+@@ -120,10 +154,38 @@ extension JourneyPlanningSession {
+                         }
+                     }
+                 }
+-        }.sorted { left, right in
+-            if remainingRides[left] != remainingRides[right] {
++        }
++        if let ordering, PassDebug.enabled {
++            // Debug: every qualifying candidate with its tight rank, optimistic rank and distance to the destination.
++            let byRank = Dictionary(grouping: candidates, by: { ordering.rank($0) }).mapValues(\.count)
++            PassDebug.log("frontier candidates=\(candidates.count) byTightRank=\(byRank.sorted { $0.key < $1.key })")
++            let order = candidates.sorted { a, b in
++                let ra = ordering.rank(a), rb = ordering.rank(b)
++                if ra != rb { return ra < rb }
++                let da = target.map { distance(snapshot.stops[a].model.coordinate, $0) } ?? 0
++                let db = target.map { distance(snapshot.stops[b].model.coordinate, $0) } ?? 0
++                return da != db ? da < db : snapshot.stops[a].id < snapshot.stops[b].id
++            }
++            for (index, stop) in order.prefix(40).enumerated() {
++                let dist = target.map { Int(distance(snapshot.stops[stop].model.coordinate, $0)) } ?? -1
++                PassDebug.log("  cand[\(index)] \(snapshot.stops[stop].id) \(snapshot.stops[stop].model.name) tight=\(ordering.rank(stop)) optimistic=\(remainingRides[stop]) dist=\(dist)m")
++            }
++            if let heienhaff = snapshot.stopByID["000200508005"] {
++                let position = order.firstIndex(of: heienhaff)
++                PassDebug.log("  Heienhaff P+R T1 000200508005 tight=\(ordering.rank(heienhaff)) optimistic=\(remainingRides[heienhaff]) position=\(position.map(String.init) ?? "not a candidate")")
++            }
++        }
++        return candidates.sorted { left, right in
++            if let ordering {
++                let a = ordering.rank(left), b = ordering.rank(right)
++                if a != b { return a < b }
++            } else if remainingRides[left] != remainingRides[right] {
+                 return remainingRides[left] < remainingRides[right]
+             }
++            if ordering?.arrivalTiebreak == true {
++                let a = arrivalByStop[left]!; let b = arrivalByStop[right]!
++                if a != b { return a < b }
++            }
+             if let target {
+                 let a = distance(snapshot.stops[left].model.coordinate, target)
+                 let b = distance(snapshot.stops[right].model.coordinate, target)
+@@ -132,6 +194,11 @@ extension JourneyPlanningSession {
+             let a = arrivalByStop[left]!; let b = arrivalByStop[right]!
+             if a != b { return a < b }
+             return snapshot.stops[left].id < snapshot.stops[right].id
++        }.filter { stop in
++            guard let ordering, let budget = zeroBudget, ordering.isZeroRide(stop) else { return true }
++            guard budget > zeroTaken else { return false }
++            zeroTaken += 1
++            return true
+         }.prefix(8).map { snapshot.stops[$0].id }
+     }
+ }
+diff --git "a/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+TransferFirst.swift" "b/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+TransferFirst.swift"
+new file mode 100644
+index 0000000..1d53a65
+--- /dev/null
++++ "b/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+TransferFirst.swift"
+@@ -0,0 +1,44 @@
++import Foundation
++
++extension JourneyPlanningSession {
++    /// CAND-29 (experiment, off unless the process environment sets `CAND29`): discovery still decides
++    /// which stops qualify with its optimistic walking-chain envelope, but orders them by the tighter
++    /// one-batch reachability RAPTOR itself uses. A stop one ride from the destination comes first,
++    /// then two, then three, and a stop the destination can be walked to comes last. `CAND29=1` only
++    /// reorders; `CAND29=cap<N>` also lets at most N zero-ride boards into one discovery. `CAND29=arr` is an
++    /// exploratory variant outside the plan: equal ranks break by the earliest arrival at the stop, then distance.
++    struct TransferFirstOrdering {
++        static let zeroRank = 1_000
++        static let unreachableRank = 2_000
++        /// Whether the ordering is used; when false the type only labels stops for the debug log.
++        let active: Bool
++        /// Maximum number of destination-walkable (and tight-unreachable) boards per discovery.
++        let zeroCap: Int?
++        /// Exploratory: break rank ties by arrival time before distance to the destination.
++        let arrivalTiebreak: Bool
++        private let reachability: Raptor.DestinationReachability
++
++        init?(snapshot: RoutingSnapshot, egress: [Edge], maxRides: Int) {
++            let setting = ProcessInfo.processInfo.environment["CAND29"] ?? ""
++            let active = !setting.isEmpty && setting != "0"
++            guard active || PassDebug.enabled else { return nil }
++            self.active = active
++            self.zeroCap = setting.hasPrefix("cap") ? Int(setting.dropFirst(3)) : nil
++            self.arrivalTiebreak = setting == "arr"
++            let started = ContinuousClock.now
++            // The same bound `Raptor.search` builds (and caches) for its executable rounds.
++            reachability = Raptor.DestinationReachability(snapshot: snapshot,
++                egressStops: Set(egress.map(\.stop)), maxRides: maxRides)
++            PassDebug.log("cand29 reachability built in \(started.duration(to: .now)) active=\(active) cap=\(zeroCap.map(String.init) ?? "-")")
++        }
++
++        func rank(_ stop: Int) -> Int {
++            guard let level = reachability.stopsByRemainingRides.firstIndex(where: { $0[stop] }) else {
++                return Self.unreachableRank
++            }
++            return level == 0 ? Self.zeroRank : level
++        }
++
++        func isZeroRide(_ stop: Int) -> Bool { rank(stop) >= Self.zeroRank }
++    }
++}
+diff --git "a/Sources/Mobilit\303\251itKit/Routing/PassDebug.swift" "b/Sources/Mobilit\303\251itKit/Routing/PassDebug.swift"
+new file mode 100644
+index 0000000..7a26080
+--- /dev/null
++++ "b/Sources/Mobilit\303\251itKit/Routing/PassDebug.swift"
+@@ -0,0 +1,91 @@
++import Foundation
++
++// Temporary diagnostics for the pass-2 investigation (scratch copy only, never committed).
++enum PassDebug {
++    static let formatter: DateFormatter = {
++        let f = DateFormatter()
++        f.dateFormat = "HH:mm:ss"
++        f.timeZone = TimeZone(identifier: "Europe/Luxembourg")
++        f.locale = Locale(identifier: "en_US_POSIX")
++        return f
++    }()
++    static func t(_ d: Date?) -> String { d.map { formatter.string(from: $0) } ?? "-" }
++    static let enabled = ProcessInfo.processInfo.environment["PASS_DEBUG"] == "1"
++    static func log(_ s: @autoclosure () -> String) { guard enabled else { return }; print("ROUTING_DEBUG " + s()); fflush(stdout) }
++}
++
++extension JourneyPlanningSession {
++    func debugDescribe(_ journeys: [Journey], label: String) {
++        guard PassDebug.enabled else { return }
++        PassDebug.log("\(label) count=\(journeys.count)")
++        for journey in journeys {
++            var parts: [String] = []
++            for leg in journey.legs {
++                switch leg {
++                case let .transit(ride):
++                    let key = ride.instance.map { RealtimePatchKey(tripID: ride.tripID, serviceDate: $0.serviceDate) }
++                    let patch = key.flatMap { latestPatchesByInstance[$0] }
++                    let board = ride.boardSequence.flatMap { patch?.event(stopID: ride.board.stop.id, sequence: $0) }
++                    let alight = ride.alightSequence.flatMap { patch?.event(stopID: ride.alight.stop.id, sequence: $0) }
++                    parts.append("\(ride.route.shortName ?? "?")[\(ride.tripID)] \(ride.board.stop.id)@\(PassDebug.t(ride.effectiveDeparture))(s\(PassDebug.t(ride.scheduledDeparture)),\(board?.departureSource.rawValue ?? "nopatch")) -> \(ride.alight.stop.id)@\(PassDebug.t(ride.effectiveArrival))(\(alight?.arrivalSource.rawValue ?? "nopatch"))")
++                case .walk: parts.append("walk")
++                case .inSeatContinuation: parts.append("stay")
++                }
++            }
++            PassDebug.log("  \(journey.id.value) \(parts.joined(separator: " | "))")
++        }
++    }
++
++    /// Same checks as `routingEffectChanged`, but lists every trip that changes routing inputs.
++    func debugRoutingEffect(from previous: [RealtimePatchKey: RealtimeTripPatch]) {
++        guard PassDebug.enabled else { return }
++        var changedTrips = 0, effectTrips = 0
++        for (key, patch) in latestPatchesByInstance.sorted(by: { $0.key.tripID < $1.key.tripID }) where patch != previous[key] {
++            changedTrips += 1
++            guard let tripIndex = snapshot.tripByID[key.tripID] else { PassDebug.log("  effect? \(key.tripID) not in snapshot"); continue }
++            let trip = snapshot.trips[tripIndex]
++            let line = snapshot.routes[trip.route].shortName ?? "?"
++            let old = previous[key]
++            if patch.status != (old?.status ?? .active) {
++                effectTrips += 1
++                PassDebug.log("  effect \(line)[\(key.tripID)] status \(String(describing: old?.status)) -> \(patch.status) new=\(old == nil)")
++                continue
++            }
++            guard patch.status == .active else { continue }
++            for time in trip.times {
++                let stopID = snapshot.stops[time.stop].id
++                let before = old?.event(stopID: stopID, sequence: time.sequence)
++                let after = patch.event(stopID: stopID, sequence: time.sequence)
++                let scheduledDeparture = time.departure.map { snapshot.date(serviceDate: key.serviceDate, serviceSeconds: $0) }
++                let scheduledArrival = time.arrival.map { snapshot.date(serviceDate: key.serviceDate, serviceSeconds: $0) }
++                let oldDeparture = before?.effectiveDeparture ?? scheduledDeparture
++                let newDeparture = after?.effectiveDeparture ?? scheduledDeparture
++                let oldArrival = before?.effectiveArrival ?? scheduledArrival
++                let newArrival = after?.effectiveArrival ?? scheduledArrival
++                var reason: String?
++                if oldDeparture != newDeparture || oldArrival != newArrival {
++                    reason = "times dep \(PassDebug.t(oldDeparture))->\(PassDebug.t(newDeparture)) arr \(PassDebug.t(oldArrival))->\(PassDebug.t(newArrival)) sched \(PassDebug.t(scheduledDeparture)) src \(after?.departureSource.rawValue ?? "-")/\(after?.arrivalSource.rawValue ?? "-")"
++                } else if (before?.boardingAllowed != false) != (after?.boardingAllowed != false)
++                    || (before?.alightingAllowed != false) != (after?.alightingAllowed != false) {
++                    reason = "boarding/alighting allowed"
++                } else {
++                    func deadline(_ event: RealtimeStopEventPatch?, effective: Date?) -> Date? {
++                        if event?.departureSource == .estimated, let scheduledDeparture, let effective {
++                            return min(scheduledDeparture, effective)
++                        }
++                        return effective
++                    }
++                    if deadline(before, effective: oldDeparture) != deadline(after, effective: newDeparture) {
++                        reason = "deadline \(before?.departureSource.rawValue ?? "-")->\(after?.departureSource.rawValue ?? "-")"
++                    }
++                }
++                if let reason {
++                    effectTrips += 1
++                    PassDebug.log("  effect \(line)[\(key.tripID)] stop \(stopID) seq \(time.sequence) new=\(old == nil) \(reason)")
++                    break
++                }
++            }
++        }
++        PassDebug.log("  patched trips changed=\(changedTrips) withRoutingEffect=\(effectTrips)")
++    }
++}
+diff --git "a/Sources/Mobilit\303\251itKit/Routing/TransitRouter.swift" "b/Sources/Mobilit\303\251itKit/Routing/TransitRouter.swift"
+index fe735ab..93d9dd7 100644
+--- "a/Sources/Mobilit\303\251itKit/Routing/TransitRouter.swift"
++++ "b/Sources/Mobilit\303\251itKit/Routing/TransitRouter.swift"
+@@ -924,6 +924,7 @@ public actor JourneyPlanningSession {
+             diagnostics.rejections = rejectionsBefore
+             built = buildJourneys(searchResult.candidates, access: access, egress: egress, accepting: accepting)
+             diagnostics.record(.candidateBuilding, since: candidateStarted)
++            debugDescribe(built.journeys, label: "pass wave=\(refinementWaves) built")
+             // Both acquisition passes check selected vehicles. Delays can make
+             // a previously unselected connection viable on the second scan;
+             // spent CPU time must not suppress that vehicle's live board.

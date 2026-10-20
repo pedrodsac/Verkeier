@@ -1,0 +1,16 @@
+departureBoard?date=2026-10-20&duration=150&format=json&id=000200508009&lang=en&lines=322,326&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=150&format=json&id=000200503001&lang=en&lines=223,321&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=150&format=json&id=000200406002&lang=en&lines=14&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=150&format=json&id=000200409005&lang=en&lines=221,23,32&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=150&format=json&id=000200417040&lang=en&lines=21&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=150&format=json&id=000200422011&lang=en&lines=25,7,9&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=150&format=json&id=000200409010&lang=en&lines=32,4&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=120&format=json&id=000200417029&lang=en&lines=T1&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=120&format=json&id=000200417022&lang=en&lines=18&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=150&format=json&id=000200426008&lang=en&lines=30&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=150&format=json&id=000200417034&lang=en&lines=12,26&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=120&format=json&id=000200417052&lang=en&lines=T1&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=120&format=json&id=000200417050&lang=en&lines=201,21,211,222,301,303,304,305,309,311,323,324,325,326,327,401,403,405,406,407,455,456,501,502,507,7,811,812&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=120&format=json&id=000200409011&lang=en&lines=23,25,32,4&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=120&format=json&id=000200417049&lang=en&lines=12,16,18,21,32&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00
+departureBoard?date=2026-10-20&duration=150&format=json&id=000200417001&lang=en&lines=30,32&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00

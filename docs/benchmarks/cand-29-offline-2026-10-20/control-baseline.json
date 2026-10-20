@@ -1,0 +1,509 @@
+{
+ "st-L1": {
+  "live": [
+   {
+    "process": "priming",
+    "total_ms": 3161,
+    "passes": 2,
+    "requests": 26,
+    "bytes": 9073853
+   },
+   {
+    "process": "warm",
+    "total_ms": 2037,
+    "passes": 2,
+    "requests": 26,
+    "bytes": 9073853
+   },
+   {
+    "process": "cold",
+    "total_ms": 2437,
+    "passes": 2,
+    "requests": 26,
+    "bytes": 9073853
+   }
+  ],
+  "replay_control": [
+   {
+    "canary_ms": 2236,
+    "samples": [
+     {
+      "process": "priming",
+      "total_ms": 2383,
+      "passes": 2,
+      "requests": 26,
+      "bytes": 9073853
+     },
+     {
+      "process": "warm",
+      "total_ms": 2158,
+      "passes": 2,
+      "requests": 26,
+      "bytes": 9073853
+     },
+     {
+      "process": "cold",
+      "total_ms": 2414,
+      "passes": 2,
+      "requests": 26,
+      "bytes": 9073853
+     }
+    ]
+   },
+   {
+    "canary_ms": 1960,
+    "samples": [
+     {
+      "process": "priming",
+      "total_ms": 2333,
+      "passes": 2,
+      "requests": 26,
+      "bytes": 9073853
+     },
+     {
+      "process": "warm",
+      "total_ms": 2160,
+      "passes": 2,
+      "requests": 26,
+      "bytes": 9073853
+     },
+     {
+      "process": "cold",
+      "total_ms": 2355,
+      "passes": 2,
+      "requests": 26,
+      "bytes": 9073853
+     }
+    ]
+   },
+   {
+    "canary_ms": 1898,
+    "samples": [
+     {
+      "process": "priming",
+      "total_ms": 2307,
+      "passes": 2,
+      "requests": 26,
+      "bytes": 9073853
+     },
+     {
+      "process": "warm",
+      "total_ms": 2158,
+      "passes": 2,
+      "requests": 26,
+      "bytes": 9073853
+     },
+     {
+      "process": "cold",
+      "total_ms": 2333,
+      "passes": 2,
+      "requests": 26,
+      "bytes": 9073853
+     }
+    ]
+   }
+  ],
+  "replay_control_median": {
+   "priming": {
+    "median_ms": 2333,
+    "runs": [
+     2383,
+     2333,
+     2307
+    ]
+   },
+   "warm": {
+    "median_ms": 2158,
+    "runs": [
+     2158,
+     2160,
+     2158
+    ]
+   },
+   "cold": {
+    "median_ms": 2355,
+    "runs": [
+     2414,
+     2355,
+     2333
+    ]
+   }
+  }
+ },
+ "s7-L1": {
+  "live": [
+   {
+    "process": "priming",
+    "total_ms": 2914,
+    "passes": 1,
+    "requests": 26,
+    "bytes": 15615022
+   },
+   {
+    "process": "warm",
+    "total_ms": 2141,
+    "passes": 1,
+    "requests": 26,
+    "bytes": 15615022
+   },
+   {
+    "process": "cold",
+    "total_ms": 2562,
+    "passes": 1,
+    "requests": 26,
+    "bytes": 15615022
+   }
+  ],
+  "replay_control": [
+   {
+    "canary_ms": 2006,
+    "samples": [
+     {
+      "process": "priming",
+      "total_ms": 2323,
+      "passes": 1,
+      "requests": 26,
+      "bytes": 15615022
+     },
+     {
+      "process": "warm",
+      "total_ms": 2110,
+      "passes": 1,
+      "requests": 26,
+      "bytes": 15615022
+     },
+     {
+      "process": "cold",
+      "total_ms": 2299,
+      "passes": 1,
+      "requests": 26,
+      "bytes": 15615022
+     }
+    ]
+   },
+   {
+    "canary_ms": 1902,
+    "samples": [
+     {
+      "process": "priming",
+      "total_ms": 2358,
+      "passes": 1,
+      "requests": 26,
+      "bytes": 15615022
+     },
+     {
+      "process": "warm",
+      "total_ms": 2111,
+      "passes": 1,
+      "requests": 26,
+      "bytes": 15615022
+     },
+     {
+      "process": "cold",
+      "total_ms": 2308,
+      "passes": 1,
+      "requests": 26,
+      "bytes": 15615022
+     }
+    ]
+   },
+   {
+    "canary_ms": 1959,
+    "samples": [
+     {
+      "process": "priming",
+      "total_ms": 2271,
+      "passes": 1,
+      "requests": 26,
+      "bytes": 15615022
+     },
+     {
+      "process": "warm",
+      "total_ms": 2093,
+      "passes": 1,
+      "requests": 26,
+      "bytes": 15615022
+     },
+     {
+      "process": "cold",
+      "total_ms": 2301,
+      "passes": 1,
+      "requests": 26,
+      "bytes": 15615022
+     }
+    ]
+   }
+  ],
+  "replay_control_median": {
+   "priming": {
+    "median_ms": 2323,
+    "runs": [
+     2323,
+     2358,
+     2271
+    ]
+   },
+   "warm": {
+    "median_ms": 2110,
+    "runs": [
+     2110,
+     2111,
+     2093
+    ]
+   },
+   "cold": {
+    "median_ms": 2301,
+    "runs": [
+     2299,
+     2308,
+     2301
+    ]
+   }
+  }
+ },
+ "s7-L2": {
+  "live": [
+   {
+    "process": "priming",
+    "total_ms": 5490,
+    "passes": 1,
+    "requests": 27,
+    "bytes": 14361509
+   },
+   {
+    "process": "warm",
+    "total_ms": 4792,
+    "passes": 1,
+    "requests": 27,
+    "bytes": 14361509
+   },
+   {
+    "process": "cold",
+    "total_ms": 4629,
+    "passes": 1,
+    "requests": 27,
+    "bytes": 14377790
+   }
+  ],
+  "replay_control": [
+   {
+    "canary_ms": 1978,
+    "samples": [
+     {
+      "process": "priming",
+      "total_ms": 4492,
+      "passes": 1,
+      "requests": 27,
+      "bytes": 14376036
+     },
+     {
+      "process": "warm",
+      "total_ms": 4238,
+      "passes": 1,
+      "requests": 27,
+      "bytes": 14376036
+     },
+     {
+      "process": "cold",
+      "total_ms": 4385,
+      "passes": 1,
+      "requests": 27,
+      "bytes": 14376036
+     }
+    ]
+   }
+  ],
+  "replay_control_median": {
+   "priming": {
+    "median_ms": 4492,
+    "runs": [
+     4492
+    ]
+   },
+   "warm": {
+    "median_ms": 4238,
+    "runs": [
+     4238
+    ]
+   },
+   "cold": {
+    "median_ms": 4385,
+    "runs": [
+     4385
+    ]
+   }
+  }
+ },
+ "s7-L3": {
+  "live": [
+   {
+    "process": "priming",
+    "total_ms": 4959,
+    "passes": 1,
+    "requests": 27,
+    "bytes": 14377790
+   },
+   {
+    "process": "warm",
+    "total_ms": 7480,
+    "passes": 1,
+    "requests": 27,
+    "bytes": 14377790
+   },
+   {
+    "process": "cold",
+    "total_ms": 3909,
+    "passes": 1,
+    "requests": 27,
+    "bytes": 14763050
+   }
+  ],
+  "replay_control": [
+   {
+    "canary_ms": 2871,
+    "samples": [
+     {
+      "process": "priming",
+      "total_ms": 7467,
+      "passes": 1,
+      "requests": 27,
+      "bytes": 14377790
+     },
+     {
+      "process": "warm",
+      "total_ms": 7256,
+      "passes": 1,
+      "requests": 27,
+      "bytes": 14377790
+     },
+     {
+      "process": "cold",
+      "total_ms": 7362,
+      "passes": 1,
+      "requests": 27,
+      "bytes": 14377790
+     }
+    ]
+   }
+  ],
+  "replay_control_median": {
+   "priming": {
+    "median_ms": 7467,
+    "runs": [
+     7467
+    ]
+   },
+   "warm": {
+    "median_ms": 7256,
+    "runs": [
+     7256
+    ]
+   },
+   "cold": {
+    "median_ms": 7362,
+    "runs": [
+     7362
+    ]
+   }
+  }
+ },
+ "c28-now": {
+  "live": [
+   {
+    "process": "priming",
+    "total_ms": 3131,
+    "passes": 1,
+    "requests": 27,
+    "bytes": 15683882
+   }
+  ],
+  "replay_control": [
+   {
+    "canary_ms": 2104,
+    "samples": [
+     {
+      "process": "priming",
+      "total_ms": 2909,
+      "passes": 1,
+      "requests": 27,
+      "bytes": 15683882
+     }
+    ]
+   }
+  ],
+  "replay_control_median": {
+   "priming": {
+    "median_ms": 2909,
+    "runs": [
+     2909
+    ]
+   }
+  }
+ },
+ "c28-rev": {
+  "live": [
+   {
+    "process": "priming",
+    "total_ms": 3101,
+    "passes": 1,
+    "requests": 29,
+    "bytes": 18057758
+   }
+  ],
+  "replay_control": [
+   {
+    "canary_ms": 1885,
+    "samples": [
+     {
+      "process": "priming",
+      "total_ms": 2984,
+      "passes": 1,
+      "requests": 29,
+      "bytes": 18057758
+     }
+    ]
+   }
+  ],
+  "replay_control_median": {
+   "priming": {
+    "median_ms": 2984,
+    "runs": [
+     2984
+    ]
+   }
+  }
+ },
+ "c28-esch": {
+  "live": [
+   {
+    "process": "priming",
+    "total_ms": 2187,
+    "passes": 1,
+    "requests": 25,
+    "bytes": 10417963
+   }
+  ],
+  "replay_control": [
+   {
+    "canary_ms": 1950,
+    "samples": [
+     {
+      "process": "priming",
+      "total_ms": 2089,
+      "passes": 1,
+      "requests": 25,
+      "bytes": 10417963
+     }
+    ]
+   }
+  ],
+  "replay_control_median": {
+   "priming": {
+    "median_ms": 2089,
+    "runs": [
+     2089
+    ]
+   }
+  }
+ }
+}

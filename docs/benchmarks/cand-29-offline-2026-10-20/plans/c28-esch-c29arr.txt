@@ -1,0 +1,105 @@
+cand29 reachability built in 0.000506625 seconds active=true cap=-
+discovery access 000220402034=1 000220402046=1 000220402123=1 000220402036=1 000220402072=1 000220402045=1 000220402097=1 000220402086=1
+discovery wave 0 boards 000220402034(Esch-sur-Alzette, Gare routière)=1 000220402046(Esch-sur-Alzette, Gare)=1 000220402123(Esch-sur-Alzette, Auberge de Jeunesse)=1 000220402036(Esch-sur-Alzette, Place de l'Hôtel de Ville)=1 000220402072(Esch-sur-Alzette, Place Norbert Metz)=1 000220402045(Esch-sur-Alzette, Passerelle Gaalgebierg)=1 000220402097(Esch-sur-Alzette, Bd. Berwart)=1 000220402086(Esch-sur-Alzette, Rue de Schifflange)=1
+frontier candidates=502 byTightRank=[(key: 1, value: 166), (key: 2, value: 326), (key: 1000, value: 10)]
+  cand[0] 000220301038 Dudelange, Rue de la Rivière tight=1 optimistic=0 dist=2288m
+  cand[1] 000220301024 Dudelange, Gemeng tight=1 optimistic=0 dist=2474m
+  cand[2] 000220301015 Dudelange (Centre), Gare tight=1 optimistic=0 dist=2516m
+  cand[3] 000220301029 Dudelange, Commerce tight=1 optimistic=0 dist=2569m
+  cand[4] 000220301033 Dudelange, Rue Antoine Zinnen tight=1 optimistic=0 dist=2571m
+  cand[5] 000220301078 Dudelange, Square Mayrisch tight=1 optimistic=0 dist=2955m
+  cand[6] 000220301022 Dudelange, Gare tight=1 optimistic=0 dist=2963m
+  cand[7] 000220301017 Dudelange, Jugendhaus tight=1 optimistic=0 dist=3010m
+  cand[8] 000220301030 Dudelange, Kierfecht tight=1 optimistic=0 dist=3025m
+  cand[9] 000220301082 Dudelange (Ville), Gare tight=1 optimistic=0 dist=3041m
+  cand[10] 000220301031 Dudelange, Rue Aloyse Kayser tight=1 optimistic=0 dist=3189m
+  cand[11] 000221201003 Rumelange, Atelier Kihn tight=1 optimistic=1 dist=3218m
+  cand[12] 000220301037 Dudelange, Nuddelsfabrik tight=1 optimistic=0 dist=3262m
+  cand[13] 000221201012 Rumelange, Schmelz tight=1 optimistic=1 dist=3275m
+  cand[14] 000220602005 Tétange, Lorei tight=1 optimistic=1 dist=3286m
+  cand[15] 000221201005 Rumelange, Gare routière tight=1 optimistic=1 dist=3358m
+  cand[16] 000220301016 Dudelange, Centre Sportif tight=1 optimistic=0 dist=3367m
+  cand[17] 000220602008 Tétange, Um Haff tight=1 optimistic=1 dist=3402m
+  cand[18] 000221201014 Rumelange, Gare tight=1 optimistic=1 dist=3403m
+  cand[19] 000220301073 Dudelange, Rue Schortgen tight=1 optimistic=0 dist=3404m
+  cand[20] 000220301019 Dudelange, Route de Kayl tight=1 optimistic=0 dist=3413m
+  cand[21] 000220301074 Dudelange, Scherrwee tight=1 optimistic=0 dist=3435m
+  cand[22] 000220602001 Tétange, Duerf tight=1 optimistic=1 dist=3459m
+  cand[23] 000220301061 Dudelange, Rue du Parc tight=1 optimistic=0 dist=3509m
+  cand[24] 000221201009 Rumelange, Moartplaz tight=1 optimistic=1 dist=3570m
+  cand[25] 000220602004 Tétange, Kiirfecht tight=1 optimistic=1 dist=3665m
+  cand[26] 000220301002 Dudelange, Angeldall tight=1 optimistic=0 dist=3695m
+  cand[27] 000220301048 Dudelange, Scherr tight=1 optimistic=0 dist=3740m
+  cand[28] 000220601013 Kayl, Diddelengerstrooss tight=1 optimistic=1 dist=3803m
+  cand[29] 000220601012 Kayl, Cité Berens tight=1 optimistic=1 dist=3827m
+  cand[30] 000221201004 Rumelange, Centre Culturel tight=1 optimistic=1 dist=3892m
+  cand[31] 000220601014 Kayl, Eecherwee tight=1 optimistic=1 dist=3898m
+  cand[32] 000220301046 Dudelange, Rue Alexandre Fleming tight=1 optimistic=0 dist=3902m
+  cand[33] 000220301013 Dudelange, Butschebuerg tight=1 optimistic=0 dist=3990m
+  cand[34] 000221201002 Rumelange, Aale Kierfecht tight=1 optimistic=1 dist=3993m
+  cand[35] 000220301018 Dudelange, Dennewald tight=1 optimistic=0 dist=4036m
+  cand[36] 000220301012 Dudelange, Gare-Burange tight=1 optimistic=0 dist=4063m
+  cand[37] 000220301035 Dudelange, A Bëlleg tight=1 optimistic=0 dist=4066m
+  cand[38] 000220601021 Kayl, Um Brill tight=1 optimistic=1 dist=4089m
+  cand[39] 000220301026 Dudelange, Rue Ribeschpont tight=1 optimistic=0 dist=4115m
+  Heienhaff P+R T1 000200508005 tight=2 optimistic=1 position=not a candidate
+discovery wave 1 boards 000220402050(Esch-sur-Alzette, Grand-rue)=1 000220402026(Esch-sur-Alzette, Bibliothèque municipale)=1 000220402018(Esch-sur-Alzette, Rue Large)=1 000220402055(Esch-sur-Alzette, Lycée des Garçons)=1 000220402108(Esch-sur-Alzette, Burgronn)=1 000220402064(Esch-sur-Alzette, Neiduerf)=1 000220402044(Esch-sur-Alzette, Rue de l'Hôpital)=1 000220402100(Esch-sur-Alzette, Piscine Bains du Parc)=1
+frontier candidates=1880 byTightRank=[(key: 1, value: 186), (key: 2, value: 1333), (key: 3, value: 351), (key: 1000, value: 10)]
+  cand[0] 000220301038 Dudelange, Rue de la Rivière tight=1 optimistic=0 dist=2288m
+  cand[1] 000220301024 Dudelange, Gemeng tight=1 optimistic=0 dist=2474m
+  cand[2] 000220301015 Dudelange (Centre), Gare tight=1 optimistic=0 dist=2516m
+  cand[3] 000220301029 Dudelange, Commerce tight=1 optimistic=0 dist=2569m
+  cand[4] 000220301033 Dudelange, Rue Antoine Zinnen tight=1 optimistic=0 dist=2571m
+  cand[5] 000220301004 Dudelange, Belair tight=1 optimistic=0 dist=2687m
+  cand[6] 000220301032 Dudelange, Kräizbierg tight=1 optimistic=0 dist=2923m
+  cand[7] 000220301078 Dudelange, Square Mayrisch tight=1 optimistic=0 dist=2955m
+  cand[8] 000220301022 Dudelange, Gare tight=1 optimistic=0 dist=2963m
+  cand[9] 000220301017 Dudelange, Jugendhaus tight=1 optimistic=0 dist=3010m
+  cand[10] 000220301030 Dudelange, Kierfecht tight=1 optimistic=0 dist=3025m
+  cand[11] 000220301082 Dudelange (Ville), Gare tight=1 optimistic=0 dist=3041m
+  cand[12] 000220301031 Dudelange, Rue Aloyse Kayser tight=1 optimistic=0 dist=3189m
+  cand[13] 000221201003 Rumelange, Atelier Kihn tight=1 optimistic=1 dist=3218m
+  cand[14] 000220301037 Dudelange, Nuddelsfabrik tight=1 optimistic=0 dist=3262m
+  cand[15] 000221201012 Rumelange, Schmelz tight=1 optimistic=1 dist=3275m
+  cand[16] 000220602005 Tétange, Lorei tight=1 optimistic=1 dist=3286m
+  cand[17] 000221201005 Rumelange, Gare routière tight=1 optimistic=1 dist=3358m
+  cand[18] 000220301016 Dudelange, Centre Sportif tight=1 optimistic=0 dist=3367m
+  cand[19] 000220602008 Tétange, Um Haff tight=1 optimistic=1 dist=3402m
+  cand[20] 000221201014 Rumelange, Gare tight=1 optimistic=1 dist=3403m
+  cand[21] 000220301073 Dudelange, Rue Schortgen tight=1 optimistic=0 dist=3404m
+  cand[22] 000220301019 Dudelange, Route de Kayl tight=1 optimistic=0 dist=3413m
+  cand[23] 000220301074 Dudelange, Scherrwee tight=1 optimistic=0 dist=3435m
+  cand[24] 000220602001 Tétange, Duerf tight=1 optimistic=1 dist=3459m
+  cand[25] 000220301061 Dudelange, Rue du Parc tight=1 optimistic=0 dist=3509m
+  cand[26] 000221201009 Rumelange, Moartplaz tight=1 optimistic=1 dist=3570m
+  cand[27] 000220602004 Tétange, Kiirfecht tight=1 optimistic=1 dist=3665m
+  cand[28] 000220301002 Dudelange, Angeldall tight=1 optimistic=0 dist=3695m
+  cand[29] 000220301048 Dudelange, Scherr tight=1 optimistic=0 dist=3740m
+  cand[30] 000220601013 Kayl, Diddelengerstrooss tight=1 optimistic=1 dist=3803m
+  cand[31] 000220601012 Kayl, Cité Berens tight=1 optimistic=1 dist=3827m
+  cand[32] 000221201004 Rumelange, Centre Culturel tight=1 optimistic=1 dist=3892m
+  cand[33] 000220601014 Kayl, Eecherwee tight=1 optimistic=1 dist=3898m
+  cand[34] 000220301046 Dudelange, Rue Alexandre Fleming tight=1 optimistic=0 dist=3902m
+  cand[35] 000220301013 Dudelange, Butschebuerg tight=1 optimistic=0 dist=3990m
+  cand[36] 000220301018 Dudelange, Dennewald tight=1 optimistic=0 dist=4036m
+  cand[37] 000220301012 Dudelange, Gare-Burange tight=1 optimistic=0 dist=4063m
+  cand[38] 000220301035 Dudelange, A Bëlleg tight=1 optimistic=0 dist=4066m
+  cand[39] 000220601021 Kayl, Um Brill tight=1 optimistic=1 dist=4089m
+  Heienhaff P+R T1 000200508005 tight=2 optimistic=1 position=1077
+discovery wave 2 boards 000220402119(Esch-sur-Alzette, Place de Lodève)=1 000221401006(Schifflange, Millchen)=1 000220402054(Esch-sur-Alzette, Leesbierg)=1 000220402059(Esch-sur-Alzette, Lycée Hubert Clement)=1 000220402080(Esch-sur-Alzette, Rue Général Patton)=1 000220402019(Esch-sur-Alzette, Rue Nelson Mandela)=1 000220402014(Esch-sur-Alzette, Bd Prince Henri)=1 000220402221(Esch-sur-Alzette, Terres Rouges)=1
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000220402026&lang=en&lines=641&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000220402050&lang=en&lines=1,2,4,5,643&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000220402018&lang=en&lines=13,2,4,5,643&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=60&format=json&id=000220402055&lang=en&lines=643&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=20:00:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000220402064&lang=en&lines=5,650,651&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=60&format=json&id=000220402044&lang=en&lines=643&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=20:00:00
+ABORT departureBoard?date=2026-10-19&duration=30&format=json&id=000220402119&lang=en&lines=15&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=20:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000220402108&lang=en&lines=5,650,651&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=120&format=json&id=000220402100&lang=en&lines=13,2,4,5,643&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=120&format=json&id=000221401006&lang=en&lines=4&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=120&format=json&id=000220402054&lang=en&lines=4&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=120&format=json&id=000220402080&lang=en&lines=643&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=120&format=json&id=000220402019&lang=en&lines=3,642,650,651&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=120&format=json&id=000220402014&lang=en&lines=3,551,642,650,651&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=120&format=json&id=000220402059&lang=en&lines=15&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000220402221&lang=en&lines=604&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00

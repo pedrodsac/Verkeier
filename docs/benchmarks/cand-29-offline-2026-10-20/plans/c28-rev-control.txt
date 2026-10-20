@@ -1,0 +1,11 @@
+cand29 reachability built in 0.000488334 seconds active=false cap=-
+discovery access 000200417019=1 000900000058=1 000200417013=1 000200417039=1 000200417005=1 000200417046=1 000200417038=1 000200417002=1
+discovery wave 0 boards 000200417019(Kirchberg, Konrad Adenauer)=1 000900000058(Kirchberg, prov. Konrad Adenauer)=1 000200417013(Kirchberg, Coudenhove-Kalergi)=1 000200417039(Kirchberg, Avalon)=1 000200417005(Kirchberg, Antoine de St Exupéry)=1 000200417046(Kirchberg, Universitéit)=1 000200417038(Kirchberg, Sichegronn)=1 000200417002(Kirchberg, Albert Borschette)=1
+discovery wave 1 boards 000200508011(Senningerberg, Rue du Golf)=1000 000200508007(Senningerberg, Laangschib)=1000 000200508005(Senningerberg, Héienhaff P+R)=1000 000200508016(Senningerberg, Héienhaff)=1000 000200508015(Senningerberg, Parishaff)=1 000200501006(Findel - Luxembourg Airport)=1 000200501001(Aéroport Luxembourg/Findel)=1 000200504010(Niederanven, Jacques Lamort)=1
+discovery wave 2 boards 000200503001(Hostert (Niederanven), Charlys Gare)=1000 000200508004(Senningerberg, Gromscheed)=1000 000200503013(Hostert (Niederanven), Stade Jos Becker)=1000 000200508002(Senningerberg, Breedewues)=1000 000200508010(Senningerberg, Rue des Résidences)=1000 000200506006(Rameldange, Op der Bunn)=1000 000200508006(Senningerberg, Kapell)=1000 000200508003(Senningerberg, Charlys Statioun)=1000
+completion selected includeDiscovery=false count=6
+completion result changed=true stops=["000200417019", "000900000058", "000200417013", "000200417039", "000200417005", "000200417046", "000200417038", "000200417002", "000200508011", "000200508007", "000200508005", "000200508016", "000200508015", "000200501006", "000200501001", "000200504010", "000200503001", "000200508004", "000200503013", "000200508002", "000200508010", "000200506006", "000200508006", "000200508003"] patches=221
+completion result changed=true stops=["000200417019", "000200417039", "000200417050", "000200508016", "000200508011", "000900000058"] patches=192
+pass wave=0 built count=25
+completion selected includeDiscovery=false count=6
+completion result overlay unchanged stops=["000200417050", "000200508011", "000200508016"] patches=14

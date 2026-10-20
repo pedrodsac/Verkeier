@@ -1,0 +1,101 @@
+cand29 reachability built in 0.001064042 seconds active=true cap=-
+discovery access 000200417019=1 000900000058=1 000200417013=1 000200417039=1 000200417005=1 000200417046=1 000200417038=1 000200417002=1
+discovery wave 0 boards 000200417019(Kirchberg, Konrad Adenauer)=1 000900000058(Kirchberg, prov. Konrad Adenauer)=1 000200417013(Kirchberg, Coudenhove-Kalergi)=1 000200417039(Kirchberg, Avalon)=1 000200417005(Kirchberg, Antoine de St Exupéry)=1 000200417046(Kirchberg, Universitéit)=1 000200417038(Kirchberg, Sichegronn)=1 000200417002(Kirchberg, Albert Borschette)=1
+frontier candidates=568 byTightRank=[(key: 1, value: 326), (key: 2, value: 238), (key: 1000, value: 4)]
+  cand[0] 000200508015 Senningerberg, Parishaff tight=1 optimistic=0 dist=2155m
+  cand[1] 000200501006 Findel - Luxembourg Airport tight=1 optimistic=0 dist=2484m
+  cand[2] 000200501001 Aéroport Luxembourg/Findel tight=1 optimistic=0 dist=2604m
+  cand[3] 000200504010 Niederanven, Jacques Lamort tight=1 optimistic=0 dist=2628m
+  cand[4] 000200504008 Niederanven, Bombicht tight=1 optimistic=0 dist=2650m
+  cand[5] 000200504007 Niederanven, P.A.S. Aalbaach tight=1 optimistic=0 dist=2858m
+  cand[6] 000200508012 Senningerberg, Lou Hemmer tight=1 optimistic=0 dist=2969m
+  cand[7] 000200701005 Munsbach, Parc d'Activité Syrdall tight=1 optimistic=0 dist=3165m
+  cand[8] 000200703003 Munsbach, Bekassin tight=1 optimistic=0 dist=3235m
+  cand[9] 000200703005 Munsbach, Stackint tight=1 optimistic=0 dist=3270m
+  cand[10] 000200701006 Munsbach, Aisvull tight=1 optimistic=0 dist=3369m
+  cand[11] 000200701003 Munsbach, Minsber Baach tight=1 optimistic=1 dist=3428m
+  cand[12] 000200701002 Munsbach, Kulturzentrum tight=1 optimistic=1 dist=3755m
+  cand[13] 000200701001 Munsbach, Gare tight=1 optimistic=1 dist=3778m
+  cand[14] 000200701004 Munsbach, Gare routière tight=1 optimistic=1 dist=3789m
+  cand[15] 000200601004 Sandweiler, Hiel tight=1 optimistic=1 dist=4447m
+  cand[16] 000200601005 Sandweiler, Kiirch tight=1 optimistic=1 dist=4463m
+  cand[17] 000200601014 Sandweiler, Kapellebierg tight=1 optimistic=1 dist=4480m
+  cand[18] 000200602002 Findel, Business Center tight=1 optimistic=0 dist=4484m
+  cand[19] 000200601010 Sandweiler, Schiltzperdgen tight=1 optimistic=1 dist=4490m
+  cand[20] 000200601002 Sandweiler, Apdikt tight=1 optimistic=1 dist=4520m
+  cand[21] 000200417052 Kirchberg, Luxexpo tight=1 optimistic=0 dist=4662m
+  cand[22] 000200417050 Kirchberg, Gare routière Luxexpo tight=1 optimistic=0 dist=4685m
+  cand[23] 000200601012 Sandweiler, rue d'Itzig tight=1 optimistic=1 dist=4706m
+  cand[24] 000200417040 Kirchberg, Hugo Gernsback tight=1 optimistic=0 dist=4715m
+  cand[25] 000200601007 Sandweiler, Koschterjanshaff tight=1 optimistic=1 dist=4720m
+  cand[26] 000200601006 Sandweiler, Kontrollstatioun tight=1 optimistic=1 dist=4728m
+  cand[27] 000200417032 Kirchberg, Pierre Werner tight=1 optimistic=0 dist=4770m
+  cand[28] 000200417015 Kirchberg, Hôpital tight=1 optimistic=0 dist=4866m
+  cand[29] 000200601001 Sandweiler, Am Eck tight=1 optimistic=1 dist=4928m
+  cand[30] 000200416002 Kalchesbréck, Reno tight=1 optimistic=0 dist=4963m
+  cand[31] 000200417025 Kirchberg, Mathias Tresch tight=1 optimistic=0 dist=4984m
+  cand[32] 000200422007 Neudorf, Kalchesbruck tight=1 optimistic=0 dist=5014m
+  cand[33] 000200601015 Sandweiler, Scheedbësch tight=1 optimistic=1 dist=5088m
+  cand[34] 000200417033 Kirchberg, Poutty Stein tight=1 optimistic=0 dist=5099m
+  cand[35] 000200417023 Kirchberg, Luxexpo Entrée Sud tight=1 optimistic=0 dist=5110m
+  cand[36] 000200417034 Kirchberg, Rehazenter tight=1 optimistic=0 dist=5145m
+  cand[37] 000200417066 Kirchberg, Alphonse Weicker (Tram) tight=1 optimistic=0 dist=5158m
+  cand[38] 000200417004 Kirchberg, Alphonse Weicker (Bus) tight=1 optimistic=0 dist=5208m
+  cand[39] 000200426002 Weimershof, Joseph Hackin tight=1 optimistic=0 dist=5238m
+  Heienhaff P+R T1 000200508005 tight=1000 optimistic=0 position=566
+discovery wave 1 boards 000200508015(Senningerberg, Parishaff)=1 000200501006(Findel - Luxembourg Airport)=1 000200501001(Aéroport Luxembourg/Findel)=1 000200504010(Niederanven, Jacques Lamort)=1 000200504008(Niederanven, Bombicht)=1 000200504007(Niederanven, P.A.S. Aalbaach)=1 000200508012(Senningerberg, Lou Hemmer)=1 000200701005(Munsbach, Parc d'Activité Syrdall)=1
+frontier candidates=1777 byTightRank=[(key: 1, value: 494), (key: 2, value: 1221), (key: 3, value: 31), (key: 1000, value: 31)]
+  cand[0] 000200504006 Niederanven, Routscheed tight=1 optimistic=0 dist=1500m
+  cand[1] 000200504001 Niederanven, Geisfeld tight=1 optimistic=0 dist=2123m
+  cand[2] 000200502002 Ernster, Engelshaff tight=1 optimistic=0 dist=2206m
+  cand[3] 000200502001 Ernster, Duerfplaz tight=1 optimistic=0 dist=2894m
+  cand[4] 000200502003 Ernster, Naasswiss tight=1 optimistic=0 dist=3182m
+  cand[5] 000200703003 Munsbach, Bekassin tight=1 optimistic=0 dist=3235m
+  cand[6] 000200703005 Munsbach, Stackint tight=1 optimistic=0 dist=3270m
+  cand[7] 000200701006 Munsbach, Aisvull tight=1 optimistic=0 dist=3369m
+  cand[8] 000200701007 Munsbach, Schlass Minsbech tight=1 optimistic=1 dist=3373m
+  cand[9] 000200701003 Munsbach, Minsber Baach tight=1 optimistic=1 dist=3428m
+  cand[10] 000200702003 Neuhaeusgen, Kiischtewee tight=1 optimistic=1 dist=3544m
+  cand[11] 000200602001 Findel, Findel tight=1 optimistic=0 dist=3561m
+  cand[12] 000200702001 Neuhaeusgen, Ennescht Neihaischen tight=1 optimistic=1 dist=3600m
+  cand[13] 000200702002 Neuhaeusgen, Iewescht Neihaischen tight=1 optimistic=1 dist=3713m
+  cand[14] 000200701002 Munsbach, Kulturzentrum tight=1 optimistic=1 dist=3755m
+  cand[15] 000200701001 Munsbach, Gare tight=1 optimistic=1 dist=3778m
+  cand[16] 000200701004 Munsbach, Gare routière tight=1 optimistic=1 dist=3789m
+  cand[17] 000180508006 Gonderange, Stohlbour tight=1 optimistic=1 dist=4009m
+  cand[18] 000180106005 Roodt-sur-Syre, Op der Rothoicht tight=1 optimistic=1 dist=4131m
+  cand[19] 000200602003 Findel, Gréiwelscheierhaff tight=1 optimistic=0 dist=4134m
+  cand[20] 000201005001 Stafelter tight=1 optimistic=1 dist=4201m
+  cand[21] 000180508005 Gonderange, Schoul tight=1 optimistic=1 dist=4276m
+  cand[22] 000180508001 Gonderange, Am Duerf tight=1 optimistic=1 dist=4287m
+  cand[23] 000180508004 Gonderange, Op der Bréck tight=1 optimistic=1 dist=4317m
+  cand[24] 000200705004 Schuttrange, Kiercheplaz tight=1 optimistic=1 dist=4336m
+  cand[25] 000180508007 Gonderange, Op der Gare tight=1 optimistic=1 dist=4361m
+  cand[26] 000180508002 Gonderange, Eeschëlerstrooss tight=1 optimistic=1 dist=4402m
+  cand[27] 000200601004 Sandweiler, Hiel tight=1 optimistic=1 dist=4447m
+  cand[28] 000200601005 Sandweiler, Kiirch tight=1 optimistic=1 dist=4463m
+  cand[29] 000200601014 Sandweiler, Kapellebierg tight=1 optimistic=1 dist=4480m
+  cand[30] 000200602002 Findel, Business Center tight=1 optimistic=0 dist=4484m
+  cand[31] 000200601010 Sandweiler, Schiltzperdgen tight=1 optimistic=1 dist=4490m
+  cand[32] 000200705005 Schuttrange, Kreizung tight=1 optimistic=1 dist=4516m
+  cand[33] 000200601002 Sandweiler, Apdikt tight=1 optimistic=1 dist=4520m
+  cand[34] 000200417052 Kirchberg, Luxexpo tight=1 optimistic=0 dist=4662m
+  cand[35] 000200705007 Schuttrange, Um Grousbuer tight=1 optimistic=1 dist=4676m
+  cand[36] 000200417050 Kirchberg, Gare routière Luxexpo tight=1 optimistic=0 dist=4685m
+  cand[37] 000200601012 Sandweiler, rue d'Itzig tight=1 optimistic=1 dist=4706m
+  cand[38] 000200417040 Kirchberg, Hugo Gernsback tight=1 optimistic=0 dist=4715m
+  cand[39] 000200601007 Sandweiler, Koschterjanshaff tight=1 optimistic=1 dist=4720m
+  Heienhaff P+R T1 000200508005 tight=1000 optimistic=0 position=1775
+discovery wave 2 boards 000200504006(Niederanven, Routscheed)=1 000200504001(Niederanven, Geisfeld)=1 000200502002(Ernster, Engelshaff)=1 000200502001(Ernster, Duerfplaz)=1 000200502003(Ernster, Naasswiss)=1 000200703003(Munsbach, Bekassin)=1 000200703005(Munsbach, Stackint)=1 000200701006(Munsbach, Aisvull)=1
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200504007&lang=en&lines=324&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200508012&lang=en&lines=223,29,302,361&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200701005&lang=en&lines=302,304,325,327&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200504006&lang=en&lines=311,321,322,323,326&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200504001&lang=en&lines=311,322,323,326&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200504008&lang=en&lines=324&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200502002&lang=en&lines=212,223&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200502003&lang=en&lines=212,223&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=120&format=json&id=000200701006&lang=en&lines=324&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=120&format=json&id=000200703003&lang=en&lines=324&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=120&format=json&id=000200703005&lang=en&lines=324&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
+ABORT departureBoard?date=2026-10-19&duration=150&format=json&id=000200502001&lang=en&lines=212,223&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00
