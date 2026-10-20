@@ -7,6 +7,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import statistics
 import subprocess
 import time
@@ -218,9 +219,38 @@ def run(scenario, samples, label):
         value['process'] = 'cold' if label.startswith('cold') else ('priming' if value['sample'] == 0 else 'warm')
         if args.replay_approximate:
             value['replayApproximate'] = True
+        split = relay_split(value)
+        if split:
+            value['relaySplit'] = split
         records.append(value)
     (args.output / 'samples.json').write_text(json.dumps(records, indent=2))
     print(f'{scenario} {label}: {len(values)} completed; maximum {max(v["total_ms"] for v in values):.0f} ms', flush=True)
+    for value in values:
+        if split := value.get('relaySplit'):
+            print(f'  {value["process"]}: server wait split on {split["boards"]} boards: upstream median '
+                  f'{split["upstreamMedianMs"]:.0f} ms (max {split["upstreamMaxMs"]:.0f}), relay and network '
+                  f'median {split["relayAndNetworkMedianMs"]:.0f} ms (max {split["relayAndNetworkMaxMs"]:.0f})', flush=True)
+
+def relay_split(value):
+    """Split each board's server wait with the relay's diagnostic Server-Timing header.
+
+    `upstream` is the relay's wait for the upstream response headers. The client's wait
+    (request sent to first response byte) minus it is relay and network time. Body transfer
+    is streamed and stays in the client's transfer time. None when no response had the header.
+    """
+    upstream, rest = [], []
+    for item in value.get('transport', []):
+        metrics = item.get('metrics') or {}
+        match = re.search(r'(?:^|,)\s*upstream;dur=([0-9.]+)', metrics.get('serverTiming') or '')
+        transactions = metrics.get('transactions') or []
+        wait = transactions[-1].get('responseWaitMilliseconds') if transactions else None
+        if match and wait is not None:
+            upstream.append(float(match.group(1)))
+            rest.append(max(0.0, wait - upstream[-1]))
+    if not upstream:
+        return None
+    return {'boards': len(upstream), 'upstreamMedianMs': statistics.median(upstream), 'upstreamMaxMs': max(upstream),
+            'relayAndNetworkMedianMs': statistics.median(rest), 'relayAndNetworkMaxMs': max(rest)}
 
 if args.transfer_walks != 'off':
     # Built once in its own process, so measured fresh-process samples start from the stored table.
