@@ -1,0 +1,55 @@
+{
+ "T": {
+  "capture": "live-baseline-2026-10-15",
+  "baseQueries": 27,
+  "cand28Queries": 26,
+  "onlyBase": [
+   "date=2026-10-15&duration=120&format=json&id=000200417050&lang=en&lines=21,6&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:00:00",
+   "date=2026-10-15&duration=120&format=json&id=000200508016&lang=en&lines=16&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:00:00",
+   "date=2026-10-15&duration=120&format=json&id=000200508016&lang=en&lines=6&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:00:00"
+  ],
+  "onlyCand28": [
+   "date=2026-10-15&duration=120&format=json&id=000200417050&lang=en&lines=201,21,211,212,222,25,301,303,304,305,309,311,321,322,323,324,325,326,327,401,403,405,406,407,455,456,501,502,507,6,7,811,812&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:00:00",
+   "date=2026-10-15&duration=120&format=json&id=000200508016&lang=en&lines=16,223,29,361,6,850&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:00:00"
+  ]
+ },
+ "S1": {
+  "capture": "live-2026-10-18/round-1",
+  "baseQueries": 27,
+  "cand28Queries": 27,
+  "onlyBase": [
+   "date=2026-10-18&duration=150&format=json&id=000200508016&lang=en&lines=16,6&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00",
+   "date=2026-10-18&duration=120&format=json&id=000200417050&lang=en&lines=21,6&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00"
+  ],
+  "onlyCand28": [
+   "date=2026-10-18&duration=120&format=json&id=000200417050&lang=en&lines=201,21,211,212,222,311,322,324,326,327,406,455,456,6,811,812&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00",
+   "date=2026-10-18&duration=150&format=json&id=000200508016&lang=en&lines=16,223,29,361,6,850&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00"
+  ]
+ },
+ "S2": {
+  "capture": "live-2026-10-18/round-2",
+  "baseQueries": 27,
+  "cand28Queries": 27,
+  "onlyBase": [
+   "date=2026-10-18&duration=150&format=json&id=000200508016&lang=en&lines=16,6&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00",
+   "date=2026-10-18&duration=120&format=json&id=000200417050&lang=en&lines=21,6&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00"
+  ],
+  "onlyCand28": [
+   "date=2026-10-18&duration=150&format=json&id=000200508016&lang=en&lines=16,223,29,361,6,850&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00",
+   "date=2026-10-18&duration=120&format=json&id=000200417050&lang=en&lines=201,21,211,212,222,311,322,324,326,327,406,455,456,6,811,812&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00"
+  ]
+ },
+ "S3": {
+  "capture": "live-2026-10-18/round-3",
+  "baseQueries": 27,
+  "cand28Queries": 27,
+  "onlyBase": [
+   "date=2026-10-18&duration=150&format=json&id=000200508016&lang=en&lines=16,6&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00",
+   "date=2026-10-18&duration=120&format=json&id=000200417050&lang=en&lines=21,6&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00"
+  ],
+  "onlyCand28": [
+   "date=2026-10-18&duration=150&format=json&id=000200508016&lang=en&lines=16,223,29,361,6,850&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=18:30:00",
+   "date=2026-10-18&duration=120&format=json&id=000200417050&lang=en&lines=201,21,211,212,222,311,322,324,326,327,406,455,456,6,811,812&maxJourneys=-1&passlist=1&rtMode=SERVER_DEFAULT&time=19:00:00"
+  ]
+ }
+}

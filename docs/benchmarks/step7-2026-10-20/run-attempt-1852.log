@@ -1,0 +1,3 @@
+=== start 2026-10-20 18:52:12 power=AC Power lowpower=0 app=/Users/pedoataidecordeiro/Developer/Verkeier-captures/step7-2026-10-20/app/Verkeier.app
+=== round 1 live 18:52:12 power=AC Power lowpower=0
+run.sh:45: read-only variable: status

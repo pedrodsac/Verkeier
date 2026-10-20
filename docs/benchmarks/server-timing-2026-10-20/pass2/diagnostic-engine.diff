@@ -1,0 +1,174 @@
+diff --git "clean/engine/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift" "engine/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift"
+index 839a45b..5e2a771 100644
+--- "clean/engine/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift"
++++ "engine/Sources/Mobilit\303\251itKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift"
+@@ -16,6 +16,7 @@ extension JourneyPlanningSession {
+         guard case let .bestEffort(configuration, refresh) = query.realtimePolicy,
+               let realtimeProvider, budgetMilliseconds > 0 else { return false }
+         let deadline = ContinuousClock.now.advanced(by: .milliseconds(budgetMilliseconds))
++        if !journeys.isEmpty { debugDescribe(journeys, label: "completion selected includeDiscovery=\(includeDiscovery)") }
+         let lower = query.direction == .arriveBy ? anchor.addingTimeInterval(-searchHorizon) : anchor
+         let upper = query.direction == .arriveBy ? anchor : anchor.addingTimeInterval(searchHorizon)
+         var targets: [RealtimeBoardTarget] = []
+@@ -47,8 +48,9 @@ extension JourneyPlanningSession {
+                 let patch = latestPatchesByInstance[key]
+                 let board = ride.boardSequence.flatMap { patch?.event(stopID: ride.board.stop.id, sequence: $0) }
+                 let alight = ride.alightSequence.flatMap { patch?.event(stopID: ride.alight.stop.id, sequence: $0) }
+-                if freshBoardingReport(board), freshArrivalReport(alight) { continue }
+-                guard attempted.insert(boarding).inserted else { continue }
++                if freshBoardingReport(board), freshArrivalReport(alight) { PassDebug.log("  ride \(ride.route.shortName ?? "?")[\(ride.tripID)] at \(ride.board.stop.id) fresh, skipped"); continue }
++                guard attempted.insert(boarding).inserted else { PassDebug.log("  ride \(ride.route.shortName ?? "?")[\(ride.tripID)] at \(ride.board.stop.id) already attempted"); continue }
++                PassDebug.log("  ride \(ride.route.shortName ?? "?")[\(ride.tripID)] at \(ride.board.stop.id) needs board: board=\(board?.departureSource.rawValue ?? "nopatch") observed=\(PassDebug.t(board?.departureObservedAt)) alight=\(alight?.arrivalSource.rawValue ?? "nopatch") transfer=\(transferArrival != nil)")
+                 // Include the permitted delay range: an unobserved connecting
+                 // vehicle may depart much later than its scheduled boarding.
+                 // The board supplies that vehicle's downstream passlist.
+@@ -82,6 +84,7 @@ extension JourneyPlanningSession {
+                     }
+                 }
+                 targets.append(.init(stopID: ride.board.stop.id, from: start, through: end, lines: lines))
++                PassDebug.log("    target \(ride.board.stop.id) \(PassDebug.t(start))-\(PassDebug.t(end)) lines=\(lines)")
+                 if seenStops.insert(ride.board.stop.id).inserted { stopIDs.append(ride.board.stop.id) }
+             }
+         }
+@@ -94,8 +97,21 @@ extension JourneyPlanningSession {
+                 preferredStops: stopIDs, anchor: anchor, searchHorizon: searchHorizon, deadline: planningDeadline,
+                 requestedInstances: requestedInstances, reachability: reachability)
+             targets += discovered.targets
++            PassDebug.log("discovery targets=\(discovered.targets.count) stops=\(discovered.targets.map { $0.stopID + ":" + $0.lines.joined(separator: ",") })")
+             matchingTripIDs.formUnion(discovered.tripIDs)
+             for target in discovered.targets where seenStops.insert(target.stopID).inserted { stopIDs.append(target.stopID) }
++            // Experiment only: add the Héienhaff P+R T1 board that tonight's completion fetched after pass 0,
++            // with the same window, lines and connection trips, to the initial discovery batch.
++            if journeys.isEmpty, ProcessInfo.processInfo.environment["PASS2_INJECT"] == "1" {
++                let reach = reachability ?? optimisticDestinationReachability(egress: egress)
++                let connecting = connectionLines(atStop: "000200508005", arrival: Date(timeIntervalSince1970: 1792524660),
++                    from: lower, through: upper, configuration: configuration,
++                    deadline: ContinuousClock.now.advanced(by: .milliseconds(250)), reachability: reach)
++                matchingTripIDs.formUnion(connecting.tripIDs)
++                targets.append(.init(stopID: "000200508005", from: Date(timeIntervalSince1970: 1792524770), through: upper, lines: ["T1"]))
++                if seenStops.insert("000200508005").inserted { stopIDs.append("000200508005") }
++                PassDebug.log("injected Heienhaff T1 target trips=\(connecting.tripIDs.count) lines=\(connecting.lines.sorted()) unrestricted=\(connecting.unrestricted)")
++            }
+             diagnostics.record(.realtimeDiscovery, since: discoveryStarted)
+         }
+         guard !targets.isEmpty, ContinuousClock.now < deadline else { return false }
+@@ -136,8 +152,12 @@ extension JourneyPlanningSession {
+             if state == .unavailable { state = .partial }
+             let effectStarted = ContinuousClock.now
+             defer { diagnostics.record(.sessionRoutingEffect, since: effectStarted) }
+-            return routingEffectChanged(from: before)
++            debugRoutingEffect(from: before)
++            let effect = routingEffectChanged(from: before)
++            PassDebug.log("completion result changed=\(effect) stops=\(stopIDs) patches=\(batch.patches.count)")
++            return effect
+         }
++        PassDebug.log("completion result overlay unchanged stops=\(stopIDs) patches=\(batch.patches.count)")
+         return false
+     }
+ 
+diff --git "engine/Sources/Mobilit\303\251itKit/Routing/PassDebug.swift" "engine/Sources/Mobilit\303\251itKit/Routing/PassDebug.swift"
+new file mode 100644
+index 0000000..37be71c
+--- /dev/null
++++ "engine/Sources/Mobilit\303\251itKit/Routing/PassDebug.swift"
+@@ -0,0 +1,88 @@
++import Foundation
++
++// Temporary diagnostics for the pass-2 investigation (scratch copy only, never committed).
++enum PassDebug {
++    static let formatter: DateFormatter = {
++        let f = DateFormatter()
++        f.dateFormat = "HH:mm:ss"
++        f.timeZone = TimeZone(identifier: "Europe/Luxembourg")
++        f.locale = Locale(identifier: "en_US_POSIX")
++        return f
++    }()
++    static func t(_ d: Date?) -> String { d.map { formatter.string(from: $0) } ?? "-" }
++    static func log(_ s: String) { print("ROUTING_DEBUG " + s); fflush(stdout) }
++}
++
++extension JourneyPlanningSession {
++    func debugDescribe(_ journeys: [Journey], label: String) {
++        PassDebug.log("\(label) count=\(journeys.count)")
++        for journey in journeys {
++            var parts: [String] = []
++            for leg in journey.legs {
++                switch leg {
++                case let .transit(ride):
++                    let key = ride.instance.map { RealtimePatchKey(tripID: ride.tripID, serviceDate: $0.serviceDate) }
++                    let patch = key.flatMap { latestPatchesByInstance[$0] }
++                    let board = ride.boardSequence.flatMap { patch?.event(stopID: ride.board.stop.id, sequence: $0) }
++                    let alight = ride.alightSequence.flatMap { patch?.event(stopID: ride.alight.stop.id, sequence: $0) }
++                    parts.append("\(ride.route.shortName ?? "?")[\(ride.tripID)] \(ride.board.stop.id)@\(PassDebug.t(ride.effectiveDeparture))(s\(PassDebug.t(ride.scheduledDeparture)),\(board?.departureSource.rawValue ?? "nopatch")) -> \(ride.alight.stop.id)@\(PassDebug.t(ride.effectiveArrival))(\(alight?.arrivalSource.rawValue ?? "nopatch"))")
++                case .walk: parts.append("walk")
++                case .inSeatContinuation: parts.append("stay")
++                }
++            }
++            PassDebug.log("  \(journey.id.value) \(parts.joined(separator: " | "))")
++        }
++    }
++
++    /// Same checks as `routingEffectChanged`, but lists every trip that changes routing inputs.
++    func debugRoutingEffect(from previous: [RealtimePatchKey: RealtimeTripPatch]) {
++        var changedTrips = 0, effectTrips = 0
++        for (key, patch) in latestPatchesByInstance.sorted(by: { $0.key.tripID < $1.key.tripID }) where patch != previous[key] {
++            changedTrips += 1
++            guard let tripIndex = snapshot.tripByID[key.tripID] else { PassDebug.log("  effect? \(key.tripID) not in snapshot"); continue }
++            let trip = snapshot.trips[tripIndex]
++            let line = snapshot.routes[trip.route].shortName ?? "?"
++            let old = previous[key]
++            if patch.status != (old?.status ?? .active) {
++                effectTrips += 1
++                PassDebug.log("  effect \(line)[\(key.tripID)] status \(String(describing: old?.status)) -> \(patch.status) new=\(old == nil)")
++                continue
++            }
++            guard patch.status == .active else { continue }
++            for time in trip.times {
++                let stopID = snapshot.stops[time.stop].id
++                let before = old?.event(stopID: stopID, sequence: time.sequence)
++                let after = patch.event(stopID: stopID, sequence: time.sequence)
++                let scheduledDeparture = time.departure.map { snapshot.date(serviceDate: key.serviceDate, serviceSeconds: $0) }
++                let scheduledArrival = time.arrival.map { snapshot.date(serviceDate: key.serviceDate, serviceSeconds: $0) }
++                let oldDeparture = before?.effectiveDeparture ?? scheduledDeparture
++                let newDeparture = after?.effectiveDeparture ?? scheduledDeparture
++                let oldArrival = before?.effectiveArrival ?? scheduledArrival
++                let newArrival = after?.effectiveArrival ?? scheduledArrival
++                var reason: String?
++                if oldDeparture != newDeparture || oldArrival != newArrival {
++                    reason = "times dep \(PassDebug.t(oldDeparture))->\(PassDebug.t(newDeparture)) arr \(PassDebug.t(oldArrival))->\(PassDebug.t(newArrival)) sched \(PassDebug.t(scheduledDeparture)) src \(after?.departureSource.rawValue ?? "-")/\(after?.arrivalSource.rawValue ?? "-")"
++                } else if (before?.boardingAllowed != false) != (after?.boardingAllowed != false)
++                    || (before?.alightingAllowed != false) != (after?.alightingAllowed != false) {
++                    reason = "boarding/alighting allowed"
++                } else {
++                    func deadline(_ event: RealtimeStopEventPatch?, effective: Date?) -> Date? {
++                        if event?.departureSource == .estimated, let scheduledDeparture, let effective {
++                            return min(scheduledDeparture, effective)
++                        }
++                        return effective
++                    }
++                    if deadline(before, effective: oldDeparture) != deadline(after, effective: newDeparture) {
++                        reason = "deadline \(before?.departureSource.rawValue ?? "-")->\(after?.departureSource.rawValue ?? "-")"
++                    }
++                }
++                if let reason {
++                    effectTrips += 1
++                    PassDebug.log("  effect \(line)[\(key.tripID)] stop \(stopID) seq \(time.sequence) new=\(old == nil) \(reason)")
++                    break
++                }
++            }
++        }
++        PassDebug.log("  patched trips changed=\(changedTrips) withRoutingEffect=\(effectTrips)")
++    }
++}
+diff --git "clean/engine/Sources/Mobilit\303\251itKit/Routing/TransitRouter.swift" "engine/Sources/Mobilit\303\251itKit/Routing/TransitRouter.swift"
+index fe735ab..93d9dd7 100644
+--- "clean/engine/Sources/Mobilit\303\251itKit/Routing/TransitRouter.swift"
++++ "engine/Sources/Mobilit\303\251itKit/Routing/TransitRouter.swift"
+@@ -924,6 +924,7 @@ public actor JourneyPlanningSession {
+             diagnostics.rejections = rejectionsBefore
+             built = buildJourneys(searchResult.candidates, access: access, egress: egress, accepting: accepting)
+             diagnostics.record(.candidateBuilding, since: candidateStarted)
++            debugDescribe(built.journeys, label: "pass wave=\(refinementWaves) built")
+             // Both acquisition passes check selected vehicles. Delays can make
+             // a previously unselected connection viable on the second scan;
+             // spent CPU time must not suppress that vehicle's live board.

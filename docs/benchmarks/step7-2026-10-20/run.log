@@ -1,0 +1,13 @@
+=== start 2026-10-20 19:05:41 power=AC Power lowpower=0 app=/Users/pedoataidecordeiro/Developer/Verkeier-captures/step7-2026-10-20/app/Verkeier.app
+skip: live round 1 already ran (78 requests)
+=== round 2 live 19:05:41 power=AC Power lowpower=0
+live round 2 exit 0, requests 81, total 159
+=== round 3 live 19:06:11 power=AC Power lowpower=0
+live round 3 exit 0, requests 81, total 240
+=== round 1 replay 19:06:35 epoch 1792515148.873201
+replay 1 exit 0
+=== round 2 replay 19:06:51 epoch 1792515953.7934198
+replay 2 exit 0
+=== round 3 replay 19:07:12 epoch 1792515977.040721
+replay 3 exit 0
+=== done 2026-10-20 19:07:42, ATP requests 240

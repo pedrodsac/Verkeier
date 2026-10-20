@@ -1,0 +1,4115 @@
+[
+  {
+    "avoidTightTransfers": false,
+    "bikeInput": "recorded",
+    "canLoadEarlier": true,
+    "canLoadLater": true,
+    "composition": "production",
+    "counters": {
+      "boardCacheHits": 2,
+      "boardsCovered": 27,
+      "candidates": 3600,
+      "delayedPastBoardings": 12,
+      "duplicatesSuppressed": 949,
+      "incompleteBoards": 0,
+      "invalidJourneys": 162,
+      "networkRequests": 27,
+      "pageNewJourneys": 6,
+      "predictedEvents": 3757,
+      "recommendationSwitches": 0,
+      "responseBytes": 14376036,
+      "retainedAlternatives": 27,
+      "sharedFirstVehicleGroups": 1,
+      "walkingCacheHits": 11248,
+      "walkingRequests": 15862,
+      "workers": 10
+    },
+    "displayedLegs": [
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792517280,
+        "effectiveDeparture": 1792516680,
+        "line": "322",
+        "option": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+        "scheduledDeparture": 1792516670,
+        "status": "delayed",
+        "stop": "000200508004",
+        "trip": "24262724"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792517820,
+        "effectiveDeparture": 1792517460,
+        "line": "25",
+        "option": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+        "scheduledDeparture": 1792517490,
+        "status": "live",
+        "stop": "000200417050",
+        "trip": "24424793"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792517280,
+        "effectiveDeparture": 1792517040,
+        "line": "850",
+        "option": "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+        "scheduledDeparture": 1792516916,
+        "status": "delayed",
+        "stop": "000200508002",
+        "trip": "24291372"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518240,
+        "effectiveDeparture": 1792517580,
+        "line": "16",
+        "option": "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+        "scheduledDeparture": 1792517580,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24360395"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792517460,
+        "effectiveDeparture": 1792517340,
+        "line": "29",
+        "option": "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+        "scheduledDeparture": 1792517360,
+        "status": "live",
+        "stop": "000200508003",
+        "trip": "24365725"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518240,
+        "effectiveDeparture": 1792517580,
+        "line": "16",
+        "option": "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+        "scheduledDeparture": 1792517580,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24360395"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518060,
+        "effectiveDeparture": 1792517880,
+        "line": "223",
+        "option": "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+        "scheduledDeparture": 1792517887,
+        "status": "live",
+        "stop": "000200508002",
+        "trip": "24263718"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518900,
+        "effectiveDeparture": 1792518300,
+        "line": "6",
+        "option": "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+        "scheduledDeparture": 1792518300,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24368670"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518420,
+        "effectiveDeparture": 1792517880,
+        "line": "326",
+        "option": "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8",
+        "scheduledDeparture": 1792517845,
+        "status": "delayed",
+        "stop": "000200508004",
+        "trip": "24264857"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518900,
+        "effectiveDeparture": 1792518540,
+        "line": "6",
+        "option": "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8",
+        "scheduledDeparture": 1792518580,
+        "status": "live",
+        "stop": "000200417050",
+        "trip": "24368670"
+      }
+    ],
+    "fullMap": false,
+    "includedModes": [
+      "bicycle",
+      "bus",
+      "funicular",
+      "train",
+      "tram"
+    ],
+    "journeys": [
+      {
+        "arrival": 1792517893.33875,
+        "departure": 1792516341.6287498,
+        "id": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+        "legs": [
+          {
+            "arrival": 1792516680,
+            "departure": 1792516341.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517280,
+            "departure": 1792516680,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "322",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517820,
+            "departure": 1792517460,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "25",
+            "to": "Kirchberg, prov. Konrad Adenauer",
+            "toStop": "000900000058",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517893.33875,
+            "departure": 1792517820,
+            "from": "Kirchberg, prov. Konrad Adenauer",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792518240,
+        "departure": 1792516485.2875,
+        "id": "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+        "legs": [
+          {
+            "arrival": 1792517040,
+            "departure": 1792516485.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517280,
+            "departure": 1792517040,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "850",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518240,
+            "departure": 1792517580,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792518240,
+        "departure": 1792516720.1375,
+        "id": "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+        "legs": [
+          {
+            "arrival": 1792517340,
+            "departure": 1792516720.1375,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Charlys Statioun",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517460,
+            "departure": 1792517340,
+            "from": "Senningerberg, Charlys Statioun",
+            "fromStop": "000200508003",
+            "line": "29",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518240,
+            "departure": 1792517580,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": "Tight transfer"
+          }
+        ]
+      },
+      {
+        "arrival": 1792518900,
+        "departure": 1792517325.2875,
+        "id": "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+        "legs": [
+          {
+            "arrival": 1792517880,
+            "departure": 1792517325.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518060,
+            "departure": 1792517880,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "223",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518900,
+            "departure": 1792518300,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792518900,
+        "departure": 1792517541.6287498,
+        "id": "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8",
+        "legs": [
+          {
+            "arrival": 1792517880,
+            "departure": 1792517541.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518420,
+            "departure": 1792517880,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "326",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518900,
+            "departure": 1792518540,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": "Tight transfer"
+          }
+        ]
+      }
+    ],
+    "liveConcurrency": 32,
+    "lowPowerMode": false,
+    "matchingRejections": {
+      "noCandidate": 4,
+      "outsideInterval": 29
+    },
+    "operationStartReferenceSeconds": 814208816.3439564,
+    "options": [
+      "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+      "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+      "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+      "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+      "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8"
+    ],
+    "passes": [
+      {
+        "candidates": 3600,
+        "duration_ms": 257.015917,
+        "horizon_s": 7200,
+        "rounds": 4,
+        "start_ms": 4076.825333,
+        "walking_ms": 65,
+        "wave": 0
+      }
+    ],
+    "peak_memory_bytes": 647921664,
+    "planningTime": 1792515953.7934198,
+    "realtimeBoards": [
+      {
+        "arrived_ms": 1214.162,
+        "matching_end_ms": 1217.292875,
+        "matching_start_ms": 1215.4071250000002,
+        "stop": "000200508004"
+      },
+      {
+        "arrived_ms": 1710.557708,
+        "matching_end_ms": 1714.628875,
+        "matching_start_ms": 1711.840875,
+        "stop": "000200508002"
+      },
+      {
+        "arrived_ms": 1978.2489170000001,
+        "matching_end_ms": 1980.049,
+        "matching_start_ms": 1978.3142500000001,
+        "stop": "000200508006"
+      },
+      {
+        "arrived_ms": 2993.747208,
+        "matching_end_ms": 3003.1835419999998,
+        "matching_start_ms": 2994.5996669999995,
+        "stop": "000200508003"
+      },
+      {
+        "arrived_ms": 2189.895792,
+        "matching_end_ms": 3003.5806249999996,
+        "matching_start_ms": 2197.7047919999995,
+        "stop": "000200508010"
+      },
+      {
+        "arrived_ms": 1825.751042,
+        "matching_end_ms": 3003.758833,
+        "matching_start_ms": 1830.2757500000002,
+        "stop": "000200503002"
+      },
+      {
+        "arrived_ms": 2756.0001669999997,
+        "matching_end_ms": 3004.4827499999997,
+        "matching_start_ms": 2758.066833,
+        "stop": "000200503013"
+      },
+      {
+        "arrived_ms": 975.8195420000001,
+        "matching_end_ms": 3004.6645,
+        "matching_start_ms": 976.7050830000001,
+        "stop": "000200503012"
+      },
+      {
+        "arrived_ms": 3670.0807919999997,
+        "matching_end_ms": 3676.0951669999995,
+        "matching_start_ms": 3670.4167499999994,
+        "stop": "000200417060"
+      },
+      {
+        "arrived_ms": 3304.5334169999996,
+        "matching_end_ms": 3676.613375,
+        "matching_start_ms": 3304.7642499999997,
+        "stop": "000200417023"
+      },
+      {
+        "arrived_ms": 3659.0319999999997,
+        "matching_end_ms": 3678.1694579999994,
+        "matching_start_ms": 3659.5378329999994,
+        "stop": "000200417033"
+      },
+      {
+        "arrived_ms": 1824.7197500000002,
+        "matching_end_ms": 3679.9097079999997,
+        "matching_start_ms": 1825.328458,
+        "stop": "000200422008"
+      },
+      {
+        "arrived_ms": 2752.341208,
+        "matching_end_ms": 3681.570958,
+        "matching_start_ms": 2752.5973329999997,
+        "stop": "000200417025"
+      },
+      {
+        "arrived_ms": 737.4986250000001,
+        "matching_end_ms": 3681.6370829999996,
+        "matching_start_ms": 743.5691670000001,
+        "stop": "000200409006"
+      },
+      {
+        "arrived_ms": 2167.7051669999996,
+        "matching_end_ms": 3682.4173329999994,
+        "matching_start_ms": 2167.9964579999996,
+        "stop": "000200426004"
+      },
+      {
+        "arrived_ms": 2742.7417079999996,
+        "matching_end_ms": 3682.4731249999995,
+        "matching_start_ms": 2742.9368329999998,
+        "stop": "000200406005"
+      },
+      {
+        "arrived_ms": 2188.2263749999997,
+        "matching_end_ms": 3683.6541669999997,
+        "matching_start_ms": 2188.6178749999995,
+        "stop": "000200417019"
+      },
+      {
+        "arrived_ms": 2364.0979579999994,
+        "matching_end_ms": 3684.0777499999995,
+        "matching_start_ms": 2364.2103329999995,
+        "stop": "000900000058"
+      },
+      {
+        "arrived_ms": 1322.8024580000001,
+        "matching_end_ms": 3684.9636669999995,
+        "matching_start_ms": 1324.77875,
+        "stop": "000200417013"
+      },
+      {
+        "arrived_ms": 2557.2586249999995,
+        "matching_end_ms": 3686.0829999999996,
+        "matching_start_ms": 2557.6052079999995,
+        "stop": "000200417039"
+      },
+      {
+        "arrived_ms": 2171.2080419999998,
+        "matching_end_ms": 3686.9399999999996,
+        "matching_start_ms": 2171.5822919999996,
+        "stop": "000200417002"
+      },
+      {
+        "arrived_ms": 3317.892,
+        "matching_end_ms": 3687.0912499999995,
+        "matching_start_ms": 3318.2229999999995,
+        "stop": "000200417046"
+      },
+      {
+        "arrived_ms": 734.030292,
+        "matching_end_ms": 3687.1225829999994,
+        "matching_start_ms": 741.067167,
+        "stop": "000200404041"
+      },
+      {
+        "arrived_ms": 2368.4078329999998,
+        "matching_end_ms": 3687.737875,
+        "matching_start_ms": 2368.5512499999995,
+        "stop": "000200417038"
+      },
+      {
+        "arrived_ms": 1215.5950830000002,
+        "matching_end_ms": 1217.1788330000002,
+        "matching_start_ms": 1215.85425,
+        "stop": "000200508004"
+      },
+      {
+        "arrived_ms": 4053.633708,
+        "matching_end_ms": 4065.9544579999997,
+        "matching_start_ms": 4054.5006249999997,
+        "stop": "000200417050"
+      },
+      {
+        "arrived_ms": 2177.5702499999998,
+        "matching_end_ms": 4066.5595829999997,
+        "matching_start_ms": 2177.8234999999995,
+        "stop": "000200417012"
+      },
+      {
+        "arrived_ms": 1706.2093330000002,
+        "matching_end_ms": 4066.5851249999996,
+        "matching_start_ms": 1706.3109170000002,
+        "stop": "000200508002"
+      },
+      {
+        "arrived_ms": 3005.4467499999996,
+        "matching_end_ms": 4067.5494169999997,
+        "matching_start_ms": 3005.7359579999998,
+        "stop": "000200508016"
+      }
+    ],
+    "realtimeCoverage": {
+      "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7": "live",
+      "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8": "live",
+      "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7": "live",
+      "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26": "live",
+      "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8": "live"
+    },
+    "recommendedOption": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+    "refreshPolicy": "forceRefresh",
+    "requestID": "68238727-04BA-499E-B681-AD571B39A243",
+    "rounds": [
+      {
+        "alights": 2858,
+        "boarding_checks": 375,
+        "feasible_boardings": 249,
+        "label_attempts": 1829,
+        "merge_ms": 0,
+        "patterns": 47,
+        "prepare_ms": 0,
+        "rejected_before_allocation": 0,
+        "retained": 1829,
+        "scan_ms": 0,
+        "slowest_chunk_ms": 0,
+        "summed_chunk_ms": 0,
+        "trip_instances": 89
+      },
+      {
+        "alights": 369282,
+        "boarding_checks": 127170,
+        "feasible_boardings": 33007,
+        "label_attempts": 196852,
+        "merge_ms": 7,
+        "patterns": 763,
+        "prepare_ms": 2,
+        "rejected_before_allocation": 71268,
+        "retained": 125584,
+        "scan_ms": 11,
+        "slowest_chunk_ms": 9,
+        "summed_chunk_ms": 57,
+        "trip_instances": 1115
+      },
+      {
+        "alights": 3032798,
+        "boarding_checks": 1182710,
+        "feasible_boardings": 282007,
+        "label_attempts": 2600097,
+        "merge_ms": 15,
+        "patterns": 1413,
+        "prepare_ms": 0,
+        "rejected_before_allocation": 2124880,
+        "retained": 475217,
+        "scan_ms": 69,
+        "slowest_chunk_ms": 54,
+        "summed_chunk_ms": 586,
+        "trip_instances": 1739
+      },
+      {
+        "alights": 469186,
+        "boarding_checks": 766904,
+        "feasible_boardings": 227585,
+        "label_attempts": 444192,
+        "merge_ms": 1,
+        "patterns": 276,
+        "prepare_ms": 0,
+        "rejected_before_allocation": 381383,
+        "retained": 62809,
+        "scan_ms": 17,
+        "slowest_chunk_ms": 11,
+        "summed_chunk_ms": 103,
+        "trip_instances": 625
+      }
+    ],
+    "sample": 0,
+    "scenario": "live-now",
+    "spans": [
+      {
+        "duration_ms": 0.461291,
+        "stage": "snapshotPreparation",
+        "start_ms": 31.147917
+      },
+      {
+        "duration_ms": 95.78525,
+        "stage": "endpoints",
+        "start_ms": 32.674167
+      },
+      {
+        "duration_ms": 47.782125,
+        "stage": "realtimeDiscovery",
+        "start_ms": 129.337625
+      },
+      {
+        "duration_ms": 8.207208,
+        "stage": "buildTransferGroups",
+        "start_ms": 574.216167
+      },
+      {
+        "duration_ms": 11.611417,
+        "stage": "buildEnvelope",
+        "start_ms": 582.4255
+      },
+      {
+        "duration_ms": 0.247875,
+        "stage": "buildIntermediateStops",
+        "start_ms": 594.0397080000001
+      },
+      {
+        "duration_ms": 116.084166,
+        "stage": "candidateBuilding",
+        "start_ms": 481.09604199999995
+      },
+      {
+        "duration_ms": 2.226625,
+        "stage": "connectionLines",
+        "start_ms": 601.273042
+      },
+      {
+        "duration_ms": 0.143666,
+        "stage": "connectionLines",
+        "start_ms": 603.528667
+      },
+      {
+        "duration_ms": 0.124333,
+        "stage": "connectionLines",
+        "start_ms": 603.6834170000001
+      },
+      {
+        "duration_ms": 3495.61025,
+        "stage": "providerBoardFetch",
+        "start_ms": 177.180083
+      },
+      {
+        "duration_ms": 2946.670708,
+        "stage": "providerStopMatching",
+        "start_ms": 741.067167
+      },
+      {
+        "duration_ms": 7.610583,
+        "stage": "providerSessionMerge",
+        "start_ms": 3687.9861669999996
+      },
+      {
+        "duration_ms": 0.009667,
+        "stage": "sessionRoutingEffect",
+        "start_ms": 3695.5972079999997
+      },
+      {
+        "duration_ms": 3451.1796249999998,
+        "stage": "providerBoardFetch",
+        "start_ms": 603.8289580000001
+      },
+      {
+        "duration_ms": 2851.695167,
+        "stage": "providerStopMatching",
+        "start_ms": 1215.85425
+      },
+      {
+        "duration_ms": 8.173208,
+        "stage": "providerSessionMerge",
+        "start_ms": 4068.3836249999995
+      },
+      {
+        "duration_ms": 0.125708,
+        "stage": "sessionRoutingEffect",
+        "start_ms": 4076.558667
+      },
+      {
+        "duration_ms": 3947.47675,
+        "stage": "realtime",
+        "start_ms": 129.326458
+      },
+      {
+        "duration_ms": 352.198416,
+        "stage": "walkingPreparation",
+        "start_ms": 128.88779200000002
+      },
+      {
+        "duration_ms": 0.000166,
+        "stage": "patchOverlay",
+        "start_ms": 128.919792
+      },
+      {
+        "duration_ms": 0.433,
+        "stage": "boardingIndex",
+        "start_ms": 130.616417
+      },
+      {
+        "duration_ms": 3.57975,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 132.978708
+      },
+      {
+        "duration_ms": 0.9665,
+        "stage": "walkingTransferRequests",
+        "start_ms": 136.568
+      },
+      {
+        "duration_ms": 6.322125,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 137.53508300000001
+      },
+      {
+        "duration_ms": 0.3665,
+        "stage": "walkingTransferWork",
+        "start_ms": 143.85837500000002
+      },
+      {
+        "duration_ms": 1.07375,
+        "stage": "walkingTransferApply",
+        "start_ms": 144.22570800000003
+      },
+      {
+        "duration_ms": 0.001042,
+        "stage": "candidateCollection",
+        "start_ms": 145.419958
+      },
+      {
+        "duration_ms": 0.726708,
+        "stage": "boardingIndex",
+        "start_ms": 148.73254200000002
+      },
+      {
+        "duration_ms": 2.451375,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 180.549333
+      },
+      {
+        "duration_ms": 9.493041,
+        "stage": "walkingTransferRequests",
+        "start_ms": 183.00366699999998
+      },
+      {
+        "duration_ms": 38.971125,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 192.49754199999998
+      },
+      {
+        "duration_ms": 11.031042,
+        "stage": "walkingTransferWork",
+        "start_ms": 231.469833
+      },
+      {
+        "duration_ms": 14.121875,
+        "stage": "walkingTransferApply",
+        "start_ms": 242.50229199999998
+      },
+      {
+        "duration_ms": 0.916875,
+        "stage": "candidateCollection",
+        "start_ms": 261.5989579999999
+      },
+      {
+        "duration_ms": 11.931959,
+        "stage": "boardingIndex",
+        "start_ms": 271.29208299999993
+      },
+      {
+        "duration_ms": 1.175916,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 377.75816699999996
+      },
+      {
+        "duration_ms": 10.3935,
+        "stage": "walkingTransferRequests",
+        "start_ms": 378.936583
+      },
+      {
+        "duration_ms": 3.690958,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 389.33187499999997
+      },
+      {
+        "duration_ms": 7.469542,
+        "stage": "walkingTransferWork",
+        "start_ms": 393.025333
+      },
+      {
+        "duration_ms": 8.996792,
+        "stage": "walkingTransferApply",
+        "start_ms": 400.49720799999994
+      },
+      {
+        "duration_ms": 0.970167,
+        "stage": "candidateCollection",
+        "start_ms": 413.32287499999995
+      },
+      {
+        "duration_ms": 15.347833,
+        "stage": "boardingIndex",
+        "start_ms": 427.819375
+      },
+      {
+        "duration_ms": 0.467208,
+        "stage": "walkingTransferRequests",
+        "start_ms": 460.17862499999995
+      },
+      {
+        "duration_ms": 0.775584,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 460.64658299999996
+      },
+      {
+        "duration_ms": 0.437959,
+        "stage": "walkingTransferWork",
+        "start_ms": 461.42245799999995
+      },
+      {
+        "duration_ms": 2.750584,
+        "stage": "walkingTransferApply",
+        "start_ms": 461.86045799999994
+      },
+      {
+        "duration_ms": 1.059334,
+        "stage": "candidateCollection",
+        "start_ms": 464.75845799999996
+      },
+      {
+        "duration_ms": 257.011084,
+        "stage": "raptor",
+        "start_ms": 4076.825333
+      },
+      {
+        "duration_ms": 1.474667,
+        "stage": "patchOverlay",
+        "start_ms": 4076.8352079999995
+      },
+      {
+        "duration_ms": 0.017834,
+        "stage": "boardingIndex",
+        "start_ms": 4079.0883329999997
+      },
+      {
+        "duration_ms": 3.995917,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 4080.3794999999996
+      },
+      {
+        "duration_ms": 0.427,
+        "stage": "walkingTransferRequests",
+        "start_ms": 4084.3805419999994
+      },
+      {
+        "duration_ms": 0.891083,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 4084.8077919999996
+      },
+      {
+        "duration_ms": 0.235084,
+        "stage": "walkingTransferWork",
+        "start_ms": 4085.6992079999995
+      },
+      {
+        "duration_ms": 0.531709,
+        "stage": "walkingTransferApply",
+        "start_ms": 4085.9343329999997
+      },
+      {
+        "duration_ms": 0.000792,
+        "stage": "candidateCollection",
+        "start_ms": 4086.5548329999997
+      },
+      {
+        "duration_ms": 0.481667,
+        "stage": "boardingIndex",
+        "start_ms": 4088.7677499999995
+      },
+      {
+        "duration_ms": 2.969875,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 4109.057875
+      },
+      {
+        "duration_ms": 7.355875,
+        "stage": "walkingTransferRequests",
+        "start_ms": 4112.030083000001
+      },
+      {
+        "duration_ms": 2.993875,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 4119.386750000001
+      },
+      {
+        "duration_ms": 6.241208,
+        "stage": "walkingTransferWork",
+        "start_ms": 4122.38075
+      },
+      {
+        "duration_ms": 11.164417,
+        "stage": "walkingTransferApply",
+        "start_ms": 4128.622375
+      },
+      {
+        "duration_ms": 0.603417,
+        "stage": "candidateCollection",
+        "start_ms": 4142.476583000001
+      },
+      {
+        "duration_ms": 8.452458,
+        "stage": "boardingIndex",
+        "start_ms": 4148.257917000001
+      },
+      {
+        "duration_ms": 1.45325,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 4241.833500000001
+      },
+      {
+        "duration_ms": 8.843708,
+        "stage": "walkingTransferRequests",
+        "start_ms": 4243.289625
+      },
+      {
+        "duration_ms": 2.160834,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 4252.134583000001
+      },
+      {
+        "duration_ms": 6.691042,
+        "stage": "walkingTransferWork",
+        "start_ms": 4254.296208000001
+      },
+      {
+        "duration_ms": 7.446667,
+        "stage": "walkingTransferApply",
+        "start_ms": 4260.988208000001
+      },
+      {
+        "duration_ms": 0.818417,
+        "stage": "candidateCollection",
+        "start_ms": 4270.900708
+      },
+      {
+        "duration_ms": 14.993708,
+        "stage": "boardingIndex",
+        "start_ms": 4281.017167000001
+      },
+      {
+        "duration_ms": 0.383708,
+        "stage": "walkingTransferRequests",
+        "start_ms": 4315.300417
+      },
+      {
+        "duration_ms": 0.715583,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 4315.6849170000005
+      },
+      {
+        "duration_ms": 0.423417,
+        "stage": "walkingTransferWork",
+        "start_ms": 4316.400708
+      },
+      {
+        "duration_ms": 3.20425,
+        "stage": "walkingTransferApply",
+        "start_ms": 4316.824292
+      },
+      {
+        "duration_ms": 1.062083,
+        "stage": "candidateCollection",
+        "start_ms": 4320.170625000001
+      },
+      {
+        "duration_ms": 6.503625,
+        "stage": "buildTransferGroups",
+        "start_ms": 4421.169417
+      },
+      {
+        "duration_ms": 9.790208,
+        "stage": "buildEnvelope",
+        "start_ms": 4427.673667000001
+      },
+      {
+        "duration_ms": 0.174208,
+        "stage": "buildIntermediateStops",
+        "start_ms": 4437.4646250000005
+      },
+      {
+        "duration_ms": 106.427709,
+        "stage": "candidateBuilding",
+        "start_ms": 4333.845208000001
+      },
+      {
+        "duration_ms": 4.86125,
+        "stage": "realtime",
+        "start_ms": 4440.273958000001
+      },
+      {
+        "duration_ms": 0.001042,
+        "stage": "directWalkingWait",
+        "start_ms": 4446.711125000001
+      },
+      {
+        "duration_ms": 0.855666,
+        "stage": "geometry",
+        "start_ms": 4459.266542
+      },
+      {
+        "duration_ms": 0.092583,
+        "stage": "validation",
+        "start_ms": 4460.1476250000005
+      },
+      {
+        "duration_ms": 0.059375,
+        "stage": "ranking",
+        "start_ms": 4460.240417000001
+      },
+      {
+        "duration_ms": 0.198166,
+        "stage": "resultAssembly",
+        "start_ms": 4460.122667000001
+      },
+      {
+        "duration_ms": 86.903209,
+        "stage": "bikeCalculation",
+        "start_ms": 32.650583
+      },
+      {
+        "duration_ms": 21.090625,
+        "stage": "snapshotPreparation",
+        "start_ms": 0.5101249999999993
+      },
+      {
+        "duration_ms": 0.218167,
+        "stage": "adapterMapping",
+        "start_ms": 4460.349125
+      },
+      {
+        "duration_ms": 0.43925,
+        "stage": "timetableReadiness",
+        "start_ms": 0.057958
+      },
+      {
+        "duration_ms": 30.612542,
+        "stage": "graphPreparation",
+        "start_ms": 0.497208
+      },
+      {
+        "duration_ms": 2.190749,
+        "stage": "publication",
+        "start_ms": 4460.510459
+      },
+      {
+        "duration_ms": 2.195375,
+        "stage": "refinement",
+        "start_ms": 4505.448708
+      },
+      {
+        "duration_ms": 52.187417,
+        "stage": "firstRender",
+        "start_ms": 4462.697208
+      },
+      {
+        "duration_ms": 0.420333,
+        "stage": "refinement",
+        "start_ms": 4520.326292
+      },
+      {
+        "duration_ms": 0.436083,
+        "stage": "refinement",
+        "start_ms": 4520.319792
+      },
+      {
+        "duration_ms": 2.718125,
+        "stage": "refinement",
+        "start_ms": 4520.759167
+      },
+      {
+        "duration_ms": 2.726375,
+        "stage": "refinement",
+        "start_ms": 4520.761458
+      },
+      {
+        "duration_ms": 1.642791,
+        "stage": "refinement",
+        "start_ms": 4523.496917
+      },
+      {
+        "duration_ms": 1.654417,
+        "stage": "refinement",
+        "start_ms": 4523.492208
+      },
+      {
+        "duration_ms": 1.602167,
+        "stage": "refinement",
+        "start_ms": 4525.14925
+      },
+      {
+        "duration_ms": 1.603708,
+        "stage": "refinement",
+        "start_ms": 4525.154917
+      },
+      {
+        "duration_ms": 3.047,
+        "stage": "refinement",
+        "start_ms": 4526.76225
+      },
+      {
+        "duration_ms": 3.052334,
+        "stage": "refinement",
+        "start_ms": 4526.766583
+      },
+      {
+        "duration_ms": 0.100083,
+        "stage": "refinement",
+        "start_ms": 4529.823125
+      },
+      {
+        "duration_ms": 0.099542,
+        "stage": "refinement",
+        "start_ms": 4529.826833
+      },
+      {
+        "duration_ms": 24.486333,
+        "stage": "refinement",
+        "start_ms": 4505.444125
+      },
+      {
+        "duration_ms": 1.948292,
+        "stage": "refinement",
+        "start_ms": 4529.928083
+      },
+      {
+        "duration_ms": 1.954917,
+        "stage": "refinement",
+        "start_ms": 4529.929625
+      }
+    ],
+    "spanSemantics": "operation-relative elapsed intervals; http and decode are cumulative concurrent work",
+    "stages_ms": {
+      "adapterMapping": 0.218167,
+      "bikeCalculation": 86.903209,
+      "boardFetch": 6946,
+      "boardingIndex": 52.385167,
+      "boardMatching": 124,
+      "buildAssembly": 121.993646,
+      "buildDeduplication": 3.091726,
+      "buildEnvelope": 21.401625,
+      "buildIntermediateStops": 0.422083,
+      "buildNormalisation": 6.738564,
+      "buildPublicationValidation": 31.819195,
+      "buildStructuralValidation": 8.506834999999999,
+      "buildTransferGroups": 14.710833000000001,
+      "buildTransferRules": 6.229290000000001,
+      "candidateBuilding": 222.51187499999997,
+      "candidateCollection": 5.432127,
+      "connectionLines": 2.494624,
+      "decode": 140,
+      "directWalkingWait": 0.001042,
+      "endpoints": 95.78525,
+      "firstRender": 52.187417,
+      "geometry": 0.855666,
+      "graphPreparation": 30.612542,
+      "http": 55446,
+      "patchOverlay": 1.474833,
+      "providerBoardFetch": 6946.789875,
+      "providerBoardPreparation": 18.045332,
+      "providerSessionMerge": 15.783791,
+      "providerStopMatching": 5798.3658749999995,
+      "publication": 2.190749,
+      "ranking": 0.059375,
+      "raptor": 257.011084,
+      "realtime": 3952.3379999999997,
+      "realtimeDiscovery": 47.782125,
+      "refinement": 49.687875,
+      "resultAssembly": 0.198166,
+      "schedulePreparation": 11,
+      "sessionRoutingEffect": 0.135375,
+      "snapshotPreparation": 21.798749,
+      "timetableReadiness": 0.43925,
+      "validation": 0.092583,
+      "walkingBoardingDeadlines": 15.626083000000001,
+      "walkingPreparation": 352.198416,
+      "walkingTransferApply": 49.290044,
+      "walkingTransferRequests": 38.33054,
+      "walkingTransferRoutes": 56.52116700000001,
+      "walkingTransfers": 65,
+      "walkingTransferWork": 32.895794
+    },
+    "supplementalOptions": [
+      "veloh-49.6541071,6.2296443-49.6301,6.1682-116-63"
+    ],
+    "thermalStateAtEnd": "nominal",
+    "thermalStateAtStart": "nominal",
+    "total_ms": 4514.8881249999995,
+    "transport": [],
+    "unfilteredJourneys": [
+      {
+        "arrival": 1792517893.33875,
+        "departure": 1792516341.6287498,
+        "id": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+        "lines": [
+          "322",
+          "25"
+        ]
+      },
+      {
+        "arrival": 1792518000,
+        "departure": 1792516341.6287498,
+        "id": "g1:654>1962:24262724@20261020:16-19|24261397@20261020:13-14|24361320@20261020:1-6",
+        "lines": [
+          "322",
+          "201",
+          "18"
+        ]
+      },
+      {
+        "arrival": 1792518240,
+        "departure": 1792516485.2875,
+        "id": "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+        "lines": [
+          "850",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1792518240,
+        "departure": 1792516720.1375,
+        "id": "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+        "lines": [
+          "29",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1792518900,
+        "departure": 1792517325.2875,
+        "id": "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+        "lines": [
+          "223",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1792518900,
+        "departure": 1792517541.6287498,
+        "id": "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8",
+        "lines": [
+          "326",
+          "6"
+        ]
+      }
+    ],
+    "warmUpPasses": [
+      {
+        "candidates": 3600,
+        "duration_ms": 352.198416,
+        "horizon_s": 7200,
+        "round_metrics": [
+          {
+            "alights": 2967,
+            "boarding_checks": 377,
+            "feasible_boardings": 250,
+            "label_attempts": 1875,
+            "merge_ms": 1,
+            "patterns": 47,
+            "prepare_ms": 0,
+            "rejected_before_allocation": 0,
+            "retained": 1875,
+            "scan_ms": 0,
+            "slowest_chunk_ms": 0,
+            "summed_chunk_ms": 0,
+            "trip_instances": 89
+          },
+          {
+            "alights": 382750,
+            "boarding_checks": 128726,
+            "feasible_boardings": 33573,
+            "label_attempts": 203447,
+            "merge_ms": 12,
+            "patterns": 763,
+            "prepare_ms": 3,
+            "rejected_before_allocation": 75357,
+            "retained": 128090,
+            "scan_ms": 18,
+            "slowest_chunk_ms": 10,
+            "summed_chunk_ms": 87,
+            "trip_instances": 1115
+          },
+          {
+            "alights": 3116626,
+            "boarding_checks": 1191926,
+            "feasible_boardings": 287429,
+            "label_attempts": 2663728,
+            "merge_ms": 18,
+            "patterns": 1413,
+            "prepare_ms": 2,
+            "rejected_before_allocation": 2183426,
+            "retained": 480302,
+            "scan_ms": 76,
+            "slowest_chunk_ms": 71,
+            "summed_chunk_ms": 549,
+            "trip_instances": 1739
+          },
+          {
+            "alights": 472724,
+            "boarding_checks": 768989,
+            "feasible_boardings": 229718,
+            "label_attempts": 450583,
+            "merge_ms": 1,
+            "patterns": 276,
+            "prepare_ms": 0,
+            "rejected_before_allocation": 385344,
+            "retained": 65239,
+            "scan_ms": 15,
+            "slowest_chunk_ms": 10,
+            "summed_chunk_ms": 87,
+            "trip_instances": 625
+          }
+        ],
+        "rounds": 4,
+        "start_ms": 128.88779200000002,
+        "walking_ms": 126,
+        "wave": 0
+      }
+    ],
+    "process": "priming"
+  },
+  {
+    "avoidTightTransfers": false,
+    "bikeInput": "recorded",
+    "canLoadEarlier": true,
+    "canLoadLater": true,
+    "composition": "production",
+    "counters": {
+      "boardCacheHits": 2,
+      "boardsCovered": 27,
+      "candidates": 3600,
+      "delayedPastBoardings": 12,
+      "duplicatesSuppressed": 945,
+      "incompleteBoards": 0,
+      "invalidJourneys": 162,
+      "networkRequests": 27,
+      "pageNewJourneys": 0,
+      "predictedEvents": 3759,
+      "recommendationSwitches": 0,
+      "responseBytes": 14376036,
+      "retainedAlternatives": 27,
+      "sharedFirstVehicleGroups": 1,
+      "walkingCacheHits": 15742,
+      "walkingRequests": 15862,
+      "workers": 10
+    },
+    "displayedLegs": [
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792517280,
+        "effectiveDeparture": 1792516680,
+        "line": "322",
+        "option": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+        "scheduledDeparture": 1792516670,
+        "status": "delayed",
+        "stop": "000200508004",
+        "trip": "24262724"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792517820,
+        "effectiveDeparture": 1792517460,
+        "line": "25",
+        "option": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+        "scheduledDeparture": 1792517490,
+        "status": "live",
+        "stop": "000200417050",
+        "trip": "24424793"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792517280,
+        "effectiveDeparture": 1792517040,
+        "line": "850",
+        "option": "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+        "scheduledDeparture": 1792516916,
+        "status": "delayed",
+        "stop": "000200508002",
+        "trip": "24291372"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518240,
+        "effectiveDeparture": 1792517580,
+        "line": "16",
+        "option": "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+        "scheduledDeparture": 1792517580,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24360395"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792517460,
+        "effectiveDeparture": 1792517340,
+        "line": "29",
+        "option": "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+        "scheduledDeparture": 1792517360,
+        "status": "live",
+        "stop": "000200508003",
+        "trip": "24365725"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518240,
+        "effectiveDeparture": 1792517580,
+        "line": "16",
+        "option": "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+        "scheduledDeparture": 1792517580,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24360395"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518060,
+        "effectiveDeparture": 1792517880,
+        "line": "223",
+        "option": "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+        "scheduledDeparture": 1792517887,
+        "status": "live",
+        "stop": "000200508002",
+        "trip": "24263718"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518900,
+        "effectiveDeparture": 1792518300,
+        "line": "6",
+        "option": "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+        "scheduledDeparture": 1792518300,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24368670"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518420,
+        "effectiveDeparture": 1792517880,
+        "line": "326",
+        "option": "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8",
+        "scheduledDeparture": 1792517845,
+        "status": "delayed",
+        "stop": "000200508004",
+        "trip": "24264857"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518900,
+        "effectiveDeparture": 1792518540,
+        "line": "6",
+        "option": "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8",
+        "scheduledDeparture": 1792518580,
+        "status": "live",
+        "stop": "000200417050",
+        "trip": "24368670"
+      }
+    ],
+    "fullMap": false,
+    "includedModes": [
+      "bicycle",
+      "bus",
+      "funicular",
+      "train",
+      "tram"
+    ],
+    "journeys": [
+      {
+        "arrival": 1792517893.33875,
+        "departure": 1792516341.6287498,
+        "id": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+        "legs": [
+          {
+            "arrival": 1792516680,
+            "departure": 1792516341.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517280,
+            "departure": 1792516680,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "322",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517820,
+            "departure": 1792517460,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "25",
+            "to": "Kirchberg, prov. Konrad Adenauer",
+            "toStop": "000900000058",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517893.33875,
+            "departure": 1792517820,
+            "from": "Kirchberg, prov. Konrad Adenauer",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792518240,
+        "departure": 1792516485.2875,
+        "id": "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+        "legs": [
+          {
+            "arrival": 1792517040,
+            "departure": 1792516485.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517280,
+            "departure": 1792517040,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "850",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518240,
+            "departure": 1792517580,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792518240,
+        "departure": 1792516720.1375,
+        "id": "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+        "legs": [
+          {
+            "arrival": 1792517340,
+            "departure": 1792516720.1375,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Charlys Statioun",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517460,
+            "departure": 1792517340,
+            "from": "Senningerberg, Charlys Statioun",
+            "fromStop": "000200508003",
+            "line": "29",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518240,
+            "departure": 1792517580,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": "Tight transfer"
+          }
+        ]
+      },
+      {
+        "arrival": 1792518900,
+        "departure": 1792517325.2875,
+        "id": "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+        "legs": [
+          {
+            "arrival": 1792517880,
+            "departure": 1792517325.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518060,
+            "departure": 1792517880,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "223",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518900,
+            "departure": 1792518300,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792518900,
+        "departure": 1792517541.6287498,
+        "id": "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8",
+        "legs": [
+          {
+            "arrival": 1792517880,
+            "departure": 1792517541.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518420,
+            "departure": 1792517880,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "326",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518900,
+            "departure": 1792518540,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": "Tight transfer"
+          }
+        ]
+      }
+    ],
+    "liveConcurrency": 32,
+    "lowPowerMode": false,
+    "matchingRejections": {
+      "noCandidate": 4,
+      "outsideInterval": 29
+    },
+    "operationStartReferenceSeconds": 814208820.8782485,
+    "options": [
+      "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+      "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+      "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+      "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+      "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8"
+    ],
+    "passes": [
+      {
+        "candidates": 3600,
+        "duration_ms": 218.981958,
+        "horizon_s": 7200,
+        "rounds": 4,
+        "start_ms": 3853.261917,
+        "walking_ms": 58,
+        "wave": 0
+      }
+    ],
+    "peak_memory_bytes": 658587648,
+    "planningTime": 1792515953.7934198,
+    "realtimeBoards": [
+      {
+        "arrived_ms": 1012.840917,
+        "matching_end_ms": 1018.160625,
+        "matching_start_ms": 1015.906792,
+        "stop": "000200508004"
+      },
+      {
+        "arrived_ms": 1526.9118750000002,
+        "matching_end_ms": 1533.758417,
+        "matching_start_ms": 1530.022958,
+        "stop": "000200508002"
+      },
+      {
+        "arrived_ms": 1789.607375,
+        "matching_end_ms": 1792.2613330000001,
+        "matching_start_ms": 1789.8929580000001,
+        "stop": "000200508006"
+      },
+      {
+        "arrived_ms": 2805.6782919999996,
+        "matching_end_ms": 2812.3957499999997,
+        "matching_start_ms": 2806.4621249999996,
+        "stop": "000200508003"
+      },
+      {
+        "arrived_ms": 2014.1793750000002,
+        "matching_end_ms": 2812.8884169999997,
+        "matching_start_ms": 2017.3497080000002,
+        "stop": "000200508010"
+      },
+      {
+        "arrived_ms": 1636.503167,
+        "matching_end_ms": 2813.1033749999997,
+        "matching_start_ms": 1641.02375,
+        "stop": "000200503002"
+      },
+      {
+        "arrived_ms": 2566.0402079999994,
+        "matching_end_ms": 2814.03525,
+        "matching_start_ms": 2566.9385829999997,
+        "stop": "000200503013"
+      },
+      {
+        "arrived_ms": 775.55375,
+        "matching_end_ms": 2814.2536249999994,
+        "matching_start_ms": 777.944083,
+        "stop": "000200503012"
+      },
+      {
+        "arrived_ms": 3463.9034999999994,
+        "matching_end_ms": 3469.1441669999995,
+        "matching_start_ms": 3464.426458,
+        "stop": "000200417060"
+      },
+      {
+        "arrived_ms": 3124.7870829999997,
+        "matching_end_ms": 3469.6966669999997,
+        "matching_start_ms": 3125.6941669999997,
+        "stop": "000200417023"
+      },
+      {
+        "arrived_ms": 3476.580208,
+        "matching_end_ms": 3484.0653329999996,
+        "matching_start_ms": 3477.0232079999996,
+        "stop": "000200417033"
+      },
+      {
+        "arrived_ms": 1634.769542,
+        "matching_end_ms": 3485.0005419999998,
+        "matching_start_ms": 1635.699583,
+        "stop": "000200422008"
+      },
+      {
+        "arrived_ms": 2561.9181249999997,
+        "matching_end_ms": 3486.5542079999996,
+        "matching_start_ms": 2562.24675,
+        "stop": "000200417025"
+      },
+      {
+        "arrived_ms": 528.075792,
+        "matching_end_ms": 3486.6041669999995,
+        "matching_start_ms": 532.228,
+        "stop": "000200409006"
+      },
+      {
+        "arrived_ms": 1987.488542,
+        "matching_end_ms": 3487.2887079999996,
+        "matching_start_ms": 1987.961917,
+        "stop": "000200426004"
+      },
+      {
+        "arrived_ms": 2549.1017079999997,
+        "matching_end_ms": 3487.3392079999994,
+        "matching_start_ms": 2549.3420829999995,
+        "stop": "000200406005"
+      },
+      {
+        "arrived_ms": 2012.4618750000002,
+        "matching_end_ms": 3488.4251249999998,
+        "matching_start_ms": 2012.8665420000002,
+        "stop": "000200417019"
+      },
+      {
+        "arrived_ms": 2123.9997919999996,
+        "matching_end_ms": 3488.8044999999997,
+        "matching_start_ms": 2124.1656249999996,
+        "stop": "000900000058"
+      },
+      {
+        "arrived_ms": 1127.759958,
+        "matching_end_ms": 3489.644833,
+        "matching_start_ms": 1131.9631250000002,
+        "stop": "000200417013"
+      },
+      {
+        "arrived_ms": 2311.8038749999996,
+        "matching_end_ms": 3490.6767499999996,
+        "matching_start_ms": 2312.2187919999997,
+        "stop": "000200417039"
+      },
+      {
+        "arrived_ms": 2000.012083,
+        "matching_end_ms": 3491.4973749999995,
+        "matching_start_ms": 2000.131542,
+        "stop": "000200417002"
+      },
+      {
+        "arrived_ms": 3119.931917,
+        "matching_end_ms": 3491.6192499999997,
+        "matching_start_ms": 3120.3278749999995,
+        "stop": "000200417046"
+      },
+      {
+        "arrived_ms": 523.919083,
+        "matching_end_ms": 3491.6370829999996,
+        "matching_start_ms": 531.698708,
+        "stop": "000200404041"
+      },
+      {
+        "arrived_ms": 2298.7537919999995,
+        "matching_end_ms": 3492.2249169999996,
+        "matching_start_ms": 2299.0167919999994,
+        "stop": "000200417038"
+      },
+      {
+        "arrived_ms": 1016.088792,
+        "matching_end_ms": 1019.126333,
+        "matching_start_ms": 1018.328708,
+        "stop": "000200508004"
+      },
+      {
+        "arrived_ms": 3832.9982079999995,
+        "matching_end_ms": 3842.8129169999997,
+        "matching_start_ms": 3833.856583,
+        "stop": "000200417050"
+      },
+      {
+        "arrived_ms": 1995.7371670000002,
+        "matching_end_ms": 3843.376125,
+        "matching_start_ms": 1996.048292,
+        "stop": "000200417012"
+      },
+      {
+        "arrived_ms": 1515.6596250000002,
+        "matching_end_ms": 3843.4001249999997,
+        "matching_start_ms": 1516.0245830000001,
+        "stop": "000200508002"
+      },
+      {
+        "arrived_ms": 2818.3286669999998,
+        "matching_end_ms": 3844.2863329999996,
+        "matching_start_ms": 2818.622708,
+        "stop": "000200508016"
+      }
+    ],
+    "realtimeCoverage": {
+      "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7": "live",
+      "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8": "live",
+      "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7": "live",
+      "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26": "live",
+      "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8": "live"
+    },
+    "recommendedOption": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+    "refreshPolicy": "forceRefresh",
+    "requestID": "B41971CB-D4DE-49D6-AF97-47A33EC8C6A3",
+    "rounds": [
+      {
+        "alights": 2858,
+        "boarding_checks": 375,
+        "feasible_boardings": 249,
+        "label_attempts": 1829,
+        "merge_ms": 0,
+        "patterns": 47,
+        "prepare_ms": 0,
+        "rejected_before_allocation": 0,
+        "retained": 1829,
+        "scan_ms": 0,
+        "slowest_chunk_ms": 0,
+        "summed_chunk_ms": 0,
+        "trip_instances": 89
+      },
+      {
+        "alights": 369282,
+        "boarding_checks": 127170,
+        "feasible_boardings": 33007,
+        "label_attempts": 196852,
+        "merge_ms": 6,
+        "patterns": 763,
+        "prepare_ms": 1,
+        "rejected_before_allocation": 71268,
+        "retained": 125584,
+        "scan_ms": 11,
+        "slowest_chunk_ms": 8,
+        "summed_chunk_ms": 56,
+        "trip_instances": 1115
+      },
+      {
+        "alights": 3032859,
+        "boarding_checks": 1182710,
+        "feasible_boardings": 282025,
+        "label_attempts": 2600151,
+        "merge_ms": 12,
+        "patterns": 1413,
+        "prepare_ms": 0,
+        "rejected_before_allocation": 2124918,
+        "retained": 475233,
+        "scan_ms": 53,
+        "slowest_chunk_ms": 47,
+        "summed_chunk_ms": 444,
+        "trip_instances": 1739
+      },
+      {
+        "alights": 469311,
+        "boarding_checks": 766904,
+        "feasible_boardings": 227616,
+        "label_attempts": 444258,
+        "merge_ms": 1,
+        "patterns": 276,
+        "prepare_ms": 0,
+        "rejected_before_allocation": 381443,
+        "retained": 62815,
+        "scan_ms": 11,
+        "slowest_chunk_ms": 6,
+        "summed_chunk_ms": 66,
+        "trip_instances": 625
+      }
+    ],
+    "sample": 1,
+    "scenario": "live-now",
+    "spans": [
+      {
+        "duration_ms": 0.165583,
+        "stage": "snapshotPreparation",
+        "start_ms": 1.141
+      },
+      {
+        "duration_ms": 1.250542,
+        "stage": "endpoints",
+        "start_ms": 1.8987079999999998
+      },
+      {
+        "duration_ms": 43.600542,
+        "stage": "realtimeDiscovery",
+        "start_ms": 3.187625
+      },
+      {
+        "duration_ms": 8.309333,
+        "stage": "buildTransferGroups",
+        "start_ms": 352.582875
+      },
+      {
+        "duration_ms": 10.509458,
+        "stage": "buildEnvelope",
+        "start_ms": 360.893167
+      },
+      {
+        "duration_ms": 0.146958,
+        "stage": "buildIntermediateStops",
+        "start_ms": 371.403667
+      },
+      {
+        "duration_ms": 108.198042,
+        "stage": "candidateBuilding",
+        "start_ms": 266.25125
+      },
+      {
+        "duration_ms": 1.560333,
+        "stage": "connectionLines",
+        "start_ms": 378.504
+      },
+      {
+        "duration_ms": 0.100458,
+        "stage": "connectionLines",
+        "start_ms": 380.088042
+      },
+      {
+        "duration_ms": 0.096125,
+        "stage": "connectionLines",
+        "start_ms": 380.19825
+      },
+      {
+        "duration_ms": 3445.449,
+        "stage": "providerBoardFetch",
+        "start_ms": 46.813
+      },
+      {
+        "duration_ms": 2960.526209,
+        "stage": "providerStopMatching",
+        "start_ms": 531.698708
+      },
+      {
+        "duration_ms": 7.183209,
+        "stage": "providerSessionMerge",
+        "start_ms": 3492.3988329999997
+      },
+      {
+        "duration_ms": 0.0075,
+        "stage": "sessionRoutingEffect",
+        "start_ms": 3499.5828329999995
+      },
+      {
+        "duration_ms": 3464.011375,
+        "stage": "providerBoardFetch",
+        "start_ms": 380.310583
+      },
+      {
+        "duration_ms": 2825.957625,
+        "stage": "providerStopMatching",
+        "start_ms": 1018.328708
+      },
+      {
+        "duration_ms": 7.940333,
+        "stage": "providerSessionMerge",
+        "start_ms": 3845.1078749999997
+      },
+      {
+        "duration_ms": 0.105792,
+        "stage": "sessionRoutingEffect",
+        "start_ms": 3853.048833
+      },
+      {
+        "duration_ms": 3850.084334,
+        "stage": "realtime",
+        "start_ms": 3.166833
+      },
+      {
+        "duration_ms": 263.072375,
+        "stage": "walkingPreparation",
+        "start_ms": 3.16825
+      },
+      {
+        "duration_ms": 0.000791,
+        "stage": "patchOverlay",
+        "start_ms": 3.1752920000000002
+      },
+      {
+        "duration_ms": 0.02375,
+        "stage": "boardingIndex",
+        "start_ms": 4.513958
+      },
+      {
+        "duration_ms": 2.579625,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 6.461417
+      },
+      {
+        "duration_ms": 0.515666,
+        "stage": "walkingTransferRequests",
+        "start_ms": 9.043792
+      },
+      {
+        "duration_ms": 1.1895,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 9.559833000000001
+      },
+      {
+        "duration_ms": 0.304292,
+        "stage": "walkingTransferWork",
+        "start_ms": 10.749958000000001
+      },
+      {
+        "duration_ms": 0.885708,
+        "stage": "walkingTransferApply",
+        "start_ms": 11.0545
+      },
+      {
+        "duration_ms": 0.000875,
+        "stage": "candidateCollection",
+        "start_ms": 12.060292
+      },
+      {
+        "duration_ms": 1.115,
+        "stage": "boardingIndex",
+        "start_ms": 15.39475
+      },
+      {
+        "duration_ms": 2.356166,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 41.799417
+      },
+      {
+        "duration_ms": 7.666042,
+        "stage": "walkingTransferRequests",
+        "start_ms": 44.159124999999996
+      },
+      {
+        "duration_ms": 3.06375,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 51.825625
+      },
+      {
+        "duration_ms": 6.37275,
+        "stage": "walkingTransferWork",
+        "start_ms": 54.889542
+      },
+      {
+        "duration_ms": 12.9775,
+        "stage": "walkingTransferApply",
+        "start_ms": 61.26275
+      },
+      {
+        "duration_ms": 0.658666,
+        "stage": "candidateCollection",
+        "start_ms": 76.989417
+      },
+      {
+        "duration_ms": 8.464375,
+        "stage": "boardingIndex",
+        "start_ms": 83.369417
+      },
+      {
+        "duration_ms": 0.681666,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 175.50841700000004
+      },
+      {
+        "duration_ms": 8.981167,
+        "stage": "walkingTransferRequests",
+        "start_ms": 176.19200000000004
+      },
+      {
+        "duration_ms": 2.331083,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 185.17441700000003
+      },
+      {
+        "duration_ms": 6.523916,
+        "stage": "walkingTransferWork",
+        "start_ms": 187.50616700000003
+      },
+      {
+        "duration_ms": 8.16475,
+        "stage": "walkingTransferApply",
+        "start_ms": 194.03050000000002
+      },
+      {
+        "duration_ms": 0.821666,
+        "stage": "candidateCollection",
+        "start_ms": 205.23516700000002
+      },
+      {
+        "duration_ms": 15.04875,
+        "stage": "boardingIndex",
+        "start_ms": 215.50604200000004
+      },
+      {
+        "duration_ms": 0.354458,
+        "stage": "walkingTransferRequests",
+        "start_ms": 248.36575000000002
+      },
+      {
+        "duration_ms": 0.689292,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 248.72075000000004
+      },
+      {
+        "duration_ms": 0.397917,
+        "stage": "walkingTransferWork",
+        "start_ms": 249.41025000000002
+      },
+      {
+        "duration_ms": 2.462542,
+        "stage": "walkingTransferApply",
+        "start_ms": 249.80820800000004
+      },
+      {
+        "duration_ms": 1.225125,
+        "stage": "candidateCollection",
+        "start_ms": 252.39437500000003
+      },
+      {
+        "duration_ms": 218.976708,
+        "stage": "raptor",
+        "start_ms": 3853.261917
+      },
+      {
+        "duration_ms": 1.399667,
+        "stage": "patchOverlay",
+        "start_ms": 3853.26675
+      },
+      {
+        "duration_ms": 0.016458,
+        "stage": "boardingIndex",
+        "start_ms": 3855.4384169999994
+      },
+      {
+        "duration_ms": 2.777917,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 3856.5344999999998
+      },
+      {
+        "duration_ms": 0.37525,
+        "stage": "walkingTransferRequests",
+        "start_ms": 3859.313625
+      },
+      {
+        "duration_ms": 0.852333,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 3859.6890419999995
+      },
+      {
+        "duration_ms": 0.22275,
+        "stage": "walkingTransferWork",
+        "start_ms": 3860.5419169999996
+      },
+      {
+        "duration_ms": 0.644417,
+        "stage": "walkingTransferApply",
+        "start_ms": 3860.7648329999997
+      },
+      {
+        "duration_ms": 0.00075,
+        "stage": "candidateCollection",
+        "start_ms": 3861.4909579999994
+      },
+      {
+        "duration_ms": 0.464458,
+        "stage": "boardingIndex",
+        "start_ms": 3863.6236249999997
+      },
+      {
+        "duration_ms": 2.68975,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 3882.0757919999996
+      },
+      {
+        "duration_ms": 6.593708,
+        "stage": "walkingTransferRequests",
+        "start_ms": 3884.7670419999995
+      },
+      {
+        "duration_ms": 2.692375,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 3891.3614169999996
+      },
+      {
+        "duration_ms": 5.947583,
+        "stage": "walkingTransferWork",
+        "start_ms": 3894.0540419999998
+      },
+      {
+        "duration_ms": 9.779,
+        "stage": "walkingTransferApply",
+        "start_ms": 3900.001875
+      },
+      {
+        "duration_ms": 0.638666,
+        "stage": "candidateCollection",
+        "start_ms": 3912.3585419999995
+      },
+      {
+        "duration_ms": 8.148417,
+        "stage": "boardingIndex",
+        "start_ms": 3917.9715829999996
+      },
+      {
+        "duration_ms": 1.27,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 3992.3682919999997
+      },
+      {
+        "duration_ms": 8.485,
+        "stage": "walkingTransferRequests",
+        "start_ms": 3993.63975
+      },
+      {
+        "duration_ms": 2.115709,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 4002.1254579999995
+      },
+      {
+        "duration_ms": 5.718584,
+        "stage": "walkingTransferWork",
+        "start_ms": 4004.2422079999997
+      },
+      {
+        "duration_ms": 6.099292,
+        "stage": "walkingTransferApply",
+        "start_ms": 4009.9613329999997
+      },
+      {
+        "duration_ms": 0.8205,
+        "stage": "candidateCollection",
+        "start_ms": 4018.3037919999997
+      },
+      {
+        "duration_ms": 13.743041,
+        "stage": "boardingIndex",
+        "start_ms": 4028.208417
+      },
+      {
+        "duration_ms": 0.366,
+        "stage": "walkingTransferRequests",
+        "start_ms": 4055.334458
+      },
+      {
+        "duration_ms": 0.688209,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 4055.7010829999995
+      },
+      {
+        "duration_ms": 0.371083,
+        "stage": "walkingTransferWork",
+        "start_ms": 4056.3894999999998
+      },
+      {
+        "duration_ms": 2.572875,
+        "stage": "walkingTransferApply",
+        "start_ms": 4056.760708
+      },
+      {
+        "duration_ms": 0.989208,
+        "stage": "candidateCollection",
+        "start_ms": 4059.458667
+      },
+      {
+        "duration_ms": 6.8405,
+        "stage": "buildTransferGroups",
+        "start_ms": 4154.866792000001
+      },
+      {
+        "duration_ms": 9.870541,
+        "stage": "buildEnvelope",
+        "start_ms": 4161.707667000001
+      },
+      {
+        "duration_ms": 0.171458,
+        "stage": "buildIntermediateStops",
+        "start_ms": 4171.578667000001
+      },
+      {
+        "duration_ms": 101.878083,
+        "stage": "candidateBuilding",
+        "start_ms": 4072.2452499999995
+      },
+      {
+        "duration_ms": 4.412958,
+        "stage": "realtime",
+        "start_ms": 4174.123625
+      },
+      {
+        "duration_ms": 0.000834,
+        "stage": "directWalkingWait",
+        "start_ms": 4179.854458000001
+      },
+      {
+        "duration_ms": 0.799167,
+        "stage": "geometry",
+        "start_ms": 4191.5825
+      },
+      {
+        "duration_ms": 0.083458,
+        "stage": "validation",
+        "start_ms": 4192.3975
+      },
+      {
+        "duration_ms": 0.05575,
+        "stage": "ranking",
+        "start_ms": 4192.481083000001
+      },
+      {
+        "duration_ms": 0.169667,
+        "stage": "resultAssembly",
+        "start_ms": 4192.382458
+      },
+      {
+        "duration_ms": 7.545875,
+        "stage": "bikeCalculation",
+        "start_ms": 1.331167
+      },
+      {
+        "duration_ms": 0.366709,
+        "stage": "snapshotPreparation",
+        "start_ms": 0.5408330000000001
+      },
+      {
+        "duration_ms": 0.190375,
+        "stage": "adapterMapping",
+        "start_ms": 4192.580042
+      },
+      {
+        "duration_ms": 0.487541,
+        "stage": "timetableReadiness",
+        "start_ms": 0.032417
+      },
+      {
+        "duration_ms": 0.613458,
+        "stage": "graphPreparation",
+        "start_ms": 0.52
+      },
+      {
+        "duration_ms": 1.151292,
+        "stage": "publication",
+        "start_ms": 4192.738791
+      },
+      {
+        "duration_ms": 0.131416,
+        "stage": "refinement",
+        "start_ms": 4209.175292
+      },
+      {
+        "duration_ms": 1.145875,
+        "stage": "refinement",
+        "start_ms": 4209.318667
+      },
+      {
+        "duration_ms": 1.148333,
+        "stage": "refinement",
+        "start_ms": 4209.320917
+      },
+      {
+        "duration_ms": 0.061583,
+        "stage": "refinement",
+        "start_ms": 4210.471375
+      },
+      {
+        "duration_ms": 0.061417,
+        "stage": "refinement",
+        "start_ms": 4210.473458
+      },
+      {
+        "duration_ms": 0.714292,
+        "stage": "refinement",
+        "start_ms": 4210.535958
+      },
+      {
+        "duration_ms": 0.715833,
+        "stage": "refinement",
+        "start_ms": 4210.537292
+      },
+      {
+        "duration_ms": 4.040542,
+        "stage": "refinement",
+        "start_ms": 4211.254833
+      },
+      {
+        "duration_ms": 4.042125,
+        "stage": "refinement",
+        "start_ms": 4211.256917
+      },
+      {
+        "duration_ms": 1.206,
+        "stage": "refinement",
+        "start_ms": 4215.300792
+      },
+      {
+        "duration_ms": 1.206625,
+        "stage": "refinement",
+        "start_ms": 4215.303125
+      },
+      {
+        "duration_ms": 0.664291,
+        "stage": "refinement",
+        "start_ms": 4216.511292
+      },
+      {
+        "duration_ms": 0.664667,
+        "stage": "refinement",
+        "start_ms": 4216.513208
+      },
+      {
+        "duration_ms": 8.011417,
+        "stage": "refinement",
+        "start_ms": 4209.171
+      },
+      {
+        "duration_ms": 0.310959,
+        "stage": "refinement",
+        "start_ms": 4217.179708
+      },
+      {
+        "duration_ms": 0.311542,
+        "stage": "refinement",
+        "start_ms": 4217.18125
+      },
+      {
+        "duration_ms": 49.483333,
+        "stage": "firstRender",
+        "start_ms": 4193.88825
+      }
+    ],
+    "spanSemantics": "operation-relative elapsed intervals; http and decode are cumulative concurrent work",
+    "stages_ms": {
+      "adapterMapping": 0.190375,
+      "bikeCalculation": 7.545875,
+      "boardFetch": 6909,
+      "boardingIndex": 47.024249,
+      "boardMatching": 102,
+      "buildAssembly": 114.414316,
+      "buildDeduplication": 2.642056,
+      "buildEnvelope": 20.379998999999998,
+      "buildIntermediateStops": 0.31841600000000003,
+      "buildNormalisation": 5.935457,
+      "buildPublicationValidation": 30.787007000000003,
+      "buildStructuralValidation": 7.219024,
+      "buildTransferGroups": 15.149833000000001,
+      "buildTransferRules": 5.993736,
+      "candidateBuilding": 210.076125,
+      "candidateCollection": 5.155455999999999,
+      "connectionLines": 1.756916,
+      "decode": 203,
+      "directWalkingWait": 0.000834,
+      "endpoints": 1.250542,
+      "firstRender": 49.483333,
+      "geometry": 0.799167,
+      "graphPreparation": 0.613458,
+      "http": 53829,
+      "patchOverlay": 1.400458,
+      "providerBoardFetch": 6909.460375000001,
+      "providerBoardPreparation": 27.521834000000002,
+      "providerSessionMerge": 15.123542,
+      "providerStopMatching": 5786.483834000001,
+      "publication": 1.151292,
+      "ranking": 0.05575,
+      "raptor": 218.976708,
+      "realtime": 3854.497292,
+      "realtimeDiscovery": 43.600542,
+      "refinement": 24.436917,
+      "resultAssembly": 0.169667,
+      "schedulePreparation": 0,
+      "sessionRoutingEffect": 0.113292,
+      "snapshotPreparation": 0.532292,
+      "timetableReadiness": 0.487541,
+      "validation": 0.083458,
+      "walkingBoardingDeadlines": 12.355124,
+      "walkingPreparation": 263.072375,
+      "walkingTransferApply": 43.586084,
+      "walkingTransferRequests": 33.337291,
+      "walkingTransferRoutes": 13.622251000000002,
+      "walkingTransfers": 58,
+      "walkingTransferWork": 25.858874999999998
+    },
+    "supplementalOptions": [
+      "veloh-49.6541071,6.2296443-49.6301,6.1682-116-63"
+    ],
+    "thermalStateAtEnd": "nominal",
+    "thermalStateAtStart": "nominal",
+    "total_ms": 4243.373042,
+    "transport": [],
+    "unfilteredJourneys": [
+      {
+        "arrival": 1792517893.33875,
+        "departure": 1792516341.6287498,
+        "id": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+        "lines": [
+          "322",
+          "25"
+        ]
+      },
+      {
+        "arrival": 1792518000,
+        "departure": 1792516341.6287498,
+        "id": "g1:654>1962:24262724@20261020:16-19|24261397@20261020:13-14|24361320@20261020:1-6",
+        "lines": [
+          "322",
+          "201",
+          "18"
+        ]
+      },
+      {
+        "arrival": 1792518240,
+        "departure": 1792516485.2875,
+        "id": "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+        "lines": [
+          "850",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1792518240,
+        "departure": 1792516720.1375,
+        "id": "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+        "lines": [
+          "29",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1792518900,
+        "departure": 1792517325.2875,
+        "id": "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+        "lines": [
+          "223",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1792518900,
+        "departure": 1792517541.6287498,
+        "id": "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8",
+        "lines": [
+          "326",
+          "6"
+        ]
+      }
+    ],
+    "warmUpPasses": [
+      {
+        "candidates": 3600,
+        "duration_ms": 263.072375,
+        "horizon_s": 7200,
+        "round_metrics": [
+          {
+            "alights": 2967,
+            "boarding_checks": 377,
+            "feasible_boardings": 250,
+            "label_attempts": 1875,
+            "merge_ms": 0,
+            "patterns": 47,
+            "prepare_ms": 0,
+            "rejected_before_allocation": 0,
+            "retained": 1875,
+            "scan_ms": 1,
+            "slowest_chunk_ms": 0,
+            "summed_chunk_ms": 0,
+            "trip_instances": 89
+          },
+          {
+            "alights": 382750,
+            "boarding_checks": 128726,
+            "feasible_boardings": 33573,
+            "label_attempts": 203447,
+            "merge_ms": 9,
+            "patterns": 763,
+            "prepare_ms": 3,
+            "rejected_before_allocation": 75357,
+            "retained": 128090,
+            "scan_ms": 16,
+            "slowest_chunk_ms": 7,
+            "summed_chunk_ms": 63,
+            "trip_instances": 1115
+          },
+          {
+            "alights": 3116626,
+            "boarding_checks": 1191926,
+            "feasible_boardings": 287429,
+            "label_attempts": 2663728,
+            "merge_ms": 12,
+            "patterns": 1413,
+            "prepare_ms": 1,
+            "rejected_before_allocation": 2183426,
+            "retained": 480302,
+            "scan_ms": 71,
+            "slowest_chunk_ms": 51,
+            "summed_chunk_ms": 577,
+            "trip_instances": 1739
+          },
+          {
+            "alights": 472724,
+            "boarding_checks": 768989,
+            "feasible_boardings": 229718,
+            "label_attempts": 450583,
+            "merge_ms": 1,
+            "patterns": 276,
+            "prepare_ms": 0,
+            "rejected_before_allocation": 385344,
+            "retained": 65239,
+            "scan_ms": 15,
+            "slowest_chunk_ms": 15,
+            "summed_chunk_ms": 105,
+            "trip_instances": 625
+          }
+        ],
+        "rounds": 4,
+        "start_ms": 3.16825,
+        "walking_ms": 68,
+        "wave": 0
+      }
+    ],
+    "process": "warm"
+  },
+  {
+    "avoidTightTransfers": false,
+    "bikeInput": "recorded",
+    "canLoadEarlier": true,
+    "canLoadLater": true,
+    "composition": "production",
+    "counters": {
+      "boardCacheHits": 2,
+      "boardsCovered": 27,
+      "candidates": 3600,
+      "delayedPastBoardings": 12,
+      "duplicatesSuppressed": 945,
+      "incompleteBoards": 0,
+      "invalidJourneys": 162,
+      "networkRequests": 27,
+      "pageNewJourneys": 6,
+      "predictedEvents": 3759,
+      "recommendationSwitches": 0,
+      "responseBytes": 14376036,
+      "retainedAlternatives": 27,
+      "sharedFirstVehicleGroups": 1,
+      "walkingCacheHits": 11248,
+      "walkingRequests": 15862,
+      "workers": 10
+    },
+    "displayedLegs": [
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792517280,
+        "effectiveDeparture": 1792516680,
+        "line": "322",
+        "option": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+        "scheduledDeparture": 1792516670,
+        "status": "delayed",
+        "stop": "000200508004",
+        "trip": "24262724"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792517820,
+        "effectiveDeparture": 1792517460,
+        "line": "25",
+        "option": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+        "scheduledDeparture": 1792517490,
+        "status": "live",
+        "stop": "000200417050",
+        "trip": "24424793"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792517280,
+        "effectiveDeparture": 1792517040,
+        "line": "850",
+        "option": "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+        "scheduledDeparture": 1792516916,
+        "status": "delayed",
+        "stop": "000200508002",
+        "trip": "24291372"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518240,
+        "effectiveDeparture": 1792517580,
+        "line": "16",
+        "option": "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+        "scheduledDeparture": 1792517580,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24360395"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792517460,
+        "effectiveDeparture": 1792517340,
+        "line": "29",
+        "option": "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+        "scheduledDeparture": 1792517360,
+        "status": "live",
+        "stop": "000200508003",
+        "trip": "24365725"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518240,
+        "effectiveDeparture": 1792517580,
+        "line": "16",
+        "option": "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+        "scheduledDeparture": 1792517580,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24360395"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518060,
+        "effectiveDeparture": 1792517880,
+        "line": "223",
+        "option": "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+        "scheduledDeparture": 1792517887,
+        "status": "live",
+        "stop": "000200508002",
+        "trip": "24263718"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518900,
+        "effectiveDeparture": 1792518300,
+        "line": "6",
+        "option": "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+        "scheduledDeparture": 1792518300,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24368670"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518420,
+        "effectiveDeparture": 1792517880,
+        "line": "326",
+        "option": "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8",
+        "scheduledDeparture": 1792517845,
+        "status": "delayed",
+        "stop": "000200508004",
+        "trip": "24264857"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792518900,
+        "effectiveDeparture": 1792518540,
+        "line": "6",
+        "option": "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8",
+        "scheduledDeparture": 1792518580,
+        "status": "live",
+        "stop": "000200417050",
+        "trip": "24368670"
+      }
+    ],
+    "fullMap": false,
+    "includedModes": [
+      "bicycle",
+      "bus",
+      "funicular",
+      "train",
+      "tram"
+    ],
+    "journeys": [
+      {
+        "arrival": 1792517893.33875,
+        "departure": 1792516341.6287498,
+        "id": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+        "legs": [
+          {
+            "arrival": 1792516680,
+            "departure": 1792516341.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517280,
+            "departure": 1792516680,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "322",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517820,
+            "departure": 1792517460,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "25",
+            "to": "Kirchberg, prov. Konrad Adenauer",
+            "toStop": "000900000058",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517893.33875,
+            "departure": 1792517820,
+            "from": "Kirchberg, prov. Konrad Adenauer",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792518240,
+        "departure": 1792516485.2875,
+        "id": "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+        "legs": [
+          {
+            "arrival": 1792517040,
+            "departure": 1792516485.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517280,
+            "departure": 1792517040,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "850",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518240,
+            "departure": 1792517580,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792518240,
+        "departure": 1792516720.1375,
+        "id": "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+        "legs": [
+          {
+            "arrival": 1792517340,
+            "departure": 1792516720.1375,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Charlys Statioun",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792517460,
+            "departure": 1792517340,
+            "from": "Senningerberg, Charlys Statioun",
+            "fromStop": "000200508003",
+            "line": "29",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518240,
+            "departure": 1792517580,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": "Tight transfer"
+          }
+        ]
+      },
+      {
+        "arrival": 1792518900,
+        "departure": 1792517325.2875,
+        "id": "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+        "legs": [
+          {
+            "arrival": 1792517880,
+            "departure": 1792517325.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518060,
+            "departure": 1792517880,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "223",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518900,
+            "departure": 1792518300,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792518900,
+        "departure": 1792517541.6287498,
+        "id": "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8",
+        "legs": [
+          {
+            "arrival": 1792517880,
+            "departure": 1792517541.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518420,
+            "departure": 1792517880,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "326",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792518900,
+            "departure": 1792518540,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": "Tight transfer"
+          }
+        ]
+      }
+    ],
+    "liveConcurrency": 32,
+    "lowPowerMode": false,
+    "matchingRejections": {
+      "noCandidate": 4,
+      "outsideInterval": 29
+    },
+    "operationStartReferenceSeconds": 814208826.5103047,
+    "options": [
+      "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+      "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+      "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+      "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+      "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8"
+    ],
+    "passes": [
+      {
+        "candidates": 3600,
+        "duration_ms": 219.937333,
+        "horizon_s": 7200,
+        "rounds": 4,
+        "start_ms": 3986.0195000000003,
+        "walking_ms": 57,
+        "wave": 0
+      }
+    ],
+    "peak_memory_bytes": 644988928,
+    "planningTime": 1792515953.7934198,
+    "realtimeBoards": [
+      {
+        "arrived_ms": 1133.6955829999997,
+        "matching_end_ms": 1136.8508749999999,
+        "matching_start_ms": 1134.9453749999998,
+        "stop": "000200508004"
+      },
+      {
+        "arrived_ms": 1637.4409579999997,
+        "matching_end_ms": 1642.7649579999998,
+        "matching_start_ms": 1639.30325,
+        "stop": "000200508002"
+      },
+      {
+        "arrived_ms": 1916.5865829999998,
+        "matching_end_ms": 1922.3627499999998,
+        "matching_start_ms": 1916.8168329999999,
+        "stop": "000200508006"
+      },
+      {
+        "arrived_ms": 2936.223417,
+        "matching_end_ms": 2944.236375,
+        "matching_start_ms": 2936.8527080000003,
+        "stop": "000200508003"
+      },
+      {
+        "arrived_ms": 2138.4836250000003,
+        "matching_end_ms": 2944.6821670000004,
+        "matching_start_ms": 2143.7970830000004,
+        "stop": "000200508010"
+      },
+      {
+        "arrived_ms": 1740.4225829999998,
+        "matching_end_ms": 2944.8625420000003,
+        "matching_start_ms": 1740.4612919999997,
+        "stop": "000200503002"
+      },
+      {
+        "arrived_ms": 2696.7158750000003,
+        "matching_end_ms": 2945.6462500000002,
+        "matching_start_ms": 2697.9300420000004,
+        "stop": "000200503013"
+      },
+      {
+        "arrived_ms": 881.802208,
+        "matching_end_ms": 2945.8205000000003,
+        "matching_start_ms": 882.518792,
+        "stop": "000200503012"
+      },
+      {
+        "arrived_ms": 3604.0230420000003,
+        "matching_end_ms": 3609.678625,
+        "matching_start_ms": 3604.415167,
+        "stop": "000200417060"
+      },
+      {
+        "arrived_ms": 3236.5888750000004,
+        "matching_end_ms": 3610.209625,
+        "matching_start_ms": 3236.9834170000004,
+        "stop": "000200417023"
+      },
+      {
+        "arrived_ms": 3593.7400420000004,
+        "matching_end_ms": 3611.678792,
+        "matching_start_ms": 3594.340583,
+        "stop": "000200417033"
+      },
+      {
+        "arrived_ms": 1749.9938749999997,
+        "matching_end_ms": 3613.27475,
+        "matching_start_ms": 1750.488958,
+        "stop": "000200422008"
+      },
+      {
+        "arrived_ms": 2686.8864580000004,
+        "matching_end_ms": 3614.9638750000004,
+        "matching_start_ms": 2687.279417,
+        "stop": "000200417025"
+      },
+      {
+        "arrived_ms": 642.961,
+        "matching_end_ms": 3615.0158330000004,
+        "matching_start_ms": 646.6915,
+        "stop": "000200409006"
+      },
+      {
+        "arrived_ms": 2136.328667,
+        "matching_end_ms": 3615.780333,
+        "matching_start_ms": 2140.885333,
+        "stop": "000200426004"
+      },
+      {
+        "arrived_ms": 2692.4190000000003,
+        "matching_end_ms": 3615.831125,
+        "matching_start_ms": 2694.7457080000004,
+        "stop": "000200406005"
+      },
+      {
+        "arrived_ms": 2125.6410830000004,
+        "matching_end_ms": 3617.02,
+        "matching_start_ms": 2126.2122080000004,
+        "stop": "000200417019"
+      },
+      {
+        "arrived_ms": 2296.110333,
+        "matching_end_ms": 3617.383333,
+        "matching_start_ms": 2296.254792,
+        "stop": "000900000058"
+      },
+      {
+        "arrived_ms": 1248.6451249999998,
+        "matching_end_ms": 3618.141125,
+        "matching_start_ms": 1250.7516669999998,
+        "stop": "000200417013"
+      },
+      {
+        "arrived_ms": 2490.8916670000003,
+        "matching_end_ms": 3619.182292,
+        "matching_start_ms": 2491.4595000000004,
+        "stop": "000200417039"
+      },
+      {
+        "arrived_ms": 2111.0727920000004,
+        "matching_end_ms": 3619.963125,
+        "matching_start_ms": 2111.263667,
+        "stop": "000200417002"
+      },
+      {
+        "arrived_ms": 3253.967375,
+        "matching_end_ms": 3620.0971250000002,
+        "matching_start_ms": 3254.327,
+        "stop": "000200417046"
+      },
+      {
+        "arrived_ms": 665.583208,
+        "matching_end_ms": 3620.1171670000003,
+        "matching_start_ms": 667.252833,
+        "stop": "000200404041"
+      },
+      {
+        "arrived_ms": 2290.807667,
+        "matching_end_ms": 3620.701167,
+        "matching_start_ms": 2290.9750830000003,
+        "stop": "000200417038"
+      },
+      {
+        "arrived_ms": 1135.1900829999997,
+        "matching_end_ms": 1136.6869999999997,
+        "matching_start_ms": 1135.4829999999997,
+        "stop": "000200508004"
+      },
+      {
+        "arrived_ms": 3963.369,
+        "matching_end_ms": 3975.4775000000004,
+        "matching_start_ms": 3964.185042,
+        "stop": "000200417050"
+      },
+      {
+        "arrived_ms": 2132.2959170000004,
+        "matching_end_ms": 3976.085292,
+        "matching_start_ms": 2132.8053330000002,
+        "stop": "000200417012"
+      },
+      {
+        "arrived_ms": 1639.9768329999997,
+        "matching_end_ms": 3976.1102920000003,
+        "matching_start_ms": 1640.0873329999997,
+        "stop": "000200508002"
+      },
+      {
+        "arrived_ms": 2928.5760830000004,
+        "matching_end_ms": 3977.067125,
+        "matching_start_ms": 2929.3109170000002,
+        "stop": "000200508016"
+      }
+    ],
+    "realtimeCoverage": {
+      "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7": "live",
+      "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8": "live",
+      "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7": "live",
+      "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26": "live",
+      "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8": "live"
+    },
+    "recommendedOption": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+    "refreshPolicy": "forceRefresh",
+    "requestID": "5F2ED324-AD08-4684-8ABF-634D0BA15D3D",
+    "rounds": [
+      {
+        "alights": 2858,
+        "boarding_checks": 375,
+        "feasible_boardings": 249,
+        "label_attempts": 1829,
+        "merge_ms": 0,
+        "patterns": 47,
+        "prepare_ms": 0,
+        "rejected_before_allocation": 0,
+        "retained": 1829,
+        "scan_ms": 0,
+        "slowest_chunk_ms": 0,
+        "summed_chunk_ms": 0,
+        "trip_instances": 89
+      },
+      {
+        "alights": 369282,
+        "boarding_checks": 127170,
+        "feasible_boardings": 33007,
+        "label_attempts": 196852,
+        "merge_ms": 5,
+        "patterns": 763,
+        "prepare_ms": 1,
+        "rejected_before_allocation": 71268,
+        "retained": 125584,
+        "scan_ms": 12,
+        "slowest_chunk_ms": 7,
+        "summed_chunk_ms": 47,
+        "trip_instances": 1115
+      },
+      {
+        "alights": 3032859,
+        "boarding_checks": 1182710,
+        "feasible_boardings": 282025,
+        "label_attempts": 2600151,
+        "merge_ms": 13,
+        "patterns": 1413,
+        "prepare_ms": 0,
+        "rejected_before_allocation": 2124918,
+        "retained": 475233,
+        "scan_ms": 53,
+        "slowest_chunk_ms": 41,
+        "summed_chunk_ms": 441,
+        "trip_instances": 1739
+      },
+      {
+        "alights": 469311,
+        "boarding_checks": 766904,
+        "feasible_boardings": 227616,
+        "label_attempts": 444258,
+        "merge_ms": 1,
+        "patterns": 276,
+        "prepare_ms": 0,
+        "rejected_before_allocation": 381443,
+        "retained": 62815,
+        "scan_ms": 12,
+        "slowest_chunk_ms": 7,
+        "summed_chunk_ms": 66,
+        "trip_instances": 625
+      }
+    ],
+    "sample": 0,
+    "scenario": "live-now",
+    "spans": [
+      {
+        "duration_ms": 0.321625,
+        "stage": "snapshotPreparation",
+        "start_ms": 30.96775
+      },
+      {
+        "duration_ms": 79.5545,
+        "stage": "endpoints",
+        "start_ms": 32.033792
+      },
+      {
+        "duration_ms": 43.298125,
+        "stage": "realtimeDiscovery",
+        "start_ms": 112.25150000000001
+      },
+      {
+        "duration_ms": 7.603167,
+        "stage": "buildTransferGroups",
+        "start_ms": 483.078083
+      },
+      {
+        "duration_ms": 10.983542,
+        "stage": "buildEnvelope",
+        "start_ms": 490.682375
+      },
+      {
+        "duration_ms": 0.154875,
+        "stage": "buildIntermediateStops",
+        "start_ms": 501.667
+      },
+      {
+        "duration_ms": 104.568625,
+        "stage": "candidateBuilding",
+        "start_ms": 399.975542
+      },
+      {
+        "duration_ms": 1.780833,
+        "stage": "connectionLines",
+        "start_ms": 508.567542
+      },
+      {
+        "duration_ms": 0.103667,
+        "stage": "connectionLines",
+        "start_ms": 510.370875
+      },
+      {
+        "duration_ms": 0.0965,
+        "stage": "connectionLines",
+        "start_ms": 510.485167
+      },
+      {
+        "duration_ms": 3450.781083,
+        "stage": "providerBoardFetch",
+        "start_ms": 155.61425
+      },
+      {
+        "duration_ms": 2974.0096670000003,
+        "stage": "providerStopMatching",
+        "start_ms": 646.6915
+      },
+      {
+        "duration_ms": 7.224709,
+        "stage": "providerSessionMerge",
+        "start_ms": 3620.887708
+      },
+      {
+        "duration_ms": 0.007167,
+        "stage": "sessionRoutingEffect",
+        "start_ms": 3628.113083
+      },
+      {
+        "duration_ms": 3453.630584,
+        "stage": "providerBoardFetch",
+        "start_ms": 510.602333
+      },
+      {
+        "duration_ms": 2841.584125,
+        "stage": "providerStopMatching",
+        "start_ms": 1135.4829999999997
+      },
+      {
+        "duration_ms": 8.04925,
+        "stage": "providerSessionMerge",
+        "start_ms": 3977.751917
+      },
+      {
+        "duration_ms": 0.104166,
+        "stage": "sessionRoutingEffect",
+        "start_ms": 3985.801542
+      },
+      {
+        "duration_ms": 3873.764291,
+        "stage": "realtime",
+        "start_ms": 112.24016700000001
+      },
+      {
+        "duration_ms": 288.0565,
+        "stage": "walkingPreparation",
+        "start_ms": 111.91141700000001
+      },
+      {
+        "duration_ms": 0.00025,
+        "stage": "patchOverlay",
+        "start_ms": 111.9385
+      },
+      {
+        "duration_ms": 0.612625,
+        "stage": "boardingIndex",
+        "start_ms": 113.50104200000001
+      },
+      {
+        "duration_ms": 3.30775,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 116.039792
+      },
+      {
+        "duration_ms": 0.8275,
+        "stage": "walkingTransferRequests",
+        "start_ms": 119.355625
+      },
+      {
+        "duration_ms": 5.9765,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 120.183833
+      },
+      {
+        "duration_ms": 0.30225,
+        "stage": "walkingTransferWork",
+        "start_ms": 126.161792
+      },
+      {
+        "duration_ms": 0.998584,
+        "stage": "walkingTransferApply",
+        "start_ms": 126.464583
+      },
+      {
+        "duration_ms": 0.002125,
+        "stage": "candidateCollection",
+        "start_ms": 127.57729200000001
+      },
+      {
+        "duration_ms": 0.921917,
+        "stage": "boardingIndex",
+        "start_ms": 130.60258299999998
+      },
+      {
+        "duration_ms": 2.119333,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 158.64124999999999
+      },
+      {
+        "duration_ms": 8.638792,
+        "stage": "walkingTransferRequests",
+        "start_ms": 160.76208299999996
+      },
+      {
+        "duration_ms": 30.149625,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 169.40204199999997
+      },
+      {
+        "duration_ms": 7.524,
+        "stage": "walkingTransferWork",
+        "start_ms": 199.55233299999998
+      },
+      {
+        "duration_ms": 13.052042,
+        "stage": "walkingTransferApply",
+        "start_ms": 207.07733299999995
+      },
+      {
+        "duration_ms": 0.655958,
+        "stage": "candidateCollection",
+        "start_ms": 223.04404199999996
+      },
+      {
+        "duration_ms": 9.626209,
+        "stage": "boardingIndex",
+        "start_ms": 229.26283299999997
+      },
+      {
+        "duration_ms": 0.76325,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 313.330083
+      },
+      {
+        "duration_ms": 8.786375,
+        "stage": "walkingTransferRequests",
+        "start_ms": 314.095083
+      },
+      {
+        "duration_ms": 3.11775,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 322.88266699999997
+      },
+      {
+        "duration_ms": 6.827834,
+        "stage": "walkingTransferWork",
+        "start_ms": 326.00095799999997
+      },
+      {
+        "duration_ms": 6.359875,
+        "stage": "walkingTransferApply",
+        "start_ms": 332.829042
+      },
+      {
+        "duration_ms": 0.793917,
+        "stage": "candidateCollection",
+        "start_ms": 341.696458
+      },
+      {
+        "duration_ms": 13.878458,
+        "stage": "boardingIndex",
+        "start_ms": 352.847292
+      },
+      {
+        "duration_ms": 0.37375,
+        "stage": "walkingTransferRequests",
+        "start_ms": 382.654292
+      },
+      {
+        "duration_ms": 0.754417,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 383.028333
+      },
+      {
+        "duration_ms": 0.441417,
+        "stage": "walkingTransferWork",
+        "start_ms": 383.782875
+      },
+      {
+        "duration_ms": 2.433333,
+        "stage": "walkingTransferApply",
+        "start_ms": 384.224375
+      },
+      {
+        "duration_ms": 0.950542,
+        "stage": "candidateCollection",
+        "start_ms": 386.776333
+      },
+      {
+        "duration_ms": 219.931458,
+        "stage": "raptor",
+        "start_ms": 3986.0195000000003
+      },
+      {
+        "duration_ms": 1.3765,
+        "stage": "patchOverlay",
+        "start_ms": 3986.026083
+      },
+      {
+        "duration_ms": 0.016583,
+        "stage": "boardingIndex",
+        "start_ms": 3988.1628750000004
+      },
+      {
+        "duration_ms": 2.846917,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 3989.2215
+      },
+      {
+        "duration_ms": 0.376875,
+        "stage": "walkingTransferRequests",
+        "start_ms": 3992.069542
+      },
+      {
+        "duration_ms": 0.859167,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 3992.4465000000005
+      },
+      {
+        "duration_ms": 0.224209,
+        "stage": "walkingTransferWork",
+        "start_ms": 3993.306083
+      },
+      {
+        "duration_ms": 0.545917,
+        "stage": "walkingTransferApply",
+        "start_ms": 3993.5305000000003
+      },
+      {
+        "duration_ms": 0.000625,
+        "stage": "candidateCollection",
+        "start_ms": 3994.155792
+      },
+      {
+        "duration_ms": 0.4545,
+        "stage": "boardingIndex",
+        "start_ms": 3996.250042
+      },
+      {
+        "duration_ms": 2.694542,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 4015.267625
+      },
+      {
+        "duration_ms": 6.449209,
+        "stage": "walkingTransferRequests",
+        "start_ms": 4017.963333
+      },
+      {
+        "duration_ms": 2.846834,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 4024.413333
+      },
+      {
+        "duration_ms": 5.867916,
+        "stage": "walkingTransferWork",
+        "start_ms": 4027.260417
+      },
+      {
+        "duration_ms": 9.837833,
+        "stage": "walkingTransferApply",
+        "start_ms": 4033.1285420000004
+      },
+      {
+        "duration_ms": 0.575584,
+        "stage": "candidateCollection",
+        "start_ms": 4045.1490830000002
+      },
+      {
+        "duration_ms": 8.012,
+        "stage": "boardingIndex",
+        "start_ms": 4050.2839580000004
+      },
+      {
+        "duration_ms": 1.353958,
+        "stage": "walkingBoardingDeadlines",
+        "start_ms": 4125.50575
+      },
+      {
+        "duration_ms": 8.227417,
+        "stage": "walkingTransferRequests",
+        "start_ms": 4126.862
+      },
+      {
+        "duration_ms": 2.101375,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 4135.090125
+      },
+      {
+        "duration_ms": 6.015166,
+        "stage": "walkingTransferWork",
+        "start_ms": 4137.192417
+      },
+      {
+        "duration_ms": 6.026959,
+        "stage": "walkingTransferApply",
+        "start_ms": 4143.208208
+      },
+      {
+        "duration_ms": 0.794417,
+        "stage": "candidateCollection",
+        "start_ms": 4151.332375
+      },
+      {
+        "duration_ms": 13.461541,
+        "stage": "boardingIndex",
+        "start_ms": 4161.411042
+      },
+      {
+        "duration_ms": 0.47625,
+        "stage": "walkingTransferRequests",
+        "start_ms": 4189.01825
+      },
+      {
+        "duration_ms": 0.63875,
+        "stage": "walkingTransferRoutes",
+        "start_ms": 4189.495292
+      },
+      {
+        "duration_ms": 0.356625,
+        "stage": "walkingTransferWork",
+        "start_ms": 4190.13425
+      },
+      {
+        "duration_ms": 2.602916,
+        "stage": "walkingTransferApply",
+        "start_ms": 4190.490917
+      },
+      {
+        "duration_ms": 0.954833,
+        "stage": "candidateCollection",
+        "start_ms": 4193.210375
+      },
+      {
+        "duration_ms": 6.620625,
+        "stage": "buildTransferGroups",
+        "start_ms": 4290.114125
+      },
+      {
+        "duration_ms": 10.0425,
+        "stage": "buildEnvelope",
+        "start_ms": 4296.735125
+      },
+      {
+        "duration_ms": 0.167916,
+        "stage": "buildIntermediateStops",
+        "start_ms": 4306.778292
+      },
+      {
+        "duration_ms": 103.354333,
+        "stage": "candidateBuilding",
+        "start_ms": 4205.964
+      },
+      {
+        "duration_ms": 4.272209,
+        "stage": "realtime",
+        "start_ms": 4309.318583
+      },
+      {
+        "duration_ms": 0.000667,
+        "stage": "directWalkingWait",
+        "start_ms": 4314.846208
+      },
+      {
+        "duration_ms": 0.864459,
+        "stage": "geometry",
+        "start_ms": 4326.860208
+      },
+      {
+        "duration_ms": 0.094291,
+        "stage": "validation",
+        "start_ms": 4327.750792
+      },
+      {
+        "duration_ms": 0.057958,
+        "stage": "ranking",
+        "start_ms": 4327.845292
+      },
+      {
+        "duration_ms": 0.199125,
+        "stage": "resultAssembly",
+        "start_ms": 4327.724958
+      },
+      {
+        "duration_ms": 78.93625,
+        "stage": "bikeCalculation",
+        "start_ms": 32.009417
+      },
+      {
+        "duration_ms": 20.130667,
+        "stage": "snapshotPreparation",
+        "start_ms": 0.4952500000000014
+      },
+      {
+        "duration_ms": 0.196084,
+        "stage": "adapterMapping",
+        "start_ms": 4327.951958
+      },
+      {
+        "duration_ms": 0.429792,
+        "stage": "timetableReadiness",
+        "start_ms": 0.05225
+      },
+      {
+        "duration_ms": 30.461375,
+        "stage": "graphPreparation",
+        "start_ms": 0.48208300000000004
+      },
+      {
+        "duration_ms": 1.819083,
+        "stage": "publication",
+        "start_ms": 4328.096542
+      },
+      {
+        "duration_ms": 2.042708,
+        "stage": "refinement",
+        "start_ms": 4368.044292
+      },
+      {
+        "duration_ms": 3.732875,
+        "stage": "refinement",
+        "start_ms": 4376.745417
+      },
+      {
+        "duration_ms": 3.739042,
+        "stage": "refinement",
+        "start_ms": 4376.751375
+      },
+      {
+        "duration_ms": 0.142166,
+        "stage": "refinement",
+        "start_ms": 4380.495917
+      },
+      {
+        "duration_ms": 0.141959,
+        "stage": "refinement",
+        "start_ms": 4380.499583
+      },
+      {
+        "duration_ms": 2.98425,
+        "stage": "refinement",
+        "start_ms": 4380.642917
+      },
+      {
+        "duration_ms": 2.993375,
+        "stage": "refinement",
+        "start_ms": 4380.644333
+      },
+      {
+        "duration_ms": 1.920334,
+        "stage": "refinement",
+        "start_ms": 4383.647083
+      },
+      {
+        "duration_ms": 1.93225,
+        "stage": "refinement",
+        "start_ms": 4383.642625
+      },
+      {
+        "duration_ms": 1.300917,
+        "stage": "refinement",
+        "start_ms": 4385.578375
+      },
+      {
+        "duration_ms": 1.30375,
+        "stage": "refinement",
+        "start_ms": 4385.582917
+      },
+      {
+        "duration_ms": 0.899083,
+        "stage": "refinement",
+        "start_ms": 4386.8907500000005
+      },
+      {
+        "duration_ms": 0.899167,
+        "stage": "refinement",
+        "start_ms": 4386.896958
+      },
+      {
+        "duration_ms": 19.765791,
+        "stage": "refinement",
+        "start_ms": 4368.040042
+      },
+      {
+        "duration_ms": 0.3945,
+        "stage": "refinement",
+        "start_ms": 4387.799792
+      },
+      {
+        "duration_ms": 0.394166,
+        "stage": "refinement",
+        "start_ms": 4387.804417
+      },
+      {
+        "duration_ms": 64.322292,
+        "stage": "firstRender",
+        "start_ms": 4329.912708
+      }
+    ],
+    "spanSemantics": "operation-relative elapsed intervals; http and decode are cumulative concurrent work",
+    "stages_ms": {
+      "adapterMapping": 0.196084,
+      "bikeCalculation": 78.93625,
+      "boardFetch": 6903,
+      "boardingIndex": 46.983833000000004,
+      "boardMatching": 160,
+      "buildAssembly": 112.63365200000001,
+      "buildDeduplication": 2.590597,
+      "buildEnvelope": 21.026042,
+      "buildIntermediateStops": 0.32279100000000005,
+      "buildNormalisation": 5.921557,
+      "buildPublicationValidation": 30.02404,
+      "buildStructuralValidation": 8.078326,
+      "buildTransferGroups": 14.223792,
+      "buildTransferRules": 6.0429569999999995,
+      "candidateBuilding": 207.922958,
+      "candidateCollection": 4.728001,
+      "connectionLines": 1.981,
+      "decode": 199,
+      "directWalkingWait": 0.000667,
+      "endpoints": 79.5545,
+      "firstRender": 64.322292,
+      "geometry": 0.864459,
+      "graphPreparation": 30.461375,
+      "http": 54190,
+      "patchOverlay": 1.3767500000000001,
+      "providerBoardFetch": 6904.411667,
+      "providerBoardPreparation": 17.642375999999995,
+      "providerSessionMerge": 15.273959000000001,
+      "providerStopMatching": 5815.593792,
+      "publication": 1.819083,
+      "ranking": 0.057958,
+      "raptor": 219.931458,
+      "realtime": 3878.0365,
+      "realtimeDiscovery": 43.298125,
+      "refinement": 44.586333,
+      "resultAssembly": 0.199125,
+      "schedulePreparation": 10,
+      "sessionRoutingEffect": 0.11133299999999999,
+      "snapshotPreparation": 20.625083999999998,
+      "timetableReadiness": 0.429792,
+      "validation": 0.094291,
+      "walkingBoardingDeadlines": 13.08575,
+      "walkingPreparation": 288.0565,
+      "walkingTransferApply": 41.857459,
+      "walkingTransferRequests": 34.156168,
+      "walkingTransferRoutes": 46.444418,
+      "walkingTransfers": 57,
+      "walkingTransferWork": 27.559417000000003
+    },
+    "supplementalOptions": [
+      "veloh-49.6541071,6.2296443-49.6301,6.1682-116-63"
+    ],
+    "thermalStateAtEnd": "nominal",
+    "thermalStateAtStart": "nominal",
+    "total_ms": 4394.239,
+    "transport": [],
+    "unfilteredJourneys": [
+      {
+        "arrival": 1792517893.33875,
+        "departure": 1792516341.6287498,
+        "id": "g1:654>1962:24262724@20261020:16-19|24424793@20261020:20-26",
+        "lines": [
+          "322",
+          "25"
+        ]
+      },
+      {
+        "arrival": 1792518000,
+        "departure": 1792516341.6287498,
+        "id": "g1:654>1962:24262724@20261020:16-19|24261397@20261020:13-14|24361320@20261020:1-6",
+        "lines": [
+          "322",
+          "201",
+          "18"
+        ]
+      },
+      {
+        "arrival": 1792518240,
+        "departure": 1792516485.2875,
+        "id": "g1:612>1962:24291372@20261020:31-34|24360395@20261020:2-7",
+        "lines": [
+          "850",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1792518240,
+        "departure": 1792516720.1375,
+        "id": "g1:127>1962:24365725@20261020:0-2|24360395@20261020:2-7",
+        "lines": [
+          "29",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1792518900,
+        "departure": 1792517325.2875,
+        "id": "g1:612>1962:24263718@20261020:13-16|24368670@20261020:2-8",
+        "lines": [
+          "223",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1792518900,
+        "departure": 1792517541.6287498,
+        "id": "g1:654>1962:24264857@20261020:27-30|24368670@20261020:3-8",
+        "lines": [
+          "326",
+          "6"
+        ]
+      }
+    ],
+    "warmUpPasses": [
+      {
+        "candidates": 3600,
+        "duration_ms": 288.0565,
+        "horizon_s": 7200,
+        "round_metrics": [
+          {
+            "alights": 2967,
+            "boarding_checks": 377,
+            "feasible_boardings": 250,
+            "label_attempts": 1875,
+            "merge_ms": 0,
+            "patterns": 47,
+            "prepare_ms": 0,
+            "rejected_before_allocation": 0,
+            "retained": 1875,
+            "scan_ms": 1,
+            "slowest_chunk_ms": 0,
+            "summed_chunk_ms": 0,
+            "trip_instances": 89
+          },
+          {
+            "alights": 382750,
+            "boarding_checks": 128726,
+            "feasible_boardings": 33573,
+            "label_attempts": 203447,
+            "merge_ms": 10,
+            "patterns": 763,
+            "prepare_ms": 2,
+            "rejected_before_allocation": 75357,
+            "retained": 128090,
+            "scan_ms": 16,
+            "slowest_chunk_ms": 7,
+            "summed_chunk_ms": 76,
+            "trip_instances": 1115
+          },
+          {
+            "alights": 3116626,
+            "boarding_checks": 1191926,
+            "feasible_boardings": 287429,
+            "label_attempts": 2663728,
+            "merge_ms": 12,
+            "patterns": 1413,
+            "prepare_ms": 1,
+            "rejected_before_allocation": 2183426,
+            "retained": 480302,
+            "scan_ms": 61,
+            "slowest_chunk_ms": 58,
+            "summed_chunk_ms": 488,
+            "trip_instances": 1739
+          },
+          {
+            "alights": 472724,
+            "boarding_checks": 768989,
+            "feasible_boardings": 229718,
+            "label_attempts": 450583,
+            "merge_ms": 1,
+            "patterns": 276,
+            "prepare_ms": 0,
+            "rejected_before_allocation": 385344,
+            "retained": 65239,
+            "scan_ms": 14,
+            "slowest_chunk_ms": 9,
+            "summed_chunk_ms": 76,
+            "trip_instances": 625
+          }
+        ],
+        "rounds": 4,
+        "start_ms": 111.91141700000001,
+        "walking_ms": 102,
+        "wave": 0
+      }
+    ],
+    "process": "cold"
+  }
+]

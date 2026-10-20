@@ -1,0 +1,366 @@
+{
+ "live-now": {
+  "liveCand28": {
+   "total_ms": 3131,
+   "passes": 1,
+   "networkRequests": 27,
+   "boardCacheHits": 5,
+   "responseBytes": 15683882,
+   "boardsCovered": 26,
+   "journeys": 5,
+   "liveLegs": 9,
+   "legs": 10
+  },
+  "replayCand28": {
+   "total_ms": 3112,
+   "passes": 1,
+   "networkRequests": 27,
+   "boardCacheHits": 5,
+   "responseBytes": 15683882,
+   "boardsCovered": 26,
+   "journeys": 5,
+   "liveLegs": 9,
+   "legs": 10
+  },
+  "replayBase": {
+   "total_ms": 4743,
+   "passes": 2,
+   "networkRequests": 28,
+   "boardCacheHits": 5,
+   "responseBytes": 13463582,
+   "boardsCovered": 26,
+   "journeys": 5,
+   "liveLegs": 9,
+   "legs": 10
+  },
+  "journeysIdenticalBaseVsCand28": true,
+  "recommendationIdentical": true,
+  "baseQueriesNotCoveredByCand28": 0,
+  "boardsOnlyBase": [
+   {
+    "stop": "000200508016",
+    "time": "19:00:00",
+    "minutes": 120,
+    "lines": [
+     "6"
+    ]
+   },
+   {
+    "stop": "000200417050",
+    "time": "19:00:00",
+    "minutes": 120,
+    "lines": [
+     "25",
+     "6"
+    ]
+   },
+   {
+    "stop": "000200508016",
+    "time": "19:00:00",
+    "minutes": 120,
+    "lines": [
+     "16"
+    ]
+   }
+  ],
+  "boardsOnlyCand28": [
+   {
+    "stop": "000200508016",
+    "time": "19:00:00",
+    "minutes": 120,
+    "lines": [
+     "16",
+     "223",
+     "29",
+     "361",
+     "6",
+     "850"
+    ],
+    "rows": 51,
+    "decodedBytes": 920650,
+    "waitMs": 1250,
+    "transferMs": 47,
+    "gzipBytes": 42547
+   },
+   {
+    "stop": "000200417050",
+    "time": "19:00:00",
+    "minutes": 120,
+    "lines": [
+     "201",
+     "21",
+     "211",
+     "212",
+     "222",
+     "25",
+     "301",
+     "303",
+     "304",
+     "305",
+     "309",
+     "311",
+     "321",
+     "322",
+     "323",
+     "324",
+     "325",
+     "326",
+     "327",
+     "401",
+     "403",
+     "405",
+     "406",
+     "407",
+     "455",
+     "456",
+     "501",
+     "502",
+     "507",
+     "6",
+     "7",
+     "811",
+     "812"
+    ],
+    "rows": 110,
+    "decodedBytes": 2182115,
+    "waitMs": 1187,
+    "transferMs": 46,
+    "gzipBytes": 120784
+   }
+  ],
+  "canaryBuildMs": {
+   "live": 2274,
+   "replayCand28": 2075,
+   "replayBase": 2050
+  },
+  "allBoards": {
+   "count": 27,
+   "medianWaitPlusTransferMs": 905,
+   "maxWaitPlusTransferMs": 1536
+  },
+  "replayBaseNarrowBoardLatency": {
+   "narrowBoardsAnsweredAfterMs": {
+    "500": 3416,
+    "800": 3717
+   },
+   "passes": 2,
+   "networkRequests": 28,
+   "note": "Base replay with every narrowed board answered after the stated time instead of the wide board's recorded wait"
+  }
+ },
+ "live-reverse": {
+  "liveCand28": {
+   "total_ms": 3101,
+   "passes": 1,
+   "networkRequests": 29,
+   "boardCacheHits": 9,
+   "responseBytes": 18057758,
+   "boardsCovered": 25,
+   "journeys": 5,
+   "liveLegs": 8,
+   "legs": 12
+  },
+  "replayCand28": {
+   "total_ms": 3142,
+   "passes": 1,
+   "networkRequests": 29,
+   "boardCacheHits": 9,
+   "responseBytes": 18057758,
+   "boardsCovered": 25,
+   "journeys": 6,
+   "liveLegs": 9,
+   "legs": 14
+  },
+  "replayBase": {
+   "total_ms": 3170,
+   "passes": 1,
+   "networkRequests": 29,
+   "boardCacheHits": 9,
+   "responseBytes": 14735982,
+   "boardsCovered": 25,
+   "journeys": 6,
+   "liveLegs": 9,
+   "legs": 14
+  },
+  "journeysIdenticalBaseVsCand28": true,
+  "recommendationIdentical": true,
+  "baseQueriesNotCoveredByCand28": 0,
+  "boardsOnlyBase": [
+   {
+    "stop": "000200417050",
+    "time": "18:30:00",
+    "minutes": 150,
+    "lines": [
+     "322",
+     "326"
+    ]
+   },
+   {
+    "stop": "000200508016",
+    "time": "20:30:00",
+    "minutes": 30,
+    "lines": [
+     "223"
+    ]
+   },
+   {
+    "stop": "000200417039",
+    "time": "20:30:00",
+    "minutes": 30,
+    "lines": [
+     "303"
+    ]
+   }
+  ],
+  "boardsOnlyCand28": [
+   {
+    "stop": "000200417050",
+    "time": "18:30:00",
+    "minutes": 150,
+    "lines": [
+     "201",
+     "21",
+     "211",
+     "212",
+     "222",
+     "25",
+     "301",
+     "303",
+     "304",
+     "305",
+     "309",
+     "311",
+     "321",
+     "322",
+     "323",
+     "324",
+     "325",
+     "326",
+     "327",
+     "401",
+     "403",
+     "405",
+     "406",
+     "407",
+     "455",
+     "456",
+     "501",
+     "502",
+     "507",
+     "6",
+     "7",
+     "811",
+     "812"
+    ],
+    "rows": 155,
+    "decodedBytes": 3140492,
+    "waitMs": 1654,
+    "transferMs": 93,
+    "gzipBytes": 158910
+   },
+   {
+    "stop": "000200508016",
+    "time": "20:30:00",
+    "minutes": 30,
+    "lines": [
+     "16",
+     "223",
+     "29",
+     "361",
+     "6",
+     "850"
+    ],
+    "rows": 12,
+    "decodedBytes": 198858,
+    "waitMs": 589,
+    "transferMs": 12,
+    "gzipBytes": 17098
+   },
+   {
+    "stop": "000200417039",
+    "time": "20:30:00",
+    "minutes": 30,
+    "lines": [
+     "16",
+     "18",
+     "30",
+     "301",
+     "303",
+     "304",
+     "305",
+     "401",
+     "403",
+     "405",
+     "406",
+     "407",
+     "6"
+    ],
+    "rows": 13,
+    "decodedBytes": 218093,
+    "waitMs": 303,
+    "transferMs": 8,
+    "gzipBytes": 17886
+   }
+  ],
+  "canaryBuildMs": {
+   "live": 2075,
+   "replayCand28": 2119,
+   "replayBase": 2475
+  },
+  "allBoards": {
+   "count": 29,
+   "medianWaitPlusTransferMs": 784,
+   "maxWaitPlusTransferMs": 1747
+  }
+ },
+ "live-esch": {
+  "liveCand28": {
+   "total_ms": 2187,
+   "passes": 1,
+   "networkRequests": 25,
+   "boardCacheHits": 3,
+   "responseBytes": 10417963,
+   "boardsCovered": 24,
+   "journeys": 6,
+   "liveLegs": 3,
+   "legs": 6
+  },
+  "replayCand28": {
+   "total_ms": 2265,
+   "passes": 1,
+   "networkRequests": 25,
+   "boardCacheHits": 3,
+   "responseBytes": 10417963,
+   "boardsCovered": 24,
+   "journeys": 6,
+   "liveLegs": 3,
+   "legs": 6
+  },
+  "replayBase": {
+   "total_ms": 2354,
+   "passes": 1,
+   "networkRequests": 25,
+   "boardCacheHits": 3,
+   "responseBytes": 10417963,
+   "boardsCovered": 24,
+   "journeys": 6,
+   "liveLegs": 3,
+   "legs": 6
+  },
+  "journeysIdenticalBaseVsCand28": true,
+  "recommendationIdentical": true,
+  "baseQueriesNotCoveredByCand28": 0,
+  "boardsOnlyBase": [],
+  "boardsOnlyCand28": [],
+  "canaryBuildMs": {
+   "live": 1983,
+   "replayCand28": 1943,
+   "replayBase": 2032
+  },
+  "allBoards": {
+   "count": 25,
+   "medianWaitPlusTransferMs": 518,
+   "maxWaitPlusTransferMs": 1253
+  }
+ }
+}

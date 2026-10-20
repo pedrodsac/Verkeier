@@ -1,0 +1,3558 @@
+[
+  {
+    "avoidTightTransfers": false,
+    "bikeInput": "live",
+    "canLoadEarlier": true,
+    "canLoadLater": true,
+    "composition": "production",
+    "counters": {
+      "boardCacheHits": 4,
+      "boardsCovered": 26,
+      "candidates": 3600,
+      "delayedPastBoardings": 26,
+      "duplicatesSuppressed": 857,
+      "incompleteBoards": 0,
+      "invalidJourneys": 12,
+      "networkRequests": 27,
+      "pageNewJourneys": 6,
+      "predictedEvents": 4089,
+      "recommendationSwitches": 0,
+      "responseBytes": 17866653,
+      "retainedAlternatives": 26,
+      "sharedFirstVehicleGroups": 1,
+      "walkingCacheHits": 22337,
+      "walkingRequests": 27845,
+      "workers": 10
+    },
+    "displayedLegs": [
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792080600,
+        "effectiveDeparture": 1792080300,
+        "line": "850",
+        "option": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+        "scheduledDeparture": 1792079516,
+        "status": "delayed",
+        "stop": "000200508002",
+        "trip": "24291375"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792081440,
+        "effectiveDeparture": 1792080720,
+        "line": "6",
+        "option": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+        "scheduledDeparture": 1792080760,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24368575"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792080840,
+        "effectiveDeparture": 1792080660,
+        "line": "29",
+        "option": "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+        "scheduledDeparture": 1792080690,
+        "status": "live",
+        "stop": "000200508003",
+        "trip": "24365635"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792081860,
+        "effectiveDeparture": 1792081140,
+        "line": "16",
+        "option": "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+        "scheduledDeparture": 1792081140,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24360473"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792081740,
+        "effectiveDeparture": 1792081080,
+        "line": "321",
+        "option": "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+        "scheduledDeparture": 1792081135,
+        "status": "live",
+        "stop": "000200508002",
+        "trip": "24261848"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792082400,
+        "effectiveDeparture": 1792081980,
+        "line": "6",
+        "option": "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+        "scheduledDeparture": 1792081960,
+        "status": "delayed",
+        "stop": "000200417050",
+        "trip": "24368581"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1792081805,
+        "effectiveDeparture": 1792081210,
+        "line": "322",
+        "option": "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+        "scheduledDeparture": 1792081210,
+        "status": "scheduled",
+        "stop": "000200508004",
+        "trip": "24262705"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792082400,
+        "effectiveDeparture": 1792081980,
+        "line": "6",
+        "option": "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+        "scheduledDeparture": 1792081960,
+        "status": "delayed",
+        "stop": "000200417050",
+        "trip": "24368581"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1792081805,
+        "effectiveDeparture": 1792081210,
+        "line": "322",
+        "option": "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8",
+        "scheduledDeparture": 1792081210,
+        "status": "scheduled",
+        "stop": "000200508004",
+        "trip": "24262705"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792082940,
+        "effectiveDeparture": 1792082460,
+        "line": "21",
+        "option": "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8",
+        "scheduledDeparture": 1792082500,
+        "status": "live",
+        "stop": "000200417050",
+        "trip": "24423069"
+      }
+    ],
+    "fullMap": false,
+    "includedModes": [
+      "bicycle",
+      "bus",
+      "funicular",
+      "train",
+      "tram"
+    ],
+    "journeys": [
+      {
+        "arrival": 1792081440,
+        "departure": 1792079745.2875,
+        "id": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+        "legs": [
+          {
+            "arrival": 1792080300,
+            "departure": 1792079745.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792080600,
+            "departure": 1792080300,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "850",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081440,
+            "departure": 1792080720,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": "Tight transfer"
+          }
+        ]
+      },
+      {
+        "arrival": 1792081860,
+        "departure": 1792080040.1375,
+        "id": "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+        "legs": [
+          {
+            "arrival": 1792080660,
+            "departure": 1792080040.1375,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Charlys Statioun",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792080840,
+            "departure": 1792080660,
+            "from": "Senningerberg, Charlys Statioun",
+            "fromStop": "000200508003",
+            "line": "29",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081860,
+            "departure": 1792081140,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792082400,
+        "departure": 1792080525.2875,
+        "id": "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+        "legs": [
+          {
+            "arrival": 1792081080,
+            "departure": 1792080525.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081740,
+            "departure": 1792081080,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "321",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792082400,
+            "departure": 1792081980,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792082400,
+        "departure": 1792080871.6287498,
+        "id": "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+        "legs": [
+          {
+            "arrival": 1792081210,
+            "departure": 1792080871.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081805,
+            "departure": 1792081210,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "322",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792082400,
+            "departure": 1792081980,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": "Tight transfer"
+          }
+        ]
+      },
+      {
+        "arrival": 1792083013.33875,
+        "departure": 1792080871.6287498,
+        "id": "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8",
+        "legs": [
+          {
+            "arrival": 1792081210,
+            "departure": 1792080871.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081805,
+            "departure": 1792081210,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "322",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792082940,
+            "departure": 1792082460,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "21",
+            "to": "Kirchberg, prov. Konrad Adenauer",
+            "toStop": "000900000058",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792083013.33875,
+            "departure": 1792082940,
+            "from": "Kirchberg, prov. Konrad Adenauer",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "",
+            "transferWarning": ""
+          }
+        ]
+      }
+    ],
+    "liveConcurrency": 32,
+    "matchingRejections": {
+      "outsideInterval": 24
+    },
+    "options": [
+      "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+      "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+      "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+      "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+      "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8"
+    ],
+    "passes": [
+      {
+        "candidates": 3600,
+        "duration_ms": 1699.534166,
+        "horizon_s": 7200,
+        "rounds": 4,
+        "start_ms": 5297.588542,
+        "wave": 0
+      },
+      {
+        "candidates": 3600,
+        "duration_ms": 1267.372959,
+        "horizon_s": 7200,
+        "rounds": 4,
+        "start_ms": 7713.689458,
+        "wave": 1
+      }
+    ],
+    "peak_memory_bytes": 806060032,
+    "planningTime": 1792079465.5914931,
+    "realtimeCoverage": {
+      "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7": "live",
+      "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8": "live",
+      "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8": "live",
+      "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8": "partial",
+      "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8": "partial"
+    },
+    "recommendedOption": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+    "refreshPolicy": "forceRefresh",
+    "requestID": "ED0B929C-FF6A-43E8-A4CE-FFBCFFFD727E",
+    "rounds": [
+      {
+        "alights": 4296,
+        "merge_ms": 3,
+        "prepare_ms": 1,
+        "retained": 2731,
+        "scan_ms": 1
+      },
+      {
+        "alights": 818155,
+        "merge_ms": 170,
+        "prepare_ms": 7,
+        "retained": 217411,
+        "scan_ms": 97
+      },
+      {
+        "alights": 5378942,
+        "merge_ms": 246,
+        "prepare_ms": 2,
+        "retained": 634515,
+        "scan_ms": 395
+      },
+      {
+        "alights": 668868,
+        "merge_ms": 14,
+        "prepare_ms": 0,
+        "retained": 70892,
+        "scan_ms": 47
+      },
+      {
+        "alights": 4296,
+        "merge_ms": 2,
+        "prepare_ms": 0,
+        "retained": 2731,
+        "scan_ms": 1
+      },
+      {
+        "alights": 818155,
+        "merge_ms": 115,
+        "prepare_ms": 7,
+        "retained": 217411,
+        "scan_ms": 61
+      },
+      {
+        "alights": 5378942,
+        "merge_ms": 208,
+        "prepare_ms": 2,
+        "retained": 634515,
+        "scan_ms": 305
+      },
+      {
+        "alights": 668868,
+        "merge_ms": 10,
+        "prepare_ms": 0,
+        "retained": 70885,
+        "scan_ms": 63
+      }
+    ],
+    "sample": 0,
+    "scenario": "live-now",
+    "spans": [
+      {
+        "duration_ms": 0.698459,
+        "stage": "snapshotPreparation",
+        "start_ms": 925.828833
+      },
+      {
+        "duration_ms": 282.195042,
+        "stage": "endpoints",
+        "start_ms": 933.669208
+      },
+      {
+        "duration_ms": 206.650375,
+        "stage": "realtimeDiscovery",
+        "start_ms": 1228.102667
+      },
+      {
+        "duration_ms": 363.078125,
+        "stage": "candidateBuilding",
+        "start_ms": 2898.867917
+      },
+      {
+        "duration_ms": 4069.503709,
+        "stage": "realtime",
+        "start_ms": 1228.056708
+      },
+      {
+        "duration_ms": 1679.0024170000002,
+        "stage": "walkingPreparation",
+        "start_ms": 1219.83375
+      },
+      {
+        "duration_ms": 1699.527708,
+        "stage": "raptor",
+        "start_ms": 5297.588542
+      },
+      {
+        "duration_ms": 364.315542,
+        "stage": "candidateBuilding",
+        "start_ms": 6997.168583000001
+      },
+      {
+        "duration_ms": 352.19675,
+        "stage": "realtime",
+        "start_ms": 7361.490625
+      },
+      {
+        "duration_ms": 1267.364167,
+        "stage": "raptor",
+        "start_ms": 7713.689458
+      },
+      {
+        "duration_ms": 360.622,
+        "stage": "candidateBuilding",
+        "start_ms": 8981.0665
+      },
+      {
+        "duration_ms": 11.005083,
+        "stage": "realtime",
+        "start_ms": 9341.69575
+      },
+      {
+        "duration_ms": 0.001917,
+        "stage": "directWalkingWait",
+        "start_ms": 9356.028125
+      },
+      {
+        "duration_ms": 3.53575,
+        "stage": "geometry",
+        "start_ms": 9392.270958000001
+      },
+      {
+        "duration_ms": 0.272166,
+        "stage": "validation",
+        "start_ms": 9398.738167000001
+      },
+      {
+        "duration_ms": 0.164708,
+        "stage": "ranking",
+        "start_ms": 9399.012417
+      },
+      {
+        "duration_ms": 3.426416,
+        "stage": "resultAssembly",
+        "start_ms": 9395.809292
+      },
+      {
+        "duration_ms": 1602.829541,
+        "stage": "bikeCalculation",
+        "start_ms": 932.9172920000001
+      },
+      {
+        "duration_ms": 916.054208,
+        "stage": "snapshotPreparation",
+        "start_ms": 5.42941700000002
+      },
+      {
+        "duration_ms": 0.519917,
+        "stage": "adapterMapping",
+        "start_ms": 9399.322125
+      },
+      {
+        "duration_ms": 5.099958,
+        "stage": "timetableReadiness",
+        "start_ms": 0.2965
+      },
+      {
+        "duration_ms": 639.761584,
+        "stage": "graphPreparation",
+        "start_ms": 5.396833
+      },
+      {
+        "duration_ms": 9.409292,
+        "stage": "publication",
+        "start_ms": 9399.546958
+      },
+      {
+        "duration_ms": 473.41575,
+        "stage": "refinement",
+        "start_ms": 9409.012042
+      },
+      {
+        "duration_ms": 51.674584,
+        "stage": "refinement",
+        "start_ms": 9963.001333
+      },
+      {
+        "duration_ms": 51.681375,
+        "stage": "refinement",
+        "start_ms": 9963.020875
+      },
+      {
+        "duration_ms": 6.248792,
+        "stage": "refinement",
+        "start_ms": 10014.714
+      },
+      {
+        "duration_ms": 6.256167,
+        "stage": "refinement",
+        "start_ms": 10014.723458
+      },
+      {
+        "duration_ms": 649.248125,
+        "stage": "firstRender",
+        "start_ms": 9408.951208
+      },
+      {
+        "duration_ms": 129.753125,
+        "stage": "refinement",
+        "start_ms": 10020.987958
+      },
+      {
+        "duration_ms": 129.767208,
+        "stage": "refinement",
+        "start_ms": 10020.994417
+      },
+      {
+        "duration_ms": 7.108583,
+        "stage": "refinement",
+        "start_ms": 10150.769125
+      },
+      {
+        "duration_ms": 7.133084,
+        "stage": "refinement",
+        "start_ms": 10150.776708
+      },
+      {
+        "duration_ms": 57.7965,
+        "stage": "refinement",
+        "start_ms": 10157.917958
+      },
+      {
+        "duration_ms": 57.807959,
+        "stage": "refinement",
+        "start_ms": 10157.944583
+      },
+      {
+        "duration_ms": 9.119834,
+        "stage": "refinement",
+        "start_ms": 10215.780458
+      },
+      {
+        "duration_ms": 9.145958,
+        "stage": "refinement",
+        "start_ms": 10215.80125
+      },
+      {
+        "duration_ms": 815.983833,
+        "stage": "refinement",
+        "start_ms": 9409.004792
+      },
+      {
+        "duration_ms": 56.363,
+        "stage": "refinement",
+        "start_ms": 10224.968625
+      },
+      {
+        "duration_ms": 56.380208,
+        "stage": "refinement",
+        "start_ms": 10224.9815
+      }
+    ],
+    "spanSemantics": "operation-relative elapsed intervals; http and decode are cumulative concurrent work",
+    "stages_ms": {
+      "adapterMapping": 0.519917,
+      "bikeCalculation": 1602.829541,
+      "boardFetch": 4933,
+      "boardMatching": 623,
+      "candidateBuilding": 1088.0156670000001,
+      "decode": 629,
+      "directWalkingWait": 0.001917,
+      "endpoints": 282.195042,
+      "firstRender": 649.248125,
+      "geometry": 3.53575,
+      "graphPreparation": 639.761584,
+      "http": 49297,
+      "publication": 9.409292,
+      "ranking": 0.164708,
+      "raptor": 2966.8918750000003,
+      "realtime": 4432.705542,
+      "realtimeDiscovery": 206.650375,
+      "refinement": 1925.6359599999998,
+      "resultAssembly": 3.426416,
+      "schedulePreparation": 103,
+      "snapshotPreparation": 918.476042,
+      "timetableReadiness": 5.099958,
+      "validation": 0.272166,
+      "walkingPreparation": 1679.0024170000002,
+      "walkingTransfers": 652
+    },
+    "supplementalOptions": [
+      "veloh-49.6541071,6.2296443-49.6301,6.1682-116-63"
+    ],
+    "total_ms": 10058.209667,
+    "transport": [
+      {
+        "metrics": {
+          "totalMilliseconds": 461.9929790496826,
+          "transactions": [
+            {
+              "encodedResponseBytes": 11196,
+              "protocolName": "h2",
+              "queueMilliseconds": 0.8080005645751953,
+              "responseWaitMilliseconds": 332.18300342559814,
+              "reusedConnection": true,
+              "transferMilliseconds": 79.4210433959961
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508016&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=16&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772268.892239,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 778.9520025253296,
+          "transactions": [
+            {
+              "encodedResponseBytes": 20943,
+              "protocolName": "h2",
+              "queueMilliseconds": 0.6879568099975586,
+              "responseWaitMilliseconds": 630.0280094146729,
+              "reusedConnection": true,
+              "transferMilliseconds": 121.84500694274902
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417050&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=21,6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772268.892035,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1926.0879755020142,
+          "transactions": [
+            {
+              "encodedResponseBytes": 48364,
+              "protocolName": "h2",
+              "queueMilliseconds": 34.47401523590088,
+              "responseWaitMilliseconds": 768.2470083236694,
+              "reusedConnection": true,
+              "transferMilliseconds": 231.1840057373047
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417019&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=16,18,30,6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.085843,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 2277.998924255371,
+          "transactions": [
+            {
+              "encodedResponseBytes": 68851,
+              "protocolName": "h2",
+              "queueMilliseconds": 33.70189666748047,
+              "responseWaitMilliseconds": 1240.9089803695679,
+              "reusedConnection": true,
+              "transferMilliseconds": 104.1649580001831
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417039&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=16,18,30,301,303,304,305,401,403,405,406,407,6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.086722,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1983.5630655288696,
+          "transactions": [
+            {
+              "encodedResponseBytes": 28278,
+              "protocolName": "h2",
+              "queueMilliseconds": 50.93097686767578,
+              "responseWaitMilliseconds": 1347.4990129470825,
+              "reusedConnection": true,
+              "transferMilliseconds": 36.24606132507324
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508002&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=212,223,321,850&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.069148,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 2318.7320232391357,
+          "transactions": [
+            {
+              "encodedResponseBytes": 54112,
+              "protocolName": "h2",
+              "queueMilliseconds": 40.08197784423828,
+              "responseWaitMilliseconds": 1615.5130863189697,
+              "reusedConnection": true,
+              "transferMilliseconds": 113.68393898010254
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417060&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=18,455,456,501,502,507,6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.080224,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1970.2030420303345,
+          "transactions": [
+            {
+              "encodedResponseBytes": 29576,
+              "protocolName": "h2",
+              "queueMilliseconds": 39.82996940612793,
+              "responseWaitMilliseconds": 874.6479749679565,
+              "reusedConnection": true,
+              "transferMilliseconds": 156.34405612945557
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200422008&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=25,7,9&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.080677,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1664.2429828643799,
+          "transactions": [
+            {
+              "encodedResponseBytes": 31679,
+              "protocolName": "h2",
+              "queueMilliseconds": 33.94806385040283,
+              "responseWaitMilliseconds": 610.1369857788086,
+              "reusedConnection": true,
+              "transferMilliseconds": 105.55994510650635
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417013&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=21,25&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.086528,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1970.64208984375,
+          "transactions": [
+            {
+              "encodedResponseBytes": 25099,
+              "protocolName": "h2",
+              "queueMilliseconds": 40.032029151916504,
+              "responseWaitMilliseconds": 1345.6250429153442,
+              "reusedConnection": true,
+              "transferMilliseconds": 34.22904014587402
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417023&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=18,21&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.080323,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 2167.1080589294434,
+          "transactions": [
+            {
+              "encodedResponseBytes": 32615,
+              "protocolName": "h2",
+              "queueMilliseconds": 33.55002403259277,
+              "responseWaitMilliseconds": 1128.943920135498,
+              "reusedConnection": true,
+              "transferMilliseconds": 94.86711025238037
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417046&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=T1&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.087009,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 2179.9620389938354,
+          "transactions": [
+            {
+              "encodedResponseBytes": 12307,
+              "protocolName": "h2",
+              "queueMilliseconds": 33.45799446105957,
+              "responseWaitMilliseconds": 1239.2950057983398,
+              "reusedConnection": true,
+              "transferMilliseconds": 7.950901985168457
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417038&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=30,32&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.087123,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1472.0278978347778,
+          "transactions": [
+            {
+              "encodedResponseBytes": 10268,
+              "protocolName": "h2",
+              "queueMilliseconds": 49.96597766876221,
+              "responseWaitMilliseconds": 454.5820951461792,
+              "reusedConnection": true,
+              "transferMilliseconds": 69.46694850921631
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508006&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.07046,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1490.976095199585,
+          "transactions": [
+            {
+              "encodedResponseBytes": 22573,
+              "protocolName": "h2",
+              "queueMilliseconds": 35.604000091552734,
+              "responseWaitMilliseconds": 493.738055229187,
+              "reusedConnection": true,
+              "transferMilliseconds": 69.20695304870605
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200426004&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=25,4&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.082096,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1941.0759210586548,
+          "transactions": [
+            {
+              "encodedResponseBytes": 45716,
+              "protocolName": "h2",
+              "queueMilliseconds": 49.67296123504639,
+              "responseWaitMilliseconds": 711.9079828262329,
+              "reusedConnection": true,
+              "transferMilliseconds": 287.00101375579834
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508003&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=212,223,29,321,850&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.070596,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1924.9459505081177,
+          "transactions": [
+            {
+              "encodedResponseBytes": 5715,
+              "protocolName": "h2",
+              "queueMilliseconds": 33.49900245666504,
+              "responseWaitMilliseconds": 875.7610321044922,
+              "reusedConnection": true,
+              "transferMilliseconds": 117.70498752593994
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200404041&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=32&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.087055,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 2398.8319635391235,
+          "transactions": [
+            {
+              "encodedResponseBytes": 28025,
+              "protocolName": "h2",
+              "queueMilliseconds": 39.62993621826172,
+              "responseWaitMilliseconds": 1344.4370031356812,
+              "reusedConnection": true,
+              "transferMilliseconds": 122.78389930725098
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417025&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=18,6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.080847,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1677.6560544967651,
+          "transactions": [
+            {
+              "encodedResponseBytes": 10148,
+              "protocolName": "h2",
+              "queueMilliseconds": 46.444058418273926,
+              "responseWaitMilliseconds": 1039.101004600525,
+              "reusedConnection": true,
+              "transferMilliseconds": 30.364990234375
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508010&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.072251,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1393.531084060669,
+          "transactions": [
+            {
+              "encodedResponseBytes": 15694,
+              "protocolName": "h2",
+              "queueMilliseconds": 39.494991302490234,
+              "responseWaitMilliseconds": 332.211971282959,
+              "reusedConnection": true,
+              "transferMilliseconds": 129.76300716400146
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200409006&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=221,850&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.080924,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1490.3119802474976,
+          "transactions": [
+            {
+              "encodedResponseBytes": 13618,
+              "protocolName": "h2",
+              "queueMilliseconds": 34.85107421875,
+              "responseWaitMilliseconds": 538.3599996566772,
+              "reusedConnection": true,
+              "transferMilliseconds": 24.692058563232422
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200406005&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=14&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.085434,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1964.6109342575073,
+          "transactions": [
+            {
+              "encodedResponseBytes": 32031,
+              "protocolName": "h2",
+              "queueMilliseconds": 34.28494930267334,
+              "responseWaitMilliseconds": 873.6540079116821,
+              "reusedConnection": true,
+              "transferMilliseconds": 155.1370620727539
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000900000058&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=21,25&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.086257,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 2639.883041381836,
+          "transactions": [
+            {
+              "encodedResponseBytes": 63132,
+              "protocolName": "h2",
+              "queueMilliseconds": 39.92605209350586,
+              "responseWaitMilliseconds": 1898.4169960021973,
+              "reusedConnection": true,
+              "transferMilliseconds": 134.3209743499756
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417033&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=18,201,21,211,25,7&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.080461,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1474.6520519256592,
+          "transactions": [
+            {
+              "encodedResponseBytes": 10381,
+              "protocolName": "h2",
+              "queueMilliseconds": 52.04010009765625,
+              "responseWaitMilliseconds": 803.5290241241455,
+              "reusedConnection": true,
+              "transferMilliseconds": 69.36490535736084
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508004&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.067239,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1222.033977508545,
+          "transactions": [
+            {
+              "encodedResponseBytes": 4676,
+              "protocolName": "h2",
+              "queueMilliseconds": 42.31405258178711,
+              "responseWaitMilliseconds": 629.4189691543579,
+              "reusedConnection": true,
+              "transferMilliseconds": 0.7760524749755859
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503002&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=321&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.077695,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1489.0680313110352,
+          "transactions": [
+            {
+              "encodedResponseBytes": 27836,
+              "protocolName": "h2",
+              "queueMilliseconds": 33.645033836364746,
+              "responseWaitMilliseconds": 521.575927734375,
+              "reusedConnection": true,
+              "transferMilliseconds": 35.914063453674316
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417002&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=21,25&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.086877,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 2319.0770149230957,
+          "transactions": [
+            {
+              "encodedResponseBytes": 18878,
+              "protocolName": "h2",
+              "queueMilliseconds": 40.31205177307129,
+              "responseWaitMilliseconds": 1677.8661012649536,
+              "reusedConnection": true,
+              "transferMilliseconds": 51.548004150390625
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503013&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=212,223,321&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.079849,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1219.7479009628296,
+          "transactions": [
+            {
+              "encodedResponseBytes": 4746,
+              "protocolName": "h2",
+              "queueMilliseconds": 40.151000022888184,
+              "responseWaitMilliseconds": 580.5050134658813,
+              "reusedConnection": true,
+              "transferMilliseconds": 48.32601547241211
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503012&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=321&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772267.080133,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 288.965106010437,
+          "transactions": [
+            {
+              "encodedResponseBytes": 11971,
+              "protocolName": "h2",
+              "queueMilliseconds": 0.39708614349365234,
+              "responseWaitMilliseconds": 189.67902660369873,
+              "reusedConnection": true,
+              "transferMilliseconds": 97.64397144317627
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508016&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772272.973425,
+        "statusCode": 200
+      }
+    ],
+    "unfilteredJourneys": [
+      {
+        "arrival": 1792081440,
+        "departure": 1792079745.2875,
+        "id": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+        "lines": [
+          "850",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1792081860,
+        "departure": 1792079925.2875,
+        "id": "g6:612>1962:24263701@20261015:13-16|24360473@20261015:2-7",
+        "lines": [
+          "223",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1792081860,
+        "departure": 1792080040.1375,
+        "id": "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+        "lines": [
+          "29",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1792082400,
+        "departure": 1792080525.2875,
+        "id": "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+        "lines": [
+          "321",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1792082400,
+        "departure": 1792080871.6287498,
+        "id": "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+        "lines": [
+          "322",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1792083013.33875,
+        "departure": 1792080871.6287498,
+        "id": "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8",
+        "lines": [
+          "322",
+          "21"
+        ]
+      }
+    ],
+    "process": "priming"
+  },
+  {
+    "avoidTightTransfers": false,
+    "bikeInput": "live",
+    "canLoadEarlier": true,
+    "canLoadLater": true,
+    "composition": "production",
+    "counters": {
+      "boardCacheHits": 4,
+      "boardsCovered": 18,
+      "candidates": 3600,
+      "delayedPastBoardings": 15,
+      "duplicatesSuppressed": 880,
+      "incompleteBoards": 0,
+      "invalidJourneys": 11,
+      "networkRequests": 19,
+      "pageNewJourneys": 0,
+      "predictedEvents": 2739,
+      "recommendationSwitches": 0,
+      "responseBytes": 10673168,
+      "retainedAlternatives": 26,
+      "sharedFirstVehicleGroups": 1,
+      "walkingCacheHits": 27621,
+      "walkingRequests": 27845,
+      "workers": 10
+    },
+    "displayedLegs": [
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792080600,
+        "effectiveDeparture": 1792080300,
+        "line": "850",
+        "option": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+        "scheduledDeparture": 1792079516,
+        "status": "delayed",
+        "stop": "000200508002",
+        "trip": "24291375"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792081440,
+        "effectiveDeparture": 1792080720,
+        "line": "6",
+        "option": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+        "scheduledDeparture": 1792080760,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24368575"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792080840,
+        "effectiveDeparture": 1792080660,
+        "line": "29",
+        "option": "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+        "scheduledDeparture": 1792080690,
+        "status": "live",
+        "stop": "000200508003",
+        "trip": "24365635"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792081860,
+        "effectiveDeparture": 1792081140,
+        "line": "16",
+        "option": "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+        "scheduledDeparture": 1792081140,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24360473"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792081740,
+        "effectiveDeparture": 1792081080,
+        "line": "321",
+        "option": "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+        "scheduledDeparture": 1792081135,
+        "status": "live",
+        "stop": "000200508002",
+        "trip": "24261848"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792082400,
+        "effectiveDeparture": 1792081980,
+        "line": "6",
+        "option": "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+        "scheduledDeparture": 1792081960,
+        "status": "delayed",
+        "stop": "000200417050",
+        "trip": "24368581"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1792081805,
+        "effectiveDeparture": 1792081210,
+        "line": "322",
+        "option": "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+        "scheduledDeparture": 1792081210,
+        "status": "scheduled",
+        "stop": "000200508004",
+        "trip": "24262705"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792082400,
+        "effectiveDeparture": 1792081980,
+        "line": "6",
+        "option": "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+        "scheduledDeparture": 1792081960,
+        "status": "delayed",
+        "stop": "000200417050",
+        "trip": "24368581"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1792081805,
+        "effectiveDeparture": 1792081210,
+        "line": "322",
+        "option": "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8",
+        "scheduledDeparture": 1792081210,
+        "status": "scheduled",
+        "stop": "000200508004",
+        "trip": "24262705"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792082940,
+        "effectiveDeparture": 1792082460,
+        "line": "21",
+        "option": "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8",
+        "scheduledDeparture": 1792082500,
+        "status": "live",
+        "stop": "000200417050",
+        "trip": "24423069"
+      }
+    ],
+    "fullMap": false,
+    "includedModes": [
+      "bicycle",
+      "bus",
+      "funicular",
+      "train",
+      "tram"
+    ],
+    "journeys": [
+      {
+        "arrival": 1792081440,
+        "departure": 1792079745.2875,
+        "id": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+        "legs": [
+          {
+            "arrival": 1792080300,
+            "departure": 1792079745.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792080600,
+            "departure": 1792080300,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "850",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081440,
+            "departure": 1792080720,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": "Tight transfer"
+          }
+        ]
+      },
+      {
+        "arrival": 1792081860,
+        "departure": 1792080040.1375,
+        "id": "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+        "legs": [
+          {
+            "arrival": 1792080660,
+            "departure": 1792080040.1375,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Charlys Statioun",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792080840,
+            "departure": 1792080660,
+            "from": "Senningerberg, Charlys Statioun",
+            "fromStop": "000200508003",
+            "line": "29",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081860,
+            "departure": 1792081140,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792082400,
+        "departure": 1792080525.2875,
+        "id": "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+        "legs": [
+          {
+            "arrival": 1792081080,
+            "departure": 1792080525.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081740,
+            "departure": 1792081080,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "321",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792082400,
+            "departure": 1792081980,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792082400,
+        "departure": 1792080871.6287498,
+        "id": "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+        "legs": [
+          {
+            "arrival": 1792081210,
+            "departure": 1792080871.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081805,
+            "departure": 1792081210,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "322",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792082400,
+            "departure": 1792081980,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": "Tight transfer"
+          }
+        ]
+      },
+      {
+        "arrival": 1792083013.33875,
+        "departure": 1792080871.6287498,
+        "id": "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8",
+        "legs": [
+          {
+            "arrival": 1792081210,
+            "departure": 1792080871.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081805,
+            "departure": 1792081210,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "322",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792082940,
+            "departure": 1792082460,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "21",
+            "to": "Kirchberg, prov. Konrad Adenauer",
+            "toStop": "000900000058",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792083013.33875,
+            "departure": 1792082940,
+            "from": "Kirchberg, prov. Konrad Adenauer",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "",
+            "transferWarning": ""
+          }
+        ]
+      }
+    ],
+    "liveConcurrency": 32,
+    "matchingRejections": {
+      "outsideInterval": 12
+    },
+    "options": [
+      "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+      "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+      "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+      "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+      "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8"
+    ],
+    "passes": [
+      {
+        "candidates": 3600,
+        "duration_ms": 1288.488042,
+        "horizon_s": 7200,
+        "rounds": 4,
+        "start_ms": 3363.472875,
+        "wave": 0
+      },
+      {
+        "candidates": 3600,
+        "duration_ms": 1062.129292,
+        "horizon_s": 7200,
+        "rounds": 4,
+        "start_ms": 5445.964625,
+        "wave": 1
+      }
+    ],
+    "peak_memory_bytes": 806060032,
+    "planningTime": 1792079465.5914931,
+    "realtimeCoverage": {
+      "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7": "live",
+      "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8": "live",
+      "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8": "live",
+      "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8": "partial",
+      "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8": "partial"
+    },
+    "recommendedOption": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+    "refreshPolicy": "forceRefresh",
+    "requestID": "8FF868D4-468A-4A8F-A61B-644938D85404",
+    "rounds": [
+      {
+        "alights": 4296,
+        "merge_ms": 4,
+        "prepare_ms": 1,
+        "retained": 2731,
+        "scan_ms": 1
+      },
+      {
+        "alights": 818319,
+        "merge_ms": 118,
+        "prepare_ms": 8,
+        "retained": 217698,
+        "scan_ms": 87
+      },
+      {
+        "alights": 5376213,
+        "merge_ms": 211,
+        "prepare_ms": 3,
+        "retained": 634880,
+        "scan_ms": 259
+      },
+      {
+        "alights": 668309,
+        "merge_ms": 14,
+        "prepare_ms": 0,
+        "retained": 70435,
+        "scan_ms": 49
+      },
+      {
+        "alights": 4296,
+        "merge_ms": 3,
+        "prepare_ms": 0,
+        "retained": 2731,
+        "scan_ms": 1
+      },
+      {
+        "alights": 818319,
+        "merge_ms": 101,
+        "prepare_ms": 6,
+        "retained": 217698,
+        "scan_ms": 50
+      },
+      {
+        "alights": 5376213,
+        "merge_ms": 175,
+        "prepare_ms": 2,
+        "retained": 634880,
+        "scan_ms": 224
+      },
+      {
+        "alights": 668309,
+        "merge_ms": 9,
+        "prepare_ms": 0,
+        "retained": 70439,
+        "scan_ms": 46
+      }
+    ],
+    "sample": 1,
+    "scenario": "live-now",
+    "spans": [
+      {
+        "duration_ms": 0.678666,
+        "stage": "snapshotPreparation",
+        "start_ms": 36.875459
+      },
+      {
+        "duration_ms": 29.284209,
+        "stage": "endpoints",
+        "start_ms": 59.45825000000001
+      },
+      {
+        "duration_ms": 416.218666,
+        "stage": "realtimeDiscovery",
+        "start_ms": 104.183209
+      },
+      {
+        "duration_ms": 518.962,
+        "stage": "candidateBuilding",
+        "start_ms": 2229.0998750000003
+      },
+      {
+        "duration_ms": 3259.291208,
+        "stage": "realtime",
+        "start_ms": 104.167584
+      },
+      {
+        "duration_ms": 2140.244292,
+        "stage": "walkingPreparation",
+        "start_ms": 88.821875
+      },
+      {
+        "duration_ms": 1288.481375,
+        "stage": "raptor",
+        "start_ms": 3363.472875
+      },
+      {
+        "duration_ms": 353.813417,
+        "stage": "candidateBuilding",
+        "start_ms": 4651.9701669999995
+      },
+      {
+        "duration_ms": 440.169667,
+        "stage": "realtime",
+        "start_ms": 5005.793667
+      },
+      {
+        "duration_ms": 1062.11875,
+        "stage": "raptor",
+        "start_ms": 5445.964625
+      },
+      {
+        "duration_ms": 327.741416,
+        "stage": "candidateBuilding",
+        "start_ms": 6508.0969589999995
+      },
+      {
+        "duration_ms": 10.764333,
+        "stage": "realtime",
+        "start_ms": 6835.845459
+      },
+      {
+        "duration_ms": 0.002458,
+        "stage": "directWalkingWait",
+        "start_ms": 6848.846541999999
+      },
+      {
+        "duration_ms": 2.221208,
+        "stage": "geometry",
+        "start_ms": 6877.338833999999
+      },
+      {
+        "duration_ms": 0.181834,
+        "stage": "validation",
+        "start_ms": 6879.6026249999995
+      },
+      {
+        "duration_ms": 0.137708,
+        "stage": "ranking",
+        "start_ms": 6879.785166999999
+      },
+      {
+        "duration_ms": 0.398625,
+        "stage": "resultAssembly",
+        "start_ms": 6879.562249999999
+      },
+      {
+        "duration_ms": 360.595583,
+        "stage": "bikeCalculation",
+        "start_ms": 58.650417000000004
+      },
+      {
+        "duration_ms": 9.897458,
+        "stage": "snapshotPreparation",
+        "start_ms": 18.025792000000003
+      },
+      {
+        "duration_ms": 0.47825,
+        "stage": "adapterMapping",
+        "start_ms": 6880.022249999999
+      },
+      {
+        "duration_ms": 1.589125,
+        "stage": "timetableReadiness",
+        "start_ms": 12.424542
+      },
+      {
+        "duration_ms": 22.833542,
+        "stage": "graphPreparation",
+        "start_ms": 14.01375
+      },
+      {
+        "duration_ms": 15.43125,
+        "stage": "publication",
+        "start_ms": 6868.077292
+      },
+      {
+        "duration_ms": 2.972083,
+        "stage": "refinement",
+        "start_ms": 6948.542084
+      },
+      {
+        "duration_ms": 29.409708,
+        "stage": "refinement",
+        "start_ms": 6951.747292
+      },
+      {
+        "duration_ms": 29.419708,
+        "stage": "refinement",
+        "start_ms": 6951.752209
+      },
+      {
+        "duration_ms": 1.288875,
+        "stage": "refinement",
+        "start_ms": 7026.812625
+      },
+      {
+        "duration_ms": 1.291042,
+        "stage": "refinement",
+        "start_ms": 7026.822
+      },
+      {
+        "duration_ms": 169.647,
+        "stage": "firstRender",
+        "start_ms": 6883.503125
+      },
+      {
+        "duration_ms": 60.919333,
+        "stage": "refinement",
+        "start_ms": 7028.122959
+      },
+      {
+        "duration_ms": 60.964416,
+        "stage": "refinement",
+        "start_ms": 7028.117584
+      },
+      {
+        "duration_ms": 34.331167,
+        "stage": "refinement",
+        "start_ms": 7089.110292
+      },
+      {
+        "duration_ms": 34.37375,
+        "stage": "refinement",
+        "start_ms": 7089.097584
+      },
+      {
+        "duration_ms": 1.288167,
+        "stage": "refinement",
+        "start_ms": 7123.488167
+      },
+      {
+        "duration_ms": 1.304666,
+        "stage": "refinement",
+        "start_ms": 7123.480084
+      },
+      {
+        "duration_ms": 28.211917,
+        "stage": "refinement",
+        "start_ms": 7124.794167
+      },
+      {
+        "duration_ms": 28.249334,
+        "stage": "refinement",
+        "start_ms": 7124.7895
+      },
+      {
+        "duration_ms": 204.539125,
+        "stage": "refinement",
+        "start_ms": 6948.5299589999995
+      },
+      {
+        "duration_ms": 35.081958,
+        "stage": "refinement",
+        "start_ms": 7153.053334
+      },
+      {
+        "duration_ms": 35.096959,
+        "stage": "refinement",
+        "start_ms": 7153.0635
+      }
+    ],
+    "spanSemantics": "operation-relative elapsed intervals; http and decode are cumulative concurrent work",
+    "stages_ms": {
+      "adapterMapping": 0.47825,
+      "bikeCalculation": 360.595583,
+      "boardFetch": 3037,
+      "boardMatching": 227,
+      "candidateBuilding": 1200.5168330000001,
+      "decode": 312,
+      "directWalkingWait": 0.002458,
+      "endpoints": 29.284209,
+      "firstRender": 169.647,
+      "geometry": 2.221208,
+      "graphPreparation": 22.833542,
+      "http": 20469,
+      "publication": 15.43125,
+      "ranking": 0.137708,
+      "raptor": 2350.600125,
+      "realtime": 3710.2252080000003,
+      "realtimeDiscovery": 416.218666,
+      "refinement": 588.7422079999999,
+      "resultAssembly": 0.398625,
+      "schedulePreparation": 5,
+      "snapshotPreparation": 10.576124,
+      "timetableReadiness": 1.589125,
+      "validation": 0.181834,
+      "walkingPreparation": 2140.244292,
+      "walkingTransfers": 521
+    },
+    "supplementalOptions": [
+      "veloh-49.6541071,6.2296443-49.6301,6.1682-116-63"
+    ],
+    "total_ms": 7053.160667,
+    "transport": [
+      {
+        "metrics": {
+          "totalMilliseconds": 626.1129379272461,
+          "transactions": [
+            {
+              "encodedResponseBytes": 4727,
+              "protocolName": "h2",
+              "queueMilliseconds": 53.4440279006958,
+              "responseWaitMilliseconds": 344.9709415435791,
+              "reusedConnection": true,
+              "transferMilliseconds": 16.94798469543457
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503012&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=321&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.634402,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1495.2709674835205,
+          "transactions": [
+            {
+              "encodedResponseBytes": 29701,
+              "protocolName": "h2",
+              "queueMilliseconds": 38.47301006317139,
+              "responseWaitMilliseconds": 1083.5360288619995,
+              "reusedConnection": true,
+              "transferMilliseconds": 46.076059341430664
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200422008&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=25,7,9&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.649789,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 991.8900728225708,
+          "transactions": [
+            {
+              "encodedResponseBytes": 45744,
+              "protocolName": "h2",
+              "queueMilliseconds": 39.47103023529053,
+              "responseWaitMilliseconds": 494.0389394760132,
+              "reusedConnection": true,
+              "transferMilliseconds": 262.24803924560547
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508003&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=212,223,29,321,850&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.623254,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1345.0729846954346,
+          "transactions": [
+            {
+              "encodedResponseBytes": 55100,
+              "protocolName": "h2",
+              "queueMilliseconds": 49.23295974731445,
+              "responseWaitMilliseconds": 717.8800106048584,
+              "reusedConnection": true,
+              "transferMilliseconds": 356.003999710083
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417060&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=18,455,456,501,502,507,6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.63902,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1626.0249614715576,
+          "transactions": [
+            {
+              "encodedResponseBytes": 25730,
+              "protocolName": "h2",
+              "queueMilliseconds": 46.63801193237305,
+              "responseWaitMilliseconds": 1265.4030323028564,
+              "reusedConnection": true,
+              "transferMilliseconds": 104.29191589355469
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417023&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=18,21&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.641565,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1617.75803565979,
+          "transactions": [
+            {
+              "encodedResponseBytes": 15632,
+              "protocolName": "h2",
+              "queueMilliseconds": 38.36405277252197,
+              "responseWaitMilliseconds": 1234.787940979004,
+              "reusedConnection": true,
+              "transferMilliseconds": 9.193062782287598
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200409006&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=221,850&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.649973,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1488.186001777649,
+          "transactions": [
+            {
+              "encodedResponseBytes": 62614,
+              "protocolName": "h2",
+              "queueMilliseconds": 40.452003479003906,
+              "responseWaitMilliseconds": 1119.0119981765747,
+              "reusedConnection": true,
+              "transferMilliseconds": 119.42505836486816
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417033&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=18,201,21,211,25,7&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.644994,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 602.558970451355,
+          "transactions": [
+            {
+              "encodedResponseBytes": 10468,
+              "protocolName": "h2",
+              "queueMilliseconds": 65.29498100280762,
+              "responseWaitMilliseconds": 197.02696800231934,
+              "reusedConnection": true,
+              "transferMilliseconds": 129.1220188140869
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508006&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.622686,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 627.0419359207153,
+          "transactions": [
+            {
+              "encodedResponseBytes": 19153,
+              "protocolName": "h2",
+              "queueMilliseconds": 53.18593978881836,
+              "responseWaitMilliseconds": 290.31598567962646,
+              "reusedConnection": true,
+              "transferMilliseconds": 71.94900512695312
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503013&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=212,223,321&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.633546,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1358.9260578155518,
+          "transactions": [
+            {
+              "encodedResponseBytes": 22802,
+              "protocolName": "h2",
+              "queueMilliseconds": 38.30909729003906,
+              "responseWaitMilliseconds": 945.7910060882568,
+              "reusedConnection": true,
+              "transferMilliseconds": 19.575953483581543
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200426004&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=25,4&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.650058,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1487.3740673065186,
+          "transactions": [
+            {
+              "encodedResponseBytes": 13581,
+              "protocolName": "h2",
+              "queueMilliseconds": 38.294076919555664,
+              "responseWaitMilliseconds": 1076.3249397277832,
+              "reusedConnection": true,
+              "transferMilliseconds": 37.63699531555176
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200406005&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=14&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.650121,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1013.401985168457,
+          "transactions": [
+            {
+              "encodedResponseBytes": 27930,
+              "protocolName": "h2",
+              "queueMilliseconds": 38.511037826538086,
+              "responseWaitMilliseconds": 566.7529106140137,
+              "reusedConnection": true,
+              "transferMilliseconds": 61.73300743103027
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417025&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=18,6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.649901,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1028.2080173492432,
+          "transactions": [
+            {
+              "encodedResponseBytes": 4754,
+              "protocolName": "h2",
+              "queueMilliseconds": 53.215980529785156,
+              "responseWaitMilliseconds": 740.7010793685913,
+              "reusedConnection": true,
+              "transferMilliseconds": 13.61691951751709
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503002&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=321&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.628036,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 740.9909963607788,
+          "transactions": [
+            {
+              "encodedResponseBytes": 28512,
+              "protocolName": "h2",
+              "queueMilliseconds": 35.72201728820801,
+              "responseWaitMilliseconds": 443.91000270843506,
+              "reusedConnection": true,
+              "transferMilliseconds": 105.0119400024414
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508002&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=212,223,321,850&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.622092,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 534.4510078430176,
+          "transactions": [
+            {
+              "encodedResponseBytes": 10363,
+              "protocolName": "h2",
+              "queueMilliseconds": 41.37599468231201,
+              "responseWaitMilliseconds": 400.4460573196411,
+              "reusedConnection": true,
+              "transferMilliseconds": 3.8499832153320312
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508004&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.497002,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1536.5968942642212,
+          "transactions": [
+            {
+              "encodedResponseBytes": 9990,
+              "protocolName": "h2",
+              "queueMilliseconds": 62.82496452331543,
+              "responseWaitMilliseconds": 1302.4719953536987,
+              "reusedConnection": true,
+              "transferMilliseconds": 4.449009895324707
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508010&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772276.623654,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 365.70000648498535,
+          "transactions": [
+            {
+              "encodedResponseBytes": 11237,
+              "protocolName": "h2",
+              "queueMilliseconds": 0.45609474182128906,
+              "responseWaitMilliseconds": 163.83099555969238,
+              "reusedConnection": true,
+              "transferMilliseconds": 116.66202545166016
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508016&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=16&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772278.823479,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 471.34900093078613,
+          "transactions": [
+            {
+              "encodedResponseBytes": 20756,
+              "protocolName": "h2",
+              "queueMilliseconds": 0.4730224609375,
+              "responseWaitMilliseconds": 382.54308700561523,
+              "reusedConnection": true,
+              "transferMilliseconds": 23.294925689697266
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417050&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=21,6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772278.823341,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 382.4349641799927,
+          "transactions": [
+            {
+              "encodedResponseBytes": 11712,
+              "protocolName": "h2",
+              "queueMilliseconds": 0.25403499603271484,
+              "responseWaitMilliseconds": 318.29893589019775,
+              "reusedConnection": true,
+              "transferMilliseconds": 60.93800067901611
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508016&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772280.990852,
+        "statusCode": 200
+      }
+    ],
+    "unfilteredJourneys": [
+      {
+        "arrival": 1792081440,
+        "departure": 1792079745.2875,
+        "id": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+        "lines": [
+          "850",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1792081860,
+        "departure": 1792079925.2875,
+        "id": "g6:612>1962:24263701@20261015:13-16|24360473@20261015:2-7",
+        "lines": [
+          "223",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1792081860,
+        "departure": 1792080040.1375,
+        "id": "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+        "lines": [
+          "29",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1792082400,
+        "departure": 1792080525.2875,
+        "id": "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+        "lines": [
+          "321",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1792082400,
+        "departure": 1792080871.6287498,
+        "id": "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+        "lines": [
+          "322",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1792083013.33875,
+        "departure": 1792080871.6287498,
+        "id": "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8",
+        "lines": [
+          "322",
+          "21"
+        ]
+      }
+    ],
+    "process": "warm"
+  },
+  {
+    "avoidTightTransfers": false,
+    "bikeInput": "live",
+    "canLoadEarlier": true,
+    "canLoadLater": true,
+    "composition": "production",
+    "counters": {
+      "boardCacheHits": 4,
+      "boardsCovered": 26,
+      "candidates": 3600,
+      "delayedPastBoardings": 29,
+      "duplicatesSuppressed": 854,
+      "incompleteBoards": 0,
+      "invalidJourneys": 12,
+      "networkRequests": 27,
+      "pageNewJourneys": 6,
+      "predictedEvents": 4059,
+      "recommendationSwitches": 0,
+      "responseBytes": 17866653,
+      "retainedAlternatives": 26,
+      "sharedFirstVehicleGroups": 1,
+      "walkingCacheHits": 22327,
+      "walkingRequests": 27827,
+      "workers": 10
+    },
+    "displayedLegs": [
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792080600,
+        "effectiveDeparture": 1792080300,
+        "line": "850",
+        "option": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+        "scheduledDeparture": 1792079516,
+        "status": "delayed",
+        "stop": "000200508002",
+        "trip": "24291375"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792081440,
+        "effectiveDeparture": 1792080720,
+        "line": "6",
+        "option": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+        "scheduledDeparture": 1792080760,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24368575"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792080840,
+        "effectiveDeparture": 1792080660,
+        "line": "29",
+        "option": "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+        "scheduledDeparture": 1792080690,
+        "status": "live",
+        "stop": "000200508003",
+        "trip": "24365635"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792081860,
+        "effectiveDeparture": 1792081140,
+        "line": "16",
+        "option": "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+        "scheduledDeparture": 1792081140,
+        "status": "live",
+        "stop": "000200508016",
+        "trip": "24360473"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792081740,
+        "effectiveDeparture": 1792081080,
+        "line": "321",
+        "option": "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+        "scheduledDeparture": 1792081135,
+        "status": "live",
+        "stop": "000200508002",
+        "trip": "24261848"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792082400,
+        "effectiveDeparture": 1792081980,
+        "line": "6",
+        "option": "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+        "scheduledDeparture": 1792081960,
+        "status": "delayed",
+        "stop": "000200417050",
+        "trip": "24368581"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1792081805,
+        "effectiveDeparture": 1792081210,
+        "line": "322",
+        "option": "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+        "scheduledDeparture": 1792081210,
+        "status": "scheduled",
+        "stop": "000200508004",
+        "trip": "24262705"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792082400,
+        "effectiveDeparture": 1792081980,
+        "line": "6",
+        "option": "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+        "scheduledDeparture": 1792081960,
+        "status": "delayed",
+        "stop": "000200417050",
+        "trip": "24368581"
+      },
+      {
+        "arrivalSource": "scheduled",
+        "departureSource": "scheduled",
+        "effectiveArrival": 1792081805,
+        "effectiveDeparture": 1792081210,
+        "line": "322",
+        "option": "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8",
+        "scheduledDeparture": 1792081210,
+        "status": "scheduled",
+        "stop": "000200508004",
+        "trip": "24262705"
+      },
+      {
+        "arrivalSource": "observed",
+        "departureSource": "observed",
+        "effectiveArrival": 1792082940,
+        "effectiveDeparture": 1792082460,
+        "line": "21",
+        "option": "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8",
+        "scheduledDeparture": 1792082500,
+        "status": "live",
+        "stop": "000200417050",
+        "trip": "24423069"
+      }
+    ],
+    "fullMap": false,
+    "includedModes": [
+      "bicycle",
+      "bus",
+      "funicular",
+      "train",
+      "tram"
+    ],
+    "journeys": [
+      {
+        "arrival": 1792081440,
+        "departure": 1792079745.2875,
+        "id": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+        "legs": [
+          {
+            "arrival": 1792080300,
+            "departure": 1792079745.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792080600,
+            "departure": 1792080300,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "850",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081440,
+            "departure": 1792080720,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": "Tight transfer"
+          }
+        ]
+      },
+      {
+        "arrival": 1792081860,
+        "departure": 1792080040.1375,
+        "id": "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+        "legs": [
+          {
+            "arrival": 1792080660,
+            "departure": 1792080040.1375,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Charlys Statioun",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792080840,
+            "departure": 1792080660,
+            "from": "Senningerberg, Charlys Statioun",
+            "fromStop": "000200508003",
+            "line": "29",
+            "to": "Senningerberg, H\u00e9ienhaff",
+            "toStop": "000200508016",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081860,
+            "departure": 1792081140,
+            "from": "Senningerberg, H\u00e9ienhaff",
+            "fromStop": "000200508016",
+            "line": "16",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792082400,
+        "departure": 1792080525.2875,
+        "id": "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+        "legs": [
+          {
+            "arrival": 1792081080,
+            "departure": 1792080525.2875,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Breedewues",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081740,
+            "departure": 1792081080,
+            "from": "Senningerberg, Breedewues",
+            "fromStop": "000200508002",
+            "line": "321",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792082400,
+            "departure": 1792081980,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": ""
+          }
+        ]
+      },
+      {
+        "arrival": 1792082400,
+        "departure": 1792080871.6287498,
+        "id": "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+        "legs": [
+          {
+            "arrival": 1792081210,
+            "departure": 1792080871.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081805,
+            "departure": 1792081210,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "322",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792082400,
+            "departure": 1792081980,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "6",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "000200417019",
+            "transferWarning": "Tight transfer"
+          }
+        ]
+      },
+      {
+        "arrival": 1792083013.33875,
+        "departure": 1792080871.6287498,
+        "id": "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8",
+        "legs": [
+          {
+            "arrival": 1792081210,
+            "departure": 1792080871.6287498,
+            "from": "Gromscheed",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Senningerberg, Gromscheed",
+            "toStop": "",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792081805,
+            "departure": 1792081210,
+            "from": "Senningerberg, Gromscheed",
+            "fromStop": "000200508004",
+            "line": "322",
+            "to": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "toStop": "000200417050",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792082940,
+            "departure": 1792082460,
+            "from": "Kirchberg, Gare routi\u00e8re Luxexpo",
+            "fromStop": "000200417050",
+            "line": "21",
+            "to": "Kirchberg, prov. Konrad Adenauer",
+            "toStop": "000900000058",
+            "transferWarning": ""
+          },
+          {
+            "arrival": 1792083013.33875,
+            "departure": 1792082940,
+            "from": "Kirchberg, prov. Konrad Adenauer",
+            "fromStop": "",
+            "line": "walk",
+            "to": "Kirchberg, Konrad Adenauer",
+            "toStop": "",
+            "transferWarning": ""
+          }
+        ]
+      }
+    ],
+    "liveConcurrency": 32,
+    "matchingRejections": {
+      "noCandidate": 1,
+      "outsideInterval": 21
+    },
+    "options": [
+      "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+      "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+      "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+      "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+      "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8"
+    ],
+    "passes": [
+      {
+        "candidates": 3600,
+        "duration_ms": 1148.355,
+        "horizon_s": 7200,
+        "rounds": 4,
+        "start_ms": 3681.1353749999994,
+        "wave": 0
+      },
+      {
+        "candidates": 3600,
+        "duration_ms": 1350.979625,
+        "horizon_s": 7200,
+        "rounds": 4,
+        "start_ms": 5507.65925,
+        "wave": 1
+      }
+    ],
+    "peak_memory_bytes": 856408064,
+    "planningTime": 1792079491.141155,
+    "realtimeCoverage": {
+      "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7": "live",
+      "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8": "live",
+      "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8": "live",
+      "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8": "partial",
+      "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8": "partial"
+    },
+    "recommendedOption": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+    "refreshPolicy": "forceRefresh",
+    "requestID": "FDEF0B18-A38A-44D6-9B4C-7695D8B65C75",
+    "rounds": [
+      {
+        "alights": 4279,
+        "merge_ms": 3,
+        "prepare_ms": 1,
+        "retained": 2731,
+        "scan_ms": 2
+      },
+      {
+        "alights": 822551,
+        "merge_ms": 131,
+        "prepare_ms": 12,
+        "retained": 217809,
+        "scan_ms": 65
+      },
+      {
+        "alights": 5398404,
+        "merge_ms": 210,
+        "prepare_ms": 3,
+        "retained": 634807,
+        "scan_ms": 234
+      },
+      {
+        "alights": 668895,
+        "merge_ms": 10,
+        "prepare_ms": 0,
+        "retained": 70896,
+        "scan_ms": 37
+      },
+      {
+        "alights": 4279,
+        "merge_ms": 4,
+        "prepare_ms": 0,
+        "retained": 2731,
+        "scan_ms": 1
+      },
+      {
+        "alights": 822551,
+        "merge_ms": 111,
+        "prepare_ms": 11,
+        "retained": 217809,
+        "scan_ms": 58
+      },
+      {
+        "alights": 5398404,
+        "merge_ms": 221,
+        "prepare_ms": 3,
+        "retained": 634807,
+        "scan_ms": 284
+      },
+      {
+        "alights": 668895,
+        "merge_ms": 24,
+        "prepare_ms": 0,
+        "retained": 70889,
+        "scan_ms": 64
+      }
+    ],
+    "sample": 0,
+    "scenario": "live-now",
+    "spans": [
+      {
+        "duration_ms": 0.585875,
+        "stage": "snapshotPreparation",
+        "start_ms": 874.029125
+      },
+      {
+        "duration_ms": 235.358541,
+        "stage": "endpoints",
+        "start_ms": 876.149125
+      },
+      {
+        "duration_ms": 99.166959,
+        "stage": "realtimeDiscovery",
+        "start_ms": 1117.830916
+      },
+      {
+        "duration_ms": 343.126834,
+        "stage": "candidateBuilding",
+        "start_ms": 2374.433541
+      },
+      {
+        "duration_ms": 2563.32525,
+        "stage": "realtime",
+        "start_ms": 1117.7968329999999
+      },
+      {
+        "duration_ms": 1260.204792,
+        "stage": "walkingPreparation",
+        "start_ms": 1114.2112909999998
+      },
+      {
+        "duration_ms": 1148.349708,
+        "stage": "raptor",
+        "start_ms": 3681.1353749999994
+      },
+      {
+        "duration_ms": 313.234291,
+        "stage": "candidateBuilding",
+        "start_ms": 4829.524875
+      },
+      {
+        "duration_ms": 364.893708,
+        "stage": "realtime",
+        "start_ms": 5142.764833
+      },
+      {
+        "duration_ms": 1350.963125,
+        "stage": "raptor",
+        "start_ms": 5507.65925
+      },
+      {
+        "duration_ms": 354.467875,
+        "stage": "candidateBuilding",
+        "start_ms": 6858.6527909999995
+      },
+      {
+        "duration_ms": 11.010083,
+        "stage": "realtime",
+        "start_ms": 7213.136833
+      },
+      {
+        "duration_ms": 0.004958,
+        "stage": "directWalkingWait",
+        "start_ms": 7228.750625
+      },
+      {
+        "duration_ms": 4.362959,
+        "stage": "geometry",
+        "start_ms": 7268.0439160000005
+      },
+      {
+        "duration_ms": 0.371875,
+        "stage": "validation",
+        "start_ms": 7272.546291000001
+      },
+      {
+        "duration_ms": 0.233417,
+        "stage": "ranking",
+        "start_ms": 7272.920708
+      },
+      {
+        "duration_ms": 0.812542,
+        "stage": "resultAssembly",
+        "start_ms": 7272.414333
+      },
+      {
+        "duration_ms": 720.24075,
+        "stage": "bikeCalculation",
+        "start_ms": 876.1052910000001
+      },
+      {
+        "duration_ms": 866.49225,
+        "stage": "snapshotPreparation",
+        "start_ms": 5.038499999999969
+      },
+      {
+        "duration_ms": 0.754916,
+        "stage": "adapterMapping",
+        "start_ms": 7273.39675
+      },
+      {
+        "duration_ms": 4.855541,
+        "stage": "timetableReadiness",
+        "start_ms": 0.151375
+      },
+      {
+        "duration_ms": 513.136625,
+        "stage": "graphPreparation",
+        "start_ms": 5.007166
+      },
+      {
+        "duration_ms": 14.919333,
+        "stage": "publication",
+        "start_ms": 7274.00325
+      },
+      {
+        "duration_ms": 8.375125,
+        "stage": "refinement",
+        "start_ms": 7565.409708
+      },
+      {
+        "duration_ms": 26.184334,
+        "stage": "refinement",
+        "start_ms": 7606.743041
+      },
+      {
+        "duration_ms": 26.198042,
+        "stage": "refinement",
+        "start_ms": 7606.758041
+      },
+      {
+        "duration_ms": 0.3445,
+        "stage": "refinement",
+        "start_ms": 7632.9700410000005
+      },
+      {
+        "duration_ms": 0.340791,
+        "stage": "refinement",
+        "start_ms": 7632.98
+      },
+      {
+        "duration_ms": 366.217417,
+        "stage": "firstRender",
+        "start_ms": 7288.914541
+      },
+      {
+        "duration_ms": 56.494375,
+        "stage": "refinement",
+        "start_ms": 7633.324833
+      },
+      {
+        "duration_ms": 56.534792,
+        "stage": "refinement",
+        "start_ms": 7633.328458
+      },
+      {
+        "duration_ms": 25.196667,
+        "stage": "refinement",
+        "start_ms": 7689.759708
+      },
+      {
+        "duration_ms": 25.210167,
+        "stage": "refinement",
+        "start_ms": 7689.773791
+      },
+      {
+        "duration_ms": 25.399125,
+        "stage": "refinement",
+        "start_ms": 7714.995041
+      },
+      {
+        "duration_ms": 25.413625,
+        "stage": "refinement",
+        "start_ms": 7715.003125
+      },
+      {
+        "duration_ms": 25.323916,
+        "stage": "refinement",
+        "start_ms": 7740.426125
+      },
+      {
+        "duration_ms": 25.359209,
+        "stage": "refinement",
+        "start_ms": 7740.435541
+      },
+      {
+        "duration_ms": 200.432666,
+        "stage": "refinement",
+        "start_ms": 7565.395875
+      },
+      {
+        "duration_ms": 13.008417,
+        "stage": "refinement",
+        "start_ms": 7765.822458
+      },
+      {
+        "duration_ms": 13.060542,
+        "stage": "refinement",
+        "start_ms": 7765.810416
+      }
+    ],
+    "spanSemantics": "operation-relative elapsed intervals; http and decode are cumulative concurrent work",
+    "stages_ms": {
+      "adapterMapping": 0.754916,
+      "bikeCalculation": 720.24075,
+      "boardFetch": 2767,
+      "boardMatching": 504,
+      "candidateBuilding": 1010.829,
+      "decode": 433,
+      "directWalkingWait": 0.004958,
+      "endpoints": 235.358541,
+      "firstRender": 366.217417,
+      "geometry": 4.362959,
+      "graphPreparation": 513.136625,
+      "http": 26201,
+      "publication": 14.919333,
+      "ranking": 0.233417,
+      "raptor": 2499.312833,
+      "realtime": 2939.229041,
+      "realtimeDiscovery": 99.166959,
+      "refinement": 552.876293,
+      "resultAssembly": 0.812542,
+      "schedulePreparation": 77,
+      "snapshotPreparation": 867.397292,
+      "timetableReadiness": 4.855541,
+      "validation": 0.371875,
+      "walkingPreparation": 1260.204792,
+      "walkingTransfers": 519
+    },
+    "supplementalOptions": [
+      "veloh-49.6541071,6.2296443-49.6301,6.1682-116-63"
+    ],
+    "total_ms": 7655.14625,
+    "transport": [
+      {
+        "metrics": {
+          "totalMilliseconds": 295.3430414199829,
+          "transactions": [
+            {
+              "encodedResponseBytes": 20963,
+              "protocolName": "h3",
+              "queueMilliseconds": 0.43904781341552734,
+              "responseWaitMilliseconds": 244.20297145843506,
+              "reusedConnection": true,
+              "transferMilliseconds": 47.83201217651367
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417050&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=21,6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772293.901234,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 221.795916557312,
+          "transactions": [
+            {
+              "encodedResponseBytes": 11444,
+              "protocolName": "h3",
+              "queueMilliseconds": 0.3910064697265625,
+              "responseWaitMilliseconds": 186.5379810333252,
+              "reusedConnection": true,
+              "transferMilliseconds": 31.94892406463623
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508016&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=16&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772293.901361,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 383.1460475921631,
+          "transactions": [
+            {
+              "encodedResponseBytes": 4665,
+              "protocolName": "h3",
+              "queueMilliseconds": 6.644964218139648,
+              "responseWaitMilliseconds": 279.2710065841675,
+              "reusedConnection": true,
+              "transferMilliseconds": 1.128077507019043
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503002&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=321&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.394713,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 752.5509595870972,
+          "transactions": [
+            {
+              "encodedResponseBytes": 10286,
+              "protocolName": "h3",
+              "queueMilliseconds": 7.017970085144043,
+              "responseWaitMilliseconds": 621.8279600143433,
+              "reusedConnection": true,
+              "transferMilliseconds": 25.292038917541504
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508004&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.391692,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1633.6590051651,
+          "transactions": [
+            {
+              "encodedResponseBytes": 48422,
+              "protocolName": "h3",
+              "queueMilliseconds": 14.15395736694336,
+              "responseWaitMilliseconds": 1405.6990146636963,
+              "reusedConnection": true,
+              "transferMilliseconds": 130.46598434448242
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417019&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=16,18,30,6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.400375,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1113.9349937438965,
+          "transactions": [
+            {
+              "encodedResponseBytes": 32144,
+              "protocolName": "h3",
+              "queueMilliseconds": 14.021039009094238,
+              "responseWaitMilliseconds": 886.9719505310059,
+              "reusedConnection": true,
+              "transferMilliseconds": 129.47404384613037
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417013&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=21,25&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.400544,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 978.8399934768677,
+          "transactions": [
+            {
+              "encodedResponseBytes": 22561,
+              "protocolName": "h3",
+              "queueMilliseconds": 14.499902725219727,
+              "responseWaitMilliseconds": 826.3660669326782,
+              "reusedConnection": true,
+              "transferMilliseconds": 54.62002754211426
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200426004&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=25,4&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.39994,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 968.5159921646118,
+          "transactions": [
+            {
+              "encodedResponseBytes": 28592,
+              "protocolName": "h3",
+              "queueMilliseconds": 8.04901123046875,
+              "responseWaitMilliseconds": 824.8380422592163,
+              "reusedConnection": true,
+              "transferMilliseconds": 37.950992584228516
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508002&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=212,223,321,850&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.392962,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 443.4080123901367,
+          "transactions": [
+            {
+              "encodedResponseBytes": 10257,
+              "protocolName": "h3",
+              "queueMilliseconds": 15.84005355834961,
+              "responseWaitMilliseconds": 288.15996646881104,
+              "reusedConnection": true,
+              "transferMilliseconds": 55.87601661682129
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508006&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.398263,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 920.3649759292603,
+          "transactions": [
+            {
+              "encodedResponseBytes": 10137,
+              "protocolName": "h3",
+              "queueMilliseconds": 7.48896598815918,
+              "responseWaitMilliseconds": 687.2439384460449,
+              "reusedConnection": true,
+              "transferMilliseconds": 129.77004051208496
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508010&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.394129,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1348.7370014190674,
+          "transactions": [
+            {
+              "encodedResponseBytes": 54906,
+              "protocolName": "h3",
+              "queueMilliseconds": 4.923105239868164,
+              "responseWaitMilliseconds": 1193.734049797058,
+              "reusedConnection": true,
+              "transferMilliseconds": 54.479002952575684
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417060&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=18,455,456,501,502,507,6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.396927,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1566.8920278549194,
+          "transactions": [
+            {
+              "encodedResponseBytes": 62545,
+              "protocolName": "h3",
+              "queueMilliseconds": 15.65706729888916,
+              "responseWaitMilliseconds": 1305.3990602493286,
+              "reusedConnection": true,
+              "transferMilliseconds": 162.41395473480225
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417033&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=18,201,21,211,25,7&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.398619,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1051.7280101776123,
+          "transactions": [
+            {
+              "encodedResponseBytes": 45049,
+              "protocolName": "h3",
+              "queueMilliseconds": 7.618069648742676,
+              "responseWaitMilliseconds": 823.8950967788696,
+              "reusedConnection": true,
+              "transferMilliseconds": 123.84390830993652
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508003&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=212,223,29,321,850&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.393585,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 962.5930786132812,
+          "transactions": [
+            {
+              "encodedResponseBytes": 29715,
+              "protocolName": "h3",
+              "queueMilliseconds": 14.59205150604248,
+              "responseWaitMilliseconds": 706.72607421875,
+              "reusedConnection": true,
+              "transferMilliseconds": 156.40592575073242
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200422008&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=25,7,9&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.399821,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 712.319016456604,
+          "transactions": [
+            {
+              "encodedResponseBytes": 15634,
+              "protocolName": "h3",
+              "queueMilliseconds": 14.231085777282715,
+              "responseWaitMilliseconds": 601.5650033950806,
+              "reusedConnection": true,
+              "transferMilliseconds": 13.093948364257812
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200409006&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=221,850&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.400174,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 962.2039794921875,
+          "transactions": [
+            {
+              "encodedResponseBytes": 13662,
+              "protocolName": "h3",
+              "queueMilliseconds": 14.188051223754883,
+              "responseWaitMilliseconds": 820.0440406799316,
+              "reusedConnection": true,
+              "transferMilliseconds": 43.91896724700928
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200406005&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=14&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.400315,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1630.0870180130005,
+          "transactions": [
+            {
+              "encodedResponseBytes": 28443,
+              "protocolName": "h3",
+              "queueMilliseconds": 14.600038528442383,
+              "responseWaitMilliseconds": 1364.4009828567505,
+              "reusedConnection": true,
+              "transferMilliseconds": 167.7790880203247
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417025&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=18,6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.399714,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1323.5489130020142,
+          "transactions": [
+            {
+              "encodedResponseBytes": 31962,
+              "protocolName": "h3",
+              "queueMilliseconds": 14.15097713470459,
+              "responseWaitMilliseconds": 1060.073971748352,
+              "reusedConnection": true,
+              "transferMilliseconds": 165.9250259399414
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000900000058&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=21,25&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.400449,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 571.6450214385986,
+          "transactions": [
+            {
+              "encodedResponseBytes": 19114,
+              "protocolName": "h3",
+              "queueMilliseconds": 6.5680742263793945,
+              "responseWaitMilliseconds": 339.5940065383911,
+              "reusedConnection": true,
+              "transferMilliseconds": 117.27297306060791
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503013&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=212,223,321&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.395048,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 742.048978805542,
+          "transactions": [
+            {
+              "encodedResponseBytes": 27230,
+              "protocolName": "h3",
+              "queueMilliseconds": 13.8930082321167,
+              "responseWaitMilliseconds": 619.6839809417725,
+              "reusedConnection": true,
+              "transferMilliseconds": 24.734020233154297
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417002&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=21,25&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.400737,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 739.7500276565552,
+          "transactions": [
+            {
+              "encodedResponseBytes": 32627,
+              "protocolName": "h3",
+              "queueMilliseconds": 13.825058937072754,
+              "responseWaitMilliseconds": 478.77800464630127,
+              "reusedConnection": true,
+              "transferMilliseconds": 154.91199493408203
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417046&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=T1&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.400825,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 571.031928062439,
+          "transactions": [
+            {
+              "encodedResponseBytes": 5718,
+              "protocolName": "h3",
+              "queueMilliseconds": 13.7709379196167,
+              "responseWaitMilliseconds": 465.3879404067993,
+              "reusedConnection": true,
+              "transferMilliseconds": 8.3160400390625
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200404041&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=32&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.400915,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 763.5130882263184,
+          "transactions": [
+            {
+              "encodedResponseBytes": 12460,
+              "protocolName": "h3",
+              "queueMilliseconds": 13.715028762817383,
+              "responseWaitMilliseconds": 622.4770545959473,
+              "reusedConnection": true,
+              "transferMilliseconds": 31.71396255493164
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417038&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=30,32&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.400994,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1611.7579936981201,
+          "transactions": [
+            {
+              "encodedResponseBytes": 25691,
+              "protocolName": "h3",
+              "queueMilliseconds": 16.691923141479492,
+              "responseWaitMilliseconds": 1346.627950668335,
+              "reusedConnection": true,
+              "transferMilliseconds": 163.1530523300171
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417023&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=18,21&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.397505,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1489.5650148391724,
+          "transactions": [
+            {
+              "encodedResponseBytes": 70193,
+              "protocolName": "h3",
+              "queueMilliseconds": 14.109015464782715,
+              "responseWaitMilliseconds": 1223.7800359725952,
+              "reusedConnection": true,
+              "transferMilliseconds": 168.2490110397339
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417039&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=16,18,30,301,303,304,305,401,403,405,406,407,6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.40065,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 1290.0750637054443,
+          "transactions": [
+            {
+              "encodedResponseBytes": 4700,
+              "protocolName": "h3",
+              "queueMilliseconds": 16.24298095703125,
+              "responseWaitMilliseconds": 1187.6280307769775,
+              "reusedConnection": true,
+              "transferMilliseconds": 1.3170242309570312
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503012&lang=en&date=2026-10-15&time=17:30:00&duration=150&maxJourneys=-1&lines=321&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772292.396344,
+        "statusCode": 200
+      },
+      {
+        "metrics": {
+          "totalMilliseconds": 316.707968711853,
+          "transactions": [
+            {
+              "encodedResponseBytes": 12006,
+              "protocolName": "h3",
+              "queueMilliseconds": 0.29397010803222656,
+              "responseWaitMilliseconds": 221.94397449493408,
+              "reusedConnection": true,
+              "transferMilliseconds": 93.10007095336914
+            }
+          ]
+        },
+        "request": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508016&lang=en&date=2026-10-15&time=18:00:00&duration=120&maxJourneys=-1&lines=6&rtMode=SERVER_DEFAULT&passlist=1",
+        "startedAt": 813772296.298309,
+        "statusCode": 200
+      }
+    ],
+    "unfilteredJourneys": [
+      {
+        "arrival": 1792081440,
+        "departure": 1792079745.2875,
+        "id": "g6:612>1962:24291375@20261015:31-34|24368575@20261015:2-8",
+        "lines": [
+          "850",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1792081860,
+        "departure": 1792079925.2875,
+        "id": "g6:612>1962:24263701@20261015:13-16|24360473@20261015:2-7",
+        "lines": [
+          "223",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1792081860,
+        "departure": 1792080040.1375,
+        "id": "g6:127>1962:24365635@20261015:0-2|24360473@20261015:2-7",
+        "lines": [
+          "29",
+          "16"
+        ]
+      },
+      {
+        "arrival": 1792082400,
+        "departure": 1792080525.2875,
+        "id": "g6:612>1962:24261848@20261015:17-20|24368581@20261015:3-8",
+        "lines": [
+          "321",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1792082400,
+        "departure": 1792080871.6287498,
+        "id": "g6:654>1962:24262705@20261015:16-19|24368581@20261015:3-8",
+        "lines": [
+          "322",
+          "6"
+        ]
+      },
+      {
+        "arrival": 1792083013.33875,
+        "departure": 1792080871.6287498,
+        "id": "g6:654>2775:24262705@20261015:16-19|24423069@20261015:2-8",
+        "lines": [
+          "322",
+          "21"
+        ]
+      }
+    ],
+    "process": "cold"
+  }
+]

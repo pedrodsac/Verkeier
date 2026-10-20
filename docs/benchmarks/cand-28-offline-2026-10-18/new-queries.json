@@ -1,0 +1,340 @@
+[
+ {
+  "capture": "live-baseline-2026-10-15",
+  "stop": "000200417050",
+  "date": "2026-10-15",
+  "time": "18:00:00",
+  "durationMinutes": 120,
+  "requestedLines": [
+   "201",
+   "21",
+   "211",
+   "212",
+   "222",
+   "25",
+   "301",
+   "303",
+   "304",
+   "305",
+   "309",
+   "311",
+   "321",
+   "322",
+   "323",
+   "324",
+   "325",
+   "326",
+   "327",
+   "401",
+   "403",
+   "405",
+   "406",
+   "407",
+   "455",
+   "456",
+   "501",
+   "502",
+   "507",
+   "6",
+   "7",
+   "811",
+   "812"
+  ],
+  "linesWithRecordedRows": [
+   "21",
+   "6"
+  ],
+  "linesWithoutRecordedRows": [
+   "201",
+   "211",
+   "212",
+   "222",
+   "25",
+   "301",
+   "303",
+   "304",
+   "305",
+   "309",
+   "311",
+   "321",
+   "322",
+   "323",
+   "324",
+   "325",
+   "326",
+   "327",
+   "401",
+   "403",
+   "405",
+   "406",
+   "407",
+   "455",
+   "456",
+   "501",
+   "502",
+   "507",
+   "7",
+   "811",
+   "812"
+  ],
+  "rowsAssembled": 22,
+  "recordedBoardsUsed": 1,
+  "networkMillisecondsUsed": 292
+ },
+ {
+  "capture": "live-baseline-2026-10-15",
+  "stop": "000200508016",
+  "date": "2026-10-15",
+  "time": "18:00:00",
+  "durationMinutes": 120,
+  "requestedLines": [
+   "16",
+   "223",
+   "29",
+   "361",
+   "6",
+   "850"
+  ],
+  "linesWithRecordedRows": [
+   "16",
+   "6"
+  ],
+  "linesWithoutRecordedRows": [
+   "223",
+   "29",
+   "361",
+   "850"
+  ],
+  "rowsAssembled": 28,
+  "recordedBoardsUsed": 2,
+  "networkMillisecondsUsed": 379
+ },
+ {
+  "capture": "live-2026-10-18/round-1",
+  "stop": "000200417050",
+  "date": "2026-10-18",
+  "time": "19:00:00",
+  "durationMinutes": 120,
+  "requestedLines": [
+   "201",
+   "21",
+   "211",
+   "212",
+   "222",
+   "311",
+   "322",
+   "324",
+   "326",
+   "327",
+   "406",
+   "455",
+   "456",
+   "6",
+   "811",
+   "812"
+  ],
+  "linesWithRecordedRows": [
+   "21",
+   "6"
+  ],
+  "linesWithoutRecordedRows": [
+   "201",
+   "211",
+   "212",
+   "222",
+   "311",
+   "322",
+   "324",
+   "326",
+   "327",
+   "406",
+   "455",
+   "456",
+   "811",
+   "812"
+  ],
+  "rowsAssembled": 11,
+  "recordedBoardsUsed": 1,
+  "networkMillisecondsUsed": 1188
+ },
+ {
+  "capture": "live-2026-10-18/round-1",
+  "stop": "000200508016",
+  "date": "2026-10-18",
+  "time": "18:30:00",
+  "durationMinutes": 150,
+  "requestedLines": [
+   "16",
+   "223",
+   "29",
+   "361",
+   "6",
+   "850"
+  ],
+  "linesWithRecordedRows": [
+   "16",
+   "6"
+  ],
+  "linesWithoutRecordedRows": [
+   "223",
+   "29",
+   "361",
+   "850"
+  ],
+  "rowsAssembled": 21,
+  "recordedBoardsUsed": 1,
+  "networkMillisecondsUsed": 1189
+ },
+ {
+  "capture": "live-2026-10-18/round-2",
+  "stop": "000200508016",
+  "date": "2026-10-18",
+  "time": "18:30:00",
+  "durationMinutes": 150,
+  "requestedLines": [
+   "16",
+   "223",
+   "29",
+   "361",
+   "6",
+   "850"
+  ],
+  "linesWithRecordedRows": [
+   "16",
+   "6"
+  ],
+  "linesWithoutRecordedRows": [
+   "223",
+   "29",
+   "361",
+   "850"
+  ],
+  "rowsAssembled": 21,
+  "recordedBoardsUsed": 1,
+  "networkMillisecondsUsed": 1353
+ },
+ {
+  "capture": "live-2026-10-18/round-2",
+  "stop": "000200417050",
+  "date": "2026-10-18",
+  "time": "19:00:00",
+  "durationMinutes": 120,
+  "requestedLines": [
+   "201",
+   "21",
+   "211",
+   "212",
+   "222",
+   "311",
+   "322",
+   "324",
+   "326",
+   "327",
+   "406",
+   "455",
+   "456",
+   "6",
+   "811",
+   "812"
+  ],
+  "linesWithRecordedRows": [
+   "21",
+   "6"
+  ],
+  "linesWithoutRecordedRows": [
+   "201",
+   "211",
+   "212",
+   "222",
+   "311",
+   "322",
+   "324",
+   "326",
+   "327",
+   "406",
+   "455",
+   "456",
+   "811",
+   "812"
+  ],
+  "rowsAssembled": 11,
+  "recordedBoardsUsed": 1,
+  "networkMillisecondsUsed": 886
+ },
+ {
+  "capture": "live-2026-10-18/round-3",
+  "stop": "000200508016",
+  "date": "2026-10-18",
+  "time": "18:30:00",
+  "durationMinutes": 150,
+  "requestedLines": [
+   "16",
+   "223",
+   "29",
+   "361",
+   "6",
+   "850"
+  ],
+  "linesWithRecordedRows": [
+   "16",
+   "6"
+  ],
+  "linesWithoutRecordedRows": [
+   "223",
+   "29",
+   "361",
+   "850"
+  ],
+  "rowsAssembled": 21,
+  "recordedBoardsUsed": 1,
+  "networkMillisecondsUsed": 1574
+ },
+ {
+  "capture": "live-2026-10-18/round-3",
+  "stop": "000200417050",
+  "date": "2026-10-18",
+  "time": "19:00:00",
+  "durationMinutes": 120,
+  "requestedLines": [
+   "201",
+   "21",
+   "211",
+   "212",
+   "222",
+   "311",
+   "322",
+   "324",
+   "326",
+   "327",
+   "406",
+   "455",
+   "456",
+   "6",
+   "811",
+   "812"
+  ],
+  "linesWithRecordedRows": [
+   "21",
+   "6"
+  ],
+  "linesWithoutRecordedRows": [
+   "201",
+   "211",
+   "212",
+   "222",
+   "311",
+   "322",
+   "324",
+   "326",
+   "327",
+   "406",
+   "455",
+   "456",
+   "811",
+   "812"
+  ],
+  "rowsAssembled": 11,
+  "recordedBoardsUsed": 1,
+  "networkMillisecondsUsed": 2402
+ }
+]

@@ -1,0 +1,2628 @@
+{
+ "pooled": {
+  "canaryMedianMs": 2298.6896245,
+  "canaryLimitMs": 2758.4275494,
+  "routes": {
+   "live-now": {
+    "priming.total": {
+     "base": 2992.224208,
+     "c5": 2793.3107915,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      2959.199375,
+      2984.721958,
+      2999.726458,
+      3010.486458
+     ],
+     "c5Values": [
+      2769.5155839999998,
+      2776.687333,
+      2809.9342500000002,
+      3033.453542
+     ]
+    },
+    "priming.snapshotPreparation": {
+     "base": 245.8514375,
+     "c5": 42.886041500000005,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      243.886667,
+      244.313584,
+      247.38929100000001,
+      258.63824900000003
+     ],
+     "c5Values": [
+      41.352251,
+      41.757041,
+      44.015042,
+      54.900124
+     ]
+    },
+    "priming.endpoints": {
+     "base": 68.9105835,
+     "c5": 77.222104,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      67.249292,
+      68.292917,
+      69.52825,
+      76.995
+     ],
+     "c5Values": [
+      75.935916,
+      76.461917,
+      77.982291,
+      87.501375
+     ]
+    },
+    "priming.graphPreparation": {
+     "base": 31.2953125,
+     "c5": 32.146666499999995,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      29.766459,
+      31.03075,
+      31.559875,
+      34.427375
+     ],
+     "c5Values": [
+      30.71525,
+      30.861292,
+      33.432041,
+      35.756125
+     ]
+    },
+    "priming.walkingPreparation": {
+     "base": 298.51245800000004,
+     "c5": 321.4428335,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      296.423834,
+      296.607833,
+      300.417083,
+      329.066541
+     ],
+     "c5Values": [
+      310.900125,
+      318.836,
+      324.049667,
+      340.606625
+     ]
+    },
+    "warm.total": {
+     "base": 2626.3341875,
+     "c5": 2641.7196455000003,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      2596.161083,
+      2617.8317500000003,
+      2634.836625,
+      2655.696667
+     ],
+     "c5Values": [
+      2620.601417,
+      2638.433958,
+      2645.005333,
+      2688.097625
+     ]
+    },
+    "warm.snapshotPreparation": {
+     "base": 0.4270835,
+     "c5": 0.46477100000000005,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      0.413459,
+      0.425334,
+      0.428833,
+      0.45725000000000005
+     ],
+     "c5Values": [
+      0.411208,
+      0.45025000000000004,
+      0.479292,
+      0.490167
+     ]
+    },
+    "warm.endpoints": {
+     "base": 0.9428335,
+     "c5": 1.01375,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      0.915667,
+      0.930125,
+      0.955542,
+      0.974167
+     ],
+     "c5Values": [
+      0.949042,
+      0.955125,
+      1.072375,
+      1.073583
+     ]
+    },
+    "warm.graphPreparation": {
+     "base": 0.5126459999999999,
+     "c5": 0.531875,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      0.494791,
+      0.511875,
+      0.513417,
+      0.534875
+     ],
+     "c5Values": [
+      0.45775,
+      0.5215,
+      0.54225,
+      0.55
+     ]
+    },
+    "warm.walkingPreparation": {
+     "base": 247.732125,
+     "c5": 267.806271,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      245.745334,
+      246.57925,
+      248.885,
+      250.774
+     ],
+     "c5Values": [
+      252.098917,
+      252.593084,
+      283.019458,
+      305.895833
+     ]
+    },
+    "cold.total": {
+     "base": 2958.9507295000003,
+     "c5": 2786.0603125,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      2941.968958,
+      2952.454125,
+      2965.447334,
+      2980.732375
+     ],
+     "c5Values": [
+      2759.4135420000002,
+      2783.494333,
+      2788.626292,
+      2932.226917
+     ]
+    },
+    "cold.snapshotPreparation": {
+     "base": 243.8230615,
+     "c5": 26.494395500000003,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      240.387499,
+      243.48945700000002,
+      244.156666,
+      246.499542
+     ],
+     "c5Values": [
+      21.74875,
+      23.843167,
+      29.145624,
+      37.386292000000005
+     ]
+    },
+    "cold.endpoints": {
+     "base": 67.885125,
+     "c5": 82.171104,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      65.969042,
+      66.497709,
+      69.272541,
+      69.761833
+     ],
+     "c5Values": [
+      76.143875,
+      80.274208,
+      84.068,
+      127.650125
+     ]
+    },
+    "cold.graphPreparation": {
+     "base": 31.998562500000002,
+     "c5": 36.564375,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      27.227667,
+      31.881917,
+      32.115208,
+      33.263125
+     ],
+     "c5Values": [
+      32.144833,
+      36.518791,
+      36.609959,
+      61.851833
+     ]
+    },
+    "cold.walkingPreparation": {
+     "base": 290.2372295,
+     "c5": 318.933333,
+     "n": [
+      4,
+      4
+     ],
+     "baseValues": [
+      285.686542,
+      288.443042,
+      292.031417,
+      300.288291
+     ],
+     "c5Values": [
+      294.655791,
+      299.044625,
+      338.822041,
+      405.696083
+     ]
+    }
+   },
+   "live-reverse": {
+    "priming.total": {
+     "base": 3164.195125,
+     "c5": 2996.422375,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      3151.861417,
+      3160.948958,
+      3167.441292,
+      3220.807959
+     ],
+     "c5Values": [
+      2976.613125,
+      2993.3735420000003,
+      2996.422375,
+      3001.631916,
+      3046.824583
+     ]
+    },
+    "priming.snapshotPreparation": {
+     "base": 246.558854,
+     "c5": 44.985957,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      244.90229200000002,
+      245.155916,
+      247.961792,
+      249.198125
+     ],
+     "c5Values": [
+      24.164208000000002,
+      41.529500999999996,
+      44.985957,
+      45.151707,
+      45.470417000000005
+     ]
+    },
+    "priming.endpoints": {
+     "base": 69.0389165,
+     "c5": 81.08275,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      68.217667,
+      68.775041,
+      69.302792,
+      72.795333
+     ],
+     "c5Values": [
+      79.910667,
+      79.951291,
+      81.08275,
+      81.530125,
+      81.565833
+     ]
+    },
+    "priming.graphPreparation": {
+     "base": 32.0978125,
+     "c5": 31.948458,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      30.456584,
+      31.82125,
+      32.374375,
+      36.769958
+     ],
+     "c5Values": [
+      30.745417,
+      31.378791,
+      31.948458,
+      32.975583,
+      34.356542
+     ]
+    },
+    "priming.walkingPreparation": {
+     "base": 318.8913335,
+     "c5": 342.111834,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      316.171125,
+      316.282917,
+      321.49975,
+      331.931417
+     ],
+     "c5Values": [
+      335.962291,
+      337.289084,
+      342.111834,
+      348.174417,
+      348.904875
+     ]
+    },
+    "warm.total": {
+     "base": 2785.6484585,
+     "c5": 2787.805416,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      2777.874792,
+      2784.445417,
+      2786.8514999999998,
+      2820.580208
+     ],
+     "c5Values": [
+      2770.7615,
+      2785.679958,
+      2787.805416,
+      2795.701,
+      2834.877875
+     ]
+    },
+    "warm.snapshotPreparation": {
+     "base": 0.450563,
+     "c5": 0.442083,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      0.422875,
+      0.44537499999999997,
+      0.455751,
+      0.5065
+     ],
+     "c5Values": [
+      0.428958,
+      0.432125,
+      0.442083,
+      0.443082,
+      0.479875
+     ]
+    },
+    "warm.endpoints": {
+     "base": 0.9962915,
+     "c5": 1.00325,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      0.908292,
+      0.927041,
+      1.065542,
+      1.101083
+     ],
+     "c5Values": [
+      0.927833,
+      0.988375,
+      1.00325,
+      1.035209,
+      1.039417
+     ]
+    },
+    "warm.graphPreparation": {
+     "base": 0.5095,
+     "c5": 0.528541,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      0.505542,
+      0.508083,
+      0.510917,
+      0.573209
+     ],
+     "c5Values": [
+      0.487125,
+      0.508416,
+      0.528541,
+      0.549042,
+      0.556875
+     ]
+    },
+    "warm.walkingPreparation": {
+     "base": 267.8382295,
+     "c5": 274.804875,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      265.067875,
+      265.888667,
+      269.787792,
+      289.724167
+     ],
+     "c5Values": [
+      258.095084,
+      263.2695,
+      274.804875,
+      277.447625,
+      304.661791
+     ]
+    },
+    "cold.total": {
+     "base": 3170.8157920000003,
+     "c5": 2986.421416,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      3129.593166,
+      3156.637,
+      3184.994584,
+      3252.450417
+     ],
+     "c5Values": [
+      2969.532541,
+      2972.005916,
+      2986.421416,
+      3013.555292,
+      3018.025833
+     ]
+    },
+    "cold.snapshotPreparation": {
+     "base": 246.9108755,
+     "c5": 21.632582999999997,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      241.723709,
+      243.235459,
+      250.58629200000001,
+      263.837668
+     ],
+     "c5Values": [
+      21.382708,
+      21.528626000000003,
+      21.632582999999997,
+      22.419708,
+      23.229459
+     ]
+    },
+    "cold.endpoints": {
+     "base": 69.3346665,
+     "c5": 85.053042,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      68.590208,
+      69.078458,
+      69.590875,
+      80.854958
+     ],
+     "c5Values": [
+      76.611792,
+      78.720583,
+      85.053042,
+      85.196709,
+      87.528042
+     ]
+    },
+    "cold.graphPreparation": {
+     "base": 33.356521,
+     "c5": 33.391166,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      28.346125,
+      32.340875,
+      34.372167,
+      41.535166
+     ],
+     "c5Values": [
+      32.364334,
+      33.383,
+      33.391166,
+      35.459917,
+      36.261708
+     ]
+    },
+    "cold.walkingPreparation": {
+     "base": 320.8278545,
+     "c5": 328.732,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      307.712792,
+      312.154917,
+      329.500792,
+      335.567625
+     ],
+     "c5Values": [
+      321.417166,
+      325.81125,
+      328.732,
+      334.953125,
+      345.5705
+     ]
+    }
+   },
+   "live-esch": {
+    "priming.total": {
+     "base": 2285.5226455,
+     "c5": 2121.758459,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      2250.010083,
+      2276.8627500000002,
+      2294.182541,
+      2294.563583
+     ],
+     "c5Values": [
+      2054.178167,
+      2060.856833,
+      2121.758459,
+      2131.1005,
+      2183.039667
+     ]
+    },
+    "priming.snapshotPreparation": {
+     "base": 249.6119165,
+     "c5": 46.629375,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      242.11795899999998,
+      249.474708,
+      249.749125,
+      253.04091499999998
+     ],
+     "c5Values": [
+      20.832292,
+      44.200832,
+      46.629375,
+      54.896376,
+      55.733543
+     ]
+    },
+    "priming.endpoints": {
+     "base": 64.86125,
+     "c5": 77.959833,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      63.581583,
+      63.595416,
+      66.127084,
+      67.69775
+     ],
+     "c5Values": [
+      70.689875,
+      74.293917,
+      77.959833,
+      79.095167,
+      79.93475
+     ]
+    },
+    "priming.graphPreparation": {
+     "base": 30.260292,
+     "c5": 31.490083,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      28.383875,
+      28.813375,
+      31.707209,
+      36.989583
+     ],
+     "c5Values": [
+      28.398334,
+      29.902666,
+      31.490083,
+      33.960958,
+      35.335
+     ]
+    },
+    "priming.walkingPreparation": {
+     "base": 245.0095205,
+     "c5": 259.459583,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      240.6235,
+      244.738458,
+      245.280583,
+      255.618625
+     ],
+     "c5Values": [
+      248.264584,
+      253.007125,
+      259.459583,
+      274.01875,
+      292.071042
+     ]
+    },
+    "warm.total": {
+     "base": 1956.5711039999999,
+     "c5": 1917.836542,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      1938.332416,
+      1954.8498749999999,
+      1958.2923329999999,
+      2060.087125
+     ],
+     "c5Values": [
+      1860.3371670000001,
+      1910.988417,
+      1917.836542,
+      1918.3970829999998,
+      1953.2711669999999
+     ]
+    },
+    "warm.snapshotPreparation": {
+     "base": 0.4413125,
+     "c5": 0.437833,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      0.425833,
+      0.4335,
+      0.449125,
+      0.455833
+     ],
+     "c5Values": [
+      0.412333,
+      0.43441699999999994,
+      0.437833,
+      0.44699900000000004,
+      0.509
+     ]
+    },
+    "warm.endpoints": {
+     "base": 0.9238124999999999,
+     "c5": 0.909834,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      0.895458,
+      0.897292,
+      0.950333,
+      0.957083
+     ],
+     "c5Values": [
+      0.876083,
+      0.906708,
+      0.909834,
+      0.936917,
+      0.943
+     ]
+    },
+    "warm.graphPreparation": {
+     "base": 0.5107915000000001,
+     "c5": 0.503666,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      0.491083,
+      0.510125,
+      0.511458,
+      0.518625
+     ],
+     "c5Values": [
+      0.477459,
+      0.498333,
+      0.503666,
+      0.541917,
+      0.592333
+     ]
+    },
+    "warm.walkingPreparation": {
+     "base": 187.80404149999998,
+     "c5": 192.43325,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      184.415958,
+      187.21025,
+      188.397833,
+      193.054375
+     ],
+     "c5Values": [
+      185.896833,
+      186.457375,
+      192.43325,
+      197.543625,
+      198.444417
+     ]
+    },
+    "cold.total": {
+     "base": 2293.238521,
+     "c5": 2071.695041,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      2232.385375,
+      2287.697,
+      2298.780042,
+      2363.951125
+     ],
+     "c5Values": [
+      2065.860041,
+      2071.365333,
+      2071.695041,
+      2072.769292,
+      2108.236084
+     ]
+    },
+    "cold.snapshotPreparation": {
+     "base": 245.331749,
+     "c5": 21.81575,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      241.02433299999998,
+      243.87924900000002,
+      246.784249,
+      260.601209
+     ],
+     "c5Values": [
+      20.673289999999998,
+      20.8355,
+      21.81575,
+      22.990375,
+      23.827333
+     ]
+    },
+    "cold.endpoints": {
+     "base": 65.4280835,
+     "c5": 73.242375,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      61.349583,
+      64.098583,
+      66.757584,
+      70.270709
+     ],
+     "c5Values": [
+      72.75175,
+      72.789708,
+      73.242375,
+      73.974292,
+      74.264042
+     ]
+    },
+    "cold.graphPreparation": {
+     "base": 34.5330205,
+     "c5": 33.062209,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      32.480917,
+      32.952916,
+      36.113125,
+      36.440542
+     ],
+     "c5Values": [
+      31.577792,
+      32.794833,
+      33.062209,
+      33.71525,
+      34.688459
+     ]
+    },
+    "cold.walkingPreparation": {
+     "base": 241.299438,
+     "c5": 250.3645,
+     "n": [
+      4,
+      5
+     ],
+     "baseValues": [
+      236.248042,
+      238.880209,
+      243.718667,
+      276.196875
+     ],
+     "c5Values": [
+      248.34675,
+      249.905,
+      250.3645,
+      257.191125,
+      268.770375
+     ]
+    }
+   },
+   "all routes": {
+    "priming.total": {
+     "base": 2992.224208,
+     "c5": 2793.3107915,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      2250.010083,
+      2276.8627500000002,
+      2294.182541,
+      2294.563583,
+      2959.199375,
+      2984.721958,
+      2999.726458,
+      3010.486458,
+      3151.861417,
+      3160.948958,
+      3167.441292,
+      3220.807959
+     ],
+     "c5Values": [
+      2054.178167,
+      2060.856833,
+      2121.758459,
+      2131.1005,
+      2183.039667,
+      2769.5155839999998,
+      2776.687333,
+      2809.9342500000002,
+      2976.613125,
+      2993.3735420000003,
+      2996.422375,
+      3001.631916,
+      3033.453542,
+      3046.824583
+     ]
+    },
+    "priming.snapshotPreparation": {
+     "base": 247.6755415,
+     "c5": 44.5933945,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      242.11795899999998,
+      243.886667,
+      244.313584,
+      244.90229200000002,
+      245.155916,
+      247.38929100000001,
+      247.961792,
+      249.198125,
+      249.474708,
+      249.749125,
+      253.04091499999998,
+      258.63824900000003
+     ],
+     "c5Values": [
+      20.832292,
+      24.164208000000002,
+      41.352251,
+      41.529500999999996,
+      41.757041,
+      44.015042,
+      44.200832,
+      44.985957,
+      45.151707,
+      45.470417000000005,
+      46.629375,
+      54.896376,
+      54.900124,
+      55.733543
+     ]
+    },
+    "priming.endpoints": {
+     "base": 68.255292,
+     "c5": 79.502917,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      63.581583,
+      63.595416,
+      66.127084,
+      67.249292,
+      67.69775,
+      68.217667,
+      68.292917,
+      68.775041,
+      69.302792,
+      69.52825,
+      72.795333,
+      76.995
+     ],
+     "c5Values": [
+      70.689875,
+      74.293917,
+      75.935916,
+      76.461917,
+      77.959833,
+      77.982291,
+      79.095167,
+      79.910667,
+      79.93475,
+      79.951291,
+      81.08275,
+      81.530125,
+      81.565833,
+      87.501375
+     ]
+    },
+    "priming.graphPreparation": {
+     "base": 31.633542,
+     "c5": 31.7192705,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      28.383875,
+      28.813375,
+      29.766459,
+      30.456584,
+      31.03075,
+      31.559875,
+      31.707209,
+      31.82125,
+      32.374375,
+      34.427375,
+      36.769958,
+      36.989583
+     ],
+     "c5Values": [
+      28.398334,
+      29.902666,
+      30.71525,
+      30.745417,
+      30.861292,
+      31.378791,
+      31.490083,
+      31.948458,
+      32.975583,
+      33.432041,
+      33.960958,
+      34.356542,
+      35.335,
+      35.756125
+     ]
+    },
+    "priming.walkingPreparation": {
+     "base": 298.51245800000004,
+     "c5": 321.4428335,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      240.6235,
+      244.738458,
+      245.280583,
+      255.618625,
+      296.423834,
+      296.607833,
+      300.417083,
+      316.171125,
+      316.282917,
+      321.49975,
+      329.066541,
+      331.931417
+     ],
+     "c5Values": [
+      248.264584,
+      253.007125,
+      259.459583,
+      274.01875,
+      292.071042,
+      310.900125,
+      318.836,
+      324.049667,
+      335.962291,
+      337.289084,
+      340.606625,
+      342.111834,
+      348.174417,
+      348.904875
+     ]
+    },
+    "warm.total": {
+     "base": 2626.3341875,
+     "c5": 2641.7196455000003,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      1938.332416,
+      1954.8498749999999,
+      1958.2923329999999,
+      2060.087125,
+      2596.161083,
+      2617.8317500000003,
+      2634.836625,
+      2655.696667,
+      2777.874792,
+      2784.445417,
+      2786.8514999999998,
+      2820.580208
+     ],
+     "c5Values": [
+      1860.3371670000001,
+      1910.988417,
+      1917.836542,
+      1918.3970829999998,
+      1953.2711669999999,
+      2620.601417,
+      2638.433958,
+      2645.005333,
+      2688.097625,
+      2770.7615,
+      2785.679958,
+      2787.805416,
+      2795.701,
+      2834.877875
+     ]
+    },
+    "warm.snapshotPreparation": {
+     "base": 0.4394375,
+     "c5": 0.4425825,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      0.413459,
+      0.422875,
+      0.425334,
+      0.425833,
+      0.428833,
+      0.4335,
+      0.44537499999999997,
+      0.449125,
+      0.455751,
+      0.455833,
+      0.45725000000000005,
+      0.5065
+     ],
+     "c5Values": [
+      0.411208,
+      0.412333,
+      0.428958,
+      0.432125,
+      0.43441699999999994,
+      0.437833,
+      0.442083,
+      0.443082,
+      0.44699900000000004,
+      0.45025000000000004,
+      0.479292,
+      0.479875,
+      0.490167,
+      0.509
+     ]
+    },
+    "warm.endpoints": {
+     "base": 0.940229,
+     "c5": 0.9520835000000001,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      0.895458,
+      0.897292,
+      0.908292,
+      0.915667,
+      0.927041,
+      0.930125,
+      0.950333,
+      0.955542,
+      0.957083,
+      0.974167,
+      1.065542,
+      1.101083
+     ],
+     "c5Values": [
+      0.876083,
+      0.906708,
+      0.909834,
+      0.927833,
+      0.936917,
+      0.943,
+      0.949042,
+      0.955125,
+      0.988375,
+      1.00325,
+      1.035209,
+      1.039417,
+      1.072375,
+      1.073583
+     ]
+    },
+    "warm.graphPreparation": {
+     "base": 0.5111874999999999,
+     "c5": 0.5250205,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      0.491083,
+      0.494791,
+      0.505542,
+      0.508083,
+      0.510125,
+      0.510917,
+      0.511458,
+      0.511875,
+      0.513417,
+      0.518625,
+      0.534875,
+      0.573209
+     ],
+     "c5Values": [
+      0.45775,
+      0.477459,
+      0.487125,
+      0.498333,
+      0.503666,
+      0.508416,
+      0.5215,
+      0.528541,
+      0.541917,
+      0.54225,
+      0.549042,
+      0.55,
+      0.556875,
+      0.592333
+     ]
+    },
+    "warm.walkingPreparation": {
+     "base": 247.732125,
+     "c5": 255.344084,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      184.415958,
+      187.21025,
+      188.397833,
+      193.054375,
+      245.745334,
+      246.57925,
+      248.885,
+      250.774,
+      265.067875,
+      265.888667,
+      269.787792,
+      289.724167
+     ],
+     "c5Values": [
+      185.896833,
+      186.457375,
+      192.43325,
+      197.543625,
+      198.444417,
+      252.098917,
+      252.593084,
+      258.095084,
+      263.2695,
+      274.804875,
+      277.447625,
+      283.019458,
+      304.661791,
+      305.895833
+     ]
+    },
+    "cold.total": {
+     "base": 2958.9507295000003,
+     "c5": 2786.0603125,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      2232.385375,
+      2287.697,
+      2298.780042,
+      2363.951125,
+      2941.968958,
+      2952.454125,
+      2965.447334,
+      2980.732375,
+      3129.593166,
+      3156.637,
+      3184.994584,
+      3252.450417
+     ],
+     "c5Values": [
+      2065.860041,
+      2071.365333,
+      2071.695041,
+      2072.769292,
+      2108.236084,
+      2759.4135420000002,
+      2783.494333,
+      2788.626292,
+      2932.226917,
+      2969.532541,
+      2972.005916,
+      2986.421416,
+      3013.555292,
+      3018.025833
+     ]
+    },
+    "cold.snapshotPreparation": {
+     "base": 244.01795750000002,
+     "c5": 22.117729,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      240.387499,
+      241.02433299999998,
+      241.723709,
+      243.235459,
+      243.48945700000002,
+      243.87924900000002,
+      244.156666,
+      246.499542,
+      246.784249,
+      250.58629200000001,
+      260.601209,
+      263.837668
+     ],
+     "c5Values": [
+      20.673289999999998,
+      20.8355,
+      21.382708,
+      21.528626000000003,
+      21.632582999999997,
+      21.74875,
+      21.81575,
+      22.419708,
+      22.990375,
+      23.229459,
+      23.827333,
+      23.843167,
+      29.145624,
+      37.386292000000005
+     ]
+    },
+    "cold.endpoints": {
+     "base": 68.834333,
+     "c5": 77.6661875,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      61.349583,
+      64.098583,
+      65.969042,
+      66.497709,
+      66.757584,
+      68.590208,
+      69.078458,
+      69.272541,
+      69.590875,
+      69.761833,
+      70.270709,
+      80.854958
+     ],
+     "c5Values": [
+      72.75175,
+      72.789708,
+      73.242375,
+      73.974292,
+      74.264042,
+      76.143875,
+      76.611792,
+      78.720583,
+      80.274208,
+      84.068,
+      85.053042,
+      85.196709,
+      87.528042,
+      127.650125
+     ]
+    },
+    "cold.graphPreparation": {
+     "base": 32.716916499999996,
+     "c5": 33.553208,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      27.227667,
+      28.346125,
+      31.881917,
+      32.115208,
+      32.340875,
+      32.480917,
+      32.952916,
+      33.263125,
+      34.372167,
+      36.113125,
+      36.440542,
+      41.535166
+     ],
+     "c5Values": [
+      31.577792,
+      32.144833,
+      32.364334,
+      32.794833,
+      33.062209,
+      33.383,
+      33.391166,
+      33.71525,
+      34.688459,
+      35.459917,
+      36.261708,
+      36.518791,
+      36.609959,
+      61.851833
+     ]
+    },
+    "cold.walkingPreparation": {
+     "base": 290.2372295,
+     "c5": 310.2308955,
+     "n": [
+      12,
+      14
+     ],
+     "baseValues": [
+      236.248042,
+      238.880209,
+      243.718667,
+      276.196875,
+      285.686542,
+      288.443042,
+      292.031417,
+      300.288291,
+      307.712792,
+      312.154917,
+      329.500792,
+      335.567625
+     ],
+     "c5Values": [
+      248.34675,
+      249.905,
+      250.3645,
+      257.191125,
+      268.770375,
+      294.655791,
+      299.044625,
+      321.417166,
+      325.81125,
+      328.732,
+      334.953125,
+      338.822041,
+      345.5705,
+      405.696083
+     ]
+    }
+   }
+  }
+ },
+ "runs": [
+  {
+   "route": "live-esch",
+   "arm": "Base",
+   "rep": "r0",
+   "canaryMs": 2306,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2294.6,
+     "snapshotPreparationMs": 249.7,
+     "liveStartMs": 318.4
+    },
+    {
+     "process": "warm",
+     "totalMs": 1954.8,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.2
+    },
+    {
+     "process": "cold",
+     "totalMs": 2232.4,
+     "snapshotPreparationMs": 246.8,
+     "liveStartMs": 314.0
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-esch",
+   "arm": "Base",
+   "rep": "r1",
+   "canaryMs": 2235,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2250.0,
+     "snapshotPreparationMs": 242.1,
+     "liveStartMs": 308.4
+    },
+    {
+     "process": "warm",
+     "totalMs": 1958.3,
+     "snapshotPreparationMs": 0.5,
+     "liveStartMs": 2.3
+    },
+    {
+     "process": "cold",
+     "totalMs": 2287.7,
+     "snapshotPreparationMs": 241.0,
+     "liveStartMs": 304.8
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-esch",
+   "arm": "Base",
+   "rep": "r2",
+   "canaryMs": 2260,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2276.9,
+     "snapshotPreparationMs": 249.5,
+     "liveStartMs": 319.4
+    },
+    {
+     "process": "warm",
+     "totalMs": 1938.3,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.2
+    },
+    {
+     "process": "cold",
+     "totalMs": 2298.8,
+     "snapshotPreparationMs": 243.9,
+     "liveStartMs": 313.4
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-esch",
+   "arm": "Base",
+   "rep": "r3",
+   "canaryMs": 2530,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2294.2,
+     "snapshotPreparationMs": 253.0,
+     "liveStartMs": 324.4
+    },
+    {
+     "process": "warm",
+     "totalMs": 2060.1,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.3
+    },
+    {
+     "process": "cold",
+     "totalMs": 2364.0,
+     "snapshotPreparationMs": 260.6,
+     "liveStartMs": 334.3
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-esch",
+   "arm": "Base",
+   "rep": "r4",
+   "canaryMs": 3000,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2354.5,
+     "snapshotPreparationMs": 292.7,
+     "liveStartMs": 383.4
+    },
+    {
+     "process": "warm",
+     "totalMs": 1985.8,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.2
+    },
+    {
+     "process": "cold",
+     "totalMs": 2377.7,
+     "snapshotPreparationMs": 308.8,
+     "liveStartMs": 387.9
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-esch",
+   "arm": "C5",
+   "rep": "r0",
+   "canaryMs": 2520,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2131.1,
+     "snapshotPreparationMs": 54.9,
+     "liveStartMs": 137.1
+    },
+    {
+     "process": "warm",
+     "totalMs": 1918.4,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.2
+    },
+    {
+     "process": "cold",
+     "totalMs": 2072.8,
+     "snapshotPreparationMs": 23.8,
+     "liveStartMs": 110.1
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-esch",
+   "arm": "C5",
+   "rep": "r1",
+   "canaryMs": 2276,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2054.2,
+     "snapshotPreparationMs": 44.2,
+     "liveStartMs": 118.6
+    },
+    {
+     "process": "warm",
+     "totalMs": 1860.3,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.2
+    },
+    {
+     "process": "cold",
+     "totalMs": 2071.4,
+     "snapshotPreparationMs": 20.8,
+     "liveStartMs": 108.0
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-esch",
+   "arm": "C5",
+   "rep": "r2",
+   "canaryMs": 2262,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2060.9,
+     "snapshotPreparationMs": 20.8,
+     "liveStartMs": 106.5
+    },
+    {
+     "process": "warm",
+     "totalMs": 1917.8,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.2
+    },
+    {
+     "process": "cold",
+     "totalMs": 2065.9,
+     "snapshotPreparationMs": 23.0,
+     "liveStartMs": 108.5
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-esch",
+   "arm": "C5",
+   "rep": "r3",
+   "canaryMs": 2379,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2183.0,
+     "snapshotPreparationMs": 46.6,
+     "liveStartMs": 130.3
+    },
+    {
+     "process": "warm",
+     "totalMs": 1911.0,
+     "snapshotPreparationMs": 0.5,
+     "liveStartMs": 2.4
+    },
+    {
+     "process": "cold",
+     "totalMs": 2071.7,
+     "snapshotPreparationMs": 20.7,
+     "liveStartMs": 106.6
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-esch",
+   "arm": "C5",
+   "rep": "r4",
+   "canaryMs": 2332,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2121.8,
+     "snapshotPreparationMs": 55.7,
+     "liveStartMs": 137.9
+    },
+    {
+     "process": "warm",
+     "totalMs": 1953.3,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.4
+    },
+    {
+     "process": "cold",
+     "totalMs": 2108.2,
+     "snapshotPreparationMs": 21.8,
+     "liveStartMs": 111.4
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-now",
+   "arm": "Base",
+   "rep": "r0",
+   "canaryMs": 2285,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2984.7,
+     "snapshotPreparationMs": 247.4,
+     "liveStartMs": 319.3
+    },
+    {
+     "process": "warm",
+     "totalMs": 2655.7,
+     "snapshotPreparationMs": 0.5,
+     "liveStartMs": 2.6
+    },
+    {
+     "process": "cold",
+     "totalMs": 2980.7,
+     "snapshotPreparationMs": 244.2,
+     "liveStartMs": 316.5
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-now",
+   "arm": "Base",
+   "rep": "r1",
+   "canaryMs": 2269,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2999.7,
+     "snapshotPreparationMs": 243.9,
+     "liveStartMs": 316.1
+    },
+    {
+     "process": "warm",
+     "totalMs": 2617.8,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.5
+    },
+    {
+     "process": "cold",
+     "totalMs": 2942.0,
+     "snapshotPreparationMs": 240.4,
+     "liveStartMs": 308.8
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-now",
+   "arm": "Base",
+   "rep": "r2",
+   "canaryMs": 2248,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 3010.5,
+     "snapshotPreparationMs": 258.6,
+     "liveStartMs": 341.8
+    },
+    {
+     "process": "warm",
+     "totalMs": 2634.8,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.4
+    },
+    {
+     "process": "cold",
+     "totalMs": 2965.4,
+     "snapshotPreparationMs": 246.5,
+     "liveStartMs": 315.4
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-now",
+   "arm": "Base",
+   "rep": "r3",
+   "canaryMs": 2233,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2959.2,
+     "snapshotPreparationMs": 244.3,
+     "liveStartMs": 314.5
+    },
+    {
+     "process": "warm",
+     "totalMs": 2596.2,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.6
+    },
+    {
+     "process": "cold",
+     "totalMs": 2952.5,
+     "snapshotPreparationMs": 243.5,
+     "liveStartMs": 315.4
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-now",
+   "arm": "Base",
+   "rep": "r4",
+   "canaryMs": 2894,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 3115.9,
+     "snapshotPreparationMs": 295.4,
+     "liveStartMs": 373.5
+    },
+    {
+     "process": "warm",
+     "totalMs": 2652.0,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.7
+    },
+    {
+     "process": "cold",
+     "totalMs": 2969.7,
+     "snapshotPreparationMs": 244.7,
+     "liveStartMs": 320.8
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-now",
+   "arm": "C5",
+   "rep": "r0",
+   "canaryMs": 2406,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2776.7,
+     "snapshotPreparationMs": 41.8,
+     "liveStartMs": 123.4
+    },
+    {
+     "process": "warm",
+     "totalMs": 2638.4,
+     "snapshotPreparationMs": 0.5,
+     "liveStartMs": 2.8
+    },
+    {
+     "process": "cold",
+     "totalMs": 2788.6,
+     "snapshotPreparationMs": 21.7,
+     "liveStartMs": 110.6
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-now",
+   "arm": "C5",
+   "rep": "r1",
+   "canaryMs": 2258,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2809.9,
+     "snapshotPreparationMs": 44.0,
+     "liveStartMs": 124.8
+    },
+    {
+     "process": "warm",
+     "totalMs": 2645.0,
+     "snapshotPreparationMs": 0.5,
+     "liveStartMs": 2.7
+    },
+    {
+     "process": "cold",
+     "totalMs": 2783.5,
+     "snapshotPreparationMs": 29.1,
+     "liveStartMs": 123.4
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-now",
+   "arm": "C5",
+   "rep": "r2",
+   "canaryMs": 2244,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2769.5,
+     "snapshotPreparationMs": 41.4,
+     "liveStartMs": 120.0
+    },
+    {
+     "process": "warm",
+     "totalMs": 2620.6,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.4
+    },
+    {
+     "process": "cold",
+     "totalMs": 2759.4,
+     "snapshotPreparationMs": 23.8,
+     "liveStartMs": 119.6
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-now",
+   "arm": "C5",
+   "rep": "r3",
+   "canaryMs": 2390,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 3033.5,
+     "snapshotPreparationMs": 54.9,
+     "liveStartMs": 146.3
+    },
+    {
+     "process": "warm",
+     "totalMs": 2688.1,
+     "snapshotPreparationMs": 0.5,
+     "liveStartMs": 2.8
+    },
+    {
+     "process": "cold",
+     "totalMs": 2932.2,
+     "snapshotPreparationMs": 37.4,
+     "liveStartMs": 193.9
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-now",
+   "arm": "C5",
+   "rep": "r4",
+   "canaryMs": 3573,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2912.7,
+     "snapshotPreparationMs": 51.6,
+     "liveStartMs": 149.8
+    },
+    {
+     "process": "warm",
+     "totalMs": 2617.7,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.6
+    },
+    {
+     "process": "cold",
+     "totalMs": 2763.4,
+     "snapshotPreparationMs": 21.8,
+     "liveStartMs": 122.5
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-reverse",
+   "arm": "Base",
+   "rep": "r0",
+   "canaryMs": 2292,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 3151.9,
+     "snapshotPreparationMs": 244.9,
+     "liveStartMs": 315.8
+    },
+    {
+     "process": "warm",
+     "totalMs": 2786.9,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.5
+    },
+    {
+     "process": "cold",
+     "totalMs": 3156.6,
+     "snapshotPreparationMs": 241.7,
+     "liveStartMs": 313.4
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-reverse",
+   "arm": "Base",
+   "rep": "r1",
+   "canaryMs": 2242,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 3160.9,
+     "snapshotPreparationMs": 249.2,
+     "liveStartMs": 322.1
+    },
+    {
+     "process": "warm",
+     "totalMs": 2777.9,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.5
+    },
+    {
+     "process": "cold",
+     "totalMs": 3129.6,
+     "snapshotPreparationMs": 243.2,
+     "liveStartMs": 314.7
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-reverse",
+   "arm": "Base",
+   "rep": "r2",
+   "canaryMs": 2248,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 3167.4,
+     "snapshotPreparationMs": 248.0,
+     "liveStartMs": 319.9
+    },
+    {
+     "process": "warm",
+     "totalMs": 2784.4,
+     "snapshotPreparationMs": 0.5,
+     "liveStartMs": 2.8
+    },
+    {
+     "process": "cold",
+     "totalMs": 3252.5,
+     "snapshotPreparationMs": 263.8,
+     "liveStartMs": 347.9
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-reverse",
+   "arm": "Base",
+   "rep": "r3",
+   "canaryMs": 3749,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 3245.7,
+     "snapshotPreparationMs": 261.4,
+     "liveStartMs": 338.3
+    },
+    {
+     "process": "warm",
+     "totalMs": 2819.2,
+     "snapshotPreparationMs": 0.5,
+     "liveStartMs": 2.7
+    },
+    {
+     "process": "cold",
+     "totalMs": 3175.8,
+     "snapshotPreparationMs": 254.6,
+     "liveStartMs": 330.8
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-reverse",
+   "arm": "Base",
+   "rep": "r4",
+   "canaryMs": 2439,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 3220.8,
+     "snapshotPreparationMs": 245.2,
+     "liveStartMs": 321.7
+    },
+    {
+     "process": "warm",
+     "totalMs": 2820.6,
+     "snapshotPreparationMs": 0.5,
+     "liveStartMs": 3.0
+    },
+    {
+     "process": "cold",
+     "totalMs": 3185.0,
+     "snapshotPreparationMs": 250.6,
+     "liveStartMs": 323.1
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-reverse",
+   "arm": "C5",
+   "rep": "r0",
+   "canaryMs": 2281,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2996.4,
+     "snapshotPreparationMs": 24.2,
+     "liveStartMs": 120.1
+    },
+    {
+     "process": "warm",
+     "totalMs": 2785.7,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.6
+    },
+    {
+     "process": "cold",
+     "totalMs": 2986.4,
+     "snapshotPreparationMs": 23.2,
+     "liveStartMs": 125.3
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-reverse",
+   "arm": "C5",
+   "rep": "r1",
+   "canaryMs": 2591,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 3046.8,
+     "snapshotPreparationMs": 45.2,
+     "liveStartMs": 129.8
+    },
+    {
+     "process": "warm",
+     "totalMs": 2834.9,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.8
+    },
+    {
+     "process": "cold",
+     "totalMs": 2969.5,
+     "snapshotPreparationMs": 21.6,
+     "liveStartMs": 112.3
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-reverse",
+   "arm": "C5",
+   "rep": "r2",
+   "canaryMs": 2289,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2976.6,
+     "snapshotPreparationMs": 41.5,
+     "liveStartMs": 124.4
+    },
+    {
+     "process": "warm",
+     "totalMs": 2770.8,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.7
+    },
+    {
+     "process": "cold",
+     "totalMs": 2972.0,
+     "snapshotPreparationMs": 21.5,
+     "liveStartMs": 114.9
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-reverse",
+   "arm": "C5",
+   "rep": "r3",
+   "canaryMs": 2375,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 2993.4,
+     "snapshotPreparationMs": 45.0,
+     "liveStartMs": 128.2
+    },
+    {
+     "process": "warm",
+     "totalMs": 2787.8,
+     "snapshotPreparationMs": 0.5,
+     "liveStartMs": 2.7
+    },
+    {
+     "process": "cold",
+     "totalMs": 3013.6,
+     "snapshotPreparationMs": 21.4,
+     "liveStartMs": 119.8
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  },
+  {
+   "route": "live-reverse",
+   "arm": "C5",
+   "rep": "r4",
+   "canaryMs": 2451,
+   "samples": [
+    {
+     "process": "priming",
+     "totalMs": 3001.6,
+     "snapshotPreparationMs": 45.5,
+     "liveStartMs": 130.6
+    },
+    {
+     "process": "warm",
+     "totalMs": 2795.7,
+     "snapshotPreparationMs": 0.4,
+     "liveStartMs": 2.6
+    },
+    {
+     "process": "cold",
+     "totalMs": 3018.0,
+     "snapshotPreparationMs": 22.4,
+     "liveStartMs": 123.5
+    }
+   ],
+   "therm": "Note: No thermal warning level has been recorded Note: No performance warning le"
+  }
+ ],
+ "firstLaunchAndNoStoredTable": {
+  "miss": [
+   {
+    "run": "live-now-Base-r0",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3704.4,
+      "snapshotPreparationMs": 278.7
+     },
+     {
+      "process": "cold",
+      "totalMs": 4042.1,
+      "snapshotPreparationMs": 263.5
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-Base-r1",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3752.5,
+      "snapshotPreparationMs": 286.1
+     },
+     {
+      "process": "cold",
+      "totalMs": 3777.8,
+      "snapshotPreparationMs": 251.1
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-Base-r2",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3625.5,
+      "snapshotPreparationMs": 250.0
+     },
+     {
+      "process": "cold",
+      "totalMs": 3724.9,
+      "snapshotPreparationMs": 253.8
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-Base-r3",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 4082.3,
+      "snapshotPreparationMs": 322.4
+     },
+     {
+      "process": "cold",
+      "totalMs": 3852.1,
+      "snapshotPreparationMs": 253.9
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-C5-r0",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3978.0,
+      "snapshotPreparationMs": 306.6
+     },
+     {
+      "process": "cold",
+      "totalMs": 3777.9,
+      "snapshotPreparationMs": 28.3
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-C5-r1",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 4210.5,
+      "snapshotPreparationMs": 341.3
+     }
+    ],
+    "aborted": true
+   },
+   {
+    "run": "live-now-C5-r2",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3675.4,
+      "snapshotPreparationMs": 265.4
+     },
+     {
+      "process": "cold",
+      "totalMs": 3499.1,
+      "snapshotPreparationMs": 22.0
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-C5-r3",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3706.6,
+      "snapshotPreparationMs": 259.0
+     }
+    ],
+    "aborted": true
+   }
+  ],
+  "miss-steady": [
+   {
+    "run": "live-now-Base-r0",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 4305.0,
+      "snapshotPreparationMs": 286.6
+     }
+    ],
+    "aborted": true
+   },
+   {
+    "run": "live-now-Base-r1",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3734.5,
+      "snapshotPreparationMs": 276.5
+     },
+     {
+      "process": "cold",
+      "totalMs": 3771.1,
+      "snapshotPreparationMs": 252.2
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-Base-r2",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3707.5,
+      "snapshotPreparationMs": 276.0
+     },
+     {
+      "process": "cold",
+      "totalMs": 3736.2,
+      "snapshotPreparationMs": 246.7
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-Base-r3",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3558.3,
+      "snapshotPreparationMs": 265.0
+     },
+     {
+      "process": "cold",
+      "totalMs": 3566.1,
+      "snapshotPreparationMs": 243.8
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-Base-r4",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3912.0,
+      "snapshotPreparationMs": 267.1
+     },
+     {
+      "process": "cold",
+      "totalMs": 3883.1,
+      "snapshotPreparationMs": 303.5
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-Base-r5",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3559.5,
+      "snapshotPreparationMs": 242.4
+     },
+     {
+      "process": "cold",
+      "totalMs": 3571.7,
+      "snapshotPreparationMs": 246.6
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-C5-r0",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 4133.2,
+      "snapshotPreparationMs": 310.5
+     },
+     {
+      "process": "cold",
+      "totalMs": 3929.9,
+      "snapshotPreparationMs": 31.9
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-C5-r1",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3601.2,
+      "snapshotPreparationMs": 50.0
+     },
+     {
+      "process": "cold",
+      "totalMs": 3595.5,
+      "snapshotPreparationMs": 23.0
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-C5-r2",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3693.1,
+      "snapshotPreparationMs": 56.5
+     },
+     {
+      "process": "cold",
+      "totalMs": 3581.1,
+      "snapshotPreparationMs": 21.0
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-C5-r3",
+    "samples": [],
+    "aborted": true
+   },
+   {
+    "run": "live-now-C5-r4",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3394.9,
+      "snapshotPreparationMs": 43.5
+     },
+     {
+      "process": "cold",
+      "totalMs": 3382.7,
+      "snapshotPreparationMs": 20.3
+     }
+    ],
+    "aborted": false
+   },
+   {
+    "run": "live-now-C5-r5",
+    "samples": [
+     {
+      "process": "priming",
+      "totalMs": 3432.0,
+      "snapshotPreparationMs": 20.9
+     },
+     {
+      "process": "cold",
+      "totalMs": 3348.6,
+      "snapshotPreparationMs": 22.0
+     }
+    ],
+    "aborted": false
+   }
+  ]
+ }
+}
