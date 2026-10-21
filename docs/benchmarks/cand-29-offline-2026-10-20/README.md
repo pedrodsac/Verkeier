@@ -6,7 +6,7 @@ were never recorded, so every candidate replay aborts with `missing-replay-query
 without any response, is *which boards each ordering would fetch*, and that shows CAND-29 as specified does not fetch
 the board that caused the 20:57 second pass.
 
-- **Code:** scratch copies only. Engine `00078b6` (`git archive`) plus [`engine.diff`](engine.diff); app `af2180a`
+- **Code:** scratch copies only. Engine `00078b6` (`git archive`) plus [`engine.diff`](engine.diff); app `fa5833b`
   (`git archive`) pointed at the scratch engine. Nothing in `~/Developer/MobilitéitKit` or any tracked file of this
   repo was written, nothing was committed or pushed.
 - **ATP requests:** 0. The replay client points at `recorded-atp.invalid`.

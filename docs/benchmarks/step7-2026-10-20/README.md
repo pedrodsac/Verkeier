@@ -6,7 +6,7 @@ change so far: steps 0–2, the direction guard, `GeodesicDistance`, CAND-28 and
 - **Route:** Gromscheed → Kirchberg, Konrad Adenauer, leave now, on a weekday evening. Planning times:
   round 1 at 18:52, rounds 2 and 3 at 19:05–19:06. This is later than the 17:51 Thursday baseline and the 17:45
   that was planned; see "Attempts" below.
-- **Build:** Release simulator app from a clean export of Verkeier `3523dcb` plus the git-ignored walking graph
+- **Build:** Release simulator app from a clean export of Verkeier `d0d58d5` plus the git-ignored walking graph
   files. MobilitéitKit `83ecb6b`, packages cloned fresh from `Package.resolved`. Feed
   `gtfs-20261014-20261212` (generation 1), installed in the simulator's container.
 - **Machine:** MacBook Air M4, iPhone 17 simulator, mains power, Low Power Mode off, thermal state nominal in

@@ -4,7 +4,7 @@ Three arms, same installed data, same fixed planning times, recorded ATP transpo
 
 | Arm | Build |
 |---|---|
-| A | `main@30fc1fc`, no stored walks |
+| A | `main@226a2fa`, no stored walks |
 | B | `feature/transfer-walk-table` with stored walks **off** (`ROUTING_TRANSFER_WALKS=0`) |
 | C | `feature/transfer-walk-table` with stored walks **on**, table built once beforehand in its own process |
 
@@ -83,7 +83,7 @@ The table is built once per walking graph/timetable: **5.5-6.7 s** for 11,188 pa
 ## Live ATP check (run later the same day)
 
 Re-run because network conditions may have changed. Simulator, live ATP, departure "now" (Gromscheed → Konrad Adenauer), one interleaved pass per arm
-(`main` first, then the branch with stored walks on; the branch build is HEAD `26edc99`). One sample per cell, so treat these as indicative.
+(`main` first, then the branch with stored walks on; the branch build is HEAD `227f5c4`). One sample per cell, so treat these as indicative.
 
 | Search | Before (`main`, ms) | After (branch, ms) | Change |
 |---|---:|---:|---:|

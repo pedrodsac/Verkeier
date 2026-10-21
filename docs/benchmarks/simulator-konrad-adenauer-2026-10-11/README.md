@@ -11,7 +11,7 @@ The five-run median fell from **4,702.567 ms to 2,313.462 ms**, a **50.804% impr
 - Gromscheed `49.6541071,6.2296443` → Kirchberg, Konrad Adenauer `49.62995,6.158028`, stop `000200417019`.
 - Same GTFS generation 5 and OSM graph, 7,200-second horizon and four rounds per pass.
 - Strict offline replay of the single earlier live iPhone run: 29 captured HTTP 200 boards, 6,643,468 bytes and 1,651 predicted events, plus its recorded bike snapshot. Missing replay queries fail. These are simulator replay timings; the physical iPhone 13 was not remeasured.
-- Baseline app commit `6af0025`, MobiliteitKit `ac6945e96e84cc3614317024cae716b0f90aca5c`; optimized package `562bca26973968113cc6c5d9d69228142c8819d5`.
+- Baseline app commit `0b09d9d`, MobiliteitKit `ac6945e96e84cc3614317024cae716b0f90aca5c`; optimized package `562bca26973968113cc6c5d9d69228142c8819d5`.
 
 ## Timing breakdown
 

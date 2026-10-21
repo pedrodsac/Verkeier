@@ -8,7 +8,7 @@ Live `live-now` searches after steps 0–2 of
   the Thursday 17:51 baseline in `../live-baseline-2026-10-15/`: 6.4–6.6 MB of
   boards per search instead of 17.9 MB, and scan passes of 130–184 ms instead of
   about 290 ms. Compare the gate verdict with a weekday run, not with this one.
-- Build: Release simulator app at `60b0c97` (plus uncommitted UI-only edits),
+- Build: Release simulator app at `07f93f4` (plus uncommitted UI-only edits),
   MobilitéitKit `1779b82`, packages cloned fresh from the pinned revision.
 - Machine: MacBook Air M4, iPhone 17 simulator, mains power, Low Power Mode off,
   no other build or benchmark running. Transfer-walk build (CPU canary):

@@ -3,7 +3,7 @@
 Replays only: **no ATP request was sent.** The plan's CAND-5 (§4.6) stores the routing snapshot that
 `TransitRouter` builds from the GTFS SQLite as one versioned binary file, so a cold start loads it instead of
 rebuilding it. This folder holds the before/after numbers; [`results.json`](results.json) has every run.
-The engine change is `83ecb6b` in `~/Developer/MobilitéitKit` (pushed); this repository pins it in `b6e0ff3` and wires the cache in `3523dcb` (not pushed).
+The engine change is `83ecb6b` in `~/Developer/MobilitéitKit` (pushed); this repository pins it in `f7881b4` and wires the cache in `d0d58d5` (not pushed).
 
 ## What was measured
 

@@ -4,7 +4,7 @@ One live search benchmark on the current code, used as the baseline in
 [ROUTING_IMPROVEMENT_BRIEF.md](../../ROUTING_IMPROVEMENT_BRIEF.md) §9.
 
 - Route: Gromscheed → Kirchberg, Konrad Adenauer, leave now (`live-now`), planning time 17:51 CEST.
-- Build: Release simulator app, `9110b4a` (plus uncommitted UI-only edits), MobilitéitKit `c4f4b70`.
+- Build: Release simulator app, `0a54e7d` (plus uncommitted UI-only edits), MobilitéitKit `c4f4b70`.
 - Data: GTFS generation 6, walking graph 20260921, stored transfer walks rebuilt first.
 - Machine: MacBook Air M4, Xcode 27.0, iPhone 17 simulator (iOS 27.0).
 - Command: `python3 Scripts/benchmark_routes.py --app <Release app> --output <dir> --scenarios live-now --warm 1 --cold 1 --maximum-limit-ms 0`

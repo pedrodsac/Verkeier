@@ -1,6 +1,6 @@
 # iPhone 13: Gromscheed → Kirchberg, Konrad Adenauer
 
-One live departure search ran at **11:47:12.890348 Europe/Luxembourg on 11 October 2026** (Unix timestamp `1791712032.890348`). A fresh process on the physical iPhone 13 used an optimized Release build, the production view model, service composition, walking graph, installed GTFS generation 5, live ATP responses and live bike availability. Code coverage and the debugger were disabled. MobiliteitKit revision: `ac6945e96e84cc3614317024cae716b0f90aca5c`; app routing revision: `ab250f5`, with the existing uncommitted UI changes included in the build.
+One live departure search ran at **11:47:12.890348 Europe/Luxembourg on 11 October 2026** (Unix timestamp `1791712032.890348`). A fresh process on the physical iPhone 13 used an optimized Release build, the production view model, service composition, walking graph, installed GTFS generation 5, live ATP responses and live bike availability. Code coverage and the debugger were disabled. MobiliteitKit revision: `ac6945e96e84cc3614317024cae716b0f90aca5c`; app routing revision: `fb33723`, with the existing uncommitted UI changes included in the build.
 
 Origin: Gromscheed, `49.6541071, 6.2296443`. Destination: the timetable stop **Kirchberg, Konrad Adenauer**, `49.62995, 6.158028`, GTFS ID `000200417019`. These are the stop's actual feed coordinates; the benchmark harness's older default coordinate is not used.
 

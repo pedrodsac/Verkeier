@@ -12,7 +12,7 @@ Departure fixed at **2026-10-12T18:16:07+02:00**, Europe/Luxembourg. All three l
 
 iPhone 17 simulator (`F726825E-2DB4-4F45-A51C-DBA5AA0E2664`), iOS 27.0. Release, coverage disabled, no debugger, production service composition, full map and route sheet. Installed GTFS generation 5 and walking graph version 20260921. Each accepted operation ran in a fresh app process; filesystem caches may be warm. These are simulator results, not physical iPhone measurements.
 
-App base commit `468cc78b022cf6dca1da629d5417d5edae2ac0b6`; MobiliteitKit `562bca26973968113cc6c5d9d69228142c8819d5`. The build includes the pre-existing uncommitted route-view edits identified in metadata, plus benchmark-only custom-origin support. Release build passed before timing began. Full canonical plan export was enabled; peak memory is not an isolated memory benchmark.
+App base commit `2b92ff8bd71fa74a59fbb0145c310f133259d581`; MobiliteitKit `562bca26973968113cc6c5d9d69228142c8819d5`. The build includes the pre-existing uncommitted route-view edits identified in metadata, plus benchmark-only custom-origin support. Release build passed before timing began. Full canonical plan export was enabled; peak memory is not an isolated memory benchmark.
 
 One live capture per journey, followed by four offline replays at the same timestamp with the captured boards and bike snapshot. The first replay is labelled `priming` by the runner but is included in this report’s four fresh-process median. Live and offline latency are reported separately. The runner’s latency rejection was disabled (`--maximum-limit-ms 0`) to retain slow samples; every live sample exceeds the normal 5,000 ms gate. A single live sample is not a percentile estimate.
 

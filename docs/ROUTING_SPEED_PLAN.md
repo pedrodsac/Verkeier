@@ -2,7 +2,7 @@
 doc: routing-speed-plan
 written: 2026-10-15
 basis: docs/ROUTING_IMPROVEMENT_BRIEF.md, docs/benchmarks/live-baseline-2026-10-15/
-app: Verkeier @ refactor/views-and-structure 9110b4a
+app: Verkeier @ refactor/views-and-structure 0a54e7d
 engine: MobilitéitKit @ c4f4b70 (pinned in Package.resolved)
 status: plan; steps 0 and 1 implemented on 2026-10-16, step 2 implemented and measured on 2026-10-18, device replay on an iPhone 13, a live simulator re-baseline (Sunday) and the offline evaluation of CAND-28 on 2026-10-18, CAND-28 live union capture, commit and CAND-5 on 2026-10-19, step 7 live re-baseline, the relay Server-Timing round and the CAND-29 offline evaluation on 2026-10-20 (see "Status after steps 0 and 1" and "Status after step 2")
 ---
@@ -22,7 +22,7 @@ at `CAND-21`. Refinements of existing candidates keep their brief ID.
 Steps 0 and 1 are done. MobilitéitKit `origin/main` has 5227042 (sub-spans,
 warm-up and board timings), 9cdf2c3 (test dates), 9d4a355 (worker-count
 test), f258d60 (CAND-25) and f329d01 (CAND-26). The app has the harness commit
-f8d42c3 (adds `--replay-latency`) and pins f329d01 in 1f69959; the app branch is
+29f576c (adds `--replay-latency`) and pins f329d01 in 6caa9ad; the app branch is
 not pushed. No ATP request was sent. All runs replayed the 73 baseline bodies,
 each answered after its recorded server wait and transfer time.
 
@@ -78,7 +78,7 @@ generation 6, because they use dates and trip IDs from an older feed. Step 2
 
 Step 2 (CAND-11) is done in MobilitéitKit as four commits on top of f329d01:
 676528c (a), eeb4899 (a2), 3d8699f (b) and 2c7575d (c). They are pushed to
-`origin/main`, and the app pins 2c7575d in a54a3da (branch not pushed). No ATP request was sent; every run replayed
+`origin/main`, and the app pins 2c7575d in 65cb191 (branch not pushed). No ATP request was sent; every run replayed
 the 73 baseline bodies with `--replay-latency`.
 
 | Change | What it does |
@@ -289,7 +289,7 @@ microsecond race; see the notes for a stable tie-break. Details:
 
 ### Device replay, iPhone 13 (2026-10-18)
 
-Release `ROUTING_BENCHMARK` build of app d72dada (engine 1779b82, walking
+Release `ROUTING_BENCHMARK` build of app b38738f (engine 1779b82, walking
 graph bundled) on the owner's iPhone 13 (A15, 6 cores, iOS 27.0.1).
 `Scripts/benchmark_routes_device.py` replays the 73 baseline bodies with
 recorded latency at the baseline epoch, using the generation-6 feed under its
@@ -358,7 +358,7 @@ live searches on the phone will be slower than these replays.
 ### Live re-baseline, simulator (2026-10-18, Sunday)
 
 Approved by the owner: 3 live rounds of priming, warm and cold on a quiet
-machine. Release build at 60b0c97 with engine 1779b82. CPU canary 1.88–2.02 s.
+machine. Release build at 07f93f4 with engine 1779b82. CPU canary 1.88–2.02 s.
 243 ATP requests (81 per round). Results and method are in
 [`benchmarks/live-2026-10-18/`](benchmarks/live-2026-10-18/README.md).
 
@@ -406,8 +406,8 @@ Each sample's request times, from the URLSession timestamps:
 CAND-28 is implemented in MobilitéitKit on top of 1779b82 and was first
 evaluated without any ATP request. On 2026-10-19 the owner chose to commit it
 without an iPhone measurement: MobilitéitKit `d8635e5` (pushed), pinned by the
-app in `1634386`. The 320 serial tests pass on 1779b82 plus only these files. The
-replay harness's approximate mode is committed in the app as `859c7f3`.
+app in `3feaabd`. The 320 serial tests pass on 1779b82 plus only these files. The
+replay harness's approximate mode is committed in the app as `d151288`.
 Details, method and files:
 [`benchmarks/cand-28-offline-2026-10-18/`](benchmarks/cand-28-offline-2026-10-18/README.md).
 
@@ -464,7 +464,7 @@ Details, method and files:
 
 CAND-5 is implemented in MobilitéitKit on top of `d8635e5` and wired into the
 app. The engine change is `83ecb6b` (pushed to `origin/main`); the app pins it
-in `b6e0ff3` and wires the cache in `3523dcb` (both on
+in `f7881b4` and wires the cache in `d0d58d5` (both on
 `refactor/views-and-structure`, not pushed). These docs are uncommitted. No ATP
 request was sent. Numbers, method and per-run data:
 [`benchmarks/cand-5-snapshot-2026-10-19/`](benchmarks/cand-5-snapshot-2026-10-19/README.md).
@@ -532,12 +532,12 @@ request was sent. Numbers, method and per-run data:
   update on a device. The MacBook ran on battery power for this series (arms alternated).
 - **Open.** Step 6's remaining items are untouched. Since this was written, the
   app has been built against the remote pin: the 342 engine tests pass on a clean
-  copy of `83ecb6b`, and the app (`3523dcb`, pushed) builds against it.
+  copy of `83ecb6b`, and the app (`d0d58d5`, pushed) builds against it.
 
 ### Step 7 live re-baseline, simulator (2026-10-20, Tuesday)
 
 This run uses everything committed so far: steps 0–2, the direction guard,
-`GeodesicDistance`, CAND-28 and CAND-5 (app `3523dcb`, MobilitéitKit
+`GeodesicDistance`, CAND-28 and CAND-5 (app `d0d58d5`, MobilitéitKit
 `83ecb6b`). Details and data:
 [`benchmarks/step7-2026-10-20/`](benchmarks/step7-2026-10-20/README.md).
 
@@ -588,7 +588,7 @@ This run uses everything committed so far: steps 0–2, the direction guard,
   `Server-Timing: upstream;dur=…;desc="headers", edge;desc="<colo>"`. It was
   committed as `verkeier-relay` `f9c9f75` (pushed) and deployed as version
   `aef3e2b5`. The engine records it with each request's metrics (`00078b6`),
-  and the app pins that revision (`def57ca`). `benchmark_routes.py` (`af2180a`)
+  and the app pins that revision (`7f03602`). `benchmark_routes.py` (`fa5833b`)
   writes a `relaySplit` per sample: the upstream wait and the rest, which is
   relay plus network. Body transfer is streamed and is not split.
 - **First live split (20:57, one round, 78 requests, on battery).** See

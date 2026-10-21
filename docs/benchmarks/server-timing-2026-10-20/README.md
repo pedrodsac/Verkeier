@@ -5,7 +5,7 @@ server wait into ATP time and relay plus network time. See the step 7 status in
 [ROUTING_SPEED_PLAN.md](../../ROUTING_SPEED_PLAN.md).
 
 - **Code:**
-  - App: Release simulator build of Verkeier `af2180a`, from a clean export plus the walking graph files.
+  - App: Release simulator build of Verkeier `fa5833b`, from a clean export plus the walking graph files.
   - Engine: MobilitéitKit `00078b6`.
   - Relay: `verkeier-relay` `f9c9f75`, deployed as version `aef3e2b5`.
 - **Machine:** MacBook Air M4 with the iPhone 17 simulator, **on battery power** (the owner's choice for this
