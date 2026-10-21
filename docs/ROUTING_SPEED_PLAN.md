@@ -4,7 +4,7 @@ written: 2026-10-15
 basis: docs/ROUTING_IMPROVEMENT_BRIEF.md, docs/benchmarks/live-baseline-2026-10-15/
 app: Verkeier @ refactor/views-and-structure 9110b4a
 engine: MobilitéitKit @ c4f4b70 (pinned in Package.resolved)
-status: plan; steps 0 and 1 implemented on 2026-10-16, step 2 implemented and measured on 2026-10-18, device replay on an iPhone 13, a live simulator re-baseline (Sunday) and the offline evaluation of CAND-28 on 2026-10-18, CAND-28 live union capture, commit and CAND-5 on 2026-10-19, step 7 live re-baseline on 2026-10-20 (see "Status after steps 0 and 1" and "Status after step 2")
+status: plan; steps 0 and 1 implemented on 2026-10-16, step 2 implemented and measured on 2026-10-18, device replay on an iPhone 13, a live simulator re-baseline (Sunday) and the offline evaluation of CAND-28 on 2026-10-18, CAND-28 live union capture, commit and CAND-5 on 2026-10-19, step 7 live re-baseline, the relay Server-Timing round and the CAND-29 offline evaluation on 2026-10-20 (see "Status after steps 0 and 1" and "Status after step 2")
 ---
 
 # Routing speed plan
@@ -578,7 +578,7 @@ This run uses everything committed so far: steps 0–2, the direction guard,
   - A relay `Server-Timing` header to locate the wait (§7, item 3).
   - Routing-only relay trimming (CAND-12 a), which cuts the transfer share.
   - Narrowing hub boards (CAND-28b).
-  - CAND-29.
+  - CAND-29. As specified it would not help; see its *Evidence* bullet in §4.5.
   - A gate that accepts the server's tail, for example measuring it apart from
     client time.
   - A tighter acquisition budget, which would change INV-6.
@@ -611,9 +611,11 @@ This run uses everything committed so far: steps 0–2, the direction guard,
   - Pass 2 cost 0.45–0.69 s per sample. With that one board added to discovery,
     a replay ran one pass with identical results and the same 26 requests,
     about 0.5 s faster.
-  - This is direct evidence for CAND-29. It also shows that minute precision
-    makes nearly every new board a routing change: all 130 trips in the first
-    batch were.
+  - This shows the cause, not a fix. CAND-29 as specified would not fetch
+    that board: see its *Evidence* bullet in §4.5 and the
+    [CAND-29 offline evaluation](benchmarks/cand-29-offline-2026-10-20/README.md).
+    Minute precision also makes nearly every new board a routing change: all
+    130 trips in the first batch were.
 
 ## Summary
 
@@ -1113,10 +1115,27 @@ When it does not, today's output depends on CPU load.
   last-mile boardings near the destination.
 - *Verify:* as CAND-28, plus a review of shown journeys on the four live
   scenarios.
-- *Evidence (2026-10-20, live-now at 20:57).* The second pass in every sample
-  came from the Héienhaff P+R T1 board, which discovery had skipped. A replay
-  with that board in discovery ran one pass, with identical results, about
-  0.5 s faster (see the step 7 section).
+- *Evidence (2026-10-20).* At 20:57 the second pass in every sample came from
+  the Héienhaff P+R T1 board, which discovery had skipped. A replay with that
+  one board added to discovery ran one pass, with identical results, about
+  0.5 s faster (see the step 7 section). **But CAND-29 as specified would not
+  fetch that board.** See the
+  [offline evaluation](benchmarks/cand-29-offline-2026-10-20/README.md):
+  - On the 20:57 capture, 269 of 317 first-wave candidates rank "1 ride", so
+    the distance tie-break still decides. Each wave takes 8 boards, and
+    Héienhaff P+R comes 102nd in wave 1 and 196th in wave 2. The zero-ride cap
+    (`cap4`) picks the same 24 boards on all 7 captures.
+  - The candidate cannot be replayed. On every capture, 12–16 of its 24
+    discovery queries were never recorded, so every run stopped with
+    `missing-replay-query`. These conclusions therefore come from the
+    discovery plans, not from routing results.
+  - Only 1 of the 7 captures has a second pass at all.
+  - *Verdict:* not worth ATP requests in this form. Three directions remain
+    untested, and each can be checked offline at plan level first:
+    - a signal for transfer stops, such as the number of distinct departing
+      lines;
+    - the transfer stops of the preliminary journeys;
+    - a few of the 24 slots reserved for such stops.
 
 **CAND-10 (extended): warm-up scan.** With CAND-23 in place, give the warm-up
 `.utility` priority or `cores − 2` workers. This is exact for its output and
