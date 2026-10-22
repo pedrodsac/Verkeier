@@ -1,0 +1,9 @@
+=== live round 2026-10-22 18:54:57 forced=0 power=Battery Power load={ 1.96 2.92 2.98 }
+live exit 0, requests 84
+live-now warm: 2 completed; maximum 2604 ms
+  priming: server wait split on 28 boards: upstream median 445 ms (max 1125), relay and network median 22 ms (max 123)
+  warm: server wait split on 28 boards: upstream median 536 ms (max 1160), relay and network median 22 ms (max 105)
+live-now cold-1: 1 completed; maximum 2514 ms
+  cold: server wait split on 28 boards: upstream median 570 ms (max 985), relay and network median 25 ms (max 90)
+=== done 18:55:13
+run2.sh exit 0

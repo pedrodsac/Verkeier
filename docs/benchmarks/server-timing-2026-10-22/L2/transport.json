@@ -1,0 +1,2270 @@
+[
+  {
+    "body": "04F50FAB-4E36-4F17-8E05-EC68C6730E72.body.json",
+    "receivedAt": 1792688103.632906,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=127.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380903.632694,
+      "taskStart": 814380903.478109,
+      "totalMilliseconds": 154.58500385284424,
+      "transactions": [
+        {
+          "encodedResponseBytes": 10385,
+          "fetchStart": 814380903.479143,
+          "protocolName": "h3",
+          "queueMilliseconds": 1.0340213775634766,
+          "requestEnd": 814380903.482474,
+          "requestStart": 814380903.479445,
+          "responseEnd": 814380903.632144,
+          "responseStart": 814380903.626045,
+          "responseWaitMilliseconds": 143.57101917266846,
+          "reusedConnection": true,
+          "transferMilliseconds": 6.09898567199707
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508010&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "23DE3C1C-339D-45F4-8631-45B255CB4141.body.json",
+    "receivedAt": 1792688103.653708,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=138.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380903.65349,
+      "taskStart": 814380903.480135,
+      "totalMilliseconds": 173.35498332977295,
+      "transactions": [
+        {
+          "encodedResponseBytes": 11674,
+          "fetchStart": 814380903.480996,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.861048698425293,
+          "requestEnd": 814380903.483136,
+          "requestStart": 814380903.48243,
+          "responseEnd": 814380903.653439,
+          "responseStart": 814380903.642472,
+          "responseWaitMilliseconds": 159.33597087860107,
+          "reusedConnection": true,
+          "transferMilliseconds": 10.967016220092773
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417002&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=21&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "168CE6FC-CFEC-4FBE-9CB0-48516906CB46.body.json",
+    "receivedAt": 1792688103.6729321,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=154.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380903.672672,
+      "taskStart": 814380903.480022,
+      "totalMilliseconds": 192.65007972717285,
+      "transactions": [
+        {
+          "encodedResponseBytes": 13823,
+          "fetchStart": 814380903.480771,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.7489919662475586,
+          "requestEnd": 814380903.482707,
+          "requestStart": 814380903.481945,
+          "responseEnd": 814380903.672604,
+          "responseStart": 814380903.656649,
+          "responseWaitMilliseconds": 173.941969871521,
+          "reusedConnection": true,
+          "transferMilliseconds": 15.954971313476562
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000900000058&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=21&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "43C04754-DDD1-4E00-866C-52393CA0B90D.body.json",
+    "receivedAt": 1792688103.685108,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=177.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380903.684116,
+      "taskStart": 814380903.478771,
+      "totalMilliseconds": 205.3450345993042,
+      "transactions": [
+        {
+          "encodedResponseBytes": 5631,
+          "fetchStart": 814380903.479177,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.40602684020996094,
+          "requestEnd": 814380903.482487,
+          "requestStart": 814380903.479928,
+          "responseEnd": 814380903.683997,
+          "responseStart": 814380903.681332,
+          "responseWaitMilliseconds": 198.8450288772583,
+          "reusedConnection": true,
+          "transferMilliseconds": 2.6650428771972656
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503002&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=321&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "CEC6DF1D-D0C6-4629-8901-B0AC1C646E75.body.json",
+    "receivedAt": 1792688103.693368,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=180.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380903.693116,
+      "taskStart": 814380903.479345,
+      "totalMilliseconds": 213.77098560333252,
+      "transactions": [
+        {
+          "encodedResponseBytes": 18514,
+          "fetchStart": 814380903.479448,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.102996826171875,
+          "requestEnd": 814380903.482495,
+          "requestStart": 814380903.480329,
+          "responseEnd": 814380903.693033,
+          "responseStart": 814380903.681533,
+          "responseWaitMilliseconds": 199.03802871704102,
+          "reusedConnection": true,
+          "transferMilliseconds": 11.500000953674316
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503013&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=212,223,321&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "6D7FE57C-908A-4BC1-9931-E9398FA72483.body.json",
+    "receivedAt": 1792688103.81772,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=239.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380903.817623,
+      "taskStart": 814380903.480243,
+      "totalMilliseconds": 337.380051612854,
+      "transactions": [
+        {
+          "encodedResponseBytes": 5491,
+          "fetchStart": 814380903.480911,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.6680488586425781,
+          "requestEnd": 814380903.482901,
+          "requestStart": 814380903.482193,
+          "responseEnd": 814380903.817541,
+          "responseStart": 814380903.817245,
+          "responseWaitMilliseconds": 334.3440294265747,
+          "reusedConnection": true,
+          "transferMilliseconds": 0.29599666595458984
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503012&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=321&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "8120648D-BBB5-44C9-86F7-6BF089B51CD6.body.json",
+    "receivedAt": 1792688103.819569,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=232.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380903.818352,
+      "taskStart": 814380903.479923,
+      "totalMilliseconds": 338.4289741516113,
+      "transactions": [
+        {
+          "encodedResponseBytes": 10272,
+          "fetchStart": 814380903.480575,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.6519556045532227,
+          "requestEnd": 814380903.482626,
+          "requestStart": 814380903.481797,
+          "responseEnd": 814380903.818267,
+          "responseStart": 814380903.817564,
+          "responseWaitMilliseconds": 334.93804931640625,
+          "reusedConnection": true,
+          "transferMilliseconds": 0.702977180480957
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508004&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "93F28A0F-CD1A-4B2A-B54E-1F11BDE118CC.body.json",
+    "receivedAt": 1792688103.8220448,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=229.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380903.819088,
+      "taskStart": 814380903.480186,
+      "totalMilliseconds": 338.9019966125488,
+      "transactions": [
+        {
+          "encodedResponseBytes": 13867,
+          "fetchStart": 814380903.480942,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.7560253143310547,
+          "requestEnd": 814380903.482959,
+          "requestStart": 814380903.482288,
+          "responseEnd": 814380903.818997,
+          "responseStart": 814380903.818288,
+          "responseWaitMilliseconds": 335.32893657684326,
+          "reusedConnection": true,
+          "transferMilliseconds": 0.7090568542480469
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200409006&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=221,850&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "7AA275B2-007D-461D-9F89-E00CAB90B4D8.body.json",
+    "receivedAt": 1792688103.826055,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=268.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380903.819534,
+      "taskStart": 814380903.479736,
+      "totalMilliseconds": 339.7979736328125,
+      "transactions": [
+        {
+          "encodedResponseBytes": 19574,
+          "fetchStart": 814380903.480252,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.516057014465332,
+          "requestEnd": 814380903.482521,
+          "requestStart": 814380903.481232,
+          "responseEnd": 814380903.819501,
+          "responseStart": 814380903.816091,
+          "responseWaitMilliseconds": 333.56988430023193,
+          "reusedConnection": true,
+          "transferMilliseconds": 3.4101009368896484
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417023&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=18,21&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "CCDDAF06-AFAA-4411-BBDE-5B55BC612008.body.json",
+    "receivedAt": 1792688103.8652182,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=345.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380903.865036,
+      "taskStart": 814380903.480216,
+      "totalMilliseconds": 384.81998443603516,
+      "transactions": [
+        {
+          "encodedResponseBytes": 13443,
+          "fetchStart": 814380903.480981,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.7649660110473633,
+          "requestEnd": 814380903.483014,
+          "requestStart": 814380903.482383,
+          "responseEnd": 814380903.864974,
+          "responseStart": 814380903.857047,
+          "responseWaitMilliseconds": 374.03297424316406,
+          "reusedConnection": true,
+          "transferMilliseconds": 7.927060127258301
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417038&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=30,32&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "B99A7A34-2D9B-4839-89A4-8C7455653E2A.body.json",
+    "receivedAt": 1792688103.879331,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=375.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380903.879255,
+      "taskStart": 814380903.480204,
+      "totalMilliseconds": 399.05107021331787,
+      "transactions": [
+        {
+          "encodedResponseBytes": 5315,
+          "fetchStart": 814380903.480926,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.722050666809082,
+          "requestEnd": 814380903.482932,
+          "requestStart": 814380903.48224,
+          "responseEnd": 814380903.879219,
+          "responseStart": 814380903.878892,
+          "responseWaitMilliseconds": 395.9599733352661,
+          "reusedConnection": true,
+          "transferMilliseconds": 0.32711029052734375
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200404041&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=32&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "CA248551-990C-4E4C-90A6-3F54F010BDD6.body.json",
+    "receivedAt": 1792688103.8854551,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=357.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380903.885237,
+      "taskStart": 814380903.479937,
+      "totalMilliseconds": 405.3000211715698,
+      "transactions": [
+        {
+          "encodedResponseBytes": 19779,
+          "fetchStart": 814380903.480715,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.7780790328979492,
+          "requestEnd": 814380903.482684,
+          "requestStart": 814380903.481898,
+          "responseEnd": 814380903.885189,
+          "responseStart": 814380903.870961,
+          "responseWaitMilliseconds": 388.27693462371826,
+          "reusedConnection": true,
+          "transferMilliseconds": 14.228105545043945
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200426004&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=25,4&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "568A2414-94F2-4523-862D-1A5484C94E15.body.json",
+    "receivedAt": 1792688103.954618,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=414.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380903.954349,
+      "taskStart": 814380903.47962,
+      "totalMilliseconds": 474.729061126709,
+      "transactions": [
+        {
+          "encodedResponseBytes": 26270,
+          "fetchStart": 814380903.479696,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.07605552673339844,
+          "requestEnd": 814380903.482502,
+          "requestStart": 814380903.480586,
+          "responseEnd": 814380903.954312,
+          "responseStart": 814380903.924123,
+          "responseWaitMilliseconds": 441.6210651397705,
+          "reusedConnection": true,
+          "transferMilliseconds": 30.188918113708496
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508002&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=212,223,321,850&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "AD4172D9-5642-4B6E-A7D8-3801D3E41F10.body.json",
+    "receivedAt": 1792688104.001769,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=495.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.00158,
+      "taskStart": 814380903.479959,
+      "totalMilliseconds": 521.6209888458252,
+      "transactions": [
+        {
+          "encodedResponseBytes": 12837,
+          "fetchStart": 814380903.480657,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.6979703903198242,
+          "requestEnd": 814380903.482667,
+          "requestStart": 814380903.481846,
+          "responseEnd": 814380904.001548,
+          "responseStart": 814380903.993635,
+          "responseWaitMilliseconds": 510.96808910369873,
+          "reusedConnection": true,
+          "transferMilliseconds": 7.912993431091309
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200406005&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=14&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "FCB339ED-BDFC-403B-8B6C-363D13AD480E.body.json",
+    "receivedAt": 1792688104.011379,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=476.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.010996,
+      "taskStart": 814380903.480058,
+      "totalMilliseconds": 530.9380292892456,
+      "transactions": [
+        {
+          "encodedResponseBytes": 29302,
+          "fetchStart": 814380903.480904,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.8460283279418945,
+          "requestEnd": 814380903.482893,
+          "requestStart": 814380903.482144,
+          "responseEnd": 814380904.010969,
+          "responseStart": 814380903.982969,
+          "responseWaitMilliseconds": 500.0760555267334,
+          "reusedConnection": true,
+          "transferMilliseconds": 27.99999713897705
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417019&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=16,18,30&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "7B184A4D-A320-46C5-BBB2-487C52B4BB2A.body.json",
+    "receivedAt": 1792688104.169481,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=647.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.169338,
+      "taskStart": 814380903.479846,
+      "totalMilliseconds": 689.4919872283936,
+      "transactions": [
+        {
+          "encodedResponseBytes": 10313,
+          "fetchStart": 814380903.480311,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.46503543853759766,
+          "requestEnd": 814380903.482528,
+          "requestStart": 814380903.481329,
+          "responseEnd": 814380904.169234,
+          "responseStart": 814380904.163228,
+          "responseWaitMilliseconds": 680.7000637054443,
+          "reusedConnection": true,
+          "transferMilliseconds": 6.006002426147461
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508006&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "537B3F33-0049-4BC8-8406-6A232DD3127C.body.json",
+    "receivedAt": 1792688104.344051,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=738.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.343426,
+      "taskStart": 814380903.479834,
+      "totalMilliseconds": 863.5920286178589,
+      "transactions": [
+        {
+          "encodedResponseBytes": 46626,
+          "fetchStart": 814380903.480476,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.6420612335205078,
+          "requestEnd": 814380903.482571,
+          "requestStart": 814380903.481744,
+          "responseEnd": 814380904.343331,
+          "responseStart": 814380904.237733,
+          "responseWaitMilliseconds": 755.1620006561279,
+          "reusedConnection": true,
+          "transferMilliseconds": 105.59797286987305
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417060&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=18,455,456,501,502,507,6&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "4F2366D9-D6A5-4AAA-94FA-5EFE9615CC16.body.json",
+    "receivedAt": 1792688104.4096808,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=858.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.40846,
+      "taskStart": 814380903.479745,
+      "totalMilliseconds": 928.7149906158447,
+      "transactions": [
+        {
+          "encodedResponseBytes": 54932,
+          "fetchStart": 814380903.479902,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.1569986343383789,
+          "requestEnd": 814380903.482509,
+          "requestStart": 814380903.480937,
+          "responseEnd": 814380904.408426,
+          "responseStart": 814380904.358451,
+          "responseWaitMilliseconds": 875.9419918060303,
+          "reusedConnection": true,
+          "transferMilliseconds": 49.975037574768066
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417033&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=18,201,21,211,25,7&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "62F6EB8E-993D-4C0F-B810-AA74742D5656.body.json",
+    "receivedAt": 1792688104.420259,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=890.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.414842,
+      "taskStart": 814380903.480011,
+      "totalMilliseconds": 934.8310232162476,
+      "transactions": [
+        {
+          "encodedResponseBytes": 13895,
+          "fetchStart": 814380903.48078,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.7690191268920898,
+          "requestEnd": 814380903.482744,
+          "requestStart": 814380903.481995,
+          "responseEnd": 814380904.414753,
+          "responseStart": 814380904.401957,
+          "responseWaitMilliseconds": 919.213056564331,
+          "reusedConnection": true,
+          "transferMilliseconds": 12.79592514038086
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417013&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=21&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "4A2A24C6-F256-4555-B1E9-AF88F5C3FCFF.body.json",
+    "receivedAt": 1792688104.438458,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=896.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.435718,
+      "taskStart": 814380903.479861,
+      "totalMilliseconds": 955.8570384979248,
+      "transactions": [
+        {
+          "encodedResponseBytes": 24896,
+          "fetchStart": 814380903.480392,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.5309581756591797,
+          "requestEnd": 814380903.482534,
+          "requestStart": 814380903.481686,
+          "responseEnd": 814380904.43555,
+          "responseStart": 814380904.408106,
+          "responseWaitMilliseconds": 925.5719184875488,
+          "reusedConnection": true,
+          "transferMilliseconds": 27.444005012512207
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417025&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=18,6&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "C9F91546-887A-4775-80E5-664B834A9534.body.json",
+    "receivedAt": 1792688104.44514,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=872.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.43901,
+      "taskStart": 814380903.4801,
+      "totalMilliseconds": 958.9099884033203,
+      "transactions": [
+        {
+          "encodedResponseBytes": 60825,
+          "fetchStart": 814380903.480822,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.7219314575195312,
+          "requestEnd": 814380903.482781,
+          "requestStart": 814380903.482042,
+          "responseEnd": 814380904.438972,
+          "responseStart": 814380904.381446,
+          "responseWaitMilliseconds": 898.6649513244629,
+          "reusedConnection": true,
+          "transferMilliseconds": 57.52599239349365
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417039&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=16,18,30,301,303,304,305,401,403,405,406,407,6&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "B1D299AE-5295-4D47-B1C5-549EB145CACE.body.json",
+    "receivedAt": 1792688104.4828038,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=932.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.471796,
+      "taskStart": 814380903.480072,
+      "totalMilliseconds": 991.7240142822266,
+      "transactions": [
+        {
+          "encodedResponseBytes": 39339,
+          "fetchStart": 814380903.48086,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.7879734039306641,
+          "requestEnd": 814380903.48288,
+          "requestStart": 814380903.482094,
+          "responseEnd": 814380904.471756,
+          "responseStart": 814380904.435571,
+          "responseWaitMilliseconds": 952.6909589767456,
+          "reusedConnection": true,
+          "transferMilliseconds": 36.18502616882324
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508003&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=212,223,29,321,850&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "93B1B89E-8C66-48FA-BE21-DF1E78CD9D8C.body.json",
+    "receivedAt": 1792688104.561833,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=1035.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.561506,
+      "taskStart": 814380903.479764,
+      "totalMilliseconds": 1081.7420482635498,
+      "transactions": [
+        {
+          "encodedResponseBytes": 27529,
+          "fetchStart": 814380903.480131,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.36704540252685547,
+          "requestEnd": 814380903.482515,
+          "requestStart": 814380903.481151,
+          "responseEnd": 814380904.561431,
+          "responseStart": 814380904.535211,
+          "responseWaitMilliseconds": 1052.6959896087646,
+          "reusedConnection": true,
+          "transferMilliseconds": 26.220083236694336
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200422008&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=25,7,9&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "C0C4CD7E-F04C-4F62-AB29-992380B532E3.body.json",
+    "receivedAt": 1792688104.584342,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=691.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.584185,
+      "taskStart": 814380903.863735,
+      "totalMilliseconds": 720.4500436782837,
+      "transactions": [
+        {
+          "encodedResponseBytes": 16631,
+          "fetchStart": 814380903.863895,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.16009807586669922,
+          "requestEnd": 814380903.86427,
+          "requestStart": 814380903.864069,
+          "responseEnd": 814380904.584147,
+          "responseStart": 814380904.576503,
+          "responseWaitMilliseconds": 712.2330665588379,
+          "reusedConnection": true,
+          "transferMilliseconds": 7.643938064575195
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508007&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=311,323,325,327,361&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "D997AB86-E2D9-467A-98B4-7D81D9B00D8C.body.json",
+    "receivedAt": 1792688104.645129,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=1125.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.644695,
+      "taskStart": 814380903.480153,
+      "totalMilliseconds": 1164.5420789718628,
+      "transactions": [
+        {
+          "encodedResponseBytes": 27893,
+          "fetchStart": 814380903.480966,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.8130073547363281,
+          "requestEnd": 814380903.482974,
+          "requestStart": 814380903.482336,
+          "responseEnd": 814380904.644655,
+          "responseStart": 814380904.624057,
+          "responseWaitMilliseconds": 1141.083002090454,
+          "reusedConnection": true,
+          "transferMilliseconds": 20.59793472290039
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417046&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=T1&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "47A4DD04-2C82-4648-9121-378F2320B8DD.body.json",
+    "receivedAt": 1792688104.74057,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=825.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.740088,
+      "taskStart": 814380903.8638,
+      "totalMilliseconds": 876.2879371643066,
+      "transactions": [
+        {
+          "encodedResponseBytes": 44233,
+          "fetchStart": 814380903.863915,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.11491775512695312,
+          "requestEnd": 814380903.864281,
+          "requestStart": 814380903.864221,
+          "responseEnd": 814380904.740044,
+          "responseStart": 814380904.710978,
+          "responseWaitMilliseconds": 846.6969728469849,
+          "reusedConnection": true,
+          "transferMilliseconds": 29.065966606140137
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508016&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=16,223,29,361,6,850&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "D9D172DD-B3A8-4682-95C6-75F3DE6D8BD1.body.json",
+    "receivedAt": 1792688104.772697,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=232.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380904.772412,
+      "taskStart": 814380904.498903,
+      "totalMilliseconds": 273.5089063644409,
+      "transactions": [
+        {
+          "encodedResponseBytes": 28011,
+          "fetchStart": 814380904.49901,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.10693073272705078,
+          "requestEnd": 814380904.499354,
+          "requestStart": 814380904.499293,
+          "responseEnd": 814380904.77237,
+          "responseStart": 814380904.752653,
+          "responseWaitMilliseconds": 253.29899787902832,
+          "reusedConnection": true,
+          "transferMilliseconds": 19.716978073120117
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417012&lang=en&date=2026-10-22&time=19:30:00&duration=90&maxJourneys=-1&lines=12,16,25,30&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "CEF4E4D0-1C28-4188-8107-ABF285440447.body.json",
+    "receivedAt": 1792688105.425631,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=768.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380905.424606,
+      "taskStart": 814380904.498814,
+      "totalMilliseconds": 925.7919788360596,
+      "transactions": [
+        {
+          "encodedResponseBytes": 126536,
+          "fetchStart": 814380904.49893,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.11599063873291016,
+          "requestEnd": 814380904.499343,
+          "requestStart": 814380904.499141,
+          "responseEnd": 814380905.424563,
+          "responseStart": 814380905.39081,
+          "responseWaitMilliseconds": 891.4669752120972,
+          "reusedConnection": true,
+          "transferMilliseconds": 33.753037452697754
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417050&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=201,21,211,212,222,25,301,303,304,305,309,311,321,322,323,324,325,326,327,401,403,405,406,407,455,456,501,502,507,6,7,811,812&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "DFB16642-D358-436B-A2F8-9FF8D4B8C3F0.body.json",
+    "receivedAt": 1792688106.06217,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=96.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.06202,
+      "taskStart": 814380905.936718,
+      "totalMilliseconds": 125.30195713043213,
+      "transactions": [
+        {
+          "encodedResponseBytes": 10386,
+          "fetchStart": 814380905.936793,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.0749826431274414,
+          "requestEnd": 814380905.937729,
+          "requestStart": 814380905.937122,
+          "responseEnd": 814380906.061973,
+          "responseStart": 814380906.052561,
+          "responseWaitMilliseconds": 114.83204364776611,
+          "reusedConnection": true,
+          "transferMilliseconds": 9.411931037902832
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508010&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "02523F7B-63F7-4653-B10B-8CE5CCBA5333.body.json",
+    "receivedAt": 1792688106.074501,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=113.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.074272,
+      "taskStart": 814380905.937332,
+      "totalMilliseconds": 136.94000244140625,
+      "transactions": [
+        {
+          "encodedResponseBytes": 12932,
+          "fetchStart": 814380905.937943,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.6109476089477539,
+          "requestEnd": 814380905.939074,
+          "requestStart": 814380905.938599,
+          "responseEnd": 814380906.074227,
+          "responseStart": 814380906.068024,
+          "responseWaitMilliseconds": 128.94999980926514,
+          "reusedConnection": true,
+          "transferMilliseconds": 6.202936172485352
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200406005&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=14&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "60A7581A-732E-4E9A-BC83-0C9D4150CC9F.body.json",
+    "receivedAt": 1792688106.102264,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=135.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.101663,
+      "taskStart": 814380905.93698,
+      "totalMilliseconds": 164.68298435211182,
+      "transactions": [
+        {
+          "encodedResponseBytes": 5565,
+          "fetchStart": 814380905.937051,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.07104873657226562,
+          "requestEnd": 814380905.937924,
+          "requestStart": 814380905.937476,
+          "responseEnd": 814380906.0995,
+          "responseStart": 814380906.092889,
+          "responseWaitMilliseconds": 154.96492385864258,
+          "reusedConnection": true,
+          "transferMilliseconds": 6.610989570617676
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503012&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=321&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "B7AD0722-35DF-4B0B-B635-844B1DDC16FD.body.json",
+    "receivedAt": 1792688106.1542668,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=193.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.154129,
+      "taskStart": 814380905.936308,
+      "totalMilliseconds": 217.82100200653076,
+      "transactions": [
+        {
+          "encodedResponseBytes": 10306,
+          "fetchStart": 814380905.936381,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.07295608520507812,
+          "requestEnd": 814380905.937683,
+          "requestStart": 814380905.936789,
+          "responseEnd": 814380906.154088,
+          "responseStart": 814380906.150225,
+          "responseWaitMilliseconds": 212.54205703735352,
+          "reusedConnection": true,
+          "transferMilliseconds": 3.8629770278930664
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508006&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "64E12949-C9F3-48BD-8584-AB082DF19954.body.json",
+    "receivedAt": 1792688106.199822,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=237.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.199628,
+      "taskStart": 814380905.937369,
+      "totalMilliseconds": 262.25900650024414,
+      "transactions": [
+        {
+          "encodedResponseBytes": 13649,
+          "fetchStart": 814380905.937959,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.5899667739868164,
+          "requestEnd": 814380905.939085,
+          "requestStart": 814380905.938706,
+          "responseEnd": 814380906.199592,
+          "responseStart": 814380906.192814,
+          "responseWaitMilliseconds": 253.728985786438,
+          "reusedConnection": true,
+          "transferMilliseconds": 6.77800178527832
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000900000058&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=21&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "43E34C4C-F68C-4140-9E42-C451A4FBF6FC.body.json",
+    "receivedAt": 1792688106.20708,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=224.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.206636,
+      "taskStart": 814380905.936004,
+      "totalMilliseconds": 270.63190937042236,
+      "transactions": [
+        {
+          "encodedResponseBytes": 26175,
+          "fetchStart": 814380905.936233,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.22900104522705078,
+          "requestEnd": 814380905.937622,
+          "requestStart": 814380905.936458,
+          "responseEnd": 814380906.206592,
+          "responseStart": 814380906.183936,
+          "responseWaitMilliseconds": 246.31404876708984,
+          "reusedConnection": true,
+          "transferMilliseconds": 22.655963897705078
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508002&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=212,223,321,850&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "0ECF6DD1-74A5-4374-A458-E347ABBAB683.body.json",
+    "receivedAt": 1792688106.251313,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=270.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.250857,
+      "taskStart": 814380905.93661,
+      "totalMilliseconds": 314.2470121383667,
+      "transactions": [
+        {
+          "encodedResponseBytes": 39080,
+          "fetchStart": 814380905.936674,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.06401538848876953,
+          "requestEnd": 814380905.937691,
+          "requestStart": 814380905.936968,
+          "responseEnd": 814380906.250768,
+          "responseStart": 814380906.22474,
+          "responseWaitMilliseconds": 287.0490550994873,
+          "reusedConnection": true,
+          "transferMilliseconds": 26.027917861938477
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508003&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=212,223,29,321,850&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "D3014CF7-CB93-40EE-98F7-86532B2F2CB8.body.json",
+    "receivedAt": 1792688106.2660651,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=297.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.25951,
+      "taskStart": 814380905.93753,
+      "totalMilliseconds": 321.9799995422363,
+      "transactions": [
+        {
+          "encodedResponseBytes": 13424,
+          "fetchStart": 814380905.938037,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.5069971084594727,
+          "requestEnd": 814380905.939153,
+          "requestStart": 814380905.939002,
+          "responseEnd": 814380906.259441,
+          "responseStart": 814380906.254037,
+          "responseWaitMilliseconds": 314.8840665817261,
+          "reusedConnection": true,
+          "transferMilliseconds": 5.403995513916016
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417038&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=30,32&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "539D0A8B-60DF-4098-A6F7-9D19921421B0.body.json",
+    "receivedAt": 1792688106.4408832,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=439.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.440487,
+      "taskStart": 814380905.937269,
+      "totalMilliseconds": 503.21805477142334,
+      "transactions": [
+        {
+          "encodedResponseBytes": 24721,
+          "fetchStart": 814380905.937752,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.4830360412597656,
+          "requestEnd": 814380905.93905,
+          "requestStart": 814380905.938193,
+          "responseEnd": 814380906.440447,
+          "responseStart": 814380906.438484,
+          "responseWaitMilliseconds": 499.4339942932129,
+          "reusedConnection": true,
+          "transferMilliseconds": 1.9630193710327148
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417025&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=18,6&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "877D1AB0-1E6E-49BF-90E1-6EAF88374F74.body.json",
+    "receivedAt": 1792688106.447188,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=413.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.441239,
+      "taskStart": 814380905.937292,
+      "totalMilliseconds": 503.94701957702637,
+      "transactions": [
+        {
+          "encodedResponseBytes": 13788,
+          "fetchStart": 814380905.93776,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.4680156707763672,
+          "requestEnd": 814380905.939056,
+          "requestStart": 814380905.938294,
+          "responseEnd": 814380906.441175,
+          "responseStart": 814380906.440544,
+          "responseWaitMilliseconds": 501.48797035217285,
+          "reusedConnection": true,
+          "transferMilliseconds": 0.6309747695922852
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200409006&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=221,850&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "ABF90AE9-6D36-4C78-8352-3ABE23630918.body.json",
+    "receivedAt": 1792688106.44971,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=429.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.443506,
+      "taskStart": 814380905.937495,
+      "totalMilliseconds": 506.0110092163086,
+      "transactions": [
+        {
+          "encodedResponseBytes": 27744,
+          "fetchStart": 814380905.938013,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.5179643630981445,
+          "requestEnd": 814380905.939101,
+          "requestStart": 814380905.938865,
+          "responseEnd": 814380906.443423,
+          "responseStart": 814380906.441203,
+          "responseWaitMilliseconds": 502.1020174026489,
+          "reusedConnection": true,
+          "transferMilliseconds": 2.220034599304199
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417046&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=T1&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "A5DC6B1A-A226-4163-9FC5-175C99CE8A81.body.json",
+    "receivedAt": 1792688106.481086,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=504.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.473562,
+      "taskStart": 814380905.937425,
+      "totalMilliseconds": 536.1369848251343,
+      "transactions": [
+        {
+          "encodedResponseBytes": 11795,
+          "fetchStart": 814380905.938,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.574946403503418,
+          "requestEnd": 814380905.939096,
+          "requestStart": 814380905.938815,
+          "responseEnd": 814380906.47346,
+          "responseStart": 814380906.465031,
+          "responseWaitMilliseconds": 525.9350538253784,
+          "reusedConnection": true,
+          "transferMilliseconds": 8.42893123626709
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417002&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=21&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "F5557778-0CC9-41E0-A8C0-809AFEE7BB23.body.json",
+    "receivedAt": 1792688106.483877,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=510.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.476369,
+      "taskStart": 814380905.936879,
+      "totalMilliseconds": 539.4899845123291,
+      "transactions": [
+        {
+          "encodedResponseBytes": 18632,
+          "fetchStart": 814380905.936974,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.09500980377197266,
+          "requestEnd": 814380905.937911,
+          "requestStart": 814380905.937377,
+          "responseEnd": 814380906.476344,
+          "responseStart": 814380906.464845,
+          "responseWaitMilliseconds": 526.9339084625244,
+          "reusedConnection": true,
+          "transferMilliseconds": 11.49904727935791
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503013&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=212,223,321&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "9E10EA60-8A5A-4D43-8E58-8AAF7C385BDA.body.json",
+    "receivedAt": 1792688106.538055,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=573.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.537953,
+      "taskStart": 814380905.936801,
+      "totalMilliseconds": 601.1520624160767,
+      "transactions": [
+        {
+          "encodedResponseBytes": 5622,
+          "fetchStart": 814380905.936857,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.05602836608886719,
+          "requestEnd": 814380905.937738,
+          "requestStart": 814380905.937207,
+          "responseEnd": 814380906.537914,
+          "responseStart": 814380906.533919,
+          "responseWaitMilliseconds": 596.1810350418091,
+          "reusedConnection": true,
+          "transferMilliseconds": 3.995060920715332
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503002&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=321&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "C4841335-7F74-40CE-B0D2-DCD881AFBFC6.body.json",
+    "receivedAt": 1792688106.553074,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=552.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.552428,
+      "taskStart": 814380905.937136,
+      "totalMilliseconds": 615.291953086853,
+      "transactions": [
+        {
+          "encodedResponseBytes": 46429,
+          "fetchStart": 814380905.937405,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.2689361572265625,
+          "requestEnd": 814380905.937951,
+          "requestStart": 814380905.937825,
+          "responseEnd": 814380906.552383,
+          "responseStart": 814380906.509512,
+          "responseWaitMilliseconds": 571.5609788894653,
+          "reusedConnection": true,
+          "transferMilliseconds": 42.87099838256836
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417060&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=18,455,456,501,502,507,6&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "530DAA22-BA70-43F0-9570-BDC3D0243424.body.json",
+    "receivedAt": 1792688106.5719209,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=605.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.570462,
+      "taskStart": 814380905.937514,
+      "totalMilliseconds": 632.9480409622192,
+      "transactions": [
+        {
+          "encodedResponseBytes": 5397,
+          "fetchStart": 814380905.938019,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.5050897598266602,
+          "requestEnd": 814380905.939122,
+          "requestStart": 814380905.938911,
+          "responseEnd": 814380906.570424,
+          "responseStart": 814380906.569132,
+          "responseWaitMilliseconds": 630.0100088119507,
+          "reusedConnection": true,
+          "transferMilliseconds": 1.2919902801513672
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200404041&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=32&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "7204D6AB-089C-4962-9660-0EC44BA981BE.body.json",
+    "receivedAt": 1792688106.590485,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=616.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.590274,
+      "taskStart": 814380905.937313,
+      "totalMilliseconds": 652.961015701294,
+      "transactions": [
+        {
+          "encodedResponseBytes": 19684,
+          "fetchStart": 814380905.937828,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.514984130859375,
+          "requestEnd": 814380905.939062,
+          "requestStart": 814380905.938427,
+          "responseEnd": 814380906.590244,
+          "responseStart": 814380906.57383,
+          "responseWaitMilliseconds": 634.768009185791,
+          "reusedConnection": true,
+          "transferMilliseconds": 16.41404628753662
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200426004&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=25,4&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "07B30E6A-7A3C-4568-B657-2132C3CE9E5C.body.json",
+    "receivedAt": 1792688106.658197,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=655.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.657725,
+      "taskStart": 814380905.937351,
+      "totalMilliseconds": 720.3739881515503,
+      "transactions": [
+        {
+          "encodedResponseBytes": 29258,
+          "fetchStart": 814380905.937952,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.6010532379150391,
+          "requestEnd": 814380905.939079,
+          "requestStart": 814380905.938653,
+          "responseEnd": 814380906.657685,
+          "responseStart": 814380906.614145,
+          "responseWaitMilliseconds": 675.0659942626953,
+          "reusedConnection": true,
+          "transferMilliseconds": 43.540000915527344
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417019&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=16,18,30&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "9358140B-1A64-43D1-BF15-D6825B33EB99.body.json",
+    "receivedAt": 1792688106.676039,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=697.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.671749,
+      "taskStart": 814380905.937384,
+      "totalMilliseconds": 734.3649864196777,
+      "transactions": [
+        {
+          "encodedResponseBytes": 13837,
+          "fetchStart": 814380905.938031,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.6469488143920898,
+          "requestEnd": 814380905.939129,
+          "requestStart": 814380905.938956,
+          "responseEnd": 814380906.671715,
+          "responseStart": 814380906.66207,
+          "responseWaitMilliseconds": 722.9410409927368,
+          "reusedConnection": true,
+          "transferMilliseconds": 9.64498519897461
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417013&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=21&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "CE9D8562-CEE8-4F99-9EEB-97DFAE52A442.body.json",
+    "receivedAt": 1792688106.973178,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=938.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.972302,
+      "taskStart": 814380905.937261,
+      "totalMilliseconds": 1035.0409746170044,
+      "transactions": [
+        {
+          "encodedResponseBytes": 27619,
+          "fetchStart": 814380905.937885,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.6240606307983398,
+          "requestEnd": 814380905.939068,
+          "requestStart": 814380905.938539,
+          "responseEnd": 814380906.972181,
+          "responseStart": 814380906.966246,
+          "responseWaitMilliseconds": 1027.1780490875244,
+          "reusedConnection": true,
+          "transferMilliseconds": 5.934953689575195
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200422008&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=25,7,9&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "A71933D5-AAF8-44DD-9DDB-8F29E2FF85D3.body.json",
+    "receivedAt": 1792688106.9875998,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=955.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.976577,
+      "taskStart": 814380905.937158,
+      "totalMilliseconds": 1039.4190549850464,
+      "transactions": [
+        {
+          "encodedResponseBytes": 19258,
+          "fetchStart": 814380905.937486,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.32806396484375,
+          "requestEnd": 814380905.939034,
+          "requestStart": 814380905.937879,
+          "responseEnd": 814380906.976467,
+          "responseStart": 814380906.972356,
+          "responseWaitMilliseconds": 1033.3219766616821,
+          "reusedConnection": true,
+          "transferMilliseconds": 4.111051559448242
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417023&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=18,21&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "E646EFB5-E694-468F-A92C-29945C796D8A.body.json",
+    "receivedAt": 1792688106.996319,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=934.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380906.978304,
+      "taskStart": 814380905.936065,
+      "totalMilliseconds": 1042.2390699386597,
+      "transactions": [
+        {
+          "encodedResponseBytes": 10296,
+          "fetchStart": 814380905.936258,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.19299983978271484,
+          "requestEnd": 814380905.937659,
+          "requestStart": 814380905.936654,
+          "responseEnd": 814380906.978154,
+          "responseStart": 814380906.976609,
+          "responseWaitMilliseconds": 1038.949966430664,
+          "reusedConnection": true,
+          "transferMilliseconds": 1.544952392578125
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508004&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "683CFC5C-DEF5-47BB-8580-9B2166DAD7CC.body.json",
+    "receivedAt": 1792688107.072455,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=1057.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380907.07131,
+      "taskStart": 814380905.937403,
+      "totalMilliseconds": 1133.9070796966553,
+      "transactions": [
+        {
+          "encodedResponseBytes": 60892,
+          "fetchStart": 814380905.937993,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.5900859832763672,
+          "requestEnd": 814380905.93909,
+          "requestStart": 814380905.93876,
+          "responseEnd": 814380907.071257,
+          "responseStart": 814380907.020798,
+          "responseWaitMilliseconds": 1081.7079544067383,
+          "reusedConnection": true,
+          "transferMilliseconds": 50.45902729034424
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417039&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=16,18,30,301,303,304,305,401,403,405,406,407,6&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "CA572FC5-758C-4730-889D-AF6CADBC0EF7.body.json",
+    "receivedAt": 1792688107.17585,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=1160.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380907.174941,
+      "taskStart": 814380905.937176,
+      "totalMilliseconds": 1237.7649545669556,
+      "transactions": [
+        {
+          "encodedResponseBytes": 55018,
+          "fetchStart": 814380905.937732,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.5559921264648438,
+          "requestEnd": 814380905.939043,
+          "requestStart": 814380905.938115,
+          "responseEnd": 814380907.174889,
+          "responseStart": 814380907.127097,
+          "responseWaitMilliseconds": 1188.0539655685425,
+          "reusedConnection": true,
+          "transferMilliseconds": 47.79195785522461
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417033&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=18,201,21,211,25,7&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "6EC489CD-1250-4B46-8031-0E85BA95D5E2.body.json",
+    "receivedAt": 1792688107.222118,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=950.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380907.221974,
+      "taskStart": 814380906.238918,
+      "totalMilliseconds": 983.0560684204102,
+      "transactions": [
+        {
+          "encodedResponseBytes": 16642,
+          "fetchStart": 814380906.23908,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.16200542449951172,
+          "requestEnd": 814380906.239451,
+          "requestStart": 814380906.239274,
+          "responseEnd": 814380907.221944,
+          "responseStart": 814380907.213484,
+          "responseWaitMilliseconds": 974.032998085022,
+          "reusedConnection": true,
+          "transferMilliseconds": 8.459925651550293
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508007&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=311,323,325,327,361&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "B364FEBC-78A9-4691-9EB3-B1C9DE397A20.body.json",
+    "receivedAt": 1792688107.2810721,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=960.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380907.280529,
+      "taskStart": 814380906.238934,
+      "totalMilliseconds": 1041.5949821472168,
+      "transactions": [
+        {
+          "encodedResponseBytes": 44538,
+          "fetchStart": 814380906.239105,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.1709461212158203,
+          "requestEnd": 814380906.239461,
+          "requestStart": 814380906.239407,
+          "responseEnd": 814380907.280467,
+          "responseStart": 814380907.221965,
+          "responseWaitMilliseconds": 982.5040102005005,
+          "reusedConnection": true,
+          "transferMilliseconds": 58.50207805633545
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508016&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=16,223,29,361,6,850&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "DFEABF90-CBEA-4BBF-9FD3-E03743F51130.body.json",
+    "receivedAt": 1792688107.5755281,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=519.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380907.574559,
+      "taskStart": 814380907.017163,
+      "totalMilliseconds": 557.3959350585938,
+      "transactions": [
+        {
+          "encodedResponseBytes": 28037,
+          "fetchStart": 814380907.017313,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.1499652862548828,
+          "requestEnd": 814380907.017651,
+          "requestStart": 814380907.0175,
+          "responseEnd": 814380907.574381,
+          "responseStart": 814380907.5564,
+          "responseWaitMilliseconds": 538.7489795684814,
+          "reusedConnection": true,
+          "transferMilliseconds": 17.98105239868164
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417012&lang=en&date=2026-10-22&time=19:30:00&duration=90&maxJourneys=-1&lines=12,16,25,30&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "7A704632-8F63-4C8C-8D42-00EB1EF68BE4.body.json",
+    "receivedAt": 1792688107.747707,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=1123.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380907.744628,
+      "taskStart": 814380906.492607,
+      "totalMilliseconds": 1252.0209550857544,
+      "transactions": [
+        {
+          "encodedResponseBytes": 126136,
+          "fetchStart": 814380906.492718,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.11098384857177734,
+          "requestEnd": 814380906.492991,
+          "requestStart": 814380906.49287,
+          "responseEnd": 814380907.744467,
+          "responseStart": 814380907.635252,
+          "responseWaitMilliseconds": 1142.261028289795,
+          "reusedConnection": true,
+          "transferMilliseconds": 109.21502113342285
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417050&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=201,21,211,212,222,25,301,303,304,305,309,311,321,322,323,324,325,326,327,401,403,405,406,407,455,456,501,502,507,6,7,811,812&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "ADDCFC81-0DA9-4E99-BD46-5E2AD11DE009.body.json",
+    "receivedAt": 1792688109.806947,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=106.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380909.806616,
+      "taskStart": 814380909.66341,
+      "totalMilliseconds": 143.20600032806396,
+      "transactions": [
+        {
+          "encodedResponseBytes": 13876,
+          "fetchStart": 814380909.664437,
+          "protocolName": "h3",
+          "queueMilliseconds": 1.0271072387695312,
+          "requestEnd": 814380909.666034,
+          "requestStart": 814380909.665293,
+          "responseEnd": 814380909.806445,
+          "responseStart": 814380909.798107,
+          "responseWaitMilliseconds": 132.0730447769165,
+          "reusedConnection": true,
+          "transferMilliseconds": 8.337974548339844
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200409006&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=221,850&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "55F71284-B606-4EBF-8550-2CC10E34D5BC.body.json",
+    "receivedAt": 1792688109.88276,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=178.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380909.882212,
+      "taskStart": 814380909.663482,
+      "totalMilliseconds": 218.73009204864502,
+      "transactions": [
+        {
+          "encodedResponseBytes": 12839,
+          "fetchStart": 814380909.664461,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.9790658950805664,
+          "requestEnd": 814380909.666082,
+          "requestStart": 814380909.665393,
+          "responseEnd": 814380909.882126,
+          "responseStart": 814380909.865228,
+          "responseWaitMilliseconds": 199.14603233337402,
+          "reusedConnection": true,
+          "transferMilliseconds": 16.897916793823242
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200406005&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=14&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "6806C3C6-2E9C-4F1B-8F88-BA14019D0ABD.body.json",
+    "receivedAt": 1792688109.924217,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=214.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380909.923862,
+      "taskStart": 814380909.663358,
+      "totalMilliseconds": 260.50400733947754,
+      "transactions": [
+        {
+          "encodedResponseBytes": 27389,
+          "fetchStart": 814380909.664402,
+          "protocolName": "h3",
+          "queueMilliseconds": 1.0440349578857422,
+          "requestEnd": 814380909.666024,
+          "requestStart": 814380909.665237,
+          "responseEnd": 814380909.923821,
+          "responseStart": 814380909.898099,
+          "responseWaitMilliseconds": 232.07497596740723,
+          "reusedConnection": true,
+          "transferMilliseconds": 25.722026824951172
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200422008&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=25,7,9&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "F9AF1C6B-3CAD-4385-99C6-8A39B6977014.body.json",
+    "receivedAt": 1792688109.929793,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=227.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380909.927129,
+      "taskStart": 814380909.661857,
+      "totalMilliseconds": 265.27202129364014,
+      "transactions": [
+        {
+          "encodedResponseBytes": 26156,
+          "fetchStart": 814380909.662817,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.9599924087524414,
+          "requestEnd": 814380909.66591,
+          "requestStart": 814380909.663122,
+          "responseEnd": 814380909.927044,
+          "responseStart": 814380909.913682,
+          "responseWaitMilliseconds": 247.7719783782959,
+          "reusedConnection": true,
+          "transferMilliseconds": 13.36205005645752
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508002&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=212,223,321,850&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "6DD06FEE-5767-48BE-A377-E12AF82C5778.body.json",
+    "receivedAt": 1792688109.956085,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=261.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380909.955882,
+      "taskStart": 814380909.663557,
+      "totalMilliseconds": 292.32490062713623,
+      "transactions": [
+        {
+          "encodedResponseBytes": 13818,
+          "fetchStart": 814380909.664484,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.926971435546875,
+          "requestEnd": 814380909.666103,
+          "requestStart": 814380909.66549,
+          "responseEnd": 814380909.955823,
+          "responseStart": 814380909.947896,
+          "responseWaitMilliseconds": 281.7929983139038,
+          "reusedConnection": true,
+          "transferMilliseconds": 7.92694091796875
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000900000058&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=21&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "020370F3-602F-45C3-B9B3-913995502D1F.body.json",
+    "receivedAt": 1792688109.976445,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=280.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380909.976243,
+      "taskStart": 814380909.663132,
+      "totalMilliseconds": 313.1110668182373,
+      "transactions": [
+        {
+          "encodedResponseBytes": 18706,
+          "fetchStart": 814380909.663581,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.44906139373779297,
+          "requestEnd": 814380909.665961,
+          "requestStart": 814380909.664526,
+          "responseEnd": 814380909.976209,
+          "responseStart": 814380909.966889,
+          "responseWaitMilliseconds": 300.927996635437,
+          "reusedConnection": true,
+          "transferMilliseconds": 9.32002067565918
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503013&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=212,223,321&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "9ACED47F-4A5C-469A-94A1-5E0F2E8BC392.body.json",
+    "receivedAt": 1792688109.9901419,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=290.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380909.989949,
+      "taskStart": 814380909.663581,
+      "totalMilliseconds": 326.36797428131104,
+      "transactions": [
+        {
+          "encodedResponseBytes": 13989,
+          "fetchStart": 814380909.66449,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.908970832824707,
+          "requestEnd": 814380909.666113,
+          "requestStart": 814380909.665557,
+          "responseEnd": 814380909.989912,
+          "responseStart": 814380909.978236,
+          "responseWaitMilliseconds": 312.1229410171509,
+          "reusedConnection": true,
+          "transferMilliseconds": 11.67607307434082
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417013&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=21&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "18C3D941-720C-47E7-9870-9BD17B2A6E33.body.json",
+    "receivedAt": 1792688110.1090589,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=359.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.108817,
+      "taskStart": 814380909.663706,
+      "totalMilliseconds": 445.1110363006592,
+      "transactions": [
+        {
+          "encodedResponseBytes": 13605,
+          "fetchStart": 814380909.664516,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.8100271224975586,
+          "requestEnd": 814380909.666164,
+          "requestStart": 814380909.665754,
+          "responseEnd": 814380910.108752,
+          "responseStart": 814380910.107731,
+          "responseWaitMilliseconds": 441.56694412231445,
+          "reusedConnection": true,
+          "transferMilliseconds": 1.0210275650024414
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417038&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=30,32&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "DD76BC47-D50A-4BAA-B6A5-692A342F6874.body.json",
+    "receivedAt": 1792688110.113136,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=386.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.108985,
+      "taskStart": 814380909.662956,
+      "totalMilliseconds": 446.0289478302002,
+      "transactions": [
+        {
+          "encodedResponseBytes": 10348,
+          "fetchStart": 814380909.663277,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.3210306167602539,
+          "requestEnd": 814380909.665946,
+          "requestStart": 814380909.664295,
+          "responseEnd": 814380910.108922,
+          "responseStart": 814380910.107115,
+          "responseWaitMilliseconds": 441.16902351379395,
+          "reusedConnection": true,
+          "transferMilliseconds": 1.8069744110107422
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508010&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "1F6B22F6-3325-4B3B-B50C-9552B36ADE72.body.json",
+    "receivedAt": 1792688110.148709,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=431.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.148231,
+      "taskStart": 814380909.663543,
+      "totalMilliseconds": 484.68804359436035,
+      "transactions": [
+        {
+          "encodedResponseBytes": 29314,
+          "fetchStart": 814380909.664477,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.9340047836303711,
+          "requestEnd": 814380909.666096,
+          "requestStart": 814380909.665442,
+          "responseEnd": 814380910.148187,
+          "responseStart": 814380910.117249,
+          "responseWaitMilliseconds": 451.153039932251,
+          "reusedConnection": true,
+          "transferMilliseconds": 30.938029289245605
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417019&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=16,18,30&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "B886E7BE-6043-4070-8C05-A215F0D0FD9E.body.json",
+    "receivedAt": 1792688110.181727,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=489.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.181603,
+      "taskStart": 814380909.662561,
+      "totalMilliseconds": 519.041895866394,
+      "transactions": [
+        {
+          "encodedResponseBytes": 10183,
+          "fetchStart": 814380909.662919,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.3579854965209961,
+          "requestEnd": 814380909.66593,
+          "requestStart": 814380909.663617,
+          "responseEnd": 814380910.181571,
+          "responseStart": 814380910.17837,
+          "responseWaitMilliseconds": 512.4399662017822,
+          "reusedConnection": true,
+          "transferMilliseconds": 3.201007843017578
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508006&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "88CE1117-D380-417D-9477-AFF69A65830F.body.json",
+    "receivedAt": 1792688110.188628,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=478.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.18821,
+      "taskStart": 814380909.662712,
+      "totalMilliseconds": 525.4980325698853,
+      "transactions": [
+        {
+          "encodedResponseBytes": 39144,
+          "fetchStart": 814380909.662975,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.26297569274902344,
+          "requestEnd": 814380909.665938,
+          "requestStart": 814380909.663961,
+          "responseEnd": 814380910.188177,
+          "responseStart": 814380910.168638,
+          "responseWaitMilliseconds": 502.69997119903564,
+          "reusedConnection": true,
+          "transferMilliseconds": 19.5389986038208
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508003&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=212,223,29,321,850&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "C90A7829-1987-45C6-9AF8-A21E8B346A2D.body.json",
+    "receivedAt": 1792688110.27056,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=562.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.270466,
+      "taskStart": 814380909.663048,
+      "totalMilliseconds": 607.4179410934448,
+      "transactions": [
+        {
+          "encodedResponseBytes": 5656,
+          "fetchStart": 814380909.663481,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.4329681396484375,
+          "requestEnd": 814380909.665953,
+          "requestStart": 814380909.664433,
+          "responseEnd": 814380910.270425,
+          "responseStart": 814380910.270013,
+          "responseWaitMilliseconds": 604.0599346160889,
+          "reusedConnection": true,
+          "transferMilliseconds": 0.4119873046875
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503002&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=321&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "7A6E1FD6-4BB1-4BD0-9A39-07D51DF66A19.body.json",
+    "receivedAt": 1792688110.294331,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=584.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.293733,
+      "taskStart": 814380909.663662,
+      "totalMilliseconds": 630.0710439682007,
+      "transactions": [
+        {
+          "encodedResponseBytes": 27871,
+          "fetchStart": 814380909.664537,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.8749961853027344,
+          "requestEnd": 814380909.666201,
+          "requestStart": 814380909.665858,
+          "responseEnd": 814380910.293692,
+          "responseStart": 814380910.273428,
+          "responseWaitMilliseconds": 607.2269678115845,
+          "reusedConnection": true,
+          "transferMilliseconds": 20.264029502868652
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417046&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=T1&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "B4D0AB36-0849-4B71-90D6-96BA81F309EA.body.json",
+    "receivedAt": 1792688110.31807,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=593.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.309499,
+      "taskStart": 814380909.663245,
+      "totalMilliseconds": 646.2540626525879,
+      "transactions": [
+        {
+          "encodedResponseBytes": 19608,
+          "fetchStart": 814380909.663885,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.6400346755981445,
+          "requestEnd": 814380909.665981,
+          "requestStart": 814380909.665071,
+          "responseEnd": 814380910.309443,
+          "responseStart": 814380910.287638,
+          "responseWaitMilliseconds": 621.6568946838379,
+          "reusedConnection": true,
+          "transferMilliseconds": 21.8050479888916
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417023&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=18,21&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "551CA4A6-96D1-4AF9-8946-A109BE3079E6.body.json",
+    "receivedAt": 1792688110.339569,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=639.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.339383,
+      "taskStart": 814380909.663643,
+      "totalMilliseconds": 675.7400035858154,
+      "transactions": [
+        {
+          "encodedResponseBytes": 11611,
+          "fetchStart": 814380909.66451,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.867009162902832,
+          "requestEnd": 814380909.666154,
+          "requestStart": 814380909.665696,
+          "responseEnd": 814380910.339352,
+          "responseStart": 814380910.336705,
+          "responseWaitMilliseconds": 670.5509424209595,
+          "reusedConnection": true,
+          "transferMilliseconds": 2.6470422744750977
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417002&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=21&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "83EB4C68-0BEF-4D79-B104-CAF9203C494C.body.json",
+    "receivedAt": 1792688110.3805299,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=660.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.380081,
+      "taskStart": 814380909.663367,
+      "totalMilliseconds": 716.7140245437622,
+      "transactions": [
+        {
+          "encodedResponseBytes": 24886,
+          "fetchStart": 814380909.664202,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.8349418640136719,
+          "requestEnd": 814380909.665994,
+          "requestStart": 814380909.665174,
+          "responseEnd": 814380910.380044,
+          "responseStart": 814380910.347947,
+          "responseWaitMilliseconds": 681.952953338623,
+          "reusedConnection": true,
+          "transferMilliseconds": 32.0969820022583
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417025&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=18,6&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "E7F3F9C2-944E-4BF3-B3A1-7F5E168137C1.body.json",
+    "receivedAt": 1792688110.6413522,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=892.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.641067,
+      "taskStart": 814380909.663682,
+      "totalMilliseconds": 977.3850440979004,
+      "transactions": [
+        {
+          "encodedResponseBytes": 5200,
+          "fetchStart": 814380909.664522,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.8400678634643555,
+          "requestEnd": 814380909.666181,
+          "requestStart": 814380909.665807,
+          "responseEnd": 814380910.64095,
+          "responseStart": 814380910.639873,
+          "responseWaitMilliseconds": 973.6920595169067,
+          "reusedConnection": true,
+          "transferMilliseconds": 1.0769367218017578
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200404041&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=32&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "B31B3CB0-10B9-438E-ADCC-626944AAF8B0.body.json",
+    "receivedAt": 1792688110.646481,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=935.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.643003,
+      "taskStart": 814380909.66206,
+      "totalMilliseconds": 980.942964553833,
+      "transactions": [
+        {
+          "encodedResponseBytes": 10343,
+          "fetchStart": 814380909.662861,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.8009672164916992,
+          "requestEnd": 814380909.665923,
+          "requestStart": 814380909.663336,
+          "responseEnd": 814380910.642898,
+          "responseStart": 814380910.641035,
+          "responseWaitMilliseconds": 975.1119613647461,
+          "reusedConnection": true,
+          "transferMilliseconds": 1.8630027770996094
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508004&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=322,326&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "CF24D24C-113E-48A8-9680-B764486345DF.body.json",
+    "receivedAt": 1792688110.661237,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=898.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.653994,
+      "taskStart": 814380909.663203,
+      "totalMilliseconds": 990.7909631729126,
+      "transactions": [
+        {
+          "encodedResponseBytes": 46331,
+          "fetchStart": 814380909.663714,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.5110502243041992,
+          "requestEnd": 814380909.665968,
+          "requestStart": 814380909.664948,
+          "responseEnd": 814380910.653874,
+          "responseStart": 814380910.643003,
+          "responseWaitMilliseconds": 977.0350456237793,
+          "reusedConnection": true,
+          "transferMilliseconds": 10.871052742004395
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417060&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=18,455,456,501,502,507,6&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "C6B7331C-31C8-4799-913C-D73CB77869DD.body.json",
+    "receivedAt": 1792688110.676176,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=901.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.655458,
+      "taskStart": 814380909.663173,
+      "totalMilliseconds": 992.2850131988525,
+      "transactions": [
+        {
+          "encodedResponseBytes": 5460,
+          "fetchStart": 814380909.663792,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.619053840637207,
+          "requestEnd": 814380909.665975,
+          "requestStart": 814380909.665017,
+          "responseEnd": 814380910.655334,
+          "responseStart": 814380910.654307,
+          "responseWaitMilliseconds": 988.3320331573486,
+          "reusedConnection": true,
+          "transferMilliseconds": 1.0269880294799805
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200503012&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=321&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "ADAD0AC0-437F-4421-984A-C2392DA8041F.body.json",
+    "receivedAt": 1792688110.678074,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=931.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.656466,
+      "taskStart": 814380909.663452,
+      "totalMilliseconds": 993.0139780044556,
+      "transactions": [
+        {
+          "encodedResponseBytes": 19722,
+          "fetchStart": 814380909.664454,
+          "protocolName": "h3",
+          "queueMilliseconds": 1.0019540786743164,
+          "requestEnd": 814380909.666045,
+          "requestStart": 814380909.665343,
+          "responseEnd": 814380910.656376,
+          "responseStart": 814380910.637138,
+          "responseWaitMilliseconds": 971.0930585861206,
+          "reusedConnection": true,
+          "transferMilliseconds": 19.237995147705078
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200426004&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=25,4&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "CB193273-7AAB-4437-9199-68E8D1BC7D37.body.json",
+    "receivedAt": 1792688110.7146668,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=578.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.714489,
+      "taskStart": 814380910.030337,
+      "totalMilliseconds": 684.1520071029663,
+      "transactions": [
+        {
+          "encodedResponseBytes": 16792,
+          "fetchStart": 814380910.030528,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.19097328186035156,
+          "requestEnd": 814380910.030918,
+          "requestStart": 814380910.030856,
+          "responseEnd": 814380910.714447,
+          "responseStart": 814380910.696984,
+          "responseWaitMilliseconds": 666.06605052948,
+          "reusedConnection": true,
+          "transferMilliseconds": 17.462968826293945
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508007&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=311,323,325,327,361&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "3B74658F-B100-4E71-B064-312CD97BCE0D.body.json",
+    "receivedAt": 1792688110.7357368,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=985.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.734925,
+      "taskStart": 814380909.663301,
+      "totalMilliseconds": 1071.6240406036377,
+      "transactions": [
+        {
+          "encodedResponseBytes": 55749,
+          "fetchStart": 814380909.663972,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.6710290908813477,
+          "requestEnd": 814380909.665987,
+          "requestStart": 814380909.665123,
+          "responseEnd": 814380910.734888,
+          "responseStart": 814380910.679357,
+          "responseWaitMilliseconds": 1013.3700370788574,
+          "reusedConnection": true,
+          "transferMilliseconds": 55.53090572357178
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417033&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=18,201,21,211,25,7&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "37A0E7D1-DC62-42DC-8B04-B497F134A85A.body.json",
+    "receivedAt": 1792688110.763077,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=983.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.762349,
+      "taskStart": 814380909.663609,
+      "totalMilliseconds": 1098.7399816513062,
+      "transactions": [
+        {
+          "encodedResponseBytes": 61079,
+          "fetchStart": 814380909.664504,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.8950233459472656,
+          "requestEnd": 814380909.66613,
+          "requestStart": 814380909.665632,
+          "responseEnd": 814380910.762314,
+          "responseStart": 814380910.6735,
+          "responseWaitMilliseconds": 1007.3699951171875,
+          "reusedConnection": true,
+          "transferMilliseconds": 88.81402015686035
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417039&lang=en&date=2026-10-22&time=18:30:00&duration=150&maxJourneys=-1&lines=16,18,30,301,303,304,305,401,403,405,406,407,6&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "881D779C-D725-41DB-9657-88769F35832F.body.json",
+    "receivedAt": 1792688110.928971,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=776.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.928106,
+      "taskStart": 814380910.030366,
+      "totalMilliseconds": 897.7400064468384,
+      "transactions": [
+        {
+          "encodedResponseBytes": 43945,
+          "fetchStart": 814380910.030507,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.14102458953857422,
+          "requestEnd": 814380910.030906,
+          "requestStart": 814380910.030687,
+          "responseEnd": 814380910.928045,
+          "responseStart": 814380910.896457,
+          "responseWaitMilliseconds": 865.5509948730469,
+          "reusedConnection": true,
+          "transferMilliseconds": 31.588077545166016
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200508016&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=16,223,29,361,6,850&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "69ACF6C1-7478-41AC-89B1-F5C96C6EEF1A.body.json",
+    "receivedAt": 1792688110.956533,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=221.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380910.956226,
+      "taskStart": 814380910.699685,
+      "totalMilliseconds": 256.54101371765137,
+      "transactions": [
+        {
+          "encodedResponseBytes": 27856,
+          "fetchStart": 814380910.699799,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.11396408081054688,
+          "requestEnd": 814380910.700057,
+          "requestStart": 814380910.699953,
+          "responseEnd": 814380910.956164,
+          "responseStart": 814380910.936328,
+          "responseWaitMilliseconds": 236.27102375030518,
+          "reusedConnection": true,
+          "transferMilliseconds": 19.835948944091797
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417012&lang=en&date=2026-10-22&time=19:30:00&duration=90&maxJourneys=-1&lines=12,16,25,30&rtMode=SERVER_DEFAULT&passlist=1"
+  },
+  {
+    "body": "9151EB3F-C969-45D0-B386-CEB14D8B2A2D.body.json",
+    "receivedAt": 1792688111.5043669,
+    "status": 200,
+    "transport": {
+      "serverTiming": "upstream;dur=976.0;desc=\"headers\", edge;desc=\"LUX\", cfExtPri",
+      "taskEnd": 814380911.501296,
+      "taskStart": 814380910.400467,
+      "totalMilliseconds": 1100.829005241394,
+      "transactions": [
+        {
+          "encodedResponseBytes": 126372,
+          "fetchStart": 814380910.40056,
+          "protocolName": "h3",
+          "queueMilliseconds": 0.09298324584960938,
+          "requestEnd": 814380910.400797,
+          "requestStart": 814380910.400701,
+          "responseEnd": 814380911.501094,
+          "responseStart": 814380911.396036,
+          "responseWaitMilliseconds": 995.2390193939209,
+          "reusedConnection": true,
+          "transferMilliseconds": 105.05795478820801
+        }
+      ]
+    },
+    "url": "https://verkeier-api.pedrocordeiroo2.workers.dev/atp/departureBoard?format=json&id=000200417050&lang=en&date=2026-10-22&time=19:00:00&duration=120&maxJourneys=-1&lines=201,21,211,212,222,25,301,303,304,305,309,311,321,322,323,324,325,326,327,401,403,405,406,407,455,456,501,502,507,6,7,811,812&rtMode=SERVER_DEFAULT&passlist=1"
+  }
+]

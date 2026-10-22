@@ -1,0 +1,5 @@
+{
+  "scenario": "live-now",
+  "reason": "Live benchmark stopped (quota, budget or capture failure); see /Users/pedoataidecordeiro/Developer/Verkeier-captures/server-timing-2026-10-22/L1/live-now-warm.log",
+  "requests": 53
+}

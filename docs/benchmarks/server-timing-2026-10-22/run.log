@@ -1,0 +1,4 @@
+=== live round 2026-10-22 18:51:01 forced=0 power=Battery Power load={ 3.61 4.03 3.30 }
+live exit 1, requests 45
+=== done 18:51:18
+run.sh exit 3
