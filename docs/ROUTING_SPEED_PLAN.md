@@ -1272,7 +1272,9 @@ device run.
    only); routing-only field trimming (Worker CPU limits, ATP terms).
 4. **CAND-23** changes on-device results so they match the simulator. Exact
    on the benchmark Mac.
-5. **Gate definition.**
+5. **Gate definition.** Decided on 2026-10-22: keep the gate as written
+   (option A). The options and evidence are in
+   [Gate definition: options](#gate-definition-options-draft-2026-10-22) below.
    - Should priming include building the snapshot and graph when nothing
      warms them earlier (CAND-31)?
    - Simulator only, or device as well?
@@ -1282,6 +1284,94 @@ device run.
 
 No option here shrinks an INV-6 budget: 8 s acquisition, ≤ 3 transfers,
 48 labels, 2 h → 24 h window, and live checks on every selected vehicle.
+
+### Gate definition: options (draft, 2026-10-22)
+
+**Decision (owner, 2026-10-22): A, keep the gate as written.** Every
+operation must render live in under 5,000 ms on the simulator, priming
+included. Warm and cold medians must be ≤ 4,000 ms, with a maximum of
+≤ 4,500 ms. This has four consequences:
+- **Step 7 stays failed.** It failed in the 20 Oct 19:05 rounds and stays so
+  until a live re-baseline passes. That costs about 225 ATP requests and
+  needs to cover a busy hour too.
+- **Client work can no longer close the gap.** In the slow rounds, client
+  time was 0.4–0.8 s against totals of up to 7.5 s.
+- **Two levers remain that keep INV-6.** Both need approval, because they
+  change live behaviour or the relay:
+  - fewer or narrower boards on the critical path (CAND-28b);
+  - relay trimming (CAND-12 a). In the slow rounds the median transfer per
+    board reached 0.2–1.0 s, and 2.6 s on the Luxexpo board.
+- **Only E bounds the wait itself.** It changes INV-6.
+
+The draft below is kept as written, for reference.
+
+**The conflict.** INV-11 times the whole search up to the rendered result,
+and that includes the live-data attempt. The production budget for that
+attempt (INV-6) is 8 s: `realtimeAcquisitionBudgetMilliseconds: 8_000` in
+`MobiliteitRouteService.swift`. When ATP is slow, the search keeps waiting
+within that budget. So a search can be correct under INV-6 and still fail
+INV-11.
+
+**Evidence.** All runs are `live-now` Gromscheed → Kirchberg, simulator,
+Release.
+- *Board wait* is the server wait the app sees per board. It includes the
+  relay hop.
+- *Client time* is the total minus the live-data stage, that is, work on the
+  critical path outside the wait. It does not count client work that overlaps
+  the wait, such as board matching and the warm-up scan.
+
+| Round | Samples | Totals, ms | Over 5 s | Board wait, median per sample | ATP / relay + network, median | Client time, ms |
+|---|---:|---|---:|---|---|---|
+| Step 7, 20 Oct 18:52 (mains) | 3 | 2,141–2,914 | 0 | 0.60–1.09 s | not measured | 442–779 |
+| Step 7, 20 Oct 19:05–19:06 (mains) | 6 | 3,909–7,480 | 2 | 1.56–3.66 s | not measured | 390–785 |
+| Server-Timing, 20 Oct 20:57 (battery) | 3 | 2,037–3,161 | 0 | 0.51–0.71 s | 402–604 / 70–117 ms | 622–909 (2 passes) |
+| Server-Timing, 22 Oct 18:51 (battery, stopped on a 503) | 1 | 3,632 | 0 | 0.86 s | 801 / 73 ms | 1,142 (2 passes) |
+| Server-Timing, 22 Oct 18:55 (battery) | 3 | 2,323–2,604 | 0 | 0.47–0.61 s | 445–570 / 22–25 ms | 390–557 |
+| Step 7 replays, recorded latency, no ATP | 9 | R1 2,161–2,515; R2 4,243–4,515; R3 7,229–7,408 | 3 | as recorded | – | 389–627 |
+
+- **Every miss is server wait.** Client time stayed at 0.4–1.1 s in every
+  sample, in slow and fast periods alike.
+- **ATP is what slows down.** When Server-Timing caught a slowdown, only
+  ATP's part grew. Relay plus network never exceeded 282 ms for a board.
+- **The worst case hasn't been measured.** The 1.5–3.7 s slow state of 19:05
+  has not yet been caught with Server-Timing.
+- Data: [step 7](benchmarks/step7-2026-10-20/README.md),
+  [20 Oct](benchmarks/server-timing-2026-10-20/README.md) and
+  [22 Oct](benchmarks/server-timing-2026-10-22/README.md).
+
+**Options**
+
+| | Gate | Result today | Keeps INV-6 | Cost and risk |
+|---|---|---|---|---|
+| A | As written: live, every operation < 5 s, warm and cold medians ≤ 4 s, maximum ≤ 4.5 s | Passes in normal periods, fails in slow ones (step 7: 2 of 9 over 5 s) | Yes | The verdict depends on how fast ATP is at that hour. No client change can close a 3.7 s board wait |
+| B | Live client time ≤ a limit (for example 1,000 ms). Totals and the Server-Timing split are reported but not gated | 390–1,142 ms. With a 1,000 ms limit, one sample fails (22 Oct 18:51 priming: battery, two passes) | Yes | Ignores client work that overlaps the wait. A regression in matching or the warm-up would show only when ATP is fast |
+| C | Replay a reference capture with its recorded latency (`--replay-latency`, no ATP), with A's limits | The normal-speed capture (R1) passes at 2.2–2.5 s. R2 runs at 4.2–4.5 s: under 5 s but over the 4 s medians. R3 fails at 7.2–7.4 s | Yes | Reproducible, and covers overlapping work. But the verdict follows the chosen capture, and captures expire with each feed. The reference must be picked by a rule (for example an ATP median of 0.4–0.8 s), not by its result |
+| D | Live, as A, but a sample counts only when its round's ATP `upstream` median is ≤ 1,000 ms. Other samples are reported | Every qualifying sample passes: ATP medians 402–801 ms, totals ≤ 3,632 ms. The slow step 7 rounds predate Server-Timing; by their board waits they would not qualify | Yes | The relay's Server-Timing header, now diagnostic, must stay. The threshold is a judgement call |
+| E | Fit slow periods into 5 s: cap live acquisition at about 4 s instead of 8 s | Not measured. Replaying R2 and R3 with that cap would show the effect, with no ATP | **No** | In slow periods, searches render with less live coverage |
+| F | Show scheduled results first, update them with live data, and gate the first render | Not built | Yes | A product change: what the user sees first can change a few seconds later |
+
+**Recommendation (not chosen).** Use C as the pass/fail gate and D for live
+rounds, and report B's client time in both.
+- C covers the whole critical path, is reproducible, and needs no ATP
+  requests.
+- D catches regressions that only show up live.
+- Neither changes INV-6. On today's evidence, this combination passes, and R3
+  stays as a reported slow-period case.
+- Choose E only if slow-period searches should be cut short at the cost of
+  live coverage.
+
+**The rest of item 5**
+- *Priming and the snapshot (CAND-31).* CAND-5 restores the snapshot from
+  Caches: priming `snapshotPreparation` dropped from 248 to 45 ms, and cold
+  from 244 to 22 ms. Keeping priming in the gate therefore costs little, and
+  the gate doesn't need CAND-31.
+- *Simulator or device.* Use the simulator Release build for pass/fail, as
+  INV-11 says, and report the device run. That device run is step 7's missing
+  piece and hasn't been done.
+- *Replay-exact as INV-1 evidence.* It was used for the provider changes
+  CAND-25 and CAND-26 and in the CAND-28 evaluation. Accept it where no
+  deadline binds in the replay: no incomplete boards, and acquisition ending
+  before its deadline.
 
 ---
 
