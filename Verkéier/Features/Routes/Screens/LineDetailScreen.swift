@@ -22,7 +22,7 @@ struct LineDetailScreen: View {
                             )
                         ) {
                             ForEach(detail.directions) { direction in
-                                Text(direction.title.stationDisplayName(hidingLocality: detail.route.mode == .tram))
+                                Text(direction.title.headsignDisplayName(isTram: detail.route.mode == .tram))
                                     .tag(direction.id)
                             }
                         }
@@ -78,9 +78,7 @@ struct LineDetailScreen: View {
                                         .font(.subheadline.monospacedDigit().weight(.semibold))
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(
-                                            departure.destinationName.stationDisplayName(
-                                                hidingLocality: detail.route.mode == .tram
-                                            )
+                                            departure.destinationName.headsignDisplayName(isTram: detail.route.mode == .tram)
                                         )
                                         .font(.subheadline.weight(.semibold))
                                         Text(

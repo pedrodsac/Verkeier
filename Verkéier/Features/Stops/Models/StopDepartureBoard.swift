@@ -32,7 +32,8 @@ struct StopDepartureBoard {
                         destination: departure.destination,
                         scheduledDeparture: departure.departureDate,
                         platform: departure.platform,
-                        dataSource: .gtfs
+                        dataSource: .gtfs,
+                        mode: departure.mode
                     )
                 },
                 locale: locale

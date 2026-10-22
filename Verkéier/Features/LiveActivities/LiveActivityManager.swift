@@ -32,7 +32,8 @@ final class LiveActivityManager {
             stopName: stop.displayName,
             lineName: departure.lineName,
             destination: departure.displayDestination,
-            platform: departure.platform
+            platform: departure.platform,
+            lineKind: departure.lineKind
         )
 
         do {

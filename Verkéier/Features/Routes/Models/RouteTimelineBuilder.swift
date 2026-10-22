@@ -317,7 +317,7 @@ enum RouteTimelineBuilder {
             kind: kind,
             mode: leg.mode,
             badgeText: kind == .transit ? leg.routeName : (kind == .bikeShare ? "vel’OH!" : nil),
-            headsign: kind == .transit ? leg.headsign?.stationDisplayName(hidingLocality: leg.mode == .tram) : nil,
+            headsign: kind == .transit ? leg.headsign?.headsignDisplayName(isTram: leg.mode == .tram) : nil,
             durationMinutes: durationMinutes(of: leg),
             stopCount: kind == .transit ? leg.stopCount : nil,
             distanceMeters: kind == .transit ? nil : leg.distanceMeters,

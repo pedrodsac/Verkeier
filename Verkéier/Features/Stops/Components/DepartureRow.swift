@@ -213,7 +213,7 @@ struct DepartureRow: View {
     }
 
     private var transportKind: DepartureTransportKind {
-        DepartureTransportKind(lineName: departure.lineName)
+        DepartureTransportKind(kind: departure.lineKind)
     }
 }
 
@@ -254,15 +254,12 @@ enum DepartureTransportKind {
     case tram
     case train
 
-    /// Infers the kind from a public line label, e.g. `"T1"` → tram.
-    init(lineName: String) {
-        let line = lineName.uppercased()
-        if line.hasPrefix("T") {
-            self = .tram
-        } else if line.hasPrefix("R") || line.hasPrefix("RE") || line.hasPrefix("IC") {
-            self = .train
-        } else {
-            self = .bus
+    /// The kind from the feed-provided mode; unknown modes show as a bus.
+    init(kind: LineKind?) {
+        switch kind {
+        case .tram: self = .tram
+        case .train: self = .train
+        case .bus, nil: self = .bus
         }
     }
 

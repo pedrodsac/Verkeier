@@ -52,6 +52,9 @@ struct Departure: Codable, Hashable, Sendable {
     /// Crowding level when the feed provides it; `nil` when unknown.
     // ponytail: stubbed — populate from ATP when the occupancy feed is confirmed.
     let occupancy: OccupancyLevel?
+    /// Transport mode when the source feed identifies it; `nil` when unknown.
+    /// Never infer it from the line label: a leading "T" does not make a tram.
+    let mode: TransportMode?
 
     nonisolated init(
         id: String,
@@ -72,7 +75,8 @@ struct Departure: Codable, Hashable, Sendable {
         journeyReference: String? = nil,
         serviceNote: String? = nil,
         continuesAs: String? = nil,
-        occupancy: OccupancyLevel? = nil
+        occupancy: OccupancyLevel? = nil,
+        mode: TransportMode? = nil
     ) {
         self.id = id
         self.stopId = stopId
@@ -93,6 +97,7 @@ struct Departure: Codable, Hashable, Sendable {
         self.serviceNote = serviceNote
         self.continuesAs = continuesAs
         self.occupancy = occupancy
+        self.mode = mode
     }
 
     /// Whether ATP has signalled a platform change for this departure.
@@ -127,7 +132,8 @@ struct Departure: Codable, Hashable, Sendable {
             journeyReference: journeyReference,
             serviceNote: serviceNote,
             continuesAs: continuesAs,
-            occupancy: occupancy
+            occupancy: occupancy,
+            mode: mode
         )
     }
 

@@ -225,7 +225,7 @@ private struct DepartureRow: View {
     }
 
     private var routeColor: Color {
-        departure.lineName.uppercased().hasPrefix("T") ? .orange : .blue
+        departure.lineKind == .tram ? .orange : .blue
     }
 }
 

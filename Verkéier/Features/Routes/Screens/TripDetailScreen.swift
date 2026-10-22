@@ -73,9 +73,7 @@ struct TripDetailScreen: View {
                         }
                     } header: {
                         VStack(alignment: .leading, spacing: 4) {
-                            if let headsign = continuation.headsign?.stationDisplayName(
-                                hidingLocality: continuation.mode == .tram
-                            ) {
+                            if let headsign = continuation.headsign?.headsignDisplayName(isTram: continuation.mode == .tram) {
                                 Text("Continues as \(continuation.lineName): \(headsign)")
                                     .lineLimit(1)
                             } else {
@@ -111,7 +109,7 @@ struct TripDetailScreen: View {
         .listStyle(.insetGrouped)
         .refreshable { await model.refresh(using: tripDetailService) }
         .navigationTitle(
-            "\(selection.lineName): \(selection.headsign?.stationDisplayName(hidingLocality: selection.mode == .tram) ?? "Destination unknown")"
+            "\(selection.lineName): \(selection.headsign?.headsignDisplayName(isTram: selection.mode == .tram) ?? "Destination unknown")"
         )
         .toolbarTitleDisplayMode(.inline)
     }

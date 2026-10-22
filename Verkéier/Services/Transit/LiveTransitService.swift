@@ -248,7 +248,8 @@ struct MobiliteitLiveTransitService: LiveTransitService {
             dataSource: .atpOpenAPI,
             lastUpdated: updatedAt,
             journeyReference: journeyID,
-            serviceNote: notes.isEmpty ? nil : notes.joined(separator: " · ")
+            serviceNote: notes.isEmpty ? nil : notes.joined(separator: " · "),
+            mode: modes(productClass: product?.productClass).first
         )
     }
 

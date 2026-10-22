@@ -19,7 +19,7 @@ struct DepartureTrackingStatusCard: View {
             if let trackedDeparture {
                 HStack(alignment: .top, spacing: 10) {
                     Label(
-                        "Live Activity tracking \(trackedDeparture.lineName) to \(trackedDeparture.destination)",
+                        "Live Activity tracking \(trackedDeparture.lineName) to \(trackedDeparture.displayDestination)",
                         systemImage: "livephoto"
                     )
                     .font(.footnote.weight(.semibold))

@@ -64,9 +64,9 @@ final class DepartureReminderService {
             let reminder = SharedTrackedDepartureReminder(
                 departureId: departure.id,
                 stopId: stop.id,
-                stopName: stop.name,
+                stopName: stop.name.stationDisplayName(hidingLocality: departure.mode == .tram),
                 lineName: departure.lineName,
-                destination: departure.destination,
+                destination: departure.displayDestination,
                 scheduledDeparture: departure.scheduledDeparture,
                 realtimeDeparture: departure.realtimeDeparture,
                 delayMinutes: departure.delayMinutes,
@@ -98,9 +98,9 @@ final class DepartureReminderService {
         var updatedReminder = SharedTrackedDepartureReminder(
             departureId: departure.id,
             stopId: activeReminder.stopId,
-            stopName: stopName ?? activeReminder.stopName,
+            stopName: stopName?.stationDisplayName(hidingLocality: departure.mode == .tram) ?? activeReminder.stopName,
             lineName: departure.lineName,
-            destination: departure.destination,
+            destination: departure.displayDestination,
             scheduledDeparture: departure.scheduledDeparture,
             realtimeDeparture: departure.realtimeDeparture,
             delayMinutes: departure.delayMinutes,
@@ -117,7 +117,7 @@ final class DepartureReminderService {
                     id: cancelledIdentifier(for: departure.id),
                     title: "Departure cancelled",
                     body:
-                        "\(departure.lineName) to \(departure.displayDestination) from \(updatedReminder.stopName.stationDisplayName(hidingLocality: departure.lineName.uppercased().hasPrefix("T"))) has been cancelled."
+                        "\(departure.lineName) to \(departure.displayDestination) from \(updatedReminder.stopName) has been cancelled."
                 )
                 updatedReminder = SharedTrackedDepartureReminder(
                     departureId: updatedReminder.departureId,
@@ -180,7 +180,7 @@ final class DepartureReminderService {
         let triggerDate = departureDate.addingTimeInterval(TimeInterval(-reminder.leadTimeMinutes * 60))
         let title = "Leave in \(reminder.leadTimeMinutes) min"
         let body =
-            "\(reminder.lineName) to \(reminder.destination.stationDisplayName(hidingLocality: reminder.lineName.uppercased().hasPrefix("T"))) leaves from \(reminder.stopName.stationDisplayName(hidingLocality: reminder.lineName.uppercased().hasPrefix("T"))) at \(departureDate.formatted(date: .omitted, time: .shortened))."
+            "\(reminder.lineName) to \(reminder.destination) leaves from \(reminder.stopName) at \(departureDate.formatted(date: .omitted, time: .shortened))."
 
         if triggerDate <= now() {
             try await sendStatusNotification(

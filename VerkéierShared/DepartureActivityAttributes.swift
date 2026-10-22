@@ -37,4 +37,5 @@ nonisolated struct DepartureActivityAttributes: ActivityAttributes {
     let lineName: String
     let destination: String
     let platform: String?
+    var lineKind: LineKind? = nil
 }

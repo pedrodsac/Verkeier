@@ -23,6 +23,16 @@ nonisolated extension String {
         return station.isEmpty ? cleaned : station
     }
 
+    /// Presentation only, for line headsigns. Tram headsigns omit the locality
+    /// and are entirely upper-case; other modes keep the locality (the part
+    /// before the first comma) upper-cased.
+    func headsignDisplayName(isTram: Bool) -> String {
+        if isTram { return stationDisplayName(hidingLocality: true).uppercased() }
+        let cleaned = stationDisplayName
+        guard let comma = cleaned.firstIndex(of: ",") else { return cleaned }
+        return cleaned[..<comma].uppercased() + cleaned[comma...]
+    }
+
     /// Whether two feed-provided names identify the same station.
     ///
     /// ATP directions can omit the locality prefix used by GTFS stop names,

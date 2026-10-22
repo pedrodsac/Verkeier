@@ -129,9 +129,12 @@ struct SharedWidgetDeparture: Codable, Hashable, Identifiable, Sendable {
     /// The source for this individual row. A board can contain a scheduled
     /// fallback after a failed live refresh, so provenance lives on the row too.
     let sourceLabel: String?
+    /// The vehicle kind, when the app knew the mode. Optional to preserve
+    /// boards written by older app releases.
+    var lineKind: LineKind? = nil
 
     nonisolated var displayDestination: String {
-        destination.stationDisplayName(hidingLocality: lineName.uppercased().hasPrefix("T"))
+        destination.headsignDisplayName(isTram: lineKind == .tram)
     }
 
     nonisolated var displayDepartureDate: Date? { realtimeDeparture ?? scheduledDeparture }

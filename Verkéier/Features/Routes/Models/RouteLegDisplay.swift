@@ -89,7 +89,7 @@ enum RouteLegDisplay {
                 segments.append(onward)
                 let line = onward.badgeText ?? onward.mode.displayName
                 if let headsign = onward.headsign, !headsign.isEmpty {
-                    captions.append(String(localized: "Continues as \(line): \(headsign)"))
+                    captions.append(String(localized: "Continues as \(line): \(headsign.headsignDisplayName(isTram: onward.mode == .tram))"))
                 } else {
                     captions.append(String(localized: "Continues as \(line)"))
                 }

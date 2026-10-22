@@ -239,7 +239,8 @@ private extension FavouritesModel {
                     delayMinutes: departure.delayMinutes,
                     platform: departure.platform,
                     isCancelled: departure.isCancelled,
-                    sourceLabel: departure.dataSource.displayName
+                    sourceLabel: departure.dataSource.displayName,
+                    lineKind: departure.lineKind
                 )
             },
             updatedAt: updatedAt,
@@ -257,7 +258,8 @@ private extension OfflineScheduleDeparture {
             destination: destination,
             scheduledDeparture: departureDate,
             platform: platform,
-            dataSource: .gtfs
+            dataSource: .gtfs,
+            mode: mode
         )
     }
 }

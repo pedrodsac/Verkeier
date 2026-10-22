@@ -43,11 +43,31 @@ struct TramStopDisplayTests {
 
     @Test func departureHeadsignsKeepTheirSourceValue() {
         let tram = Departure(id: "tram", stopId: "stop", lineName: "T1",
-            destination: "Luxembourg, Stadion", scheduledDeparture: nil, dataSource: .mock)
+            destination: "Luxembourg, Stadion", scheduledDeparture: nil, dataSource: .mock, mode: .tram)
         let bus = Departure(id: "bus", stopId: "stop", lineName: "18",
-            destination: "Luxembourg, Gare", scheduledDeparture: nil, dataSource: .mock)
-        #expect(tram.displayDestination == "Stadion")
+            destination: "Luxembourg, Gare", scheduledDeparture: nil, dataSource: .mock, mode: .bus)
+        #expect(tram.displayDestination == "STADION")
         #expect(tram.destination == "Luxembourg, Stadion")
-        #expect(bus.displayDestination == bus.destination)
+        #expect(bus.displayDestination == "LUXEMBOURG, Gare")
+        #expect(bus.destination == "Luxembourg, Gare")
+
+        let tLineBus = Departure(id: "t-bus", stopId: "stop", lineName: "T9",
+            destination: "Luxembourg, Gare", scheduledDeparture: nil, dataSource: .mock, mode: .bus)
+        #expect(tLineBus.displayDestination == "LUXEMBOURG, Gare")
+    }
+}
+
+@MainActor
+struct HeadsignDisplayTests {
+    @Test func busHeadsignLocalityIsUppercased() {
+        #expect("Luxembourg, Gare".headsignDisplayName(isTram: false) == "LUXEMBOURG, Gare")
+        #expect("Esch/Alzette, Gare (Bus)".headsignDisplayName(isTram: false) == "ESCH/ALZETTE, Gare")
+        #expect("Luxexpo".headsignDisplayName(isTram: false) == "Luxexpo")
+    }
+
+    @Test func tramHeadsignsOmitLocalityAndAreUppercased() {
+        #expect("Luxembourg, Stadion".headsignDisplayName(isTram: true) == "STADION")
+        #expect("Luxembourg, Gare, Quai 1".headsignDisplayName(isTram: true) == "GARE, QUAI 1")
+        #expect("Luxexpo".headsignDisplayName(isTram: true) == "LUXEXPO")
     }
 }

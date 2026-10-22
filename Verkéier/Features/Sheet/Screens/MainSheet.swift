@@ -50,11 +50,7 @@ struct MainSheet: View {
             }
 
             Tab("Settings", systemImage: "gear", value: SheetTab.settings) {
-                NavigationStack {
-                    SettingsScreen()
-                        .navigationTitle("Settings")
-                        .toolbarTitleDisplayMode(.inline)
-                }
+                settingsTab
             }
         }
         .tabBarMinimizeBehavior(.never)
@@ -103,6 +99,14 @@ struct MainSheet: View {
                 }
         }
     }
+	
+	private var settingsTab: some View {
+		NavigationStack {
+			SettingsScreen()
+				.navigationTitle("Settings")
+				.toolbarTitleDisplayMode(.inline)
+		}
+	}
 
     private var tabBarBackground: AnyShapeStyle {
         return AnyShapeStyle(.regularMaterial)

@@ -32,7 +32,7 @@ struct RouteLegDisplayTests {
         #expect(items.map(\.id) == ["place-0", "segment-0", "place-2"])
         guard case let .segment(ride) = items[1] else { Issue.record("Missing combined ride"); return }
         #expect(ride.badgeText == "7")
-        #expect(ride.continuationCaptions == ["Continues as 25: Domeldange, Gare routière"])
+        #expect(ride.continuationCaptions == ["Continues as 25: DOMELDANGE, Gare routière"])
         #expect(ride.durationMinutes == 6)
         #expect(ride.stopCount == 6)
         #expect(ride.sourceSegmentIDs == ["segment-0", "segment-1"])

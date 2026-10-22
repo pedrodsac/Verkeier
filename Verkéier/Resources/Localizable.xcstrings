@@ -58,6 +58,7 @@
       }
     },
     "—" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -328,6 +329,7 @@
       }
     },
     "✓ Live updates" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -356,6 +358,7 @@
       }
     },
     "✓ Timetable only" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -524,6 +527,7 @@
       }
     },
     "Advanced" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -608,6 +612,7 @@
       }
     },
     "API" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -692,6 +697,7 @@
       }
     },
     "Arrivals: %@ – %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -897,6 +903,7 @@
 
     },
     "Board filters" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1121,6 +1128,7 @@
       }
     },
     "Check for GTFS update" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1209,6 +1217,7 @@
       }
     },
     "Collapsed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1320,6 +1329,34 @@
         }
       }
     },
+    "Continue" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortfahren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weider"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        }
+      }
+    },
     "Continue on the same vehicle. No need to get off." : {
 
     },
@@ -1418,6 +1455,7 @@
       }
     },
     "Data" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1474,6 +1512,7 @@
       }
     },
     "Data Status" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1642,6 +1681,7 @@
       }
     },
     "Departures: %@ – %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1900,6 +1940,7 @@
       }
     },
     "Downloading timetable…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1928,6 +1969,7 @@
       }
     },
     "Edit labels" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1956,6 +1998,7 @@
       }
     },
     "Expanded" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1984,6 +2027,7 @@
       }
     },
     "Export support bundle" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2216,6 +2260,34 @@
         }
       }
     },
+    "Getting routes ready" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Routen werden vorbereitet"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préparation des itinéraires"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Routë ginn preparéiert"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A preparar os percursos"
+          }
+        }
+      }
+    },
     "Home" : {
       "localizations" : {
         "de" : {
@@ -2380,6 +2452,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alertas da viagem"
+          }
+        }
+      }
+    },
+    "Keep Verkéier open until this finishes." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lass Verkéier geöffnet, bis dieser Vorgang abgeschlossen ist."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gardez Verkéier ouvert jusqu’à la fin."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loss Verkéier op, bis dat fäerdeg ass."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantenha o Verkéier aberto até terminar."
           }
         }
       }
@@ -2672,6 +2772,7 @@
       }
     },
     "Live updates" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2728,6 +2829,7 @@
       }
     },
     "Loading stops" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2899,6 +3001,34 @@
         }
       }
     },
+    "Measuring walks between stops…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fußwege zwischen Haltestellen werden gemessen …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mesure des trajets à pied entre les arrêts…"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D’Weeër tëscht den Arrêten ginn gemooss …"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A medir os percursos a pé entre paragens…"
+          }
+        }
+      }
+    },
     "Mode preference" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2988,6 +3118,7 @@
       }
     },
     "Nearby stops" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3184,6 +3315,7 @@
       }
     },
     "No nearby stops" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4082,6 +4214,7 @@
       }
     },
     "Preparing timetable data" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4105,6 +4238,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A preparar dados dos horários"
+          }
+        }
+      }
+    },
+    "Preparing…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird vorbereitet …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préparation…"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparatioun …"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A preparar…"
           }
         }
       }
@@ -4595,6 +4756,7 @@
       }
     },
     "Reset filters" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4646,6 +4808,90 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opções de rota"
+          }
+        }
+      }
+    },
+    "Route planning still works, but may be slower. Verkéier will try again the next time you open it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Routenplanung funktioniert weiterhin, kann aber langsamer sein. Verkéier versucht es beim nächsten Öffnen erneut."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La planification d’itinéraires fonctionne toujours, mais peut être plus lente. Verkéier réessaiera à la prochaine ouverture."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D’Routeplanung funktionéiert weider, ka mä méi lues sinn. Verkéier probéiert et beim nächsten Opmaachen nach eng Kéier."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O planeamento de percursos continua a funcionar, mas pode ser mais lento. O Verkéier tentará novamente da próxima vez que o abrir."
+          }
+        }
+      }
+    },
+    "Route preparation didn't finish" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Routenvorbereitung wurde nicht abgeschlossen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La préparation des itinéraires n’a pas abouti"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D’Preparatioun vun de Routë war net fäerdeg"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A preparação dos percursos não terminou"
+          }
+        }
+      }
+    },
+    "Route preparation progress" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortschritt der Routenvorbereitung"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progression de la préparation des itinéraires"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortschrëtt vun der Routepreparatioun"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progresso da preparação dos percursos"
           }
         }
       }
@@ -4766,6 +5012,7 @@
       }
     },
     "Saved Stops" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4789,6 +5036,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paragens guardadas"
+          }
+        }
+      }
+    },
+    "Saving…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird gespeichert …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrement…"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Späicheren …"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A guardar…"
           }
         }
       }
@@ -4905,6 +5180,9 @@
         }
       }
     },
+    "Selected route" : {
+
+    },
     "Service alerts" : {
       "localizations" : {
         "de" : {
@@ -4932,6 +5210,9 @@
           }
         }
       }
+    },
+    "Service Alerts" : {
+
     },
     "Settings" : {
       "localizations" : {
@@ -5247,6 +5528,7 @@
       }
     },
     "Stop %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5386,7 +5668,11 @@
         }
       }
     },
+    "Stops at this location" : {
+
+    },
     "Stops unavailable" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5415,6 +5701,7 @@
       }
     },
     "Support" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5614,6 +5901,7 @@
       }
     },
     "Timetable only" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5841,6 +6129,7 @@
       }
     },
     "Transit data details" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5947,6 +6236,7 @@
       }
     },
     "Try again when your location is available." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6059,6 +6349,7 @@
       }
     },
     "vel’OH! %@, %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6116,6 +6407,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A aplicação Verkéier é independente e não está afiliada aos operadores de transportes públicos do Luxemburgo."
+          }
+        }
+      }
+    },
+    "Verkéier is measuring the walks between nearby stops so it can plan journeys faster. This only happens after a map or timetable update." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier misst die Fußwege zwischen nahen Haltestellen, um Fahrten schneller zu planen. Das passiert nur nach einer Karten- oder Fahrplanaktualisierung."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier mesure les trajets à pied entre les arrêts proches pour planifier vos trajets plus vite. Cela n’arrive qu’après une mise à jour de la carte ou des horaires."
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verkéier moosst d’Weeër tëscht Arrêten an der Noperschaft, fir Fahrten méi séier ze plangen. Dat geschitt nëmmen no engem Update vun der Kaart oder vun den Horairen."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Verkéier está a medir os percursos a pé entre paragens próximas para planear viagens mais depressa. Isto só acontece após uma atualização do mapa ou dos horários."
           }
         }
       }
@@ -6213,286 +6532,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Os seus dados"
-          }
-        }
-      }
-    },
-    "Getting routes ready" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Routen werden vorbereitet"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Préparation des itinéraires"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Routë ginn preparéiert"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A preparar os percursos"
-          }
-        }
-      }
-    },
-    "Verkéier is measuring the walks between nearby stops so it can plan journeys faster. This only happens after a map or timetable update." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verkéier misst die Fußwege zwischen nahen Haltestellen, um Fahrten schneller zu planen. Das passiert nur nach einer Karten- oder Fahrplanaktualisierung."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verkéier mesure les trajets à pied entre les arrêts proches pour planifier vos trajets plus vite. Cela n’arrive qu’après une mise à jour de la carte ou des horaires."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verkéier moosst d’Weeër tëscht Arrêten an der Noperschaft, fir Fahrten méi séier ze plangen. Dat geschitt nëmmen no engem Update vun der Kaart oder vun den Horairen."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O Verkéier está a medir os percursos a pé entre paragens próximas para planear viagens mais depressa. Isto só acontece após uma atualização do mapa ou dos horários."
-          }
-        }
-      }
-    },
-    "Preparing…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wird vorbereitet …"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Préparation…"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preparatioun …"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A preparar…"
-          }
-        }
-      }
-    },
-    "Measuring walks between stops…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fußwege zwischen Haltestellen werden gemessen …"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mesure des trajets à pied entre les arrêts…"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "D’Weeër tëscht den Arrêten ginn gemooss …"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A medir os percursos a pé entre paragens…"
-          }
-        }
-      }
-    },
-    "Saving…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wird gespeichert …"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enregistrement…"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Späicheren …"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A guardar…"
-          }
-        }
-      }
-    },
-    "Keep Verkéier open until this finishes." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lass Verkéier geöffnet, bis dieser Vorgang abgeschlossen ist."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gardez Verkéier ouvert jusqu’à la fin."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Loss Verkéier op, bis dat fäerdeg ass."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mantenha o Verkéier aberto até terminar."
-          }
-        }
-      }
-    },
-    "Route preparation didn't finish" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Routenvorbereitung wurde nicht abgeschlossen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La préparation des itinéraires n’a pas abouti"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "D’Preparatioun vun de Routë war net fäerdeg"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A preparação dos percursos não terminou"
-          }
-        }
-      }
-    },
-    "Route planning still works, but may be slower. Verkéier will try again the next time you open it." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Routenplanung funktioniert weiterhin, kann aber langsamer sein. Verkéier versucht es beim nächsten Öffnen erneut."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La planification d’itinéraires fonctionne toujours, mais peut être plus lente. Verkéier réessaiera à la prochaine ouverture."
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "D’Routeplanung funktionéiert weider, ka mä méi lues sinn. Verkéier probéiert et beim nächsten Opmaachen nach eng Kéier."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O planeamento de percursos continua a funcionar, mas pode ser mais lento. O Verkéier tentará novamente da próxima vez que o abrir."
-          }
-        }
-      }
-    },
-    "Continue" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fortfahren"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continuer"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weider"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continuar"
-          }
-        }
-      }
-    },
-    "Route preparation progress" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fortschritt der Routenvorbereitung"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Progression de la préparation des itinéraires"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fortschrëtt vun der Routepreparatioun"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Progresso da preparação dos percursos"
           }
         }
       }

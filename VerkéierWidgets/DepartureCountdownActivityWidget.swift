@@ -12,7 +12,7 @@ struct DepartureCountdownActivityWidget: Widget {
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    ActivityLineBadge(line: context.attributes.lineName, compact: false)
+                    ActivityLineBadge(line: context.attributes.lineName, kind: context.attributes.lineKind, compact: false)
                         .padding(.leading, 2)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
@@ -46,19 +46,19 @@ struct DepartureCountdownActivityWidget: Widget {
 					.padding(.top, -10)
                 }
             } compactLeading: {
-                ActivityLineBadge(line: context.attributes.lineName, compact: true)
+                ActivityLineBadge(line: context.attributes.lineName, kind: context.attributes.lineKind, compact: true)
             } compactTrailing: {
                 ActivityCompactDepartureCountdown(state: context.state, compact: true)
             } minimal: {
                 ZStack {
-                    Circle().fill(lineColor(context.attributes.lineName))
+                    Circle().fill(lineColor(context.attributes.lineKind))
                     Image(systemName: context.state.isCancelled ? "xmark" : "tram.fill")
                         .font(.caption2.weight(.bold))
                         .foregroundStyle(.white)
                 }
             }
             .widgetURL(TransitDeepLink.showDepartures(stopId: context.attributes.stopId).url)
-            .keylineTint(lineColor(context.attributes.lineName))
+            .keylineTint(lineColor(context.attributes.lineKind))
         }
     }
 }
@@ -102,7 +102,7 @@ private struct DepartureLockScreenView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            ActivityLineBadge(line: context.attributes.lineName, compact: false, roundedSquare: true)
+            ActivityLineBadge(line: context.attributes.lineName, kind: context.attributes.lineKind, compact: false, roundedSquare: true)
 
 			VStack(alignment: .leading, spacing: 5) {
 				HStack(spacing: 5) {
@@ -144,6 +144,7 @@ private struct DepartureLockScreenView: View {
 
 private struct ActivityLineBadge: View {
     let line: String
+    let kind: LineKind?
     let compact: Bool
     var roundedSquare = false
 
@@ -167,10 +168,10 @@ private struct ActivityLineBadge: View {
 		.background {
             if compact || roundedSquare {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(lineColor(line).gradient)
+                    .fill(lineColor(kind).gradient)
             } else {
                 Circle()
-                    .fill(lineColor(line).gradient)
+                    .fill(lineColor(kind).gradient)
             }
         }
     }
@@ -241,11 +242,12 @@ private struct ActivityStatusLabel: View {
     }
 }
 
-private func lineColor(_ line: String) -> Color {
-    let name = line.uppercased()
-    if name.hasPrefix("T") { return .orange }
-    if name.range(of: #"^\d+$"#, options: .regularExpression) != nil { return .blue }
-    return .red
+private func lineColor(_ kind: LineKind?) -> Color {
+    switch kind {
+    case .tram: .orange
+    case .train: .red
+    case .bus, nil: .blue
+    }
 }
 
 #Preview("Line 16 · Lock Screen", as: .content, using: DepartureActivityAttributes.preview,
