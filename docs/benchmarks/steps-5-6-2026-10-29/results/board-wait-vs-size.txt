@@ -1,0 +1,10 @@
+capture | boards | ATP wait (upstream if recorded, else server wait) median/max ms | r and slope vs lines, departures, decoded MB
+cand-28-live-2026-10-19/live-esch | 25 | 517/1187 | lines r=0.65 58.0 ms/line; departures r=0.55 10.0 ms/departure; bytes r=0.53 347.0 ms/MB
+cand-28-live-2026-10-19/live-now | 27 | 905/1497 | lines r=0.29 15.1 ms/line; departures r=0.50 6.5 ms/departure; bytes r=0.46 305.6 ms/MB
+cand-28-live-2026-10-19/live-reverse | 29 | 743/1654 | lines r=0.41 23.8 ms/line; departures r=0.49 5.4 ms/departure; bytes r=0.50 286.9 ms/MB
+server-timing-2026-10-20/L1 | 78 | 484/910 | lines r=0.39 16.0 ms/line; departures r=0.27 3.8 ms/departure; bytes r=0.34 236.8 ms/MB
+server-timing-2026-10-22/L1 | 44 | 568/1517 | lines r=0.40 28.4 ms/line; departures r=0.50 7.7 ms/departure; bytes r=0.50 385.8 ms/MB
+server-timing-2026-10-22/L2 | 84 | 514/1160 | lines r=0.40 20.0 ms/line; departures r=0.52 6.1 ms/departure; bytes r=0.54 328.7 ms/MB
+step7-2026-10-20/L1 | 78 | 677/1513 | lines r=0.26 15.8 ms/line; departures r=0.35 4.9 ms/departure; bytes r=0.32 242.3 ms/MB
+step7-2026-10-20/L2 | 81 | 1795/2990 | lines r=0.22 21.0 ms/line; departures r=0.23 5.3 ms/departure; bytes r=0.25 288.7 ms/MB
+step7-2026-10-20/L3 | 81 | 2094/4367 | lines r=0.17 27.2 ms/line; departures r=0.14 5.4 ms/departure; bytes r=0.18 344.9 ms/MB

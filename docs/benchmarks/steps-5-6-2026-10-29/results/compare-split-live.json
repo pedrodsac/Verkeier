@@ -1,0 +1,328 @@
+[
+  {
+    "capture": "L1A",
+    "rep": 1,
+    "sample": "priming",
+    "identical": false,
+    "differences": [
+      "realtimeBoards order"
+    ],
+    "requests": [
+      26,
+      29
+    ],
+    "bytes": [
+      18920956,
+      19110983
+    ],
+    "totals": [
+      4455.573625,
+      5468.607959
+    ],
+    "realtime": [
+      3763.7412080000004,
+      4526.564917000001
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "L1A",
+    "rep": 1,
+    "sample": "warm",
+    "identical": false,
+    "differences": [
+      "realtimeBoards order"
+    ],
+    "requests": [
+      26,
+      29
+    ],
+    "bytes": [
+      18920956,
+      19110983
+    ],
+    "totals": [
+      4126.769458,
+      4534.756125
+    ],
+    "realtime": [
+      3699.10475,
+      4023.7487499999997
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "L1A",
+    "rep": 1,
+    "sample": "cold",
+    "identical": false,
+    "differences": [
+      "realtimeBoards order"
+    ],
+    "requests": [
+      26,
+      29
+    ],
+    "bytes": [
+      18920956,
+      19110983
+    ],
+    "totals": [
+      4279.595667,
+      4734.473375
+    ],
+    "realtime": [
+      3730.2195,
+      4101.190583
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "L2B",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      26,
+      29
+    ],
+    "bytes": [
+      19169849,
+      18972792
+    ],
+    "totals": [
+      3622.139458,
+      3357.906542
+    ],
+    "realtime": [
+      3042.2638330000004,
+      2772.378125
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      2,
+      null
+    ]
+  },
+  {
+    "capture": "L2B",
+    "rep": 1,
+    "sample": "warm",
+    "identical": false,
+    "differences": [
+      "recommendedOption"
+    ],
+    "requests": [
+      26,
+      29
+    ],
+    "bytes": [
+      19169849,
+      18972792
+    ],
+    "totals": [
+      3378.809459,
+      3137.862083
+    ],
+    "realtime": [
+      2943.1405,
+      2692.096501
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      2,
+      null
+    ]
+  },
+  {
+    "capture": "L2B",
+    "rep": 1,
+    "sample": "cold",
+    "identical": false,
+    "differences": [
+      "recommendedOption",
+      "counter delayedPastBoardings 17->16",
+      "counter predictedEvents 4430->4428"
+    ],
+    "requests": [
+      26,
+      29
+    ],
+    "bytes": [
+      19169849,
+      18972792
+    ],
+    "totals": [
+      3569.6782080000003,
+      3378.2945
+    ],
+    "realtime": [
+      3011.352708,
+      2802.827959
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      2,
+      null
+    ]
+  },
+  {
+    "capture": "L3B",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      26,
+      29
+    ],
+    "bytes": [
+      19158465,
+      18961408
+    ],
+    "totals": [
+      4300.029417,
+      4011.479417
+    ],
+    "realtime": [
+      3716.998708,
+      3426.494083
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      1,
+      null
+    ]
+  },
+  {
+    "capture": "L4A",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      26,
+      29
+    ],
+    "bytes": [
+      18837652,
+      19037758
+    ],
+    "totals": [
+      3324.451291,
+      4071.022458
+    ],
+    "realtime": [
+      2772.658583,
+      3379.001042
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      1
+    ]
+  },
+  {
+    "capture": "L5A",
+    "rep": 1,
+    "sample": "priming",
+    "identical": false,
+    "differences": [
+      "counter boardCacheHits 3->5"
+    ],
+    "requests": [
+      27,
+      30
+    ],
+    "bytes": [
+      16304931,
+      16505054
+    ],
+    "totals": [
+      4388.398041,
+      4890.892208
+    ],
+    "realtime": [
+      3734.886333,
+      4220.142042
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      1
+    ]
+  },
+  {
+    "capture": "L6B",
+    "rep": 1,
+    "sample": "priming",
+    "identical": false,
+    "differences": [
+      "counter boardCacheHits 3->5"
+    ],
+    "requests": [
+      27,
+      30
+    ],
+    "bytes": [
+      16451268,
+      16254887
+    ],
+    "totals": [
+      3007.030333,
+      2702.038875
+    ],
+    "realtime": [
+      2359.571542,
+      2092.4627499999997
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      1,
+      null
+    ]
+  }
+]

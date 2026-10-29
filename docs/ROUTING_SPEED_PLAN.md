@@ -4,7 +4,7 @@ written: 2026-10-15
 basis: docs/ROUTING_IMPROVEMENT_BRIEF.md, docs/benchmarks/live-baseline-2026-10-15/
 app: Verkeier @ refactor/views-and-structure 0a54e7d
 engine: MobilitéitKit @ c4f4b70 (pinned in Package.resolved)
-status: plan; steps 0 and 1 implemented on 2026-10-16, step 2 implemented and measured on 2026-10-18, device replay on an iPhone 13, a live simulator re-baseline (Sunday) and the offline evaluation of CAND-28 on 2026-10-18, CAND-28 live union capture, commit and CAND-5 on 2026-10-19, step 7 live re-baseline, the relay Server-Timing round and the CAND-29 offline evaluation on 2026-10-20, the CAND-12 (a) offline check on 2026-10-29 (see "Status after steps 0 and 1" and "Status after step 2")
+status: plan; steps 0 and 1 implemented on 2026-10-16, step 2 implemented and measured on 2026-10-18, device replay on an iPhone 13, a live simulator re-baseline (Sunday) and the offline evaluation of CAND-28 on 2026-10-18, CAND-28 live union capture, commit and CAND-5 on 2026-10-19, step 7 live re-baseline, the relay Server-Timing round and the CAND-29 offline evaluation on 2026-10-20, the CAND-12 (a) offline check and steps 5 and 6 completed on 2026-10-29 (see "Status after steps 0 and 1" and "Status after step 2")
 ---
 
 # Routing speed plan
@@ -579,7 +579,8 @@ This run uses everything committed so far: steps 0–2, the direction guard,
   - Routing-only relay trimming (CAND-12 a). Offline it leaves results
     identical, but whether it cuts the transfer share is open; see its
     *Evidence* bullet in §4.5.
-  - Narrowing hub boards (CAND-28b).
+  - Narrowing hub boards (CAND-28b). Done on 2026-10-29 as a split into
+    parallel requests; see "Steps 5 and 6 completed".
   - CAND-29. As specified it would not help; see its *Evidence* bullet in §4.5.
   - A gate that accepts the server's tail, for example measuring it apart from
     client time.
@@ -618,6 +619,35 @@ This run uses everything committed so far: steps 0–2, the direction guard,
     [CAND-29 offline evaluation](benchmarks/cand-29-offline-2026-10-20/README.md).
     Minute precision also makes nearly every new board a routing change: all
     130 trips in the first batch were.
+
+### Steps 5 and 6 completed (2026-10-29, Thursday)
+
+The owner delegated the remaining decisions on 2026-10-29 ("Make decisions for
+yourself. Complete 5 and 6 on your own."). Details and data:
+[`benchmarks/steps-5-6-2026-10-29/`](benchmarks/steps-5-6-2026-10-29/README.md).
+
+- **Adopted, engine pushed, app pins `a152c0f`:**
+  - CAND-23 (`1d0ce96`): chunks sized from the 10-worker ceiling, not the
+    core count. Installed-feed JSON identical; 1, 6 and 10 workers identical.
+  - CAND-28b (`a152c0f`): a line filter over 12 lines goes out as parallel
+    parts on free board-request permits. The 33-line Luxexpo board was the
+    last board in 12 of 19 earlier live samples.
+- **CAND-28b live A/B** (18:20–18:32, 279 ATP requests, slow ATP: other boards
+  0.85–1.8 s): the slowest Luxexpo part took a median of 1.34× the sample's
+  other boards, against 1.67× for the whole board. Realtime stage in units of
+  the median board: 2.00 against 2.36. Estimated −0.3 s when Luxexpo arrives
+  last by a margin. Cost: +3 requests per search (+11.5 %), same bytes.
+- **Same results:** replays of 8 older and 6 new captures give identical
+  journeys, options and coverage in all 28 sample pairs. Only order-sensitive
+  counters move, and the recommendation follows the wall clock.
+- **Declined with measurements:** CAND-10 (warm-up at `.utility`: −26 ms
+  median, sign flips by capture; 8 workers: −2 ms), CAND-14 (render −14 ms),
+  CAND-32 (bike work ends within 0.22 s), CAND-31 (priming's snapshot and graph
+  cost 50–175 ms).
+- **Closed:** CAND-29 (pass 2 in 1 of 8 captures; as specified it misses that
+  board), CAND-30 (machine load, 18 Oct). CAND-12 (a) stays undeployed.
+- **Gate:** still fails in slow periods, as decision A expected. In this
+  round 1 of 5 samples per arm went over 5 s.
 
 ## Summary
 
@@ -906,15 +936,16 @@ cannot detect this.
 | CAND-26 | Match boards as they arrive | Replay-exact | −0.4–0.6 s cold, −0.8–1.1 s priming, ~0 warm | Medium–high |
 | CAND-27 | Fast discovery planning | Replay-exact* | −0.05–0.3 s; deterministic coverage | Medium |
 | CAND-28 | Line filters at selected transfer stops cover connecting lines | Live | removes pass 2 here: −1.8–2.1 s today, −0.7–1.0 s after exact steps | Medium–high (≈ 70 %) for this route |
-| CAND-29 | Transfer-first discovery ordering | Live | covers transfer stops; −0.3–0.8 s by dropping hub boards | Medium (≈ 60 %) |
-| CAND-10 (ext) | Warm-up priority and worker count | Exact with CAND-23 | −0.3 to +0.5 s | Low |
-| CAND-23 | Chunk count independent of cores | Exact on the 10-core Mac | determinism; frees worker count as a tuning knob | Medium (verify first) |
+| CAND-28b | Split wide line filters into parallel requests on free permits | Live; same rows | ≈ −0.3 s when the wide board arrives last; +3 requests | Adopted 2026-10-29 (`a152c0f`) |
+| CAND-29 | Transfer-first discovery ordering | Live | covers transfer stops; −0.3–0.8 s by dropping hub boards | Closed 2026-10-29 |
+| CAND-10 (ext) | Warm-up priority and worker count | Exact with CAND-23 | −0.3 to +0.5 s; replays −26 / −2 ms | Declined 2026-10-29 |
+| CAND-23 | Chunk count independent of cores | Exact on the 10-core Mac | determinism; frees worker count as a tuning knob | Adopted 2026-10-29 (`1d0ce96`) |
 | CAND-30 | Locate the client-side request time | Diagnostic | up to −0.9 s priming, −0.1–0.35 s warm | Unknown |
 | CAND-12 (a, ext) | Relay trims unread fields for routing only | Exact if scoped (replay identical, 2026-10-29) | −71–75 % decoded, ≈ −63–71 % on the wire; decode −60 ms, total unchanged offline; transfer unknown | High for bytes, low for time |
 | CAND-5 (corr) | Persist the routing snapshot | Exact | −0.25–0.35 s cold and priming | High |
-| CAND-31 | Warm router and walking graph before the first search | Exact for results | −0.9–1.1 s on the first search, if the gate allows it | High; owner decides |
-| CAND-14 | Start walking refinement after first render | Exact | −0.1–0.4 s priming render | Low–medium |
-| CAND-32 | Run the bike branch at lower priority | Exact for transit | indirect | Low |
+| CAND-31 | Warm router and walking graph before the first search | Exact for results | −0.9–1.1 s on the first search, if the gate allows it; ≈ 0.1 s since CAND-5 | Declined 2026-10-29 |
+| CAND-14 | Start walking refinement after first render | Exact | −0.1–0.4 s priming render; replays −14 ms | Declined 2026-10-29 |
+| CAND-32 | Run the bike branch at lower priority | Exact for transit | indirect; nothing waits on it | Declined 2026-10-29 |
 | CAND-33 | Harness and instrumentation | — | makes the above measurable | — |
 | CAND-34 | Incremental pass-2 rescan | Exact (research) | up to −0.5 s if pass 2 stays | Low |
 
@@ -1013,6 +1044,9 @@ When it does not, today's output depends on CPU load.
   which CAND-10 needs.
 - *Verify first:* run the equivalence queries with 1, 6 and 10 workers and diff
   the output. If they already match, drop this option.
+- *Implemented (engine `1d0ce96`, 2026-10-29)* as a guarantee: the outputs
+  already matched, and CAND-10's worker switch needs it. Installed-feed JSON
+  identical to `1bd2ebf`; 1, 6 and 10 workers identical.
 
 ### 4.3 Candidate building (exact)
 
@@ -1102,6 +1136,20 @@ When it does not, today's output depends on CPU load.
   Thursday), about +14–17 % `responseBytes`. The live latency of those boards
   decides the net gain.
 
+**CAND-28b: split wide transfer-stop filters** (specified and implemented on
+2026-10-29, engine `a152c0f`).
+
+- *Change:* a line filter over 12 lines is dealt round-robin into parallel
+  requests (33 → 11 + 11 + 11). Each extra part takes a board-request permit
+  that is free at that moment, never queueing. Without spare capacity the
+  filter stays one request. Every line is still requested, so INV-6 holds.
+- *Why not narrower filters:* dropping a line could drop a shown ride's live
+  check. ATP's wait grows with what a board returns (r = 0.18–0.54, about
+  240–390 ms per decoded MB), so splitting shortens the slowest request instead.
+- *Result:* see "Steps 5 and 6 completed" and the
+  [write-up](benchmarks/steps-5-6-2026-10-29/README.md). About −0.3 s when the wide board arrives last by a margin,
+  for +3 requests per search; identical results on 14 captures.
+
 **CAND-29: transfer-first discovery ordering.**
 
 - *Change:* keep the optimistic walking-chain envelope for deciding *which*
@@ -1138,6 +1186,9 @@ When it does not, today's output depends on CPU load.
       lines;
     - the transfer stops of the preliminary journeys;
     - a few of the 24 slots reserved for such stops.
+- *Closed (2026-10-29).* Since CAND-28 only 1 of 8 captures runs a second
+  pass. The second direction is what speculative completion already requests;
+  the other two add discovery boards for about 1 search in 8.
 
 **CAND-10 (extended): warm-up scan.** With CAND-23 in place, give the warm-up
 `.utility` priority or `cores − 2` workers. This is exact for its output and
@@ -1145,6 +1196,9 @@ frees CPU for networking, decoding and matching. Warm-up length matters only
 where it is the critical path (warm), so measure both directions. Removing the
 warm-up altogether (the original CAND-10) is a live change; re-test it only
 after CAND-28/29 show that discovery covers the picks' transfer stops.
+*Declined (2026-10-29):* in replays of 4 captures, `.utility` changed totals by
+a median of −26 ms (+141 to −216 ms by capture) and 8 workers by −2 ms, with
+identical results.
 
 **CAND-30: client-side request time.**
 
@@ -1198,12 +1252,19 @@ after CAND-28/29 show that discovery covers the picks' transfer stops.
 - **CAND-31:** warm the router and walking graph when the app becomes active
   or the planner opens. Results are identical. The harness starts searching
   right after launch, so this shows up only if the gate definition changes.
+  *Declined (2026-10-29):* since CAND-5, priming's snapshot and graph cost
+  50–175 ms together, and warming would run on every activation.
 - **CAND-14:** as in the brief. Priming's 649 ms render overlapped 816 ms and
   473 ms of refinement.
+  *Declined (2026-10-29):* that render was the CPU-inflated baseline. The
+  render now takes a median of 67 ms; deferring refinement saved 14 ms of it
+  in replays, and the total didn't move.
 - **CAND-32:** `bikeCalculation` took 1.6 s alongside discovery in priming.
   Lower its priority. Check that publication does not wait on it once the
   transit path is faster: today the bike result is ready at 2.5 s and
   publication happens at 9.4 s.
+  *Declined (2026-10-29):* bike work now takes 8–96 ms and ends 9–217 ms into
+  a search; publication starts after 2.0 s, so nothing waits on it.
 
 ### 4.7 Measurement (CAND-33)
 
@@ -1290,13 +1351,17 @@ device run.
    | (b) CAND-28/29 A/B, 3 routes × 2 arms × 3 | 18 | ≈ 450; or ≈ 120 for three union captures plus offline replay |
    | (c) Final re-baseline | 9 | ≈ 225 |
 
-   Steps 0–4 need no ATP if the saved bodies can be replayed.
+   Steps 0–4 need no ATP if the saved bodies can be replayed. Used on
+   2026-10-29: 279 requests for the CAND-28b A/B.
 2. **Live behaviour.** CAND-28. CAND-29, which reverses the deliberate
    discovery ordering kept in `ac6945e`. Removing the warm-up (CAND-10).
+   *Decided 2026-10-29 (delegated):* CAND-28 kept, CAND-28b adopted, CAND-29
+   closed, the warm-up kept.
 3. **Relay changes** (`verkeier-relay`): a `Server-Timing` header (diagnostic
    only); routing-only field trimming (Worker CPU limits, ATP terms).
+   *Decided 2026-10-29 (delegated):* trimming not deployed; see CAND-12 (a).
 4. **CAND-23** changes on-device results so they match the simulator. Exact
-   on the benchmark Mac.
+   on the benchmark Mac. *Adopted 2026-10-29 (delegated), engine `1d0ce96`.*
 5. **Gate definition.** Decided on 2026-10-22: keep the gate as written
    (option A). The options and evidence are in
    [Gate definition: options](#gate-definition-options-draft-2026-10-22) below.
@@ -1323,7 +1388,9 @@ included. Warm and cold medians must be ≤ 4,000 ms, with a maximum of
   time was 0.4–0.8 s against totals of up to 7.5 s.
 - **Two levers remain that keep INV-6.** Both need approval, because they
   change live behaviour or the relay:
-  - fewer or narrower boards on the critical path (CAND-28b);
+  - fewer or narrower boards on the critical path (CAND-28b). Adopted on
+    2026-10-29 as a split into parallel requests: about −0.3 s when the wide
+    Luxexpo board arrives last, but it doesn't close the slow-period gap;
   - relay trimming (CAND-12 a). In the slow rounds the median transfer per
     board reached 0.2–1.0 s, and 2.6 s on the Luxexpo board. The offline
     check on 2026-10-29 found identical results but could not show a

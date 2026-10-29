@@ -1,0 +1,570 @@
+[
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      25,
+      26
+    ],
+    "bytes": [
+      10417963,
+      10503470
+    ],
+    "totals": [
+      2093.705166,
+      2334.808583
+    ],
+    "realtime": [
+      1675.551375,
+      1908.076126
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      1
+    ]
+  },
+  {
+    "capture": "c28-now",
+    "rep": 1,
+    "sample": "priming",
+    "identical": false,
+    "differences": [
+      "counter predictedEvents 4071->4070"
+    ],
+    "requests": [
+      27,
+      30
+    ],
+    "bytes": [
+      15683882,
+      15833683
+    ],
+    "totals": [
+      2807.809834,
+      3269.155459
+    ],
+    "realtime": [
+      2235.516916,
+      2706.888041
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      1
+    ]
+  },
+  {
+    "capture": "c28-rev",
+    "rep": 1,
+    "sample": "priming",
+    "identical": false,
+    "differences": [
+      "counter boardCacheHits 9->12"
+    ],
+    "requests": [
+      29,
+      33
+    ],
+    "bytes": [
+      18057758,
+      18256733
+    ],
+    "totals": [
+      3182.38175,
+      3840.2049580000003
+    ],
+    "realtime": [
+      2506.424293,
+      3243.529875
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      1
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      26,
+      28
+    ],
+    "bytes": [
+      15615022,
+      15709264
+    ],
+    "totals": [
+      2316.179708,
+      2868.1217500000002
+    ],
+    "realtime": [
+      1734.699833,
+      2291.2519580000003
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": "warm",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      26,
+      28
+    ],
+    "bytes": [
+      15615022,
+      15709264
+    ],
+    "totals": [
+      2138.992417,
+      2589.993083
+    ],
+    "realtime": [
+      1720.491834,
+      2183.849209
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": "cold",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      26,
+      28
+    ],
+    "bytes": [
+      15615022,
+      15709264
+    ],
+    "totals": [
+      2321.445125,
+      2826.014708
+    ],
+    "realtime": [
+      1776.751,
+      2255.041
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": "priming",
+    "identical": false,
+    "differences": [
+      "counter predictedEvents 3759->3758"
+    ],
+    "requests": [
+      27,
+      29
+    ],
+    "bytes": [
+      14376036,
+      14488702
+    ],
+    "totals": [
+      4430.473291,
+      5011.562708
+    ],
+    "realtime": [
+      3903.97625,
+      4467.913001000001
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": "warm",
+    "identical": false,
+    "differences": [
+      "counter predictedEvents 3759->3743"
+    ],
+    "requests": [
+      27,
+      29
+    ],
+    "bytes": [
+      14376036,
+      14488702
+    ],
+    "totals": [
+      4204.654084,
+      4742.012125
+    ],
+    "realtime": [
+      3819.9454579999997,
+      4353.375875
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": "cold",
+    "identical": false,
+    "differences": [
+      "counter predictedEvents 3757->3756"
+    ],
+    "requests": [
+      27,
+      29
+    ],
+    "bytes": [
+      14376036,
+      14488702
+    ],
+    "totals": [
+      4401.275167,
+      4952.824417
+    ],
+    "realtime": [
+      3872.4670419999998,
+      4416.903292
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      27,
+      29
+    ],
+    "bytes": [
+      14377790,
+      14490456
+    ],
+    "totals": [
+      7441.1143329999995,
+      7472.34025
+    ],
+    "realtime": [
+      6893.868958,
+      6908.695583
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": "warm",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      27,
+      29
+    ],
+    "bytes": [
+      14377790,
+      14490456
+    ],
+    "totals": [
+      7228.61925,
+      7224.0165
+    ],
+    "realtime": [
+      6832.66625,
+      6826.854875
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": "cold",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      27,
+      29
+    ],
+    "bytes": [
+      14377790,
+      14490456
+    ],
+    "totals": [
+      7441.480708,
+      7397.171083
+    ],
+    "realtime": [
+      6892.841292,
+      6848.640792
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      26,
+      28
+    ],
+    "bytes": [
+      9073853,
+      9136786
+    ],
+    "totals": [
+      2396.5555,
+      2615.332625
+    ],
+    "realtime": [
+      1548.5715420000001,
+      1812.845833
+    ],
+    "passes": [
+      2,
+      2
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": "warm",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      26,
+      28
+    ],
+    "bytes": [
+      9073853,
+      9136786
+    ],
+    "totals": [
+      2191.174625,
+      2478.220916
+    ],
+    "realtime": [
+      1515.018125,
+      1768.3670419999999
+    ],
+    "passes": [
+      2,
+      2
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": "cold",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      26,
+      28
+    ],
+    "bytes": [
+      9073853,
+      9136786
+    ],
+    "totals": [
+      2413.753,
+      2651.984292
+    ],
+    "realtime": [
+      1596.331542,
+      1834.578
+    ],
+    "passes": [
+      2,
+      2
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      28,
+      31
+    ],
+    "bytes": [
+      16308642,
+      16478486
+    ],
+    "totals": [
+      2371.474916,
+      2893.804459
+    ],
+    "realtime": [
+      1812.167791,
+      2345.109958
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": "warm",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      28,
+      31
+    ],
+    "bytes": [
+      16308642,
+      16478486
+    ],
+    "totals": [
+      2226.8885,
+      2721.770583
+    ],
+    "realtime": [
+      1818.762042,
+      2284.439583
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": "cold",
+    "identical": true,
+    "differences": [],
+    "requests": [
+      28,
+      31
+    ],
+    "bytes": [
+      16308642,
+      16478486
+    ],
+    "totals": [
+      2390.7695,
+      2841.7788339999997
+    ],
+    "realtime": [
+      1842.888125,
+      2304.154834
+    ],
+    "passes": [
+      1,
+      1
+    ],
+    "approximated": [
+      null,
+      2
+    ]
+  }
+]
