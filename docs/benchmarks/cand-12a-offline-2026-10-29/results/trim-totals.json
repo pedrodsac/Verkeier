@@ -1,0 +1,178 @@
+{
+  "c28-esch": {
+    "totals": {
+      "raw": 10417963,
+      "trimmed": 2639622,
+      "rawGzip": 1030654,
+      "trimmedGzip": 172584,
+      "rawBrotli": 359862,
+      "trimmedBrotli": 138360,
+      "recordedEncoded": 464334,
+      "bodies": 25
+    },
+    "checks": {
+      "products>1": 0
+    },
+    "droppedBoardKeys": {
+      "board.TechnicalMessages": 10875,
+      "board.serverVersion": 200,
+      "board.dialectVersion": 150,
+      "board.planRtTs": 775,
+      "board.requestId": 450
+    }
+  },
+  "c28-now": {
+    "totals": {
+      "raw": 15683882,
+      "trimmed": 4529570,
+      "rawGzip": 1525205,
+      "trimmedGzip": 270048,
+      "rawBrotli": 526332,
+      "trimmedBrotli": 207798,
+      "recordedEncoded": 681657,
+      "bodies": 27
+    },
+    "checks": {
+      "products>1": 0
+    },
+    "droppedBoardKeys": {
+      "board.TechnicalMessages": 11745,
+      "board.serverVersion": 216,
+      "board.dialectVersion": 162,
+      "board.planRtTs": 837,
+      "board.requestId": 486
+    }
+  },
+  "c28-rev": {
+    "totals": {
+      "raw": 18057758,
+      "trimmed": 5205186,
+      "rawGzip": 1709735,
+      "trimmedGzip": 337945,
+      "rawBrotli": 641995,
+      "trimmedBrotli": 247390,
+      "recordedEncoded": 831813,
+      "bodies": 29
+    },
+    "checks": {
+      "products>1": 0
+    },
+    "droppedBoardKeys": {
+      "board.TechnicalMessages": 12615,
+      "board.serverVersion": 232,
+      "board.dialectVersion": 174,
+      "board.planRtTs": 899,
+      "board.requestId": 522
+    }
+  },
+  "s7-L1": {
+    "totals": {
+      "raw": 46845066,
+      "trimmed": 13445778,
+      "rawGzip": 4564601,
+      "trimmedGzip": 812409,
+      "rawBrotli": 1568493,
+      "trimmedBrotli": 621066,
+      "recordedEncoded": 2052225,
+      "bodies": 78
+    },
+    "checks": {
+      "products>1": 0
+    },
+    "droppedBoardKeys": {
+      "board.TechnicalMessages": 33930,
+      "board.serverVersion": 624,
+      "board.dialectVersion": 468,
+      "board.planRtTs": 2418,
+      "board.requestId": 1404
+    }
+  },
+  "s7-L2": {
+    "totals": {
+      "raw": 43100808,
+      "trimmed": 12391396,
+      "rawGzip": 4215309,
+      "trimmedGzip": 763880,
+      "rawBrotli": 1521333,
+      "trimmedBrotli": 587148,
+      "recordedEncoded": 1972117,
+      "bodies": 81
+    },
+    "checks": {
+      "products>1": 0
+    },
+    "droppedBoardKeys": {
+      "board.TechnicalMessages": 35235,
+      "board.serverVersion": 648,
+      "board.dialectVersion": 486,
+      "board.planRtTs": 2511,
+      "board.requestId": 1458
+    }
+  },
+  "s7-L3": {
+    "totals": {
+      "raw": 43518630,
+      "trimmed": 12545505,
+      "rawGzip": 4257608,
+      "trimmedGzip": 770719,
+      "rawBrotli": 1528802,
+      "trimmedBrotli": 590273,
+      "recordedEncoded": 1983024,
+      "bodies": 81
+    },
+    "checks": {
+      "products>1": 0
+    },
+    "droppedBoardKeys": {
+      "board.TechnicalMessages": 34874,
+      "board.serverVersion": 648,
+      "board.dialectVersion": 486,
+      "board.planRtTs": 2511,
+      "board.requestId": 1458
+    }
+  },
+  "st-L1": {
+    "totals": {
+      "raw": 27221559,
+      "trimmed": 7688853,
+      "rawGzip": 2610612,
+      "trimmedGzip": 497529,
+      "rawBrotli": 1095345,
+      "trimmedBrotli": 389628,
+      "recordedEncoded": 1391649,
+      "bodies": 78
+    },
+    "checks": {
+      "products>1": 0
+    },
+    "droppedBoardKeys": {
+      "board.TechnicalMessages": 33930,
+      "board.serverVersion": 624,
+      "board.dialectVersion": 468,
+      "board.planRtTs": 2418,
+      "board.requestId": 1404
+    }
+  },
+  "st22-L2": {
+    "totals": {
+      "raw": 48925926,
+      "trimmed": 13980834,
+      "rawGzip": 4788718,
+      "trimmedGzip": 858387,
+      "rawBrotli": 1696663,
+      "trimmedBrotli": 659178,
+      "recordedEncoded": 2212544,
+      "bodies": 84
+    },
+    "checks": {
+      "products>1": 0
+    },
+    "droppedBoardKeys": {
+      "board.TechnicalMessages": 36540,
+      "board.serverVersion": 672,
+      "board.dialectVersion": 504,
+      "board.planRtTs": 2604,
+      "board.requestId": 1512
+    }
+  }
+}

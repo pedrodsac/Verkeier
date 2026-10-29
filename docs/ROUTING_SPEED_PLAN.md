@@ -4,7 +4,7 @@ written: 2026-10-15
 basis: docs/ROUTING_IMPROVEMENT_BRIEF.md, docs/benchmarks/live-baseline-2026-10-15/
 app: Verkeier @ refactor/views-and-structure 0a54e7d
 engine: MobilitéitKit @ c4f4b70 (pinned in Package.resolved)
-status: plan; steps 0 and 1 implemented on 2026-10-16, step 2 implemented and measured on 2026-10-18, device replay on an iPhone 13, a live simulator re-baseline (Sunday) and the offline evaluation of CAND-28 on 2026-10-18, CAND-28 live union capture, commit and CAND-5 on 2026-10-19, step 7 live re-baseline, the relay Server-Timing round and the CAND-29 offline evaluation on 2026-10-20 (see "Status after steps 0 and 1" and "Status after step 2")
+status: plan; steps 0 and 1 implemented on 2026-10-16, step 2 implemented and measured on 2026-10-18, device replay on an iPhone 13, a live simulator re-baseline (Sunday) and the offline evaluation of CAND-28 on 2026-10-18, CAND-28 live union capture, commit and CAND-5 on 2026-10-19, step 7 live re-baseline, the relay Server-Timing round and the CAND-29 offline evaluation on 2026-10-20, the CAND-12 (a) offline check on 2026-10-29 (see "Status after steps 0 and 1" and "Status after step 2")
 ---
 
 # Routing speed plan
@@ -576,7 +576,9 @@ This run uses everything committed so far: steps 0–2, the direction guard,
     client.
 - **What could still move the gate** (all need the owner):
   - A relay `Server-Timing` header to locate the wait (§7, item 3).
-  - Routing-only relay trimming (CAND-12 a), which cuts the transfer share.
+  - Routing-only relay trimming (CAND-12 a). Offline it leaves results
+    identical, but whether it cuts the transfer share is open; see its
+    *Evidence* bullet in §4.5.
   - Narrowing hub boards (CAND-28b).
   - CAND-29. As specified it would not help; see its *Evidence* bullet in §4.5.
   - A gate that accepts the server's tail, for example measuring it apart from
@@ -908,7 +910,7 @@ cannot detect this.
 | CAND-10 (ext) | Warm-up priority and worker count | Exact with CAND-23 | −0.3 to +0.5 s | Low |
 | CAND-23 | Chunk count independent of cores | Exact on the 10-core Mac | determinism; frees worker count as a tuning knob | Medium (verify first) |
 | CAND-30 | Locate the client-side request time | Diagnostic | up to −0.9 s priming, −0.1–0.35 s warm | Unknown |
-| CAND-12 (a, ext) | Relay trims unread fields for routing only | Exact if scoped | −71 % decoded, −83 % gzip; latency ≤ 0.1–0.2 s | High for bytes, low for time |
+| CAND-12 (a, ext) | Relay trims unread fields for routing only | Exact if scoped (replay identical, 2026-10-29) | −71–75 % decoded, ≈ −63–71 % on the wire; decode −60 ms, total unchanged offline; transfer unknown | High for bytes, low for time |
 | CAND-5 (corr) | Persist the routing snapshot | Exact | −0.25–0.35 s cold and priming | High |
 | CAND-31 | Warm router and walking graph before the first search | Exact for results | −0.9–1.1 s on the first search, if the gate allows it | High; owner decides |
 | CAND-14 | Start walking refinement after first render | Exact | −0.1–0.4 s priming render | Low–medium |
@@ -1158,11 +1160,34 @@ after CAND-28/29 show that discovery covers the picks' transfer stops.
 - Requirements:
   - Opt-in per request: a distinct URL parameter, which also gives a distinct
     `BoardCacheScope` namespace, so the UI never receives trimmed boards.
-  - Check the Worker's CPU limit for parsing 2 MB of JSON.
+  - Check the Worker's CPU limit for parsing up to 3.1 MB of JSON per board
+    (median 346 KB).
   - Check ATP terms.
 - *Verify offline:* trim the captured bodies with the same rule and replay;
   results must be identical.
 - *Value:* mostly CPU and memory, which helps phones more than the simulator.
+- *Evidence (2026-10-29).* The offline check is done; see the
+  [write-up](benchmarks/cand-12a-offline-2026-10-29/README.md). Eight captures
+  were replayed with recorded latency, once with the original bodies and once
+  trimmed, on the capture-era build and on the current one (engine
+  `1bd2ebf`). No ATP requests.
+  - **Results are identical** in all 63 sample pairs. Only `s7-L2`'s
+    `duplicatesSuppressed`, `predictedEvents` and `invalidJourneys` vary, and
+    they vary between replays of the untouched bodies too, like the race
+    under "Round-3 +4 counters".
+  - Decoded bytes fall by 71–75 %, the estimated wire size by about 63–71 %.
+  - Client decode falls by a median of about 60 ms per search and peak memory
+    by about 13 MB. The total does not move beyond replay noise, because most
+    decoding overlaps the wait for other boards.
+  - *Transfer can't be measured offline.* To trim, the Worker must read the
+    whole ATP body before sending; today it streams it. In the Server-Timing
+    rounds transfer was a median of 11–13 ms per board. The slow 19:05
+    transfers (about 80 KB/s) were either ATP sending slowly, which trimming
+    would not help, or the leg from Cloudflare to the client, which it would
+    cut roughly by the byte ratio. A trimming Worker that reports its own read
+    of the body in `Server-Timing` would tell the two apart.
+  - *Verdict:* safe for results. The Worker's CPU limit and ATP's terms remain
+    to be checked, and its time value for the gate is unproven.
 
 ### 4.6 Cold start, render, contention
 
@@ -1300,7 +1325,11 @@ included. Warm and cold medians must be ≤ 4,000 ms, with a maximum of
   change live behaviour or the relay:
   - fewer or narrower boards on the critical path (CAND-28b);
   - relay trimming (CAND-12 a). In the slow rounds the median transfer per
-    board reached 0.2–1.0 s, and 2.6 s on the Luxexpo board.
+    board reached 0.2–1.0 s, and 2.6 s on the Luxexpo board. The offline
+    check on 2026-10-29 found identical results but could not show a
+    transfer saving: the Worker would still wait for ATP's whole body, and
+    the data don't say whether the slow transfers came from ATP or from the
+    leg to the client. See its *Evidence* bullet in §4.5.
 - **Only E bounds the wait itself.** It changes INV-6.
 
 The draft below is kept as written, for reference.

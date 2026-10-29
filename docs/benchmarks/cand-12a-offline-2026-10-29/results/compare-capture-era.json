@@ -1,0 +1,935 @@
+[
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 2093.7755,
+      "bytes": 10417963,
+      "memory": 601784320,
+      "decode": 62,
+      "providerBoardPreparation": 13.389210999999998,
+      "boardMatching": 81,
+      "providerStopMatching": 1001.183751,
+      "realtime": 1680.917625
+    },
+    "trim": {
+      "total": 2052.435166,
+      "bytes": 2639622,
+      "memory": 596787200,
+      "decode": 31,
+      "providerBoardPreparation": 14.468585,
+      "boardMatching": 74,
+      "providerStopMatching": 1003.2326660000001,
+      "realtime": 1642.95625
+    }
+  },
+  {
+    "capture": "c28-now",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 2809.341542,
+      "bytes": 15683882,
+      "memory": 669483008,
+      "decode": 101,
+      "providerBoardPreparation": 15.191125000000003,
+      "boardMatching": 130,
+      "providerStopMatching": 2627.090832,
+      "realtime": 2227.0347500000003
+    },
+    "trim": {
+      "total": 2839.341166,
+      "bytes": 4529570,
+      "memory": 651247616,
+      "decode": 54,
+      "providerBoardPreparation": 17.741042000000004,
+      "boardMatching": 137,
+      "providerStopMatching": 2596.313959,
+      "realtime": 2234.287708
+    }
+  },
+  {
+    "capture": "c28-rev",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 3042.144625,
+      "bytes": 18057758,
+      "memory": 674136064,
+      "decode": 116,
+      "providerBoardPreparation": 28.057502999999997,
+      "boardMatching": 179,
+      "providerStopMatching": 2362.140457,
+      "realtime": 2444.6035840000004
+    },
+    "trim": {
+      "total": 3016.066666,
+      "bytes": 5205186,
+      "memory": 656506880,
+      "decode": 73,
+      "providerBoardPreparation": 28.807250999999997,
+      "boardMatching": 157,
+      "providerStopMatching": 2362.897501,
+      "realtime": 2444.876959
+    }
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 2432.653708,
+      "bytes": 15615022,
+      "memory": 666828800,
+      "decode": 103,
+      "providerBoardPreparation": 18.480250999999996,
+      "boardMatching": 127,
+      "providerStopMatching": 2638.3476659999997,
+      "realtime": 1863.1540830000001
+    },
+    "trim": {
+      "total": 2339.220875,
+      "bytes": 4481926,
+      "memory": 658620416,
+      "decode": 52,
+      "providerBoardPreparation": 16.266045,
+      "boardMatching": 109,
+      "providerStopMatching": 2636.1313330000003,
+      "realtime": 1778.366459
+    }
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": "warm",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 2162.298958,
+      "bytes": 15615022,
+      "memory": 676839424,
+      "decode": 140,
+      "providerBoardPreparation": 15.599707000000002,
+      "boardMatching": 90,
+      "providerStopMatching": 2642.210708,
+      "realtime": 1734.346792
+    },
+    "trim": {
+      "total": 2108.353542,
+      "bytes": 4481926,
+      "memory": 666714112,
+      "decode": 81,
+      "providerBoardPreparation": 16.003248999999993,
+      "boardMatching": 85,
+      "providerStopMatching": 2588.033584,
+      "realtime": 1696.2667500000002
+    }
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": "cold",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 2408.107458,
+      "bytes": 15615022,
+      "memory": 665354240,
+      "decode": 170,
+      "providerBoardPreparation": 19.465084000000004,
+      "boardMatching": 128,
+      "providerStopMatching": 2638.137166,
+      "realtime": 1834.8546669999998
+    },
+    "trim": {
+      "total": 2347.880958,
+      "bytes": 4481926,
+      "memory": 657784832,
+      "decode": 108,
+      "providerBoardPreparation": 16.164457999999996,
+      "boardMatching": 135,
+      "providerStopMatching": 2620.222584,
+      "realtime": 1796.777959
+    }
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": false,
+    "origVsLive": [
+      "responseBytes 14361509->14376036"
+    ],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 4405.268959,
+      "bytes": 14376036,
+      "memory": 648183808,
+      "decode": 155,
+      "providerBoardPreparation": 15.706002999999999,
+      "boardMatching": 121,
+      "providerStopMatching": 5728.725667,
+      "realtime": 3875.478333
+    },
+    "trim": {
+      "total": 4400.139625,
+      "bytes": 4137670,
+      "memory": 634978304,
+      "decode": 78,
+      "providerBoardPreparation": 15.264287999999999,
+      "boardMatching": 119,
+      "providerStopMatching": 5772.240876,
+      "realtime": 3875.214541
+    }
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": "warm",
+    "identical": false,
+    "differences": [
+      "counter duplicatesSuppressed 945->949",
+      "counter predictedEvents 3759->3757"
+    ],
+    "origMatchesLive": false,
+    "origVsLive": [
+      "responseBytes 14361509->14376036"
+    ],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 4188.148792,
+      "bytes": 14376036,
+      "memory": 659193856,
+      "decode": 191,
+      "providerBoardPreparation": 24.290499,
+      "boardMatching": 100,
+      "providerStopMatching": 5716.304625000001,
+      "realtime": 3802.21525
+    },
+    "trim": {
+      "total": 4188.473542,
+      "bytes": 4137670,
+      "memory": 643973120,
+      "decode": 132,
+      "providerBoardPreparation": 26.317287000000004,
+      "boardMatching": 109,
+      "providerStopMatching": 5734.214208,
+      "realtime": 3803.286958
+    }
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": "cold",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": false,
+    "origVsLive": [
+      "responseBytes 14377790->14376036"
+    ],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 4397.810292,
+      "bytes": 14376036,
+      "memory": 649478144,
+      "decode": 224,
+      "providerBoardPreparation": 25.892167000000004,
+      "boardMatching": 163,
+      "providerStopMatching": 5784.189958,
+      "realtime": 3873.066833
+    },
+    "trim": {
+      "total": 4367.040708,
+      "bytes": 4137670,
+      "memory": 636846080,
+      "decode": 132,
+      "providerBoardPreparation": 26.973421,
+      "boardMatching": 171,
+      "providerStopMatching": 5783.632167,
+      "realtime": 3858.5291249999996
+    }
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 2,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": false,
+    "origVsLive": [
+      "responseBytes 14361509->14376036"
+    ],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 4469.962584,
+      "bytes": 14376036,
+      "memory": 650428416,
+      "decode": 171,
+      "providerBoardPreparation": 15.439749000000003,
+      "boardMatching": 143,
+      "providerStopMatching": 5771.734542,
+      "realtime": 3903.578
+    },
+    "trim": {
+      "total": 4616.08225,
+      "bytes": 4137670,
+      "memory": 633864192,
+      "decode": 83,
+      "providerBoardPreparation": 16.550249,
+      "boardMatching": 121,
+      "providerStopMatching": 5799.286126,
+      "realtime": 3896.638208
+    }
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 2,
+    "sample": "warm",
+    "identical": false,
+    "differences": [
+      "counter duplicatesSuppressed 949->945",
+      "counter predictedEvents 3757->3759"
+    ],
+    "origMatchesLive": false,
+    "origVsLive": [
+      "responseBytes 14361509->14376036"
+    ],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 4205.1565,
+      "bytes": 14376036,
+      "memory": 661127168,
+      "decode": 184,
+      "providerBoardPreparation": 25.186043999999995,
+      "boardMatching": 103,
+      "providerStopMatching": 5746.989792,
+      "realtime": 3814.280958
+    },
+    "trim": {
+      "total": 4196.193792,
+      "bytes": 4137670,
+      "memory": 644628480,
+      "decode": 120,
+      "providerBoardPreparation": 26.014706,
+      "boardMatching": 107,
+      "providerStopMatching": 5735.914875,
+      "realtime": 3803.778208
+    }
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 2,
+    "sample": "cold",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": false,
+    "origVsLive": [
+      "responseBytes 14377790->14376036"
+    ],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 4499.111584,
+      "bytes": 14376036,
+      "memory": 650756096,
+      "decode": 184,
+      "providerBoardPreparation": 21.207206000000006,
+      "boardMatching": 147,
+      "providerStopMatching": 5720.955667,
+      "realtime": 3901.140958
+    },
+    "trim": {
+      "total": 4369.329416,
+      "bytes": 4137670,
+      "memory": 637517824,
+      "decode": 132,
+      "providerBoardPreparation": 26.495541999999993,
+      "boardMatching": 158,
+      "providerStopMatching": 5762.423084,
+      "realtime": 3853.2989159999997
+    }
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 3,
+    "sample": "priming",
+    "identical": false,
+    "differences": [
+      "counter duplicatesSuppressed 945->965",
+      "counter invalidJourneys 162->141",
+      "counter predictedEvents 3759->3756"
+    ],
+    "origMatchesLive": false,
+    "origVsLive": [
+      "responseBytes 14361509->14376036"
+    ],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 4528.83475,
+      "bytes": 14376036,
+      "memory": 616841216,
+      "decode": 148,
+      "providerBoardPreparation": 24.369752,
+      "boardMatching": 130,
+      "providerStopMatching": 5800.66025,
+      "realtime": 3945.552625
+    },
+    "trim": {
+      "total": 4430.027291,
+      "bytes": 4137670,
+      "memory": 638681088,
+      "decode": 91,
+      "providerBoardPreparation": 15.826457999999993,
+      "boardMatching": 124,
+      "providerStopMatching": 5779.732374,
+      "realtime": 3889.220584
+    }
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 3,
+    "sample": "warm",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": false,
+    "origVsLive": [
+      "responseBytes 14361509->14376036"
+    ],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 4294.397625,
+      "bytes": 14376036,
+      "memory": 616841216,
+      "decode": 199,
+      "providerBoardPreparation": 23.725538,
+      "boardMatching": 98,
+      "providerStopMatching": 5836.7099579999995,
+      "realtime": 3911.264458
+    },
+    "trim": {
+      "total": 4188.618541,
+      "bytes": 4137670,
+      "memory": 645840896,
+      "decode": 121,
+      "providerBoardPreparation": 26.997042,
+      "boardMatching": 108,
+      "providerStopMatching": 5739.04225,
+      "realtime": 3806.3175
+    }
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 3,
+    "sample": "cold",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": false,
+    "origVsLive": [
+      "responseBytes 14377790->14376036"
+    ],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 4408.646667,
+      "bytes": 14376036,
+      "memory": 652296192,
+      "decode": 206,
+      "providerBoardPreparation": 23.68154100000001,
+      "boardMatching": 163,
+      "providerStopMatching": 5722.6795,
+      "realtime": 3883.319542
+    },
+    "trim": {
+      "total": 4378.225375,
+      "bytes": 4137670,
+      "memory": 637730816,
+      "decode": 127,
+      "providerBoardPreparation": 24.393165999999994,
+      "boardMatching": 152,
+      "providerStopMatching": 5755.603,
+      "realtime": 3861.200334
+    }
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 4,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": false,
+    "origVsLive": [
+      "responseBytes 14361509->14376036"
+    ],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 4444.537292,
+      "bytes": 14376036,
+      "memory": 650526720,
+      "decode": 130,
+      "providerBoardPreparation": 14.218792,
+      "boardMatching": 117,
+      "providerStopMatching": 5749.523625,
+      "realtime": 3899.783167
+    },
+    "trim": {
+      "total": 4375.347375,
+      "bytes": 4137670,
+      "memory": 638976000,
+      "decode": 75,
+      "providerBoardPreparation": 14.577501000000002,
+      "boardMatching": 117,
+      "providerStopMatching": 5786.559459,
+      "realtime": 3868.6970410000004
+    }
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 4,
+    "sample": "warm",
+    "identical": false,
+    "differences": [
+      "realtimeBoards order"
+    ],
+    "origMatchesLive": false,
+    "origVsLive": [
+      "responseBytes 14361509->14376036"
+    ],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 4063.38725,
+      "bytes": 14376036,
+      "memory": 661389312,
+      "decode": 222,
+      "providerBoardPreparation": 27.66017,
+      "boardMatching": 104,
+      "providerStopMatching": 5759.961458,
+      "realtime": 3666.2336250000003
+    },
+    "trim": {
+      "total": 4211.847416,
+      "bytes": 4137670,
+      "memory": 647479296,
+      "decode": 127,
+      "providerBoardPreparation": 26.791747,
+      "boardMatching": 111,
+      "providerStopMatching": 5747.879166,
+      "realtime": 3810.927542
+    }
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 4,
+    "sample": "cold",
+    "identical": false,
+    "differences": [
+      "counter duplicatesSuppressed 945->965",
+      "counter invalidJourneys 162->141",
+      "counter predictedEvents 3759->3756"
+    ],
+    "origMatchesLive": false,
+    "origVsLive": [
+      "responseBytes 14377790->14376036"
+    ],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 4407.441083,
+      "bytes": 14376036,
+      "memory": 647086080,
+      "decode": 209,
+      "providerBoardPreparation": 25.082208,
+      "boardMatching": 157,
+      "providerStopMatching": 5781.946207999999,
+      "realtime": 3875.741958
+    },
+    "trim": {
+      "total": 4378.03875,
+      "bytes": 4137670,
+      "memory": 640090112,
+      "decode": 120,
+      "providerBoardPreparation": 23.355375999999996,
+      "boardMatching": 146,
+      "providerStopMatching": 5791.477500999999,
+      "realtime": 3864.8802079999996
+    }
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 7460.946417,
+      "bytes": 14377790,
+      "memory": 616759296,
+      "decode": 124,
+      "providerBoardPreparation": 14.53021,
+      "boardMatching": 139,
+      "providerStopMatching": 9076.105292,
+      "realtime": 6913.02325
+    },
+    "trim": {
+      "total": 7614.566958,
+      "bytes": 4144166,
+      "memory": 640729088,
+      "decode": 100,
+      "providerBoardPreparation": 16.571171,
+      "boardMatching": 136,
+      "providerStopMatching": 9008.848125,
+      "realtime": 6861.635167
+    }
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": "warm",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 7346.726083,
+      "bytes": 14377790,
+      "memory": 616759296,
+      "decode": 176,
+      "providerBoardPreparation": 22.840542000000003,
+      "boardMatching": 96,
+      "providerStopMatching": 8976.271376,
+      "realtime": 6825.827375
+    },
+    "trim": {
+      "total": 7341.026833,
+      "bytes": 4144166,
+      "memory": 640729088,
+      "decode": 86,
+      "providerBoardPreparation": 22.46558100000001,
+      "boardMatching": 92,
+      "providerStopMatching": 9072.297125000001,
+      "realtime": 6836.054499
+    }
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": "cold",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": false,
+    "origVsLive": [
+      "responseBytes 14763050->14377790"
+    ],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 7425.022125,
+      "bytes": 14377790,
+      "memory": 655179776,
+      "decode": 240,
+      "providerBoardPreparation": 25.235376000000002,
+      "boardMatching": 160,
+      "providerStopMatching": 9016.351,
+      "realtime": 6888.896209
+    },
+    "trim": {
+      "total": 7589.199167,
+      "bytes": 4144166,
+      "memory": 611467264,
+      "decode": 106,
+      "providerBoardPreparation": 21.549623999999994,
+      "boardMatching": 163,
+      "providerStopMatching": 9091.370834,
+      "realtime": 6878.632041
+    }
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 2443.739417,
+      "bytes": 9073853,
+      "memory": 633028608,
+      "decode": 60,
+      "providerBoardPreparation": 19.94379,
+      "boardMatching": 64,
+      "providerStopMatching": 1941.3552510000002,
+      "realtime": 1555.8717499999998
+    },
+    "trim": {
+      "total": 2361.758917,
+      "bytes": 2562951,
+      "memory": 627228672,
+      "decode": 31,
+      "providerBoardPreparation": 16.611374999999995,
+      "boardMatching": 66,
+      "providerStopMatching": 1975.462875,
+      "realtime": 1565.9523760000002
+    }
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": "warm",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 2143.3275830000002,
+      "bytes": 9073853,
+      "memory": 642121728,
+      "decode": 59,
+      "providerBoardPreparation": 18.714456000000002,
+      "boardMatching": 44,
+      "providerStopMatching": 1992.5575,
+      "realtime": 1510.941667
+    },
+    "trim": {
+      "total": 2158.743792,
+      "bytes": 2562951,
+      "memory": 636239872,
+      "decode": 50,
+      "providerBoardPreparation": 22.149546,
+      "boardMatching": 52,
+      "providerStopMatching": 1986.75175,
+      "realtime": 1510.9181250000001
+    }
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": "cold",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 2335.493209,
+      "bytes": 9073853,
+      "memory": 632094720,
+      "decode": 100,
+      "providerBoardPreparation": 19.814415,
+      "boardMatching": 80,
+      "providerStopMatching": 2033.4237090000001,
+      "realtime": 1568.851167
+    },
+    "trim": {
+      "total": 2315.207167,
+      "bytes": 2562951,
+      "memory": 623706112,
+      "decode": 61,
+      "providerBoardPreparation": 19.92658,
+      "boardMatching": 92,
+      "providerStopMatching": 2023.913833,
+      "realtime": 1552.796958
+    }
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": "priming",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 2451.640708,
+      "bytes": 16308642,
+      "memory": 669171712,
+      "decode": 106,
+      "providerBoardPreparation": 23.52483100000001,
+      "boardMatching": 113,
+      "providerStopMatching": 2428.479709,
+      "realtime": 1855.922834
+    },
+    "trim": {
+      "total": 2349.168125,
+      "bytes": 4660278,
+      "memory": 656048128,
+      "decode": 51,
+      "providerBoardPreparation": 15.404415999999998,
+      "boardMatching": 108,
+      "providerStopMatching": 2404.7301660000003,
+      "realtime": 1812.081791
+    }
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": "warm",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 2212.718125,
+      "bytes": 16308642,
+      "memory": 679231488,
+      "decode": 128,
+      "providerBoardPreparation": 14.514084,
+      "boardMatching": 84,
+      "providerStopMatching": 2501.301292,
+      "realtime": 1815.723833
+    },
+    "trim": {
+      "total": 2193.579333,
+      "bytes": 4660278,
+      "memory": 663977984,
+      "decode": 81,
+      "providerBoardPreparation": 15.223081000000004,
+      "boardMatching": 86,
+      "providerStopMatching": 2460.568125,
+      "realtime": 1800.760666
+    }
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": "cold",
+    "identical": true,
+    "differences": [],
+    "origMatchesLive": true,
+    "origVsLive": [],
+    "approximate": [
+      false,
+      false
+    ],
+    "orig": {
+      "total": 2370.545125,
+      "bytes": 16308642,
+      "memory": 668221440,
+      "decode": 160,
+      "providerBoardPreparation": 15.197621999999996,
+      "boardMatching": 129,
+      "providerStopMatching": 2471.239292,
+      "realtime": 1843.9664159999998
+    },
+    "trim": {
+      "total": 2362.53075,
+      "bytes": 4660278,
+      "memory": 649854976,
+      "decode": 93,
+      "providerBoardPreparation": 16.112455,
+      "boardMatching": 126,
+      "providerStopMatching": 2450.033,
+      "realtime": 1827.030292
+    }
+  }
+]

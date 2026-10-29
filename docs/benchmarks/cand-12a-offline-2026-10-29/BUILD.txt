@@ -1,0 +1,2 @@
+Release, iPhone simulator, Verkeier f352e87 (git archive plus the walking graph files), MobilitéitKit 1bd2ebf. Built 2026-10-29 12:38:00.
+Same source as BUILD.txt, rebuilt 2026-10-29 13:12:48 with ENABLE_CODE_COVERAGE=NO and destination iPhone 17 (dd2). The first build (dd, runs/new-coverage) had coverage instrumentation.
