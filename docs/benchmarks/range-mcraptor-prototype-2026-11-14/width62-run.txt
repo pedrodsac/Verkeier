@@ -1,0 +1,466 @@
+RMR setup generation=5 snapshot=255ms timetable=8ms routes=1542 patterns=1747 split=6 trips=16889 transfers=11ms edges=11196 walkPairs=11196 accepted=11196 scopedRules=213 workers=10
+RMR pair=1 Gromscheed → Kirchberg Konrad Adenauer access=25 egress=25 current=25 stripped=25 exact=64 minute=63 uncut=63 published=6 coverage=["dominated", "equal", "equal", "equal", "equal", "equal"]
+RMR   timings median ms: currentParallel=364.1 currentSingle=1207.5 prototypeExact=8.5 prototypeMinute=6.8
+RMR   exact stats: iterations=339 rounds=554 routes=32784 boardings=55207 alightings=173652 attempts=199155 labels=13602 bound=14514 target=138785 dominated=32254 overflows=0 largestBag=9 emitted=156 bounds=0.6ms search=7.8ms rebuild=0.1ms
+RMR   minute stats: iterations=120 rounds=270 routes=21142 boardings=32622 alightings=101115 attempts=120794 labels=8238 bound=13860 target=83575 dominated=15121 overflows=0 largestBag=9 emitted=149 bounds=0.6ms search=6.0ms rebuild=0.2ms
+RMR   algorithmic stripped-vs-exact: common=17 onlyA=8 (dominated by B: 8) onlyB=47 (dominated by A: 0)
+RMR   production full-vs-exact: common=17 onlyA=8 (dominated by B: 8) onlyB=47 (dominated by A: 0)
+RMR   granularity exact-vs-minute: common=61 onlyA=3 (dominated by B: 0) onlyB=2 (dominated by A: 2)
+RMR   truncation exact-vs-uncut: common=54 onlyA=10 (dominated by B: 10) onlyB=9 (dominated by A: 0)
+RMR     18:21:35→18:54:20 t1 w670
+        current: -
+        prototype: access Senningerberg, Mënsterbësch[1740] 670s / 361 Senningerberg, Mënsterbësch[1740]@18:32:45>Senningerberg, Parishaff[2758]@18:35:40 / 6 Senningerberg, Parishaff[2758]@18:41:00>Kirchberg, Konrad Adenauer[1962]@18:54:20 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     18:21:35→18:56:15 t1 w1222
+        current: access 670s egress 485s: 361 Senningerberg, Mënsterbësch[1740]@18:32:45>Senningerberg, Héienhaff[2757]@18:34:10 / walk Senningerberg, Héienhaff[2757]>Senningerberg, Héienhaff P+R[2738] 67s / T1 Senningerberg, Héienhaff P+R[2738]@18:39:50>Kirchberg, Nationalbibliothéik[2499]@18:48:10
+        prototype: -
+RMR     18:21:35→18:56:21 t1 w1138
+        current: access 670s egress 401s: 361 Senningerberg, Mënsterbësch[1740]@18:32:45>Senningerberg, Héienhaff[2757]@18:34:10 / walk Senningerberg, Héienhaff[2757]>Senningerberg, Héienhaff P+R[2738] 67s / T1 Senningerberg, Héienhaff P+R[2738]@18:39:50>Kirchberg, Universitéit[2500]@18:49:40
+        prototype: -
+RMR     18:21:35→18:57:33 t1 w943
+        current: access 670s egress 273s: 361 Senningerberg, Mënsterbësch[1740]@18:32:45>Senningerberg, Héienhaff[2757]@18:34:10 / 6 Senningerberg, Héienhaff[2757]@18:42:50>Kirchberg, Avalon[2309]@18:53:00
+        prototype: -
+RMR     18:36:05→19:04:50 t1 w325
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 29 Senningerberg, Charlys Statioun[127]@18:41:30>Senningerberg, Parishaff[2758]@18:45:50 / 16 Senningerberg, Parishaff[2758]@18:51:50>Kirchberg, Konrad Adenauer[1962]@19:04:50 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     18:37:25→18:59:20 t1 w347
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 326 Senningerberg, Gromscheed[654]@18:37:25>Kirchberg, Gare routière Luxexpo[2503]@18:46:45 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Mathias Tresch[157] 347s / 18 Kirchberg, Mathias Tresch[157]@18:54:30>Kirchberg, Konrad Adenauer[1962]@18:59:20 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     18:37:25→19:02:30 t2 w185
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 326 Senningerberg, Gromscheed[654]@18:37:25>Kirchberg, Gare routière Luxexpo[2503]@18:46:45 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Hugo Gernsback[2324] 51s / 21 Kirchberg, Hugo Gernsback[2324]@18:53:20>Kirchberg, Luxexpo Entrée Sud[2112]@18:54:40 / walk Kirchberg, Luxexpo Entrée Sud[2112]>Kirchberg, Chambre des Métiers[1967] 134s / 30 Kirchberg, Chambre des Métiers[1967]@18:59:10>Kirchberg, Konrad Adenauer[1962]@19:02:30 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     18:37:25→19:04:50 t2 w40
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 326 Senningerberg, Gromscheed[654]@18:37:25>Senningerberg, Kapell[655]@18:38:05 / walk Senningerberg, Kapell[655]>Senningerberg, Charlys Statioun[127] 40s / 223 Senningerberg, Charlys Statioun[127]@18:40:05>Senningerberg, Parishaff[2758]@18:45:10 / 16 Senningerberg, Parishaff[2758]@18:51:50>Kirchberg, Konrad Adenauer[1962]@19:04:50 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     18:39:20→19:14:20 t2 w51
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 326 Senningerberg, Gromscheed[654]@18:39:20>Niederanven, Routscheed[268]@18:43:20 / 325 Niederanven, Routscheed[268]@18:49:41>Kirchberg, Hugo Gernsback[2324]@19:01:46 / walk Kirchberg, Hugo Gernsback[2324]>Kirchberg, Gare routière Luxexpo[2503] 51s / 6 Kirchberg, Gare routière Luxexpo[2503]@19:07:50>Kirchberg, Konrad Adenauer[1962]@19:14:20 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     18:39:20→19:24:20 t3 w0
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 326 Senningerberg, Gromscheed[654]@18:39:20>Niederanven, Routscheed[268]@18:43:20 / 325 Niederanven, Routscheed[268]@18:49:41>Senningerberg, Mënsterbësch[1740]@18:56:01 / 361 Senningerberg, Mënsterbësch[1740]@19:02:45>Senningerberg, Parishaff[2758]@19:05:40 / 16 Senningerberg, Parishaff[2758]@19:11:20>Kirchberg, Konrad Adenauer[1962]@19:24:20 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     18:43:00→19:09:20 t1 w672
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 321 Senningerberg, Charlys Statioun[127]@18:48:25>Kirchberg, Gare routière Luxexpo[2503]@18:57:05 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Mathias Tresch[157] 347s / 18 Kirchberg, Mathias Tresch[157]@19:04:30>Kirchberg, Konrad Adenauer[1962]@19:09:20 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     18:48:01→19:14:20 t1 w325
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 850 Senningerberg, Charlys Statioun[127]@18:53:26>Senningerberg, Héienhaff[2757]@18:56:31 / 6 Senningerberg, Héienhaff[2757]@19:02:50>Kirchberg, Konrad Adenauer[1962]@19:14:20 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     18:48:55→19:35:10 t2 w0
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 322 Senningerberg, Gromscheed[654]@18:48:55>Roodt-sur-Syre, Campus scolaire[1913]@18:56:25 / 311 Roodt-sur-Syre, Campus scolaire[1913]@19:03:50>Kirchberg, Gare routière Luxexpo[2503]@19:17:10 / 6 Kirchberg, Gare routière Luxexpo[2503]@19:29:40>Kirchberg, Konrad Adenauer[1962]@19:35:10 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     18:51:05→19:20:12 t2 w510
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 29 Senningerberg, Charlys Statioun[127]@18:56:30>Senningerberg, Héienhaff[2757]@18:59:00 / walk Senningerberg, Héienhaff[2757]>Senningerberg, Héienhaff P+R[2738] 67s / T1 Senningerberg, Héienhaff P+R[2738]@19:03:50>Kirchberg, Alphonse Weicker (Tram)[2498]@19:10:50 / walk Kirchberg, Alphonse Weicker (Tram)[2498]>Kirchberg, Alphonse Weicker (Bus)[72] 56s / 21 Kirchberg, Alphonse Weicker (Bus)[72]@19:15:30>Kirchberg, prov. Konrad Adenauer[2775]@19:19:10 / egress Kirchberg, prov. Konrad Adenauer[2775] 62s
+RMR     18:51:05→19:20:15 t1 w877
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 29 Senningerberg, Charlys Statioun[127]@18:56:30>Senningerberg, Héienhaff[2757]@18:59:00 / walk Senningerberg, Héienhaff[2757]>Senningerberg, Héienhaff P+R[2738] 67s / T1 Senningerberg, Héienhaff P+R[2738]@19:03:50>Kirchberg, Nationalbibliothéik[2499]@19:12:10 / egress Kirchberg, Nationalbibliothéik[2499] 485s
+RMR     18:51:05→19:20:21 t1 w793
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 29 Senningerberg, Charlys Statioun[127]@18:56:30>Senningerberg, Héienhaff[2757]@18:59:00 / walk Senningerberg, Héienhaff[2757]>Senningerberg, Héienhaff P+R[2738] 67s / T1 Senningerberg, Héienhaff P+R[2738]@19:03:50>Kirchberg, Universitéit[2500]@19:13:40 / egress Kirchberg, Universitéit[2500] 401s
+RMR     18:51:05→19:24:20 t1 w325
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 29 Senningerberg, Charlys Statioun[127]@18:56:30>Aéroport Luxembourg/Findel[1895]@19:04:00 / 16 Aéroport Luxembourg/Findel[1895]@19:10:10>Kirchberg, Konrad Adenauer[1962]@19:24:20 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     18:51:35→19:24:20 t1 w670
+        current: -
+        prototype: access Senningerberg, Mënsterbësch[1740] 670s / 361 Senningerberg, Mënsterbësch[1740]@19:02:45>Senningerberg, Parishaff[2758]@19:05:40 / 16 Senningerberg, Parishaff[2758]@19:11:20>Kirchberg, Konrad Adenauer[1962]@19:24:20 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     18:58:53→19:28:15 t1 w922
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 212 Senningerberg, Charlys Statioun[127]@19:04:18>Kirchberg, Gare routière Luxexpo[2503]@19:13:08 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Luxexpo[2497] 112s / T1 Kirchberg, Luxexpo[2497]@19:17:10>Kirchberg, Nationalbibliothéik[2499]@19:20:10 / egress Kirchberg, Nationalbibliothéik[2499] 485s
+RMR     18:58:53→19:28:21 t1 w838
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 212 Senningerberg, Charlys Statioun[127]@19:04:18>Kirchberg, Gare routière Luxexpo[2503]@19:13:08 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Luxexpo[2497] 112s / T1 Kirchberg, Luxexpo[2497]@19:17:10>Kirchberg, Universitéit[2500]@19:21:40 / egress Kirchberg, Universitéit[2500] 401s
+RMR     18:58:53→19:30:10 t1 w672
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 212 Senningerberg, Charlys Statioun[127]@19:04:18>Kirchberg, Gare routière Luxexpo[2503]@19:13:08 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Mathias Tresch[157] 347s / 18 Kirchberg, Mathias Tresch[157]@19:26:10>Kirchberg, Konrad Adenauer[1962]@19:30:10 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     18:58:53→19:35:00 t2 w642
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 212 Senningerberg, Charlys Statioun[127]@19:04:18>Kirchberg, Gare routière Luxexpo[2503]@19:13:08 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Luxexpo[2497] 112s / T1 Kirchberg, Luxexpo[2497]@19:17:10>Kirchberg, Philharmonie / Mudam (Tram)[1775]@19:25:40 / walk Kirchberg, Philharmonie / Mudam (Tram)[1775]>Kirchberg, B.E.I.[51] 205s / 6 Kirchberg, B.E.I.[51]@19:30:00>Kirchberg, Konrad Adenauer[1962]@19:35:00 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:00:28→19:30:10 t1 w955
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 850 Senningerberg, Charlys Statioun[127]@19:05:53>Dommeldange, Dauschbuer[1763]@19:13:53 / walk Dommeldange, Dauschbuer[1763]>Kirchberg, Simone de Beauvoir[2597] 630s / 18 Kirchberg, Simone de Beauvoir[2597]@19:27:30>Kirchberg, Konrad Adenauer[1962]@19:30:10 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:00:45→19:30:10 t1 w1017
+        current: -
+        prototype: access Senningerberg, Mënsterbësch[1740] 670s / 311 Senningerberg, Mënsterbësch[1740]@19:11:55>Kirchberg, Gare routière Luxexpo[2503]@19:17:10 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Mathias Tresch[157] 347s / 18 Kirchberg, Mathias Tresch[157]@19:26:10>Kirchberg, Konrad Adenauer[1962]@19:30:10 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:03:42→19:30:10 t2 w740
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 223 Senningerberg, Charlys Statioun[127]@19:09:07>Senningerberg, Rue du Golf[613]@19:10:17 / walk Senningerberg, Rue du Golf[613]>Senningerberg, Laangschib[624] 68s / 311 Senningerberg, Laangschib[624]@19:12:30>Kirchberg, Gare routière Luxexpo[2503]@19:17:10 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Mathias Tresch[157] 347s / 18 Kirchberg, Mathias Tresch[157]@19:26:10>Kirchberg, Konrad Adenauer[1962]@19:30:10 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:08:55→19:35:10 t1 w325
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 29 Senningerberg, Charlys Statioun[127]@19:14:20>Senningerberg, Parishaff[2758]@19:18:00 / 6 Senningerberg, Parishaff[2758]@19:23:20>Kirchberg, Konrad Adenauer[1962]@19:35:10 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:08:55→19:42:50 t3 w300
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 326 Senningerberg, Gromscheed[654]@19:08:55>Niederanven, Routscheed[268]@19:12:35 / 325 Niederanven, Routscheed[268]@19:19:41>Kirchberg, Hugo Gernsback[2324]@19:31:46 / walk Kirchberg, Hugo Gernsback[2324]>Kirchberg, Gare routière Luxexpo[2503] 51s / 456 Kirchberg, Gare routière Luxexpo[2503]@19:33:54>Kirchberg, Simone de Beauvoir[2597]@19:36:54 / walk Kirchberg, Simone de Beauvoir[2597]>Kirchberg, Avalon[2309] 249s / 30 Kirchberg, Avalon[2309]@19:41:50>Kirchberg, Konrad Adenauer[1962]@19:42:50 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:17:50→19:38:12 t2 w376
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 322 Senningerberg, Gromscheed[654]@19:17:50>Kirchberg, Gare routière Luxexpo[2503]@19:27:10 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Luxexpo[2497] 112s / T1 Kirchberg, Luxexpo[2497]@19:29:10>Kirchberg, Alphonse Weicker (Tram)[2498]@19:30:50 / walk Kirchberg, Alphonse Weicker (Tram)[2498]>Kirchberg, Réimerwee[250] 202s / 25 Kirchberg, Réimerwee[250]@19:34:20>Kirchberg, prov. Konrad Adenauer[2775]@19:37:10 / egress Kirchberg, prov. Konrad Adenauer[2775] 62s
+RMR     19:17:50→19:40:10 t1 w347
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 322 Senningerberg, Gromscheed[654]@19:17:50>Kirchberg, Gare routière Luxexpo[2503]@19:27:10 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Mathias Tresch[157] 347s / 18 Kirchberg, Mathias Tresch[157]@19:36:10>Kirchberg, Konrad Adenauer[1962]@19:40:10 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:17:50→19:42:50 t2 w314
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 322 Senningerberg, Gromscheed[654]@19:17:50>Kirchberg, Gare routière Luxexpo[2503]@19:27:10 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Luxexpo[2497] 112s / T1 Kirchberg, Luxexpo[2497]@19:29:10>Kirchberg, Alphonse Weicker (Tram)[2498]@19:30:50 / walk Kirchberg, Alphonse Weicker (Tram)[2498]>Kirchberg, Réimerwee[250] 202s / 30 Kirchberg, Réimerwee[250]@19:39:20>Kirchberg, Konrad Adenauer[1962]@19:42:50 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:17:50→19:44:20 t2 w0
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 322 Senningerberg, Gromscheed[654]@19:17:50>Senningerberg, Rue du Golf[613]@19:19:40 / 850 Senningerberg, Rue du Golf[613]@19:24:46>Senningerberg, Héienhaff[2757]@19:26:31 / 16 Senningerberg, Héienhaff[2757]@19:33:00>Kirchberg, Konrad Adenauer[1962]@19:44:20 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:17:50→19:51:32 t1 w62
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 322 Senningerberg, Gromscheed[654]@19:17:50>Kirchberg, Gare routière Luxexpo[2503]@19:27:10 / 21 Kirchberg, Gare routière Luxexpo[2503]@19:43:30>Kirchberg, prov. Konrad Adenauer[2775]@19:50:30 / egress Kirchberg, prov. Konrad Adenauer[2775] 62s
+RMR     19:18:01→19:44:20 t1 w325
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 850 Senningerberg, Charlys Statioun[127]@19:23:26>Senningerberg, Héienhaff[2757]@19:26:31 / 16 Senningerberg, Héienhaff[2757]@19:33:00>Kirchberg, Konrad Adenauer[1962]@19:44:20 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:23:55→19:51:32 t2 w510
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 29 Senningerberg, Charlys Statioun[127]@19:29:20>Senningerberg, Héienhaff[2757]@19:31:30 / walk Senningerberg, Héienhaff[2757]>Senningerberg, Héienhaff P+R[2738] 67s / T1 Senningerberg, Héienhaff P+R[2738]@19:35:50>Kirchberg, Alphonse Weicker (Tram)[2498]@19:42:50 / walk Kirchberg, Alphonse Weicker (Tram)[2498]>Kirchberg, Alphonse Weicker (Bus)[72] 56s / 21 Kirchberg, Alphonse Weicker (Bus)[72]@19:47:00>Kirchberg, prov. Konrad Adenauer[2775]@19:50:30 / egress Kirchberg, prov. Konrad Adenauer[2775] 62s
+RMR     19:23:55→19:52:15 t1 w877
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 29 Senningerberg, Charlys Statioun[127]@19:29:20>Senningerberg, Héienhaff[2757]@19:31:30 / walk Senningerberg, Héienhaff[2757]>Senningerberg, Héienhaff P+R[2738] 67s / T1 Senningerberg, Héienhaff P+R[2738]@19:35:50>Kirchberg, Nationalbibliothéik[2499]@19:44:10 / egress Kirchberg, Nationalbibliothéik[2499] 485s
+RMR     19:23:55→19:52:21 t1 w793
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 29 Senningerberg, Charlys Statioun[127]@19:29:20>Senningerberg, Héienhaff[2757]@19:31:30 / walk Senningerberg, Héienhaff[2757]>Senningerberg, Héienhaff P+R[2738] 67s / T1 Senningerberg, Héienhaff P+R[2738]@19:35:50>Kirchberg, Universitéit[2500]@19:45:40 / egress Kirchberg, Universitéit[2500] 401s
+RMR     19:23:55→19:55:10 t1 w325
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 29 Senningerberg, Charlys Statioun[127]@19:29:20>Aéroport Luxembourg/Findel[1895]@19:35:50 / 6 Aéroport Luxembourg/Findel[1895]@19:42:10>Kirchberg, Konrad Adenauer[1962]@19:55:10 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:37:25→20:00:10 t1 w347
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 326 Senningerberg, Gromscheed[654]@19:37:25>Kirchberg, Gare routière Luxexpo[2503]@19:46:45 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Mathias Tresch[157] 347s / 18 Kirchberg, Mathias Tresch[157]@19:56:10>Kirchberg, Konrad Adenauer[1962]@20:00:10 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:37:25→20:00:10 t2 w141
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 326 Senningerberg, Gromscheed[654]@19:37:25>Kirchberg, Gare routière Luxexpo[2503]@19:46:45 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Hugo Gernsback[2324] 51s / 21 Kirchberg, Hugo Gernsback[2324]@19:50:20>Kirchberg, Luxexpo Entrée Sud[2112]@19:51:40 / walk Kirchberg, Luxexpo Entrée Sud[2112]>Kirchberg, Poutty Stein[2110] 90s / 18 Kirchberg, Poutty Stein[2110]@19:54:40>Kirchberg, Konrad Adenauer[1962]@20:00:10 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:37:25→20:06:30 t2 w0
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 326 Senningerberg, Gromscheed[654]@19:37:25>Senningerberg, Rue du Golf[613]@19:39:15 / 29 Senningerberg, Rue du Golf[613]@19:45:30>Senningerberg, Parishaff[2758]@19:48:00 / 16 Senningerberg, Parishaff[2758]@19:53:30>Kirchberg, Konrad Adenauer[1962]@20:06:30 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:37:25→20:06:32 t1 w62
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 326 Senningerberg, Gromscheed[654]@19:37:25>Kirchberg, Gare routière Luxexpo[2503]@19:46:45 / 21 Kirchberg, Gare routière Luxexpo[2503]@19:58:30>Kirchberg, prov. Konrad Adenauer[2775]@20:05:30 / egress Kirchberg, prov. Konrad Adenauer[2775] 62s
+RMR     19:37:25→20:15:18 t1 w688
+        current: access 0s egress 688s: 326 Senningerberg, Gromscheed[654]@19:37:25>Kirchberg, Gare routière Luxexpo[2503]@19:46:45 / 25 Kirchberg, Gare routière Luxexpo[2503]@20:01:30>Kirchberg, Chambre des Métiers[1967]@20:03:50
+        prototype: -
+RMR     19:39:09→20:06:30 t1 w325
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 850 Senningerberg, Charlys Statioun[127]@19:44:34>Senningerberg, Héienhaff[2757]@19:47:04 / 16 Senningerberg, Héienhaff[2757]@19:55:10>Kirchberg, Konrad Adenauer[1962]@20:06:30 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:39:09→20:15:05 t1 w790
+        current: access 325s egress 465s: 850 Senningerberg, Charlys Statioun[127]@19:44:34>Senningerberg, Héienhaff[2757]@19:47:04 / 16 Senningerberg, Héienhaff[2757]@19:55:10>Kirchberg, Antoine de St Exupéry[47]@20:07:20
+        prototype: -
+RMR     19:40:16→20:08:12 t1 w783
+        current: -
+        prototype: access Senningerberg, Mënsterbësch[1740] 670s / 325 Senningerberg, Mënsterbësch[1740]@19:51:26>Kirchberg, Hugo Gernsback[2324]@19:56:41 / walk Kirchberg, Hugo Gernsback[2324]>Kirchberg, Gare routière Luxexpo[2503] 51s / 25 Kirchberg, Gare routière Luxexpo[2503]@20:01:30>Kirchberg, prov. Konrad Adenauer[2775]@20:07:10 / egress Kirchberg, prov. Konrad Adenauer[2775] 62s
+RMR     19:40:16→20:09:33 t1 w924
+        current: access 670s egress 203s: 325 Senningerberg, Mënsterbësch[1740]@19:51:26>Kirchberg, Hugo Gernsback[2324]@19:56:41 / walk Kirchberg, Hugo Gernsback[2324]>Kirchberg, Gare routière Luxexpo[2503] 51s / 25 Kirchberg, Gare routière Luxexpo[2503]@20:01:30>Kirchberg, Coudenhove-Kalergi[183]@20:06:10
+        prototype: -
+RMR     19:40:16→20:19:50 t2 w721
+        current: -
+        prototype: access Senningerberg, Mënsterbësch[1740] 670s / 325 Senningerberg, Mënsterbësch[1740]@19:51:26>Kirchberg, Hugo Gernsback[2324]@19:56:41 / walk Kirchberg, Hugo Gernsback[2324]>Kirchberg, Gare routière Luxexpo[2503] 51s / 25 Kirchberg, Gare routière Luxexpo[2503]@20:01:30>Kirchberg, Antoine de St Exupéry[47]@20:08:00 / 18 Kirchberg, Antoine de St Exupéry[47]@20:18:30>Kirchberg, Konrad Adenauer[1962]@20:19:50 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:40:16→20:20:32 t1 w783
+        current: access 670s egress 0s: 325 Senningerberg, Mënsterbësch[1740]@19:51:26>Kirchberg, Hugo Gernsback[2324]@19:56:41 / walk Kirchberg, Hugo Gernsback[2324]>Kirchberg, Gare routière Luxexpo[2503] 51s / 21 Kirchberg, Gare routière Luxexpo[2503]@20:12:30>Kirchberg, prov. Konrad Adenauer[2775]@20:19:30 / walk Kirchberg, prov. Konrad Adenauer[2775]>Kirchberg, Konrad Adenauer[1962] 62s
+        prototype: -
+RMR     19:53:55→20:24:15 t1 w877
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 29 Senningerberg, Charlys Statioun[127]@19:59:20>Senningerberg, Héienhaff[2757]@20:01:30 / walk Senningerberg, Héienhaff[2757]>Senningerberg, Héienhaff P+R[2738] 67s / T1 Senningerberg, Héienhaff P+R[2738]@20:07:50>Kirchberg, Nationalbibliothéik[2499]@20:16:10 / egress Kirchberg, Nationalbibliothéik[2499] 485s
+RMR     19:53:55→20:29:50 t2 w597
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 29 Senningerberg, Charlys Statioun[127]@19:59:20>Senningerberg, Héienhaff[2757]@20:01:30 / walk Senningerberg, Héienhaff[2757]>Senningerberg, Héienhaff P+R[2738] 67s / T1 Senningerberg, Héienhaff P+R[2738]@20:07:50>Kirchberg, Philharmonie / Mudam (Tram)[1775]@20:21:40 / walk Kirchberg, Philharmonie / Mudam (Tram)[1775]>Kirchberg, B.E.I.[51] 205s / 18 Kirchberg, B.E.I.[51]@20:25:50>Kirchberg, Konrad Adenauer[1962]@20:29:50 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:53:55→20:38:50 t2 w456
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 29 Senningerberg, Charlys Statioun[127]@19:59:20>Senningerberg, Héienhaff[2757]@20:01:30 / walk Senningerberg, Héienhaff[2757]>Senningerberg, Héienhaff P+R[2738] 67s / T1 Senningerberg, Héienhaff P+R[2738]@20:07:50>Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@20:23:00 / walk Kirchberg, Rout Bréck - Pafendall (Tram)[2501]>Kirchberg, Rout Bréck - Pafendall (Bus)[1964] 64s / 6 Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@20:32:40>Kirchberg, Konrad Adenauer[1962]@20:38:50 / egress Kirchberg, Konrad Adenauer[1962] 0s
+RMR     19:57:25→20:35:22 t1 w1198
+        current: -
+        prototype: access Senningerberg, Charlys Statioun[127] 325s / 212 Senningerberg, Charlys Statioun[127]@20:02:50>Kirchberg, Gare routière Luxexpo[2503]@20:11:30 / walk Kirchberg, Gare routière Luxexpo[2503]>Kirchberg, Hugo Gernsback[2324] 51s / 21 Kirchberg, Hugo Gernsback[2324]@20:20:20>Kirchberg, Luxexpo Entrée Sud[2112]@20:21:40 / walk Kirchberg, Luxexpo Entrée Sud[2112]>Kirchberg, Chambre des Métiers[1967] 134s / egress Kirchberg, Chambre des Métiers[1967] 688s
+RMR     20:08:55→20:46:18 t2 w932
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 326 Senningerberg, Gromscheed[654]@20:08:55>Senningen, Um Kiem[1788]@20:11:25 / 325 Senningen, Um Kiem[1788]@20:16:56>Kirchberg, Hugo Gernsback[2324]@20:26:41 / walk Kirchberg, Hugo Gernsback[2324]>Kirchberg, Gare routière Luxexpo[2503] 51s / 211 Kirchberg, Gare routière Luxexpo[2503]@20:30:07>Kirchberg, Poutty Stein[2110]@20:31:37 / walk Kirchberg, Poutty Stein[2110]>Kirchberg, Chambre des Métiers[1967] 193s / egress Kirchberg, Chambre des Métiers[1967] 688s
+RMR     20:08:55→20:50:22 t2 w822
+        current: -
+        prototype: access Senningerberg, Gromscheed[654] 0s / 326 Senningerberg, Gromscheed[654]@20:08:55>Senningen, Um Kiem[1788]@20:11:25 / 325 Senningen, Um Kiem[1788]@20:16:56>Kirchberg, Hugo Gernsback[2324]@20:26:41 / 21 Kirchberg, Hugo Gernsback[2324]@20:35:20>Kirchberg, Luxexpo Entrée Sud[2112]@20:36:40 / walk Kirchberg, Luxexpo Entrée Sud[2112]>Kirchberg, Chambre des Métiers[1967] 134s / egress Kirchberg, Chambre des Métiers[1967] 688s
+RMR     20:10:16→20:50:22 t1 w1492
+        current: access 670s egress 688s: 325 Senningerberg, Mënsterbësch[1740]@20:21:26>Kirchberg, Hugo Gernsback[2324]@20:26:41 / 21 Kirchberg, Hugo Gernsback[2324]@20:35:20>Kirchberg, Luxexpo Entrée Sud[2112]@20:36:40 / walk Kirchberg, Luxexpo Entrée Sud[2112]>Kirchberg, Chambre des Métiers[1967] 134s
+        prototype: -
+RMR pair=3 Hamilius → Kirchberg Luxexpo access=25 egress=25 current=43 stripped=43 exact=98 minute=90 uncut=100 published=6 coverage=["equal", "equal", "equal", "equal", "equal", "equal"]
+RMR   timings median ms: currentParallel=655.2 currentSingle=2477.2 prototypeExact=48.5 prototypeMinute=13.7
+RMR   exact stats: iterations=1496 rounds=1985 routes=348875 boardings=398490 alightings=2384898 attempts=2445772 labels=35977 bound=3125 target=2232458 dominated=174212 overflows=0 largestBag=6 emitted=118 bounds=0.6ms search=48.5ms rebuild=0.1ms
+RMR   minute stats: iterations=120 rounds=334 routes=57694 boardings=79633 alightings=391225 attempts=416593 labels=9042 bound=3037 target=386824 dominated=17690 overflows=0 largestBag=6 emitted=110 bounds=0.6ms search=11.3ms rebuild=0.1ms
+RMR   algorithmic stripped-vs-exact: common=33 onlyA=10 (dominated by B: 10) onlyB=65 (dominated by A: 0)
+RMR   production full-vs-exact: common=33 onlyA=10 (dominated by B: 10) onlyB=65 (dominated by A: 0)
+RMR   granularity exact-vs-minute: common=88 onlyA=10 (dominated by B: 0) onlyB=2 (dominated by A: 2)
+RMR   truncation exact-vs-uncut: common=98 onlyA=0 (dominated by B: 0) onlyB=2 (dominated by A: 0)
+RMR     08:12:30→08:33:36 t1 w0
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 16 Hamilius (Bus)[59]@08:12:30>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@08:17:30 / 811 Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@08:23:21>Kirchberg, Gare routière Luxexpo[2503]@08:33:36 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     08:14:00→08:34:02 t1 w311
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 2 Hamilius (Bus)[59]@08:14:00>Centre, Fondation Pescatore[287]@08:16:40 / walk Centre, Fondation Pescatore[287]>Limpertsberg, Theater (Tram)[2496] 199s / T1 Limpertsberg, Theater (Tram)[2496]@08:20:00>Kirchberg, Luxexpo[2497]@08:32:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:14:00→08:37:02 t1 w143
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 2 Hamilius (Bus)[59]@08:14:00>Limpertsberg, Theater (Bus)[7]@08:18:50 / walk Limpertsberg, Theater (Bus)[7]>Limpertsberg, Theater (Tram)[2496] 31s / T1 Limpertsberg, Theater (Tram)[2496]@08:23:00>Kirchberg, Luxexpo[2497]@08:35:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:17:00→08:37:02 t1 w176
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 21 Hamilius (Bus)[59]@08:17:00>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@08:22:00 / walk Kirchberg, Rout Bréck - Pafendall (Bus)[1964]>Kirchberg, Rout Bréck - Pafendall (Tram)[2501] 64s / T1 Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@08:25:30>Kirchberg, Luxexpo[2497]@08:35:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:22:30→08:44:17 t1 w0
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 3 Hamilius (Bus)[59]@08:22:30>Limpertsberg, Theater (Bus)[7]@08:27:20 / 211 Limpertsberg, Theater (Bus)[7]@08:33:00>Kirchberg, Gare routière Luxexpo[2503]@08:44:17 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     08:24:00→08:43:40 t1 w58
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 9 Hamilius (Bus)[59]@08:24:00>Neudorf, Brasserie[78]@08:35:20 / walk Neudorf, Brasserie[78]>Neudorf, Huesegrënnchen[186] 58s / 7 Neudorf, Huesegrënnchen[186]@08:37:30>Kirchberg, Gare routière Luxexpo[2503]@08:43:40 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     08:27:00→08:51:02 t1 w149
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 22 Hamilius (Bus)[59]@08:27:00>Centre, Stäreplaz / Étoile (Bus)[2138]@08:30:50 / walk Centre, Stäreplaz / Étoile (Bus)[2138]>Centre, Stäreplaz / Étoile (Tram)[2502] 37s / T1 Centre, Stäreplaz / Étoile (Tram)[2502]@08:33:30>Kirchberg, Luxexpo[2497]@08:49:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:29:00→08:48:02 t1 w176
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 18 Hamilius (Bus)[59]@08:29:00>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@08:34:00 / walk Kirchberg, Rout Bréck - Pafendall (Bus)[1964]>Kirchberg, Rout Bréck - Pafendall (Tram)[2501] 64s / T1 Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@08:36:30>Kirchberg, Luxexpo[2497]@08:46:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:29:00→08:51:17 t1 w0
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 18 Hamilius (Bus)[59]@08:29:00>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@08:34:00 / 201 Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@08:41:27>Kirchberg, Gare routière Luxexpo[2503]@08:51:17 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     08:30:00→08:51:17 t1 w71
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@08:30:40>Limpertsberg, Theater (Tram)[2496]@08:37:00 / walk Limpertsberg, Theater (Tram)[2496]>Limpertsberg, Theater (Bus)[7] 31s / 201 Limpertsberg, Theater (Bus)[7]@08:40:00>Kirchberg, Gare routière Luxexpo[2503]@08:51:17 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     08:32:00→08:51:02 t1 w176
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 21 Hamilius (Bus)[59]@08:32:00>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@08:37:00 / walk Kirchberg, Rout Bréck - Pafendall (Bus)[1964]>Kirchberg, Rout Bréck - Pafendall (Tram)[2501] 64s / T1 Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@08:39:30>Kirchberg, Luxexpo[2497]@08:49:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:39:00→08:58:02 t1 w176
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 18 Hamilius (Bus)[59]@08:39:00>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@08:44:00 / walk Kirchberg, Rout Bréck - Pafendall (Bus)[1964]>Kirchberg, Rout Bréck - Pafendall (Tram)[2501] 64s / T1 Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@08:46:30>Kirchberg, Luxexpo[2497]@08:56:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:39:00→08:59:50 t1 w58
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 9 Hamilius (Bus)[59]@08:39:00>Neudorf, Brasserie[78]@08:50:20 / walk Neudorf, Brasserie[78]>Neudorf, Huesegrënnchen[186] 58s / 25 Neudorf, Huesegrënnchen[186]@08:53:40>Kirchberg, Gare routière Luxexpo[2503]@08:59:50 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     08:42:30→09:02:02 t1 w176
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 16 Hamilius (Bus)[59]@08:42:30>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@08:47:30 / walk Kirchberg, Rout Bréck - Pafendall (Bus)[1964]>Kirchberg, Rout Bréck - Pafendall (Tram)[2501] 64s / T1 Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@08:50:30>Kirchberg, Luxexpo[2497]@09:00:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:42:30→09:03:36 t1 w0
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 16 Hamilius (Bus)[59]@08:42:30>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@08:47:30 / 811 Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@08:53:21>Kirchberg, Gare routière Luxexpo[2503]@09:03:36 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     08:42:30→09:05:51 t0 w481
+        current: access 0s egress 481s: 16 Hamilius (Bus)[59]@08:42:30>Kirchberg, Chambre des Métiers[1967]@08:57:50
+        prototype: -
+RMR     08:42:30→09:06:37 t0 w477
+        current: access 0s egress 477s: 16 Hamilius (Bus)[59]@08:42:30>Kirchberg, Alphonse Weicker (Bus)[72]@08:58:40
+        prototype: -
+RMR     08:42:30→09:06:42 t0 w352
+        current: access 0s egress 352s: 16 Hamilius (Bus)[59]@08:42:30>Kirchberg, Hôpital[1699]@09:00:50
+        prototype: -
+RMR     08:44:00→09:05:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@08:44:40>Kirchberg, Luxexpo[2497]@09:03:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:44:00→09:05:02 t1 w143
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 2 Hamilius (Bus)[59]@08:44:00>Limpertsberg, Theater (Bus)[7]@08:48:50 / walk Limpertsberg, Theater (Bus)[7]>Limpertsberg, Theater (Tram)[2496] 31s / T1 Limpertsberg, Theater (Tram)[2496]@08:51:00>Kirchberg, Luxexpo[2497]@09:03:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:51:00→09:12:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@08:51:40>Kirchberg, Luxexpo[2497]@09:10:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:54:00→09:13:40 t1 w58
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 9 Hamilius (Bus)[59]@08:54:00>Neudorf, Brasserie[78]@09:05:20 / walk Neudorf, Brasserie[78]>Neudorf, Huesegrënnchen[186] 58s / 7 Neudorf, Huesegrënnchen[186]@09:07:30>Kirchberg, Gare routière Luxexpo[2503]@09:13:40 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     08:55:00→09:16:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@08:55:40>Kirchberg, Luxexpo[2497]@09:14:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:57:30→09:16:02 t1 w176
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 16 Hamilius (Bus)[59]@08:57:30>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@09:02:30 / walk Kirchberg, Rout Bréck - Pafendall (Bus)[1964]>Kirchberg, Rout Bréck - Pafendall (Tram)[2501] 64s / T1 Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@09:04:30>Kirchberg, Luxexpo[2497]@09:14:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:57:30→09:18:36 t1 w0
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 16 Hamilius (Bus)[59]@08:57:30>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@09:02:30 / 811 Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@09:08:21>Kirchberg, Gare routière Luxexpo[2503]@09:18:36 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     08:57:30→09:20:51 t0 w481
+        current: access 0s egress 481s: 16 Hamilius (Bus)[59]@08:57:30>Kirchberg, Chambre des Métiers[1967]@09:12:50
+        prototype: -
+RMR     08:58:00→09:19:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@08:58:40>Kirchberg, Luxexpo[2497]@09:17:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:59:00→09:19:02 t1 w176
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 18 Hamilius (Bus)[59]@08:59:00>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@09:04:00 / walk Kirchberg, Rout Bréck - Pafendall (Bus)[1964]>Kirchberg, Rout Bréck - Pafendall (Tram)[2501] 64s / T1 Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@09:07:30>Kirchberg, Luxexpo[2497]@09:17:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     08:59:00→09:21:17 t1 w0
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 18 Hamilius (Bus)[59]@08:59:00>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@09:04:00 / 201 Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@09:11:27>Kirchberg, Gare routière Luxexpo[2503]@09:21:17 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:00:04→09:21:17 t0 w596
+        current: -
+        prototype: access Limpertsberg, Theater (Bus)[7] 596s / 201 Limpertsberg, Theater (Bus)[7]@09:10:00>Kirchberg, Gare routière Luxexpo[2503]@09:21:17 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:02:00→09:21:17 t1 w218
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 21 Hamilius (Bus)[59]@09:02:00>Centre, Fondation Pescatore[287]@09:04:40 / walk Centre, Fondation Pescatore[287]>Limpertsberg, Theater (Bus)[7] 218s / 201 Limpertsberg, Theater (Bus)[7]@09:10:00>Kirchberg, Gare routière Luxexpo[2503]@09:21:17 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:02:00→09:23:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:02:40>Kirchberg, Luxexpo[2497]@09:21:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:09:00→09:29:50 t1 w58
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 9 Hamilius (Bus)[59]@09:09:00>Neudorf, Brasserie[78]@09:20:20 / walk Neudorf, Brasserie[78]>Neudorf, Huesegrënnchen[186] 58s / 25 Neudorf, Huesegrënnchen[186]@09:23:40>Kirchberg, Gare routière Luxexpo[2503]@09:29:50 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:09:00→09:30:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:09:40>Kirchberg, Luxexpo[2497]@09:28:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:09:00→09:32:46 t0 w356
+        current: access 0s egress 356s: 18 Hamilius (Bus)[59]@09:09:00>Kirchberg, Poutty Stein[2110]@09:26:50
+        prototype: -
+RMR     09:09:00→09:34:05 t0 w355
+        current: access 0s egress 355s: 18 Hamilius (Bus)[59]@09:09:00>Kirchberg, Luxexpo Entrée Sud[2112]@09:28:10
+        prototype: -
+RMR     09:12:00→09:33:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:12:40>Kirchberg, Luxexpo[2497]@09:31:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:12:30→09:33:02 t1 w176
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 16 Hamilius (Bus)[59]@09:12:30>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@09:17:30 / walk Kirchberg, Rout Bréck - Pafendall (Bus)[1964]>Kirchberg, Rout Bréck - Pafendall (Tram)[2501] 64s / T1 Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@09:21:30>Kirchberg, Luxexpo[2497]@09:31:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:12:30→09:33:36 t1 w0
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 16 Hamilius (Bus)[59]@09:12:30>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@09:17:30 / 811 Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@09:23:21>Kirchberg, Gare routière Luxexpo[2503]@09:33:36 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:14:00→09:37:02 t1 w143
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 2 Hamilius (Bus)[59]@09:14:00>Limpertsberg, Theater (Bus)[7]@09:18:50 / walk Limpertsberg, Theater (Bus)[7]>Limpertsberg, Theater (Tram)[2496] 31s / T1 Limpertsberg, Theater (Tram)[2496]@09:23:00>Kirchberg, Luxexpo[2497]@09:35:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:16:00→09:37:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:16:40>Kirchberg, Luxexpo[2497]@09:35:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:17:00→09:37:02 t1 w176
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 21 Hamilius (Bus)[59]@09:17:00>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@09:22:00 / walk Kirchberg, Rout Bréck - Pafendall (Bus)[1964]>Kirchberg, Rout Bréck - Pafendall (Tram)[2501] 64s / T1 Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@09:25:30>Kirchberg, Luxexpo[2497]@09:35:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:19:00→09:40:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:19:40>Kirchberg, Luxexpo[2497]@09:38:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:23:00→09:42:57 t1 w71
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:23:40>Limpertsberg, Theater (Tram)[2496]@09:30:00 / walk Limpertsberg, Theater (Tram)[2496]>Limpertsberg, Theater (Bus)[7] 31s / 211 Limpertsberg, Theater (Bus)[7]@09:33:00>Kirchberg, Gare routière Luxexpo[2503]@09:42:57 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:23:00→09:44:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:23:40>Kirchberg, Luxexpo[2497]@09:42:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:23:04→09:42:57 t0 w596
+        current: -
+        prototype: access Limpertsberg, Theater (Bus)[7] 596s / 211 Limpertsberg, Theater (Bus)[7]@09:33:00>Kirchberg, Gare routière Luxexpo[2503]@09:42:57 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:24:00→09:42:57 t1 w218
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 2 Hamilius (Bus)[59]@09:24:00>Centre, Fondation Pescatore[287]@09:26:40 / walk Centre, Fondation Pescatore[287]>Limpertsberg, Theater (Bus)[7] 218s / 211 Limpertsberg, Theater (Bus)[7]@09:33:00>Kirchberg, Gare routière Luxexpo[2503]@09:42:57 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:24:00→09:43:40 t1 w58
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 9 Hamilius (Bus)[59]@09:24:00>Neudorf, Brasserie[78]@09:35:20 / walk Neudorf, Brasserie[78]>Neudorf, Huesegrënnchen[186] 58s / 7 Neudorf, Huesegrënnchen[186]@09:37:30>Kirchberg, Gare routière Luxexpo[2503]@09:43:40 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:26:00→09:47:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:26:40>Kirchberg, Luxexpo[2497]@09:45:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:26:00→09:48:36 t1 w77
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:26:40>Centre, Stäreplaz / Étoile (Tram)[2502]@09:29:30 / walk Centre, Stäreplaz / Étoile (Tram)[2502]>Centre, Stäreplaz / Étoile (Bus)[2138] 37s / 811 Centre, Stäreplaz / Étoile (Bus)[2138]@09:31:39>Kirchberg, Gare routière Luxexpo[2503]@09:48:36 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:27:00→09:51:02 t1 w149
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 22 Hamilius (Bus)[59]@09:27:00>Centre, Stäreplaz / Étoile (Bus)[2138]@09:30:50 / walk Centre, Stäreplaz / Étoile (Bus)[2138]>Centre, Stäreplaz / Étoile (Tram)[2502] 37s / T1 Centre, Stäreplaz / Étoile (Tram)[2502]@09:33:30>Kirchberg, Luxexpo[2497]@09:49:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:29:00→09:52:46 t0 w356
+        current: access 0s egress 356s: 18 Hamilius (Bus)[59]@09:29:00>Kirchberg, Poutty Stein[2110]@09:46:50
+        prototype: -
+RMR     09:29:00→09:52:50 t1 w0
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 18 Hamilius (Bus)[59]@09:29:00>Kirchberg, Avalon[2309]@09:43:00 / 303 Kirchberg, Avalon[2309]@09:49:00>Kirchberg, Gare routière Luxexpo[2503]@09:52:50 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:30:00→09:51:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:30:40>Kirchberg, Luxexpo[2497]@09:49:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:32:30→09:51:02 t1 w176
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 16 Hamilius (Bus)[59]@09:32:30>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@09:37:30 / walk Kirchberg, Rout Bréck - Pafendall (Bus)[1964]>Kirchberg, Rout Bréck - Pafendall (Tram)[2501] 64s / T1 Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@09:39:30>Kirchberg, Luxexpo[2497]@09:49:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:32:30→09:54:30 t1 w62
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 16 Hamilius (Bus)[59]@09:32:30>Kirchberg, Konrad Adenauer[1962]@09:45:00 / walk Kirchberg, Konrad Adenauer[1962]>Kirchberg, prov. Konrad Adenauer[2775] 62s / 25 Kirchberg, prov. Konrad Adenauer[2775]@09:47:30>Kirchberg, Gare routière Luxexpo[2503]@09:54:30 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:32:30→09:55:51 t0 w481
+        current: access 0s egress 481s: 16 Hamilius (Bus)[59]@09:32:30>Kirchberg, Chambre des Métiers[1967]@09:47:50
+        prototype: -
+RMR     09:32:30→09:59:50 t1 w0
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 16 Hamilius (Bus)[59]@09:32:30>Kirchberg, Hôpital[1699]@09:50:50 / 25 Kirchberg, Hôpital[1699]@09:57:40>Kirchberg, Gare routière Luxexpo[2503]@09:59:50 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:33:00→09:54:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:33:40>Kirchberg, Luxexpo[2497]@09:52:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:34:00→09:54:02 t1 w311
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 2 Hamilius (Bus)[59]@09:34:00>Centre, Fondation Pescatore[287]@09:36:40 / walk Centre, Fondation Pescatore[287]>Limpertsberg, Theater (Tram)[2496] 199s / T1 Limpertsberg, Theater (Tram)[2496]@09:40:00>Kirchberg, Luxexpo[2497]@09:52:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:34:00→09:58:02 t1 w143
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 2 Hamilius (Bus)[59]@09:34:00>Limpertsberg, Theater (Bus)[7]@09:38:50 / walk Limpertsberg, Theater (Bus)[7]>Limpertsberg, Theater (Tram)[2496] 31s / T1 Limpertsberg, Theater (Tram)[2496]@09:44:00>Kirchberg, Luxexpo[2497]@09:56:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:37:00→09:58:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:37:40>Kirchberg, Luxexpo[2497]@09:56:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:39:00→09:58:02 t1 w176
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 18 Hamilius (Bus)[59]@09:39:00>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@09:44:00 / walk Kirchberg, Rout Bréck - Pafendall (Bus)[1964]>Kirchberg, Rout Bréck - Pafendall (Tram)[2501] 64s / T1 Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@09:46:30>Kirchberg, Luxexpo[2497]@09:56:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:39:00→09:59:50 t1 w58
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 9 Hamilius (Bus)[59]@09:39:00>Neudorf, Brasserie[78]@09:50:20 / walk Neudorf, Brasserie[78]>Neudorf, Huesegrënnchen[186] 58s / 25 Neudorf, Huesegrënnchen[186]@09:53:40>Kirchberg, Gare routière Luxexpo[2503]@09:59:50 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:44:00→10:06:02 t1 w143
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 2 Hamilius (Bus)[59]@09:44:00>Limpertsberg, Theater (Bus)[7]@09:48:50 / walk Limpertsberg, Theater (Bus)[7]>Limpertsberg, Theater (Tram)[2496] 31s / T1 Limpertsberg, Theater (Tram)[2496]@09:52:00>Kirchberg, Luxexpo[2497]@10:04:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:45:00→10:06:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:45:40>Kirchberg, Luxexpo[2497]@10:04:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:47:00→10:06:02 t1 w176
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 21 Hamilius (Bus)[59]@09:47:00>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@09:52:00 / walk Kirchberg, Rout Bréck - Pafendall (Bus)[1964]>Kirchberg, Rout Bréck - Pafendall (Tram)[2501] 64s / T1 Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@09:54:30>Kirchberg, Luxexpo[2497]@10:04:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:47:00→10:13:40 t1 w0
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 21 Hamilius (Bus)[59]@09:47:00>Kirchberg, Hôpital[1699]@10:05:30 / 7 Kirchberg, Hôpital[1699]@10:11:30>Kirchberg, Gare routière Luxexpo[2503]@10:13:40 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:49:00→10:10:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:49:40>Kirchberg, Luxexpo[2497]@10:08:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:49:00→10:12:46 t0 w356
+        current: access 0s egress 356s: 18 Hamilius (Bus)[59]@09:49:00>Kirchberg, Poutty Stein[2110]@10:06:50
+        prototype: -
+RMR     09:52:30→10:15:51 t0 w481
+        current: access 0s egress 481s: 16 Hamilius (Bus)[59]@09:52:30>Kirchberg, Chambre des Métiers[1967]@10:07:50
+        prototype: -
+RMR     09:53:00→10:14:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:53:40>Kirchberg, Luxexpo[2497]@10:12:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:54:00→10:13:40 t1 w58
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 9 Hamilius (Bus)[59]@09:54:00>Neudorf, Brasserie[78]@10:05:20 / walk Neudorf, Brasserie[78]>Neudorf, Huesegrënnchen[186] 58s / 7 Neudorf, Huesegrënnchen[186]@10:07:30>Kirchberg, Gare routière Luxexpo[2503]@10:13:40 / egress Kirchberg, Gare routière Luxexpo[2503] 0s
+RMR     09:57:00→10:18:02 t0 w152
+        current: -
+        prototype: access Hamilius-Centre (Tram)[2573] 40s / T1 Hamilius-Centre (Tram)[2573]@09:57:40>Kirchberg, Luxexpo[2497]@10:16:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR     09:59:00→10:18:02 t1 w176
+        current: -
+        prototype: access Hamilius (Bus)[59] 0s / 18 Hamilius (Bus)[59]@09:59:00>Kirchberg, Rout Bréck - Pafendall (Bus)[1964]@10:04:00 / walk Kirchberg, Rout Bréck - Pafendall (Bus)[1964]>Kirchberg, Rout Bréck - Pafendall (Tram)[2501] 64s / T1 Kirchberg, Rout Bréck - Pafendall (Tram)[2501]@10:06:30>Kirchberg, Luxexpo[2497]@10:16:10 / egress Kirchberg, Luxexpo[2497] 112s
+RMR pair=8 Ettelbruck Gare routière → Esch Gare routière access=25 egress=25 current=18 stripped=18 exact=29 minute=29 uncut=55 published=6 coverage=["dominated", "equal", "equal", "dominated", "equal", "dominated"]
+RMR   timings median ms: currentParallel=279.5 currentSingle=884.6 prototypeExact=28.0 prototypeMinute=18.0
+RMR   exact stats: iterations=529 rounds=867 routes=135864 boardings=189231 alightings=594964 attempts=659851 labels=31587 bound=103861 target=112641 dominated=411762 overflows=0 largestBag=11 emitted=33 bounds=0.6ms search=26.8ms rebuild=0.0ms
+RMR   minute stats: iterations=120 rounds=316 routes=65739 boardings=105684 alightings=272208 attempts=326576 labels=21508 bound=101128 target=73605 dominated=130335 overflows=0 largestBag=11 emitted=33 bounds=0.6ms search=16.8ms rebuild=0.2ms
+RMR   algorithmic stripped-vs-exact: common=15 onlyA=3 (dominated by B: 3) onlyB=14 (dominated by A: 0)
+RMR   production full-vs-exact: common=15 onlyA=3 (dominated by B: 3) onlyB=14 (dominated by A: 0)
+RMR   granularity exact-vs-minute: common=25 onlyA=4 (dominated by B: 0) onlyB=4 (dominated by A: 4)
+RMR   truncation exact-vs-uncut: common=24 onlyA=5 (dominated by B: 5) onlyB=31 (dominated by A: 0)
+RMR     16:02:35→18:05:05 t3 w116
+        current: access 0s egress 0s: K27 Ettelbruck, Gare routière[2258]@16:02:35>Diekirch, Gare routière[294]@16:09:37 / walk Diekirch, Gare routière[294]>Diekirch, Gare[1979] 76s / RB Diekirch, Gare[1979]@16:21:00>Ettelbruck, Gare[1978]@16:26:00 / RE Ettelbruck, Gare[1978]@16:46:00>Belval (Université), Gare[1997]@17:50:00 / walk Belval (Université), Gare[1997]>Belval (Université), Gare routière[2065] 40s / 551 Belval (Université), Gare routière[2065]@17:57:55>Esch-sur-Alzette, Gare routière[514]@18:05:05
+        prototype: -
+RMR     16:02:35→18:29:20 t3 w98
+        current: access 0s egress 0s: K27 Ettelbruck, Gare routière[2258]@16:02:35>Diekirch, Gare routière[294]@16:09:37 / walk Diekirch, Gare routière[294]>Diekirch, Gare[1979] 76s / RB Diekirch, Gare[1979]@16:21:00>Luxembourg, Gare Centrale[1975]@17:08:00 / TER Luxembourg, Gare Centrale[1975]@17:15:00>Bettembourg, Gare[1986]@17:25:00 / walk Bettembourg, Gare[1986]>Bettembourg, Gare routière[728] 22s / 641 Bettembourg, Gare routière[728]@17:40:00>Esch-sur-Alzette, Gare routière[514]@18:29:20
+        prototype: -
+RMR     16:05:00→17:46:48 t2 w184
+        current: access 0s egress 108s: 180 Ettelbruck, Gare routière[2258]@16:05:00>Diekirch, Gare routière[294]@16:12:20 / walk Diekirch, Gare routière[294]>Diekirch, Gare[1979] 76s / RB Diekirch, Gare[1979]@16:21:00>Ettelbruck, Gare[1978]@16:26:00 / RE Ettelbruck, Gare[1978]@16:46:00>Esch-sur-Alzette, Gare[1989]@17:45:00
+        prototype: -
+RMR     16:05:48→17:46:48 t2 w184
+        current: -
+        prototype: access Ettelbruck, Gare routière[2258] 0s / 119 Ettelbruck, Gare routière[2258]@16:05:48>Diekirch, Gare routière[294]@16:13:01 / walk Diekirch, Gare routière[294]>Diekirch, Gare[1979] 76s / RB Diekirch, Gare[1979]@16:21:00>Ettelbruck, Gare[1978]@16:26:00 / RE Ettelbruck, Gare[1978]@16:46:00>Esch-sur-Alzette, Gare[1989]@17:45:00 / egress Esch-sur-Alzette, Gare[1989] 108s
+RMR     16:05:48→18:05:05 t3 w116
+        current: -
+        prototype: access Ettelbruck, Gare routière[2258] 0s / 119 Ettelbruck, Gare routière[2258]@16:05:48>Diekirch, Gare routière[294]@16:13:01 / walk Diekirch, Gare routière[294]>Diekirch, Gare[1979] 76s / RB Diekirch, Gare[1979]@16:21:00>Ettelbruck, Gare[1978]@16:26:00 / RE Ettelbruck, Gare[1978]@16:46:00>Belval (Université), Gare[1997]@17:50:00 / walk Belval (Université), Gare[1997]>Belval (Université), Gare routière[2065] 40s / 551 Belval (Université), Gare routière[2065]@17:57:55>Esch-sur-Alzette, Gare routière[514]@18:05:05 / egress Esch-sur-Alzette, Gare routière[514] 0s
+RMR     16:05:48→18:29:20 t3 w98
+        current: -
+        prototype: access Ettelbruck, Gare routière[2258] 0s / 119 Ettelbruck, Gare routière[2258]@16:05:48>Diekirch, Gare routière[294]@16:13:01 / walk Diekirch, Gare routière[294]>Diekirch, Gare[1979] 76s / RB Diekirch, Gare[1979]@16:21:00>Luxembourg, Gare Centrale[1975]@17:08:00 / TER Luxembourg, Gare Centrale[1975]@17:15:00>Bettembourg, Gare[1986]@17:25:00 / walk Bettembourg, Gare[1986]>Bettembourg, Gare routière[728] 22s / 641 Bettembourg, Gare routière[728]@17:40:00>Esch-sur-Alzette, Gare routière[514]@18:29:20 / egress Esch-sur-Alzette, Gare routière[514] 0s
+RMR     16:14:02→17:45:55 t3 w174
+        current: -
+        prototype: access Ettelbruck, Gare[1978] 118s / IC Ettelbruck, Gare[1978]@16:16:00>Mersch, Gare[1976]@16:27:00 / RE Mersch, Gare[1976]@16:37:00>Esch-sur-Alzette, Gare[1989]@17:29:00 / walk Esch-sur-Alzette, Gare[1989]>Esch-sur-Alzette, Auberge de Jeunesse[2151] 56s / 3 Esch-sur-Alzette, Auberge de Jeunesse[2151]@17:35:00>Esch-sur-Alzette, Rue Nelson Mandela[1772]@17:37:00 / 650 Esch-sur-Alzette, Rue Nelson Mandela[1772]@17:43:55>Esch-sur-Alzette, Gare routière[514]@17:45:55 / egress Esch-sur-Alzette, Gare routière[514] 0s
+RMR     16:14:02→17:54:40 t2 w158
+        current: -
+        prototype: access Ettelbruck, Gare[1978] 118s / IC Ettelbruck, Gare[1978]@16:16:00>Mersch, Gare[1976]@16:27:00 / RE Mersch, Gare[1976]@16:37:00>Belval (Université), Gare[1997]@17:34:00 / walk Belval (Université), Gare[1997]>Belval (Université), Gare routière[2065] 40s / 651 Belval (Université), Gare routière[2065]@17:48:15>Esch-sur-Alzette, Gare routière[514]@17:54:40 / egress Esch-sur-Alzette, Gare routière[514] 0s
+RMR     16:14:02→18:09:40 t3 w137
+        current: -
+        prototype: access Ettelbruck, Gare[1978] 118s / IC Ettelbruck, Gare[1978]@16:16:00>Luxembourg, Gare Centrale[1975]@16:46:00 / RE Luxembourg, Gare Centrale[1975]@17:04:00>Bascharage/Sanem, Gare[1995]@17:20:00 / walk Bascharage/Sanem, Gare[1995]>Bascharage/Sanem, Gare routière[2046] 19s / 15 Bascharage/Sanem, Gare routière[2046]@17:33:00>Belvaux, Mairie/Poste[2062]@17:49:00 / 651 Belvaux, Mairie/Poste[2062]@17:58:15>Esch-sur-Alzette, Gare routière[514]@18:09:40 / egress Esch-sur-Alzette, Gare routière[514] 0s
+RMR     16:37:48→18:57:00 t3 w116
+        current: -
+        prototype: access Ettelbruck, Gare routière[2258] 0s / 119 Ettelbruck, Gare routière[2258]@16:37:48>Diekirch, Gare routière[294]@16:45:21 / walk Diekirch, Gare routière[294]>Diekirch, Gare[1979] 76s / RB Diekirch, Gare[1979]@16:51:00>Luxembourg, Gare Centrale[1975]@17:38:00 / RE Luxembourg, Gare Centrale[1975]@17:50:00>Belval (Université), Gare[1997]@18:20:00 / walk Belval (Université), Gare[1997]>Belval (Université), Gare routière[2065] 40s / 3 Belval (Université), Gare routière[2065]@18:47:00>Esch-sur-Alzette, Gare routière[514]@18:57:00 / egress Esch-sur-Alzette, Gare routière[514] 0s
+RMR     16:44:02→18:13:00 t3 w137
+        current: -
+        prototype: access Ettelbruck, Gare[1978] 118s / RE Ettelbruck, Gare[1978]@16:46:00>Luxembourg, Gare Centrale[1975]@17:15:00 / RB Luxembourg, Gare Centrale[1975]@17:20:00>Bascharage/Sanem, Gare[1995]@17:38:00 / walk Bascharage/Sanem, Gare[1995]>Bascharage/Sanem, Gare routière[2046] 19s / 14 Bascharage/Sanem, Gare routière[2046]@17:40:00>Sanem, Op Lohr[786]@17:42:00 / 13 Sanem, Op Lohr[786]@17:49:00>Esch-sur-Alzette, Gare routière[514]@18:13:00 / egress Esch-sur-Alzette, Gare routière[514] 0s
+RMR     16:56:02→18:37:00 t3 w209
+        current: -
+        prototype: access Ettelbruck, Gare[1978] 118s / RB Ettelbruck, Gare[1978]@16:58:00>Luxembourg, Gare Centrale[1975]@17:38:00 / walk Luxembourg, Gare Centrale[1975]>Luxembourg, Gare Centrale (Tram)[2594] 50s / T1 Luxembourg, Gare Centrale (Tram)[2594]@17:41:20>Gasperich, Stadion[2698]@17:55:30 / walk Gasperich, Stadion[2698]>Gasperich, Stade de Luxembourg[2614] 41s / 606 Gasperich, Stade de Luxembourg[2614]@18:02:55>Esch-sur-Alzette, Raemerich[511]@18:19:55 / 1 Esch-sur-Alzette, Raemerich[511]@18:25:00>Esch-sur-Alzette, Gare routière[514]@18:37:00 / egress Esch-sur-Alzette, Gare routière[514] 0s
+RMR     16:56:02→18:43:00 t3 w137
+        current: -
+        prototype: access Ettelbruck, Gare[1978] 118s / RB Ettelbruck, Gare[1978]@16:58:00>Luxembourg, Gare Centrale[1975]@17:38:00 / RB Luxembourg, Gare Centrale[1975]@17:50:00>Bascharage/Sanem, Gare[1995]@18:08:00 / walk Bascharage/Sanem, Gare[1995]>Bascharage/Sanem, Gare routière[2046] 19s / 14 Bascharage/Sanem, Gare routière[2046]@18:10:00>Sanem, Op Lohr[786]@18:12:00 / 13 Sanem, Op Lohr[786]@18:19:00>Esch-sur-Alzette, Gare routière[514]@18:43:00 / egress Esch-sur-Alzette, Gare routière[514] 0s
+RMR     17:03:00→18:46:48 t3 w141
+        current: -
+        prototype: access Ettelbruck, Gare routière[2258] 0s / 941 Ettelbruck, Gare routière[2258]@17:03:00>Schieren, Porte de Schieren[2188]@17:11:08 / 118 Schieren, Porte de Schieren[2188]@17:18:02>Schieren, Alen Atelier[2468]@17:19:22 / walk Schieren, Alen Atelier[2468]>Schieren, Gare[2027] 33s / RB Schieren, Gare[2027]@17:30:00>Ettelbruck, Gare[1978]@17:33:00 / RE Ettelbruck, Gare[1978]@17:46:00>Esch-sur-Alzette, Gare[1989]@18:45:00 / egress Esch-sur-Alzette, Gare[1989] 108s
+RMR     17:07:48→18:46:48 t2 w184
+        current: -
+        prototype: access Ettelbruck, Gare routière[2258] 0s / 119 Ettelbruck, Gare routière[2258]@17:07:48>Diekirch, Gare routière[294]@17:15:21 / walk Diekirch, Gare routière[294]>Diekirch, Gare[1979] 76s / RB Diekirch, Gare[1979]@17:21:00>Ettelbruck, Gare[1978]@17:26:00 / RE Ettelbruck, Gare[1978]@17:46:00>Esch-sur-Alzette, Gare[1989]@18:45:00 / egress Esch-sur-Alzette, Gare[1989] 108s
+RMR     17:14:02→18:49:00 t3 w216
+        current: -
+        prototype: access Ettelbruck, Gare[1978] 118s / IC Ettelbruck, Gare[1978]@17:16:00>Mersch, Gare[1976]@17:27:00 / RE Mersch, Gare[1976]@17:37:00>Schifflange, Gare[1988]@18:25:00 / walk Schifflange, Gare[1988]>Schifflange, Stadhaus[463] 98s / 4 Schifflange, Stadhaus[463]@18:32:00>Esch-sur-Alzette, Place Norbert Metz[2067]@18:40:00 / 15 Esch-sur-Alzette, Place Norbert Metz[2067]@18:47:00>Esch-sur-Alzette, Gare routière[514]@18:49:00 / egress Esch-sur-Alzette, Gare routière[514] 0s
+RMR     17:14:02→18:52:00 t3 w209
+        current: -
+        prototype: access Ettelbruck, Gare[1978] 118s / IC Ettelbruck, Gare[1978]@17:16:00>Luxembourg, Gare Centrale[1975]@17:46:00 / walk Luxembourg, Gare Centrale[1975]>Luxembourg, Gare Centrale (Tram)[2594] 50s / T1 Luxembourg, Gare Centrale (Tram)[2594]@17:49:20>Gasperich, Stadion[2698]@18:03:30 / walk Gasperich, Stadion[2698]>Gasperich, Stade de Luxembourg[2614] 41s / 607 Gasperich, Stade de Luxembourg[2614]@18:06:55>Belvaux, Roudewee[2040]@18:31:43 / 1 Belvaux, Roudewee[2040]@18:37:00>Esch-sur-Alzette, Gare routière[514]@18:52:00 / egress Esch-sur-Alzette, Gare routière[514] 0s
