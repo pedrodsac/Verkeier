@@ -23,6 +23,7 @@
 | Buses continuing under another line number (7 → 25) | `ROUTING_BLOCK_CONTINUATIONS.md` |
 | Router performance, simulator measurements and reproduction | `ROUTE_CALCULATION_PERFORMANCE.md` |
 | How a route is calculated end to end, live baseline and improvement candidates (written for agents) | `ROUTING_IMPROVEMENT_BRIEF.md` |
+| Range-McRAPTOR routing kernel: prototype, equivalence and the default switch | `benchmarks/range-mcraptor-prototype-2026-11-14/` + `benchmarks/range-mcraptor-kernel-2026-11-15/` |
 | Stored transfer walks and the launch route-preparation screen | `TRANSFER_WALKS.md` |
 | UI lag, launch work and map update performance | `UI_PERFORMANCE.md` |
 | Route trace appearance, stop labels, and map shields | `MAP_TRACE_DESIGN.md` |
@@ -51,7 +52,9 @@ docs/
 ├── ROUTING_FAILURE_PREVENTION_IMPLEMENTATION.md  ← delivered behavior and regression traceability
 ├── ROUTE_CALCULATION_PERFORMANCE.md              ← implementation and measured five-second gate
 ├── ROUTING_IMPROVEMENT_BRIEF.md                  ← routing pipeline, live baseline, improvement backlog (for agents)
-└── benchmarks/route-performance-2026-09-30/      ← per-request timing evidence
+├── benchmarks/route-performance-2026-09-30/      ← per-request timing evidence
+├── benchmarks/range-mcraptor-prototype-2026-11-14/ ← range-McRAPTOR prototype timings (Mac, iPhone 13)
+└── benchmarks/range-mcraptor-kernel-2026-11-15/  ← range kernel equivalence at scale, default switch
 ```
 
 ## What this app is
