@@ -6,22 +6,17 @@ Verkéier is a native SwiftUI iOS app for Luxembourg public transport, built to 
 
 ## Commands
 
-Build for simulator:
+Use the official Xcode plugin (`xcode-integration`, MCP tools `mcp__plugin_xcode-integration_xcode__*`) for building, testing and running. It talks to the open Xcode workspace, so Xcode must be running with `Verkeier.xcodeproj` open (`XcodeOpenWorkspace` / `XcodeListWorkspaces`; pass the returned `tabIdentifier` to every call). Prefer these over shelling out to `xcodebuild`:
 
-```sh
-xcodebuild -project Verkeier.xcodeproj -scheme Verkeier -destination 'platform=iOS Simulator,name=iPhone 17' build
-```
+- **Build:** `BuildProject`; on failure read `GetBuildLog`. `XcodeRefreshCodeIssuesInFile` gives fast per-file diagnostics.
+- **Tests:** `RunAllTests` for the full suite; `RunSomeTests` for one suite or method (Swift Testing), e.g. `VerkeierTests/StopDeduplicationTests`. `GetTestList` lists what is available.
+- **Run and verify on the simulator:** `RunProject`, then `GetConsoleOutput`. Use the `xcode-integration:device-interaction` skill (`DeviceInteraction*` tools) for screenshots, UI hierarchy and taps.
+- **Previews:** `RenderPreview`. **Docs:** `DocumentationSearch`. **Schemes, destinations, run settings:** `XcodeListSchemes`, `XcodeListRunDestinations`, `XcodeSwitchRunDestination` (use an iPhone 17 simulator).
 
-Run the full test suite:
+Plain `xcodebuild` remains the fallback when Xcode is not open or for headless runs, with the same scheme and destination:
 
 ```sh
 xcodebuild -project Verkeier.xcodeproj -scheme Verkeier -destination 'platform=iOS Simulator,name=iPhone 17' test
-```
-
-Run a single test class or method (Swift Testing):
-
-```sh
-xcodebuild -project Verkeier.xcodeproj -scheme Verkeier -destination 'platform=iOS Simulator,name=iPhone 17' test -only-testing:VerkeierTests/StopDeduplicationTests
 ```
 
 Format app sources with Xcode's built-in swift-format (config in `.swift-format`; Live Activities and widgets are excluded for now):
@@ -97,7 +92,7 @@ Installed skills cover the SwiftUI/iOS surface this project lives in — use the
 - **SwiftUI:** `swiftui-pro` / `swiftui-expert-skill` (review, modern APIs, data flow), `swiftui-animation` (transitions, springs, SF Symbol effects), `swiftui-performance-audit` (janky scroll, excess view updates), `make-interfaces-feel-better` (UI polish, micro-interactions).
 - **Platform:** `ios-accessibility` (VoiceOver, Dynamic Type — see the Dynamic Type/VoiceOver convention above), `ios-localization` (String Catalogs), `ios-networking` (URLSession for the ATP/AVL/GTFS clients), `swiftdata-pro` (favourites storage).
 - **Testing:** `swift-testing-pro`, `swift-protocol-di-testing` — match the Swift Testing + protocol-DI conventions this codebase already uses.
-- **Build/run:** `xcodebuildmcp-cli`, `ios-simulator-skill` for building, running, and UI automation on the simulator.
+- **Build/run/test:** the official `xcode-integration` plugin (see Commands) and its skills: `device-interaction` (simulator screenshots, UI automation), `swiftui-specialist`, `modernize-tests`, `xctrace` (profiling), and the accessibility specialists.
 
 ## Codebase graph
 
