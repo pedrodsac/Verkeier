@@ -1,0 +1,34 @@
+{
+  "checks": {
+    "two board requests": true,
+    "first has no passlistMaxStops": true,
+    "second has passlistMaxStops=cap": true,
+    "otherwise identical": true,
+    "passlist=1 on both": true
+  },
+  "boards": [
+    {
+      "format": "json",
+      "id": "000200417050",
+      "lang": "en",
+      "date": "2026-11-15",
+      "time": "18:06:00",
+      "duration": "30",
+      "maxJourneys": "-1",
+      "rtMode": "SERVER_DEFAULT",
+      "passlist": "1"
+    },
+    {
+      "format": "json",
+      "id": "000200417050",
+      "lang": "en",
+      "date": "2026-11-15",
+      "time": "18:06:00",
+      "duration": "30",
+      "maxJourneys": "-1",
+      "rtMode": "SERVER_DEFAULT",
+      "passlist": "1",
+      "passlistMaxStops": "10"
+    }
+  ]
+}

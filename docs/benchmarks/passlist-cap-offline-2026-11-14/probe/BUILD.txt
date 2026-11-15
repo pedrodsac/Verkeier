@@ -1,0 +1,18 @@
+Probe app build (dry run), 15 November 2026
+
+Source:  Verkeier eed8d9e (git archive copy) + app-passlist-probe.diff
+Engine:  MobilitéitKit d98fb57 (the app's pin, resolved from GitHub; unmodified)
+Command: xcodebuild -project Verkeier.xcodeproj -scheme Verkeier -configuration Release \
+           -destination id=<dedicated simulator> -derivedDataPath <scratch>/dd-dry \
+           ENABLE_CODE_COVERAGE=NO 'API_PROXY_URL=' build
+Result:  BUILD SUCCEEDED; Info.plist API_PROXY_URL is empty and the relay host appears nowhere in the bundle,
+         so this build cannot reach the relay or ATP unless ROUTING_PASSLIST_PROBE_BASE_URL points it somewhere.
+Tools:   Xcode 27.2, iOS 27.2 simulator runtime
+Device:  dedicated iOS 27.2 iPhone 17 simulator, shut down after the dry run.
+
+A live run through the deployed relay needs the same build without the 'API_PROXY_URL=' override.
+Relay:   verkeier-relay main f9c9f75 + relay-passlistMaxStops.diff (branch probe/passlist-max-stops, uncommitted),
+         typecheck clean, `node --test` 8/8 (Node v26.13.0), wrangler 4.145.0.
+         Deployed 2026-11-15 18:12 CET: version f4e020d1-8f18-4451-84a0-ef1fd1cf66c9, tag passlist-v3.
+         Rollback target: 8f513969-7425-4b4a-afbb-db559ee276b9.
+Live:    2026-11-15 18:13 CET, the dry-run build with --live --base-url <production relay>; 2 ATP requests.

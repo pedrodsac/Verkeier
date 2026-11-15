@@ -1,0 +1,2897 @@
+[
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10",
+    "identical": false,
+    "differences": [
+      "unfilteredJourneys",
+      "journeys",
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "journeys lost 0 gained 0",
+      "651@000220402034 departureSource observed->scheduled",
+      "651@000220402034 effectiveDeparture -260s",
+      "651@000220402034 status delayed->live"
+    ],
+    "counters": {
+      "delayedPastBoardings": [
+        44,
+        24
+      ],
+      "duplicatesSuppressed": [
+        911,
+        938
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1157
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      1241627
+    ],
+    "total": [
+      2500.350291,
+      2365.44925
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10",
+    "identical": false,
+    "differences": [
+      "unfilteredJourneys",
+      "journeys",
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "journeys lost 0 gained 0",
+      "651@000220402034 departureSource observed->scheduled",
+      "651@000220402034 effectiveDeparture -260s",
+      "651@000220402034 status delayed->live"
+    ],
+    "counters": {
+      "delayedPastBoardings": [
+        44,
+        24
+      ],
+      "duplicatesSuppressed": [
+        911,
+        938
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1157
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      5252522
+    ],
+    "total": [
+      2500.350291,
+      2386.458459
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        911,
+        925
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1709
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14233
+      ]
+    },
+    "bytes": [
+      10503470,
+      7499938
+    ],
+    "total": [
+      2500.350291,
+      2540.975166
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "delayedPastBoardings": [
+        44,
+        19
+      ],
+      "duplicatesSuppressed": [
+        911,
+        960
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        730
+      ],
+      "walkingCacheHits": [
+        8969,
+        8976
+      ],
+      "walkingRequests": [
+        14215,
+        14221
+      ]
+    },
+    "bytes": [
+      10503470,
+      3502288
+    ],
+    "total": [
+      2500.350291,
+      2286.692416
+    ]
+  },
+  {
+    "capture": "c28-now",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "delayedPastBoardings": [
+        10,
+        8
+      ],
+      "duplicatesSuppressed": [
+        1219,
+        1213
+      ],
+      "invalidJourneys": [
+        30,
+        9
+      ],
+      "predictedEvents": [
+        4070,
+        2513
+      ],
+      "walkingCacheHits": [
+        12226,
+        12286
+      ],
+      "walkingRequests": [
+        17336,
+        17396
+      ]
+    },
+    "bytes": [
+      15833683,
+      2428234
+    ],
+    "total": [
+      3656.640583,
+      2999.353333
+    ]
+  },
+  {
+    "capture": "c28-now",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        1219,
+        1213
+      ],
+      "invalidJourneys": [
+        30,
+        9
+      ],
+      "predictedEvents": [
+        4070,
+        2546
+      ],
+      "walkingCacheHits": [
+        12226,
+        12286
+      ],
+      "walkingRequests": [
+        17336,
+        17396
+      ]
+    },
+    "bytes": [
+      15833683,
+      8996160
+    ],
+    "total": [
+      3656.640583,
+      3477.187375
+    ]
+  },
+  {
+    "capture": "c28-now",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        1219,
+        1212
+      ],
+      "invalidJourneys": [
+        30,
+        21
+      ],
+      "predictedEvents": [
+        4070,
+        3660
+      ],
+      "walkingCacheHits": [
+        12226,
+        12256
+      ],
+      "walkingRequests": [
+        17336,
+        17366
+      ]
+    },
+    "bytes": [
+      15833683,
+      13571762
+    ],
+    "total": [
+      3656.640583,
+      3547.147375
+    ]
+  },
+  {
+    "capture": "c28-now",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "journeys",
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "321@000200508002 arrivalSource observed->estimated",
+      "321@000200508002 effectiveArrival -20s",
+      "25@000200417050 arrivalSource observed->estimated"
+    ],
+    "counters": {
+      "boardCacheHits": [
+        5,
+        9
+      ],
+      "delayedPastBoardings": [
+        10,
+        7
+      ],
+      "duplicatesSuppressed": [
+        1219,
+        1221
+      ],
+      "invalidJourneys": [
+        30,
+        11
+      ],
+      "predictedEvents": [
+        4070,
+        1631
+      ],
+      "walkingCacheHits": [
+        12226,
+        12296
+      ],
+      "walkingRequests": [
+        17336,
+        17406
+      ]
+    },
+    "bytes": [
+      15833683,
+      6117177
+    ],
+    "total": [
+      3656.640583,
+      3179.639
+    ]
+  },
+  {
+    "capture": "c28-rev",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        554,
+        570
+      ],
+      "predictedEvents": [
+        4039,
+        2518
+      ],
+      "retainedAlternatives": [
+        25,
+        26
+      ],
+      "walkingCacheHits": [
+        10371,
+        10433
+      ],
+      "walkingRequests": [
+        15430,
+        15491
+      ]
+    },
+    "bytes": [
+      18256733,
+      2783472
+    ],
+    "total": [
+      4313.881375,
+      3241.453958
+    ]
+  },
+  {
+    "capture": "c28-rev",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        554,
+        570
+      ],
+      "predictedEvents": [
+        4039,
+        2518
+      ],
+      "retainedAlternatives": [
+        25,
+        26
+      ],
+      "walkingCacheHits": [
+        10371,
+        10433
+      ],
+      "walkingRequests": [
+        15430,
+        15491
+      ]
+    },
+    "bytes": [
+      18256733,
+      10353049
+    ],
+    "total": [
+      4313.881375,
+      3682.37925
+    ]
+  },
+  {
+    "capture": "c28-rev",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        554,
+        566
+      ],
+      "predictedEvents": [
+        4039,
+        3670
+      ],
+      "walkingCacheHits": [
+        10371,
+        10403
+      ],
+      "walkingRequests": [
+        15430,
+        15462
+      ]
+    },
+    "bytes": [
+      18256733,
+      15731600
+    ],
+    "total": [
+      4313.881375,
+      4004.381583
+    ]
+  },
+  {
+    "capture": "c28-rev",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "delayedPastBoardings": [
+        42,
+        36
+      ],
+      "duplicatesSuppressed": [
+        554,
+        568
+      ],
+      "predictedEvents": [
+        4039,
+        1767
+      ],
+      "walkingCacheHits": [
+        10371,
+        10444
+      ],
+      "walkingRequests": [
+        15430,
+        15502
+      ]
+    },
+    "bytes": [
+      18256733,
+      6980569
+    ],
+    "total": [
+      4313.881375,
+      4380.504167
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        763
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2306
+      ],
+      "walkingCacheHits": [
+        12117,
+        12223
+      ],
+      "walkingRequests": [
+        17160,
+        17266
+      ]
+    },
+    "bytes": [
+      15709264,
+      2405875
+    ],
+    "total": [
+      3047.742375,
+      2635.358709
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        763
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2306
+      ],
+      "walkingCacheHits": [
+        12117,
+        12223
+      ],
+      "walkingRequests": [
+        17160,
+        17266
+      ]
+    },
+    "bytes": [
+      15709264,
+      8933454
+    ],
+    "total": [
+      3047.742375,
+      2845.182167
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        761
+      ],
+      "predictedEvents": [
+        3660,
+        3344
+      ],
+      "walkingCacheHits": [
+        12117,
+        12166
+      ],
+      "walkingRequests": [
+        17160,
+        17209
+      ]
+    },
+    "bytes": [
+      15709264,
+      13486944
+    ],
+    "total": [
+      3047.742375,
+      3009.060625
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "25@000200417050 arrivalSource observed->estimated"
+    ],
+    "counters": {
+      "boardCacheHits": [
+        4,
+        7
+      ],
+      "invalidJourneys": [
+        40,
+        34
+      ],
+      "predictedEvents": [
+        3660,
+        1540
+      ],
+      "retainedAlternatives": [
+        23,
+        22
+      ],
+      "walkingCacheHits": [
+        12117,
+        12239
+      ],
+      "walkingRequests": [
+        17160,
+        17282
+      ]
+    },
+    "bytes": [
+      15709264,
+      6105177
+    ],
+    "total": [
+      3047.742375,
+      2772.539459
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "f10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        763
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2333
+      ],
+      "walkingCacheHits": [
+        17078,
+        17184
+      ],
+      "walkingRequests": [
+        17160,
+        17266
+      ]
+    },
+    "bytes": [
+      15709264,
+      2405875
+    ],
+    "total": [
+      2613.147333,
+      2161.848958
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        764
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2312
+      ],
+      "walkingCacheHits": [
+        17078,
+        17184
+      ],
+      "walkingRequests": [
+        17160,
+        17266
+      ]
+    },
+    "bytes": [
+      15709264,
+      8933454
+    ],
+    "total": [
+      2613.147333,
+      2441.248541
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        761
+      ],
+      "predictedEvents": [
+        3660,
+        3342
+      ],
+      "walkingCacheHits": [
+        17078,
+        17127
+      ],
+      "walkingRequests": [
+        17160,
+        17209
+      ]
+    },
+    "bytes": [
+      15709264,
+      13486944
+    ],
+    "total": [
+      2613.147333,
+      2560.443709
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "25@000200417050 arrivalSource observed->estimated"
+    ],
+    "counters": {
+      "boardCacheHits": [
+        4,
+        7
+      ],
+      "duplicatesSuppressed": [
+        759,
+        761
+      ],
+      "invalidJourneys": [
+        40,
+        33
+      ],
+      "predictedEvents": [
+        3660,
+        1548
+      ],
+      "retainedAlternatives": [
+        23,
+        22
+      ],
+      "walkingCacheHits": [
+        17078,
+        17200
+      ],
+      "walkingRequests": [
+        17160,
+        17282
+      ]
+    },
+    "bytes": [
+      15709264,
+      6105177
+    ],
+    "total": [
+      2613.147333,
+      2290.9955
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "f10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        763
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2306
+      ],
+      "walkingCacheHits": [
+        12117,
+        12223
+      ],
+      "walkingRequests": [
+        17160,
+        17266
+      ]
+    },
+    "bytes": [
+      15709264,
+      2405875
+    ],
+    "total": [
+      2985.958917,
+      2564.146541
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        763
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2306
+      ],
+      "walkingCacheHits": [
+        12117,
+        12223
+      ],
+      "walkingRequests": [
+        17160,
+        17266
+      ]
+    },
+    "bytes": [
+      15709264,
+      8933454
+    ],
+    "total": [
+      2985.958917,
+      2781.530666
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        761
+      ],
+      "predictedEvents": [
+        3660,
+        3344
+      ],
+      "walkingCacheHits": [
+        12117,
+        12166
+      ],
+      "walkingRequests": [
+        17160,
+        17209
+      ]
+    },
+    "bytes": [
+      15709264,
+      13486944
+    ],
+    "total": [
+      2985.958917,
+      2910.1836670000002
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "25@000200417050 arrivalSource observed->estimated"
+    ],
+    "counters": {
+      "boardCacheHits": [
+        4,
+        7
+      ],
+      "duplicatesSuppressed": [
+        759,
+        760
+      ],
+      "invalidJourneys": [
+        40,
+        33
+      ],
+      "predictedEvents": [
+        3660,
+        1536
+      ],
+      "retainedAlternatives": [
+        23,
+        22
+      ],
+      "walkingCacheHits": [
+        12117,
+        12239
+      ],
+      "walkingRequests": [
+        17160,
+        17282
+      ]
+    },
+    "bytes": [
+      15709264,
+      6105177
+    ],
+    "total": [
+      2985.958917,
+      2730.5955
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        945,
+        944
+      ],
+      "invalidJourneys": [
+        161,
+        150
+      ],
+      "predictedEvents": [
+        3759,
+        2307
+      ],
+      "walkingCacheHits": [
+        11249,
+        11344
+      ],
+      "walkingRequests": [
+        15864,
+        15959
+      ]
+    },
+    "bytes": [
+      14488702,
+      2184172
+    ],
+    "total": [
+      6033.262916,
+      4912.011041
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        945,
+        944
+      ],
+      "invalidJourneys": [
+        161,
+        151
+      ],
+      "predictedEvents": [
+        3759,
+        2321
+      ],
+      "walkingCacheHits": [
+        11249,
+        11344
+      ],
+      "walkingRequests": [
+        15864,
+        15959
+      ]
+    },
+    "bytes": [
+      14488702,
+      8098041
+    ],
+    "total": [
+      6033.262916,
+      4963.0425
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        945,
+        971
+      ],
+      "invalidJourneys": [
+        161,
+        132
+      ],
+      "predictedEvents": [
+        3759,
+        3340
+      ],
+      "walkingCacheHits": [
+        11249,
+        11298
+      ],
+      "walkingRequests": [
+        15864,
+        15895
+      ]
+    },
+    "bytes": [
+      14488702,
+      12318007
+    ],
+    "total": [
+      6033.262916,
+      5066.52925
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        945,
+        957
+      ],
+      "invalidJourneys": [
+        161,
+        119
+      ],
+      "predictedEvents": [
+        3759,
+        1532
+      ],
+      "walkingCacheHits": [
+        11249,
+        11350
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      5549673
+    ],
+    "total": [
+      6033.262916,
+      5386.833458
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "f10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        945,
+        944
+      ],
+      "invalidJourneys": [
+        161,
+        150
+      ],
+      "predictedEvents": [
+        3759,
+        2333
+      ],
+      "walkingCacheHits": [
+        15744,
+        15839
+      ],
+      "walkingRequests": [
+        15864,
+        15959
+      ]
+    },
+    "bytes": [
+      14488702,
+      2184172
+    ],
+    "total": [
+      5106.747833,
+      4373.541333
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        945,
+        948
+      ],
+      "invalidJourneys": [
+        161,
+        150
+      ],
+      "predictedEvents": [
+        3759,
+        2318
+      ],
+      "walkingCacheHits": [
+        15744,
+        15839
+      ],
+      "walkingRequests": [
+        15864,
+        15959
+      ]
+    },
+    "bytes": [
+      14488702,
+      8098041
+    ],
+    "total": [
+      5106.747833,
+      4325.697083
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        945,
+        953
+      ],
+      "invalidJourneys": [
+        161,
+        162
+      ],
+      "predictedEvents": [
+        3759,
+        3370
+      ],
+      "walkingCacheHits": [
+        15744,
+        15775
+      ],
+      "walkingRequests": [
+        15864,
+        15895
+      ]
+    },
+    "bytes": [
+      14488702,
+      12318007
+    ],
+    "total": [
+      5106.747833,
+      4713.148416
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        945,
+        944
+      ],
+      "invalidJourneys": [
+        161,
+        136
+      ],
+      "predictedEvents": [
+        3759,
+        1523
+      ],
+      "walkingCacheHits": [
+        15744,
+        15826
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      5549673
+    ],
+    "total": [
+      5106.747833,
+      4953.829709
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "f10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        949,
+        948
+      ],
+      "invalidJourneys": [
+        161,
+        150
+      ],
+      "predictedEvents": [
+        3741,
+        2331
+      ],
+      "walkingCacheHits": [
+        11249,
+        11344
+      ],
+      "walkingRequests": [
+        15864,
+        15959
+      ]
+    },
+    "bytes": [
+      14488702,
+      2184172
+    ],
+    "total": [
+      5680.292959,
+      4711.26675
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        949,
+        944
+      ],
+      "invalidJourneys": [
+        161,
+        150
+      ],
+      "predictedEvents": [
+        3741,
+        2321
+      ],
+      "walkingCacheHits": [
+        11249,
+        11344
+      ],
+      "walkingRequests": [
+        15864,
+        15959
+      ]
+    },
+    "bytes": [
+      14488702,
+      8098041
+    ],
+    "total": [
+      5680.292959,
+      4900.210333
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "invalidJourneys": [
+        161,
+        162
+      ],
+      "predictedEvents": [
+        3741,
+        3388
+      ],
+      "walkingCacheHits": [
+        11249,
+        11298
+      ],
+      "walkingRequests": [
+        15864,
+        15895
+      ]
+    },
+    "bytes": [
+      14488702,
+      12318007
+    ],
+    "total": [
+      5680.292959,
+      5119.453458
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        949,
+        925
+      ],
+      "invalidJourneys": [
+        161,
+        176
+      ],
+      "predictedEvents": [
+        3741,
+        1533
+      ],
+      "walkingCacheHits": [
+        11249,
+        11350
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      5549673
+    ],
+    "total": [
+      5680.292959,
+      4973.358542
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        994
+      ],
+      "invalidJourneys": [
+        155,
+        142
+      ],
+      "predictedEvents": [
+        3758,
+        2335
+      ],
+      "walkingCacheHits": [
+        11251,
+        11346
+      ],
+      "walkingRequests": [
+        15868,
+        15963
+      ]
+    },
+    "bytes": [
+      14490456,
+      2186855
+    ],
+    "total": [
+      7791.829084,
+      7771.093541
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        994
+      ],
+      "invalidJourneys": [
+        155,
+        142
+      ],
+      "predictedEvents": [
+        3758,
+        2310
+      ],
+      "walkingCacheHits": [
+        11251,
+        11346
+      ],
+      "walkingRequests": [
+        15868,
+        15963
+      ]
+    },
+    "bytes": [
+      14490456,
+      8095982
+    ],
+    "total": [
+      7791.829084,
+      7648.665208
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        1000
+      ],
+      "invalidJourneys": [
+        155,
+        143
+      ],
+      "predictedEvents": [
+        3758,
+        3344
+      ],
+      "walkingCacheHits": [
+        11251,
+        11300
+      ],
+      "walkingRequests": [
+        15868,
+        15899
+      ]
+    },
+    "bytes": [
+      14490456,
+      12319289
+    ],
+    "total": [
+      7791.829084,
+      8128.500291
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        987
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        1514
+      ],
+      "walkingCacheHits": [
+        11251,
+        11352
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      5545554
+    ],
+    "total": [
+      7791.829084,
+      7621.918084
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 1,
+    "arm": "f10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        994
+      ],
+      "invalidJourneys": [
+        155,
+        142
+      ],
+      "predictedEvents": [
+        3758,
+        2310
+      ],
+      "walkingCacheHits": [
+        15748,
+        15843
+      ],
+      "walkingRequests": [
+        15868,
+        15963
+      ]
+    },
+    "bytes": [
+      14490456,
+      2186855
+    ],
+    "total": [
+      7255.48425,
+      7261.085
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        994
+      ],
+      "invalidJourneys": [
+        155,
+        143
+      ],
+      "predictedEvents": [
+        3758,
+        2323
+      ],
+      "walkingCacheHits": [
+        15748,
+        15843
+      ],
+      "walkingRequests": [
+        15868,
+        15963
+      ]
+    },
+    "bytes": [
+      14490456,
+      8095982
+    ],
+    "total": [
+      7255.48425,
+      7242.735792
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        1000
+      ],
+      "invalidJourneys": [
+        155,
+        143
+      ],
+      "predictedEvents": [
+        3758,
+        3344
+      ],
+      "walkingCacheHits": [
+        15748,
+        15779
+      ],
+      "walkingRequests": [
+        15868,
+        15899
+      ]
+    },
+    "bytes": [
+      14490456,
+      12319289
+    ],
+    "total": [
+      7255.48425,
+      7405.142
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        993
+      ],
+      "invalidJourneys": [
+        155,
+        126
+      ],
+      "predictedEvents": [
+        3758,
+        1530
+      ],
+      "walkingCacheHits": [
+        15748,
+        15830
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      5545554
+    ],
+    "total": [
+      7255.48425,
+      7243.079834
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 2,
+    "arm": "f10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        994
+      ],
+      "invalidJourneys": [
+        155,
+        142
+      ],
+      "predictedEvents": [
+        3758,
+        2323
+      ],
+      "walkingCacheHits": [
+        11251,
+        11346
+      ],
+      "walkingRequests": [
+        15868,
+        15963
+      ]
+    },
+    "bytes": [
+      14490456,
+      2186855
+    ],
+    "total": [
+      7754.360125,
+      7707.670583
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        994
+      ],
+      "invalidJourneys": [
+        155,
+        142
+      ],
+      "predictedEvents": [
+        3758,
+        2323
+      ],
+      "walkingCacheHits": [
+        11251,
+        11346
+      ],
+      "walkingRequests": [
+        15868,
+        15963
+      ]
+    },
+    "bytes": [
+      14490456,
+      8095982
+    ],
+    "total": [
+      7754.360125,
+      7571.566084
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        1000
+      ],
+      "invalidJourneys": [
+        155,
+        143
+      ],
+      "predictedEvents": [
+        3758,
+        3344
+      ],
+      "walkingCacheHits": [
+        11251,
+        11300
+      ],
+      "walkingRequests": [
+        15868,
+        15899
+      ]
+    },
+    "bytes": [
+      14490456,
+      12319289
+    ],
+    "total": [
+      7754.360125,
+      8181.054542
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        986
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        1519
+      ],
+      "walkingCacheHits": [
+        11251,
+        11352
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      5545554
+    ],
+    "total": [
+      7754.360125,
+      7603.952
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        890
+      ],
+      "predictedEvents": [
+        2051,
+        1269
+      ],
+      "walkingCacheHits": [
+        16878,
+        17106
+      ],
+      "walkingRequests": [
+        21259,
+        21489
+      ]
+    },
+    "bytes": [
+      9136786,
+      1406273
+    ],
+    "total": [
+      2944.094,
+      2696.6177079999998
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        890
+      ],
+      "predictedEvents": [
+        2051,
+        1269
+      ],
+      "walkingCacheHits": [
+        16878,
+        17106
+      ],
+      "walkingRequests": [
+        21259,
+        21489
+      ]
+    },
+    "bytes": [
+      9136786,
+      5296913
+    ],
+    "total": [
+      2944.094,
+      2819.260334
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        890
+      ],
+      "predictedEvents": [
+        2051,
+        1841
+      ],
+      "walkingCacheHits": [
+        16878,
+        16978
+      ],
+      "walkingRequests": [
+        21259,
+        21359
+      ]
+    },
+    "bytes": [
+      9136786,
+      7969196
+    ],
+    "total": [
+      2944.094,
+      2953.291167
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "displayedLegs"
+    ],
+    "detail": [
+      "25@000200417033 arrivalSource observed->estimated"
+    ],
+    "counters": {
+      "boardCacheHits": [
+        3,
+        4
+      ],
+      "predictedEvents": [
+        2051,
+        853
+      ],
+      "walkingCacheHits": [
+        16878,
+        17163
+      ],
+      "walkingRequests": [
+        21259,
+        21547
+      ]
+    },
+    "bytes": [
+      9136786,
+      3606267
+    ],
+    "total": [
+      2944.094,
+      2933.664584
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "f10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        890
+      ],
+      "predictedEvents": [
+        2051,
+        1269
+      ],
+      "walkingCacheHits": [
+        21157,
+        21387
+      ],
+      "walkingRequests": [
+        21259,
+        21489
+      ]
+    },
+    "bytes": [
+      9136786,
+      1406273
+    ],
+    "total": [
+      2520.604167,
+      2175.166875
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        890
+      ],
+      "predictedEvents": [
+        2051,
+        1269
+      ],
+      "walkingCacheHits": [
+        21157,
+        21387
+      ],
+      "walkingRequests": [
+        21259,
+        21489
+      ]
+    },
+    "bytes": [
+      9136786,
+      5296913
+    ],
+    "total": [
+      2520.604167,
+      2439.024667
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        890
+      ],
+      "predictedEvents": [
+        2051,
+        1841
+      ],
+      "walkingCacheHits": [
+        21157,
+        21257
+      ],
+      "walkingRequests": [
+        21259,
+        21359
+      ]
+    },
+    "bytes": [
+      9136786,
+      7969196
+    ],
+    "total": [
+      2520.604167,
+      2427.422958
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "displayedLegs"
+    ],
+    "detail": [
+      "25@000200417033 arrivalSource observed->estimated"
+    ],
+    "counters": {
+      "boardCacheHits": [
+        3,
+        4
+      ],
+      "predictedEvents": [
+        2051,
+        852
+      ],
+      "walkingCacheHits": [
+        21157,
+        21445
+      ],
+      "walkingRequests": [
+        21259,
+        21547
+      ]
+    },
+    "bytes": [
+      9136786,
+      3606267
+    ],
+    "total": [
+      2520.604167,
+      2528.953042
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "f10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        890
+      ],
+      "predictedEvents": [
+        2051,
+        1269
+      ],
+      "walkingCacheHits": [
+        16878,
+        17106
+      ],
+      "walkingRequests": [
+        21259,
+        21489
+      ]
+    },
+    "bytes": [
+      9136786,
+      1406273
+    ],
+    "total": [
+      2869.550167,
+      2556.122416
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        890
+      ],
+      "predictedEvents": [
+        2051,
+        1269
+      ],
+      "walkingCacheHits": [
+        16878,
+        17106
+      ],
+      "walkingRequests": [
+        21259,
+        21489
+      ]
+    },
+    "bytes": [
+      9136786,
+      5296913
+    ],
+    "total": [
+      2869.550167,
+      2821.698833
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        890
+      ],
+      "predictedEvents": [
+        2051,
+        1841
+      ],
+      "walkingCacheHits": [
+        16878,
+        16978
+      ],
+      "walkingRequests": [
+        21259,
+        21359
+      ]
+    },
+    "bytes": [
+      9136786,
+      7969196
+    ],
+    "total": [
+      2869.550167,
+      2827.737333
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k5",
+    "identical": false,
+    "differences": [
+      "displayedLegs"
+    ],
+    "detail": [
+      "25@000200417033 arrivalSource observed->estimated"
+    ],
+    "counters": {
+      "boardCacheHits": [
+        3,
+        4
+      ],
+      "predictedEvents": [
+        2051,
+        861
+      ],
+      "walkingCacheHits": [
+        16878,
+        17156
+      ],
+      "walkingRequests": [
+        21259,
+        21539
+      ]
+    },
+    "bytes": [
+      9136786,
+      3606267
+    ],
+    "total": [
+      2869.550167,
+      3005.257417
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2354
+      ],
+      "walkingCacheHits": [
+        12177,
+        12255
+      ],
+      "walkingRequests": [
+        17272,
+        17350
+      ]
+    },
+    "bytes": [
+      16478486,
+      2486806
+    ],
+    "total": [
+      3121.608459,
+      2664.359958
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        943
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2344
+      ],
+      "walkingCacheHits": [
+        12177,
+        12255
+      ],
+      "walkingRequests": [
+        17272,
+        17350
+      ]
+    },
+    "bytes": [
+      16478486,
+      9469114
+    ],
+    "total": [
+      3121.608459,
+      3181.722333
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        936
+      ],
+      "invalidJourneys": [
+        59,
+        58
+      ],
+      "predictedEvents": [
+        3774,
+        3373
+      ],
+      "walkingCacheHits": [
+        12177,
+        12226
+      ],
+      "walkingRequests": [
+        17272,
+        17321
+      ]
+    },
+    "bytes": [
+      16478486,
+      14193228
+    ],
+    "total": [
+      3121.608459,
+      3116.339666
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k5",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        935
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        1573
+      ],
+      "retainedAlternatives": [
+        16,
+        15
+      ],
+      "walkingCacheHits": [
+        12177,
+        12269
+      ],
+      "walkingRequests": [
+        17272,
+        17364
+      ]
+    },
+    "bytes": [
+      16478486,
+      6503118
+    ],
+    "total": [
+      3121.608459,
+      3079.072375
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "f10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2374
+      ],
+      "walkingCacheHits": [
+        17161,
+        17239
+      ],
+      "walkingRequests": [
+        17272,
+        17350
+      ]
+    },
+    "bytes": [
+      16478486,
+      2486806
+    ],
+    "total": [
+      2670.775792,
+      2251.495958
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2354
+      ],
+      "walkingCacheHits": [
+        17161,
+        17239
+      ],
+      "walkingRequests": [
+        17272,
+        17350
+      ]
+    },
+    "bytes": [
+      16478486,
+      9469114
+    ],
+    "total": [
+      2670.775792,
+      2637.85475
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        936
+      ],
+      "invalidJourneys": [
+        59,
+        58
+      ],
+      "predictedEvents": [
+        3774,
+        3373
+      ],
+      "walkingCacheHits": [
+        17161,
+        17210
+      ],
+      "walkingRequests": [
+        17272,
+        17321
+      ]
+    },
+    "bytes": [
+      16478486,
+      14193228
+    ],
+    "total": [
+      2670.775792,
+      2678.431875
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k5",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        935
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        1580
+      ],
+      "retainedAlternatives": [
+        16,
+        15
+      ],
+      "walkingCacheHits": [
+        17161,
+        17253
+      ],
+      "walkingRequests": [
+        17272,
+        17364
+      ]
+    },
+    "bytes": [
+      16478486,
+      6503118
+    ],
+    "total": [
+      2670.775792,
+      2454.705083
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "f10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2354
+      ],
+      "walkingCacheHits": [
+        12177,
+        12255
+      ],
+      "walkingRequests": [
+        17272,
+        17350
+      ]
+    },
+    "bytes": [
+      16478486,
+      2486806
+    ],
+    "total": [
+      3072.8055,
+      2649.643625
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2354
+      ],
+      "walkingCacheHits": [
+        12177,
+        12255
+      ],
+      "walkingRequests": [
+        17272,
+        17350
+      ]
+    },
+    "bytes": [
+      16478486,
+      9469114
+    ],
+    "total": [
+      3072.8055,
+      2900.713459
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k20",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        936
+      ],
+      "invalidJourneys": [
+        59,
+        58
+      ],
+      "predictedEvents": [
+        3774,
+        3373
+      ],
+      "walkingCacheHits": [
+        12177,
+        12226
+      ],
+      "walkingRequests": [
+        17272,
+        17321
+      ]
+    },
+    "bytes": [
+      16478486,
+      14193228
+    ],
+    "total": [
+      3072.8055,
+      3152.480167
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k5",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        935
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        1575
+      ],
+      "retainedAlternatives": [
+        16,
+        15
+      ],
+      "walkingCacheHits": [
+        12177,
+        12269
+      ],
+      "walkingRequests": [
+        17272,
+        17364
+      ]
+    },
+    "bytes": [
+      16478486,
+      6503118
+    ],
+    "total": [
+      3072.8055,
+      2947.571459
+    ]
+  }
+]

@@ -1,0 +1,23 @@
+{"unique":
+{
+ "passlists": 2422,
+ "gapTimes": 50130,
+ "constantMatches": 49557,
+ "linearMatches": 47553,
+ "beyond30MinNonzeroDelay": 360,
+ "passlistsWithoutAnchorDelay": 562,
+ "constantShare": 98.9,
+ "linearShare": 94.9
+}
+, "all":
+{
+ "passlists": 7702,
+ "gapTimes": 159669,
+ "constantMatches": 157612,
+ "linearMatches": 152382,
+ "beyond30MinNonzeroDelay": 528,
+ "passlistsWithoutAnchorDelay": 1735,
+ "constantShare": 98.7,
+ "linearShare": 95.4
+}
+}

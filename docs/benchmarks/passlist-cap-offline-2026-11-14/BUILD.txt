@@ -1,0 +1,23 @@
+Release, iPhone simulator, Verkeier 4911ff0 (git archive plus the walking graph files), MobilitéitKit a152c0f, ENABLE_CODE_COVERAGE=NO (0 profile-coverage-mapping lines). Built 2026-11-14 19:07 for a dedicated iOS 27.2 iPhone 17 simulator (FD63C650).
+Timetable: generation 5 (gtfs-20261007-20261212.zip, valid through 2026-12-12), copied from the Mac app container and passed with SIMCTL_CHILD_ROUTING_BENCHMARK_DATABASE.
+
+15 November 2026, fix and replay (ROUTING_PASSLIST_CAP experiment, engine-experiment.diff):
+- a152c0f + horizon change: Verkeier 4911ff0 in a scratch workspace with a local MobilitéitKit copy, Release, ENABLE_CODE_COVERAGE=NO (0 profile-coverage-mapping lines). Runs: replay1.sh, batch1.sh.
+- a152c0f + horizon change + merge clamp: same, replay1b.sh, batch1b.sh.
+- d98fb57 + horizon change: Verkeier eed8d9e (git archive plus the walking graph files) in a scratch workspace, Release, coverage off. Runs: replay2.sh, batch2.sh.
+- d98fb57 + horizon change + merge clamp: same, replay2b.sh, batch2b.sh.
+Same simulator (FD63C650), same gen-5 timetable. Without ROUTING_PASSLIST_CAP every build runs its engine's unchanged code path.
+
+15 November 2026, terminus-kept replay (ROUTING_PASSLIST_GAP experiment, engine-gap-rule.diff on top of engine-experiment.diff):
+- a152c0f + horizon change + merge clamp + gap rule: Verkeier 4911ff0 scratch workspace as above, Release, ENABLE_CODE_COVERAGE=NO (0 profile-coverage-mapping lines). Built 18:23. Runs: replay_c.sh / batch_c.sh with V=1.
+- d98fb57 + the same three changes: Verkeier eed8d9e scratch workspace, Release, coverage off (0 lines). Built 18:25. Runs: V=2.
+Same simulator (FD63C650), same gen-5 timetable. Arms: k10last = no flags (unchanged code), k10lastfix = ROUTING_PASSLIST_CAP=10, k10lastgap = ROUTING_PASSLIST_CAP=10 + ROUTING_PASSLIST_GAP=1, f10lastgap = the same on the field-trimmed set.
+
+15 November 2026, night, the real engine change (no flags):
+- d98fb57 + the working-tree change (passlistMaxStops=10 on every routing board, gap rule by position, unconditional merge clamp, unit tests): Verkeier eed8d9e scratch workspace (copy of the V=2 one) with the engine working tree copied in, Release, ENABLE_CODE_COVERAGE=NO (0 profile-coverage-mapping lines). Built 21:26. The scratch app's BenchmarkRecordedTransport.key also ignores passlistMaxStops, since the captures predate it. Runs: tools/batch_real.sh (V=3), arms k10lastreal and origreal.
+- Later that night, trip detail asks for whole passlists (RealtimeRoutingRequest.wholePasslists, set by TransitTripSnapshot); 364 of 364 engine tests pass serially. Routing requests are unchanged by it, so it was not rebuilt or replayed; engine-change.diff was regenerated to include it.
+- Committed 15 November, night: engine 02e17cf on branch passlist-cap (parent d98fb57), not pushed; engine-change.diff equals its diff.
+- Merged the same night: engine main fast-forwarded d98fb57 -> 02e17cf (not pushed); 364 of 364 tests pass serially on main.
+- Pushed the same night: origin/main d98fb57 -> 02e17cf.
+- App pin, same night (uncommitted): Package.resolved -> 02e17cf (xcodebuild resolved MobilitéitKit @ main 02e17cf); LiveTransitService stop board sends passlistMaximumStops = routingPasslistMaximumStops; JourneyPlanningIntegrationTests' stop board requests send it too; BenchmarkRecordedTransport.key ignores passlistmaxstops. xcodebuild test on FD63C650: 326 tests in 56 suites passed.
+- Committed as app ef2c4c9 (only these four changes; the owner's uncommitted favourites work stays unstaged). Checked first in a scratch worktree of eed8d9e + the patch, with the git-ignored walking graph copied in: 315 tests in 54 suites passed (the other 11 are in the owner's untracked test files).

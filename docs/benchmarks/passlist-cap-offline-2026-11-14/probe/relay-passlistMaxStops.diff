@@ -1,0 +1,81 @@
+diff --git a/README.md b/README.md
+index 7a69241..7ba4a15 100644
+--- a/README.md
++++ b/README.md
+@@ -55,14 +55,15 @@ public release, and monitor upstream quota usage.
+ ## Departure-board contract
+ 
+ The relay forwards validated `date`, `time`, `duration`, `maxJourneys`,
+-`passlist`, `rtMode`, destination and product/line/operator/platform filters.
++`passlist`, `passlistMaxStops` (0–1,000), `rtMode`, destination and
++product/line/operator/platform filters.
+ Omitted `maxJourneys` defaults to `-1` (all services in the requested window);
+ explicit nonnegative counts have no relay-imposed upper cap. ATP limits
+ `duration` to 0–1,439 minutes.
+ ATP supports `SERVER_DEFAULT` and `OFF`; the legacy `FULL` value is translated
+ to `SERVER_DEFAULT` for older clients. A `passlist=1` request returns the
+ upstream per-stop prediction fields without rewriting the response. Successful
+-upstream responses include `X-Verkeier-Relay-Version: passlist-v2` and are not
++upstream responses include `X-Verkeier-Relay-Version: passlist-v3` and are not
+ cached by the relay. App and package caches manage freshness.
+ 
+ Every forwarded response carries a diagnostic `Server-Timing` header, for
+diff --git a/src/index.ts b/src/index.ts
+index 96aa926..f75ea63 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -88,6 +88,7 @@ export function buildUpstreamURL(url: URL, env: Env): URL {
+       forwardOptional(upstream, url, "platforms", listValue);
+       forwardOptional(upstream, url, "rtMode", realtimeModeValue);
+       forwardOptional(upstream, url, "passlist", passlistValue);
++      forwardOptional(upstream, url, "passlistMaxStops", passlistMaxStopsValue);
+       forwardOptional(upstream, url, "requestId", requestIDValue);
+       upstream.searchParams.set("format", "json");
+       return upstream;
+@@ -224,6 +225,10 @@ const passlistValue: ParameterValidator = (value, name) => {
+   return normalized;
+ };
+ 
++// ATP counts the requested stop and the last stop. 0 is ATP's documented minimum.
++const passlistMaxStopsValue: ParameterValidator = (value, name) =>
++  boundedInteger(value, 0, 1_000, 0, name);
++
+ const requestIDValue: ParameterValidator = (value, name) => {
+   const normalized = value.trim();
+   if (!normalized || normalized.length > 128 || !/^[A-Za-z0-9._:-]+$/.test(normalized)) {
+@@ -274,7 +279,7 @@ function forwardResponse(upstreamResponse: Response, timing: string): Response {
+     upstreamResponse.headers.get("Content-Type") ?? "application/json"
+   );
+   headers.set("Cache-Control", "no-store");
+-  headers.set("X-Verkeier-Relay-Version", "passlist-v2");
++  headers.set("X-Verkeier-Relay-Version", "passlist-v3");
+   headers.set("Server-Timing", timing);
+ 
+   return new Response(upstreamResponse.body, {
+diff --git a/tests/relay.test.ts b/tests/relay.test.ts
+index 3829a45..e7af60e 100644
+--- a/tests/relay.test.ts
++++ b/tests/relay.test.ts
+@@ -20,7 +20,8 @@ test('legacy FULL translates to the supported ATP mode', () => {
+ });
+ 
+ test('invalid mode, oversized duration and invalid passlist are rejected', async () => {
+-  for (const query of ['rtMode=UNKNOWN', 'duration=2000', 'passlist=2', 'maxJourneys=-2', 'maxJourneys=1.5']) {
++  for (const query of ['rtMode=UNKNOWN', 'duration=2000', 'passlist=2', 'maxJourneys=-2', 'maxJourneys=1.5',
++                       'passlistMaxStops=-1', 'passlistMaxStops=2.5', 'passlistMaxStops=1001', 'passlistMaxStops=ten']) {
+     const response = await worker.fetch(new Request(`https://fixture.invalid/atp/departureBoard?id=stop&${query}`), env);
+     assert.equal(response.status, 400);
+   }
+@@ -63,3 +64,12 @@ test('Server-Timing names a valid edge location and never a malformed one', () =
+   assert.equal(serverTiming(-1, 'lux"; x'), 'upstream;dur=0.0;desc="headers"');
+   assert.equal(serverTiming(5), 'upstream;dur=5.0;desc="headers"');
+ });
++
++test('departure boards forward a passlist cap only when the caller sends one', () => {
++  const capped = buildUpstreamURL(new URL('https://fixture.invalid/atp/departureBoard?id=stop&passlist=1&passlistMaxStops=10'), env);
++  assert.equal(capped.searchParams.get('passlistMaxStops'), '10');
++  const zero = buildUpstreamURL(new URL('https://fixture.invalid/atp/departureBoard?id=stop&passlist=1&passlistMaxStops=0'), env);
++  assert.equal(zero.searchParams.get('passlistMaxStops'), '0');
++  const uncapped = buildUpstreamURL(new URL('https://fixture.invalid/atp/departureBoard?id=stop&passlist=1'), env);
++  assert.equal(uncapped.searchParams.has('passlistMaxStops'), false);
++});

@@ -1,0 +1,12 @@
+prefix       shapes={'unchanged-short': 56, 'prefix': 99} length-K={0: 99} realtime={} departures={'full': 155, 'capped': 155, 'matched': 155, 'onlyFull': 0, 'onlyCapped': 0} bytes=-0.485
+             verdict: prefix in all 99 passlists longer than the cap; capped length minus cap {0: 99}
+prefix-last  shapes={'unchanged-short': 56, 'prefix+last': 99} length-K={0: 99} realtime={} departures={'full': 155, 'capped': 155, 'matched': 155, 'onlyFull': 0, 'onlyCapped': 0} bytes=-0.489
+             verdict: prefix+last in all 99 passlists longer than the cap; capped length minus cap {0: 99}
+thin         shapes={'unchanged-short': 56, 'subsequence+first+last': 99} length-K={0: 99} realtime={} departures={'full': 155, 'capped': 155, 'matched': 155, 'onlyFull': 0, 'onlyCapped': 0} bytes=-0.488
+             verdict: subsequence+first+last in all 99 passlists longer than the cap; capped length minus cap {0: 99}
+ignore       shapes={'unchanged-short': 56, 'unchanged-long(cap ignored)': 99} length-K={2: 4, 3: 3, 5: 4, 6: 4, 10: 4, 11: 11, 12: 4, 14: 3, 16: 8, 17: 7, 18: 8, 19: 11, 20: 8, 21: 4, 24: 3, 25: 2, 26: 7, 32: 4} realtime={} departures={'full': 155, 'capped': 155, 'matched': 155, 'onlyFull': 0, 'onlyCapped': 0} bytes=0.0
+             verdict: ATP ignored passlistMaxStops (the relay may not forward it)
+trimmed-k10  shapes={'unchanged-short': 56, 'prefix': 99} length-K={0: 99} realtime={} departures={'full': 155, 'capped': 155, 'matched': 155, 'onlyFull': 0, 'onlyCapped': 0} bytes=-0.485
+             verdict: prefix in all 99 passlists longer than the cap; capped length minus cap {0: 99}
+rt-changed   shapes={'unchanged-short': 56, 'prefix+last': 98} length-K={0: 98} realtime={'rtDepTime': 1} departures={'full': 155, 'capped': 154, 'matched': 154, 'onlyFull': 1, 'onlyCapped': 0} bytes=-0.492
+             verdict: prefix+last in all 98 passlists longer than the cap; capped length minus cap {0: 98}

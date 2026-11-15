@@ -1,0 +1,23 @@
+diff -ru B/MobiliteitKit/Sources/MobilitéitKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift C/MobiliteitKit/Sources/MobilitéitKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift
+--- B/MobiliteitKit/Sources/MobilitéitKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift	2026-10-29 18:57:03
++++ C/MobiliteitKit/Sources/MobilitéitKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift	2026-11-10 22:18:33
+@@ -90,9 +90,18 @@
+             let discoveryStarted = ContinuousClock.now
+             let planningDeadline = min(deadline, discoveryStarted.advanced(by:
+                 .milliseconds(min(250, max(1, budgetMilliseconds / 10)))))
+-            let discovered = discoveryRealtimeTargets(access: access, egress: egress, journeys: journeys,
++            var discovered = discoveryRealtimeTargets(access: access, egress: egress, journeys: journeys,
+                 preferredStops: stopIDs, anchor: anchor, searchHorizon: searchHorizon, deadline: planningDeadline,
+                 requestedInstances: requestedInstances, reachability: reachability)
++            // EXPERIMENT (scratch arm only, never committed): drop discovery boards near the destination.
++            if let limit = ProcessInfo.processInfo.environment["ROUTING_EXPERIMENT_DISCOVERY_SKIP_NEAR_DESTINATION_M"].flatMap(Double.init),
++               let destination = egress.first.map({ snapshot.stops[$0.stop].model.coordinate }) {
++                let preferred = Set(stopIDs)
++                discovered.targets.removeAll { target in
++                    guard !preferred.contains(target.stopID), let stop = snapshot.stopByID[target.stopID] else { return false }
++                    return distance(snapshot.stops[stop].model.coordinate, destination) <= limit
++                }
++            }
+             targets += discovered.targets
+             matchingTripIDs.formUnion(discovered.tripIDs)
+             for target in discovered.targets where seenStops.insert(target.stopID).inserted { stopIDs.append(target.stopID) }

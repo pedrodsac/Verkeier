@@ -1,0 +1,342 @@
+{
+ "k10last": {
+  "c28-esch": {
+   "k": 10,
+   "keepLast": true,
+   "fields": false,
+   "totals": {
+    "bodies": 25,
+    "raw": 10417963,
+    "trimmed": 5166074,
+    "rawGzip": 1030654,
+    "trimmedGzip": 318069,
+    "recordedEncoded": 464334
+   },
+   "passlists": {
+    "passlists": 484,
+    "stopsBefore": 8991,
+    "stopsAfter": 3851,
+    "capped": 284
+   },
+   "checks": {}
+  },
+  "c28-now": {
+   "k": 10,
+   "keepLast": true,
+   "fields": false,
+   "totals": {
+    "bodies": 27,
+    "raw": 15683882,
+    "trimmed": 8801860,
+    "rawGzip": 1525205,
+    "trimmedGzip": 598696,
+    "recordedEncoded": 681657
+   },
+   "passlists": {
+    "passlists": 837,
+    "stopsBefore": 13120,
+    "stopsAfter": 6691,
+    "capped": 478
+   },
+   "checks": {}
+  },
+  "c28-rev": {
+   "k": 10,
+   "keepLast": true,
+   "fields": false,
+   "totals": {
+    "bodies": 29,
+    "raw": 18057758,
+    "trimmed": 10134310,
+    "rawGzip": 1709735,
+    "trimmedGzip": 750231,
+    "recordedEncoded": 831813
+   },
+   "passlists": {
+    "passlists": 966,
+    "stopsBefore": 15216,
+    "stopsAfter": 7677,
+    "capped": 564
+   },
+   "checks": {}
+  },
+  "s7-L1": {
+   "k": 10,
+   "keepLast": true,
+   "fields": false,
+   "totals": {
+    "bodies": 78,
+    "raw": 46845066,
+    "trimmed": 26334906,
+    "rawGzip": 4564601,
+    "trimmedGzip": 1804573,
+    "recordedEncoded": 2052225
+   },
+   "passlists": {
+    "passlists": 2526,
+    "stopsBefore": 39210,
+    "capped": 1431,
+    "stopsAfter": 19995
+   },
+   "checks": {}
+  },
+  "s7-L2": {
+   "k": 10,
+   "keepLast": true,
+   "fields": false,
+   "totals": {
+    "bodies": 81,
+    "raw": 43100808,
+    "trimmed": 23812340,
+    "rawGzip": 4215309,
+    "trimmedGzip": 1622712,
+    "recordedEncoded": 1972117
+   },
+   "passlists": {
+    "passlists": 2291,
+    "stopsBefore": 36134,
+    "capped": 1311,
+    "stopsAfter": 18044
+   },
+   "checks": {}
+  },
+  "s7-L3": {
+   "k": 10,
+   "keepLast": true,
+   "fields": false,
+   "totals": {
+    "bodies": 81,
+    "raw": 43518630,
+    "trimmed": 24069162,
+    "rawGzip": 4257608,
+    "trimmedGzip": 1643879,
+    "recordedEncoded": 1983024
+   },
+   "passlists": {
+    "passlists": 2311,
+    "stopsBefore": 36418,
+    "capped": 1321,
+    "stopsAfter": 18208
+   },
+   "checks": {}
+  },
+  "st-L1": {
+   "k": 10,
+   "keepLast": true,
+   "fields": false,
+   "totals": {
+    "bodies": 78,
+    "raw": 27221559,
+    "trimmed": 15607335,
+    "rawGzip": 2610612,
+    "trimmedGzip": 1127710,
+    "recordedEncoded": 1391649
+   },
+   "passlists": {
+    "passlists": 1491,
+    "stopsBefore": 23082,
+    "stopsAfter": 11979,
+    "capped": 840
+   },
+   "checks": {}
+  },
+  "st22-L2": {
+   "k": 10,
+   "keepLast": true,
+   "fields": false,
+   "totals": {
+    "bodies": 84,
+    "raw": 48925926,
+    "trimmed": 27757887,
+    "rawGzip": 4788718,
+    "trimmedGzip": 1932596,
+    "recordedEncoded": 2212544
+   },
+   "passlists": {
+    "passlists": 2610,
+    "stopsBefore": 40308,
+    "capped": 1473,
+    "stopsAfter": 20478
+   },
+   "checks": {}
+  }
+ },
+ "f10last": {
+  "c28-esch": {
+   "k": 10,
+   "keepLast": true,
+   "fields": true,
+   "totals": {
+    "bodies": 25,
+    "raw": 10417963,
+    "trimmed": 1213032,
+    "rawGzip": 1030654,
+    "trimmedGzip": 74223,
+    "recordedEncoded": 464334
+   },
+   "passlists": {
+    "passlists": 484,
+    "stopsBefore": 8991,
+    "stopsAfter": 3851,
+    "capped": 284
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "c28-now": {
+   "k": 10,
+   "keepLast": true,
+   "fields": true,
+   "totals": {
+    "bodies": 27,
+    "raw": 15683882,
+    "trimmed": 2364693,
+    "rawGzip": 1525205,
+    "trimmedGzip": 136103,
+    "recordedEncoded": 681657
+   },
+   "passlists": {
+    "passlists": 837,
+    "stopsBefore": 13120,
+    "stopsAfter": 6691,
+    "capped": 478
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "c28-rev": {
+   "k": 10,
+   "keepLast": true,
+   "fields": true,
+   "totals": {
+    "bodies": 29,
+    "raw": 18057758,
+    "trimmed": 2710591,
+    "rawGzip": 1709735,
+    "trimmedGzip": 163151,
+    "recordedEncoded": 831813
+   },
+   "passlists": {
+    "passlists": 966,
+    "stopsBefore": 15216,
+    "stopsAfter": 7677,
+    "capped": 564
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "s7-L1": {
+   "k": 10,
+   "keepLast": true,
+   "fields": true,
+   "totals": {
+    "bodies": 78,
+    "raw": 46845066,
+    "trimmed": 7030065,
+    "rawGzip": 4564601,
+    "trimmedGzip": 407928,
+    "recordedEncoded": 2052225
+   },
+   "passlists": {
+    "passlists": 2526,
+    "stopsBefore": 39210,
+    "capped": 1431,
+    "stopsAfter": 19995
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "s7-L2": {
+   "k": 10,
+   "keepLast": true,
+   "fields": true,
+   "totals": {
+    "bodies": 81,
+    "raw": 43100808,
+    "trimmed": 6365142,
+    "rawGzip": 4215309,
+    "trimmedGzip": 379000,
+    "recordedEncoded": 1972117
+   },
+   "passlists": {
+    "passlists": 2291,
+    "stopsBefore": 36134,
+    "capped": 1311,
+    "stopsAfter": 18044
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "s7-L3": {
+   "k": 10,
+   "keepLast": true,
+   "fields": true,
+   "totals": {
+    "bodies": 81,
+    "raw": 43518630,
+    "trimmed": 6453001,
+    "rawGzip": 4257608,
+    "trimmedGzip": 383281,
+    "recordedEncoded": 1983024
+   },
+   "passlists": {
+    "passlists": 2311,
+    "stopsBefore": 36418,
+    "capped": 1321,
+    "stopsAfter": 18208
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "st-L1": {
+   "k": 10,
+   "keepLast": true,
+   "fields": true,
+   "totals": {
+    "bodies": 78,
+    "raw": 27221559,
+    "trimmed": 4114461,
+    "rawGzip": 2610612,
+    "trimmedGzip": 266910,
+    "recordedEncoded": 1391649
+   },
+   "passlists": {
+    "passlists": 1491,
+    "stopsBefore": 23082,
+    "stopsAfter": 11979,
+    "capped": 840
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "st22-L2": {
+   "k": 10,
+   "keepLast": true,
+   "fields": true,
+   "totals": {
+    "bodies": 84,
+    "raw": 48925926,
+    "trimmed": 7262469,
+    "rawGzip": 4788718,
+    "trimmedGzip": 425916,
+    "recordedEncoded": 2212544
+   },
+   "passlists": {
+    "passlists": 2610,
+    "stopsBefore": 40308,
+    "capped": 1473,
+    "stopsAfter": 20478
+   },
+   "checks": {
+    "products>1": 0
+   }
+  }
+ }
+}

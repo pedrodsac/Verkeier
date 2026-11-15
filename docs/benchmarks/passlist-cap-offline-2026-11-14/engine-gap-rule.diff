@@ -1,0 +1,23 @@
+--- a/Sources/MobilitéitKit/Routing/HafasRealtimeRoutingProvider+Events.swift
++++ b/Sources/MobilitéitKit/Routing/HafasRealtimeRoutingProvider+Events.swift
+@@ -54,6 +54,10 @@
+     /// EXPERIMENT (passlist cap replay): the `passlistMaxStops` the replayed boards were cut to.
+     /// Production would take it from the board request instead of the environment.
+     static let assumedPasslistCap: Int? = ProcessInfo.processInfo.environment["ROUTING_PASSLIST_CAP"].flatMap(Int.init)
++    /// EXPERIMENT (passlist cap replay, terminus kept): ATP's capped passlist is the first K - 1 stops
++    /// and the last stop. With `ROUTING_PASSLIST_GAP=1`, a stop ATP left out of a capped passlist keeps the
++    /// preceding reported delay without the 30-minute horizon, as ATP's own gap prognoses do (99 %).
++    static let passlistGapRule = ProcessInfo.processInfo.environment["ROUTING_PASSLIST_GAP"] == "1"
+ 
+     func patch(for live: HafasDeparture, candidate: Candidate,
+                boardingStopID: String, observedAt: Date, deadline: ContinuousClock.Instant? = nil) async -> RealtimeTripPatch? {
+@@ -98,7 +102,8 @@
+                 if let precedingDelay,
+                    scheduled >= precedingDelay.scheduled,
+                    scheduled.timeIntervalSince(precedingDelay.scheduled) <= 30 * 60
+-                       || (passlistCapped && lastReportedPosition.map { position > $0 } == true),
++                       || (passlistCapped && lastReportedPosition.map { position > $0 } == true)
++                       || (passlistCapped && Self.passlistGapRule && pass == nil),
+                    abs(precedingDelay.seconds) <= 2 * 60 * 60 {
+                     return (scheduled.addingTimeInterval(precedingDelay.seconds), .estimated)
+                 }

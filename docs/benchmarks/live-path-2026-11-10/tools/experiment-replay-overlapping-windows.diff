@@ -1,0 +1,80 @@
+diff -ru -x * B/app/Verkéier/App/Benchmarks/BenchmarkReplayInputs.swift D/app/Verkéier/App/Benchmarks/BenchmarkReplayInputs.swift
+--- B/app/Verkéier/App/Benchmarks/BenchmarkReplayInputs.swift	2026-10-29 19:19:14
++++ D/app/Verkéier/App/Benchmarks/BenchmarkReplayInputs.swift	2026-11-10 22:55:21
+@@ -102,7 +102,40 @@
+         let wanted = lines(in: url)
+         let window = windowKey(url)
+         guard !wanted.isEmpty else { return nil }
+-        let candidates = bodies.filter { $0.value.window == window }.sorted { $0.key < $1.key }
++        // EXPERIMENT (scratch arm D only): also assemble from recorded boards of the same stop whose
++        // window overlaps the query, keeping rows planned inside the query's window.
++        func span(_ key: String) -> (base: String, start: Date, end: Date)? {
++            var date = "", time = "", duration = 0.0, rest: [String] = []
++            for item in key.split(separator: "?").last?.split(separator: "&") ?? [] {
++                let parts = item.split(separator: "=", maxSplits: 1).map(String.init)
++                switch parts.first {
++                case "date": date = parts.last ?? ""
++                case "time": time = parts.last ?? ""
++                case "duration": duration = Double(parts.last ?? "") ?? 0
++                default: rest.append(String(item))
++                }
++            }
++            let formatter = DateFormatter()
++            formatter.locale = Locale(identifier: "en_US_POSIX"); formatter.timeZone = TimeZone(identifier: "UTC")
++            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
++            guard let start = formatter.date(from: date + " " + time) else { return nil }
++            return (rest.joined(separator: "&"), start, start.addingTimeInterval(duration * 60))
++        }
++        let wantedSpan = span(window)
++        let candidates = bodies.filter { item in
++            if item.value.window == window { return true }
++            guard let wantedSpan, let other = span(item.value.window) else { return false }
++            return other.base == wantedSpan.base && other.start < wantedSpan.end && other.end > wantedSpan.start
++        }.sorted { $0.key < $1.key }
++        func inside(_ row: [String: Any]) -> Bool {
++            guard let wantedSpan else { return true }
++            let formatter = DateFormatter()
++            formatter.locale = Locale(identifier: "en_US_POSIX"); formatter.timeZone = TimeZone(identifier: "UTC")
++            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
++            guard let planned = formatter.date(from: (row["date"] as? String ?? "") + " " + (row["time"] as? String ?? ""))
++            else { return false }
++            return planned >= wantedSpan.start && planned <= wantedSpan.end
++        }
+         var rows: [[String: Any]] = []
+         var sources: [String] = []
+         var missing: [String] = []
+@@ -110,19 +143,21 @@
+         var template: [String: Any]?
+         var seen: Set<String> = []
+         for line in wanted {
+-            guard
+-                let source = candidates.first(where: { $0.value.lines.isEmpty || $0.value.lines.contains(line) }),
+-                let object = try? JSONSerialization.jsonObject(with: source.value.body) as? [String: Any]
+-            else { missing.append(line); continue }
+-            if template == nil { template = object }
+-            if !sources.contains(source.key) { sources.append(source.key) }
+-            delay = max(delay, source.value.networkMilliseconds)
+-            for row in object["Departure"] as? [[String: Any]] ?? [] where Self.line(of: row) == line {
+-                let identity =
+-                    ((row["JourneyDetailRef"] as? [String: Any])?["ref"] as? String ?? "") + "|"
+-                    + (row["stopExtId"] as? String ?? "") + "|" + (row["date"] as? String ?? "")
+-                    + (row["time"] as? String ?? "")
+-                if seen.insert(identity).inserted { rows.append(row) }
++            let lineSources = candidates.filter { $0.value.lines.isEmpty || $0.value.lines.contains(line) }
++            if lineSources.isEmpty { missing.append(line); continue }
++            for source in lineSources {
++                guard let object = try? JSONSerialization.jsonObject(with: source.value.body) as? [String: Any]
++                else { continue }
++                if template == nil { template = object }
++                if !sources.contains(source.key) { sources.append(source.key) }
++                delay = max(delay, source.value.networkMilliseconds)
++                for row in object["Departure"] as? [[String: Any]] ?? [] where Self.line(of: row) == line && inside(row) {
++                    let identity =
++                        ((row["JourneyDetailRef"] as? [String: Any])?["ref"] as? String ?? "") + "|"
++                        + (row["stopExtId"] as? String ?? "") + "|" + (row["date"] as? String ?? "")
++                        + (row["time"] as? String ?? "")
++                    if seen.insert(identity).inserted { rows.append(row) }
++                }
+             }
+         }
+         guard var body = template, !sources.isEmpty else { return nil }

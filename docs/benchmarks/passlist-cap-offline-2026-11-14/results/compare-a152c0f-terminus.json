@@ -1,0 +1,3243 @@
+[
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        911,
+        960
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1184
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      1213047
+    ],
+    "total": [
+      2336.994292,
+      2393.475042
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "unfilteredJourneys",
+      "journeys",
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "journeys lost 0 gained 0",
+      "651@000220402034 departureSource observed->scheduled",
+      "651@000220402034 effectiveDeparture -260s",
+      "651@000220402034 status delayed->live"
+    ],
+    "counters": {
+      "delayedPastBoardings": [
+        44,
+        24
+      ],
+      "duplicatesSuppressed": [
+        911,
+        937
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1140
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2336.994292,
+      2395.561041
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "delayedPastBoardings": [
+        44,
+        27
+      ],
+      "duplicatesSuppressed": [
+        911,
+        960
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1171
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2336.994292,
+      2316.6045
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        911,
+        960
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1184
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2336.994292,
+      2622.710167
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 2,
+    "sample": 0,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "delayedPastBoardings": [
+        44,
+        27
+      ],
+      "duplicatesSuppressed": [
+        911,
+        960
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1156
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2418.3241669999998,
+      2345.431458
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 2,
+    "sample": 0,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "delayedPastBoardings": [
+        44,
+        27
+      ],
+      "duplicatesSuppressed": [
+        911,
+        960
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1171
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2418.3241669999998,
+      2312.460958
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 2,
+    "sample": 0,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        911,
+        960
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1184
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2418.3241669999998,
+      2323.861625
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 3,
+    "sample": 0,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "unfilteredJourneys",
+      "journeys",
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "journeys lost 0 gained 0",
+      "651@000220402034 departureSource observed->scheduled",
+      "651@000220402034 effectiveDeparture -260s",
+      "651@000220402034 status delayed->live"
+    ],
+    "counters": {
+      "delayedPastBoardings": [
+        44,
+        24
+      ],
+      "duplicatesSuppressed": [
+        911,
+        937
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1140
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2374.895042,
+      2323.0559160000003
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 3,
+    "sample": 0,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "delayedPastBoardings": [
+        44,
+        27
+      ],
+      "duplicatesSuppressed": [
+        911,
+        960
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1171
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2374.895042,
+      2302.541167
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 3,
+    "sample": 0,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        911,
+        960
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1184
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2374.895042,
+      2345.212459
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 4,
+    "sample": 0,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "unfilteredJourneys",
+      "journeys",
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "journeys lost 0 gained 0",
+      "651@000220402034 departureSource observed->scheduled",
+      "651@000220402034 effectiveDeparture -260s",
+      "651@000220402034 status delayed->live"
+    ],
+    "counters": {
+      "delayedPastBoardings": [
+        44,
+        24
+      ],
+      "duplicatesSuppressed": [
+        911,
+        937
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1140
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2519.7115,
+      2554.8163329999998
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 4,
+    "sample": 0,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "delayedPastBoardings": [
+        44,
+        27
+      ],
+      "duplicatesSuppressed": [
+        911,
+        960
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1171
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2519.7115,
+      2267.049458
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 4,
+    "sample": 0,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        911,
+        960
+      ],
+      "invalidJourneys": [
+        18,
+        0
+      ],
+      "predictedEvents": [
+        2188,
+        1184
+      ],
+      "walkingCacheHits": [
+        8969,
+        8987
+      ],
+      "walkingRequests": [
+        14215,
+        14232
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2519.7115,
+      2313.072375
+    ]
+  },
+  {
+    "capture": "c28-now",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        1219,
+        1213
+      ],
+      "invalidJourneys": [
+        30,
+        9
+      ],
+      "predictedEvents": [
+        4071,
+        2517
+      ],
+      "walkingCacheHits": [
+        12226,
+        12280
+      ],
+      "walkingRequests": [
+        17336,
+        17390
+      ]
+    },
+    "bytes": [
+      15833683,
+      2364805
+    ],
+    "total": [
+      3471.1985839999998,
+      3439.1276669999997
+    ]
+  },
+  {
+    "capture": "c28-now",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "delayedPastBoardings": [
+        10,
+        8
+      ],
+      "duplicatesSuppressed": [
+        1219,
+        1213
+      ],
+      "invalidJourneys": [
+        30,
+        9
+      ],
+      "predictedEvents": [
+        4071,
+        2498
+      ],
+      "walkingCacheHits": [
+        12226,
+        12280
+      ],
+      "walkingRequests": [
+        17336,
+        17390
+      ]
+    },
+    "bytes": [
+      15833683,
+      8883454
+    ],
+    "total": [
+      3471.1985839999998,
+      3362.580417
+    ]
+  },
+  {
+    "capture": "c28-now",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        1219,
+        1213
+      ],
+      "invalidJourneys": [
+        30,
+        9
+      ],
+      "predictedEvents": [
+        4071,
+        2516
+      ],
+      "walkingCacheHits": [
+        12226,
+        12280
+      ],
+      "walkingRequests": [
+        17336,
+        17390
+      ]
+    },
+    "bytes": [
+      15833683,
+      8883454
+    ],
+    "total": [
+      3471.1985839999998,
+      3309.234417
+    ]
+  },
+  {
+    "capture": "c28-now",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        1219,
+        1213
+      ],
+      "invalidJourneys": [
+        30,
+        9
+      ],
+      "predictedEvents": [
+        4071,
+        2535
+      ],
+      "walkingCacheHits": [
+        12226,
+        12280
+      ],
+      "walkingRequests": [
+        17336,
+        17390
+      ]
+    },
+    "bytes": [
+      15833683,
+      8883454
+    ],
+    "total": [
+      3471.1985839999998,
+      3279.951917
+    ]
+  },
+  {
+    "capture": "c28-rev",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10lastgap",
+    "identical": false,
+    "differences": [
+      "unfilteredJourneys",
+      "journeys",
+      "options",
+      "realtimeCoverage",
+      "displayedLegs"
+    ],
+    "detail": [
+      "journeys lost 1 gained 1",
+      "legs only-orig 2 only-arm 2",
+      "coverage [('live', None), (None, 'live')]"
+    ],
+    "counters": {
+      "duplicatesSuppressed": [
+        554,
+        568
+      ],
+      "predictedEvents": [
+        4039,
+        2514
+      ],
+      "walkingCacheHits": [
+        10371,
+        10433
+      ],
+      "walkingRequests": [
+        15430,
+        15491
+      ]
+    },
+    "bytes": [
+      18256733,
+      2710733
+    ],
+    "total": [
+      4247.684208,
+      3862.779208
+    ]
+  },
+  {
+    "capture": "c28-rev",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "unfilteredJourneys",
+      "journeys",
+      "options",
+      "realtimeCoverage",
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "journeys lost 1 gained 1",
+      "legs only-orig 2 only-arm 2",
+      "coverage [('live', None), (None, 'live')]"
+    ],
+    "counters": {
+      "duplicatesSuppressed": [
+        554,
+        568
+      ],
+      "predictedEvents": [
+        4039,
+        2510
+      ],
+      "walkingCacheHits": [
+        10371,
+        10433
+      ],
+      "walkingRequests": [
+        15430,
+        15491
+      ]
+    },
+    "bytes": [
+      18256733,
+      10240876
+    ],
+    "total": [
+      4247.684208,
+      4433.366417
+    ]
+  },
+  {
+    "capture": "c28-rev",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "unfilteredJourneys",
+      "journeys",
+      "options",
+      "realtimeCoverage",
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "journeys lost 1 gained 1",
+      "legs only-orig 2 only-arm 2",
+      "coverage [('live', None), (None, 'live')]"
+    ],
+    "counters": {
+      "duplicatesSuppressed": [
+        554,
+        568
+      ],
+      "predictedEvents": [
+        4039,
+        2513
+      ],
+      "walkingCacheHits": [
+        10371,
+        10433
+      ],
+      "walkingRequests": [
+        15430,
+        15491
+      ]
+    },
+    "bytes": [
+      18256733,
+      10240876
+    ],
+    "total": [
+      4247.684208,
+      3936.44275
+    ]
+  },
+  {
+    "capture": "c28-rev",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastgap",
+    "identical": false,
+    "differences": [
+      "unfilteredJourneys",
+      "journeys",
+      "options",
+      "realtimeCoverage",
+      "displayedLegs"
+    ],
+    "detail": [
+      "journeys lost 1 gained 1",
+      "legs only-orig 2 only-arm 2",
+      "coverage [('live', None), (None, 'live')]"
+    ],
+    "counters": {
+      "duplicatesSuppressed": [
+        554,
+        568
+      ],
+      "predictedEvents": [
+        4039,
+        2514
+      ],
+      "walkingCacheHits": [
+        10371,
+        10433
+      ],
+      "walkingRequests": [
+        15430,
+        15491
+      ]
+    },
+    "bytes": [
+      18256733,
+      10240876
+    ],
+    "total": [
+      4247.684208,
+      3848.9715
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        764
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2311
+      ],
+      "walkingCacheHits": [
+        12117,
+        12210
+      ],
+      "walkingRequests": [
+        17160,
+        17253
+      ]
+    },
+    "bytes": [
+      15709264,
+      2343404
+    ],
+    "total": [
+      2964.959,
+      2556.264959
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        764
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2281
+      ],
+      "walkingCacheHits": [
+        12117,
+        12210
+      ],
+      "walkingRequests": [
+        17160,
+        17253
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2964.959,
+      3134.096833
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        764
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2328
+      ],
+      "walkingCacheHits": [
+        12117,
+        12210
+      ],
+      "walkingRequests": [
+        17160,
+        17253
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2964.959,
+      2814.493083
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        764
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2311
+      ],
+      "walkingCacheHits": [
+        12117,
+        12210
+      ],
+      "walkingRequests": [
+        17160,
+        17253
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2964.959,
+      3192.472292
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        764
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2329
+      ],
+      "walkingCacheHits": [
+        17078,
+        17171
+      ],
+      "walkingRequests": [
+        17160,
+        17253
+      ]
+    },
+    "bytes": [
+      15709264,
+      2343404
+    ],
+    "total": [
+      2596.081792,
+      2189.645625
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        764
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2305
+      ],
+      "walkingCacheHits": [
+        17078,
+        17171
+      ],
+      "walkingRequests": [
+        17160,
+        17253
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2596.081792,
+      2569.8924580000003
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        764
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2328
+      ],
+      "walkingCacheHits": [
+        17078,
+        17171
+      ],
+      "walkingRequests": [
+        17160,
+        17253
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2596.081792,
+      2380.172875
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        764
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2329
+      ],
+      "walkingCacheHits": [
+        17078,
+        17171
+      ],
+      "walkingRequests": [
+        17160,
+        17253
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2596.081792,
+      2473.610417
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        764
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2329
+      ],
+      "walkingCacheHits": [
+        12117,
+        12210
+      ],
+      "walkingRequests": [
+        17160,
+        17253
+      ]
+    },
+    "bytes": [
+      15709264,
+      2343404
+    ],
+    "total": [
+      2958.483583,
+      2549.237709
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        764
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2283
+      ],
+      "walkingCacheHits": [
+        12117,
+        12210
+      ],
+      "walkingRequests": [
+        17160,
+        17253
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2958.483583,
+      3024.803958
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        764
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2328
+      ],
+      "walkingCacheHits": [
+        12117,
+        12210
+      ],
+      "walkingRequests": [
+        17160,
+        17253
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2958.483583,
+      3433.009666
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        759,
+        764
+      ],
+      "invalidJourneys": [
+        40,
+        39
+      ],
+      "predictedEvents": [
+        3660,
+        2311
+      ],
+      "walkingCacheHits": [
+        12117,
+        12210
+      ],
+      "walkingRequests": [
+        17160,
+        17253
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2958.483583,
+      2896.265458
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        945,
+        935
+      ],
+      "invalidJourneys": [
+        161,
+        137
+      ],
+      "predictedEvents": [
+        3759,
+        2329
+      ],
+      "walkingCacheHits": [
+        11249,
+        11331
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      2126051
+    ],
+    "total": [
+      5152.771125,
+      6380.177458
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10last",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        945,
+        936
+      ],
+      "invalidJourneys": [
+        161,
+        137
+      ],
+      "predictedEvents": [
+        3759,
+        2294
+      ],
+      "walkingCacheHits": [
+        11249,
+        11331
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      7997698
+    ],
+    "total": [
+      5152.771125,
+      5496.305375
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastfix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        945,
+        955
+      ],
+      "invalidJourneys": [
+        161,
+        118
+      ],
+      "predictedEvents": [
+        3759,
+        2334
+      ],
+      "walkingCacheHits": [
+        11249,
+        11331
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      7997698
+    ],
+    "total": [
+      5152.771125,
+      5840.61025
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        945,
+        960
+      ],
+      "invalidJourneys": [
+        161,
+        118
+      ],
+      "predictedEvents": [
+        3759,
+        2314
+      ],
+      "walkingCacheHits": [
+        11249,
+        11331
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      7997698
+    ],
+    "total": [
+      5152.771125,
+      5358.988209
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        949,
+        935
+      ],
+      "invalidJourneys": [
+        161,
+        137
+      ],
+      "predictedEvents": [
+        3742,
+        2337
+      ],
+      "walkingCacheHits": [
+        15744,
+        15826
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      2126051
+    ],
+    "total": [
+      4729.755959,
+      4557.856959
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10last",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        949,
+        936
+      ],
+      "invalidJourneys": [
+        161,
+        137
+      ],
+      "predictedEvents": [
+        3742,
+        2294
+      ],
+      "walkingCacheHits": [
+        15744,
+        15826
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      7997698
+    ],
+    "total": [
+      4729.755959,
+      4846.854625
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10lastfix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        949,
+        939
+      ],
+      "invalidJourneys": [
+        161,
+        137
+      ],
+      "predictedEvents": [
+        3742,
+        2326
+      ],
+      "walkingCacheHits": [
+        15744,
+        15826
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      7997698
+    ],
+    "total": [
+      4729.755959,
+      5124.407333
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        949,
+        935
+      ],
+      "invalidJourneys": [
+        161,
+        137
+      ],
+      "predictedEvents": [
+        3742,
+        2336
+      ],
+      "walkingCacheHits": [
+        15744,
+        15826
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      7997698
+    ],
+    "total": [
+      4729.755959,
+      4757.493542
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        965,
+        939
+      ],
+      "invalidJourneys": [
+        141,
+        137
+      ],
+      "predictedEvents": [
+        3756,
+        2327
+      ],
+      "walkingCacheHits": [
+        11249,
+        11331
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      2126051
+    ],
+    "total": [
+      5078.117042,
+      4952.379041
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10last",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        965,
+        940
+      ],
+      "invalidJourneys": [
+        141,
+        137
+      ],
+      "predictedEvents": [
+        3756,
+        2293
+      ],
+      "walkingCacheHits": [
+        11249,
+        11331
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      7997698
+    ],
+    "total": [
+      5078.117042,
+      5445.550625
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10lastfix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        965,
+        935
+      ],
+      "invalidJourneys": [
+        141,
+        137
+      ],
+      "predictedEvents": [
+        3756,
+        2336
+      ],
+      "walkingCacheHits": [
+        11249,
+        11331
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      7997698
+    ],
+    "total": [
+      5078.117042,
+      5146.112875
+    ]
+  },
+  {
+    "capture": "s7-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        965,
+        935
+      ],
+      "invalidJourneys": [
+        141,
+        137
+      ],
+      "predictedEvents": [
+        3756,
+        2318
+      ],
+      "walkingCacheHits": [
+        11249,
+        11331
+      ],
+      "walkingRequests": [
+        15864,
+        15946
+      ]
+    },
+    "bytes": [
+      14488702,
+      7997698
+    ],
+    "total": [
+      5078.117042,
+      5126.78975
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        987
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        2338
+      ],
+      "walkingCacheHits": [
+        11251,
+        11333
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      2128560
+    ],
+    "total": [
+      7612.541625,
+      8130.611875
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10last",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        988
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        2316
+      ],
+      "walkingCacheHits": [
+        11251,
+        11333
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      7995465
+    ],
+    "total": [
+      7612.541625,
+      7729.189334
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastfix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        987
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        2338
+      ],
+      "walkingCacheHits": [
+        11251,
+        11333
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      7995465
+    ],
+    "total": [
+      7612.541625,
+      7766.469625
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        987
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        2320
+      ],
+      "walkingCacheHits": [
+        11251,
+        11333
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      7995465
+    ],
+    "total": [
+      7612.541625,
+      7695.544459
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 1,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        987
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        2338
+      ],
+      "walkingCacheHits": [
+        15748,
+        15830
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      2128560
+    ],
+    "total": [
+      7212.203167,
+      7386.520834
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10last",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        988
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        2316
+      ],
+      "walkingCacheHits": [
+        15748,
+        15830
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      7995465
+    ],
+    "total": [
+      7212.203167,
+      7224.266583
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10lastfix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        987
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        2338
+      ],
+      "walkingCacheHits": [
+        15748,
+        15830
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      7995465
+    ],
+    "total": [
+      7212.203167,
+      7312.168208
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        987
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        2338
+      ],
+      "walkingCacheHits": [
+        15748,
+        15830
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      7995465
+    ],
+    "total": [
+      7212.203167,
+      7321.769459
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 2,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        987
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        2338
+      ],
+      "walkingCacheHits": [
+        11251,
+        11333
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      2128560
+    ],
+    "total": [
+      7548.508708,
+      7753.68925
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10last",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        988
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        2296
+      ],
+      "walkingCacheHits": [
+        11251,
+        11333
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      7995465
+    ],
+    "total": [
+      7548.508708,
+      7565.078833
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10lastfix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        987
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        2338
+      ],
+      "walkingCacheHits": [
+        11251,
+        11333
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      7995465
+    ],
+    "total": [
+      7548.508708,
+      7684.65025
+    ]
+  },
+  {
+    "capture": "s7-L3",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        997,
+        987
+      ],
+      "invalidJourneys": [
+        155,
+        130
+      ],
+      "predictedEvents": [
+        3758,
+        2320
+      ],
+      "walkingCacheHits": [
+        11251,
+        11333
+      ],
+      "walkingRequests": [
+        15868,
+        15950
+      ]
+    },
+    "bytes": [
+      14490456,
+      7995465
+    ],
+    "total": [
+      7548.508708,
+      7981.407125
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        894
+      ],
+      "predictedEvents": [
+        2051,
+        1253
+      ],
+      "walkingCacheHits": [
+        16878,
+        17079
+      ],
+      "walkingRequests": [
+        21259,
+        21461
+      ]
+    },
+    "bytes": [
+      9136786,
+      1371531
+    ],
+    "total": [
+      2852.1762909999998,
+      2564.032875
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10last",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        894
+      ],
+      "predictedEvents": [
+        2051,
+        1253
+      ],
+      "walkingCacheHits": [
+        16878,
+        17079
+      ],
+      "walkingRequests": [
+        21259,
+        21461
+      ]
+    },
+    "bytes": [
+      9136786,
+      5232776
+    ],
+    "total": [
+      2852.1762909999998,
+      7574.66125
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastfix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        894
+      ],
+      "predictedEvents": [
+        2051,
+        1253
+      ],
+      "walkingCacheHits": [
+        16878,
+        17079
+      ],
+      "walkingRequests": [
+        21259,
+        21461
+      ]
+    },
+    "bytes": [
+      9136786,
+      5232776
+    ],
+    "total": [
+      2852.1762909999998,
+      2908.988125
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        894
+      ],
+      "predictedEvents": [
+        2051,
+        1253
+      ],
+      "walkingCacheHits": [
+        16878,
+        17079
+      ],
+      "walkingRequests": [
+        21259,
+        21461
+      ]
+    },
+    "bytes": [
+      9136786,
+      5232776
+    ],
+    "total": [
+      2852.1762909999998,
+      2695.955042
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        894
+      ],
+      "predictedEvents": [
+        2051,
+        1253
+      ],
+      "walkingCacheHits": [
+        21157,
+        21359
+      ],
+      "walkingRequests": [
+        21259,
+        21461
+      ]
+    },
+    "bytes": [
+      9136786,
+      1371531
+    ],
+    "total": [
+      2377.818417,
+      2191.903541
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10last",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        894
+      ],
+      "predictedEvents": [
+        2051,
+        1253
+      ],
+      "walkingCacheHits": [
+        21157,
+        21359
+      ],
+      "walkingRequests": [
+        21259,
+        21461
+      ]
+    },
+    "bytes": [
+      9136786,
+      5232776
+    ],
+    "total": [
+      2377.818417,
+      5147.588542
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10lastfix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        894
+      ],
+      "predictedEvents": [
+        2051,
+        1253
+      ],
+      "walkingCacheHits": [
+        21157,
+        21359
+      ],
+      "walkingRequests": [
+        21259,
+        21461
+      ]
+    },
+    "bytes": [
+      9136786,
+      5232776
+    ],
+    "total": [
+      2377.818417,
+      2294.526333
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        894
+      ],
+      "predictedEvents": [
+        2051,
+        1253
+      ],
+      "walkingCacheHits": [
+        21157,
+        21359
+      ],
+      "walkingRequests": [
+        21259,
+        21461
+      ]
+    },
+    "bytes": [
+      9136786,
+      5232776
+    ],
+    "total": [
+      2377.818417,
+      2344.182125
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        894
+      ],
+      "predictedEvents": [
+        2051,
+        1253
+      ],
+      "walkingCacheHits": [
+        16878,
+        17079
+      ],
+      "walkingRequests": [
+        21259,
+        21461
+      ]
+    },
+    "bytes": [
+      9136786,
+      1371531
+    ],
+    "total": [
+      2768.184792,
+      2588.111375
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10last",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        894
+      ],
+      "predictedEvents": [
+        2051,
+        1253
+      ],
+      "walkingCacheHits": [
+        16878,
+        17079
+      ],
+      "walkingRequests": [
+        21259,
+        21461
+      ]
+    },
+    "bytes": [
+      9136786,
+      5232776
+    ],
+    "total": [
+      2768.184792,
+      5017.090125
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10lastfix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        894
+      ],
+      "predictedEvents": [
+        2051,
+        1253
+      ],
+      "walkingCacheHits": [
+        16878,
+        17079
+      ],
+      "walkingRequests": [
+        21259,
+        21461
+      ]
+    },
+    "bytes": [
+      9136786,
+      5232776
+    ],
+    "total": [
+      2768.184792,
+      2664.489834
+    ]
+  },
+  {
+    "capture": "st-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        893,
+        894
+      ],
+      "predictedEvents": [
+        2051,
+        1253
+      ],
+      "walkingCacheHits": [
+        16878,
+        17079
+      ],
+      "walkingRequests": [
+        21259,
+        21461
+      ]
+    },
+    "bytes": [
+      9136786,
+      5232776
+    ],
+    "total": [
+      2768.184792,
+      2764.367333
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2364
+      ],
+      "walkingCacheHits": [
+        12177,
+        12251
+      ],
+      "walkingRequests": [
+        17272,
+        17346
+      ]
+    },
+    "bytes": [
+      16478486,
+      2420943
+    ],
+    "total": [
+      3353.151167,
+      2666.826167
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2324
+      ],
+      "walkingCacheHits": [
+        12177,
+        12251
+      ],
+      "walkingRequests": [
+        17272,
+        17346
+      ]
+    },
+    "bytes": [
+      16478486,
+      9345608
+    ],
+    "total": [
+      3353.151167,
+      2893.681583
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2352
+      ],
+      "walkingCacheHits": [
+        12177,
+        12251
+      ],
+      "walkingRequests": [
+        17272,
+        17346
+      ]
+    },
+    "bytes": [
+      16478486,
+      9345608
+    ],
+    "total": [
+      3353.151167,
+      2842.612458
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2346
+      ],
+      "walkingCacheHits": [
+        12177,
+        12251
+      ],
+      "walkingRequests": [
+        17272,
+        17346
+      ]
+    },
+    "bytes": [
+      16478486,
+      9345608
+    ],
+    "total": [
+      3353.151167,
+      2865.169792
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2364
+      ],
+      "walkingCacheHits": [
+        17161,
+        17235
+      ],
+      "walkingRequests": [
+        17272,
+        17346
+      ]
+    },
+    "bytes": [
+      16478486,
+      2420943
+    ],
+    "total": [
+      2727.672458,
+      2229.544208
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        943
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2328
+      ],
+      "walkingCacheHits": [
+        17161,
+        17235
+      ],
+      "walkingRequests": [
+        17272,
+        17346
+      ]
+    },
+    "bytes": [
+      16478486,
+      9345608
+    ],
+    "total": [
+      2727.672458,
+      2463.667583
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2352
+      ],
+      "walkingCacheHits": [
+        17161,
+        17235
+      ],
+      "walkingRequests": [
+        17272,
+        17346
+      ]
+    },
+    "bytes": [
+      16478486,
+      9345608
+    ],
+    "total": [
+      2727.672458,
+      2479.188
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2364
+      ],
+      "walkingCacheHits": [
+        17161,
+        17235
+      ],
+      "walkingRequests": [
+        17272,
+        17346
+      ]
+    },
+    "bytes": [
+      16478486,
+      9345608
+    ],
+    "total": [
+      2727.672458,
+      2456.791542
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "f10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2364
+      ],
+      "walkingCacheHits": [
+        12177,
+        12251
+      ],
+      "walkingRequests": [
+        17272,
+        17346
+      ]
+    },
+    "bytes": [
+      16478486,
+      2420943
+    ],
+    "total": [
+      3047.320958,
+      2666.966459
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2308
+      ],
+      "walkingCacheHits": [
+        12177,
+        12251
+      ],
+      "walkingRequests": [
+        17272,
+        17346
+      ]
+    },
+    "bytes": [
+      16478486,
+      9345608
+    ],
+    "total": [
+      3047.320958,
+      2834.7865
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2352
+      ],
+      "walkingCacheHits": [
+        12177,
+        12251
+      ],
+      "walkingRequests": [
+        17272,
+        17346
+      ]
+    },
+    "bytes": [
+      16478486,
+      9345608
+    ],
+    "total": [
+      3047.320958,
+      2828.455917
+    ]
+  },
+  {
+    "capture": "st22-L2",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "duplicatesSuppressed": [
+        933,
+        942
+      ],
+      "invalidJourneys": [
+        59,
+        53
+      ],
+      "predictedEvents": [
+        3774,
+        2364
+      ],
+      "walkingCacheHits": [
+        12177,
+        12251
+      ],
+      "walkingRequests": [
+        17272,
+        17346
+      ]
+    },
+    "bytes": [
+      16478486,
+      9345608
+    ],
+    "total": [
+      3047.320958,
+      3205.670875
+    ]
+  }
+]

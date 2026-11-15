@@ -1,0 +1,107 @@
+diff --git a/Verkéier/App/Benchmarks/PasslistProbe.swift b/Verkéier/App/Benchmarks/PasslistProbe.swift
+new file mode 100644
+index 0000000..3fadca8
+--- /dev/null
++++ b/Verkéier/App/Benchmarks/PasslistProbe.swift
+@@ -0,0 +1,83 @@
++#if targetEnvironment(simulator) || ROUTING_BENCHMARK
++import Foundation
++
++/// EXPERIMENT (passlist cap probe, scratch build only): sends exactly two departure boards for one
++/// stop and window through the app's relay, the first without and the second with
++/// `passlistMaxStops`, and saves both bodies unchanged. Run with
++/// `ROUTING_BENCHMARK_SCENARIO=passlist-probe`; `ROUTING_PASSLIST_PROBE_BASE_URL` replaces the relay
++/// for a dry run against a local mock.
++enum PasslistProbe {
++    static func run(environment env: [String: String]) async throws {
++        // An override never falls back to the relay: a malformed one aborts instead.
++        let base: URL
++        if let override = env["ROUTING_PASSLIST_PROBE_BASE_URL"] {
++            guard let url = URL(string: override), url.scheme != nil, url.host() != nil else {
++                emit("ROUTING_BENCHMARK_ABORT passlist-probe-bad-base-url")
++                return
++            }
++            base = url
++        } else if let relay = AppConfiguration.current.apiProxyURL {
++            base = relay
++        } else {
++            emit("ROUTING_BENCHMARK_ABORT passlist-probe-no-relay")
++            return
++        }
++        emit("ROUTING_PASSLIST_PROBE_BASE " + (base.host() ?? "?"))
++        guard let stop = env["ROUTING_PASSLIST_PROBE_STOP"], !stop.isEmpty,
++            let cap = env["ROUTING_PASSLIST_PROBE_CAP"].flatMap(Int.init), cap >= 0
++        else {
++            emit("ROUTING_BENCHMARK_ABORT passlist-probe-missing-stop-or-cap")
++            return
++        }
++        let duration = env["ROUTING_PASSLIST_PROBE_DURATION"].flatMap(Int.init) ?? 30
++        // Both requests ask for the same pinned window, so they list the same departures.
++        var calendar = Calendar(identifier: .gregorian)
++        calendar.timeZone = TimeZone(identifier: "Europe/Luxembourg")!
++        let now = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: .now)
++        let date = env["ROUTING_PASSLIST_PROBE_DATE"]
++            ?? String(format: "%04d-%02d-%02d", now.year!, now.month!, now.day!)
++        let time = env["ROUTING_PASSLIST_PROBE_TIME"] ?? String(format: "%02d:%02d:00", now.hour!, now.minute!)
++        let items: [URLQueryItem] = [
++            .init(name: "format", value: "json"), .init(name: "id", value: stop), .init(name: "lang", value: "en"),
++            .init(name: "date", value: date), .init(name: "time", value: time),
++            .init(name: "duration", value: String(duration)), .init(name: "maxJourneys", value: "-1"),
++            .init(name: "rtMode", value: "SERVER_DEFAULT"), .init(name: "passlist", value: "1"),
++        ]
++        let configuration = URLSessionConfiguration.ephemeral
++        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
++        let session = URLSession(configuration: configuration)
++        let folder = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("passlist-probe")
++        try? FileManager.default.removeItem(at: folder)
++        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
++        for (label, extra) in [("full", [URLQueryItem]()), ("capped", [.init(name: "passlistMaxStops", value: String(cap))])] {
++            var components = URLComponents(
++                url: base.appendingPathComponent("atp").appendingPathComponent("departureBoard"),
++                resolvingAgainstBaseURL: false)!
++            components.queryItems = items + extra
++            let started = ContinuousClock.now
++            let (body, response) = try await session.data(from: components.url!)
++            let elapsed = started.duration(to: .now)
++            let http = response as? HTTPURLResponse
++            let headers = (http?.allHeaderFields ?? [:]).reduce(into: [String: String]()) { result, pair in
++                result[String(describing: pair.key)] = String(describing: pair.value)
++            }
++            let meta: [String: Any] = [
++                "label": label, "url": components.url!.absoluteString, "status": http?.statusCode ?? 0,
++                "bytes": body.count, "milliseconds": Double(elapsed.components.attoseconds) / 1e15
++                    + Double(elapsed.components.seconds) * 1000,
++                "headers": headers, "cap": cap, "stop": stop, "date": date, "time": time, "duration": duration,
++            ]
++            try body.write(to: folder.appendingPathComponent("\(label).json"))
++            try JSONSerialization.data(withJSONObject: meta, options: [.sortedKeys])
++                .write(to: folder.appendingPathComponent("\(label).meta.json"))
++            emit("ROUTING_PASSLIST_PROBE \(label) \(http?.statusCode ?? 0) \(body.count)")
++        }
++        emit("ROUTING_PASSLIST_PROBE_FOLDER " + folder.path)
++    }
++
++    private static func emit(_ line: String) {
++        print(line)
++        fflush(stdout)
++    }
++}
++#endif
+diff --git a/Verkéier/App/Benchmarks/SimulatorRouteBenchmark.swift b/Verkéier/App/Benchmarks/SimulatorRouteBenchmark.swift
+index d653a91..5457204 100644
+--- a/Verkéier/App/Benchmarks/SimulatorRouteBenchmark.swift
++++ b/Verkéier/App/Benchmarks/SimulatorRouteBenchmark.swift
+@@ -47,6 +47,13 @@ final class SimulatorRouteBenchmark {
+                 fflush(stdout)
+                 return
+             }
++            if scenario == "passlist-probe" {
++                // EXPERIMENT (passlist cap probe): two board requests, no routing.
++                try await PasslistProbe.run(environment: env)
++                print("ROUTING_BENCHMARK_DONE")
++                fflush(stdout)
++                return
++            }
+             let gtfs = MobiliteitGTFSService()
+             let database: URL
+             if let path = env["ROUTING_BENCHMARK_DATABASE"] {

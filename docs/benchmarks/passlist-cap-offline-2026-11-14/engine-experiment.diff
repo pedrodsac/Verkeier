@@ -1,0 +1,58 @@
+diff -ru a/Sources/MobilitéitKit/Routing/HafasRealtimeRoutingProvider+Events.swift b/Sources/MobilitéitKit/Routing/HafasRealtimeRoutingProvider+Events.swift
+--- a/Sources/MobilitéitKit/Routing/HafasRealtimeRoutingProvider+Events.swift	2026-11-15 16:31:30
++++ b/Sources/MobilitéitKit/Routing/HafasRealtimeRoutingProvider+Events.swift	2026-11-15 17:33:44
+@@ -51,6 +51,10 @@
+         return left.drop(while: { $0 == "0" }) == right.drop(while: { $0 == "0" })
+     }
+ 
++    /// EXPERIMENT (passlist cap replay): the `passlistMaxStops` the replayed boards were cut to.
++    /// Production would take it from the board request instead of the environment.
++    static let assumedPasslistCap: Int? = ProcessInfo.processInfo.environment["ROUTING_PASSLIST_CAP"].flatMap(Int.init)
++
+     func patch(for live: HafasDeparture, candidate: Candidate,
+                boardingStopID: String, observedAt: Date, deadline: ContinuousClock.Instant? = nil) async -> RealtimeTripPatch? {
+         let stopTimes = await cachedStopTimes(forTripID: candidate.departure.tripID)
+@@ -72,6 +76,11 @@
+         let boardingPrediction = date(date: live.realtimeDate ?? live.plannedDate, time: live.realtimeTime)
+         var precedingDelay: (seconds: TimeInterval, scheduled: Date)?
+         var events: [RealtimeStopEventPatch] = []
++        // EXPERIMENT (passlist cap replay): a passlist cut at the requested cap stops before the
++        // trip does. Past its last stop, keep the last reported delay to the trip's end instead of
++        // falling back to the timetable after 30 minutes, so the patch stays chronological.
++        let lastReportedPosition = aligned.keys.max()
++        let passlistCapped = Self.assumedPasslistCap.map { live.passlist.values.count >= $0 } ?? false
+         for position in stopTimes.indices {
+             if Task.isCancelled || deadline.map({ ContinuousClock.now >= $0 }) == true { return nil }
+             let value = stopTimes[position]
+@@ -88,7 +97,8 @@
+                 if let prediction { return (prediction, .reported) }
+                 if let precedingDelay,
+                    scheduled >= precedingDelay.scheduled,
+-                   scheduled.timeIntervalSince(precedingDelay.scheduled) <= 30 * 60,
++                   scheduled.timeIntervalSince(precedingDelay.scheduled) <= 30 * 60
++                       || (passlistCapped && lastReportedPosition.map { position > $0 } == true),
+                    abs(precedingDelay.seconds) <= 2 * 60 * 60 {
+                     return (scheduled.addingTimeInterval(precedingDelay.seconds), .estimated)
+                 }
+diff -ru a/Sources/MobilitéitKit/Routing/RealtimeTripPatch+Merging.swift b/Sources/MobilitéitKit/Routing/RealtimeTripPatch+Merging.swift
+--- a/Sources/MobilitéitKit/Routing/RealtimeTripPatch+Merging.swift	2026-11-15 16:31:30
++++ b/Sources/MobilitéitKit/Routing/RealtimeTripPatch+Merging.swift	2026-11-15 17:33:44
+@@ -72,12 +72,17 @@
+             status = self.status == .cancelled || incoming.status == .cancelled ? .cancelled
+                 : (self.status == .unreachable || incoming.status == .unreachable ? .unreachable : .active)
+         } else { status = newDate > oldDate ? incoming.status : self.status }
+-        let result = RealtimeTripPatch(tripID: tripID, serviceDate: serviceDate, status: status,
++        let combined = RealtimeTripPatch(tripID: tripID, serviceDate: serviceDate, status: status,
+                                       events: merged.values.sorted {
+             if let left = $0.stopSequence, let right = $1.stopSequence { return left < right }
+             return ($0.scheduledDeparture ?? $0.scheduledArrival ?? .distantPast)
+                 < ($1.scheduledDeparture ?? $1.scheduledArrival ?? .distantPast)
+         })
++        // EXPERIMENT (passlist cap replay): estimates from one board can overshoot another board's
++        // minute-precision report by seconds. Clamp them as a single board's patch is clamped,
++        // instead of keeping one whole patch and dropping the other board's reports.
++        let result = HafasRealtimeRoutingProvider.assumedPasslistCap == nil ? combined
++            : RealtimeTimeline.constrainingMinutePrecision(combined)
+         return result.status != .active || result.isChronological ? result
+             : (newDate >= oldDate ? incoming : self)
+     }

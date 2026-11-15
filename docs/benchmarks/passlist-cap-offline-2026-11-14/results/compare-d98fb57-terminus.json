@@ -1,0 +1,310 @@
+[
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "unfilteredJourneys",
+      "journeys",
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "journeys lost 0 gained 0",
+      "651@000220402034 departureSource observed->scheduled",
+      "651@000220402034 effectiveDeparture -260s",
+      "651@000220402034 status delayed->live"
+    ],
+    "counters": {
+      "delayedPastBoardings": [
+        44,
+        24
+      ],
+      "predictedEvents": [
+        2188,
+        1141
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2963.527375,
+      2158.080959
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "delayedPastBoardings": [
+        44,
+        27
+      ],
+      "predictedEvents": [
+        2188,
+        1171
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2963.527375,
+      2163.873791
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        2188,
+        1184
+      ]
+    },
+    "bytes": [
+      10503470,
+      5194205
+    ],
+    "total": [
+      2963.527375,
+      2221.609166
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2282
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2400.893125,
+      2349.5725
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2329
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2400.893125,
+      2275.69925
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2312
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2400.893125,
+      2249.509542
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2300
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      1996.40175,
+      1791.5179170000001
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2329
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      1996.40175,
+      1774.742375
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2330
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      1996.40175,
+      1772.328417
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10last",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2300
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2411.416542,
+      2201.769708
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10lastfix",
+    "identical": false,
+    "differences": [
+      "matchingRejections"
+    ],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2329
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2411.416542,
+      2183.659083
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10lastgap",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2330
+      ]
+    },
+    "bytes": [
+      15709264,
+      8824137
+    ],
+    "total": [
+      2411.416542,
+      2308.936666
+    ]
+  }
+]

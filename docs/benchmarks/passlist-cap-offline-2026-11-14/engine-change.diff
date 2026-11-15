@@ -1,0 +1,638 @@
+diff --git "a/Sources/Mobilit\303\251itKit/DepartureBoardRequest+Interval.swift" "b/Sources/Mobilit\303\251itKit/DepartureBoardRequest+Interval.swift"
+index 1e9e820..d84e5db 100644
+--- "a/Sources/Mobilit\303\251itKit/DepartureBoardRequest+Interval.swift"
++++ "b/Sources/Mobilit\303\251itKit/DepartureBoardRequest+Interval.swift"
+@@ -27,6 +27,7 @@ extension HafasDepartureBoardRequest {
+                      maximumJourneys: maximumJourneys, products: products, operators: operators,
+                      lines: lines, filterEquivalentStops: filterEquivalentStops,
+                      attributes: attributes, platforms: platforms,
+-                     realtimeMode: realtimeMode, includePasslist: includePasslist)
++                     realtimeMode: realtimeMode, includePasslist: includePasslist,
++                     passlistMaximumStops: passlistMaximumStops)
+     }
+ }
+diff --git "a/Sources/Mobilit\303\251itKit/MobiliteitAPIClient.swift" "b/Sources/Mobilit\303\251itKit/MobiliteitAPIClient.swift"
+index 0089316..d23c5c6 100644
+--- "a/Sources/Mobilit\303\251itKit/MobiliteitAPIClient.swift"
++++ "b/Sources/Mobilit\303\251itKit/MobiliteitAPIClient.swift"
+@@ -104,6 +104,9 @@ public struct HafasDepartureBoardRequest: Hashable, Sendable {
+     public let platforms: [String]
+     public let realtimeMode: HafasRealtimeMode?
+     public let includePasslist: Bool
++    /// ATP's `passlistMaxStops`, sent only with a passlist. ATP then returns at most this many stops: the
++    /// board stop, the next stops up to one short of the cap, and the terminus, skipping the stops between.
++    public let passlistMaximumStops: Int?
+ 
+     public init(
+         stationID: String,
+@@ -122,7 +125,8 @@ public struct HafasDepartureBoardRequest: Hashable, Sendable {
+         attributes: [String] = [],
+         platforms: [String] = [],
+         realtimeMode: HafasRealtimeMode? = nil,
+-        includePasslist: Bool = false
++        includePasslist: Bool = false,
++        passlistMaximumStops: Int? = nil
+     ) {
+         self.stationID = stationID
+         self.externalStationID = externalStationID
+@@ -141,6 +145,7 @@ public struct HafasDepartureBoardRequest: Hashable, Sendable {
+         self.platforms = platforms
+         self.realtimeMode = realtimeMode
+         self.includePasslist = includePasslist
++        self.passlistMaximumStops = passlistMaximumStops
+     }
+ }
+ 
+@@ -349,6 +354,8 @@ public struct MobiliteitAPIClient: Sendable {
+             .init(name: "platforms", value: request.platforms.isEmpty ? nil : request.platforms.joined(separator: ",")),
+             .init(name: "rtMode", value: request.realtimeMode?.rawValue),
+             .init(name: "passlist", value: request.includePasslist ? "1" : nil),
++            .init(name: "passlistMaxStops",
++                  value: request.includePasslist ? request.passlistMaximumStops.map(String.init) : nil),
+         ].filter { $0.value != nil }
+         return try url(path: "departureBoard", queryItems: items)
+     }
+diff --git "a/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+Acquisition.swift" "b/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+Acquisition.swift"
+index 2488c27..0f22303 100644
+--- "a/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+Acquisition.swift"
++++ "b/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+Acquisition.swift"
+@@ -21,17 +21,15 @@ extension HafasRealtimeRoutingProvider {
+                 let lines = Self.selectedLines(in: targets)
+                 let windows = targets.isEmpty ? [RealtimeBoardTarget(stopID: stopID, from: request.from, through: request.through)] : targets
+                 for window in windows where window.through >= window.from {
+-                    let (date, time) = Self.requestDateAndTime(window.from)
+-                    var value = await client.cachedDepartureBoardCoverage(.init(
+-                        stationID: stopID, language: client.language ?? "en", date: date, time: time,
+-                        durationMinutes: max(1, Int(ceil(window.through.timeIntervalSince(window.from) / 60))),
+-                        maximumJourneys: -1, realtimeMode: .serverDefault, includePasslist: true
++                    let duration = window.through.timeIntervalSince(window.from)
++                    var value = await client.cachedDepartureBoardCoverage(Self.routingBoardRequest(
++                        client: client, stopID: stopID, from: window.from, duration: duration,
++                        wholePasslists: request.wholePasslists
+                     ), maximumCacheAge: cacheLifetime)
+                     if !lines.isEmpty, value < 1 {
+-                        let filtered = await client.cachedDepartureBoardCoverage(.init(
+-                            stationID: stopID, language: client.language ?? "en", date: date, time: time,
+-                            durationMinutes: max(1, Int(ceil(window.through.timeIntervalSince(window.from) / 60))),
+-                            maximumJourneys: -1, lines: lines, realtimeMode: .serverDefault, includePasslist: true
++                        let filtered = await client.cachedDepartureBoardCoverage(Self.routingBoardRequest(
++                            client: client, stopID: stopID, from: window.from, duration: duration, lines: lines,
++                            wholePasslists: request.wholePasslists
+                         ), maximumCacheAge: cacheLifetime)
+                         value = max(value, filtered)
+                     }
+@@ -163,11 +161,9 @@ extension HafasRealtimeRoutingProvider {
+         let intervals = boardIntervals(stopID: stopID, request: request).prefix(8)
+         guard !intervals.isEmpty else { return false }
+         for interval in intervals {
+-            let (date, time) = requestDateAndTime(interval.start)
+-            let parts = await client.departureBoardLineCoverageParts(.init(
+-                stationID: stopID, language: client.language ?? "en", date: date, time: time,
+-                durationMinutes: max(1, Int(ceil(interval.duration / 60))), maximumJourneys: -1,
+-                lines: selectedLines, realtimeMode: .serverDefault, includePasslist: true
++            let parts = await client.departureBoardLineCoverageParts(routingBoardRequest(
++                client: client, stopID: stopID, from: interval.start, duration: interval.duration,
++                lines: selectedLines, wholePasslists: request.wholePasslists
+             ), maximumCacheAge: cacheLifetime, minimumFetchedAt: scopedRefresh ? request.refreshStartedAt : nil)
+             let waits = parts.contains { if case .flight = $0.source { true } else { false } }
+             guard waits, Set(parts.flatMap(\.requestedLines)).isSuperset(of: selectedLines) else { return false }
+diff --git "a/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+CappedPasslist.swift" "b/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+CappedPasslist.swift"
+new file mode 100644
+index 0000000..bdb4dbd
+--- /dev/null
++++ "b/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+CappedPasslist.swift"
+@@ -0,0 +1,46 @@
++import Foundation
++
++extension HafasRealtimeRoutingProvider {
++    /// The `passlistMaxStops` every routing board sends. ATP keeps the board stop, the next eight stops and
++    /// the terminus, and leaves out the stops between; ten cuts about 44 % of board bytes, with the same
++    /// routes in the passlist-cap replays (`docs/benchmarks/passlist-cap-offline-2026-11-14` in the app).
++    ///
++    /// A stop board that routing should reuse from the cache must send the same cap: the cap is part of
++    /// the cache scope, so an uncapped board with a passlist no longer supplies routing.
++    public nonisolated static let routingPasslistMaximumStops = 10
++
++    /// The board every routing fetch and cache lookup uses. All of them must send the same cap, because
++    /// the board cache keys its coverage on every query item except the window. `wholePasslists` (trip
++    /// detail, see `RealtimeRoutingRequest.wholePasslists`) drops the cap; it has no default so that
++    /// every fetch and lookup of one request takes it from that request.
++    nonisolated static func routingBoardRequest(client: MobiliteitAPIClient, stopID: String, from start: Date,
++                                                duration: TimeInterval, lines: [String] = [],
++                                                wholePasslists: Bool)
++        -> HafasDepartureBoardRequest {
++        let (date, time) = requestDateAndTime(start)
++        return .init(stationID: stopID, language: client.language ?? "en", date: date, time: time,
++                     durationMinutes: max(1, Int(ceil(duration / 60))), maximumJourneys: -1, lines: lines,
++                     realtimeMode: .serverDefault, includePasslist: true,
++                     passlistMaximumStops: wholePasslists ? nil : routingPasslistMaximumStops)
++    }
++
++    /// The trip positions a capped passlist leaves out: after the last aligned stop before the terminus,
++    /// and before the terminus (or through the end of the trip when the terminus did not align). Nil when
++    /// no stop before the terminus aligned, since there is then no reported delay to carry.
++    ///
++    /// A passlist counts as capped when it holds exactly `maximumStops` entries and the last two are not
++    /// neighbours by HAFAS route index (or either index is missing). A full passlist of that length keeps
++    /// neighbouring indices at the end, so its unreported stops keep the usual estimate horizon.
++    nonisolated static func cappedPasslistGap(_ passlist: [HafasPasslistStop], aligned: [Int: HafasPasslistStop],
++                                              stopCount: Int,
++                                              maximumStops: Int = routingPasslistMaximumStops) -> Range<Int>? {
++        guard maximumStops >= 2, passlist.count == maximumStops, let terminus = passlist.last else { return nil }
++        if let before = passlist[passlist.count - 2].routeIndex, let last = terminus.routeIndex,
++           last - before == 1 {
++            return nil
++        }
++        guard let lastBeforeGap = aligned.filter({ $0.value != terminus }).keys.max() else { return nil }
++        let end = aligned.first { $0.value == terminus }?.key ?? stopCount
++        return lastBeforeGap + 1 < end ? lastBeforeGap + 1..<end : nil
++    }
++}
+diff --git "a/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+Events.swift" "b/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+Events.swift"
+index 7b96586..8cf1f4f 100644
+--- "a/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+Events.swift"
++++ "b/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+Events.swift"
+@@ -70,6 +70,10 @@ extension HafasRealtimeRoutingProvider {
+         let status: RealtimeTripStatus = live.cancelled == true ? .cancelled
+             : (live.reachable == false ? .unreachable : .active)
+         let boardingPrediction = date(date: live.realtimeDate ?? live.plannedDate, time: live.realtimeTime)
++        // ATP's own prognoses for the stops a capped passlist leaves out repeat the delay before the gap
++        // (98.9 % of them in the replay captures), so the gap carries it without the 30-minute horizon,
++        // which would otherwise end in timetable times before the reported terminus.
++        let gap = Self.cappedPasslistGap(live.passlist.values, aligned: aligned, stopCount: stopTimes.count)
+         var precedingDelay: (seconds: TimeInterval, scheduled: Date)?
+         var events: [RealtimeStopEventPatch] = []
+         for position in stopTimes.indices {
+@@ -83,12 +87,13 @@ extension HafasRealtimeRoutingProvider {
+             let reportedDeparture = date(date: pass?.realtimeDepartureDate ?? pass?.departureDate,
+                                          time: pass?.realtimeDepartureTime)
+                 ?? (position == boarding ? boardingPrediction : nil)
++            let inGap = gap?.contains(position) == true
+             func timing(_ scheduled: Date?, prediction: Date?) -> (Date?, RealtimeTimingSource) {
+                 guard let scheduled else { return (nil, .scheduled) }
+                 if let prediction { return (prediction, .reported) }
+                 if let precedingDelay,
+                    scheduled >= precedingDelay.scheduled,
+-                   scheduled.timeIntervalSince(precedingDelay.scheduled) <= 30 * 60,
++                   inGap || scheduled.timeIntervalSince(precedingDelay.scheduled) <= 30 * 60,
+                    abs(precedingDelay.seconds) <= 2 * 60 * 60 {
+                     return (scheduled.addingTimeInterval(precedingDelay.seconds), .estimated)
+                 }
+diff --git "a/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+LineCoverage.swift" "b/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+LineCoverage.swift"
+index 98ba274..f3a2b1b 100644
+--- "a/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+LineCoverage.swift"
++++ "b/Sources/Mobilit\303\251itKit/Routing/HafasRealtimeRoutingProvider+LineCoverage.swift"
+@@ -13,10 +13,9 @@ extension HafasRealtimeRoutingProvider {
+                 interval: interval, request: request, now: now, cacheLifetime: cacheLifetime, scheduler: scheduler)
+         }
+         let minimumFetchedAt = request.refreshPolicy == .forceRefresh ? request.refreshStartedAt : nil
+-        let (date, time) = requestDateAndTime(interval.start)
+-        let whole = HafasDepartureBoardRequest(stationID: stopID, language: client.language ?? "en", date: date,
+-            time: time, durationMinutes: max(1, Int(ceil(interval.duration / 60))), maximumJourneys: -1,
+-            lines: selectedLines, realtimeMode: .serverDefault, includePasslist: true)
++        let whole = routingBoardRequest(client: client, stopID: stopID, from: interval.start,
++                                        duration: interval.duration, lines: selectedLines,
++                                        wholePasslists: request.wholePasslists)
+         if let minimumFetchedAt { await client.retireDepartureBoardCoverage(whole, before: minimumFetchedAt) }
+         let slices = request.refreshPolicy == .useCache || minimumFetchedAt != nil
+             ? await client.departureBoardLineCoverageIntervals(whole, maximumCacheAge: cacheLifetime, minimumFetchedAt: minimumFetchedAt)
+@@ -37,11 +36,10 @@ extension HafasRealtimeRoutingProvider {
+     ) async -> BoardResult {
+         let scopedRefresh = request.refreshPolicy == .forceRefresh && request.refreshStartedAt != nil
+         let minimumFetchedAt = scopedRefresh ? request.refreshStartedAt : nil
+-        let (date, time) = requestDateAndTime(interval.start)
+         func boardRequest(_ lines: [String]) -> HafasDepartureBoardRequest {
+-            .init(stationID: stopID, language: client.language ?? "en", date: date, time: time,
+-                durationMinutes: max(1, Int(ceil(interval.duration / 60))), maximumJourneys: -1,
+-                lines: lines, realtimeMode: .serverDefault, includePasslist: true)
++            routingBoardRequest(client: client, stopID: stopID, from: interval.start,
++                                duration: interval.duration, lines: lines,
++                                wholePasslists: request.wholePasslists)
+         }
+         var result = LineCoverageAccumulator(stopID: stopID, fetchedAt: now())
+         var missing = Set(selectedLines)
+diff --git "a/Sources/Mobilit\303\251itKit/Routing/RealtimeRoutingTypes.swift" "b/Sources/Mobilit\303\251itKit/Routing/RealtimeRoutingTypes.swift"
+index 0ca6337..3d23581 100644
+--- "a/Sources/Mobilit\303\251itKit/Routing/RealtimeRoutingTypes.swift"
++++ "b/Sources/Mobilit\303\251itKit/Routing/RealtimeRoutingTypes.swift"
+@@ -196,6 +196,12 @@ public struct RealtimeRoutingRequest: Sendable {
+     /// Keep matched timetable-only trips when a detail screen needs platform
+     /// metadata. Their timings remain scheduled, never live predictions.
+     public let includeTripMetadata: Bool
++    /// Ask boards for every stop of each passlist instead of the routing cap
++    /// (`HafasRealtimeRoutingProvider.routingPasslistMaximumStops`). Trip detail
++    /// shows live times only for reported stops, and a capped passlist reports
++    /// just the first stops and the terminus. The cap is part of the board cache
++    /// scope, so these boards neither supply routing nor reuse its boards.
++    public let wholePasslists: Bool
+     /// Optional transport lookahead. Matching remains restricted to from/through;
+     /// the shared board cache retains the extra coverage for expanded profiles.
+     public let minimumBoardCoverageMinutes: Int
+@@ -208,6 +214,7 @@ public struct RealtimeRoutingRequest: Sendable {
+                 maximumConcurrentRequests: Int = 4, timeout: Duration = .seconds(4),
+                 deadline: ContinuousClock.Instant? = nil, targets: [RealtimeBoardTarget] = [],
+                 tripIDs: Set<String> = [], includeTripMetadata: Bool = false,
++                wholePasslists: Bool = false,
+                 minimumBoardCoverageMinutes: Int = 0, refreshStartedAt: Date? = nil) {
+         self.stopIDs = stopIDs; self.from = from; self.through = through
+         self.scheduledLookbackSeconds = max(0, scheduledLookbackSeconds)
+@@ -218,6 +225,7 @@ public struct RealtimeRoutingRequest: Sendable {
+         self.targets = targets
+         self.tripIDs = tripIDs
+         self.includeTripMetadata = includeTripMetadata
++        self.wholePasslists = wholePasslists
+         self.minimumBoardCoverageMinutes = min(1_439, max(0, minimumBoardCoverageMinutes))
+         self.refreshStartedAt = refreshStartedAt
+     }
+diff --git "a/Sources/Mobilit\303\251itKit/Routing/RealtimeTripPatch+Merging.swift" "b/Sources/Mobilit\303\251itKit/Routing/RealtimeTripPatch+Merging.swift"
+index a43d27c..0178ab2 100644
+--- "a/Sources/Mobilit\303\251itKit/Routing/RealtimeTripPatch+Merging.swift"
++++ "b/Sources/Mobilit\303\251itKit/Routing/RealtimeTripPatch+Merging.swift"
+@@ -72,12 +72,15 @@ extension RealtimeTripPatch {
+             status = self.status == .cancelled || incoming.status == .cancelled ? .cancelled
+                 : (self.status == .unreachable || incoming.status == .unreachable ? .unreachable : .active)
+         } else { status = newDate > oldDate ? incoming.status : self.status }
+-        let result = RealtimeTripPatch(tripID: tripID, serviceDate: serviceDate, status: status,
+-                                      events: merged.values.sorted {
+-            if let left = $0.stopSequence, let right = $1.stopSequence { return left < right }
+-            return ($0.scheduledDeparture ?? $0.scheduledArrival ?? .distantPast)
+-                < ($1.scheduledDeparture ?? $1.scheduledArrival ?? .distantPast)
+-        })
++        // One board's seconds-precision estimate can overshoot another board's minute-precision report.
++        // Clamp it as a single board's patch is clamped, instead of keeping one whole patch and dropping
++        // the other board's reports. Chronological patches pass through unchanged.
++        let result = RealtimeTimeline.constrainingMinutePrecision(RealtimeTripPatch(
++            tripID: tripID, serviceDate: serviceDate, status: status, events: merged.values.sorted {
++                if let left = $0.stopSequence, let right = $1.stopSequence { return left < right }
++                return ($0.scheduledDeparture ?? $0.scheduledArrival ?? .distantPast)
++                    < ($1.scheduledDeparture ?? $1.scheduledArrival ?? .distantPast)
++            }))
+         return result.status != .active || result.isChronological ? result
+             : (newDate >= oldDate ? incoming : self)
+     }
+diff --git "a/Sources/Mobilit\303\251itKit/Routing/TransitTripSnapshot.swift" "b/Sources/Mobilit\303\251itKit/Routing/TransitTripSnapshot.swift"
+index 8c5b638..2e5afeb 100644
+--- "a/Sources/Mobilit\303\251itKit/Routing/TransitTripSnapshot.swift"
++++ "b/Sources/Mobilit\303\251itKit/Routing/TransitTripSnapshot.swift"
+@@ -69,7 +69,8 @@ extension TransitRouter {
+         let batch = try await realtimePatches(for: .init(
+             stopIDs: targets.map(\.stopID), from: from, through: through,
+             refreshPolicy: refreshPolicy,
+-            targets: targets, tripIDs: [instance.tripID], includeTripMetadata: true
++            targets: targets, tripIDs: [instance.tripID], includeTripMetadata: true,
++            wholePasslists: true
+         ))
+         try Task.checkCancellation()
+         let patch = batch?.patches.first {
+diff --git "a/Tests/Mobilit\303\251itKitTests/CappedPasslistTests.swift" "b/Tests/Mobilit\303\251itKitTests/CappedPasslistTests.swift"
+new file mode 100644
+index 0000000..391a2fc
+--- /dev/null
++++ "b/Tests/Mobilit\303\251itKitTests/CappedPasslistTests.swift"
+@@ -0,0 +1,249 @@
++import Foundation
++import Testing
++@testable import MobiliteitKit
++
++/// ATP's `passlistMaxStops=K` keeps the board stop, the next K - 2 stops and the terminus. The stops
++/// between are left out, and the patch carries the delay before them through to the terminus.
++@Suite struct CappedPasslistTests {
++    /// Fourteen stops: s01-s09 two minutes apart from 08:00, then s10-s14 at 08:30, 08:45, 09:00, 09:15
++    /// and 09:30, so s12 and s13 lie more than 30 minutes after s09.
++    static let times = ["08:00", "08:02", "08:04", "08:06", "08:08", "08:10", "08:12", "08:14", "08:16",
++                        "08:30", "08:45", "09:00", "09:15", "09:30"]
++
++    static func stopID(_ index: Int) -> String { String(format: "s%02d", index + 1) }
++
++    static func fixture() async throws -> RealtimeTestFixture {
++        let stops = times.indices.map { "\(stopID($0)),Stop \($0 + 1),49.\(60 + $0),6.\(10 + $0)\n" }.joined()
++        let stopTimes = times.enumerated().map { index, time in
++            "trip,\(time):00,\(time):00,\(stopID(index)),\(index + 1)\n"
++        }.joined()
++        return try await RealtimeTestFixture(stopTimes: stopTimes, additionalStops: stops)
++    }
++
++    static func shifted(_ time: String, minutes: Int) -> String {
++        let parts = time.split(separator: ":").compactMap { Int($0) }
++        let total = parts[0] * 60 + parts[1] + minutes
++        return String(format: "%02d:%02d:00", total / 60, total % 60)
++    }
++
++    /// The board at s01 as ATP returns it with K = 10: s01-s09 and the terminus, each delayed.
++    static func board(delayMinutes: Int, terminusRouteIndex: Int?) -> String {
++        var rows = (0..<9).map { index in
++            liveStop(stopID(index), planned: "\(times[index]):00",
++                     predicted: shifted(times[index], minutes: delayMinutes), extra: ",\"routeIdx\":\(index)")
++        }
++        let terminus = shifted(times[13], minutes: delayMinutes)
++        rows.append(liveStop(stopID(13), planned: "\(times[13]):00", predicted: terminus, arrival: terminus,
++                             extra: terminusRouteIndex.map { ",\"routeIdx\":\($0)" } ?? ""))
++        return liveBoard(stops: rows.joined(separator: ","), realtime: shifted(times[0], minutes: delayMinutes),
++                         stop: stopID(0))
++    }
++
++    static func patch(delayMinutes: Int, terminusRouteIndex: Int?) async throws
++        -> (patch: RealtimeTripPatch?, requests: [URLRequest]) {
++        let fixture = try await fixture(); defer { fixture.remove() }
++        let body = board(delayMinutes: delayMinutes, terminusRouteIndex: terminusRouteIndex)
++        let (client, host) = RealtimeBoardProtocol.client { _ in body }; defer { RealtimeBoardProtocol.remove(host) }
++        let provider = try HafasRealtimeRoutingProvider(databaseURL: fixture.database, client: client)
++        let batch = try await provider.patches(for: .init(stopIDs: [stopID(0)],
++            from: RealtimeTestFixture.date("08:00:00"), through: RealtimeTestFixture.date("08:30:00")))
++        return (batch.patches.first, RealtimeBoardProtocol.requests(host))
++    }
++
++    @Test func routingBoardsAskForTenStops() async throws {
++        let requests = try await Self.patch(delayMinutes: 0, terminusRouteIndex: 13).requests
++        let url = try #require(requests.first?.url)
++        let params = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
++        #expect(params.first { $0.name == "passlist" }?.value == "1")
++        #expect(params.first { $0.name == "passlistMaxStops" }?.value == "10")
++    }
++
++    @Test func capIsSentOnlyWithAPasslistAndSurvivesIntervals() async throws {
++        let (client, host) = RealtimeBoardProtocol.client { _ in liveBoard(stops: "") }
++        defer { RealtimeBoardProtocol.remove(host) }
++        for (stationID, passlist) in [("a", false), ("b", true)] {
++            _ = try await client.departureBoard(.init(stationID: stationID, includePasslist: passlist,
++                                                      passlistMaximumStops: 10), refreshPolicy: .forceRefresh)
++        }
++        let values = RealtimeBoardProtocol.requests(host).compactMap(\.url).map { url in
++            URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?
++                .first { $0.name == "passlistMaxStops" }?.value
++        }
++        #expect(values == [nil, "10"])
++        let request = HafasDepartureBoardRequest(stationID: "a", includePasslist: true, passlistMaximumStops: 10)
++        #expect(request.covering(.init(start: .now, duration: 600)).passlistMaximumStops == 10)
++    }
++
++    /// Without the gap rule, s12 falls back to its timetable time, 09:00, after s11's estimate of 09:05.
++    /// The patch would not be chronological, and the trip would lose its delay.
++    @Test func cappedPasslistCarriesTheDelayToTheTerminus() async throws {
++        let patch = try #require(try await Self.patch(delayMinutes: 20, terminusRouteIndex: 13).patch)
++        #expect(patch.isChronological)
++        #expect(patch.events[8].departureSource == .reported)
++        for (index, time) in [(10, "09:05:00"), (11, "09:20:00"), (12, "09:35:00")] {
++            #expect(patch.events[index].effectiveArrival == RealtimeTestFixture.date(time))
++            #expect(patch.events[index].arrivalSource == .estimated)
++            #expect(patch.events[index].departureSource == .estimated)
++        }
++        #expect(patch.events[13].effectiveArrival == RealtimeTestFixture.date("09:50:00"))
++        #expect(patch.events[13].arrivalSource == .reported)
++    }
++
++    /// Ten stops whose last two are route neighbours are a whole passlist, not a capped one: a stop the
++    /// timetable has and ATP does not keeps the 30-minute horizon.
++    @Test func neighbouringTerminusKeepsTheHorizon() async throws {
++        let patch = try #require(try await Self.patch(delayMinutes: 10, terminusRouteIndex: 9).patch)
++        #expect(patch.events[10].effectiveArrival == RealtimeTestFixture.date("08:55:00"))
++        #expect(patch.events[10].arrivalSource == .estimated)
++        for index in [11, 12] {
++            #expect(patch.events[index].effectiveArrival == patch.events[index].scheduledArrival)
++            #expect(patch.events[index].arrivalSource == .scheduled)
++        }
++    }
++
++    static func passlist(count: Int, routeIndices: [Int?]) throws -> [HafasPasslistStop] {
++        try (0..<count).map { index in
++            let extra = routeIndices[index].map { ",\"routeIdx\":\($0)" } ?? ""
++            let json = liveStop(stopID(index), planned: String(format: "08:%02d:00", index), extra: extra)
++            return try JSONDecoder().decode(HafasPasslistStop.self, from: Data(json.utf8))
++        }
++    }
++
++    static func aligned(_ passlist: [HafasPasslistStop], positions: [Int?]) -> [Int: HafasPasslistStop] {
++        Dictionary(uniqueKeysWithValues: zip(positions, passlist).compactMap { position, stop in
++            position.map { ($0, stop) }
++        })
++    }
++
++    @Test func gapLiesBetweenTheLastStopBeforeItAndTheTerminus() throws {
++        let stops = try Self.passlist(count: 10, routeIndices: Array(0..<9) + [13])
++        let positions: [Int?] = Array(0..<9) + [13]
++        #expect(HafasRealtimeRoutingProvider.cappedPasslistGap(stops, aligned: Self.aligned(stops, positions: positions),
++                                                               stopCount: 14) == 9..<13)
++        // An unaligned stop before the gap moves its start back; an unaligned terminus extends it to the end.
++        let shifted: [Int?] = Array(0..<8) + [nil, nil]
++        #expect(HafasRealtimeRoutingProvider.cappedPasslistGap(stops, aligned: Self.aligned(stops, positions: shifted),
++                                                               stopCount: 14) == 8..<14)
++        let missingIndices = try Self.passlist(count: 10, routeIndices: Array(repeating: nil, count: 10))
++        #expect(HafasRealtimeRoutingProvider.cappedPasslistGap(missingIndices,
++            aligned: Self.aligned(missingIndices, positions: positions), stopCount: 14) == 9..<13)
++    }
++
++    @Test func wholeOrUnalignedPasslistsHaveNoGap() throws {
++        let neighbours = try Self.passlist(count: 10, routeIndices: Array(0..<10))
++        #expect(HafasRealtimeRoutingProvider.cappedPasslistGap(neighbours,
++            aligned: Self.aligned(neighbours, positions: Array(0..<9) + [13]), stopCount: 14) == nil)
++        let short = try Self.passlist(count: 9, routeIndices: Array(0..<8) + [13])
++        #expect(HafasRealtimeRoutingProvider.cappedPasslistGap(short,
++            aligned: Self.aligned(short, positions: Array(0..<8) + [13]), stopCount: 14) == nil)
++        let capped = try Self.passlist(count: 10, routeIndices: Array(0..<9) + [13])
++        #expect(HafasRealtimeRoutingProvider.cappedPasslistGap(capped,
++            aligned: Self.aligned(capped, positions: Array(repeating: nil, count: 9) + [13]), stopCount: 14) == nil)
++    }
++
++    /// The board at s01 with its whole passlist, every stop reported `delayMinutes` late.
++    static func wholeBoard(delayMinutes: Int) -> String {
++        let rows = times.indices.map { index in
++            let predicted = shifted(times[index], minutes: delayMinutes)
++            return liveStop(stopID(index), planned: "\(times[index]):00", predicted: predicted,
++                            arrival: index == times.count - 1 ? predicted : nil, extra: ",\"routeIdx\":\(index)")
++        }
++        return liveBoard(stops: rows.joined(separator: ","), realtime: shifted(times[0], minutes: delayMinutes),
++                         stop: stopID(0))
++    }
++
++    static func passlistCap(_ request: URLRequest) -> String? {
++        URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems?
++            .first { $0.name == "passlistMaxStops" }?.value
++    }
++
++    /// Trip detail shows live times only for reported stops, so it asks for the whole passlist and
++    /// keeps them for the stops a routing board would leave out.
++    @Test func tripDetailAsksForWholePasslists() async throws {
++        let fixture = try await Self.fixture(); defer { fixture.remove() }
++        // Answer as ATP does: a capped board when the request sends the cap.
++        let whole = Self.wholeBoard(delayMinutes: 20), capped = Self.board(delayMinutes: 20, terminusRouteIndex: 13)
++        let (client, host) = RealtimeBoardProtocol.client { Self.passlistCap($0) == nil ? whole : capped }
++        defer { RealtimeBoardProtocol.remove(host) }
++        let provider = try HafasRealtimeRoutingProvider(databaseURL: fixture.database, client: client)
++        let router = try await TransitRouter(databaseURL: fixture.database, realtimeProvider: provider)
++        let generation = await router.snapshot.info.generation
++        let result = try await router.tripSnapshot(for: .init(feedGeneration: generation, tripID: "trip",
++            serviceDate: try GTFSDate(parsing: "20260930")), boardingSequence: 1)
++        let requests = RealtimeBoardProtocol.requests(host)
++        #expect(!requests.isEmpty)
++        #expect(requests.allSatisfy { Self.passlistCap($0) == nil })
++        #expect(result.stops.map { $0.departure?.realtime }
++            == Self.times.map { RealtimeTestFixture.date(Self.shifted($0, minutes: 20)) })
++    }
++
++    /// The cap is part of the board cache scope: a routing board doesn't answer trip detail, and the
++    /// whole-passlist board trip detail fetched doesn't answer routing.
++    @Test func routingAndTripDetailBoardsAreCachedApart() async throws {
++        let fixture = try await Self.fixture(); defer { fixture.remove() }
++        let body = Self.wholeBoard(delayMinutes: 0)
++        let (client, host) = RealtimeBoardProtocol.client { _ in body }; defer { RealtimeBoardProtocol.remove(host) }
++        let provider = try HafasRealtimeRoutingProvider(databaseURL: fixture.database, client: client)
++        let window = (from: RealtimeTestFixture.date("07:58:00"), through: RealtimeTestFixture.date("08:30:00"))
++        func fetch(wholePasslists: Bool) async throws {
++            _ = try await provider.patches(for: .init(stopIDs: [Self.stopID(0)], from: window.from,
++                through: window.through, wholePasslists: wholePasslists))
++        }
++        try await fetch(wholePasslists: false)
++        try await fetch(wholePasslists: true)
++        try await fetch(wholePasslists: false)
++        try await fetch(wholePasslists: true)
++        #expect(RealtimeBoardProtocol.requests(host).map(Self.passlistCap) == ["10", nil])
++    }
++}
++
++/// Two boards of one trip: the first estimates a stop from its own report in seconds, the second
++/// reports the next stop in whole minutes, a little earlier.
++@Suite struct RealtimeTripPatchMergeClampTests {
++    static func at(_ time: String) -> Date { RealtimeTestFixture.date(time) }
++
++    static func patches(estimate: String) throws -> (first: RealtimeTripPatch, second: RealtimeTripPatch) {
++        let date = try GTFSDate(parsing: "20260930")
++        let observed = at("08:05:00"), later = at("08:05:10")
++        let first = RealtimeTripPatch(tripID: "trip", serviceDate: date, events: [
++            .init(stopID: "a", scheduledDeparture: at("08:00:00"), effectiveDeparture: at("08:08:00"),
++                  departureSource: .reported, stopSequence: 1, observedAt: observed),
++            .init(stopID: "x", scheduledDeparture: at("08:10:30"), effectiveDeparture: at(estimate),
++                  departureSource: .estimated, scheduledArrival: at("08:10:30"), effectiveArrival: at(estimate),
++                  arrivalSource: .estimated, stopSequence: 2, observedAt: observed),
++            .init(stopID: "b", scheduledDeparture: at("08:11:00"), effectiveDeparture: at("08:19:00"),
++                  departureSource: .estimated, scheduledArrival: at("08:11:00"), effectiveArrival: at("08:19:00"),
++                  arrivalSource: .estimated, stopSequence: 3, observedAt: observed),
++        ])
++        let second = RealtimeTripPatch(tripID: "trip", serviceDate: date, events: [
++            .init(stopID: "a", scheduledDeparture: at("08:00:00"), effectiveDeparture: at("08:00:00"),
++                  stopSequence: 1, observedAt: later),
++            .init(stopID: "x", scheduledDeparture: at("08:10:30"), effectiveDeparture: at("08:10:30"),
++                  scheduledArrival: at("08:10:30"), effectiveArrival: at("08:10:30"), stopSequence: 2,
++                  observedAt: later),
++            .init(stopID: "b", scheduledDeparture: at("08:11:00"), effectiveDeparture: at("08:18:00"),
++                  departureSource: .reported, scheduledArrival: at("08:11:00"), effectiveArrival: at("08:18:00"),
++                  arrivalSource: .reported, stopSequence: 3, observedAt: later),
++        ])
++        return (first, second)
++    }
++
++    @Test func mergeClampsAnEstimateThatOvershootsAMinuteReport() throws {
++        let (first, second) = try Self.patches(estimate: "08:18:30")
++        let merged = first.merging(second)
++        #expect(merged.isChronological)
++        #expect(merged.events[0].effectiveDeparture == Self.at("08:08:00"))
++        #expect(merged.events[0].departureSource == .reported)
++        #expect(merged.events[1].effectiveArrival == Self.at("08:18:00"))
++        #expect(merged.events[1].effectiveDeparture == Self.at("08:18:00"))
++        #expect(merged.events[1].arrivalSource == .estimated)
++        #expect(merged.events[2].effectiveArrival == Self.at("08:18:00"))
++        #expect(merged.events[2].arrivalSource == .reported)
++    }
++
++    @Test func mergeKeepsTheNewerPatchWhenTheConflictIsLarger() throws {
++        let (first, second) = try Self.patches(estimate: "08:20:00")
++        let merged = first.merging(second)
++        #expect(merged == second)
++    }
++}
+diff --git "a/Tests/Mobilit\303\251itKitTests/DepartureBoardIntervalTests.swift" "b/Tests/Mobilit\303\251itKitTests/DepartureBoardIntervalTests.swift"
+index da0aa4b..3c72f27 100644
+--- "a/Tests/Mobilit\303\251itKitTests/DepartureBoardIntervalTests.swift"
++++ "b/Tests/Mobilit\303\251itKitTests/DepartureBoardIntervalTests.swift"
+@@ -50,7 +50,8 @@ import Testing
+                          language: String = "en", maximum: Int = -1) throws -> HafasDepartureBoardRequest {
+         .init(stationID: "a", language: language, date: try GTFSDate(parsing: "20260930"),
+               time: try ServiceTime(parsing: time), durationMinutes: minutes, maximumJourneys: maximum,
+-              lines: line.map { [$0] } ?? [], realtimeMode: .serverDefault, includePasslist: true)
++              lines: line.map { [$0] } ?? [], realtimeMode: .serverDefault, includePasslist: true,
++              passlistMaximumStops: HafasRealtimeRoutingProvider.routingPasslistMaximumStops)
+     }
+ 
+     @Test func stopBoardSuppliesRoutingWithoutAnotherRequest() async throws {
+diff --git "a/Tests/Mobilit\303\251itKitTests/RealtimeBoardLineCompositionTests.swift" "b/Tests/Mobilit\303\251itKitTests/RealtimeBoardLineCompositionTests.swift"
+index 5c79383..9da2868 100644
+--- "a/Tests/Mobilit\303\251itKitTests/RealtimeBoardLineCompositionTests.swift"
++++ "b/Tests/Mobilit\303\251itKitTests/RealtimeBoardLineCompositionTests.swift"
+@@ -60,7 +60,8 @@ import Testing
+     private func request(lines: [String]) throws -> HafasDepartureBoardRequest {
+         .init(stationID: "a", language: "en", date: try GTFSDate(parsing: "20260930"),
+             time: try ServiceTime(parsing: "08:00:00"), durationMinutes: 90,
+-            maximumJourneys: -1, lines: lines, realtimeMode: .serverDefault, includePasslist: true)
++            maximumJourneys: -1, lines: lines, realtimeMode: .serverDefault, includePasslist: true,
++            passlistMaximumStops: HafasRealtimeRoutingProvider.routingPasslistMaximumStops)
+     }
+ 
+     private func routingRequest() -> RealtimeRoutingRequest {
+diff --git "a/Tests/Mobilit\303\251itKitTests/RealtimeBoardSupersetTests.swift" "b/Tests/Mobilit\303\251itKitTests/RealtimeBoardSupersetTests.swift"
+index a7e37e9..fb92070 100644
+--- "a/Tests/Mobilit\303\251itKitTests/RealtimeBoardSupersetTests.swift"
++++ "b/Tests/Mobilit\303\251itKitTests/RealtimeBoardSupersetTests.swift"
+@@ -135,6 +135,7 @@ import Testing
+                          maximum: Int = -1) throws -> HafasDepartureBoardRequest {
+         .init(stationID: "a", language: language, date: try GTFSDate(parsing: "20260930"),
+             time: try ServiceTime(parsing: "08:00:00"), durationMinutes: 90,
+-            maximumJourneys: maximum, lines: lines, realtimeMode: .serverDefault, includePasslist: passlist)
++            maximumJourneys: maximum, lines: lines, realtimeMode: .serverDefault, includePasslist: passlist,
++            passlistMaximumStops: HafasRealtimeRoutingProvider.routingPasslistMaximumStops)
+     }
+ }
+diff --git "a/Tests/Mobilit\303\251itKitTests/RealtimeBudgetTests.swift" "b/Tests/Mobilit\303\251itKitTests/RealtimeBudgetTests.swift"
+index 6741fcd..ecdd492 100644
+--- "a/Tests/Mobilit\303\251itKitTests/RealtimeBudgetTests.swift"
++++ "b/Tests/Mobilit\303\251itKitTests/RealtimeBudgetTests.swift"
+@@ -127,7 +127,8 @@ import Testing
+         _ = await provider.cachedStopTimes(forTripID: "trip")
+         _ = try await client.departureBoardSnapshot(.init(stationID: "a", language: "en",
+             date: try GTFSDate(parsing: "20260930"), time: ServiceTime(rawValue: 8 * 3_600),
+-            durationMinutes: 30, maximumJourneys: -1, realtimeMode: .serverDefault, includePasslist: true))
++            durationMinutes: 30, maximumJourneys: -1, realtimeMode: .serverDefault, includePasslist: true,
++            passlistMaximumStops: HafasRealtimeRoutingProvider.routingPasslistMaximumStops))
+         let batch = try await provider.patches(for: .init(stopIDs: ["a"], from: from, through: through,
+             timeout: .seconds(4), deadline: started.advanced(by: .seconds(4))))
+         #expect(!batch.patches.isEmpty)
+diff --git "a/Tests/Mobilit\303\251itKitTests/RealtimeCoverageRegressionTests.swift" "b/Tests/Mobilit\303\251itKitTests/RealtimeCoverageRegressionTests.swift"
+index 7dfaaab..0fbf7f3 100644
+--- "a/Tests/Mobilit\303\251itKitTests/RealtimeCoverageRegressionTests.swift"
++++ "b/Tests/Mobilit\303\251itKitTests/RealtimeCoverageRegressionTests.swift"
+@@ -77,7 +77,8 @@ import Testing
+         defer { RealtimeBoardProtocol.remove(host) }
+         _ = try await client.departureBoardSnapshot(.init(stationID: "a", language: "en",
+             date: GTFSDate(parsing: "20260930"), time: ServiceTime(parsing: "08:00:00"), durationMinutes: 90,
+-            maximumJourneys: -1, realtimeMode: .serverDefault, includePasslist: true))
++            maximumJourneys: -1, realtimeMode: .serverDefault, includePasslist: true,
++            passlistMaximumStops: HafasRealtimeRoutingProvider.routingPasslistMaximumStops))
+         let provider = try HafasRealtimeRoutingProvider(databaseURL: fixture.database, client: client)
+         let batch = try await provider.patches(for: .init(stopIDs: ["slow-0", "slow-1", "slow-2", "slow-3", "a"],
+             from: RealtimeTestFixture.date("08:00:00"), through: RealtimeTestFixture.date("09:30:00"), timeout: .milliseconds(900)))
+diff --git "a/Tests/Mobilit\303\251itKitTests/RealtimeItineraryCoverageTests.swift" "b/Tests/Mobilit\303\251itKitTests/RealtimeItineraryCoverageTests.swift"
+index 8ab5915..9f2aeaa 100644
+--- "a/Tests/Mobilit\303\251itKitTests/RealtimeItineraryCoverageTests.swift"
++++ "b/Tests/Mobilit\303\251itKitTests/RealtimeItineraryCoverageTests.swift"
+@@ -136,7 +136,8 @@ import Testing
+         defer { RealtimeBoardProtocol.remove(host) }
+         let unrestricted = HafasDepartureBoardRequest(stationID: "a", language: "en",
+             date: try GTFSDate(parsing: "20260930"), time: ServiceTime(rawValue: 7 * 3_600 + 30 * 60),
+-            durationMinutes: 180, maximumJourneys: -1, realtimeMode: .serverDefault, includePasslist: true)
++            durationMinutes: 180, maximumJourneys: -1, realtimeMode: .serverDefault, includePasslist: true,
++            passlistMaximumStops: HafasRealtimeRoutingProvider.routingPasslistMaximumStops)
+         if primeUnrestricted { _ = try await client.departureBoardSnapshot(unrestricted) }
+         let provider = try HafasRealtimeRoutingProvider(databaseURL: fixture.database, client: client)
+         let router = try await TransitRouter(databaseURL: fixture.database, realtimeProvider: provider)
+diff --git "a/Tests/Mobilit\303\251itKitTests/ScopedDepartureBoardReuseTests.swift" "b/Tests/Mobilit\303\251itKitTests/ScopedDepartureBoardReuseTests.swift"
+index 9c3f698..1a3562e 100644
+--- "a/Tests/Mobilit\303\251itKitTests/ScopedDepartureBoardReuseTests.swift"
++++ "b/Tests/Mobilit\303\251itKitTests/ScopedDepartureBoardReuseTests.swift"
+@@ -142,7 +142,8 @@ import Testing
+     private func request(minutes: Int, lines: [String]) throws -> HafasDepartureBoardRequest {
+         .init(stationID: "a", language: "en", date: try GTFSDate(parsing: "20260930"),
+             time: try ServiceTime(parsing: "08:00:00"), durationMinutes: minutes,
+-            maximumJourneys: -1, lines: lines, realtimeMode: .serverDefault, includePasslist: true)
++            maximumJourneys: -1, lines: lines, realtimeMode: .serverDefault, includePasslist: true,
++            passlistMaximumStops: HafasRealtimeRoutingProvider.routingPasslistMaximumStops)
+     }
+ 
+     private func routingRequest(since boundary: Date) -> RealtimeRoutingRequest {

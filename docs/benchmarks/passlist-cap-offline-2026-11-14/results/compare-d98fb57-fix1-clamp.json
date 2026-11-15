@@ -1,0 +1,397 @@
+[
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10fix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        2188,
+        1204
+      ]
+    },
+    "bytes": [
+      10503470,
+      1241627
+    ],
+    "total": [
+      2963.527375,
+      2147.373917
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10fix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        2188,
+        1204
+      ]
+    },
+    "bytes": [
+      10503470,
+      5252522
+    ],
+    "total": [
+      2963.527375,
+      2146.6327499999998
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k15fix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        2188,
+        1492
+      ]
+    },
+    "bytes": [
+      10503470,
+      6466463
+    ],
+    "total": [
+      2963.527375,
+      2109.644167
+    ]
+  },
+  {
+    "capture": "c28-esch",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k5fix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        2188,
+        760
+      ]
+    },
+    "bytes": [
+      10503470,
+      3502288
+    ],
+    "total": [
+      2963.527375,
+      2099.470417
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "f10fix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2349
+      ]
+    },
+    "bytes": [
+      15709264,
+      2405875
+    ],
+    "total": [
+      2400.893125,
+      2113.639291
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k10fix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2349
+      ]
+    },
+    "bytes": [
+      15709264,
+      8933454
+    ],
+    "total": [
+      2400.893125,
+      2285.948458
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k15fix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2858
+      ]
+    },
+    "bytes": [
+      15709264,
+      11388286
+    ],
+    "total": [
+      2400.893125,
+      2268.38975
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 0,
+    "arm": "k5fix",
+    "identical": false,
+    "differences": [
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "25@000200417050 arrivalSource observed->estimated"
+    ],
+    "counters": {
+      "boardCacheHits": [
+        5,
+        8
+      ],
+      "predictedEvents": [
+        3660,
+        1603
+      ]
+    },
+    "bytes": [
+      15709264,
+      6105177
+    ],
+    "total": [
+      2400.893125,
+      2177.079917
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "f10fix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2349
+      ]
+    },
+    "bytes": [
+      15709264,
+      2405875
+    ],
+    "total": [
+      1996.40175,
+      1729.9271250000002
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k10fix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2349
+      ]
+    },
+    "bytes": [
+      15709264,
+      8933454
+    ],
+    "total": [
+      1996.40175,
+      1796.086167
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k15fix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2858
+      ]
+    },
+    "bytes": [
+      15709264,
+      11388286
+    ],
+    "total": [
+      1996.40175,
+      1844.057166
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 1,
+    "arm": "k5fix",
+    "identical": false,
+    "differences": [
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "25@000200417050 arrivalSource observed->estimated"
+    ],
+    "counters": {
+      "boardCacheHits": [
+        5,
+        8
+      ],
+      "predictedEvents": [
+        3660,
+        1603
+      ]
+    },
+    "bytes": [
+      15709264,
+      6105177
+    ],
+    "total": [
+      1996.40175,
+      1729.926625
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "f10fix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2349
+      ]
+    },
+    "bytes": [
+      15709264,
+      2405875
+    ],
+    "total": [
+      2411.416542,
+      2075.695916
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k10fix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2349
+      ]
+    },
+    "bytes": [
+      15709264,
+      8933454
+    ],
+    "total": [
+      2411.416542,
+      2191.739083
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k15fix",
+    "identical": true,
+    "differences": [],
+    "detail": [],
+    "counters": {
+      "predictedEvents": [
+        3660,
+        2858
+      ]
+    },
+    "bytes": [
+      15709264,
+      11388286
+    ],
+    "total": [
+      2411.416542,
+      2261.319708
+    ]
+  },
+  {
+    "capture": "s7-L1",
+    "rep": 1,
+    "sample": 2,
+    "arm": "k5fix",
+    "identical": false,
+    "differences": [
+      "matchingRejections",
+      "displayedLegs"
+    ],
+    "detail": [
+      "25@000200417050 arrivalSource observed->estimated"
+    ],
+    "counters": {
+      "boardCacheHits": [
+        5,
+        8
+      ],
+      "predictedEvents": [
+        3660,
+        1599
+      ]
+    },
+    "bytes": [
+      15709264,
+      6105177
+    ],
+    "total": [
+      2411.416542,
+      2127.303125
+    ]
+  }
+]

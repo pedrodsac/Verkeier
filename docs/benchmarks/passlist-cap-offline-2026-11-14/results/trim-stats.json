@@ -1,0 +1,942 @@
+{
+ "k5": {
+  "c28-esch": {
+   "k": 5,
+   "fields": false,
+   "totals": {
+    "bodies": 25,
+    "raw": 10417963,
+    "trimmed": 3485797,
+    "rawGzip": 1030654,
+    "trimmedGzip": 182696,
+    "recordedEncoded": 464334
+   },
+   "passlists": {
+    "passlists": 484,
+    "stopsBefore": 8991,
+    "capped": 371,
+    "stopsAfter": 2172
+   },
+   "checks": {}
+  },
+  "c28-now": {
+   "k": 5,
+   "fields": false,
+   "totals": {
+    "bodies": 27,
+    "raw": 15683882,
+    "trimmed": 6062640,
+    "rawGzip": 1525205,
+    "trimmedGzip": 314447,
+    "recordedEncoded": 681657
+   },
+   "passlists": {
+    "passlists": 837,
+    "stopsBefore": 13120,
+    "capped": 641,
+    "stopsAfter": 3926
+   },
+   "checks": {}
+  },
+  "c28-rev": {
+   "k": 5,
+   "fields": false,
+   "totals": {
+    "bodies": 29,
+    "raw": 18057758,
+    "trimmed": 6909353,
+    "rawGzip": 1709735,
+    "trimmedGzip": 383132,
+    "recordedEncoded": 831813
+   },
+   "passlists": {
+    "passlists": 966,
+    "stopsBefore": 15216,
+    "stopsAfter": 4420,
+    "capped": 740
+   },
+   "checks": {}
+  },
+  "s7-L1": {
+   "k": 5,
+   "fields": false,
+   "totals": {
+    "bodies": 78,
+    "raw": 46845066,
+    "trimmed": 18223551,
+    "rawGzip": 4564601,
+    "trimmedGzip": 957089,
+    "recordedEncoded": 2052225
+   },
+   "passlists": {
+    "passlists": 2526,
+    "stopsBefore": 39210,
+    "capped": 1905,
+    "stopsAfter": 11790
+   },
+   "checks": {}
+  },
+  "s7-L2": {
+   "k": 5,
+   "fields": false,
+   "totals": {
+    "bodies": 81,
+    "raw": 43100808,
+    "trimmed": 16528681,
+    "rawGzip": 4215309,
+    "trimmedGzip": 892585,
+    "recordedEncoded": 1972117
+   },
+   "passlists": {
+    "passlists": 2291,
+    "stopsBefore": 36134,
+    "capped": 1689,
+    "stopsAfter": 10634
+   },
+   "checks": {}
+  },
+  "s7-L3": {
+   "k": 5,
+   "fields": false,
+   "totals": {
+    "bodies": 81,
+    "raw": 43518630,
+    "trimmed": 16704991,
+    "rawGzip": 4257608,
+    "trimmedGzip": 902133,
+    "recordedEncoded": 1983024
+   },
+   "passlists": {
+    "passlists": 2311,
+    "stopsBefore": 36418,
+    "capped": 1711,
+    "stopsAfter": 10736
+   },
+   "checks": {}
+  },
+  "st-L1": {
+   "k": 5,
+   "fields": false,
+   "totals": {
+    "bodies": 78,
+    "raw": 27221559,
+    "trimmed": 10758891,
+    "rawGzip": 2610612,
+    "trimmedGzip": 625784,
+    "recordedEncoded": 1391649
+   },
+   "passlists": {
+    "passlists": 1491,
+    "stopsBefore": 23082,
+    "capped": 1161,
+    "stopsAfter": 7014
+   },
+   "checks": {}
+  },
+  "st22-L2": {
+   "k": 5,
+   "fields": false,
+   "totals": {
+    "bodies": 84,
+    "raw": 48925926,
+    "trimmed": 19324770,
+    "rawGzip": 4788718,
+    "trimmedGzip": 1041501,
+    "recordedEncoded": 2212544
+   },
+   "passlists": {
+    "passlists": 2610,
+    "stopsBefore": 40308,
+    "capped": 1947,
+    "stopsAfter": 12099
+   },
+   "checks": {}
+  }
+ },
+ "k10": {
+  "c28-esch": {
+   "k": 10,
+   "fields": false,
+   "totals": {
+    "bodies": 25,
+    "raw": 10417963,
+    "trimmed": 5224258,
+    "rawGzip": 1030654,
+    "trimmedGzip": 315180,
+    "recordedEncoded": 464334
+   },
+   "passlists": {
+    "passlists": 484,
+    "stopsBefore": 8991,
+    "stopsAfter": 3851,
+    "capped": 284
+   },
+   "checks": {}
+  },
+  "c28-now": {
+   "k": 10,
+   "fields": false,
+   "totals": {
+    "bodies": 27,
+    "raw": 15683882,
+    "trimmed": 8914885,
+    "rawGzip": 1525205,
+    "trimmedGzip": 596983,
+    "recordedEncoded": 681657
+   },
+   "passlists": {
+    "passlists": 837,
+    "stopsBefore": 13120,
+    "stopsAfter": 6691,
+    "capped": 478
+   },
+   "checks": {}
+  },
+  "c28-rev": {
+   "k": 10,
+   "fields": false,
+   "totals": {
+    "bodies": 29,
+    "raw": 18057758,
+    "trimmed": 10246951,
+    "rawGzip": 1709735,
+    "trimmedGzip": 750585,
+    "recordedEncoded": 831813
+   },
+   "passlists": {
+    "passlists": 966,
+    "stopsBefore": 15216,
+    "stopsAfter": 7677,
+    "capped": 564
+   },
+   "checks": {}
+  },
+  "s7-L1": {
+   "k": 10,
+   "fields": false,
+   "totals": {
+    "bodies": 78,
+    "raw": 46845066,
+    "trimmed": 26664408,
+    "rawGzip": 4564601,
+    "trimmedGzip": 1794655,
+    "recordedEncoded": 2052225
+   },
+   "passlists": {
+    "passlists": 2526,
+    "stopsBefore": 39210,
+    "capped": 1431,
+    "stopsAfter": 19995
+   },
+   "checks": {}
+  },
+  "s7-L2": {
+   "k": 10,
+   "fields": false,
+   "totals": {
+    "bodies": 81,
+    "raw": 43100808,
+    "trimmed": 24115037,
+    "rawGzip": 4215309,
+    "trimmedGzip": 1611774,
+    "recordedEncoded": 1972117
+   },
+   "passlists": {
+    "passlists": 2291,
+    "stopsBefore": 36134,
+    "capped": 1311,
+    "stopsAfter": 18044
+   },
+   "checks": {}
+  },
+  "s7-L3": {
+   "k": 10,
+   "fields": false,
+   "totals": {
+    "bodies": 81,
+    "raw": 43518630,
+    "trimmed": 24377471,
+    "rawGzip": 4257608,
+    "trimmedGzip": 1633957,
+    "recordedEncoded": 1983024
+   },
+   "passlists": {
+    "passlists": 2311,
+    "stopsBefore": 36418,
+    "capped": 1321,
+    "stopsAfter": 18208
+   },
+   "checks": {}
+  },
+  "st-L1": {
+   "k": 10,
+   "fields": false,
+   "totals": {
+    "bodies": 78,
+    "raw": 27221559,
+    "trimmed": 15800943,
+    "rawGzip": 2610612,
+    "trimmedGzip": 1133679,
+    "recordedEncoded": 1391649
+   },
+   "passlists": {
+    "passlists": 1491,
+    "stopsBefore": 23082,
+    "stopsAfter": 11979,
+    "capped": 840
+   },
+   "checks": {}
+  },
+  "st22-L2": {
+   "k": 10,
+   "fields": false,
+   "totals": {
+    "bodies": 84,
+    "raw": 48925926,
+    "trimmed": 28128051,
+    "rawGzip": 4788718,
+    "trimmedGzip": 1927658,
+    "recordedEncoded": 2212544
+   },
+   "passlists": {
+    "passlists": 2610,
+    "stopsBefore": 40308,
+    "capped": 1473,
+    "stopsAfter": 20478
+   },
+   "checks": {}
+  }
+ },
+ "k15": {
+  "c28-esch": {
+   "k": 15,
+   "fields": false,
+   "totals": {
+    "bodies": 25,
+    "raw": 10417963,
+    "trimmed": 6426870,
+    "rawGzip": 1030654,
+    "trimmedGzip": 445035,
+    "recordedEncoded": 464334
+   },
+   "passlists": {
+    "passlists": 484,
+    "stopsBefore": 8991,
+    "stopsAfter": 5037,
+    "capped": 201
+   },
+   "checks": {}
+  },
+  "c28-now": {
+   "k": 15,
+   "fields": false,
+   "totals": {
+    "bodies": 27,
+    "raw": 15683882,
+    "trimmed": 11360738,
+    "rawGzip": 1525205,
+    "trimmedGzip": 871791,
+    "recordedEncoded": 681657
+   },
+   "passlists": {
+    "passlists": 837,
+    "stopsBefore": 13120,
+    "stopsAfter": 8981,
+    "capped": 417
+   },
+   "checks": {}
+  },
+  "c28-rev": {
+   "k": 15,
+   "fields": false,
+   "totals": {
+    "bodies": 29,
+    "raw": 18057758,
+    "trimmed": 13096897,
+    "rawGzip": 1709735,
+    "trimmedGzip": 1070978,
+    "recordedEncoded": 831813
+   },
+   "passlists": {
+    "passlists": 966,
+    "stopsBefore": 15216,
+    "stopsAfter": 10398,
+    "capped": 506
+   },
+   "checks": {}
+  },
+  "s7-L1": {
+   "k": 15,
+   "fields": false,
+   "totals": {
+    "bodies": 78,
+    "raw": 46845066,
+    "trimmed": 33985920,
+    "rawGzip": 4564601,
+    "trimmedGzip": 2637334,
+    "recordedEncoded": 2052225
+   },
+   "passlists": {
+    "passlists": 2526,
+    "stopsBefore": 39210,
+    "capped": 1257,
+    "stopsAfter": 26859
+   },
+   "checks": {}
+  },
+  "s7-L2": {
+   "k": 15,
+   "fields": false,
+   "totals": {
+    "bodies": 81,
+    "raw": 43100808,
+    "trimmed": 30841586,
+    "rawGzip": 4215309,
+    "trimmedGzip": 2381803,
+    "recordedEncoded": 1972117
+   },
+   "passlists": {
+    "passlists": 2291,
+    "stopsBefore": 36134,
+    "capped": 1161,
+    "stopsAfter": 24338
+   },
+   "checks": {}
+  },
+  "s7-L3": {
+   "k": 15,
+   "fields": false,
+   "totals": {
+    "bodies": 81,
+    "raw": 43518630,
+    "trimmed": 31171400,
+    "rawGzip": 4257608,
+    "trimmedGzip": 2411700,
+    "recordedEncoded": 1983024
+   },
+   "passlists": {
+    "passlists": 2311,
+    "stopsBefore": 36418,
+    "capped": 1171,
+    "stopsAfter": 24552
+   },
+   "checks": {}
+  },
+  "st-L1": {
+   "k": 15,
+   "fields": false,
+   "totals": {
+    "bodies": 78,
+    "raw": 27221559,
+    "trimmed": 20039175,
+    "rawGzip": 2610612,
+    "trimmedGzip": 1593508,
+    "recordedEncoded": 1391649
+   },
+   "passlists": {
+    "passlists": 1491,
+    "stopsBefore": 23082,
+    "stopsAfter": 16050,
+    "capped": 759
+   },
+   "checks": {}
+  },
+  "st22-L2": {
+   "k": 15,
+   "fields": false,
+   "totals": {
+    "bodies": 84,
+    "raw": 48925926,
+    "trimmed": 35709924,
+    "rawGzip": 4788718,
+    "trimmedGzip": 2801625,
+    "recordedEncoded": 2212544
+   },
+   "passlists": {
+    "passlists": 2610,
+    "stopsBefore": 40308,
+    "capped": 1299,
+    "stopsAfter": 27552
+   },
+   "checks": {}
+  }
+ },
+ "k20": {
+  "c28-esch": {
+   "k": 20,
+   "fields": false,
+   "totals": {
+    "bodies": 25,
+    "raw": 10417963,
+    "trimmed": 7448691,
+    "rawGzip": 1030654,
+    "trimmedGzip": 573250,
+    "recordedEncoded": 464334
+   },
+   "passlists": {
+    "passlists": 484,
+    "stopsBefore": 8991,
+    "stopsAfter": 6036,
+    "capped": 189
+   },
+   "checks": {}
+  },
+  "c28-now": {
+   "k": 20,
+   "fields": false,
+   "totals": {
+    "bodies": 27,
+    "raw": 15683882,
+    "trimmed": 13448399,
+    "rawGzip": 1525205,
+    "trimmedGzip": 1177744,
+    "recordedEncoded": 681657
+   },
+   "passlists": {
+    "passlists": 837,
+    "stopsBefore": 13120,
+    "stopsAfter": 10952,
+    "capped": 358
+   },
+   "checks": {}
+  },
+  "c28-rev": {
+   "k": 20,
+   "fields": false,
+   "totals": {
+    "bodies": 29,
+    "raw": 18057758,
+    "trimmed": 15570092,
+    "rawGzip": 1709735,
+    "trimmedGzip": 1369850,
+    "recordedEncoded": 831813
+   },
+   "passlists": {
+    "passlists": 966,
+    "stopsBefore": 15216,
+    "stopsAfter": 12764,
+    "capped": 399
+   },
+   "checks": {}
+  },
+  "s7-L1": {
+   "k": 20,
+   "fields": false,
+   "totals": {
+    "bodies": 78,
+    "raw": 46845066,
+    "trimmed": 40244079,
+    "rawGzip": 4564601,
+    "trimmedGzip": 3533555,
+    "recordedEncoded": 2052225
+   },
+   "passlists": {
+    "passlists": 2526,
+    "stopsBefore": 39210,
+    "capped": 1065,
+    "stopsAfter": 32787
+   },
+   "checks": {}
+  },
+  "s7-L2": {
+   "k": 20,
+   "fields": false,
+   "totals": {
+    "bodies": 81,
+    "raw": 43100808,
+    "trimmed": 36672272,
+    "rawGzip": 4215309,
+    "trimmedGzip": 3213847,
+    "recordedEncoded": 1972117
+   },
+   "passlists": {
+    "passlists": 2291,
+    "stopsBefore": 36134,
+    "capped": 1002,
+    "stopsAfter": 29861
+   },
+   "checks": {}
+  },
+  "s7-L3": {
+   "k": 20,
+   "fields": false,
+   "totals": {
+    "bodies": 81,
+    "raw": 43518630,
+    "trimmed": 37066248,
+    "rawGzip": 4257608,
+    "trimmedGzip": 3251950,
+    "recordedEncoded": 1983024
+   },
+   "passlists": {
+    "passlists": 2311,
+    "stopsBefore": 36418,
+    "capped": 1012,
+    "stopsAfter": 30125
+   },
+   "checks": {}
+  },
+  "st-L1": {
+   "k": 20,
+   "fields": false,
+   "totals": {
+    "bodies": 78,
+    "raw": 27221559,
+    "trimmed": 23764038,
+    "rawGzip": 2610612,
+    "trimmedGzip": 2107122,
+    "recordedEncoded": 1391649
+   },
+   "passlists": {
+    "passlists": 1491,
+    "stopsBefore": 23082,
+    "stopsAfter": 19650,
+    "capped": 597
+   },
+   "checks": {}
+  },
+  "st22-L2": {
+   "k": 20,
+   "fields": false,
+   "totals": {
+    "bodies": 84,
+    "raw": 48925926,
+    "trimmed": 42157104,
+    "rawGzip": 4788718,
+    "trimmedGzip": 3724344,
+    "recordedEncoded": 2212544
+   },
+   "passlists": {
+    "passlists": 2610,
+    "stopsBefore": 40308,
+    "capped": 1098,
+    "stopsAfter": 33654
+   },
+   "checks": {}
+  }
+ },
+ "k30": {
+  "c28-esch": {
+   "k": 30,
+   "fields": false,
+   "totals": {
+    "bodies": 25,
+    "raw": 10417963,
+    "trimmed": 9030950,
+    "rawGzip": 1030654,
+    "trimmedGzip": 828878,
+    "recordedEncoded": 464334
+   },
+   "passlists": {
+    "passlists": 484,
+    "stopsBefore": 8991,
+    "stopsAfter": 7605,
+    "capped": 107
+   },
+   "checks": {}
+  },
+  "c28-now": {
+   "k": 30,
+   "fields": false,
+   "totals": {
+    "bodies": 27,
+    "raw": 15683882,
+    "trimmed": 15521505,
+    "rawGzip": 1525205,
+    "trimmedGzip": 1502213,
+    "recordedEncoded": 681657
+   },
+   "passlists": {
+    "passlists": 837,
+    "stopsBefore": 13120,
+    "stopsAfter": 12948,
+    "capped": 43
+   },
+   "checks": {}
+  },
+  "c28-rev": {
+   "k": 30,
+   "fields": false,
+   "totals": {
+    "bodies": 29,
+    "raw": 18057758,
+    "trimmed": 17821479,
+    "rawGzip": 1709735,
+    "trimmedGzip": 1674766,
+    "recordedEncoded": 831813
+   },
+   "passlists": {
+    "passlists": 966,
+    "stopsBefore": 15216,
+    "stopsAfter": 14967,
+    "capped": 55
+   },
+   "checks": {}
+  },
+  "s7-L1": {
+   "k": 30,
+   "fields": false,
+   "totals": {
+    "bodies": 78,
+    "raw": 46845066,
+    "trimmed": 46392843,
+    "rawGzip": 4564601,
+    "trimmedGzip": 4501545,
+    "recordedEncoded": 2052225
+   },
+   "passlists": {
+    "passlists": 2526,
+    "stopsBefore": 39210,
+    "stopsAfter": 38724,
+    "capped": 126
+   },
+   "checks": {}
+  },
+  "s7-L2": {
+   "k": 30,
+   "fields": false,
+   "totals": {
+    "bodies": 81,
+    "raw": 43100808,
+    "trimmed": 42639171,
+    "rawGzip": 4215309,
+    "trimmedGzip": 4153858,
+    "recordedEncoded": 1972117
+   },
+   "passlists": {
+    "passlists": 2291,
+    "stopsBefore": 36134,
+    "capped": 117,
+    "stopsAfter": 35633
+   },
+   "checks": {}
+  },
+  "s7-L3": {
+   "k": 30,
+   "fields": false,
+   "totals": {
+    "bodies": 81,
+    "raw": 43518630,
+    "trimmed": 43056999,
+    "rawGzip": 4257608,
+    "trimmedGzip": 4196204,
+    "recordedEncoded": 1983024
+   },
+   "passlists": {
+    "passlists": 2311,
+    "stopsBefore": 36418,
+    "stopsAfter": 35917,
+    "capped": 117
+   },
+   "checks": {}
+  },
+  "st-L1": {
+   "k": 30,
+   "fields": false,
+   "totals": {
+    "bodies": 78,
+    "raw": 27221559,
+    "trimmed": 27027933,
+    "rawGzip": 2610612,
+    "trimmedGzip": 2582309,
+    "recordedEncoded": 1391649
+   },
+   "passlists": {
+    "passlists": 1491,
+    "stopsBefore": 23082,
+    "stopsAfter": 22860,
+    "capped": 57
+   },
+   "checks": {}
+  },
+  "st22-L2": {
+   "k": 30,
+   "fields": false,
+   "totals": {
+    "bodies": 84,
+    "raw": 48925926,
+    "trimmed": 48447675,
+    "rawGzip": 4788718,
+    "trimmedGzip": 4717442,
+    "recordedEncoded": 2212544
+   },
+   "passlists": {
+    "passlists": 2610,
+    "stopsBefore": 40308,
+    "stopsAfter": 39792,
+    "capped": 132
+   },
+   "checks": {}
+  }
+ },
+ "f10": {
+  "c28-esch": {
+   "k": 10,
+   "fields": true,
+   "totals": {
+    "bodies": 25,
+    "raw": 10417963,
+    "trimmed": 1241612,
+    "rawGzip": 1030654,
+    "trimmedGzip": 74672,
+    "recordedEncoded": 464334
+   },
+   "passlists": {
+    "passlists": 484,
+    "stopsBefore": 8991,
+    "stopsAfter": 3851,
+    "capped": 284
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "c28-now": {
+   "k": 10,
+   "fields": true,
+   "totals": {
+    "bodies": 27,
+    "raw": 15683882,
+    "trimmed": 2428105,
+    "rawGzip": 1525205,
+    "trimmedGzip": 137407,
+    "recordedEncoded": 681657
+   },
+   "passlists": {
+    "passlists": 837,
+    "stopsBefore": 13120,
+    "stopsAfter": 6691,
+    "capped": 478
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "c28-rev": {
+   "k": 10,
+   "fields": true,
+   "totals": {
+    "bodies": 29,
+    "raw": 18057758,
+    "trimmed": 2783309,
+    "rawGzip": 1709735,
+    "trimmedGzip": 165239,
+    "recordedEncoded": 831813
+   },
+   "passlists": {
+    "passlists": 966,
+    "stopsBefore": 15216,
+    "stopsAfter": 7677,
+    "capped": 564
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "s7-L1": {
+   "k": 10,
+   "fields": true,
+   "totals": {
+    "bodies": 78,
+    "raw": 46845066,
+    "trimmed": 7217463,
+    "rawGzip": 4564601,
+    "trimmedGzip": 411393,
+    "recordedEncoded": 2052225
+   },
+   "passlists": {
+    "passlists": 2526,
+    "stopsBefore": 39210,
+    "capped": 1431,
+    "stopsAfter": 19995
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "s7-L2": {
+   "k": 10,
+   "fields": true,
+   "totals": {
+    "bodies": 81,
+    "raw": 43100808,
+    "trimmed": 6539127,
+    "rawGzip": 4215309,
+    "trimmedGzip": 381548,
+    "recordedEncoded": 1972117
+   },
+   "passlists": {
+    "passlists": 2291,
+    "stopsBefore": 36134,
+    "capped": 1311,
+    "stopsAfter": 18044
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "s7-L3": {
+   "k": 10,
+   "fields": true,
+   "totals": {
+    "bodies": 81,
+    "raw": 43518630,
+    "trimmed": 6629398,
+    "rawGzip": 4257608,
+    "trimmedGzip": 385962,
+    "recordedEncoded": 1983024
+   },
+   "passlists": {
+    "passlists": 2311,
+    "stopsBefore": 36418,
+    "capped": 1321,
+    "stopsAfter": 18208
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "st-L1": {
+   "k": 10,
+   "fields": true,
+   "totals": {
+    "bodies": 78,
+    "raw": 27221559,
+    "trimmed": 4218675,
+    "rawGzip": 2610612,
+    "trimmedGzip": 268842,
+    "recordedEncoded": 1391649
+   },
+   "passlists": {
+    "passlists": 1491,
+    "stopsBefore": 23082,
+    "stopsAfter": 11979,
+    "capped": 840
+   },
+   "checks": {
+    "products>1": 0
+   }
+  },
+  "st22-L2": {
+   "k": 10,
+   "fields": true,
+   "totals": {
+    "bodies": 84,
+    "raw": 48925926,
+    "trimmed": 7460001,
+    "rawGzip": 4788718,
+    "trimmedGzip": 429291,
+    "recordedEncoded": 2212544
+   },
+   "passlists": {
+    "passlists": 2610,
+    "stopsBefore": 40308,
+    "capped": 1473,
+    "stopsAfter": 20478
+   },
+   "checks": {
+    "products>1": 0
+   }
+  }
+ }
+}

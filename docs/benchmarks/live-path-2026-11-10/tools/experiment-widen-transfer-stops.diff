@@ -1,0 +1,75 @@
+diff -ru B/MobiliteitKit/Sources/MobilitéitKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift D/MobiliteitKit/Sources/MobilitéitKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift
+--- B/MobiliteitKit/Sources/MobilitéitKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift	2026-10-29 18:57:03
++++ D/MobiliteitKit/Sources/MobilitéitKit/Routing/JourneyPlanningSession+ItineraryRealtime.swift	2026-11-10 22:49:43
+@@ -12,7 +12,8 @@
+                                    anchor: Date, searchHorizon: TimeInterval,
+                                    force: Bool, budgetMilliseconds: Int, includeDiscovery: Bool, reusingRealtime: Bool = false,
+                                    attempted: inout Set<ItineraryBoarding>,
+-                                   maximumConcurrentRequests: Int? = nil) async throws -> Bool {
++                                   maximumConcurrentRequests: Int? = nil,
++                                   earliestArrivals: [String: Date]? = nil) async throws -> Bool {
+         guard case let .bestEffort(configuration, refresh) = query.realtimePolicy,
+               let realtimeProvider, budgetMilliseconds > 0 else { return false }
+         let deadline = ContinuousClock.now.advanced(by: .milliseconds(budgetMilliseconds))
+@@ -63,15 +64,20 @@
+                     requestedInstances.insert(key)
+                 }
+                 var lines = ride.route.shortName.flatMap { $0.isEmpty ? nil : [$0] } ?? []
++                var widenedStart = start
+                 if let transferArrival {
+                     // The ride's own line is not the only way on from this stop: ask for every line
+                     // discovery would, and match their trips too (see `connectionLines`).
+-                    let connectionKey = ConnectionKey(stopID: ride.board.stop.id, arrival: transferArrival)
++                    // EXPERIMENT (scratch arm only): cover the stop from the earliest moment any
++                    // warm-up candidate reaches it, not only from this ride's own transfer.
++                    let earliest = earliestArrivals?[ride.board.stop.id].map { min($0, transferArrival) } ?? transferArrival
++                    widenedStart = max(lower, min(start, earliest.addingTimeInterval(-60)))
++                    let connectionKey = ConnectionKey(stopID: ride.board.stop.id, arrival: earliest)
+                     if connections[connectionKey] == nil {
+                         let planningStarted = ContinuousClock.now
+                         if reachability == nil { reachability = optimisticDestinationReachability(egress: egress) }
+                         connections[connectionKey] = connectionLines(atStop: connectionKey.stopID,
+-                            arrival: transferArrival, from: lower, through: upper, configuration: configuration,
++                            arrival: earliest, from: lower, through: upper, configuration: configuration,
+                             deadline: connectionPlanningDeadline, reachability: reachability!)
+                         diagnostics.record(.connectionLines, since: planningStarted)
+                     }
+@@ -81,7 +87,7 @@
+                         lines = connecting.unrestricted ? [] : Array(Set(lines).union(connecting.lines)).sorted()
+                     }
+                 }
+-                targets.append(.init(stopID: ride.board.stop.id, from: start, through: end, lines: lines))
++                targets.append(.init(stopID: ride.board.stop.id, from: widenedStart, through: end, lines: lines))
+                 if seenStops.insert(ride.board.stop.id).inserted { stopIDs.append(ride.board.stop.id) }
+             }
+         }
+diff -ru B/MobiliteitKit/Sources/MobilitéitKit/Routing/TransitRouter.swift D/MobiliteitKit/Sources/MobilitéitKit/Routing/TransitRouter.swift
+--- B/MobiliteitKit/Sources/MobilitéitKit/Routing/TransitRouter.swift	2026-10-29 18:57:03
++++ D/MobiliteitKit/Sources/MobilitéitKit/Routing/TransitRouter.swift	2026-11-10 22:49:43
+@@ -870,11 +870,25 @@
+                 var speculativeAttempts: Set<ItineraryBoarding> = []
+                 let remaining = max(0, remainingRealtimeMilliseconds
+                     - Int(RoutingDiagnostics.elapsed(since: acquisitionStarted).rounded(.up)))
++                var earliestArrivals: [String: Date]?
++                if ProcessInfo.processInfo.environment["ROUTING_EXPERIMENT_TRANSFER_STOP_EARLIEST"] == "1" {
++                    var earliest: [Int: Date] = [:]
++                    for candidate in pedestrianPreparation.result.candidates {
++                        for leg in candidate.legs {
++                            switch leg {
++                            case let .transit(ride): earliest[ride.alight] = min(earliest[ride.alight] ?? .distantFuture, ride.alightTime)
++                            case let .walkingTransfer(walk): earliest[walk.to] = min(earliest[walk.to] ?? .distantFuture, walk.arrival)
++                            case let .pathway(path): earliest[path.to] = min(earliest[path.to] ?? .distantFuture, path.arrival)
++                            }
++                        }
++                    }
++                    earliestArrivals = Dictionary(uniqueKeysWithValues: earliest.map { (snapshot.stops[$0.key].id, $0.value) })
++                }
+                 _ = try await completeItineraryRealtime(selected, access: access, egress: egress,
+                     anchor: anchor, searchHorizon: searchHorizon, force: forceRealtime,
+                     budgetMilliseconds: remaining, includeDiscovery: false,
+                     reusingRealtime: reusingRealtime, attempted: &speculativeAttempts,
+-                    maximumConcurrentRequests: 4)
++                    maximumConcurrentRequests: 4, earliestArrivals: earliestArrivals)
+             }
+             try await discovery
+             let elapsed = RoutingDiagnostics.elapsed(since: acquisitionStarted)
