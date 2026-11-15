@@ -611,6 +611,9 @@
         }
       }
     },
+    "Already a favourite" : {
+
+    },
     "API" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1127,6 +1130,15 @@
         }
       }
     },
+    "Change stop" : {
+
+    },
+    "Change Stop" : {
+
+    },
+    "Changes the stop for this favourite" : {
+
+    },
     "Check for GTFS update" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1425,6 +1437,9 @@
           }
         }
       }
+    },
+    "Current stop" : {
+
     },
     "Customize favourite" : {
       "localizations" : {
@@ -1967,6 +1982,15 @@
           }
         }
       }
+    },
+    "Drag to reorder. Tap a favourite to change its stop." : {
+
+    },
+    "Edit" : {
+
+    },
+    "Edit favourites" : {
+
     },
     "Edit labels" : {
       "extractionState" : "stale",
@@ -3286,6 +3310,9 @@
         }
       }
     },
+    "No Favourites" : {
+
+    },
     "No matches" : {
       "localizations" : {
         "de" : {
@@ -3370,6 +3397,9 @@
           }
         }
       }
+    },
+    "OK" : {
+
     },
     "On time" : {
       "localizations" : {
@@ -4755,6 +4785,9 @@
         }
       }
     },
+    "Reorder favourites" : {
+
+    },
     "Reset filters" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4926,6 +4959,9 @@
           }
         }
       }
+    },
+    "Save a stop from its departures to see it here." : {
+
     },
     "Save commute" : {
       "localizations" : {
@@ -5123,6 +5159,9 @@
           }
         }
       }
+    },
+    "Search for a stop" : {
+
     },
     "Search stops" : {
       "localizations" : {
@@ -5584,6 +5623,9 @@
         }
       }
     },
+    "Stop Not Changed" : {
+
+    },
     "Stop Sequence" : {
       "localizations" : {
         "de" : {
@@ -5784,6 +5826,9 @@
           }
         }
       }
+    },
+    "That stop is already one of your favourites." : {
+
     },
     "The dashed line connects stops. The exact route path is unavailable." : {
       "localizations" : {

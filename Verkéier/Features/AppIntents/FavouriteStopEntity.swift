@@ -73,6 +73,7 @@ nonisolated enum FavouriteStopEntityStore {
                 platformIds: $0.platformIds
             )
             shared.isTramStop = $0.modes.contains(.tram)
+            shared.liveStationID = $0.liveStationID
             return shared
         }
         SharedTransitDataStore.saveFavouriteStops(entities)
@@ -89,6 +90,7 @@ nonisolated enum FavouriteStopEntityStore {
                 boardFilterData: favourite.boardFilterData
             )
             shared.isTramStop = favourite.stop.modes.contains(.tram)
+            shared.liveStationID = favourite.stop.liveStationID
             return shared
         }
         SharedTransitDataStore.saveFavouriteStops(entities)

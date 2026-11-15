@@ -201,25 +201,19 @@ struct MobiliteitLiveTransitService: LiveTransitService {
     private var language: String { Locale.current.language.languageCode?.identifier ?? "en" }
 
     func map(_ source: HafasDeparture, stop: Stop, updatedAt: Date) -> Departure? {
-        // HAFAS can return an arrival at the selected stop as a departure-board
-        // row when that stop is the journey's terminus. There is nowhere for a
-        // rider to board and travel from here, so omit it from every consumer
-        // of the live board (including favourites and widgets).
+        // Terminal arrivals have nowhere to travel from here, so omit them
+        // from every consumer of the live board (including favourites and widgets).
         if Self.isTerminalArrival(source, at: stop) {
             return nil
         }
 
-        let scheduled = Self.date(date: source.plannedDate, time: source.plannedTime)
-        let realtime = Self.date(
-            date: source.realtimeDate ?? source.plannedDate,
-            time: source.realtimeTime
-        )
+        let scheduled = HafasDepartureReading.scheduledDate(of: source)
+        let realtime = HafasDepartureReading.realtimeDate(of: source)
         guard scheduled != nil || realtime != nil else { return nil }
 
         let product = source.product
-        let lineName = product?.line ?? source.name ?? product?.name ?? product?.categoryShort ?? "Service"
-        let trimmedDirection = source.direction?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let destination = trimmedDirection.isEmpty ? "Unknown destination" : trimmedDirection
+        let lineName = HafasDepartureReading.lineName(of: source)
+        let destination = HafasDepartureReading.destination(of: source)
         let delay = scheduled.flatMap { planned in
             realtime.map { Int(($0.timeIntervalSince(planned) / 60).rounded()) }
         }
@@ -241,10 +235,7 @@ struct MobiliteitLiveTransitService: LiveTransitService {
             scheduledDeparture: scheduled,
             realtimeDeparture: realtime,
             delayMinutes: delay,
-            platform: Self.firstNonempty(
-                source.realtimePlatform?.text,
-                source.platform?.text
-            ),
+            platform: HafasDepartureReading.platform(of: source),
             operatorName: product?.operatorName,
             isCancelled: source.cancelled ?? false,
             isStatusUnknown: source.prognosisType?.uppercased() == "UNKNOWN",
@@ -271,49 +262,15 @@ struct MobiliteitLiveTransitService: LiveTransitService {
         return result
     }
 
-    private static func date(date: String?, time: String?) -> Date? {
-        guard let date, let time else { return nil }
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(identifier: "Europe/Luxembourg")
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        if let value = formatter.date(from: "\(date) \(time)") { return value }
-        formatter.dateFormat = "yyyy-MM-dd HH:mm"
-        return formatter.date(from: "\(date) \(time)")
-    }
-
     static func stationIdentifier(for stop: Stop) -> String? {
-        stop.hafasStationIDs.first ?? stop.gtfsStopID
+        stop.liveStationID
     }
 
     static func isTerminalArrival(_ departure: HafasDeparture, at stop: Stop) -> Bool {
-        if let lastStop = departure.passlist.values.last {
-            let stopIdentifiers = Set(
-                ([stop.id, stop.gtfsStopID].compactMap { $0 } + stop.hafasStationIDs)
-                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                    .filter { !$0.isEmpty }
-            )
-            let lastStopIdentifiers = [lastStop.id, lastStop.externalID]
-                .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
-                .filter { !$0.isEmpty }
-
-            if lastStopIdentifiers.contains(where: stopIdentifiers.contains) {
-                return true
-            }
-            if let name = lastStop.name, name.identifiesSameStation(as: stop.name) {
-                return true
-            }
-        }
-
-        // Direction is the terminus label and remains the fallback for HAFAS
-        // responses whose pass list is absent or uses unrelated identifiers.
-        return departure.direction?.identifiesSameStation(as: stop.name) == true
-    }
-
-    static func firstNonempty(_ values: String?...) -> String? {
-        values.lazy.compactMap { value in
-            let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines)
-            return trimmed?.isEmpty == false ? trimmed : nil
-        }.first
+        HafasDepartureReading.isTerminalArrival(
+            departure,
+            stopIdentifiers: [stop.id, stop.gtfsStopID].compactMap { $0 } + stop.hafasStationIDs,
+            stopName: stop.name
+        )
     }
 }

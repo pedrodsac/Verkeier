@@ -3,7 +3,7 @@ import SwiftUI
 import WidgetKit
 
 struct DeparturesSummaryWidget: Widget {
-    static let kind = "DeparturesSummaryWidget"
+    nonisolated static let kind = "DeparturesSummaryWidget"
 
     var body: some WidgetConfiguration {
         AppIntentConfiguration(

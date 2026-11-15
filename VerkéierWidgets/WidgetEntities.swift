@@ -61,7 +61,15 @@ struct RefreshDeparturesWidgetIntent: AppIntent {
     }
 
     func perform() async throws -> some IntentResult {
-        WidgetCenter.shared.reloadTimelines(ofKind: "DeparturesSummaryWidget")
+        // Fetch here rather than only reloading: the timeline would otherwise
+        // re-read the board the app last saved.
+        if let refresher = WidgetDepartureRefresher.configured() {
+            let stops = SharedTransitDataStore.favouriteStops()
+            if let stop = stops.first(where: { $0.id == stopID }) ?? stops.first {
+                await refresher.refreshIfNeeded(stop)
+            }
+        }
+        WidgetCenter.shared.reloadTimelines(ofKind: DeparturesSummaryWidget.kind)
         return .result()
     }
 }
@@ -154,9 +162,16 @@ struct LiveDeparturesTimelineProvider: AppIntentTimelineProvider {
         for configuration: SelectFavouriteStopIntent,
         in _: Context
     ) async -> Timeline<LiveDeparturesEntry> {
+        let stop = selectedStop(for: configuration)
+        var board = stop.flatMap { SharedTransitDataStore.favouriteDepartureBoards()[$0.id] }
+        // Fetch from the extension so the widget stays current while the app
+        // is closed; a failed fetch keeps the saved board.
+        if let stop, let refresher = WidgetDepartureRefresher.configured() {
+            board = await refresher.refreshIfNeeded(stop)
+        }
         let start = Date.now
         let entries = (0...15).map {
-            entry(for: configuration, at: start.addingTimeInterval(TimeInterval($0 * 60)))
+            LiveDeparturesEntry(date: start.addingTimeInterval(TimeInterval($0 * 60)), stop: stop, board: board)
         }
         return Timeline(entries: entries, policy: .after(start.addingTimeInterval(15 * 60)))
     }
@@ -165,11 +180,15 @@ struct LiveDeparturesTimelineProvider: AppIntentTimelineProvider {
         for configuration: SelectFavouriteStopIntent,
         at date: Date
     ) -> LiveDeparturesEntry {
-        let stops = SharedTransitDataStore.favouriteStops()
-        let stop = configuration.stop.flatMap { selected in
-            stops.first { $0.id == selected.id }
-        } ?? stops.first
+        let stop = selectedStop(for: configuration)
         let board = stop.flatMap { SharedTransitDataStore.favouriteDepartureBoards()[$0.id] }
         return LiveDeparturesEntry(date: date, stop: stop, board: board)
+    }
+
+    private func selectedStop(for configuration: SelectFavouriteStopIntent) -> SharedFavouriteStop? {
+        let stops = SharedTransitDataStore.favouriteStops()
+        return configuration.stop.flatMap { selected in
+            stops.first { $0.id == selected.id }
+        } ?? stops.first
     }
 }

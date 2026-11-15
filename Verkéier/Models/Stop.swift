@@ -65,6 +65,12 @@ struct Stop: Codable, Hashable, Identifiable {
     /// feeds cannot be matched safely.
     let hafasStationIDs: [String]
 
+    /// The identifier ATP departure boards are requested with: the first
+    /// HAFAS identifier, else the GTFS stop ID that ATP also accepts.
+    nonisolated var liveStationID: String? {
+        hafasStationIDs.first ?? gtfsStopID
+    }
+
     /// Creates a stop.
     ///
     /// - Parameter platformIds: Distinct platform identifiers. Blank entries are

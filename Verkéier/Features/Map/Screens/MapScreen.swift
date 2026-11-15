@@ -28,7 +28,7 @@ struct MapScreen: View {
     @Environment(\.avlClient) private var avlClient
     @Environment(\.disruptionAlertService) private var disruptionAlertService
     @Environment(\.liveActivityManager) private var liveActivityManager
-    @Query(sort: \PersistedFavouriteStop.createdAt) private var savedFavourites: [PersistedFavouriteStop]
+    @Query(sort: PersistedFavouriteStop.displayOrder) private var savedFavourites: [PersistedFavouriteStop]
 
     @State private var isMainSheetPresented = false
     @State private var isOnboardingPresented = false

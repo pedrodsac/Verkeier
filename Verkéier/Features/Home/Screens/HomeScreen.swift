@@ -13,9 +13,11 @@ struct HomeScreen: View {
     @Environment(\.liveTransitService) private var liveTransitService
     @Environment(\.gtfsService) private var gtfsService
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \PersistedFavouriteStop.createdAt) private var favouriteStops: [PersistedFavouriteStop]
+    @Query(sort: PersistedFavouriteStop.displayOrder) private var favouriteStops: [PersistedFavouriteStop]
 
     @State private var editingFavourite: PersistedFavouriteStop?
+    @State private var showsFavouritesManager = false
+    @State private var changingStop: FavouriteStopChangeRequest?
     @State private var lastEditedFavouriteID: String?
     @AccessibilityFocusState private var focusedFavouriteID: String?
 
@@ -57,7 +59,31 @@ struct HomeScreen: View {
                 )
             }
         }
+        .sheet(isPresented: $showsFavouritesManager) {
+            FavouritesManagerSheet()
+                .featureModels(router.models)
+                .environment(router)
+                .environment(router.locationService)
+        }
+        .sheet(item: $changingStop) { request in
+            NavigationStack {
+                FavouriteStopPickerScreen(favouriteStopID: request.id)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") { changingStop = nil }
+                        }
+                    }
+            }
+            .featureModels(router.models)
+            .environment(router)
+            .environment(router.locationService)
+        }
     }
+}
+
+/// Identifies the favourite whose stop is being changed, by its current stop ID.
+private struct FavouriteStopChangeRequest: Identifiable {
+    let id: String
 }
 
 // MARK: - Sections
@@ -88,11 +114,22 @@ private extension HomeScreen {
     }
 
     var favouritesSection: some View {
-        carouselSection("Favourites") {
+        Section {
             pagedListSection(favouriteStops, favorite: true) { favourite in
                 favouriteRow(favourite)
             }
+        } header: {
+            HStack {
+                Text("Favourites")
+                Spacer()
+                Button("Edit") { showsFavouritesManager = true }
+                    .font(.subheadline)
+                    .textCase(nil)
+                    .accessibilityLabel("Edit favourites")
+            }
+            .safeAreaPadding(.horizontal, 16)
         }
+        .listSectionMargins(.horizontal, 0)
     }
 
     var nearbySection: some View {
@@ -189,6 +226,9 @@ private extension HomeScreen {
         .accessibilityAction(named: "Plan from \(stop.displayName)") {
             router.planRoute(from: stop)
         }
+        .accessibilityAction(named: "Change stop") {
+            changingStop = FavouriteStopChangeRequest(id: favourite.stopId)
+        }
         .contextMenu {
             favouriteContextMenu(for: favourite, stop: stop)
         }
@@ -227,6 +267,16 @@ private extension HomeScreen {
             editingFavourite = favourite
         } label: {
             Label("Customize favourite", systemImage: "paintpalette")
+        }
+        Button {
+            changingStop = FavouriteStopChangeRequest(id: favourite.stopId)
+        } label: {
+            Label("Change stop", systemImage: "arrow.triangle.swap")
+        }
+        Button {
+            showsFavouritesManager = true
+        } label: {
+            Label("Reorder favourites", systemImage: "arrow.up.arrow.down")
         }
         Divider()
         Button(role: .destructive) {

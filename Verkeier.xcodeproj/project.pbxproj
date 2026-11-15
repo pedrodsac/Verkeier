@@ -13,6 +13,7 @@
 		62FE86412FEE000000000002 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000102 /* AsyncAlgorithms */; };
 		62FE86412FEE000000000005 /* UIOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 62FE86412FEE000000000105 /* UIOnboarding */; };
 		E8456D76306913BE00EC1050 /* MobiliteitKit in Frameworks */ = {isa = PBXBuildFile; productRef = E8456D75306913BE00EC1050 /* MobiliteitKit */; };
+		E8456D77306913BE00EC1050 /* MobiliteitKit in Frameworks */ = {isa = PBXBuildFile; productRef = E8456D78306913BE00EC1050 /* MobiliteitKit */; };
 		E8D57E2F304F173F00F569AC /* Valhalla in Frameworks */ = {isa = PBXBuildFile; productRef = E8D57E31304F173F00F569AC /* Valhalla */; };
 /* End PBXBuildFile section */
 
@@ -117,6 +118,7 @@
 		000000000000000330000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				E8456D77306913BE00EC1050 /* MobiliteitKit in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -221,6 +223,9 @@
 				62FE86412FDDDDC400081C56 /* VerkéierWidgets */,
 			);
 			name = VerkeierWidgets;
+			packageProductDependencies = (
+				E8456D78306913BE00EC1050 /* MobiliteitKit */,
+			);
 			productName = "VerkéierWidgets";
 			productReference = 000000000000000000000320 /* VerkeierWidgets.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -769,6 +774,11 @@
 			productName = UIOnboarding;
 		};
 		E8456D75306913BE00EC1050 /* MobiliteitKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E8456D74306913BE00EC1050 /* XCRemoteSwiftPackageReference "MobiliteitKit" */;
+			productName = MobiliteitKit;
+		};
+		E8456D78306913BE00EC1050 /* MobiliteitKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E8456D74306913BE00EC1050 /* XCRemoteSwiftPackageReference "MobiliteitKit" */;
 			productName = MobiliteitKit;

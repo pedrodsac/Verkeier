@@ -145,6 +145,10 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
     let name: String
     let locality: String?
     var isTramStop: Bool? = nil
+    /// The ATP station identifier the widget fetches live departures with.
+    /// Absent for stops the app has to resolve by name and location, and in
+    /// favourites written by older app releases.
+    var liveStationID: String? = nil
     let platformIds: [String]
     /// Opaque, app-owned filter payload. Older widgets can safely ignore it.
     let boardFilterData: Data?
@@ -189,6 +193,7 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
         case name
         case locality
         case isTramStop
+        case liveStationID
         case platformIds
         case boardFilterData
     }
@@ -201,6 +206,7 @@ struct SharedFavouriteStop: Codable, Hashable, Identifiable {
         name = try container.decode(String.self, forKey: .name).stationDisplayName
         locality = try container.decodeIfPresent(String.self, forKey: .locality)
         isTramStop = try container.decodeIfPresent(Bool.self, forKey: .isTramStop)
+        liveStationID = try container.decodeIfPresent(String.self, forKey: .liveStationID)
         platformIds = Self.normalizedPlatformIds(
             try container.decodeIfPresent([String].self, forKey: .platformIds),
             fallbackId: id

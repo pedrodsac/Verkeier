@@ -30,8 +30,22 @@ final class PersistedFavouriteStop {
     var displayLabel: String?
     var iconName: String?
     var colorHex: String?
+    /// Rider-chosen position among the favourites. Optional so existing stores
+    /// migrate without a default; `nil` sorts first, then by ``createdAt``.
+    var sortOrder: Int?
 
-    init(stop: Stop, boardFilter: TransitBoardFilter? = nil, createdAt: Date = .now) {
+    /// The order favourites are shown in, everywhere they are listed.
+    static let displayOrder: [SortDescriptor<PersistedFavouriteStop>] = [
+        SortDescriptor(\.sortOrder),
+        SortDescriptor(\.createdAt),
+    ]
+
+    init(
+        stop: Stop,
+        boardFilter: TransitBoardFilter? = nil,
+        sortOrder: Int? = nil,
+        createdAt: Date = .now
+    ) {
         stopId = stop.id
         name = stop.name
         locality = stop.locality
@@ -41,8 +55,43 @@ final class PersistedFavouriteStop {
         platformIdsRawValue = stop.platformIds.joined(separator: ",")
         gtfsStopID = stop.gtfsStopID
         hafasStationIDsRawValue = stop.hafasStationIDs.joined(separator: ",")
+        self.sortOrder = sortOrder
         self.createdAt = createdAt
         boardFilterData = boardFilter.flatMap { try? JSONEncoder().encode($0) }
+    }
+
+    /// Numbers `favourites` (given in their current display order) so they
+    /// follow `stopIDs`. Favourites missing from `stopIDs` keep their relative
+    /// order after the listed ones.
+    static func applyOrder(_ stopIDs: [String], to favourites: [PersistedFavouriteStop]) {
+        let position = Dictionary(stopIDs.enumerated().map { ($1, $0) }, uniquingKeysWith: { first, _ in first })
+        let ordered = favourites.enumerated().sorted { lhs, rhs in
+            (position[lhs.element.stopId] ?? stopIDs.count + lhs.offset)
+                < (position[rhs.element.stopId] ?? stopIDs.count + rhs.offset)
+        }
+        for (index, favourite) in ordered.map(\.element).enumerated() where favourite.sortOrder != index {
+            favourite.sortOrder = index
+        }
+    }
+
+    /// Points this favourite at another stop while keeping its name, look,
+    /// labels, position and creation date. The board filter is dropped because
+    /// its platforms and lines belong to the old stop. A name that was just the
+    /// old stop's name follows the new stop.
+    func replaceStop(with stop: Stop) {
+        if displayLabel == self.stop.displayName {
+            displayLabel = stop.displayName
+        }
+        stopId = stop.id
+        name = stop.name
+        locality = stop.locality
+        latitude = stop.location.latitude
+        longitude = stop.location.longitude
+        modesRawValue = stop.modes.map(\.rawValue).joined(separator: ",")
+        platformIdsRawValue = stop.platformIds.joined(separator: ",")
+        gtfsStopID = stop.gtfsStopID
+        hafasStationIDsRawValue = stop.hafasStationIDs.joined(separator: ",")
+        boardFilterData = nil
     }
 
     var stop: Stop {

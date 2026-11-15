@@ -13,6 +13,8 @@ final class FavouritesModel {
     /// Favourites can always fall back to a timetable board once the GTFS feed
     /// is ready, even without the live relay.
     var gtfsFeedStatus: GTFSFeedStatus = .unavailable
+    /// Stops matching the query in the change-stop picker.
+    var replacementSearchResults: [Stop] = []
 
     var favouriteStopIDs: Set<String> {
         Set(favouriteStops.map(\.id))
@@ -163,7 +165,11 @@ extension FavouritesModel {
         let favourite =
             Self.favourite(stopID: stop.id, in: context)
             ?? {
-                let favourite = PersistedFavouriteStop(stop: stop, boardFilter: boardFilter)
+                let favourite = PersistedFavouriteStop(
+                    stop: stop,
+                    boardFilter: boardFilter,
+                    sortOrder: Self.nextSortOrder(in: context)
+                )
                 context.insert(favourite)
                 return favourite
             }()
@@ -188,9 +194,45 @@ extension FavouritesModel {
         saveChanges(in: context)
     }
 
+    /// Points the favourite saved for `stopID` at `newStop`, keeping its name,
+    /// look and position. Returns `false` when `newStop` is already another
+    /// favourite or the favourite no longer exists.
+    @discardableResult
+    func replaceStop(ofFavouriteWithStopID stopID: String, with newStop: Stop, in context: ModelContext) -> Bool {
+        guard newStop.id != stopID else { return true }
+        guard Self.favourite(stopID: newStop.id, in: context) == nil,
+            let favourite = Self.favourite(stopID: stopID, in: context)
+        else { return false }
+        favourite.replaceStop(with: newStop)
+        removeBoard(forStopID: stopID)
+        saveChanges(in: context)
+        return true
+    }
+
+    /// Stores `stopIDs` as the favourites' order. Favourites missing from the
+    /// list keep their relative order after the listed ones.
+    func reorder(stopIDs: [String], in context: ModelContext) {
+        let descriptor = FetchDescriptor<PersistedFavouriteStop>(sortBy: PersistedFavouriteStop.displayOrder)
+        guard let saved = try? context.fetch(descriptor) else { return }
+        PersistedFavouriteStop.applyOrder(stopIDs, to: saved)
+        saveChanges(in: context)
+    }
+
+    /// Searches timetable stops for the change-stop picker.
+    func searchReplacementStops(matching query: String, using gtfsService: any GTFSService) async {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            replacementSearchResults = []
+            return
+        }
+        let results = await gtfsService.searchStops(query: trimmed).deduplicatedByExactName()
+        guard !Task.isCancelled else { return }
+        replacementSearchResults = results
+    }
+
     /// Mirrors the saved favourites to App Intents and Spotlight.
     private func mirrorForIntents(in context: ModelContext) {
-        let descriptor = FetchDescriptor<PersistedFavouriteStop>(sortBy: [SortDescriptor(\.createdAt)])
+        let descriptor = FetchDescriptor<PersistedFavouriteStop>(sortBy: PersistedFavouriteStop.displayOrder)
         let favourites = (try? context.fetch(descriptor)) ?? []
         FavouriteStopEntityStore.save(favourites: favourites)
         if favourites.isEmpty {
@@ -203,6 +245,11 @@ extension FavouritesModel {
     private func saveChanges(in context: ModelContext) {
         try? context.save()
         mirrorForIntents(in: context)
+    }
+
+    private static func nextSortOrder(in context: ModelContext) -> Int {
+        let saved = (try? context.fetch(FetchDescriptor<PersistedFavouriteStop>())) ?? []
+        return (saved.compactMap(\.sortOrder).max() ?? saved.count - 1) + 1
     }
 
     private static func favourite(stopID: String, in context: ModelContext) -> PersistedFavouriteStop? {
