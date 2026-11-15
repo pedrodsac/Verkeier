@@ -224,7 +224,8 @@ struct JourneyPlanningIntegrationTests {
             session: URLSession(configuration: configuration), language: "en")
         let board = try await client.departureBoardSnapshot(.init(stationID: "origin", language: "en",
             date: GTFSDate(parsing: "20260904"), time: ServiceTime(parsing: "08:00:00"),
-            durationMinutes: 180, maximumJourneys: -1, realtimeMode: .serverDefault, includePasslist: true))
+            durationMinutes: 180, maximumJourneys: -1, realtimeMode: .serverDefault, includePasslist: true,
+            passlistMaximumStops: HafasRealtimeRoutingProvider.routingPasslistMaximumStops))
         let source = try #require(board.board.departures.values.first)
         let stop = Stop(id: "origin", name: "Origin", location: fixture.origin, dataSource: .gtfs, gtfsStopID: "origin")
         let mapped = try #require(MobiliteitLiveTransitService(proxyURL: nil).map(source, stop: stop,
@@ -246,7 +247,8 @@ struct JourneyPlanningIntegrationTests {
         }
         let reused = try await client.departureBoardSnapshot(.init(stationID: "origin", language: "en",
             date: GTFSDate(parsing: "20260904"), time: ServiceTime(parsing: "08:01:00"),
-            durationMinutes: 60, maximumJourneys: -1, realtimeMode: .serverDefault, includePasslist: true))
+            durationMinutes: 60, maximumJourneys: -1, realtimeMode: .serverDefault, includePasslist: true,
+            passlistMaximumStops: HafasRealtimeRoutingProvider.routingPasslistMaximumStops))
         #expect(reused.fetchedAt == board.fetchedAt)
     }
 

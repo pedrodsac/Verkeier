@@ -81,7 +81,9 @@ nonisolated enum BenchmarkRecordedTransport {
     }()
     static func key(_ url: URL, excluding extra: Set<String> = []) -> String {
         let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
-        let ignored = Set(["accessid", "apikey", "key", "token", "requestid"]).union(extra)
+        // Captures from before MobilitéitKit 02e17cf have no passlistMaxStops, so their capped
+        // queries replay the whole passlists that were recorded.
+        let ignored = Set(["accessid", "apikey", "key", "token", "requestid", "passlistmaxstops"]).union(extra)
         let query = items.filter { !ignored.contains($0.name.lowercased()) }
             .sorted { ($0.name, $0.value ?? "") < ($1.name, $1.value ?? "") }
             .map { "\($0.name)=\($0.value ?? "")" }.joined(separator: "&")

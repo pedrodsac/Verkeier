@@ -170,7 +170,10 @@ struct MobiliteitLiveTransitService: LiveTransitService {
                 operators: filter.operators,
                 platforms: filter.platforms,
                 realtimeMode: filter.realtimeMode == .full ? .serverDefault : .off,
-                includePasslist: true
+                includePasslist: true,
+                // Routing's cap: the board reads only the terminus, which ATP keeps, and the
+                // same cap keeps this board in routing's cache scope so routing can reuse it.
+                passlistMaximumStops: HafasRealtimeRoutingProvider.routingPasslistMaximumStops
             )
         )
 
