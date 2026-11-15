@@ -197,6 +197,11 @@ Worst case per `generate`: 1 warm-up + 3 authoritative scans. Window doubling re
 
 ## 5. RAPTOR kernel
 
+> **Since 15 November 2026 the default kernel is range-McRAPTOR** (`RangeRaptor`, picked by `RoutingKernel`; engine `41534f0`). This
+> section describes the profile kernel (`Raptor.search`), which stays behind `ROUTING_KERNEL=profile` until it is deleted, and INV-8 and
+> `ROUTING_VERIFY_KERNEL` apply to it only. The range kernel, its equivalence harness and its open regressions are described in
+> `benchmarks/range-mcraptor-kernel-2026-11-15/`.
+
 ### 5.1 Variant
 - Rounds = vehicle rides; `maxRounds = maxTransfers + 1 = 4`.
 - Each stop keeps a **profile of up to 48 labels** (`Raptor.profileWidth`), not one earliest arrival. One forward pass covers a whole window of departures.

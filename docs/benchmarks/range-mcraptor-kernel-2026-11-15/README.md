@@ -1,6 +1,6 @@
 # Range-McRAPTOR kernel: equivalence at scale and the default switch (15 November 2026)
 
-**Verdict.** The range kernel is ready to replace the profile kernel, and it is now the default on a local MobilitéitKit branch. On
+**Verdict.** The range kernel is ready to replace the profile kernel. It is now the default on MobilitéitKit `main` (`41534f0`), and the app pins that commit. On
 **1,800 random queries** (3 seeds × 300, each with and without synthetic realtime), every journey the profile kernel can publish is matched or
 beaten by one the range kernel can publish: **missing = 0**. The range kernel finds about **twice as many** Pareto journeys. Within a session, a search
 takes a median of **11.6 ms** against **31.4 ms** for the profile kernel on 10 workers, with p90 84 against
@@ -11,13 +11,14 @@ difference. Open issues:
 - rail-preference queries still have tails of 600–770 ms, as long as the profile kernel's;
 - this feed cannot exercise wheelchair or bike queries.
 
-**Recommendation:** review the branch, then push it and bump the app's pin. Run the app on the Mac or the Simulator, and keep the profile kernel
-behind `ROUTING_KERNEL=profile` until the owner has used the new one.
+**Status (15 November 2026).** The owner ran a Release build on their iPhone 13: their app branch `refactor/views-and-structure` with this
+engine. They found it much quicker, with good routes, and approved the merge. The branch went to MobilitéitKit `main` (`a152c0f..41534f0`),
+and the app's pin moved from `a152c0f` to `41534f0`. The profile kernel stays behind `ROUTING_KERNEL=profile` until it is deleted (next step 4).
 
 | | |
 |---|---|
-| Engine | MobilitéitKit branch `range-mcraptor-kernel` (local, not pushed, head `41534f0`), base `830726a` plus the prototype `fd28443`. Commits: `cbcf317` kernel behind a flag, `fe23a11` tight changes / preferred-mode classes / ties, `cf9fbc7` kernel-specific test expectations, `f5cd2f1` relaxed changes and later rows, `4121c1c` harness timings, `3d2ee1e` publishable fronts in the harness, `daf4e81` stay-aboard walks, `db63ac3` continuations past the window's end, `1d5b10d` range kernel by default, `41534f0` installed worker and shard tests on the profile kernel |
-| App | Pin untouched (`c4f4b70`). No app code changed. The pin bump also brings 17 engine commits between `c4f4b70` and `830726a` |
+| Engine | MobilitéitKit `main` at `41534f0` (pushed 15 November 2026 from branch `range-mcraptor-kernel`), base `830726a` plus the prototype `fd28443`. Commits: `cbcf317` kernel behind a flag, `fe23a11` tight changes / preferred-mode classes / ties, `cf9fbc7` kernel-specific test expectations, `f5cd2f1` relaxed changes and later rows, `4121c1c` harness timings, `3d2ee1e` publishable fronts in the harness, `daf4e81` stay-aboard walks, `db63ac3` continuations past the window's end, `1d5b10d` range kernel by default, `41534f0` installed worker and shard tests on the profile kernel |
+| App | Pin `41534f0` (was `a152c0f`). No app code changed. The bump also brings `830726a`, which starts a batch's new board requests before the boards that join one already in flight |
 | Network | None. No ATP, relay or walking-service requests. Walks are the harness's deterministic straight-line stand-in |
 | Raw results | `equivalence-results.json` (per query: front sizes, missing and gained journeys, timings, published pages), `run.txt` (the six console logs) |
 
@@ -36,8 +37,8 @@ The prototype write-up (`../range-mcraptor-prototype-2026-11-14/`) proposed five
    closed stops. Rows whose alighting differs are boarded too (`f5cd2f1`). Horizon widening is the session's existing doubling up to 24 hours,
    unchanged.
 4. **Equivalence at scale**: this document.
-5. **Switch the default** (`1d5b10d`). The profile kernel stays, selectable by flag, until the owner has used the range kernel in the app.
-   Delete it only after that review.
+5. **Switch the default** (`1d5b10d`). The profile kernel stays, selectable by flag. The owner has now used the range kernel in the app (see
+   Status), so it can be deleted once the follow-ups below have landed.
 
 ## What the harness checks
 
@@ -188,16 +189,16 @@ By preference profile, non-empty queries without realtime (median warm against p
 
 ## Next steps
 
-1. **Review, then push and bump the pin.** Pushing the engine branch and bumping the app's MobilitéitKit pin need the owner's go-ahead. The bump also
-   brings the 17 engine commits already on `main` after `c4f4b70`.
-2. **Prepare at launch.** The app should call `TransitRouter.prepareRoutingKernel()` once the router exists, so the first search doesn't wait for
-   the footpath table. Until it is ready, a search waits for it (`footpathWait` is nil), so results don't depend on timing.
-3. **Try it in the app** on the Mac or the Simulator, with live boards, and compare pages with `ROUTING_KERNEL=profile`.
-4. **Work on the two regressions.**
+1. **Prepare at launch.** The app should call `TransitRouter.prepareRoutingKernel()` once the router exists, so the first search doesn't wait for
+   the footpath table. Until it is ready, a search waits for it (`footpathWait` is nil), so results don't depend on timing. The cost of building it
+   from the app's stored transfer walks on the phone has not been measured.
+2. **Compare pages in the app** with live boards against `ROUTING_KERNEL=profile`, on the Mac or the Simulator. The owner's trial on the phone
+   covered speed and route quality by eye, not a page-by-page comparison.
+3. **Work on the two regressions.**
    - Realtime: patch only the rows a realtime batch touches, instead of copying the timetable.
    - One-transfer queries: departure iterations dominate. Pruning iterations by the existing ride bounds is one option to measure.
-5. **Delete the profile kernel** after the owner's review: `RaptorSearch` with its compact profile, pattern and reference scans and its
-   parallel merge, and the fallback in `RangeRaptor.Engine`.
+4. **Delete the profile kernel**: `RaptorSearch` with its compact profile, pattern and reference scans and its parallel merge, and the fallback in
+   `RangeRaptor.Engine`. The engine tests that pin `routingKernel: .profile` (the installed worker and shard tests) go with it.
 
 ## Reproduce
 
